@@ -13,88 +13,137 @@
 
 <div class="container">
   <div class="row">
-    <div class="col">
+    <div class="col-5">
       <h1>Funny Movies</h1>
     </div>
-    <div class="col" style="margin-top: 10px;">
+    <div class="col-7" style="margin-top: 10px;">
       <form>
        <div class="row">
-          <div class="form-group col-4">
+          <div id ="wcJoin" class="form-gr oup col-6">Welcome nguyenhuuca@gmailcom</div>
+          <div id = "grUser" class="form-gr oup col-3">
             <input type="text"  placeholder="User name"  class="form-control" id="usr">
           </div>
-          <div class="form-group col-4">
+          <div id = "grPass" class="form-group col-3">
             <input type="password" placeholder="Password" class="form-control" id="pwd">
           </div>
-          <div class="form-group col-4">
-            <button type="button" class="btn btn-light">Login</button>
-            <button type="button" class="btn btn-light">Register</button>
+          <div class="form-group col-6">
+            <button id = "shareBtn" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#shareModal">Share a movie</button>
+            <button id = "loginBtn" onclick="joinSystem()" type="button" class="btn btn-light">Register / Login</button>
+            <button id = "logoutBtn" onclick="logout()" type="button" class="btn btn-light">Logout</button>
+         
           </div>
        </div>
       </form>
     </div>
   </div>
   <hr></hr>
-  <div class="row">
-    <!-- 16:9 aspect ratio -->
-    <div class="col-6">
-      <div class="ratio ratio-16x9">
-        <iframe src="https://www.youtube.com/embed/h_GqRV-SZmU" allowfullscreen></iframe>
+  <div id = "list-video">  
+  </div>
+  <div class="modal fade" id="shareModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="shareModalLabel">Share a Youtube movie</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="message-text" class="col-form-label">Youtube URL:</label>
+              <input class="form-control" id="message-text"></input>
+            </div>
+            <div class="mb-3">
+              <button style="width: 100%;"type="button" class="btn btn-primary" onclick="share()">Share</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-    <div class="col-6">
-      <div>{Movie title}</div>
-      <div>Shared by:</div>
-      <div>
-        <p style="float: left; margin-right: 10px;">123<i class="fas fa-thumbs-up"></i></p>
-        <p>100<i class="fas fa-thumbs-down"></i></p>
-      </div>
-      <div>Description:</div>
-      <p>
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum
-      </p>
     </div>
   </div>
-</br>
-  <div class="row">
-    <!-- 16:9 aspect ratio -->
-    <div class="col-6">
-      <div class="ratio ratio-16x9">
-        <iframe src="https://www.youtube.com/embed/h_GqRV-SZmU" allowfullscreen></iframe>
+</div>
+  <script>
+    function VideoObj(userShared, title, src, desc) {
+          this.userShared = userShared;
+          this.title = title;
+          this.src = src;
+          this.desc = desc;
+    };
+
+    function share() {
+      console.log("update db");
+
+    };
+
+    function joinSystem() {
+      console.log("join system");
+
+      $("#shareBtn").show();
+      $("#logoutBtn").show();
+      $("#wcJoin").show();
+
+      $("#loginBtn").hide()
+      $("#grUser").hide()
+      $("#grPass").hide()
+
+    };
+
+    function logout() {
+      console.log("logout system");
+      init();
+      $("#loginBtn").show()
+
+    };
+
+
+    function init() {
+      $("#shareBtn").hide();
+      $("#logoutBtn").hide();
+      $("#wcJoin").hide();
+
+      $("#grUser").show()
+      $("#grPass").show()
+    }
+      // template list
+    function loadTemplate() {
+      return ` <div class="row">
+      <!-- 16:9 aspect ratio -->
+      <div class="col-6">
+        <div class="ratio ratio-16x9">
+          <iframe src="{{linkYotube}}" allowfullscreen></iframe>
+        </div>
+      </div>
+      <div class="col-6">
+        <div style="color:red; font-weight:bold;">{{movi_title}}</div>
+        <div>Shared by:{{userName}}</div>
+        <div>
+          <p style="float: left; margin-right: 10px;">123<i class="fas fa-thumbs-up"></i></p>
+          <p>100<i class="fas fa-thumbs-down"></i></p>
+        </div>
+        <div>Description:</div>
+        <p>{{desc}}</p>
       </div>
     </div>
-    <div class="col-6">
-      <div>{Movie title}</div>
-      <div>Shared by:</div>
-      <div>
-        <p style="float: left; margin-right: 10px;">123<i class="fas fa-thumbs-up"></i></p>
-        <p>100<i class="fas fa-thumbs-down"></i></p>
-      </div>
-      <div>Description:</div>
-      <p>
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum
-      </p>
-    </div>
-  </div>
-</br>
-  <div class="row">
-    <!-- 16:9 aspect ratio -->
-    <div class="col-6">
-      <div class="ratio ratio-16x9">
-        <iframe src="https://www.youtube.com/embed/h_GqRV-SZmU" allowfullscreen></iframe>
-      </div>
-    </div>
-    <div class="col-6">
-      <div>{Movie title}</div>
-      <div>Shared by:</div>
-      <div>
-        <p style="float: left; margin-right: 10px;">123<i class="fas fa-thumbs-up"></i></p>
-        <p>100<i class="fas fa-thumbs-down"></i></p>
-      </div>
-      <div>Description:</div>
-      <p>
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum
-      </p>
-    </div>
-  </div>
+    </br>`;
+    }
+  </script>
+
+  <script>
+    var data = [];
+    init();
+    const video1 = new VideoObj("canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
+    const video2 = new VideoObj("canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
+    const video3 = new VideoObj("canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
+    data.push(video1);
+    data.push(video2);
+    data.push(video3);
+    data.forEach(item => {
+      var stringHtml = loadTemplate();
+      stringHtml = stringHtml.replace("{{linkYotube}}", item.src);
+      stringHtml = stringHtml.replace("{{movi_title}}", item.title);
+      stringHtml = stringHtml.replace("{{userName}}", item.userShared);
+      stringHtml = stringHtml.replace("{{desc}}", item.desc);
+      $('#list-video').append(stringHtml);
+    });
+  </script>
 </body>
 </html>
