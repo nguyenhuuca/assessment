@@ -5,7 +5,10 @@ import com.canhlabs.assessment.repo.UserRepo;
 import com.canhlabs.assessment.service.UserService;
 import com.canhlabs.assessment.share.dto.LoginDto;
 import com.canhlabs.assessment.share.dto.UserInfoDto;
+import com.canhlabs.assessment.share.exception.CustomException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
@@ -44,6 +46,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserInfoDto joinSystem(LoginDto loginDto) {
+        validate(loginDto);
         User user = userRepo.findAllByUserName(loginDto.getEmail());
         if(user != null) {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
@@ -56,6 +59,15 @@ public class UserServiceImpl implements UserService {
         newUser = userRepo.save(newUser);
         return toUserInfo(newUser);
 
+    }
+
+    private void validate(LoginDto loginDto) {
+        if(StringUtils.isEmpty(loginDto.getEmail()) || StringUtils.isEmpty(loginDto.getPassword())) {
+            throw  CustomException.builder()
+                    .message("Field is not empty")
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build();
+        }
     }
 
     @Override

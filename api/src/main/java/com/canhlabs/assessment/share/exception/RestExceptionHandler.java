@@ -204,9 +204,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ResultErrorInfo> handleCustomException(CustomException ex) {
+    public ResponseEntity<Object> handleCustomException(CustomException ex) {
+        Error error = new Error(BAD_REQUEST);
+        error.setMessage(ex.getMessage());
         log.error(ex.getMessage());
-        return ResponseEntity.status(ex.getStatus()).body(ex.buildErrorMessage());
+        return buildResponseEntity(error);
     }
 
 }
