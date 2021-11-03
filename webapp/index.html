@@ -62,7 +62,8 @@
   </div>
 </div>
   <script>
-    function VideoObj(userShared, title, src, desc) {
+    function VideoObj(id, userShared, title, src, desc) {
+          this.id = id;
           this.userShared = userShared;
           this.title = title;
           this.src = src;
@@ -94,6 +95,22 @@
 
     };
 
+    function voteUp(element) {
+      var id = $(element).attr("id");
+      var idItem = "#"+ id.split("_")[0] + "_" + "upCount";
+      var val= $(idItem).text();
+      val = parseInt(val) + 1;
+      $(idItem).text(val);
+    };
+
+    function voteDown(element) {
+      var id = $(element).attr("id");
+      var idItem = "#"+ id.split("_")[0] + "_" + "downCount";
+      var val = $(idItem).text();
+      val = parseInt(val) - 1;
+      $(idItem).text(val);
+    };
+
 
     function init() {
       $("#shareBtn").hide();
@@ -114,10 +131,17 @@
       </div>
       <div class="col-6">
         <div style="color:red; font-weight:bold;">{{movi_title}}</div>
-        <div>Shared by:{{userName}}</div>
         <div>
-          <p style="float: left; margin-right: 10px;">123<i class="fas fa-thumbs-up"></i></p>
-          <p>100<i class="fas fa-thumbs-down"></i></p>
+          <div style = "float:left; width:200px;">Shared by:{{userName}}</div>
+          <div>
+            <span id = "{{id_upVote}}" onclick = "voteUp(this)"><i class="far fa-thumbs-up fa-2x"></i></span>
+            <span id = "{{id_downVote}}" onclick = "voteDown(this)""><i class="far fa-thumbs-down fa-2x"></i></span>  
+          </div> 
+          
+        </div>
+        <div>
+          <span id = "{{id_upCount}}" style="float: left; margin-right: 10px;">123</span><span><i class="far fa-thumbs-up"></i></span>
+          <span id = {{id_downCount}}>100</span> <span><i class="far fa-thumbs-down"></i></span>
         </div>
         <div>Description:</div>
         <p>{{desc}}</p>
@@ -130,9 +154,9 @@
   <script>
     var data = [];
     init();
-    const video1 = new VideoObj("canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
-    const video2 = new VideoObj("canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
-    const video3 = new VideoObj("canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
+    const video1 = new VideoObj(1, "nguyenhuuca", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
+    const video2 = new VideoObj(2, "canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
+    const video3 = new VideoObj(3, "canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
     data.push(video1);
     data.push(video2);
     data.push(video3);
@@ -142,6 +166,10 @@
       stringHtml = stringHtml.replace("{{movi_title}}", item.title);
       stringHtml = stringHtml.replace("{{userName}}", item.userShared);
       stringHtml = stringHtml.replace("{{desc}}", item.desc);
+      stringHtml = stringHtml.replace("{{id_upCount}}", item.id +"_upCount");
+      stringHtml = stringHtml.replace("{{id_downCount}}", item.id+"_downCount");
+      stringHtml = stringHtml.replace("{{id_upVote}}", item.id+"_upVote");
+      stringHtml = stringHtml.replace("{{id_downVote}}", item.id+"_downVote");
       $('#list-video').append(stringHtml);
     });
   </script>
