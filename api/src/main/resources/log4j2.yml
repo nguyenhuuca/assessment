@@ -1,0 +1,57 @@
+Configuration:
+  status: info
+
+  appenders:
+    Console:
+      name: LogToConsole
+      PatternLayout:
+        Pattern: " %highlight{[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n}"
+        DisableAnsi: "false"
+
+    RollingFile:
+      - name: LogToRollingFile
+        fileName: ${env:LOG_DIR:-./logs}/assessment.log
+        filePattern: "${env:LOG_DIR:-./logs}/archive/$${date:yyyy-MM}/assessment-%d{MM-dd-yyyy}-%i.log.gz"
+        PatternLayout:
+          pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
+        Policies:
+          sizeBasedTriggeringPolicy:
+             size: 50MB
+          TimeBasedTriggeringPolicy:
+             interval: 1
+        DefaultRollOverStrategy:
+          max: 15
+
+  Loggers:
+    logger:
+      - name: com.canhlabs
+        level: "${env:LOG_DIR:-INFO}"
+        additivity: false
+        AppenderRef:
+          - ref: LogToConsole
+          - ref: LogToRollingFile
+      - name: org.springframework
+        level: "${env:LOG_DIR:-INFO}"
+        additivity: false
+        AppenderRef:
+          - ref: LogToConsole
+          - ref: LogToRollingFile
+      - name: org.hibernate
+        level: info
+        additivity: false
+        AppenderRef:
+          - ref: LogToConsole
+          - ref: LogToRollingFile
+#       - name: org.hibernate.type.descriptor.sql
+#         level: trace
+#         additivity: false
+#         AppenderRef:
+#           - ref: LogToConsole
+#           - ref: LogToRollingFile
+    Root:
+      level: "${env:LOG_DIR:-INFO}"
+      AppenderRef:
+        - ref: LogToConsole
+        - ref: LogToRollingFile
+        
+        

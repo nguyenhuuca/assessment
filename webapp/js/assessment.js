@@ -1,4 +1,11 @@
-
+$.ajaxSetup({
+    headers:{
+        'Authorization': localStorage.getItem("jwt")
+    }
+})
+var appConst = {
+    baseUrl: "http://localhost:8081/v1/assessment"
+}
 /**
  * Using to holed video objct
  * @param {*} id : id video after share
@@ -37,22 +44,33 @@ function share() {
  */
 function joinSystem() {
     console.log("join system");
+    var userObj = {
+        email: $("#usr").val(),
+        password: $("#pwd").val()
+    }
 
-    $("#shareBtn").show();
-    $("#logoutBtn").show();
-    $("#wcJoin").show();
+    $.ajax({
+        url: appConst.baseUrl.concat("/join"),
+        type: "POST",
+        data: JSON.stringify(userObj),
+        contentType: "application/json",
+        dataType: "json"
+    }).done(function(rs) {
+        proceesLoginSuccess(rs.data);
+    }).fail(function(err) {
+        $("#messageInfo").text(err.responseJSON.error.message);
+        $("#messageInfo").show();
+    });
+}
 
-    $("#loginBtn").hide()
-    $("#grUser").hide()
-    $("#grPass").hide()
-
-};
 
 /**
  * Using to remove jwt token, and user can login again
  */
 function logout() {
     console.log("logout system");
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("user");
     init();
     $("#loginBtn").show()
 
@@ -88,10 +106,19 @@ function voteDown(element) {
 function init() {
     $("#shareBtn").hide();
     $("#logoutBtn").hide();
-    $("#wcJoin").hide();
+    $("#messageInfo").hide();
 
     $("#grUser").show()
     $("#grPass").show()
+    // check user login befor
+    if(localStorage.getItem("jwt")) {
+        const data = {
+            jwt: localStorage.getItem("jwt"),
+            user: JSON.parse(localStorage.getItem("user"))
+        }
+        proceesLoginSuccess(data);
+
+    }
 }
 
 /**
@@ -165,3 +192,17 @@ function mockData() {
       $('#list-video').append(stringHtml);
     });
 }
+
+function proceesLoginSuccess(data) {
+    $("#shareBtn").show();
+    $("#logoutBtn").show();
+    $("#messageInfo").text(` Welcome ${data.user.email}`);
+    $("#messageInfo").show();
+    $("#loginBtn").hide();
+    $("#grUser").hide();
+    $("#grPass").hide();
+    // save jwt
+    localStorage.setItem('jwt', data.jwt);
+    localStorage.setItem('user', JSON.stringify(data.user));
+}
+
