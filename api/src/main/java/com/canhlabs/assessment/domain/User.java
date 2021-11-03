@@ -4,8 +4,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -24,6 +27,14 @@ public class User extends BaseDomain {
 
     @Column(name = "password")
     private String password;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
 
 }

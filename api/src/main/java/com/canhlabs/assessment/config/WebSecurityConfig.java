@@ -18,8 +18,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         AppConstant.WebIgnoringConfig.WHITE_LIST_PATH.forEach(item -> web.ignoring().antMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()));
-        // backward compatible
-        web.ignoring().antMatchers(HttpMethod.GET, "/v1/operations/sso/verify/**");
     }
 
 
@@ -32,7 +30,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(AppConstant.WebIgnoringConfig.SWAGGER_DOC.toArray(new String[0])).permitAll()
                 .anyRequest().permitAll()
-                //.csrf().disable()
+                .and()
+                .csrf().disable()
                 ;
 
         // set session stateless policy

@@ -27,14 +27,27 @@ function VideoObj(id, userShared, title, src, desc) {
  */
 function share() {
     console.log("update db");
-    var url = $("#urlYoutube").val();
-    console.log(url);
-
-    const video1 = new VideoObj(1, "nguyenhuuca", "Test share", "https://youtube.com/embed/tMui4IVW0BM", 'This is new video');
-    var stringHtml = bindingDataWhenLoad(video1, loadTemplate());
-    $("#list-video").prepend(stringHtml);
-
-
+    var link = $("#urlYoutube").val();
+    var shareObj = {
+        url: link
+    }
+    $.ajax({
+        url: appConst.baseUrl.concat("/share-links"),
+        type: "POST",
+        data: JSON.stringify(shareObj),
+        contentType: "application/json",
+        dataType: "json"
+    }).done(function(rs) {
+        var videoInfo = rs.data;
+        console.log(videoInfo);
+        const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
+        var stringHtml = bindingDataWhenLoad(video, loadTemplate());
+        $("#list-video").prepend(stringHtml);
+    }).fail(function(err) {
+        $("#messageInfo").text(err.responseJSON.error.message);
+        $("#messageInfo").show();
+    });
+   
 };
 
 /**
@@ -179,18 +192,29 @@ function bindingDataWhenLoad(videoObj, templateHtml) {
  */
 function mockData() {
     var data = [];
-    const video1 = new VideoObj(1, "nguyenhuuca", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
-    const video2 = new VideoObj(2, "canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
-    const video3 = new VideoObj(3, "canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
-    data.push(video1);
-    data.push(video2);
-    data.push(video3);
-
-    data.forEach(item => {
-      var templateHtml = loadTemplate();
-      stringHtml = bindingDataWhenLoad(item, templateHtml); 
-      $('#list-video').append(stringHtml);
+    $.ajax({
+        url: appConst.baseUrl.concat("/share-links"),
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json"
+    }).done(function(rs) {
+        var videoInfoList = rs.data;
+        console.log(videoInfoList);
+        videoInfoList.forEach(videoInfo => {
+            const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
+            data.push(video);
+        });
+        data.forEach(item => {
+            var templateHtml = loadTemplate();
+            stringHtml = bindingDataWhenLoad(item, templateHtml); 
+            $('#list-video').append(stringHtml);
+          });
+    }).fail(function(err) {
+        $("#messageInfo").text(err.responseJSON.error.message);
+        $("#messageInfo").show();
     });
+
+   
 }
 
 function proceesLoginSuccess(data) {

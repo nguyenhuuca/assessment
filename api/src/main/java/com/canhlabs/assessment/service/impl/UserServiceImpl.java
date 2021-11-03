@@ -8,7 +8,6 @@ import com.canhlabs.assessment.share.dto.UserInfoDto;
 import com.canhlabs.assessment.share.exception.CustomException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -65,7 +64,6 @@ public class UserServiceImpl implements UserService {
         if(StringUtils.isEmpty(loginDto.getEmail()) || StringUtils.isEmpty(loginDto.getPassword())) {
             throw  CustomException.builder()
                     .message("Field is not empty")
-                    .status(HttpStatus.BAD_REQUEST)
                     .build();
         }
     }
