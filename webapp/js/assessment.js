@@ -20,6 +20,13 @@ function VideoObj(id, userShared, title, src, desc) {
  */
 function share() {
     console.log("update db");
+    var url = $("#urlYoutube").val();
+    console.log(url);
+
+    const video1 = new VideoObj(1, "nguyenhuuca", "Test share", "https://youtube.com/embed/tMui4IVW0BM", 'This is new video');
+    var stringHtml = bindingDataWhenLoad(video1, loadTemplate());
+    $("#list-video").prepend(stringHtml);
+
 
 };
 
@@ -138,4 +145,23 @@ function bindingDataWhenLoad(videoObj, templateHtml) {
     stringHtml = stringHtml.replace("{{id_upVote}}", videoObj.id+"_upVote");
     stringHtml = stringHtml.replace("{{id_downVote}}", videoObj.id+"_downVote");
     return stringHtml;
+}
+
+/**
+ * 
+ */
+function mockData() {
+    var data = [];
+    const video1 = new VideoObj(1, "nguyenhuuca", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
+    const video2 = new VideoObj(2, "canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
+    const video3 = new VideoObj(3, "canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
+    data.push(video1);
+    data.push(video2);
+    data.push(video3);
+
+    data.forEach(item => {
+      var templateHtml = loadTemplate();
+      stringHtml = bindingDataWhenLoad(item, templateHtml); 
+      $('#list-video').append(stringHtml);
+    });
 }

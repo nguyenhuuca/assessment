@@ -53,7 +53,7 @@
           <form>
             <div class="mb-3">
               <label for="message-text" class="col-form-label">Youtube URL:</label>
-              <input class="form-control" id="message-text"></input>
+              <input class="form-control" id="urlYoutube"></input>
             </div>
             <div class="mb-3">
               <button style="width: 100%;"type="button" class="btn btn-primary" onclick="share()">Share</button>
@@ -67,21 +67,8 @@
 
   <script>
     // load all when init page
-    var data = [];
     init();
-    const video1 = new VideoObj(1, "nguyenhuuca", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
-    const video2 = new VideoObj(2, "canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
-    const video3 = new VideoObj(3, "canh", "Test share", "https://www.youtube.com/embed/h_GqRV-SZmU", 'This is new video');
-    data.push(video1);
-    data.push(video2);
-    data.push(video3);
-
-    data.forEach(item => {
-      var templateHtml = loadTemplate();
-      stringHtml = bindingDataWhenLoad(item, templateHtml); 
-      $('#list-video').append(stringHtml);
-    });
-    
+    mockData();
   </script>
 </body>
 </html>
