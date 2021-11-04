@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface ShareLinkRepo extends JpaRepository<ShareLink, Long> {
     @NotNull
-    List<ShareLink> findAll();
+    List<ShareLink> findByOrderByCreatedAtDesc();
 }

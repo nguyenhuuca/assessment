@@ -19,7 +19,7 @@ loadEnv
 
 
 # java option configure.
-JAVA_OPT="${MAX_HEAP} ${MIN_HEAP} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=../logs/heap_dump.hprof"
+JAVA_OPT="${MAX_HEAP} ${MIN_HEAP} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=logs/heap_dump.hprof"
 echo "java option configure:"
 echo "${JAVA_OPT}"
 
@@ -27,13 +27,13 @@ echo "" > logs/assessment.log
 
 
 ## in case rung jar file
-nohup $JAVA_HOME/bin/java $JAVA_OPT -jar assessment-1.0-SNAPSHOT.jar > /dev/null 2>&1 & echo  "$!" > ./pid/assessment.pid
+nohup $JAVA_HOME/bin/java $JAVA_OPT -jar assessment-1.0.0.jar > /dev/null 2>&1 & echo  "$!" > pid/assessment.pid
 
 i=0
 while [ $i -lt 5 ]
 do
 
-    if grep -q "Tomcat started on port(s)" ./logs/assessment.log;
+    if grep -q "Tomcat started on port(s)" logs/assessment.log;
         then
             echo "Started FunnyApp"
             echo "process id:$!"

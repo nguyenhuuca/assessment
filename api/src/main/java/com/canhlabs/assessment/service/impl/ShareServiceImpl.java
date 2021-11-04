@@ -66,7 +66,7 @@ public class ShareServiceImpl implements ShareService {
 
     @Override
     public List<VideoDto> getALLShare() {
-        List<ShareLink> shareLinks = shareLinkRepo.findAll();
+        List<ShareLink> shareLinks = shareLinkRepo.findByOrderByCreatedAtDesc();
         return Converter.videoDtoList(shareLinks);
     }
 

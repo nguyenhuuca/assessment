@@ -4,8 +4,8 @@ $.ajaxSetup({
     }
 })
 var appConst = {
-    baseUrl: "http://localhost:8081/v1/assessment"
-    //baseUrl: "https://canh-labs.com/api/v1/assessment"
+    //baseUrl: "http://localhost:8081/v1/assessment"
+    baseUrl: "https://canh-labs.com/api/v1/assessment"
 }
 /**
  * Using to holed video object
@@ -27,7 +27,7 @@ function VideoObj(id, userShared, title, src, desc) {
  * Using to share youtubue url
  */
 function share() {
-    console.log("update db");
+    $("#shareSpinner").show();
     var link = $("#urlYoutube").val();
     var shareObj = {
         url: link
@@ -44,10 +44,13 @@ function share() {
         const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
         var stringHtml = bindingDataWhenLoad(video, loadTemplate());
         $("#list-video").prepend(stringHtml);
+        $("#shareSpinner").hide();
         $('#shareModal').modal('hide')
+
     }).fail(function(err) {
         $("#errMsg").text(err.responseJSON.error.message);
         $("#errMsg").show();
+        $("#shareSpinner").hide();
     });
    
 };
@@ -58,7 +61,7 @@ function share() {
  * Need to handle some error
  */
 function joinSystem() {
-    console.log("join system");
+    $("#loginSpinner").show();
     var userObj = {
         email: $("#usr").val(),
         password: $("#pwd").val()
@@ -75,6 +78,7 @@ function joinSystem() {
     }).fail(function(err) {
         $("#errMsg").text(err.responseJSON.error.message);
         $("#errMsg").show();
+        $("#loginSpinner").hide();
     });
 }
 
@@ -119,6 +123,8 @@ function voteDown(element) {
  * When load page, need to init state for some element on page
  */
 function initState() {
+    $("#loginSpinner").hide();
+    $("#shareSpinner").hide();
     $("#shareBtn").hide();
     $("#logoutBtn").hide();
     $("#messageInfo").hide();
@@ -228,6 +234,7 @@ function proceesLoginSuccess(data) {
     $("#messageInfo").text(` Welcome ${data.user.email}`);
     $("#messageInfo").show();
     $("#loginBtn").hide();
+    $("#loginSpinner").hide();
     $("#grUser").hide();
     $("#grPass").hide();
     $("#errMsg").hide();

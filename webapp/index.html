@@ -29,8 +29,13 @@
             <input type="password" placeholder="Password" class="form-control" id="pwd">
           </div>
           <div class="app-header__form-item">
-            <button id = "shareBtn" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#shareModal">Share a movie</button>
-            <button id = "loginBtn" onclick="joinSystem()" type="button" class="btn btn-light">Register / Login</button>
+            <button id = "shareBtn" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#shareModal">
+              Share a movie
+            </button>
+            <button id = "loginBtn" onclick="joinSystem()" type="button" class="btn btn-light">
+              <span id ="loginSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+               Register / Login
+            </button>
             <button id = "logoutBtn" onclick="logout()" type="button" class="btn btn-light">Logout</button>
           </div>
         </form>
@@ -54,7 +59,10 @@
               <input class="form-control" id="urlYoutube"></input>
             </div>
             <div class="mb-3">
-              <button style="width: 100%;"type="button" class="btn btn-primary" onclick="share()">Share</button>
+              <button style="width: 100%;"type="button" class="btn btn-light" onclick="share()">
+                <span id ="shareSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Share
+              </button>
             </div>
           </form>
         </div>
