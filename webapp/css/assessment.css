@@ -1,6 +1,19 @@
-.app-top-header{
-    margin-top: 10px;
+.app-container {
+    padding: 20px 0;
+  }
+  
+.app-container .app-header,
+.app-container .app-header .app-header__form {
+display: flex;
+align-items: center;
 }
-.app-form-login {
-    text-align: right;
+
+.app-container .app-header .app-header__wrapper {
+flex: 1;
 }
+
+.app-container .app-header .app-header__form .app-header__form-item {
+flex: 1;
+margin: 0 10px;
+}
+  

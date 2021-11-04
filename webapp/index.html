@@ -14,31 +14,28 @@
 </head>
 <body>
 
-<div class="container">
-  <div class="row">
-    <div class="col-5">
-      <h1>Funny Movies</h1>
-    </div>
-    <div class="col-7 app-top-header">
-      <form>
-       <div class="row">
-          <div id ="messageInfo" class="form-gr oup col-6">Welcome nguyenhuuca@gmailcom</div>
-          <div id = "grUser" class="form-gr oup col-3">
+  <div class="container app-container">
+    <div class="row app-header">
+      <div class="app-header__wrapper">
+        <h1>Funny Movies</h1>
+      </div>
+      <div class="app-header__wrapper">
+        <form class="app-header__form">
+          <div id ="messageInfo" class="app-header__form-item">Welcome nguyenhuuca@gmailcom</div>
+          <div id = "grUser" class = "app-header__form-item">
             <input type="text"  placeholder="User name"  class="form-control" id="usr">
           </div>
-          <div id = "grPass" class="form-group col-3">
+          <div id = "grPass" class="app-header__form-item">
             <input type="password" placeholder="Password" class="form-control" id="pwd">
           </div>
-          <div class="form-group col-6 app-form-login">
+          <div class="app-header__form-item">
             <button id = "shareBtn" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#shareModal">Share a movie</button>
             <button id = "loginBtn" onclick="joinSystem()" type="button" class="btn btn-light">Register / Login</button>
             <button id = "logoutBtn" onclick="logout()" type="button" class="btn btn-light">Logout</button>
-         
           </div>
-       </div>
-      </form>
+        </form>
+      </div>
     </div>
-  </div>
   <hr></hr>
   <div id = "list-video">  
   </div>
