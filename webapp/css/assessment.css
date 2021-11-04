@@ -4,16 +4,38 @@
   
 .app-container .app-header,
 .app-container .app-header .app-header__form {
-display: flex;
-align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .app-container .app-header .app-header__wrapper {
-flex: 1;
+    flex: 1;
 }
 
 .app-container .app-header .app-header__form .app-header__form-item {
-flex: 1;
-margin: 0 10px;
+    flex: 1;
+    margin: 0 10px;
+}
+
+.app-error-msg {
+    text-align: right;
+    margin-top: -15px;
+    margin-bottom: 10px;
+    color:red;
+}
+
+.app-wrap-desc {
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 250px;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+}
+.app-title {
+    margin-bottom: 5px;
+    font-weight: 600;
 }
   

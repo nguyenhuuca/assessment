@@ -5,7 +5,9 @@ import com.canhlabs.assessment.repo.ShareLinkRepo;
 import com.canhlabs.assessment.repo.UserRepo;
 import com.canhlabs.assessment.service.ShareService;
 import com.canhlabs.assessment.share.AppProperties;
+import com.canhlabs.assessment.share.AppUtils;
 import com.canhlabs.assessment.share.dto.ShareRequestDto;
+import com.canhlabs.assessment.share.dto.UserDetailDto;
 import com.canhlabs.assessment.share.dto.VideoDto;
 import com.canhlabs.assessment.share.exception.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -58,6 +60,7 @@ public class ShareServiceImpl implements ShareService {
         ShareLink shareLink = toEntity(videoDto);
         shareLink = shareLinkRepo.save(shareLink);
         videoDto.setId(shareLink.getId());
+        videoDto.setUserShared(shareLink.getUser().getUserName());
         return videoDto;
     }
 
@@ -122,12 +125,16 @@ public class ShareServiceImpl implements ShareService {
     }
 
     private ShareLink toEntity(VideoDto videoDto) {
+        UserDetailDto currentUser = AppUtils.getCurrentUser();
+        if(currentUser == null) {
+            throw  CustomException.builder().message("Error get current user").build();
+        }
         return ShareLink.builder()
                 .title(videoDto.getTitle())
                 .desc(videoDto.getDesc())
                 .embedLink(videoDto.getEmbedLink())
                 .urlLink(videoDto.getUrlLink())
-                .user(userRepo.findAllById(1L))
+                .user(userRepo.findAllById(currentUser.getId()))
                 .build();
     }
 }

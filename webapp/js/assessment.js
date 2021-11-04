@@ -4,8 +4,8 @@ $.ajaxSetup({
     }
 })
 var appConst = {
-    //baseUrl: "http://localhost:8081/v1/assessment"
-    baseUrl: "https://canh-labs.com/api/v1/assessment"
+    baseUrl: "http://localhost:8081/v1/assessment"
+    //baseUrl: "https://canh-labs.com/api/v1/assessment"
 }
 /**
  * Using to holed video object
@@ -44,9 +44,10 @@ function share() {
         const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
         var stringHtml = bindingDataWhenLoad(video, loadTemplate());
         $("#list-video").prepend(stringHtml);
+        $('#shareModal').modal('hide')
     }).fail(function(err) {
-        $("#messageInfo").text(err.responseJSON.error.message);
-        $("#messageInfo").show();
+        $("#errMsg").text(err.responseJSON.error.message);
+        $("#errMsg").show();
     });
    
 };
@@ -72,8 +73,8 @@ function joinSystem() {
     }).done(function(rs) {
         proceesLoginSuccess(rs.data);
     }).fail(function(err) {
-        $("#messageInfo").text(err.responseJSON.error.message);
-        $("#messageInfo").show();
+        $("#errMsg").text(err.responseJSON.error.message);
+        $("#errMsg").show();
     });
 }
 
@@ -121,6 +122,7 @@ function initState() {
     $("#shareBtn").hide();
     $("#logoutBtn").hide();
     $("#messageInfo").hide();
+    $("#errMsg").hide();
 
     $("#grUser").show()
     $("#grPass").show()
@@ -151,7 +153,9 @@ function loadTemplate() {
         <div class="col-6">
         <div style="color:red; font-weight:bold;">{{movi_title}}</div>
         <div>
-            <div style = "float:left; width:200px;">Shared by:{{userName}}</div>
+            <div style = "float:left; width:200px;">
+               <div style = "float:left;font-weight: 600;">Shared by:&nbsp;</div> <div>{{userName}}</div>
+            </div>
             <div>
             <span id = "{{id_upVote}}" onclick = "voteUp(this)"><i class="far fa-thumbs-up fa-2x"></i></span>
             <span id = "{{id_downVote}}" onclick = "voteDown(this)""><i class="far fa-thumbs-down fa-2x"></i></span>  
@@ -159,11 +163,11 @@ function loadTemplate() {
             
         </div>
         <div>
-            <span id = "{{id_upCount}}" style="float: left; margin-right: 10px;">123</span><span><i class="far fa-thumbs-up"></i></span>
-            <span id = {{id_downCount}}>100</span> <span><i class="far fa-thumbs-down"></i></span>
+            <span id = "{{id_upCount}}" style="float: left; margin-right: 10px;">0</span><span><i class="far fa-thumbs-up"></i></span>
+            <span id = {{id_downCount}}>0</span> <span><i class="far fa-thumbs-down"></i></span>
         </div>
-        <div>Description:</div>
-        <p>{{desc}}</p>
+        <div class = "app-title">Description:</div>
+        <pre class = "app-wrap-desc">{{desc}}</pre>
         </div>
     </div>
     </br>
@@ -212,8 +216,8 @@ function loadData() {
             $('#list-video').append(stringHtml);
         });
     }).fail(function(err) {
-        $("#messageInfo").text(err.responseJSON.error.message);
-        $("#messageInfo").show();
+        $("#errMsg").text(err.responseJSON.error.message);
+        $("#errMsg").show();
     });
 
 }
@@ -226,8 +230,14 @@ function proceesLoginSuccess(data) {
     $("#loginBtn").hide();
     $("#grUser").hide();
     $("#grPass").hide();
+    $("#errMsg").hide();
     // save jwt
     localStorage.setItem('jwt', data.jwt);
     localStorage.setItem('user', JSON.stringify(data.user));
+    $.ajaxSetup({
+        headers:{
+            'Authorization': localStorage.getItem("jwt")
+        }
+    })
 }
 

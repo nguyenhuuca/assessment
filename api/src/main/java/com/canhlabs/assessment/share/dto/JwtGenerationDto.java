@@ -5,11 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@Getter
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserDetailDto extends BaseDto{
-    private Long id;
-    private String email;
+@AllArgsConstructor
+@Getter
+public class JwtGenerationDto extends BaseDto {
+    private Long duration; // millisecond
+    private UserDetailDto payload;
 }

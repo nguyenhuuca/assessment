@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 
 public class Converter {
     private Converter(){}
-    public static UserInfoDto toUserInfo(User user) {
+    public static UserInfoDto toUserInfo(User user, String token) {
         return UserInfoDto.builder()
-                .jwt("test")
+                .jwt(token)
                 .user(toUserDetail(user))
                 .build();
     }

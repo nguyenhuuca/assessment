@@ -39,7 +39,7 @@ public class AssessmentController extends  BaseController{
         UserInfoDto rs = userService.joinSystem(loginDto);
         return new ResponseEntity<>(ResultObjectInfo.<UserInfoDto>builder()
                 .status(ResultStatus.SUCCESS)
-                .data((UserInfoDto) rs)
+                .data(rs)
                 .build(), HttpStatus.OK);
     }
 

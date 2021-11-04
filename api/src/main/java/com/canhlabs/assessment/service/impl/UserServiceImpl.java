@@ -3,7 +3,11 @@ package com.canhlabs.assessment.service.impl;
 import com.canhlabs.assessment.domain.User;
 import com.canhlabs.assessment.repo.UserRepo;
 import com.canhlabs.assessment.service.UserService;
+import com.canhlabs.assessment.share.AppUtils;
+import com.canhlabs.assessment.share.JwtProvider;
+import com.canhlabs.assessment.share.dto.JwtGenerationDto;
 import com.canhlabs.assessment.share.dto.LoginDto;
+import com.canhlabs.assessment.share.dto.UserDetailDto;
 import com.canhlabs.assessment.share.dto.UserInfoDto;
 import com.canhlabs.assessment.share.exception.CustomException;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +30,13 @@ import static com.canhlabs.assessment.service.impl.Converter.toUserInfo;
 public class UserServiceImpl implements UserService {
     private UserRepo userRepo;
     private PasswordEncoder bCrypt;
+    private JwtProvider jwtProvider;
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    public void injectJwt(JwtProvider jwtProvider) {
+        this.jwtProvider = jwtProvider;
+    }
     @Autowired
     public void injectAuth(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
@@ -51,21 +61,13 @@ public class UserServiceImpl implements UserService {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
                     loginDto.getPassword());
             authenticationManager.authenticate(authenticationToken);
-            return toUserInfo(user);
+            return toUserInfo(user, getToken(user));
         }
         // create new user
         User  newUser = toEntity(loginDto);
         newUser = userRepo.save(newUser);
-        return toUserInfo(newUser);
+        return toUserInfo(newUser, getToken(newUser));
 
-    }
-
-    private void validate(LoginDto loginDto) {
-        if(StringUtils.isEmpty(loginDto.getEmail()) || StringUtils.isEmpty(loginDto.getPassword())) {
-            throw  CustomException.builder()
-                    .message("Field is not empty")
-                    .build();
-        }
     }
 
     @Override
@@ -83,6 +85,26 @@ public class UserServiceImpl implements UserService {
                 .userName(loginDto.getEmail())
                 .password(bCrypt.encode(loginDto.getPassword()))
                 .build();
+    }
+
+    private String getToken(User user) {
+        return jwtProvider.generateToken(JwtGenerationDto.builder()
+                .payload(UserDetailDto.builder().id(user.getId()).email(user.getUserName()).build())
+                .build()).getToken();
+    }
+
+    private void validate(LoginDto loginDto) {
+        if(StringUtils.isEmpty(loginDto.getEmail()) || StringUtils.isEmpty(loginDto.getPassword())) {
+            throw  CustomException.builder()
+                    .message("Field is not empty")
+                    .build();
+        }
+
+        if(!AppUtils.isValidEmail(loginDto.getEmail())) {
+            throw  CustomException.builder()
+                    .message("Invalid email")
+                    .build();
+        }
     }
 
 }

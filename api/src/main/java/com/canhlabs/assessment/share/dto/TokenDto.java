@@ -7,9 +7,8 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserDetailDto extends BaseDto{
-    private Long id;
-    private String email;
+@AllArgsConstructor
+public class TokenDto extends BaseDto {
+    private String token;
 }

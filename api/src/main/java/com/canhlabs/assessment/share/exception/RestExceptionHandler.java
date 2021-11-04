@@ -211,4 +211,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Object> handleUnauthorizedException(UnauthorizedException ex) {
+        Error apiError = new Error(BAD_REQUEST);
+        apiError.setMessage(ex.getMessage());
+        log.error(ex.getMessage(), ex);
+        return buildResponseEntity(apiError);
+    }
+
 }
