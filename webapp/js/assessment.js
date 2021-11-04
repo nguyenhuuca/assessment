@@ -116,6 +116,7 @@ function voteDown(element) {
     var idItem = "#"+ id.split("_")[0] + "_" + "downCount";
     var val = $(idItem).text();
     val = parseInt(val) - 1;
+    val = val >= 0 ? val : 0;
     $(idItem).text(val);
 };
 
@@ -159,7 +160,7 @@ function loadTemplate() {
         <div class="col-6">
         <div style="color:red; font-weight:bold;">{{movi_title}}</div>
         <div>
-            <div style = "float:left; width:200px;">
+            <div style = "float:left; width:250px;">
                <div style = "float:left;font-weight: 600;">Shared by:&nbsp;</div> <div>{{userName}}</div>
             </div>
             <div>
@@ -199,7 +200,7 @@ function bindingDataWhenLoad(videoObj, templateHtml) {
 }
 
 /**
- * 
+ * Using to get all link share when page is loaded
  */
 function loadData() {
     var data = [];

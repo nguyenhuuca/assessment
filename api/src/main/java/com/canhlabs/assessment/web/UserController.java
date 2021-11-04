@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = {AppConstant.API.TAG_API})
 @Validated
 @Slf4j
-public class AssessmentController extends  BaseController{
+public class UserController extends  BaseController{
 
     private UserService userService;
 

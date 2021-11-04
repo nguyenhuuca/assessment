@@ -44,7 +44,6 @@ public class ShareServiceImpl implements ShareService {
     }
 
 
-
     @Autowired
     public void injectProp(AppProperties props){
         this.props = props;
@@ -70,6 +69,11 @@ public class ShareServiceImpl implements ShareService {
         return Converter.videoDtoList(shareLinks);
     }
 
+    /**
+     * Using to parse url post from user and get video info from youtube
+     * @param link post by user
+     * @return video info
+     */
     private VideoDto getInfoFromYoutube(String link) {
         VideoDto videoDto = null;
         try {
@@ -79,11 +83,19 @@ public class ShareServiceImpl implements ShareService {
             videoDto = requestYouTube(link,videoId);
             log.info(videoId);
         } catch (Exception ex) {
-            log.error(ex.getMessage());
+            throw  CustomException.builder()
+                    .message("Cannot get video info")
+                    .build();
         }
         return videoDto;
     }
 
+    /**
+     * Using RestTemplate to mask rest api to googleapi with api key
+     * @param link url post by user
+     * @param videoId detect from link
+     * @return video info
+     */
     private VideoDto requestYouTube(String link, String videoId) throws JsonProcessingException {
         RestTemplate rest = new RestTemplate();
         String url = API_GOOGLE +
@@ -108,6 +120,11 @@ public class ShareServiceImpl implements ShareService {
                 .build();
     }
 
+    /**
+     * Map to hold key and value of query param
+     * @param query theo query string follow fromat: a1=v1&=a2=v2....
+     * @return hashmap
+     */
     private Map<String, String> getQueryParam(String query) {
         String[] params = query.split("&");
         Map<String, String> map = new HashMap<>();

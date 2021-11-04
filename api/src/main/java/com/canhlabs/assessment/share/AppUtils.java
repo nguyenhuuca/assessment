@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.regex.Pattern;
 
 public class AppUtils {
+    @SuppressWarnings("squid:S5998")
     static final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\."+
             "[a-zA-Z0-9_+&*-]+)*@" +
             "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
