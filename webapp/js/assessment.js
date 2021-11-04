@@ -4,10 +4,11 @@ $.ajaxSetup({
     }
 })
 var appConst = {
-    baseUrl: "http://localhost:8081/v1/assessment"
+    //baseUrl: "http://localhost:8081/v1/assessment"
+    baseUrl: "https://canh-labs.com/api/v1/assessment"
 }
 /**
- * Using to holed video objct
+ * Using to holed video object
  * @param {*} id : id video after share
  * @param {*} userShared: userShare 
  * @param {*} title: title video
@@ -84,7 +85,7 @@ function logout() {
     console.log("logout system");
     localStorage.removeItem("jwt");
     localStorage.removeItem("user");
-    init();
+    initState();
     $("#loginBtn").show()
 
 };
@@ -116,7 +117,7 @@ function voteDown(element) {
 /**
  * When load page, need to init state for some element on page
  */
-function init() {
+function initState() {
     $("#shareBtn").hide();
     $("#logoutBtn").hide();
     $("#messageInfo").hide();
@@ -190,7 +191,7 @@ function bindingDataWhenLoad(videoObj, templateHtml) {
 /**
  * 
  */
-function mockData() {
+function loadData() {
     var data = [];
     $.ajax({
         url: appConst.baseUrl.concat("/share-links"),
@@ -200,21 +201,21 @@ function mockData() {
     }).done(function(rs) {
         var videoInfoList = rs.data;
         console.log(videoInfoList);
-        videoInfoList.forEach(videoInfo => {
+        videoInfoList.forEach(videoInfo =>{
             const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
             data.push(video);
         });
+        
         data.forEach(item => {
             var templateHtml = loadTemplate();
             stringHtml = bindingDataWhenLoad(item, templateHtml); 
             $('#list-video').append(stringHtml);
-          });
+        });
     }).fail(function(err) {
         $("#messageInfo").text(err.responseJSON.error.message);
         $("#messageInfo").show();
     });
 
-   
 }
 
 function proceesLoginSuccess(data) {
