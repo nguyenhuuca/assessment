@@ -72,7 +72,7 @@ class ShareServiceTest {
                 .build();
         when(shareLinkRepo.save(ArgumentMatchers.any())).thenReturn(shareLink);
         //
-        when(props.getGoogleApiKey()).thenReturn("google api key");
+        when(props.getGoogleApiKey()).thenReturn( System.getenv("GOOGLE_KEY"));
         when(props.getGooglePart()).thenReturn("snippet,contentDetails,statistics,status");
         VideoDto rs = shareService.shareLink(shareRequestDto);
         Assertions.assertThat(rs.getUserShared()).isEqualTo("Ca1");
