@@ -85,6 +85,10 @@ function joinSystem() {
 
 /**
  * Using to remove jwt token, and user can login again
+ * I am using stateless web application, so not need to call to server to logout.
+ * Because jwt is Self-contained (Transparent token),
+ * In-case We want revoke this token on server, we need add this token to
+ * black list on server arter logout.
  */
 function logout() {
     console.log("logout system");

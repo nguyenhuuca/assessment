@@ -60,7 +60,7 @@ public class WebSwaggerConfig {
 
     private ApiInfo apiEndPointsInfo() {
         return new ApiInfoBuilder()
-                .title("API - Operation Dashboard")
+                .title("API - Funny Movies")
                 //.description(description)
                 .contact(new Contact("ca", "www.canhlabs.com", "noemail@email.com "))
                 //.license("Apache 2.0")
