@@ -35,7 +35,7 @@ cd api
 `http://localhost:8081/actutor/health`
 
 #### To visit the  web LocalHost:
-`Change baseURL in webapp/jsassesement.js to http://localhost:8081/v1/assessment`
+`Change baseURL in webapp/js/assesement.js to http://localhost:8081/v1/assessment`
 
 `Open webapp/index.html`
 
