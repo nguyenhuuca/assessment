@@ -125,6 +125,19 @@ function voteDown(element) {
 };
 
 /**
+ * Using to delete video that user have just added
+ * @param {*} element 
+ */
+function deleteVideos(element) {
+    var id = $(element).attr("id");
+    var idItem = "#"+ id.split("_")[0] + "_row";
+    console.log(id);
+    console.log(idItem);
+    $(idItem).remove();
+
+};
+
+/**
  * When load page, need to init state for some element on page
  */
 function initState() {
@@ -154,7 +167,7 @@ function initState() {
  */
 function loadTemplate() {
     return `
-    <div class="row">
+    <div class="row" id = "{{id_row}}">
         <!-- 16:9 aspect ratio -->
         <div class="col-6">
         <div class="ratio ratio-16x9">
@@ -168,10 +181,16 @@ function loadTemplate() {
                <div style = "float:left;font-weight: 600;">Shared by:&nbsp;</div> <div>{{userName}}</div>
             </div>
             <div>
-            <span id = "{{id_upVote}}" onclick = "voteUp(this)"><i class="far fa-thumbs-up fa-2x"></i></span>
-            <span id = "{{id_downVote}}" onclick = "voteDown(this)""><i class="far fa-thumbs-down fa-2x"></i></span>  
+                <span id = "{{id_upVote}}" onclick = "voteUp(this)"><i class="app-pointer far fa-thumbs-up fa-2x"></i></span>
+                <span id = "{{id_downVote}}" onclick = "voteDown(this)""><i class="app-pointer far fa-thumbs-down fa-2x"></i></span>  
+                <div style = "float:right;">
+                    <span id = "{{id_del_item}}" onclick = "deleteVideos(this)">
+                        <i style = "color:red;" class="app-pointer fas fa-trash-alt"></i>
+                    </span>
+                </div>
             </div> 
-            
+           
+           
         </div>
         <div>
             <span id = "{{id_upCount}}" style="float: left; margin-right: 10px;">0</span><span><i class="far fa-thumbs-up"></i></span>
@@ -199,7 +218,9 @@ function bindingDataWhenLoad(videoObj, templateHtml) {
     stringHtml = stringHtml.replace("{{id_upCount}}", videoObj.id +"_upCount");
     stringHtml = stringHtml.replace("{{id_downCount}}", videoObj.id+"_downCount");
     stringHtml = stringHtml.replace("{{id_upVote}}", videoObj.id+"_upVote");
+    stringHtml = stringHtml.replace("{{id_del_item}}", videoObj.id + "_del_item")
     stringHtml = stringHtml.replace("{{id_downVote}}", videoObj.id+"_downVote");
+    stringHtml = stringHtml.replace("{{id_row}}", videoObj.id + "_row");
     return stringHtml;
 }
 

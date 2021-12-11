@@ -1,6 +1,7 @@
 package com.canhlabs.assessment.service.impl;
 
 import com.canhlabs.assessment.domain.ShareLink;
+import com.canhlabs.assessment.domain.User;
 import com.canhlabs.assessment.repo.ShareLinkRepo;
 import com.canhlabs.assessment.repo.UserRepo;
 import com.canhlabs.assessment.service.ShareService;
@@ -15,13 +16,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -31,7 +35,12 @@ public class ShareServiceImpl implements ShareService {
     private AppProperties props;
     private ShareLinkRepo shareLinkRepo;
     private UserRepo userRepo;
+    private KafkaTemplate<String, String> template;
 
+    @Autowired
+    public void injectKafka(KafkaTemplate<String, String> template) {
+        this.template = template;
+    }
     @Autowired
     public void injectShareLink(ShareLinkRepo shareLinkRepo){
         this.shareLinkRepo = shareLinkRepo;
@@ -69,13 +78,39 @@ public class ShareServiceImpl implements ShareService {
         return Converter.videoDtoList(shareLinks);
     }
 
+    @Override
+    public void sendInfo(String message) {
+        template.send("topic1", message);
+
+    }
+
+    /**
+     *
+     * @param id of videos
+     */
+    @Transactional
+    @Override
+    public void deleteVideo(Long id) {
+        Optional<ShareLink> video = shareLinkRepo.findById(id);
+        if(video.isPresent()) {
+            User user = video.get().getUser();
+           if(!user.getId().equals(AppUtils.getCurrentUserId())){
+               throw CustomException.builder()
+
+                       .message("Only delete video that you created")
+                       .build();
+           }
+           shareLinkRepo.delete(video.get());
+        }
+    }
+
     /**
      * Using to parse url post from user and get video info from youtube
      * @param link post by user
      * @return video info
      */
     private VideoDto getInfoFromYoutube(String link) {
-        VideoDto videoDto = null;
+        VideoDto videoDto;
         try {
             URL url = new URL(link);
             Map<String, String> map = getQueryParam(url.getQuery());

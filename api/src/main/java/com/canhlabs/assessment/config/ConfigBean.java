@@ -1,9 +1,11 @@
 package com.canhlabs.assessment.config;
 
+import org.apache.kafka.clients.admin.NewTopic;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
@@ -33,5 +35,13 @@ public class ConfigBean {
                         .allowedMethods("POST, PUT, GET, OPTIONS, DELETE");
             }
         };
+    }
+
+    @Bean
+    public NewTopic topic() {
+        return TopicBuilder.name("topic1")
+                .partitions(1)
+                .replicas(1)
+                .build();
     }
 }

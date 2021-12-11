@@ -25,6 +25,16 @@ public class AppUtils {
         }
         return (detail instanceof UserDetailDto) ? (UserDetailDto) detail : null;
     }
+
+    public static Long getCurrentUserId() {
+        UserDetailDto userDetailDto =  getCurrentUser();
+        if(userDetailDto!=null) {
+            return userDetailDto.getId();
+        }
+        return 0L;
+
+
+    }
     public static boolean isValidEmail(String email) {
         if (email == null)
             return false;

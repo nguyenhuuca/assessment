@@ -35,6 +35,7 @@ public class AppConstant {
         }
         public static final List<PathObject> WHITE_LIST_PATH = List.of(
                 PathObject.builder().path("/join").method(HttpMethod.POST.name()).build(),
+                PathObject.builder().path("/send-info").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().path("/share-links").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/health").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build()

@@ -20,5 +20,16 @@ public interface ShareService {
      */
     List<VideoDto> getALLShare();
 
+    /**
+     * using kafka to send message to other system
+     */
+    void sendInfo(String message);
 
+
+    /**
+     * Using to delete video that shared by user.
+     * User only delete video that user created before, not video of other user.
+     * @param id of videos
+     */
+    void deleteVideo(Long id);
 }

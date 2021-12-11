@@ -56,4 +56,27 @@ public class ShareLinkController {
                 .data(rs)
                 .build(), HttpStatus.OK);
     }
+
+    @DeleteMapping("share-links/{id}")
+    public ResponseEntity<ResultObjectInfo<String>> deleteVideos(@PathVariable Long id) {
+        shareService.deleteVideo(id);
+        return new ResponseEntity<>(ResultObjectInfo.<String>builder()
+                .status(ResultStatus.SUCCESS)
+                .data("")
+                .build(), HttpStatus.OK);
+
+    }
+
+    /**
+     * Get all shared link return to client
+     * @return detail of video that user shared
+     */
+    @PostMapping("/send-info")
+    public ResponseEntity<ResultObjectInfo<String>> sendInfo(@RequestBody String message) {
+        shareService.sendInfo(message);
+        return new ResponseEntity<>(ResultObjectInfo.<String>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(message)
+                .build(), HttpStatus.OK);
+    }
 }
