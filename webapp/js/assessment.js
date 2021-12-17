@@ -4,8 +4,8 @@ $.ajaxSetup({
     }
 })
 var appConst = {
-    //baseUrl: "http://localhost:8081/v1/assessment"
-    baseUrl: "https://canh-labs.com/api/v1/assessment"
+    baseUrl: "http://localhost:8081/v1/assessment"
+    //baseUrl: "https://canh-labs.com/api/v1/assessment"
 }
 /**
  * Using to holed video object
@@ -129,11 +129,22 @@ function voteDown(element) {
  * @param {*} element 
  */
 function deleteVideos(element) {
-    var id = $(element).attr("id");
-    var idItem = "#"+ id.split("_")[0] + "_row";
+    var id = $(element).attr("id")[0];
+    var idItem = "#"+ id + "_row";
     console.log(id);
     console.log(idItem);
     $(idItem).remove();
+    $.ajax({
+        url: appConst.baseUrl.concat("/share-links/"+id),
+        type: 'DELETE'
+    }).done(function(rs) {
+      console.log(rs);
+
+    }).fail(function(err) {
+        $("#errMsg").text(err.responseJSON.error.message);
+        $("#errMsg").show();
+        $("#shareSpinner").hide();
+    });
 
 };
 

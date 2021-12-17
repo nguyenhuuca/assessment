@@ -3,7 +3,6 @@ package com.canhlabs.assessment.service.impl;
 import com.canhlabs.assessment.domain.User;
 import com.canhlabs.assessment.repo.UserRepo;
 import com.canhlabs.assessment.service.UserService;
-import com.canhlabs.assessment.share.AppUtils;
 import com.canhlabs.assessment.share.JwtProvider;
 import com.canhlabs.assessment.share.dto.JwtGenerationDto;
 import com.canhlabs.assessment.share.dto.LoginDto;
@@ -60,7 +59,7 @@ public class UserServiceImpl implements UserService {
         if(user != null) {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
                     loginDto.getPassword());
-            authenticationManager.authenticate(authenticationToken);
+            authenticationManager. authenticate(authenticationToken);
             return toUserInfo(user, getToken(user));
         }
         // create new user
@@ -100,11 +99,11 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
 
-        if(!AppUtils.isValidEmail(loginDto.getEmail())) {
-            throw  CustomException.builder()
-                    .message("Invalid email")
-                    .build();
-        }
+//        if(!AppUtils.isValidEmail(loginDto.getEmail())) {
+//            throw  CustomException.builder()
+//                    .message("Invalid email")
+//                    .build();
+//        }
     }
 
 }
