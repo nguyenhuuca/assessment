@@ -37,7 +37,8 @@ public class AppConstant {
                 PathObject.builder().path("/join").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().path("/share-links").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/health").method(HttpMethod.GET.name()).build(),
-                PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build()
+                PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build(),
+                PathObject.builder().path("/thread/**").method(HttpMethod.GET.name()).build()
 
         );
         public static final String[] WHITE_LIST_URLS =

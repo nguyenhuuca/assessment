@@ -7,7 +7,7 @@
 # Hibernate - SQL configure
 spring.jpa.hibernate.ddl-auto=none
 spring.jpa.show-sql=true
-spring.main.allow-circular-references=true
+#spring.main.allow-circular-references=true
 spring.jpa.properties.hibernate.format_sql=true
 # spring.sql.init.enabled=true
 server.port=${SERVER_PORT:8081}
@@ -34,3 +34,7 @@ app.jwt-secret-key=${JWT_SECRET:12345678901234567890123456789012}
 # google api key
 app.google-api-key=${GOOGLE_KEY}
 app.google-part=snippet,contentDetails,statistics,status
+springdoc.api-docs.path=/v3/api-docs
+springdoc.swagger-ui.path=/swagger-ui/index.html
+springdoc.swagger-ui.enabled=true
+springdoc.show-actuator=true

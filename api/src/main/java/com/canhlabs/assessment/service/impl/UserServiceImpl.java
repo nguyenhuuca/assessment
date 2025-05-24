@@ -12,9 +12,11 @@ import com.canhlabs.assessment.share.dto.UserInfoDto;
 import com.canhlabs.assessment.share.exception.CustomException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,7 +30,6 @@ import java.util.Set;
 import static com.canhlabs.assessment.service.impl.Converter.toUserInfo;
 
 @Service
-@Lazy
 public class UserServiceImpl implements UserService {
     private UserRepo userRepo;
     private PasswordEncoder bCrypt;
@@ -39,11 +40,11 @@ public class UserServiceImpl implements UserService {
     public void injectJwt(JwtProvider jwtProvider) {
         this.jwtProvider = jwtProvider;
     }
+    @Lazy
     @Autowired
     public void injectAuth(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
-
 
     @Autowired
     public  void injectData(UserRepo userRepo) {
