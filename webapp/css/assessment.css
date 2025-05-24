@@ -1,7 +1,29 @@
+/* Dark mode styles */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --card-bg: #ffffff;
+    --border-color: #dee2e6;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --card-bg: #2d2d2d;
+    --border-color: #404040;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
 .app-container {
     padding: 20px 0;
-  }
-  
+    background-color: var(--bg-color);
+}
+
 .app-container .app-header,
 .app-container .app-header .app-header__form {
     display: flex;
@@ -33,9 +55,335 @@
     white-space: -pre-wrap;
     white-space: -o-pre-wrap;
     word-wrap: break-word;
+    color: var(--text-color);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
 }
 .app-title {
     margin-bottom: 5px;
     font-weight: 600;
+}
+
+.app-header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.app-header h1 {
+    color: var(--text-color);
+}
+
+.form-control {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.form-control:focus {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.btn-light {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.btn-light:hover {
+    background-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 20px 25px;
+    background-color: var(--card-bg);
+    border-radius: 15px 15px 0 0;
+}
+
+.modal-header .modal-title {
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-body .form-label {
+    color: var(--text-color);
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.modal-body .form-control {
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.modal-body .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+}
+
+.modal-body .btn-share {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.modal-body .btn-share:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.modal-body .btn-share:active {
+    transform: translateY(0);
+}
+
+.modal-body .btn-share .spinner-border {
+    margin-right: 8px;
+}
+
+.btn-close {
+    color: var(--text-color);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+/* Modal animation */
+.modal.fade .modal-dialog {
+    transform: scale(0.8);
+    transition: transform 0.3s ease-in-out;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    background-color: var(--border-color);
+}
+
+.theme-toggle i {
+    color: var(--text-color);
+    font-size: 1.2rem;
+}
+
+/* Like and Dislike buttons styling */
+.vote-buttons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 10px 0;
+}
+
+.vote-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.vote-button:hover {
+    background-color: var(--border-color);
+    transform: translateY(-2px);
+}
+
+.vote-button i {
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.vote-button:hover i {
+    transform: scale(1.1);
+}
+
+.vote-count {
+    font-weight: 600;
+    min-width: 30px;
+    text-align: center;
+}
+
+/* Update the template styles */
+.vote-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 10px 0;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 10px;
+    }
+
+    .app-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .app-header__wrapper {
+        width: 100%;
+    }
+
+    .app-header__form {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .app-header__form-item {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .app-header h1 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    /* Video list responsive */
+    .row {
+        margin: 0;
+    }
+
+    .col-6 {
+        width: 100%;
+        padding: 0;
+    }
+
+    /* Make video container full width */
+    .ratio-16x9 {
+        margin-bottom: 15px;
+    }
+
+    /* Adjust vote buttons for mobile */
+    .vote-container {
+        justify-content: center;
+        margin: 15px 0;
+    }
+
+    .vote-button {
+        padding: 8px 15px;
+    }
+
+    /* Adjust description for mobile */
+    .app-wrap-desc {
+        max-height: 150px;
+        font-size: 0.9rem;
+    }
+
+    /* Adjust modal for mobile */
+    .modal-dialog {
+        margin: 10px;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    /* Adjust theme toggle button for mobile */
+    .theme-toggle {
+        top: 10px;
+        right: 10px;
+        width: 35px;
+        height: 35px;
+    }
+
+    /* Adjust form controls for mobile */
+    .form-control {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    /* Make buttons more touch-friendly */
+    .btn {
+        padding: 10px 15px;
+        font-size: 1rem;
+    }
+
+    /* Adjust spacing for mobile */
+    .app-title {
+        margin-top: 15px;
+    }
+
+    /* Make shared by text more readable on mobile */
+    .app-header__form-item div {
+        font-size: 0.9rem;
+    }
+}
+
+/* Additional styles for very small screens */
+@media (max-width: 480px) {
+    .app-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .vote-button {
+        padding: 6px 12px;
+    }
+
+    .modal-header {
+        padding: 15px;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
+}
+
+/* Fix for landscape orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+    .modal-dialog {
+        margin: 5px auto;
+    }
+
+    .app-wrap-desc {
+        max-height: 100px;
+    }
 }
   

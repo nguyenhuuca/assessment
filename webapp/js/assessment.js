@@ -4,8 +4,9 @@ $.ajaxSetup({
     }
 })
 let appConst = {
-    baseUrl: "http://localhost:8081/v1/assessment"
-    //baseUrl: "https://canh-labs.com/api/v1/assessment"
+    baseUrl: "http://localhost:8081/v1/assessment",
+    //baseUrl: "https://canh-labs.com/api/v1/assessment",
+    offlineMode: true  // Flag to control offline/online mode
 }
 /**
  * Using to holed video object
@@ -32,28 +33,43 @@ function share() {
     let shareObj = {
         url: link
     }
-    $.ajax({
-        url: appConst.baseUrl.concat("/share-links"),
-        type: "POST",
-        data: JSON.stringify(shareObj),
-        contentType: "application/json",
-        dataType: "json"
-    }).done(function(rs) {
-        let videoInfo = rs.data;
-        console.log(videoInfo);
-        const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
+
+    if (appConst.offlineMode) {
+        // Mock response for offline mode
+        const mockVideoInfo = {
+            id: Date.now().toString(),
+            userShared: JSON.parse(localStorage.getItem("user"))?.email || "anonymous@example.com",
+            title: "Shared Video " + Date.now(),
+            embedLink: link,
+            desc: "Shared in offline mode"
+        };
+        const video = new VideoObj(mockVideoInfo.id, mockVideoInfo.userShared, mockVideoInfo.title, mockVideoInfo.embedLink, mockVideoInfo.desc);
         let stringHtml = bindingDataWhenLoad(video, loadTemplate());
         $("#list-video").prepend(stringHtml);
         $("#shareSpinner").hide();
-        $('#shareModal').modal('hide')
-
-    }).fail(function(err) {
-        $("#errMsg").text(err.responseJSON.error.message);
-        $("#errMsg").show();
-        $("#shareSpinner").hide();
-    });
-   
-};
+        $('#shareModal').modal('hide');
+    } else {
+        $.ajax({
+            url: appConst.baseUrl.concat("/share-links"),
+            type: "POST",
+            data: JSON.stringify(shareObj),
+            contentType: "application/json",
+            dataType: "json"
+        }).done(function(rs) {
+            let videoInfo = rs.data;
+            console.log(videoInfo);
+            const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
+            let stringHtml = bindingDataWhenLoad(video, loadTemplate());
+            $("#list-video").prepend(stringHtml);
+            $("#shareSpinner").hide();
+            $('#shareModal').modal('hide')
+        }).fail(function(err) {
+            $("#errMsg").text(err.responseJSON.error.message);
+            $("#errMsg").show();
+            $("#shareSpinner").hide();
+        });
+    }
+}
 
 /**
  * User can login or register incase is new user
@@ -67,19 +83,30 @@ function joinSystem() {
         password: $("#pwd").val()
     }
 
-    $.ajax({
-        url: appConst.baseUrl.concat("/join"),
-        type: "POST",
-        data: JSON.stringify(userObj),
-        contentType: "application/json",
-        dataType: "json"
-    }).done(function(rs) {
-        proceesLoginSuccess(rs.data);
-    }).fail(function(err) {
-        $("#errMsg").text(err.responseJSON.error.message);
-        $("#errMsg").show();
-        $("#loginSpinner").hide();
-    });
+    if (appConst.offlineMode) {
+        // Mock login response for offline mode
+        const mockData = {
+            jwt: "mock-jwt-token",
+            user: {
+                email: userObj.email
+            }
+        };
+        proceesLoginSuccess(mockData);
+    } else {
+        $.ajax({
+            url: appConst.baseUrl.concat("/join"),
+            type: "POST",
+            data: JSON.stringify(userObj),
+            contentType: "application/json",
+            dataType: "json"
+        }).done(function(rs) {
+            proceesLoginSuccess(rs.data);
+        }).fail(function(err) {
+            $("#errMsg").text(err.responseJSON.error.message);
+            $("#errMsg").show();
+            $("#loginSpinner").hide();
+        });
+    }
 }
 
 
@@ -99,16 +126,40 @@ function logout() {
 
 }
 
+// Add vote state tracking
+let voteStates = {};
+
 /**
  * Using to increase vote when click icon voteUp
  * @param {*} element hold the value of voteUp 
  */
 function voteUp(element) {
     let id = $(element).attr("id");
-    let idItem = "#"+ id.split("_")[0] + "_" + "upCount";
-    let val= $(idItem).text();
-    val = parseInt(val) + 1;
-    $(idItem).text(val);
+    let videoId = id.split("_")[0];
+    let upCountId = "#" + videoId + "_upCount";
+    let downCountId = "#" + videoId + "_downCount";
+    let currentState = voteStates[videoId] || 'none';
+    
+    // Reset previous state
+    if (currentState === 'down') {
+        let downVal = parseInt($(downCountId).text());
+        $(downCountId).text(Math.max(0, downVal - 1));
+    }
+    
+    // Update new state
+    if (currentState === 'up') {
+        let upVal = parseInt($(upCountId).text());
+        $(upCountId).text(Math.max(0, upVal - 1));
+        voteStates[videoId] = 'none';
+        $(element).find('i').removeClass('fas').addClass('far');
+    } else {
+        let upVal = parseInt($(upCountId).text());
+        $(upCountId).text(upVal + 1);
+        voteStates[videoId] = 'up';
+        $(element).find('i').removeClass('far').addClass('fas');
+        // Reset down vote if exists
+        $(`#${videoId}_downVote`).find('i').removeClass('fas').addClass('far');
+    }
 }
 
 /**
@@ -117,11 +168,31 @@ function voteUp(element) {
  */
 function voteDown(element) {
     let id = $(element).attr("id");
-    let idItem = "#"+ id.split("_")[0] + "_" + "downCount";
-    let val = $(idItem).text();
-    val = parseInt(val) - 1;
-    val = val >= 0 ? val : 0;
-    $(idItem).text(val);
+    let videoId = id.split("_")[0];
+    let upCountId = "#" + videoId + "_upCount";
+    let downCountId = "#" + videoId + "_downCount";
+    let currentState = voteStates[videoId] || 'none';
+    
+    // Reset previous state
+    if (currentState === 'up') {
+        let upVal = parseInt($(upCountId).text());
+        $(upCountId).text(Math.max(0, upVal - 1));
+    }
+    
+    // Update new state
+    if (currentState === 'down') {
+        let downVal = parseInt($(downCountId).text());
+        $(downCountId).text(Math.max(0, downVal - 1));
+        voteStates[videoId] = 'none';
+        $(element).find('i').removeClass('fas').addClass('far');
+    } else {
+        let downVal = parseInt($(downCountId).text());
+        $(downCountId).text(downVal + 1);
+        voteStates[videoId] = 'down';
+        $(element).find('i').removeClass('far').addClass('fas');
+        // Reset up vote if exists
+        $(`#${videoId}_upVote`).find('i').removeClass('fas').addClass('far');
+    }
 }
 
 /**
@@ -167,15 +238,16 @@ function loadTemplate() {
             <div style = "float:left; width:250px;">
                <div style = "float:left;font-weight: 600;">Shared by:&nbsp;</div> <div>{{userName}}</div>
             </div>
-            <div>
-            <span id = "{{id_upVote}}" onclick = "voteUp(this)"><i class="far fa-thumbs-up fa-2x"></i></span>
-            <span id = "{{id_downVote}}" onclick = "voteDown(this)""><i class="far fa-thumbs-down fa-2x"></i></span>  
-            </div> 
-            
         </div>
-        <div>
-            <span id = "{{id_upCount}}" style="float: left; margin-right: 10px;">0</span><span><i class="far fa-thumbs-up"></i></span>
-            <span id = {{id_downCount}}>0</span> <span><i class="far fa-thumbs-down"></i></span>
+        <div class="vote-container">
+            <div class="vote-button" id="{{id_upVote}}" onclick="voteUp(this)">
+                <i class="far fa-thumbs-up"></i>
+                <span class="vote-count" id="{{id_upCount}}">0</span>
+            </div>
+            <div class="vote-button" id="{{id_downVote}}" onclick="voteDown(this)">
+                <i class="far fa-thumbs-down"></i>
+                <span class="vote-count" id="{{id_downCount}}">0</span>
+            </div>
         </div>
         <div class = "app-title">Description:</div>
         <pre class = "app-wrap-desc">{{desc}}</pre>
@@ -203,34 +275,82 @@ function bindingDataWhenLoad(videoObj, templateHtml) {
     return stringHtml;
 }
 
+// Mock data for videos
+const mockVideos = [
+    {
+        id: "1",
+        userShared: "john.doe@example.com",
+        title: "Funny Cat Compilation 2024",
+        embedLink: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        desc: "A hilarious compilation of cats doing funny things!"
+    },
+    {
+        id: "2",
+        userShared: "jane.smith@example.com",
+        title: "Best Dog Moments",
+        embedLink: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        desc: "The most adorable and funny dog moments caught on camera"
+    },
+    {
+        id: "3",
+        userShared: "bob.wilson@example.com",
+        title: "Epic Fails 2024",
+        embedLink: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        desc: "The most epic fails of 2024 that will make you laugh"
+    }
+];
+
 /**
  * Using to get all link share when page is loaded
  */
 function loadData() {
     let data = [];
-    $.ajax({
-        url: appConst.baseUrl.concat("/share-links"),
-        type: "GET",
-        contentType: "application/json",
-        dataType: "json"
-    }).done(function(rs) {
-        let videoInfoList = rs.data;
-        console.log(videoInfoList);
-        videoInfoList.forEach(videoInfo =>{
-            const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
+    
+    if (appConst.offlineMode) {
+        // Use mock data in offline mode
+        mockVideos.forEach(videoInfo => {
+            const video = new VideoObj(
+                videoInfo.id,
+                videoInfo.userShared,
+                videoInfo.title,
+                videoInfo.embedLink,
+                videoInfo.desc
+            );
             data.push(video);
         });
-        
-        data.forEach(item => {
-            let templateHtml = loadTemplate();
-            let stringHtml = bindingDataWhenLoad(item, templateHtml);
-            $('#list-video').append(stringHtml);
+    } else {
+        // Use API in online mode
+        $.ajax({
+            url: appConst.baseUrl.concat("/share-links"),
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json"
+        }).done(function(rs) {
+            let videoInfoList = rs.data;
+            console.log(videoInfoList);
+            videoInfoList.forEach(videoInfo => {
+                const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
+                data.push(video);
+            });
+            
+            data.forEach(item => {
+                let templateHtml = loadTemplate();
+                let stringHtml = bindingDataWhenLoad(item, templateHtml);
+                $('#list-video').append(stringHtml);
+            });
+        }).fail(function(err) {
+            $("#errMsg").text(err.responseJSON.error.message);
+            $("#errMsg").show();
         });
-    }).fail(function(err) {
-        $("#errMsg").text(err.responseJSON.error.message);
-        $("#errMsg").show();
+        return; // Return early for API call since we'll append data in the done callback
+    }
+    
+    // For offline mode, append data immediately
+    data.forEach(item => {
+        let templateHtml = loadTemplate();
+        let stringHtml = bindingDataWhenLoad(item, templateHtml);
+        $('#list-video').append(stringHtml);
     });
-
 }
 
 function proceesLoginSuccess(data) {
@@ -251,5 +371,36 @@ function proceesLoginSuccess(data) {
             'Authorization': localStorage.getItem("jwt")
         }
     })
+}
+
+/**
+ * Initialize theme from localStorage or system preference
+ */
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.querySelector('.theme-toggle i').classList.replace('fa-moon', 'fa-sun');
+    }
+}
+
+/**
+ * Toggle between light and dark theme
+ */
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    const icon = document.querySelector('.theme-toggle i');
+    if (newTheme === 'dark') {
+        icon.classList.replace('fa-moon', 'fa-sun');
+    } else {
+        icon.classList.replace('fa-sun', 'fa-moon');
+    }
 }
 
