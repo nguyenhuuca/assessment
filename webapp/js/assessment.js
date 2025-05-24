@@ -3,17 +3,17 @@ $.ajaxSetup({
         'Authorization': localStorage.getItem("jwt")
     }
 })
-var appConst = {
+let appConst = {
     baseUrl: "http://localhost:8081/v1/assessment"
     //baseUrl: "https://canh-labs.com/api/v1/assessment"
 }
 /**
  * Using to holed video object
  * @param {*} id : id video after share
- * @param {*} userShared: userShare 
- * @param {*} title: title video
- * @param {*} src:  emper link
- * @param {*} desc: description 
+ * @param userShared
+ * @param title
+ * @param src
+ * @param desc
  */
 function VideoObj(id, userShared, title, src, desc) {
         this.id = id;
@@ -21,15 +21,15 @@ function VideoObj(id, userShared, title, src, desc) {
         this.title = title;
         this.src = src;
         this.desc = desc;
-};
+}
 
 /**
  * Using to share youtubue url
  */
 function share() {
     $("#shareSpinner").show();
-    var link = $("#urlYoutube").val();
-    var shareObj = {
+    let link = $("#urlYoutube").val();
+    let shareObj = {
         url: link
     }
     $.ajax({
@@ -39,10 +39,10 @@ function share() {
         contentType: "application/json",
         dataType: "json"
     }).done(function(rs) {
-        var videoInfo = rs.data;
+        let videoInfo = rs.data;
         console.log(videoInfo);
         const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
-        var stringHtml = bindingDataWhenLoad(video, loadTemplate());
+        let stringHtml = bindingDataWhenLoad(video, loadTemplate());
         $("#list-video").prepend(stringHtml);
         $("#shareSpinner").hide();
         $('#shareModal').modal('hide')
@@ -97,32 +97,32 @@ function logout() {
     initState();
     $("#loginBtn").show()
 
-};
+}
 
 /**
  * Using to increase vote when click icon voteUp
  * @param {*} element hold the value of voteUp 
  */
 function voteUp(element) {
-    var id = $(element).attr("id");
-    var idItem = "#"+ id.split("_")[0] + "_" + "upCount";
-    var val= $(idItem).text();
+    let id = $(element).attr("id");
+    let idItem = "#"+ id.split("_")[0] + "_" + "upCount";
+    let val= $(idItem).text();
     val = parseInt(val) + 1;
     $(idItem).text(val);
-};
+}
 
 /**
  * Using to decrease vote when click icon voteDown
  * @param {*} element hole the value of voteDown
  */
 function voteDown(element) {
-    var id = $(element).attr("id");
-    var idItem = "#"+ id.split("_")[0] + "_" + "downCount";
-    var val = $(idItem).text();
+    let id = $(element).attr("id");
+    let idItem = "#"+ id.split("_")[0] + "_" + "downCount";
+    let val = $(idItem).text();
     val = parseInt(val) - 1;
     val = val >= 0 ? val : 0;
     $(idItem).text(val);
-};
+}
 
 /**
  * When load page, need to init state for some element on page
@@ -192,7 +192,7 @@ function loadTemplate() {
  * @returns  string html after replace all data
  */
 function bindingDataWhenLoad(videoObj, templateHtml) {
-    var stringHtml = templateHtml.replace("{{linkYotube}}", videoObj.src);
+    let stringHtml = templateHtml.replace("{{linkYotube}}", videoObj.src);
     stringHtml = stringHtml.replace("{{movi_title}}", videoObj.title);
     stringHtml = stringHtml.replace("{{userName}}", videoObj.userShared);
     stringHtml = stringHtml.replace("{{desc}}", videoObj.desc);
@@ -207,14 +207,14 @@ function bindingDataWhenLoad(videoObj, templateHtml) {
  * Using to get all link share when page is loaded
  */
 function loadData() {
-    var data = [];
+    let data = [];
     $.ajax({
         url: appConst.baseUrl.concat("/share-links"),
         type: "GET",
         contentType: "application/json",
         dataType: "json"
     }).done(function(rs) {
-        var videoInfoList = rs.data;
+        let videoInfoList = rs.data;
         console.log(videoInfoList);
         videoInfoList.forEach(videoInfo =>{
             const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
@@ -222,8 +222,8 @@ function loadData() {
         });
         
         data.forEach(item => {
-            var templateHtml = loadTemplate();
-            stringHtml = bindingDataWhenLoad(item, templateHtml); 
+            let templateHtml = loadTemplate();
+            let stringHtml = bindingDataWhenLoad(item, templateHtml);
             $('#list-video').append(stringHtml);
         });
     }).fail(function(err) {

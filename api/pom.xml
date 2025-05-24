@@ -137,13 +137,6 @@
             <version>2.21.1</version>
         </dependency>
 
-<!--        &lt;!&ndash; Spring Boot Admin &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>de.codecentric</groupId>-->
-<!--            <artifactId>spring-boot-admin-starter-client</artifactId>-->
-<!--            <version>${spring-boot-admin-starter-client.version}</version>-->
-<!--        </dependency>-->
-
         <!-- SpringDoc OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>

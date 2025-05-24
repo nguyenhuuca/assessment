@@ -1,0 +1,42 @@
+#######################################################
+# This file is used to configure common settings for all profiles
+#######################################################
+
+# Hibernate - SQL configure
+spring:
+  threads:
+    virtual:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/funnyapp
+    username: postgres
+    password: ${DB_PASS:123456}
+
+server:
+  port: ${SERVER_PORT:8081}
+# App config common
+app:
+  token-expired: 86400000
+  jwt-secret-key: ${JWT_SECRET:12345678901234567890123456789012}
+  google-api-key: ${GOOGLE_KEY}
+  google-part: snippet,contentDetails,statistics,status
+  thread-executor: virtual1
+
+# Springdoc (OpenAPI/Swagger) config
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui/index.html
+    enabled: true
+  show-actuator: true

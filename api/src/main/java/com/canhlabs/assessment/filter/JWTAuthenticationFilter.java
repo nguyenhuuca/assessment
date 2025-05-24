@@ -53,7 +53,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (UnauthorizedException e) {
-            log.error("Error UnauthorizedException");
+            log.error("Error UnauthorizedException", e);
             httpServletResponse.setContentType("application/json;charset=UTF-8");
             httpServletResponse.getWriter().write(e.toJson());
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
