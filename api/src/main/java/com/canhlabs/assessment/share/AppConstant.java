@@ -40,12 +40,20 @@ public class AppConstant {
                 PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build()
 
         );
+        public static final String[] WHITE_LIST_URLS =
+                WHITE_LIST_PATH.stream()
+                        .map(item -> {
+                            String basePath = item.getBasePath() != null ? item.getBasePath() : "";
+                            return basePath + item.getPath();
+                        })
+                        .distinct()
+                        .toArray(String[]::new);
 
         // apply for document swagger
         public static final List<String> SWAGGER_DOC = List.of(
                         "/",
                         // -- swagger ui
-                        "/v2/api-docs", "/swagger-resources", "/swagger-resources/**",
+                        "/v3/api-docs/**", "/swagger-resources", "/swagger-resources/**","/swagger-ui/index.html",
                         "/configuration/ui", "/configuration/security", "/swagger-ui.html",
                         "/swagger-ui/**",
                         "/webjars/**"

@@ -1,6 +1,8 @@
 package com.canhlabs.assessment.share.exception;
 
 import com.canhlabs.assessment.share.ResultErrorInfo;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
@@ -9,10 +11,13 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,8 +30,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
@@ -41,9 +44,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      * request parameter is missing.
      */
     @Override
-    @NonNull
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(@NonNull MissingServletRequestParameterException ex,
-                                                                          @NonNull HttpHeaders headers, @NonNull HttpStatus status, @NonNull WebRequest request) {
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(ex.getMessage(), ex);
         return buildResponseEntity(new Error(BAD_REQUEST, ex.getParameterName() + " parameter is missing", ex));
     }
@@ -53,9 +54,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      * invalid as well.
      */
     @Override
-    @NonNull
-    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(@NonNull HttpMediaTypeNotSupportedException ex,
-                                                                     @NonNull HttpHeaders headers, @NonNull HttpStatus status, @NonNull WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         StringBuilder builder = new StringBuilder();
         builder.append(ex.getContentType());
         builder.append(" media type is not supported. Supported media types are ");
@@ -70,9 +69,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      * validation.
      */
     @Override
-    @NonNull
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException ex,
-                                                                  @NonNull HttpHeaders headers, @NonNull HttpStatus status, @NonNull WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Error apiError = new Error(BAD_REQUEST);
         apiError.setMessage("Validation error");
         apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
@@ -115,16 +112,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     @NonNull
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(@NonNull HttpMessageNotReadableException ex,
-                                                                  @NonNull HttpHeaders headers, @NonNull HttpStatus status, @NonNull WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(ex.getMessage(), ex);
         return buildResponseEntity(new Error(HttpStatus.BAD_REQUEST, "Malformed JSON request", ex));
     }
 
     @Override
     @NonNull
-    protected ResponseEntity<Object> handleHttpMessageNotWritable(@NonNull HttpMessageNotWritableException ex,
-                                                                  @NonNull HttpHeaders headers, @NonNull HttpStatus status, @NonNull WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(ex.getMessage(), ex);
         return buildResponseEntity(new Error(HttpStatus.INTERNAL_SERVER_ERROR, "Error writing JSON output", ex));
     }
@@ -134,9 +129,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     @NonNull
-    protected ResponseEntity<Object> handleNoHandlerFoundException(@NonNull NoHandlerFoundException ex, @NonNull HttpHeaders headers,
-                                                                   @NonNull HttpStatus status, @NonNull WebRequest request) {
-        Error apiError = new Error(BAD_REQUEST);
+    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+      Error apiError = new Error(BAD_REQUEST);
         apiError.setMessage(
                 String.format("Could not find the %s method for URL %s", ex.getHttpMethod(), ex.getRequestURL()));
         log.error(ex.getMessage(), ex);

@@ -8,15 +8,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity
+public class WebSecurityConfig {
 
     JWTAuthenticationFilter jwtAuthenticationFilter;
 
@@ -25,36 +33,54 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    @Override
-    public void configure(WebSecurity web) {
-        AppConstant.WebIgnoringConfig.WHITE_LIST_PATH.forEach(item -> web.ignoring().antMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()));
-    }
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // Build a white list from your AppConstant config
+        String[] swaggerWhiteList = AppConstant.WebIgnoringConfig.SWAGGER_DOC.toArray(new String[0]);
 
-
-    @SuppressWarnings("squid:S5122")
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
-        // add white list urls for swagger ui
         http
-                .authorizeRequests()
-                .antMatchers("/actuator/health").permitAll()
-                .antMatchers(AppConstant.WebIgnoringConfig.SWAGGER_DOC.toArray(new String[0])).permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .csrf().disable()
-                ;
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> {
+                    // Whitelisted endpoints
+                    AppConstant.WebIgnoringConfig.WHITE_LIST_PATH.forEach(item -> {
+                        auth.requestMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()).permitAll();
+                    });
+                    auth.requestMatchers("/actuator/health").permitAll();
+                    auth.requestMatchers(swaggerWhiteList).permitAll();
+                    auth.requestMatchers(AppConstant.WebIgnoringConfig.WHITE_LIST_URLS).permitAll();
+                    auth.anyRequest().authenticated();
 
-        // set session stateless policy
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                })
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
-    @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+
+
+    // To enable AuthenticationManager injection if needed
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
+
+//    // Password encoder bean
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
+//
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        return request -> {
+            CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
+            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            return config;
+        };
+    }
+
 
 
 }

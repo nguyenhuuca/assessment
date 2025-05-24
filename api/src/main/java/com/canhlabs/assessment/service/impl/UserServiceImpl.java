@@ -12,6 +12,7 @@ import com.canhlabs.assessment.share.dto.UserInfoDto;
 import com.canhlabs.assessment.share.exception.CustomException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,6 +28,7 @@ import java.util.Set;
 import static com.canhlabs.assessment.service.impl.Converter.toUserInfo;
 
 @Service
+@Lazy
 public class UserServiceImpl implements UserService {
     private UserRepo userRepo;
     private PasswordEncoder bCrypt;

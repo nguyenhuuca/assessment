@@ -4,8 +4,8 @@ $.ajaxSetup({
     }
 })
 var appConst = {
-    //baseUrl: "http://localhost:8081/v1/assessment"
-    baseUrl: "https://canh-labs.com/api/v1/assessment"
+    baseUrl: "http://localhost:8081/v1/assessment"
+    //baseUrl: "https://canh-labs.com/api/v1/assessment"
 }
 /**
  * Using to holed video object

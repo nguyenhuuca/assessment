@@ -6,7 +6,6 @@ import com.canhlabs.assessment.share.ResultObjectInfo;
 import com.canhlabs.assessment.share.dto.LoginDto;
 import com.canhlabs.assessment.share.dto.UserInfoDto;
 import com.canhlabs.assessment.share.enums.ResultStatus;
-import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(AppConstant.API.BASE_URL)
-@Api(tags = {AppConstant.API.TAG_API})
 @Validated
 @Slf4j
 public class UserController extends  BaseController{
