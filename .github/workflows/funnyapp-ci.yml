@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'api/**'
+      - '.github/workflows/funnyapp-ci.yml'
 
 
 jobs:
