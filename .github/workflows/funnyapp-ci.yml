@@ -25,6 +25,16 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file api/pom.xml
 
+      - name: Debug JAR file
+        run: |
+          ls -lh api/target
+          file api/target/shorten-1.0-SNAPSHOT.jar
+
+      - name: Debug JAR file 2
+        run: |
+          ls -lh target
+          file target/shorten-1.0-SNAPSHOT.jar
+
       - name: Copy JAR file to remote server via SCP
         uses: appleboy/scp-action@master
         with:
@@ -34,6 +44,7 @@ jobs:
           key: ${{ secrets.SSH_DO_SECRET_KEY }}
           source: "target/assessment-1.0-SNAPSHOT.jar"
           target: "/opt/CICD/"
+
 
   deploy:
     needs: [ build ]
