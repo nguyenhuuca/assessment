@@ -26,10 +26,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.PORT }}
           key: ${{ secrets.SSH_DO_SECRET_KEY }}
-          source: |
-            webapp/index.html
-            webapp/js/*
-            webapp/css/*
+          source: webapp/
           target: /var/www/funnyapp.canh-labs.com/
           strip_components: 1  # loại bỏ thư mục gốc `web/` để copy đúng cấu trúc
 

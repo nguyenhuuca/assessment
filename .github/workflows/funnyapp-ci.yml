@@ -62,6 +62,6 @@ jobs:
             if [ -f assessment-1.0.0.jar ]; then
               mv assessment-1.0.0.jar backup/assessment-1.0.0-$(date +%Y%m%d%H%M%S).jar
             fi
-            cp /opt/CICD/api/assessment-1.0.0.jar .
+            cp /opt/CICD/api/target/assessment-1.0.0.jar .
             ./stopServer.sh
             ./startServer.sh

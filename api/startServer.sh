@@ -33,7 +33,7 @@ i=0
 while [ $i -lt 5 ]
 do
 
-    if grep -q "Tomcat started on port(s)" logs/assessment.log;
+    if grep -q "Tomcat started" logs/assessment.log;
         then
             echo "Started FunnyApp"
             echo "process id:$!"
