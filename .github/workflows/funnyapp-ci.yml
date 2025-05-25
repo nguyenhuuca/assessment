@@ -3,6 +3,9 @@ name: Maven CI/CD
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'backend/**'
+
 
 jobs:
   build:
@@ -50,14 +53,14 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.PORT }}
-          key: ${{ secrets.SSH_DO_SECRET_KEY }}
+          key: ${{ secrets.SSH_DOcd_SECRET_KEY }}
           script_stop: true
           script: |
-            cd /opt/canh-labs/shorten/available
+            cd /opt/funnyapp
             mkdir -p backup
-            if [ -f shorten-1.0-SNAPSHOT.jar ]; then
-              mv shorten-1.0-SNAPSHOT.jar backup/shorten-1.0-SNAPSHOT-$(date +%Y%m%d%H%M%S).jar
+            if [ -f assessment-1.0.0.jar ]; then
+              mv assessment-1.0.0.jar backup/assessment-1.0.0-$(date +%Y%m%d%H%M%S).jar
             fi
-            cp /opt/CICD/shorten-1.0-SNAPSHOT.jar .
+            cp /opt/CICD/api/assessment-1.0.0.jar .
             ./stopServer.sh
             ./startServer.sh

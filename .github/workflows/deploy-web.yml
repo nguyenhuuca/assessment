@@ -1,0 +1,37 @@
+name: Deploy Frontend (Static Copy)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy static files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.SSH_DO_SECRET_KEY }}
+          source: |
+            webapp/index.html
+            webapp/js/**
+            webapp/css/**
+          target: /var/www/funnyapp.canh-labs.com/
+          strip_components: 1  # loại bỏ thư mục gốc `web/` để copy đúng cấu trúc
+
+      - name: Reload web server (optional)
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.SSH_DO_SECRET_KEY }}
+          script: |
+            sudo systemctl reload nginx
