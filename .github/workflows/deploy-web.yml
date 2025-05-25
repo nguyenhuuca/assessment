@@ -13,6 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: list frontend files
+        run: ls -R webapp/
+
+      - name: list files
+        run: ls
+
       - name: Deploy static files to server
         uses: appleboy/scp-action@master
         with:

@@ -54,7 +54,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.PORT }}
-          key: ${{ secrets.SSH_DOcd_SECRET_KEY }}
+          key: ${{ secrets.SSH_DO_SECRET_KEY }}
           script_stop: true
           script: |
             cd /opt/funnyapp
