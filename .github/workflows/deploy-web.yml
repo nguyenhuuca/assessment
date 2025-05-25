@@ -28,8 +28,8 @@ jobs:
           key: ${{ secrets.SSH_DO_SECRET_KEY }}
           source: |
             webapp/index.html
-            webapp/js/**
-            webapp/css/**
+            webapp/js/*
+            webapp/css/*
           target: /var/www/funnyapp.canh-labs.com/
           strip_components: 1  # loại bỏ thư mục gốc `web/` để copy đúng cấu trúc
 
