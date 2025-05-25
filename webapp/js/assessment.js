@@ -4,9 +4,9 @@ $.ajaxSetup({
     }
 })
 let appConst = {
-    baseUrl: "http://localhost:8081/v1/assessment",
-    //baseUrl: "https://canh-labs.com/api/v1/assessment",
-    offlineMode: true  // Flag to control offline/online mode
+    #baseUrl: "http://localhost:8081/v1/assessment",
+    baseUrl: "https://canh-labs.com/api/v1/assessment",
+    offlineMode: false  // Flag to control offline/online mode
 }
 /**
  * Using to holed video object
