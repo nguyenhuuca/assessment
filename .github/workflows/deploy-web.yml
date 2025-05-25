@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'web/**'
+      - 'webapp/**'
 
 jobs:
   deploy-frontend:

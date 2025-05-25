@@ -1,10 +1,10 @@
-name: Maven CI/CD
+name: Funny App Build and Deploy
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'backend/**'
+      - 'api/**'
 
 
 jobs:
