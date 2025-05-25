@@ -4,7 +4,7 @@ $.ajaxSetup({
     }
 })
 let appConst = {
-    #baseUrl: "http://localhost:8081/v1/assessment",
+    //baseUrl: "http://localhost:8081/v1/assessment",
     baseUrl: "https://canh-labs.com/api/v1/assessment",
     offlineMode: false  // Flag to control offline/online mode
 }
