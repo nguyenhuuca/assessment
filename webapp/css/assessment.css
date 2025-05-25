@@ -1,16 +1,16 @@
 /* Dark mode styles */
 :root {
-    --bg-color: #ffffff;
-    --text-color: #333333;
-    --card-bg: #ffffff;
-    --border-color: #dee2e6;
-}
-
-[data-theme="dark"] {
     --bg-color: #1a1a1a;
     --text-color: #ffffff;
     --card-bg: #2d2d2d;
     --border-color: #404040;
+}
+
+[data-theme="light"] {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --card-bg: #ffffff;
+    --border-color: #dee2e6;
 }
 
 body {
@@ -247,6 +247,35 @@ body {
     font-weight: 600;
     min-width: 30px;
     text-align: center;
+}
+
+/* Delete button styling */
+.delete-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background-color: var(--card-bg);
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background-color: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.delete-button i {
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.delete-button:hover i {
+    transform: scale(1.1);
 }
 
 /* Update the template styles */

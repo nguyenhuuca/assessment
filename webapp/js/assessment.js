@@ -6,7 +6,7 @@ $.ajaxSetup({
 let appConst = {
     //baseUrl: "http://localhost:8081/v1/assessment",
     baseUrl: "https://canh-labs.com/api/v1/assessment",
-    offlineMode: false  // Flag to control offline/online mode
+    offlineMode: true  // Flag to control offline/online mode
 }
 /**
  * Using to holed video object
@@ -248,6 +248,10 @@ function loadTemplate() {
                 <i class="far fa-thumbs-down"></i>
                 <span class="vote-count" id="{{id_downCount}}">0</span>
             </div>
+            <div class="delete-button" id="{{id_delete}}" onclick="deleteVideo(this)">
+                <i class="fas fa-trash"></i>
+                Delete
+            </div>
         </div>
         <div class = "app-title">Description:</div>
         <pre class = "app-wrap-desc">{{desc}}</pre>
@@ -272,6 +276,7 @@ function bindingDataWhenLoad(videoObj, templateHtml) {
     stringHtml = stringHtml.replace("{{id_downCount}}", videoObj.id+"_downCount");
     stringHtml = stringHtml.replace("{{id_upVote}}", videoObj.id+"_upVote");
     stringHtml = stringHtml.replace("{{id_downVote}}", videoObj.id+"_downVote");
+    stringHtml = stringHtml.replace("{{id_delete}}", videoObj.id+"_delete");
     return stringHtml;
 }
 
@@ -401,6 +406,34 @@ function toggleTheme() {
         icon.classList.replace('fa-moon', 'fa-sun');
     } else {
         icon.classList.replace('fa-sun', 'fa-moon');
+    }
+}
+
+/**
+ * Delete a video
+ * @param {*} element The delete button element
+ */
+function deleteVideo(element) {
+    let id = $(element).attr("id");
+    let videoId = id.split("_")[0];
+    
+    if (appConst.offlineMode) {
+        // For offline mode, just remove the video element
+        $(element).closest('.row').remove();
+    } else {
+        // For online mode, call the API to delete
+        $.ajax({
+            url: appConst.baseUrl.concat("/share-links/").concat(videoId),
+            type: "DELETE",
+            contentType: "application/json",
+            dataType: "json"
+        }).done(function() {
+            // Remove the video element on successful deletion
+            $(element).closest('.row').remove();
+        }).fail(function(err) {
+            $("#errMsg").text(err.responseJSON.error.message);
+            $("#errMsg").show();
+        });
     }
 }
 
