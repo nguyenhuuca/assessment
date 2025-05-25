@@ -44,7 +44,7 @@ public class WebSecurityConfig {
                     });
                     auth.requestMatchers("/actuator/health").permitAll();
                     auth.requestMatchers(swaggerWhiteList).permitAll();
-                    auth.requestMatchers(AppConstant.WebIgnoringConfig.WHITE_LIST_URLS).permitAll();
+                    //auth.requestMatchers(AppConstant.WebIgnoringConfig.WHITE_LIST_URLS).permitAll();
                     auth.anyRequest().authenticated();
 
                 })

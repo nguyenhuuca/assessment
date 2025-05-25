@@ -35,3 +35,4 @@ logs
 application-prod.properties
 
 .env
+.env.local

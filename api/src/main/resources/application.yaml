@@ -24,7 +24,18 @@ spring:
 
 server:
   port: ${SERVER_PORT:8081}
-# App config common
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: when_authorized
+
+#  servlet:
+#    context-path: /api # App config common
 app:
   token-expired: 86400000
   jwt-secret-key: ${JWT_SECRET:12345678901234567890123456789012}
@@ -37,6 +48,7 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
-    path: /swagger-ui/index.html
+    # path: /swagger-ui/index.html
     enabled: true
   show-actuator: true
+
