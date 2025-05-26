@@ -36,3 +36,4 @@ application-prod.properties
 
 .env
 .env.local
+/api/env.local

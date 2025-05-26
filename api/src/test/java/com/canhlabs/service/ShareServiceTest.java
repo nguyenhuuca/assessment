@@ -1,14 +1,14 @@
 package com.canhlabs.service;
 
-import com.canhlabs.assessment.domain.ShareLink;
-import com.canhlabs.assessment.domain.User;
-import com.canhlabs.assessment.repo.ShareLinkRepo;
-import com.canhlabs.assessment.repo.UserRepo;
-import com.canhlabs.assessment.service.impl.ShareServiceImpl;
-import com.canhlabs.assessment.share.AppProperties;
-import com.canhlabs.assessment.share.dto.ShareRequestDto;
-import com.canhlabs.assessment.share.dto.UserDetailDto;
-import com.canhlabs.assessment.share.dto.VideoDto;
+import com.canhlabs.funnyapp.domain.ShareLink;
+import com.canhlabs.funnyapp.domain.User;
+import com.canhlabs.funnyapp.repo.ShareLinkRepo;
+import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.service.impl.ShareServiceImpl;
+import com.canhlabs.funnyapp.share.AppProperties;
+import com.canhlabs.funnyapp.share.dto.ShareRequestDto;
+import com.canhlabs.funnyapp.share.dto.UserDetailDto;
+import com.canhlabs.funnyapp.share.dto.VideoDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

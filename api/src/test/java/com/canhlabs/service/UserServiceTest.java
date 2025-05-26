@@ -1,13 +1,13 @@
 package com.canhlabs.service;
 
-import com.canhlabs.assessment.domain.User;
-import com.canhlabs.assessment.repo.UserRepo;
-import com.canhlabs.assessment.service.impl.UserServiceImpl;
-import com.canhlabs.assessment.share.JwtProvider;
-import com.canhlabs.assessment.share.dto.LoginDto;
-import com.canhlabs.assessment.share.dto.TokenDto;
-import com.canhlabs.assessment.share.dto.UserInfoDto;
-import com.canhlabs.assessment.share.exception.CustomException;
+import com.canhlabs.funnyapp.domain.User;
+import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.service.impl.UserServiceImpl;
+import com.canhlabs.funnyapp.share.JwtProvider;
+import com.canhlabs.funnyapp.share.dto.LoginDto;
+import com.canhlabs.funnyapp.share.dto.TokenDto;
+import com.canhlabs.funnyapp.share.dto.UserInfoDto;
+import com.canhlabs.funnyapp.share.exception.CustomException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

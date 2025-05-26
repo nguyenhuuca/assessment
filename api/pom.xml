@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.canhlabs</groupId>
-    <artifactId>assessment</artifactId>
+    <artifactId>funny-app</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>Funny video</name>
@@ -176,7 +176,7 @@
     </dependencies>
 
     <build>
-        <finalName>assessment-${project.version}</finalName>
+        <finalName>funny-app-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

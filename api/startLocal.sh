@@ -32,7 +32,7 @@ build () {
 }
 
 start () {
-  java -jar ./target/assessment-1.0.0.jar
+  java -jar ./target/funny-app-1.0.0.jar
   check_rs "$?"
 }
 

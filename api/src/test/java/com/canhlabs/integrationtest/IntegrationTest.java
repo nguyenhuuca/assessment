@@ -1,8 +1,8 @@
 package com.canhlabs.integrationtest;
 
-import com.canhlabs.assessment.share.dto.LoginDto;
-import com.canhlabs.assessment.share.dto.ShareRequestDto;
-import com.canhlabs.assessment.share.dto.UserDetailDto;
+import com.canhlabs.funnyapp.share.dto.LoginDto;
+import com.canhlabs.funnyapp.share.dto.ShareRequestDto;
+import com.canhlabs.funnyapp.share.dto.UserDetailDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .email("ca12@gmail.com")
                 .password("123456")
                 .build();
-        ResultActions rsAction = mockMvc.perform(post("/v1/assessment/join")
+        ResultActions rsAction = mockMvc.perform(post("/v1/funny-app/join")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(loginDto))
                         .accept(MediaType.APPLICATION_JSON))
@@ -69,7 +69,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .email("ca12@gmail.com")
                 .password("123456")
                 .build();
-        ResultActions rsAction = mockMvc.perform(post("/v1/assessment/join")
+        ResultActions rsAction = mockMvc.perform(post("/v1/funny-app/join")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(loginDto))
                         .accept(MediaType.APPLICATION_JSON))
@@ -85,7 +85,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         ShareRequestDto shareRequestDto = ShareRequestDto.builder().url("https://www.youtube.com/watch?v=PfdgzZlBF9A").build();
 
         // need to provided DP_HOST DB_PASS, GOOGLE_KEY via Enviroiment variable
-        mockMvc.perform(post("/v1/assessment/share-links")
+        mockMvc.perform(post("/v1/funny-app/share-links")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("authorization", jwt)
                         .content(mapper.writeValueAsString(shareRequestDto))

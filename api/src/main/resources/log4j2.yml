@@ -10,8 +10,8 @@ Configuration:
 
     RollingFile:
       - name: LogToRollingFile
-        fileName: ${env:LOG_DIR:-./logs}/assessment.log
-        filePattern: "${env:LOG_DIR:-./logs}/archive/$${date:yyyy-MM}/assessment-%d{MM-dd-yyyy}-%i.log.gz"
+        fileName: ${env:LOG_DIR:-./logs}/funny-app.log
+        filePattern: "${env:LOG_DIR:-./logs}/archive/$${date:yyyy-MM}/funny-app-%d{MM-dd-yyyy}-%i.log.gz"
         PatternLayout:
           pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
         Policies:

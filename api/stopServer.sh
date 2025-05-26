@@ -1,2 +1,2 @@
 #!/bin/sh
-kill -9 `cat pid/assessment.pid`
+kill -9 `cat pid/funny-app.pid`
