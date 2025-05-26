@@ -1,12 +1,7 @@
-$.ajaxSetup({
-    headers:{
-        'Authorization': localStorage.getItem("jwt")
-    }
-})
 let appConst = {
     //baseUrl: "http://localhost:8081/v1/assessment",
     baseUrl: "https://canh-labs.com/api/v1/funny-app",
-    offlineMode: true  // Flag to control offline/online mode
+    offlineMode: false  // Flag to control offline/online mode
 }
 /**
  * Using to holed video object
@@ -38,7 +33,6 @@ VideoObj.prototype.determineCategory = function() {
  * Using to share youtubue url
  */
 function share() {
-    $("#shareSpinner").show();
     let link = $("#urlYoutube").val();
     let shareObj = {
         url: link
@@ -56,9 +50,9 @@ function share() {
         const video = new VideoObj(mockVideoInfo.id, mockVideoInfo.userShared, mockVideoInfo.title, mockVideoInfo.embedLink, mockVideoInfo.desc);
         let stringHtml = bindingDataWhenLoad(video, loadTemplate());
         $("#list-video").prepend(stringHtml);
-        $("#shareSpinner").hide();
         $('#shareModal').modal('hide');
     } else {
+        $("#shareSpinner").show();
         $.ajax({
             url: appConst.baseUrl.concat("/share-links"),
             type: "POST",
@@ -72,7 +66,7 @@ function share() {
             let stringHtml = bindingDataWhenLoad(video, loadTemplate());
             $("#list-video").prepend(stringHtml);
             $("#shareSpinner").hide();
-            $('#shareModal').modal('hide')
+            $('#shareModal').modal('hide');
         }).fail(function(err) {
             $("#errMsg").text(err.responseJSON.error.message);
             $("#errMsg").show();
@@ -81,60 +75,14 @@ function share() {
     }
 }
 
-/**
- * User can login or register incase is new user
- * When call api joinSytem, will return user info and jwt token for old user and new user
- * Need to handle some error
- */
-function joinSystem() {
-    $("#loginSpinner").show();
-    var userObj = {
-        email: $("#usr").val(),
-        password: $("#pwd").val()
-    }
-
-    if (appConst.offlineMode) {
-        // Mock login response for offline mode
-        const mockData = {
-            jwt: "mock-jwt-token",
-            user: {
-                email: userObj.email
-            }
-        };
-        proceesLoginSuccess(mockData);
-    } else {
-        $.ajax({
-            url: appConst.baseUrl.concat("/join"),
-            type: "POST",
-            data: JSON.stringify(userObj),
-            contentType: "application/json",
-            dataType: "json"
-        }).done(function(rs) {
-            proceesLoginSuccess(rs.data);
-        }).fail(function(err) {
-            $("#errMsg").text(err.responseJSON.error.message);
-            $("#errMsg").show();
-            $("#loginSpinner").hide();
-        });
-    }
-}
-
-
-/**
- * Using to remove jwt token, and user can login again
- * I am using stateless web application, so not need to call to server to logout.
- * Because jwt is Self-contained (Transparent token),
- * In-case We want revoke this token on server, we need add this token to
- * black list on server arter logout.
- */
-function logout() {
-    console.log("logout system");
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("user");
-    initState();
-    $("#loginBtn").show()
-
-}
+// Thêm xử lý khi modal đóng
+$(document).ready(function() {
+    $('#shareModal').on('hidden.bs.modal', function () {
+        $("#shareSpinner").hide();
+        $("#errMsg").hide();
+        $("#urlYoutube").val('');
+    });
+});
 
 // Add vote state tracking
 let voteStates = {};
@@ -209,24 +157,9 @@ function voteDown(element) {
  * When load page, need to init state for some element on page
  */
 function initState() {
-    $("#loginSpinner").hide();
+    initAuthState();
+    initTheme();
     $("#shareSpinner").hide();
-    $("#shareBtn").hide();
-    $("#logoutBtn").hide();
-    $("#messageInfo").hide();
-    $("#errMsg").hide();
-
-    $("#grUser").show()
-    $("#grPass").show()
-    // check user login befor
-    if(localStorage.getItem("jwt")) {
-        const data = {
-            jwt: localStorage.getItem("jwt"),
-            user: JSON.parse(localStorage.getItem("user"))
-        }
-        proceesLoginSuccess(data);
-
-    }
 }
 
 /**
@@ -304,7 +237,7 @@ function loadData() {
         displayVideos(mockVideos);
     } else {
         $.ajax({
-            url: appConst.baseUrl.concat("/videos"),
+            url: appConst.baseUrl.concat("/share-links"),
             type: "GET",
             dataType: "json"
         }).done(function(rs) {
@@ -343,26 +276,6 @@ function displayVideos(videos) {
         const videoHtml = bindingDataWhenLoad(video, loadTemplate());
         $("#list-video-popular").append(videoHtml);
     });
-}
-
-function proceesLoginSuccess(data) {
-    $("#shareBtn").show();
-    $("#logoutBtn").show();
-    $("#messageInfo").text(` Welcome ${data.user.email}`);
-    $("#messageInfo").show();
-    $("#loginBtn").hide();
-    $("#loginSpinner").hide();
-    $("#grUser").hide();
-    $("#grPass").hide();
-    $("#errMsg").hide();
-    // save jwt
-    localStorage.setItem('jwt', data.jwt);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    $.ajaxSetup({
-        headers:{
-            'Authorization': localStorage.getItem("jwt")
-        }
-    })
 }
 
 /**
