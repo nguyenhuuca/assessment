@@ -53,7 +53,31 @@
     </div>
     <hr>
     <div class="app-error-msg" id="errMsg">Error message</div>
-    <div id="list-video"></div>
+    
+    <!-- Add tabs -->
+    <ul class="nav nav-tabs mb-3" id="videoTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="true">All Videos</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="popular-tab" data-bs-toggle="tab" data-bs-target="#popular" type="button" role="tab" aria-controls="popular" aria-selected="false">Video Popular</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="funny-tab" data-bs-toggle="tab" data-bs-target="#funny" type="button" role="tab" aria-controls="funny" aria-selected="false">Video Hài Hước</button>
+      </li>
+    </ul>
+    
+    <div class="tab-content" id="videoTabsContent">
+      <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+        <div id="list-video"></div>
+      </div>
+      <div class="tab-pane fade" id="popular" role="tabpanel" aria-labelledby="popular-tab">
+        <div id="list-video-popular"></div>
+      </div>
+      <div class="tab-pane fade" id="funny" role="tabpanel" aria-labelledby="funny-tab">
+        <div id="list-video-funny"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Share Modal -->

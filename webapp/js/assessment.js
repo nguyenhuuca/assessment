@@ -17,12 +17,22 @@ let appConst = {
  * @param desc
  */
 function VideoObj(id, userShared, title, src, desc) {
-        this.id = id;
-        this.userShared = userShared;
-        this.title = title;
-        this.src = src;
-        this.desc = desc;
+    this.id = id;
+    this.userShared = userShared;
+    this.title = title;
+    this.src = src;
+    this.desc = desc;
+    this.upvotes = 0;
+    this.downvotes = 0;
+    this.category = this.determineCategory();
 }
+
+VideoObj.prototype.determineCategory = function() {
+    // Simple logic to determine if video is funny based on title and description
+    const funnyKeywords = ['funny', 'hài', 'hài hước', 'comedy', 'vui', 'cười'];
+    const titleAndDesc = (this.title + ' ' + this.desc).toLowerCase();
+    return funnyKeywords.some(keyword => titleAndDesc.includes(keyword)) ? 'funny' : 'regular';
+};
 
 /**
  * Using to share youtubue url
@@ -280,81 +290,58 @@ function bindingDataWhenLoad(videoObj, templateHtml) {
     return stringHtml;
 }
 
-// Mock data for videos
-const mockVideos = [
-    {
-        id: "1",
-        userShared: "john.doe@example.com",
-        title: "Funny Cat Compilation 2024",
-        embedLink: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-        desc: "A hilarious compilation of cats doing funny things!"
-    },
-    {
-        id: "2",
-        userShared: "jane.smith@example.com",
-        title: "Best Dog Moments",
-        embedLink: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-        desc: "The most adorable and funny dog moments caught on camera"
-    },
-    {
-        id: "3",
-        userShared: "bob.wilson@example.com",
-        title: "Epic Fails 2024",
-        embedLink: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-        desc: "The most epic fails of 2024 that will make you laugh"
-    }
-];
-
 /**
  * Using to get all link share when page is loaded
  */
 function loadData() {
-    let data = [];
-    
     if (appConst.offlineMode) {
-        // Use mock data in offline mode
-        mockVideos.forEach(videoInfo => {
-            const video = new VideoObj(
-                videoInfo.id,
-                videoInfo.userShared,
-                videoInfo.title,
-                videoInfo.embedLink,
-                videoInfo.desc
-            );
-            data.push(video);
-        });
+        // Mock data for offline mode
+        const mockVideos = [
+            new VideoObj("1", "user1@example.com", "Funny Cat Video", "https://www.youtube.com/embed/example1", "A hilarious cat video"),
+            new VideoObj("2", "user2@example.com", "Cooking Tutorial", "https://www.youtube.com/embed/example2", "Learn to cook"),
+            new VideoObj("3", "user3@example.com", "Hài Hước - Stand Up Comedy", "https://www.youtube.com/embed/example3", "Funny stand up comedy show")
+        ];
+        displayVideos(mockVideos);
     } else {
-        // Use API in online mode
         $.ajax({
-            url: appConst.baseUrl.concat("/share-links"),
+            url: appConst.baseUrl.concat("/videos"),
             type: "GET",
-            contentType: "application/json",
             dataType: "json"
         }).done(function(rs) {
-            let videoInfoList = rs.data;
-            console.log(videoInfoList);
-            videoInfoList.forEach(videoInfo => {
-                const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
-                data.push(video);
-            });
-            
-            data.forEach(item => {
-                let templateHtml = loadTemplate();
-                let stringHtml = bindingDataWhenLoad(item, templateHtml);
-                $('#list-video').append(stringHtml);
-            });
+            const videos = rs.data.map(videoInfo => 
+                new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc)
+            );
+            displayVideos(videos);
         }).fail(function(err) {
             $("#errMsg").text(err.responseJSON.error.message);
             $("#errMsg").show();
         });
-        return; // Return early for API call since we'll append data in the done callback
     }
+}
+
+function displayVideos(videos) {
+    // Clear all video lists
+    $("#list-video").empty();
+    $("#list-video-popular").empty();
+    $("#list-video-funny").empty();
+
+    // Sort videos by upvotes for popular tab
+    const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
     
-    // For offline mode, append data immediately
-    data.forEach(item => {
-        let templateHtml = loadTemplate();
-        let stringHtml = bindingDataWhenLoad(item, templateHtml);
-        $('#list-video').append(stringHtml);
+    // Display videos in appropriate tabs
+    videos.forEach(video => {
+        const videoHtml = bindingDataWhenLoad(video, loadTemplate());
+        $("#list-video").append(videoHtml);
+        
+        if (video.category === 'funny') {
+            $("#list-video-funny").append(videoHtml);
+        }
+    });
+
+    // Display popular videos (top 5)
+    sortedByPopularity.slice(0, 5).forEach(video => {
+        const videoHtml = bindingDataWhenLoad(video, loadTemplate());
+        $("#list-video-popular").append(videoHtml);
     });
 }
 
@@ -384,10 +371,19 @@ function proceesLoginSuccess(data) {
 function initTheme() {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
     
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        document.querySelector('.theme-toggle i').classList.replace('fa-moon', 'fa-sun');
+    // Set initial theme
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    
+    // Update icon based on current theme
+    const icon = document.querySelector('.theme-toggle i');
+    if (currentTheme === 'dark') {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+    } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
     }
 }
 
@@ -398,14 +394,18 @@ function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     
+    // Update theme
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     
+    // Update icon
     const icon = document.querySelector('.theme-toggle i');
     if (newTheme === 'dark') {
-        icon.classList.replace('fa-moon', 'fa-sun');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
     } else {
-        icon.classList.replace('fa-sun', 'fa-moon');
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
     }
 }
 

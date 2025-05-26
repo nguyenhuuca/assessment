@@ -415,4 +415,80 @@ body {
         max-height: 100px;
     }
 }
+
+/* Tab styling */
+.nav-tabs {
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 20px;
+}
+
+.nav-tabs .nav-item {
+    margin-bottom: -2px;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: #6c757d;
+    font-weight: 500;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    margin-right: 5px;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #007bff;
+    border: none;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.nav-tabs .nav-link.active {
+    color: #007bff;
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid #007bff;
+}
+
+.nav-tabs .nav-link.active:hover {
+    border-bottom: 3px solid #007bff;
+}
+
+/* Tab content styling */
+.tab-content {
+    padding: 20px 0;
+}
+
+.tab-pane {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Dark theme support */
+[data-theme="dark"] .nav-tabs {
+    border-bottom-color: #495057;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link {
+    color: #adb5bd;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link:hover {
+    color: #4dabf7;
+    background-color: rgba(77, 171, 247, 0.1);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+    color: #4dabf7;
+    border-bottom-color: #4dabf7;
+}
   
