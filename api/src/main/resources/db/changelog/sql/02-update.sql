@@ -1,0 +1,7 @@
+ALTER TABLE youtube_video
+ADD COLUMN url_link TEXT,
+ADD COLUMN embed_link TEXT,
+ADD COLUMN title TEXT,
+ADD COLUMN description TEXT,
+ADD COLUMN up_count BIGINT DEFAULT 0,
+ADD COLUMN down_count BIGINT DEFAULT 0;

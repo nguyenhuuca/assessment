@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
@@ -14,7 +15,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 @EnableConfigurationProperties
 @EnableAspectJAutoProxy
 @EnableCaching
-
+@EnableScheduling
 @Slf4j
 public class FunnyApp {
     public static void  main(String[] args) {

@@ -22,8 +22,13 @@ spring:
     username: postgres
     password: ${DB_PASS:123456}
 
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
 server:
   port: ${SERVER_PORT:8081}
+
 
 management:
   endpoints:
@@ -40,8 +45,9 @@ app:
   token-expired: 86400000
   jwt-secret-key: ${JWT_SECRET:12345678901234567890123456789012}
   google-api-key: ${GOOGLE_KEY}
-  google-part: snippet,contentDetails,statistics,status
+  google-part: snippet,contentDetails,statistics,statusKey
   thread-executor: virtual1
+  gpt-key: ${GPT_KEY}
 
 # Springdoc (OpenAPI/Swagger) config
 springdoc:

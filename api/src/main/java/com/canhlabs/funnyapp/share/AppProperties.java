@@ -22,6 +22,7 @@ public class AppProperties {
     private String googleApiKey;
     // query condition
     private String googlePart;
+    private String gptKey;
 
 
 
