@@ -43,4 +43,5 @@ public class ConfigBean {
         return authConfig.getAuthenticationManager();
     }
 
+
 }

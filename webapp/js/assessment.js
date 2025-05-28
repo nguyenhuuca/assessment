@@ -191,10 +191,6 @@ function loadTemplate() {
                 <i class="far fa-thumbs-down"></i>
                 <span class="vote-count" id="{{id_downCount}}">0</span>
             </div>
-<!--            <div class="delete-button" id="{{id_delete}}" onclick="deleteVideo(this)">-->
-<!--                <i class="fas fa-trash"></i>-->
-<!--                Delete-->
-<!--            </div>-->
         </div>
         <div class = "app-title">Description:</div>
         <pre class = "app-wrap-desc">{{desc}}</pre>

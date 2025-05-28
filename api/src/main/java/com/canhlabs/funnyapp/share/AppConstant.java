@@ -59,6 +59,7 @@ public class AppConstant {
                         "/configuration/ui", "/configuration/security", "/swagger-ui.html",
                         "/swagger-ui/**",
                         "/webjars/**",
+                        "/actuator/**",
                         "/v1/funny-app/top-videos",
                         "/v1/funny-app/top-videos/**"
                         // other public endpoints of your API may be appended to this array

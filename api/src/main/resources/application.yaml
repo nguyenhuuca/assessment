@@ -31,13 +31,13 @@ server:
 
 
 management:
+  endpoint:
+    prometheus:
+      enabled: true
   endpoints:
     web:
       exposure:
-        include: [ "health", "info" ]
-  endpoint:
-    health:
-      show-details: when_authorized
+        include: ["health", "info","prometheus"]
 
 #  servlet:
 #    context-path: /api # App config common
