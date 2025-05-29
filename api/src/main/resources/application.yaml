@@ -38,6 +38,10 @@ management:
     web:
       exposure:
         include: '*'
+  metrics:
+    enable:
+      all: true
+
 
 #  servlet:
 #    context-path: /api # App config common
