@@ -47,7 +47,7 @@ public class ConfigBean {
 
     @Bean
     MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
-        return registry -> registry.config().commonTags("application", "funny-app-springbooy");
+        return registry -> registry.config().commonTags("application", "funny-app-springboot");
     }
 
 
