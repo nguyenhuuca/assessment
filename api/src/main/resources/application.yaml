@@ -37,7 +37,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: ["health", "info","prometheus"]
+        include: '*'
 
 #  servlet:
 #    context-path: /api # App config common
