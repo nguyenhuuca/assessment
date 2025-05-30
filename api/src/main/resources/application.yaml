@@ -37,7 +37,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: ['health', 'info', 'prometheus', 'metrics']
   metrics:
     enable:
       all: true
