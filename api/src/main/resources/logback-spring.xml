@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <!-- Using LOG_DIR, if not, get ./logs -->
+    <property name="LOG_DIR" value="${LOG_DIR:-./logs}"/>
+
+    <!-- Console Appender -->
+    <appender name="LogToConsole" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{1} - %msg%n</pattern>
+            <outputPatternAsHeader>true</outputPatternAsHeader>
+        </encoder>
+    </appender>
+
+    <!-- Rolling File Appender -->
+    <appender name="LogToRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/funny-app.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Save archive -->
+            <fileNamePattern>${LOG_DIR}/archive/%d{yyyy-MM}/funny-app-%d{MM-dd-yyyy}-%i.log.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- file size limit 50MB -->
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- max 15 file backup -->
+            <maxHistory>15</maxHistory>
+            <!-- total size 750MB (optional) -->
+            <totalSizeCap>750MB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{1} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Logger fo package com.canhlabs -->
+    <logger name="com.canhlabs" level="${LOG_LEVEL:-INFO}" additivity="false" >
+        <appender-ref ref="LogToConsole"/>
+        <appender-ref ref="LogToRollingFile"/>
+    </logger>
+
+    <!-- Logger for Spring Framework -->
+    <logger name="org.springframework" level="${LOG_LEVEL:-INFO}" additivity="false">
+        <appender-ref ref="LogToConsole"/>
+        <appender-ref ref="LogToRollingFile"/>
+    </logger>
+
+    <!-- Logger cho Hibernate -->
+    <logger name="org.hibernate" level="INFO" additivity="false">
+        <appender-ref ref="LogToConsole"/>
+        <appender-ref ref="LogToRollingFile"/>
+    </logger>
+
+    <!-- Root logger -->
+    <root level="${LOG_LEVEL:-INFO}">
+        <appender-ref ref="LogToConsole"/>
+        <appender-ref ref="LogToRollingFile"/>
+    </root>
+
+</configuration>
