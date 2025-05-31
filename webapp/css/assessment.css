@@ -34,9 +34,37 @@ body {
     flex: 1;
 }
 
+.app-container .app-header .app-header__form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
 .app-container .app-header .app-header__form .app-header__form-item {
-    flex: 1;
-    margin: 0 10px;
+    margin: 4px 0;
+}
+
+.app-container .app-header .app-header__form .app-header__form-item input {
+    min-width: 180px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.app-container .app-header .app-header__form .app-header__form-item input:focus {
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.app-container .app-header .app-header__form .app-header__form-item button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.app-container .app-header .app-header__form .app-header__form-item button:hover {
+    transform: translateY(-1px);
 }
 
 .app-error-msg {
@@ -304,11 +332,24 @@ body {
     .app-header__form {
         flex-direction: column;
         width: 100%;
+        gap: 8px;
     }
 
     .app-header__form-item {
         width: 100%;
-        margin: 5px 0;
+        margin: 2px 0;
+    }
+
+    .app-header__form-item input {
+        width: 100%;
+        min-width: unset;
+        margin-bottom: 4px;
+    }
+
+    .app-header__form-item button {
+        width: 100%;
+        margin: 2px 0;
+        padding: 10px 16px;
     }
 
     .app-header h1 {
@@ -384,6 +425,12 @@ body {
     .app-header__form-item div {
         font-size: 0.9rem;
     }
+
+    #messageInfo {
+        text-align: center;
+        margin-bottom: 6px;
+        font-size: 1.1rem;
+    }
 }
 
 /* Additional styles for very small screens */
@@ -402,6 +449,18 @@ body {
 
     .modal-body {
         padding: 12px;
+    }
+
+    .app-header__form-item input {
+        font-size: 16px;
+    }
+
+    .app-header__form-item button {
+        font-size: 1rem;
+    }
+
+    #messageInfo {
+        font-size: 1rem;
     }
 }
 
@@ -490,5 +549,116 @@ body {
 [data-theme="dark"] .nav-tabs .nav-link.active {
     color: #4dabf7;
     border-bottom-color: #4dabf7;
+}
+
+/* Video item styling */
+.video-item {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.video-item:hover {
+    transform: translateY(-2px);
+}
+
+.video-title {
+    color: var(--text-color);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.video-meta {
+    margin-bottom: 15px;
+}
+
+.video-shared-by {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.meta-label {
+    color: var(--text-color);
+    opacity: 0.7;
+    font-weight: 500;
+}
+
+.meta-value {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.video-actions {
+    margin-bottom: 20px;
+}
+
+.video-description {
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+}
+
+.description-label {
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.description-content {
+    color: var(--text-color);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.description-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.description-content::-webkit-scrollbar-track {
+    background: var(--bg-color);
+    border-radius: 3px;
+}
+
+.description-content::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.description-content::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .video-item {
+        padding: 15px;
+    }
+
+    .video-title {
+        font-size: 1.2rem;
+    }
+
+    .description-content {
+        max-height: 150px;
+    }
+}
+
+#messageInfo {
+    font-weight: 500;
+    color: var(--text-color);
+    opacity: 0.9;
+    margin-right: 8px;
 }
   

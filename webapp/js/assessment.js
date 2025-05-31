@@ -1,7 +1,7 @@
 let appConst = {
-    //baseUrl: "http://localhost:8081/v1/assessment",
-    baseUrl: "https://canh-labs.com/api/v1/funny-app",
-    offlineMode: false  // Flag to control offline/online mode
+    baseUrl: "http://localhost:8081/v1/funny-app",
+    // baseUrl: "https://canh-labs.com/api/v1/funny-app",
+    offlineMode: true  // Flag to control offline/online mode
 }
 /**
  * Using to holed video object
@@ -49,7 +49,6 @@ function share() {
         };
         const video = new VideoObj(mockVideoInfo.id, mockVideoInfo.userShared, mockVideoInfo.title, mockVideoInfo.embedLink, mockVideoInfo.desc);
         let stringHtml = bindingDataWhenLoad(video, loadTemplate());
-        $("#list-video").prepend(stringHtml);
         $('#shareModal').modal('hide');
     } else {
         $("#shareSpinner").show();
@@ -168,7 +167,7 @@ function initState() {
  */
 function loadTemplate() {
     return `
-    <div class="row">
+    <div class="row video-item">
         <!-- 16:9 aspect ratio -->
         <div class="col-6">
         <div class="ratio ratio-16x9">
@@ -176,24 +175,28 @@ function loadTemplate() {
         </div>
         </div>
         <div class="col-6">
-        <div style="color:red; font-weight:bold;">{{movi_title}}</div>
-        <div>
-            <div style = "float:left; width:250px;">
-               <div style = "float:left;font-weight: 600;">Shared by:&nbsp;</div> <div>{{userName}}</div>
+        <div class="video-title">{{movi_title}}</div>
+        <div class="video-meta">
+            <div class="video-shared-by">
+               <span class="meta-label">Shared by:</span> <span class="meta-value">{{userName}}</span>
             </div>
         </div>
-        <div class="vote-container">
-            <div class="vote-button" id="{{id_upVote}}" onclick="voteUp(this)">
-                <i class="far fa-thumbs-up"></i>
-                <span class="vote-count" id="{{id_upCount}}">0</span>
-            </div>
-            <div class="vote-button" id="{{id_downVote}}" onclick="voteDown(this)">
-                <i class="far fa-thumbs-down"></i>
-                <span class="vote-count" id="{{id_downCount}}">0</span>
+        <div class="video-actions">
+            <div class="vote-container">
+                <div class="vote-button" id="{{id_upVote}}" onclick="voteUp(this)">
+                    <i class="far fa-thumbs-up"></i>
+                    <span class="vote-count" id="{{id_upCount}}">0</span>
+                </div>
+                <div class="vote-button" id="{{id_downVote}}" onclick="voteDown(this)">
+                    <i class="far fa-thumbs-down"></i>
+                    <span class="vote-count" id="{{id_downCount}}">0</span>
+                </div>
             </div>
         </div>
-        <div class = "app-title">Description:</div>
-        <pre class = "app-wrap-desc">{{desc}}</pre>
+        <div class="video-description">
+            <div class="description-label">Description:</div>
+            <div class="description-content">{{desc}}</div>
+        </div>
         </div>
     </div>
     </br>
@@ -250,7 +253,6 @@ function loadData() {
 
 function displayVideos(videos) {
     // Clear all video lists
-    $("#list-video").empty();
     $("#list-video-popular").empty();
     $("#list-video-funny").empty();
 
@@ -260,8 +262,6 @@ function displayVideos(videos) {
     // Display videos in appropriate tabs
     videos.forEach(video => {
         const videoHtml = bindingDataWhenLoad(video, loadTemplate());
-        $("#list-video").append(videoHtml);
-        
         if (video.category === 'funny') {
             $("#list-video-funny").append(videoHtml);
         }
