@@ -661,4 +661,151 @@ body {
     opacity: 0.9;
     margin-right: 8px;
 }
+
+/* Profile Modal Styles */
+.profile-section {
+    padding: 15px 0;
+}
+
+.section-title {
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.mfa-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.status-label {
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.status-value {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.status-value.enabled {
+    color: #28a745;
+}
+
+.mfa-setup-section {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.mfa-setup-section.active {
+    display: block;
+}
+
+.qr-code-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.qr-code {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 15px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.qr-instructions {
+    color: var(--text-color);
+    opacity: 0.8;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.verification-form {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.verification-form .form-group {
+    margin-bottom: 15px;
+}
+
+.verification-form label {
+    color: var(--text-color);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.verification-form input {
+    text-align: center;
+    letter-spacing: 4px;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+#setupMfaBtn {
+    width: 100%;
+    padding: 10px;
+    font-weight: 500;
+}
+
+#verifyMfaBtn {
+    width: 100%;
+    padding: 10px;
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .qr-code {
+        width: 180px;
+        height: 180px;
+    }
+
+    .verification-form {
+        max-width: 100%;
+    }
+}
+
+.mfa-disable-section {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.mfa-disable-section.active {
+    display: block;
+}
+
+#disableMfaBtn {
+    width: 100%;
+    padding: 10px;
+    font-weight: 500;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+#disableMfaBtn:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .mfa-disable-section {
+        padding: 15px;
+    }
+}
   

@@ -41,6 +41,9 @@
             <button id="shareBtn" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#shareModal">
               <i class="fas fa-share-alt me-2"></i>Share a movie
             </button>
+            <button id="profileBtn" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#profileModal">
+              <i class="fas fa-user me-2"></i>Profile
+            </button>
             <button id="loginBtn" onclick="joinSystem()" type="button" class="btn btn-light">
               <span id="loginSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
               <i class="fas fa-sign-in-alt me-2"></i>Register / Login
@@ -98,6 +101,60 @@
               Share Video
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileModalLabel">
+            <i class="fas fa-user me-2"></i>Profile Settings
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="profile-section">
+            <h6 class="section-title">Two-Factor Authentication</h6>
+            <div class="mfa-status">
+              <span class="status-label">Status:</span>
+              <span id="mfaStatus" class="status-value">Disabled</span>
+            </div>
+            <div id="mfaSetupSection" class="mfa-setup-section">
+              <div class="qr-code-container">
+                <div id="qrCode" class="qr-code"></div>
+                <p class="qr-instructions">Scan this QR code with your authenticator app</p>
+              </div>
+              <div class="verification-form">
+                <div class="form-group">
+                  <label for="verificationCode">Enter verification code:</label>
+                  <input type="text" id="verificationCode" class="form-control" placeholder="Enter 6-digit code">
+                </div>
+                <button id="verifyMfaBtn" class="btn btn-primary mt-3">
+                  <span id="verifySpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                  Verify & Enable MFA
+                </button>
+              </div>
+            </div>
+            <div id="mfaDisableSection" class="mfa-disable-section">
+              <div class="verification-form">
+                <div class="form-group">
+                  <label for="disableVerificationCode">Enter verification code to disable MFA:</label>
+                  <input type="text" id="disableVerificationCode" class="form-control" placeholder="Enter 6-digit code">
+                </div>
+                <button id="disableMfaBtn" class="btn btn-danger mt-3">
+                  <span id="disableSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                  Disable MFA
+                </button>
+              </div>
+            </div>
+            <button id="setupMfaBtn" class="btn btn-outline-primary mt-3">
+              <i class="fas fa-shield-alt me-2"></i>Setup MFA
+            </button>
+          </div>
         </div>
       </div>
     </div>
