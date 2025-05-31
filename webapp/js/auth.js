@@ -53,6 +53,7 @@ function joinSystem() {
 function processLoginSuccess(data) {
     $("#shareBtn").show();
     $("#logoutBtn").show();
+    $("#profileBtn").show();
     $("#messageInfo").text(` Welcome ${data.user.email}`);
     $("#messageInfo").show();
     $("#loginBtn").hide();
@@ -85,6 +86,7 @@ function logout() {
     localStorage.removeItem("user");
     initState();
     $("#loginBtn").show();
+    $("#profileBtn").hide();
 }
 
 /**
@@ -94,6 +96,7 @@ function initAuthState() {
     $("#loginSpinner").hide();
     $("#shareBtn").hide();
     $("#logoutBtn").hide();
+    $("#profileBtn").hide();
     $("#messageInfo").hide();
     $("#errMsg").hide();
     $("#grUser").show();
