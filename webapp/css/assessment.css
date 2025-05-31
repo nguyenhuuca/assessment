@@ -663,10 +663,10 @@ body {
     width: 255px;
 }
 #loginBtn {
-    width: 180px;
+    min-width: 180px;
 }
 #logoutBtn {
-    width: 180px;
+    min-width: 180px;
 }
 
 /* Profile Modal Styles */
