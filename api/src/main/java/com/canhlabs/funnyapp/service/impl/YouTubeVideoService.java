@@ -11,6 +11,7 @@ import com.canhlabs.funnyapp.share.enums.CacheKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,7 +95,7 @@ public class YouTubeVideoService {
 
             // Nếu là mới thì set createdAt
             if (entity.getId() == null) {
-                entity.setCreatedAt(LocalDateTime.now());
+                entity.setCreatedAt(Instant.now());
             }
 
             upserts.add(entity);

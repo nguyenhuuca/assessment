@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class YouTubeVideo {
+public class YouTubeVideo extends BaseDomain {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +48,4 @@ public class YouTubeVideo {
     @Column(name = "down_count")
     private Long downCount;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
 }

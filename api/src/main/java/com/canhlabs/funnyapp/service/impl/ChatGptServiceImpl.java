@@ -7,6 +7,7 @@ import com.canhlabs.funnyapp.share.ChatGptRequest;
 import com.canhlabs.funnyapp.share.ChatGptResponse;
 import com.canhlabs.funnyapp.share.enums.CacheKey;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class ChatGptServiceImpl implements ChatGptService {
 
@@ -37,8 +39,8 @@ public class ChatGptServiceImpl implements ChatGptService {
         """;
 
         ChatGptRequest request = new ChatGptRequest(
-                "gpt-4o",
-                List.of(new ChatGptRequest.Message("user", prompt))
+                "gpt-4.1",
+                List.of(new ChatGptRequest.Message("system", prompt))
         );
 
         HttpHeaders headers = new HttpHeaders();
@@ -55,7 +57,6 @@ public class ChatGptServiceImpl implements ChatGptService {
         );
 
         String content = response.getBody().getChoices().get(0).getMessage().getContent();
-
         return parseJsonArray(content);
     }
 
@@ -67,9 +68,11 @@ public class ChatGptServiceImpl implements ChatGptService {
                         .replaceAll("(?s)```", "")         // remove ending ```
                         .trim();
             }
-
+            log.info("return from chatGPT: {}", content);
             // Parse JSON array to List<String>
-            return objectMapper.readValue(content, List.class);
+            List<String> rs = objectMapper.readValue(content, List.class);
+            log.info("{}", rs.size());
+            return rs;
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse video ID list from ChatGPT response", e);
         }
