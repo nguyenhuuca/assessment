@@ -660,6 +660,13 @@ body {
     color: var(--text-color);
     opacity: 0.9;
     margin-right: 8px;
+    width: 255px;
+}
+#loginBtn {
+    width: 180px;
+}
+#logoutBtn {
+    width: 180px;
 }
 
 /* Profile Modal Styles */
