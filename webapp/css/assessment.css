@@ -808,4 +808,132 @@ body {
         padding: 15px;
     }
 }
+
+/* Profile button container */
+.profile-button-container {
+    position: fixed;
+    top: 20px;
+    right: 80px; /* Position it next to the theme toggle button */
+    z-index: 1000;
+}
+
+.profile-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.profile-button i {
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+
+.profile-button:hover {
+    background-color: var(--border-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive adjustments for profile button */
+@media (max-width: 768px) {
+    .profile-button-container {
+        top: 15px;
+        right: 70px;
+    }
+
+    .profile-button {
+        width: 35px;
+        height: 35px;
+    }
+
+    .profile-button i {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-button-container {
+        top: 10px;
+        right: 60px;
+    }
+
+    .profile-button {
+        width: 32px;
+        height: 32px;
+    }
+
+    .profile-button i {
+        font-size: 1rem;
+    }
+}
+
+/* User Details Section */
+.user-details-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.user-info {
+    margin-top: 15px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.info-label {
+    min-width: 120px;
+    color: var(--text-color);
+    opacity: 0.7;
+    font-weight: 500;
+}
+
+.info-value {
+    color: var(--text-color);
+    font-weight: 600;
+    flex: 1;
+}
+
+.section-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 25px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .user-details-section {
+        padding: 15px;
+    }
+
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .info-label {
+        min-width: unset;
+    }
+}
   

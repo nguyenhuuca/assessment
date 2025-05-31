@@ -41,9 +41,6 @@
             <button id="shareBtn" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#shareModal">
               <i class="fas fa-share-alt me-2"></i>Share a movie
             </button>
-            <button id="profileBtn" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#profileModal">
-              <i class="fas fa-user me-2"></i>Profile
-            </button>
             <button id="loginBtn" onclick="joinSystem()" type="button" class="btn btn-light">
               <span id="loginSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
               <i class="fas fa-sign-in-alt me-2"></i>Register / Login
@@ -54,6 +51,11 @@
           </div>
         </form>
       </div>
+    </div>
+    <div class="profile-button-container">
+      <button id="profileBtn" type="button" class="btn btn-light profile-button" data-bs-toggle="modal" data-bs-target="#profileModal">
+        <i class="fas fa-user"></i>
+      </button>
     </div>
     <hr>
     <div class="app-error-msg" id="errMsg">Error message</div>
@@ -118,6 +120,28 @@
         </div>
         <div class="modal-body">
           <div class="profile-section">
+            <!-- User Details Section -->
+            <div class="user-details-section">
+              <h6 class="section-title">User Information</h6>
+              <div class="user-info">
+                <div class="info-item">
+                  <span class="info-label">Email:</span>
+                  <span id="userEmail" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Member Since:</span>
+                  <span id="memberSince" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Last Login:</span>
+                  <span id="lastLogin" class="info-value"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- MFA Section -->
             <h6 class="section-title">Two-Factor Authentication</h6>
             <div class="mfa-status">
               <span class="status-label">Status:</span>
