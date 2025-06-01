@@ -1,0 +1,52 @@
+@startuml
+actor User
+participant "Frontend" as FE
+participant "MfaController" as BE
+participant "MfaService"
+database "Database" as DB
+participant "Google Authenticator" as GA
+
+== [1] Setup MFA ==
+
+User -> FE : Click "Setup MFA"
+FE -> BE : POST /api/mfa/setup
+BE -> MfaService : generateSecret()
+MfaService -> MfaService : generate otpauth://... + QR Base64
+MfaService -> DB : save temporary secret
+BE -> FE : return QR Base64 + secret
+FE -> User : Display QR code for scanning
+
+== [2] Enable MFA ==
+
+User -> GA : Scan QR code
+User -> FE : Enter TOTP code
+FE -> BE : POST /api/mfa/enable
+BE -> MfaService : verify(code, temporarySecret)
+alt valid code
+    MfaService -> DB : mark MFA enabled, store permanent secret
+    BE -> FE : success
+else invalid code
+    BE -> FE : return error
+end
+
+== [3] Login with MFA ==
+
+User -> FE : Login (username + password)
+FE -> BE : POST /login
+BE -> DB : verify credentials
+alt MFA not enabled
+    BE -> FE : return login success
+else MFA enabled
+    BE -> FE : prompt for TOTP code
+end
+
+User -> FE : Enter MFA code
+FE -> BE : POST /api/mfa/verify
+BE -> MfaService : verify(code, storedSecret)
+alt valid code
+    BE -> FE : return login success
+else invalid code
+    BE -> FE : return 401 Unauthorized
+end
+
+@enduml
