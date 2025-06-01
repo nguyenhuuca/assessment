@@ -1,52 +1,67 @@
 @startuml
-actor User
-participant "Frontend" as FE
-participant "MfaController" as BE
-participant "MfaService"
-database "Database" as DB
-participant "Google Authenticator" as GA
+' Enable color theme
+skinparam sequence {
+    ArrowColor DeepSkyBlue
+    ActorBorderColor black
+    LifeLineBorderColor gray
+    LifeLineBackgroundColor #DDDDDD
+    ParticipantBorderColor black
+    ParticipantBackgroundColor #E0F7FA
+    BoxBackgroundColor #FFF9C4
+    NoteBackgroundColor #FFECB3
+    NoteBorderColor black
+}
 
-== [1] Setup MFA ==
+actor User #DarkSeaGreen
+participant "Frontend" as FE #White
+participant "MfaController\n(Backend)" as BE #LightBlue
+participant "MfaService" #LightCyan
+database "Database" as DB #Wheat
+participant "Google Authenticator" as GA #LightGreen
 
-User -> FE : Click "Setup MFA"
-FE -> BE : POST /api/mfa/setup
-BE -> MfaService : generateSecret()
-MfaService -> MfaService : generate otpauth://... + QR Base64
-MfaService -> DB : save temporary secret
-BE -> FE : return QR Base64 + secret
-FE -> User : Display QR code for scanning
+box "1. Setup MFA"
+    User -> FE : Click "Setup MFA"
+    FE -> BE : POST /api/mfa/setup
+    BE -> MfaService : generateSecret()
+    MfaService -> MfaService : generate otpauth://... + QR Base64
+    MfaService -> DB : save temporary secret
+    BE -> FE : return QR Base64 + secret
+    FE -> User : Display QR code
+end box
 
-== [2] Enable MFA ==
+box "2. Enable MFA"
+    User -> GA : Scan QR code
+    User -> FE : Enter TOTP code
+    FE -> BE : POST /api/mfa/enable
+    BE -> MfaService : verify(code, temporarySecret)
+    alt valid code
+        MfaService -> DB : store secret permanently (MFA enabled)
+        BE -> FE : return success
+    else invalid code
+        BE -> FE : return error
+    end
+end box
 
-User -> GA : Scan QR code
-User -> FE : Enter TOTP code
-FE -> BE : POST /api/mfa/enable
-BE -> MfaService : verify(code, temporarySecret)
-alt valid code
-    MfaService -> DB : mark MFA enabled, store permanent secret
-    BE -> FE : success
-else invalid code
-    BE -> FE : return error
-end
+box "3. Login"
+    User -> FE : Login (username/password)
+    FE -> BE : POST /login
+    BE -> DB : validate credentials
+    alt MFA not enabled
+        BE -> FE : return login success
+    else MFA enabled
+        BE -> FE : prompt for TOTP code
+    end
+end box
 
-== [3] Login with MFA ==
-
-User -> FE : Login (username + password)
-FE -> BE : POST /login
-BE -> DB : verify credentials
-alt MFA not enabled
-    BE -> FE : return login success
-else MFA enabled
-    BE -> FE : prompt for TOTP code
-end
-
-User -> FE : Enter MFA code
-FE -> BE : POST /api/mfa/verify
-BE -> MfaService : verify(code, storedSecret)
-alt valid code
-    BE -> FE : return login success
-else invalid code
-    BE -> FE : return 401 Unauthorized
-end
+box "4. Verify MFA"
+    User -> FE : Enter TOTP code
+    FE -> BE : POST /api/mfa/verify
+    BE -> MfaService : verify(code, storedSecret)
+    alt valid code
+        BE -> FE : return login success
+    else invalid code
+        BE -> FE : return 401 Unauthorized
+    end
+end box
 
 @enduml
