@@ -9,6 +9,38 @@ $.ajaxSetup({
     }
 });
 
+let pendingLoginData = null;
+
+/**
+ * Get all users from localStorage
+ * @returns {Object} Object containing all users with their MFA status
+ */
+function getUsers() {
+    return JSON.parse(localStorage.getItem('users') || '{}');
+}
+
+/**
+ * Save user to localStorage
+ * @param {Object} user - User object to save
+ */
+function saveUser(user) {
+    const users = getUsers();
+    users[user.email] = {
+        mfaEnabled: user.mfaEnabled || false
+    };
+    localStorage.setItem('users', JSON.stringify(users));
+}
+
+/**
+ * Get user's MFA status from localStorage
+ * @param {string} email - User's email
+ * @returns {boolean} MFA status
+ */
+function getUserMfaStatus(email) {
+    const users = getUsers();
+    return users[email]?.mfaEnabled || false;
+}
+
 /**
  * User can login or register in case is new user
  * When call api joinSystem, will return user info and jwt token for old user and new user
@@ -21,14 +53,16 @@ function joinSystem() {
     }
 
     if (appConst.offlineMode) {
-        // Mock login response for offline mode
+        // Check if user exists in users list
+        const mfaEnabled = getUserMfaStatus(userObj.email);
         const mockData = {
             jwt: "mock-jwt-token",
             user: {
-                email: userObj.email
+                email: userObj.email,
+                mfaEnabled: mfaEnabled
             }
         };
-        processLoginSuccess(mockData);
+        handleLoginResponse(mockData);
     } else {
         $.ajax({
             url: appConst.baseUrl.concat("/join"),
@@ -37,11 +71,79 @@ function joinSystem() {
             contentType: "application/json",
             dataType: "json"
         }).done(function(rs) {
-            processLoginSuccess(rs.data);
+            handleLoginResponse(rs.data);
         }).fail(function(err) {
             $("#errMsg").text(err.responseJSON.error.message);
             $("#errMsg").show();
             $("#loginSpinner").hide();
+        });
+    }
+}
+
+/**
+ * Handle login response and check if MFA verification is needed
+ * @param {Object} data - Login response data
+ */
+function handleLoginResponse(data) {
+    // Store the login data temporarily
+    pendingLoginData = data;
+
+    // Check MFA status from users list
+    const mfaEnabled = getUserMfaStatus(data.user.email);
+    
+    // Update user's MFA status
+    data.user.mfaEnabled = mfaEnabled;
+
+    if (mfaEnabled) {
+        // User has MFA enabled, show verification modal
+        $('#mfaVerificationModal').modal('show');
+        $("#loginSpinner").hide();
+    } else {
+        // No MFA required, process login directly
+        processLoginSuccess(data);
+    }
+}
+
+/**
+ * Verify MFA code during login
+ */
+function verifyLoginMFA() {
+    const code = document.getElementById('loginVerificationCode').value;
+    if (!code || code.length !== 6) {
+        $("#errMsg").text("Please enter a valid 6-digit code");
+        $("#errMsg").show();
+        return;
+    }
+
+    const spinner = document.getElementById('verifyLoginSpinner');
+    spinner.classList.remove('d-none');
+
+    if (appConst.offlineMode) {
+        // Mock verification for offline mode
+        setTimeout(() => {
+            processLoginSuccess(pendingLoginData);
+            $('#mfaVerificationModal').modal('hide');
+            spinner.classList.add('d-none');
+        }, 1000);
+    } else {
+        // Call API to verify code
+        $.ajax({
+            url: appConst.baseUrl.concat("/mfa/verify-login"),
+            type: "POST",
+            data: JSON.stringify({ 
+                code: code,
+                email: pendingLoginData.user.email 
+            }),
+            contentType: "application/json",
+            dataType: "json"
+        }).done(function(rs) {
+            processLoginSuccess(pendingLoginData);
+            $('#mfaVerificationModal').modal('hide');
+        }).fail(function(err) {
+            $("#errMsg").text(err.responseJSON.error.message);
+            $("#errMsg").show();
+        }).always(function() {
+            spinner.classList.add('d-none');
         });
     }
 }
@@ -249,6 +351,9 @@ function enableMFA() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     user.mfaEnabled = true;
     localStorage.setItem('user', JSON.stringify(user));
+    
+    // Save to users list
+    saveUser(user);
 
     // Show success message
     $("#errMsg").text("MFA has been enabled successfully!");
@@ -278,6 +383,9 @@ function disableMFA() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     user.mfaEnabled = false;
     localStorage.setItem('user', JSON.stringify(user));
+    
+    // Save to users list
+    saveUser(user);
 
     // Show success message
     $("#errMsg").text("MFA has been disabled successfully!");
@@ -287,4 +395,14 @@ function disableMFA() {
 // Initialize MFA when document is ready
 $(document).ready(function() {
     initMFA();
+    
+    // Add event listener for MFA verification button
+    document.getElementById('verifyLoginMfaBtn').addEventListener('click', verifyLoginMFA);
+    
+    // Clear pending login data when modal is closed
+    $('#mfaVerificationModal').on('hidden.bs.modal', function () {
+        pendingLoginData = null;
+        document.getElementById('loginVerificationCode').value = '';
+        $("#errMsg").hide();
+    });
 }); 

@@ -184,6 +184,32 @@
     </div>
   </div>
 
+  <!-- MFA Verification Modal -->
+  <div class="modal fade" id="mfaVerificationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mfaVerificationModalLabel">
+            <i class="fas fa-shield-alt me-2"></i>Two-Factor Authentication
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="verification-form">
+            <div class="form-group">
+              <label for="loginVerificationCode">Enter verification code:</label>
+              <input type="text" id="loginVerificationCode" class="form-control" placeholder="Enter 6-digit code">
+            </div>
+            <button id="verifyLoginMfaBtn" class="btn btn-primary mt-3">
+              <span id="verifyLoginSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+              Verify & Login
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // load all when init page
     initState();
