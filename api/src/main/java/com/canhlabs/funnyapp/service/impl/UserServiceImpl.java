@@ -5,11 +5,16 @@ import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.share.AppUtils;
 import com.canhlabs.funnyapp.share.JwtProvider;
+import com.canhlabs.funnyapp.share.QrUtil;
 import com.canhlabs.funnyapp.share.dto.JwtGenerationDto;
 import com.canhlabs.funnyapp.share.dto.LoginDto;
+import com.canhlabs.funnyapp.share.dto.MfaRequest;
+import com.canhlabs.funnyapp.share.dto.SetupResponse;
 import com.canhlabs.funnyapp.share.dto.UserDetailDto;
 import com.canhlabs.funnyapp.share.dto.UserInfoDto;
 import com.canhlabs.funnyapp.share.exception.CustomException;
+import com.canhlabs.funnyapp.share.totp.TotpUtil;
+import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,6 +44,7 @@ public class UserServiceImpl implements UserService {
     public void injectJwt(JwtProvider jwtProvider) {
         this.jwtProvider = jwtProvider;
     }
+
     @Lazy
     @Autowired
     public void injectAuth(AuthenticationManager authenticationManager) {
@@ -45,9 +52,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Autowired
-    public  void injectData(UserRepo userRepo) {
+    public void injectData(UserRepo userRepo) {
         this.userRepo = userRepo;
     }
+
     @Autowired
     public void injectBCrypt(PasswordEncoder bCrypt) {
         this.bCrypt = bCrypt;
@@ -58,14 +66,14 @@ public class UserServiceImpl implements UserService {
     public UserInfoDto joinSystem(LoginDto loginDto) {
         validate(loginDto);
         User user = userRepo.findAllByUserName(loginDto.getEmail());
-        if(user != null) {
+        if (user != null) {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
                     loginDto.getPassword());
             authenticationManager.authenticate(authenticationToken);
             return toUserInfo(user, getToken(user));
         }
         // create new user
-        User  newUser = toEntity(loginDto);
+        User newUser = toEntity(loginDto);
         newUser = userRepo.save(newUser);
         return toUserInfo(newUser, getToken(newUser));
 
@@ -79,6 +87,50 @@ public class UserServiceImpl implements UserService {
         }
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), grantedAuthorities);
+    }
+
+    @Override
+    public String generateSecret() {
+        byte[] buffer = new byte[10]; // 80 bits
+        new SecureRandom().nextBytes(buffer);
+        return new Base32().encodeToString(buffer).replace("=", "");
+    }
+
+    @Override
+    public String enableMfa(String userName, String secret, String otp) {
+        if (!TotpUtil.verify(otp, secret))  {
+            throw  CustomException.builder()
+                    .message("Otp is incorrectly")
+                    .build();
+        }
+        User user = userRepo.findAllByUserName(userName);
+        user.setMfaEnabled(true);
+        user.setMfaSecret(secret);
+        userRepo.save(user);
+        return "success";
+    }
+
+    @Override
+    public SetupResponse setupMfa(String userName) {
+        String secret = generateSecret();
+        String issuer = "canh-labs";
+        String otpAuthUrl = String.format(
+                "otpauth://totp/%s:%s?secret=%s&issuer=%s&digits=6&period=30",
+                issuer, userName, secret, issuer
+        );
+        String qrCode = QrUtil.generateQRCodeBase64(otpAuthUrl, 250, 250);
+        return new SetupResponse(secret, qrCode);
+    }
+
+    @Override
+    public String verifyMfa(MfaRequest mfaRequest) {
+        User user = userRepo.findAllByUserName(mfaRequest.username());
+        if (!TotpUtil.verify(mfaRequest.otp(), user.getMfaSecret())) {
+            throw  CustomException.builder()
+                    .message("Otp is incorrectly")
+                    .build();
+        }
+        return "success";
     }
 
     private User toEntity(LoginDto loginDto) {
@@ -95,14 +147,14 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validate(LoginDto loginDto) {
-        if(StringUtils.isEmpty(loginDto.getEmail()) || StringUtils.isEmpty(loginDto.getPassword())) {
-            throw  CustomException.builder()
+        if (StringUtils.isEmpty(loginDto.getEmail()) || StringUtils.isEmpty(loginDto.getPassword())) {
+            throw CustomException.builder()
                     .message("Field is not empty")
                     .build();
         }
 
-        if(!AppUtils.isValidEmail(loginDto.getEmail())) {
-            throw  CustomException.builder()
+        if (!AppUtils.isValidEmail(loginDto.getEmail())) {
+            throw CustomException.builder()
                     .message("Invalid email")
                     .build();
         }

@@ -41,8 +41,7 @@ public class WebSecurityConfig {
                         auth.requestMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()).permitAll();
                     });
                     auth.requestMatchers(swaggerWhiteList).permitAll();
-                    //auth.requestMatchers(AppConstant.WebIgnoringConfig.WHITE_LIST_URLS).permitAll();
-                    auth.anyRequest().authenticated();
+                    auth.anyRequest().permitAll();
 
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

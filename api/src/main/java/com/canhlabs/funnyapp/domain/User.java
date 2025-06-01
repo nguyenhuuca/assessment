@@ -41,5 +41,10 @@ public class User extends BaseDomain {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @Column(name = "mfa_enabled", nullable = false)
+    private boolean mfaEnabled = false;
+
+    @Column(name = "mfa_secret")
+    private String mfaSecret;
 
 }
