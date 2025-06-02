@@ -1,0 +1,69 @@
+package com.canhlabs.funnyapp.service.impl;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+
+@Slf4j
+@Service
+public class MailService {
+
+    private final JavaMailSender mailSender;
+    private String htmlTemplate;
+
+    public MailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    @PostConstruct
+    public void loadTemplate() throws IOException {
+        // Load HTML template once at startup
+        ClassPathResource resource = new ClassPathResource("templates/email/invite.html");
+        htmlTemplate = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
+    }
+
+    public void sendSimpleMail(String to, String subject, String content) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("no-reply@canh-labs.com");
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(content);
+        mailSender.send(message);
+    }
+
+    @Async
+    public void sendInvitation(String to, String username, String verifyUrl) {
+        String subject = "Enable Your Account";
+        // Replace placeholders
+        String content = htmlTemplate
+                .replace("{{username}}", username)
+                .replace("{{loginUrl}}", verifyUrl);
+
+        sendEmail(to, subject, content);
+    }
+
+
+    private void sendEmail(String to, String subject, String content) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(content, true); // true for HTML
+            mailSender.send(message);
+        } catch (Exception e) {
+            log.warn("Send email err", e);
+        }
+    }
+}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Activate Login</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f6fc;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            max-width: 520px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            color: white;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .logo img {
+            max-width: 100px;
+            border-radius: 12px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #00cec9;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #00b894;
+        }
+
+        .btn-wrapper {
+            text-align: center;
+            margin: 28px 0;
+        }
+
+        .footer {
+            font-size: 13px;
+            color: #dfe6e9;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer a {
+            color: #81ecec;
+            text-decoration: none;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">
+        <img src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" alt="Canh Labs Logo" />
+    </div>
+
+    <h2>Welcome to Canh Labs 👋</h2>
+
+    <p>Hi {{username}},</p>
+    <p>Your account is almost ready. To complete the login setup, please click the button below to activate your access.</p>
+
+    <div class="btn-wrapper">
+        <a href="{{loginUrl}}" target="_blank" class="btn">Login Now</a>
+    </div>
+
+    <p>If you didn't request this email, just ignore it.</p>
+
+    <div class="footer">
+        &copy; 2025 Canh Labs · Need help? <a href="mailto:support@canh-labs.com">Contact Support</a>
+    </div>
+</div>
+</body>
+</html>

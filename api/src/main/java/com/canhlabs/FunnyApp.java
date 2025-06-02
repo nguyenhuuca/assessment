@@ -1,6 +1,9 @@
 package com.canhlabs;
 
+import com.canhlabs.funnyapp.service.impl.MailService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,9 +20,16 @@ import org.springframework.security.config.annotation.authentication.configurati
 @EnableCaching
 @EnableScheduling
 @Slf4j
-public class FunnyApp {
+public class FunnyApp implements CommandLineRunner {
+    @Autowired
+    MailService mailService;
     public static void  main(String[] args) {
         SpringApplication.run(FunnyApp.class, args);
         log.info("Starting application");
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        log.info("No pre-processing after started");
     }
 }

@@ -22,9 +22,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(AppConstant.API.BASE_URL)
+@RequestMapping(AppConstant.API.BASE_URL +"/user")
 @Validated
 @Slf4j
+
 public class UserController extends BaseController {
 
     private UserService userService;

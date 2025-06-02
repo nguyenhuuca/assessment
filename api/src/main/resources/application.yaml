@@ -17,6 +17,14 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_SENDER}
+    password: ${EMAIL_PASS}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:5432/funnyapp
     username: postgres
@@ -50,7 +58,6 @@ app:
   jwt-secret-key: ${JWT_SECRET:12345678901234567890123456789012}
   google-api-key: ${GOOGLE_KEY}
   google-part: snippet,contentDetails,statistics,statusKey
-  thread-executor: virtual1
   gpt-key: ${GPT_KEY}
 
 # Springdoc (OpenAPI/Swagger) config
@@ -61,4 +68,5 @@ springdoc:
     # path: /swagger-ui/index.html
     enabled: true
   show-actuator: true
+
 
