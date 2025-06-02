@@ -665,9 +665,9 @@ body {
 #loginBtn {
     min-width: 180px;
 }
-#logoutBtn {
+/* #logoutBtn {
     min-width: 180px;
-}
+} */
 
 /* Profile Modal Styles */
 .profile-section {
@@ -819,9 +819,12 @@ body {
 /* Profile button container */
 .profile-button-container {
     position: fixed;
-    top: 20px;
-    right: 80px; /* Position it next to the theme toggle button */
+    top: 70px;
+    right: 20px;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .profile-button {
@@ -838,46 +841,81 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.profile-button i {
-    font-size: 1.2rem;
-    color: var(--text-color);
+.logout-button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #dc3545;
+    border: none;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.profile-button:hover {
-    background-color: var(--border-color);
-    transform: translateY(-2px);
+.logout-button i {
+    color: white;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.logout-button:hover {
+    transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive adjustments for profile button */
+[data-theme="dark"] .logout-button {
+    background-color: #dc3545;
+}
+
+[data-theme="dark"] .logout-button i {
+    color: white;
+}
+
+/* Responsive adjustments for profile and logout buttons */
 @media (max-width: 768px) {
     .profile-button-container {
-        top: 15px;
-        right: 70px;
+        top: 55px;
+        right: 15px;
+        gap: 8px;
     }
 
-    .profile-button {
+    .profile-button,
+    .logout-button {
         width: 35px;
         height: 35px;
+        min-width: 35px;
+        min-height: 35px;
     }
 
-    .profile-button i {
+    .profile-button i,
+    .logout-button i {
         font-size: 1.1rem;
     }
 }
 
 @media (max-width: 480px) {
     .profile-button-container {
-        top: 10px;
-        right: 60px;
+        top: 50px;
+        right: 10px;
+        gap: 6px;
     }
 
-    .profile-button {
+    .profile-button,
+    .logout-button {
         width: 32px;
         height: 32px;
+        min-width: 32px;
+        min-height: 32px;
     }
 
-    .profile-button i {
+    .profile-button i,
+    .logout-button i {
         font-size: 1rem;
     }
 }
@@ -943,4 +981,78 @@ body {
         min-width: unset;
     }
 }
+
+/* Modal header actions */
+.modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header-actions .logout-button {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #dc3545;
+    border: none;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.modal-header-actions .logout-button i {
+    color: white;
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+.modal-header-actions .logout-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .modal-header-actions .logout-button {
+    background-color: #dc3545;
+}
+
+[data-theme="dark"] .modal-header-actions .logout-button i {
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modal-header-actions .logout-button {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        min-height: 22px;
+    }
+
+    .modal-header-actions .logout-button i {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-header-actions {
+        gap: 8px;
+    }
+    
+    .modal-header-actions .logout-button {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+    }
+
+    .modal-header-actions .logout-button i {
+        font-size: 0.7rem;
+    }
+}
+  
   
