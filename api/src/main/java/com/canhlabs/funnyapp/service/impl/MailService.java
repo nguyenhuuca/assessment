@@ -53,6 +53,7 @@ public class MailService {
                 .replace("{{loginUrl}}", verifyUrl);
 
         sendEmail(to, subject, content);
+        log.info("Send email to {} success", to);
     }
 
 
