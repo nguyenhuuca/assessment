@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -29,7 +30,9 @@ public class MailService {
     public void loadTemplate() throws IOException {
         // Load HTML template once at startup
         ClassPathResource resource = new ClassPathResource("templates/email/invite.html");
-        htmlTemplate = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
+        try (InputStream is = resource.getInputStream()) {
+            htmlTemplate = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
     public void sendSimpleMail(String to, String subject, String content) {
