@@ -355,9 +355,11 @@ function enableMFA() {
     // Save to users list
     saveUser(user);
 
-    // Show success message
-    $("#errMsg").text("MFA has been enabled successfully!");
-    $("#errMsg").show();
+    // Show success message in profile modal
+    const profileMessage = document.getElementById('profileMessage');
+    profileMessage.textContent = "MFA has been enabled successfully!";
+    profileMessage.className = 'profile-message success';
+    profileMessage.style.display = 'block';
 }
 
 /**
@@ -387,9 +389,11 @@ function disableMFA() {
     // Save to users list
     saveUser(user);
 
-    // Show success message
-    $("#errMsg").text("MFA has been disabled successfully!");
-    $("#errMsg").show();
+    // Show success message in profile modal
+    const profileMessage = document.getElementById('profileMessage');
+    profileMessage.textContent = "MFA has been disabled successfully!";
+    profileMessage.className = 'profile-message success';
+    profileMessage.style.display = 'block';
 }
 
 // Initialize MFA when document is ready
@@ -404,5 +408,12 @@ $(document).ready(function() {
         pendingLoginData = null;
         document.getElementById('loginVerificationCode').value = '';
         $("#errMsg").hide();
+    });
+
+    // Add event listener to clear message when modal is closed
+    $('#profileModal').on('hidden.bs.modal', function () {
+        const profileMessage = document.getElementById('profileMessage');
+        profileMessage.style.display = 'none';
+        profileMessage.textContent = '';
     });
 }); 

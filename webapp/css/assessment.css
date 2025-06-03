@@ -132,7 +132,7 @@ body {
 
 .modal-header {
     border-bottom: 1px solid var(--border-color);
-    padding: 20px 25px;
+    padding: 12px 20px;
     background-color: var(--card-bg);
     border-radius: 15px 15px 0 0;
 }
@@ -144,7 +144,7 @@ body {
 }
 
 .modal-body {
-    padding: 25px;
+    padding: 15px 20px;
 }
 
 .modal-body .form-label {
@@ -1203,6 +1203,47 @@ body {
     background-color: var(--bg-color);
     border-radius: 8px;
     border: 1px solid var(--border-color);
+}
+
+/* Profile Message */
+.profile-message {
+    margin: 0 0 8px 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+    text-align: center;
+    font-weight: 500;
+}
+
+.profile-message.success {
+    background-color: rgba(40, 167, 69, 0.1);
+    border: 1px solid #28a745;
+    color: #28a745;
+}
+
+.profile-message.error {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid #dc3545;
+    color: #dc3545;
+}
+
+[data-theme="dark"] .profile-message.success {
+    background-color: rgba(40, 167, 69, 0.2);
+    border-color: #28a745;
+    color: #28a745;
+}
+
+[data-theme="dark"] .profile-message.error {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+/* Add margin to tabs when message is shown */
+.profile-message:not(:empty) + .nav-tabs {
+    margin-top: 8px;
 }
   
   
