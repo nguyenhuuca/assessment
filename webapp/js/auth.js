@@ -109,14 +109,17 @@ function handleLoginResponse(data) {
  */
 function verifyLoginMFA() {
     const code = document.getElementById('loginVerificationCode').value;
+    const errorElement = document.getElementById('mfaVerificationError');
+    
     if (!code || code.length !== 6) {
-        $("#errMsg").text("Please enter a valid 6-digit code");
-        $("#errMsg").show();
+        errorElement.textContent = "Please enter a valid 6-digit code";
+        errorElement.style.display = 'block';
         return;
     }
 
     const spinner = document.getElementById('verifyLoginSpinner');
     spinner.classList.remove('d-none');
+    errorElement.style.display = 'none';
 
     if (appConst.offlineMode) {
         // Mock verification for offline mode
@@ -140,8 +143,8 @@ function verifyLoginMFA() {
             processLoginSuccess(pendingLoginData);
             $('#mfaVerificationModal').modal('hide');
         }).fail(function(err) {
-            $("#errMsg").text(err.responseJSON.error.message);
-            $("#errMsg").show();
+            errorElement.textContent = err.responseJSON.error.message;
+            errorElement.style.display = 'block';
         }).always(function() {
             spinner.classList.add('d-none');
         });
@@ -224,6 +227,7 @@ function initMFA() {
     const verifyMfaBtn = document.getElementById('verifyMfaBtn');
     const disableMfaBtn = document.getElementById('disableMfaBtn');
     const mfaStatus = document.getElementById('mfaStatus');
+    const profileMessage = document.getElementById('profileMessage');
 
     // Check if MFA is already enabled
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -249,8 +253,9 @@ function initMFA() {
             }).done(function(rs) {
                 document.getElementById('qrCode').innerHTML = `<img src="${rs.data.qrCode}" alt="MFA QR Code">`;
             }).fail(function(err) {
-                $("#errMsg").text(err.responseJSON.error.message);
-                $("#errMsg").show();
+                profileMessage.textContent = err.responseJSON.error.message;
+                profileMessage.className = 'profile-message error';
+                profileMessage.style.display = 'block';
             });
         }
         mfaSetupSection.classList.add('active');
@@ -260,13 +265,15 @@ function initMFA() {
     verifyMfaBtn.addEventListener('click', function() {
         const code = document.getElementById('verificationCode').value;
         if (!code || code.length !== 6) {
-            $("#errMsg").text("Please enter a valid 6-digit code");
-            $("#errMsg").show();
+            profileMessage.textContent = "Please enter a valid 6-digit code";
+            profileMessage.className = 'profile-message error';
+            profileMessage.style.display = 'block';
             return;
         }
 
         const spinner = document.getElementById('verifySpinner');
         spinner.classList.remove('d-none');
+        profileMessage.style.display = 'none';
 
         if (appConst.offlineMode) {
             // Mock verification for offline mode
@@ -285,8 +292,9 @@ function initMFA() {
             }).done(function(rs) {
                 enableMFA();
             }).fail(function(err) {
-                $("#errMsg").text(err.responseJSON.error.message);
-                $("#errMsg").show();
+                profileMessage.textContent = err.responseJSON.error.message;
+                profileMessage.className = 'profile-message error';
+                profileMessage.style.display = 'block';
             }).always(function() {
                 spinner.classList.add('d-none');
             });
@@ -297,13 +305,15 @@ function initMFA() {
     disableMfaBtn.addEventListener('click', function() {
         const code = document.getElementById('disableVerificationCode').value;
         if (!code || code.length !== 6) {
-            $("#errMsg").text("Please enter a valid 6-digit code");
-            $("#errMsg").show();
+            profileMessage.textContent = "Please enter a valid 6-digit code";
+            profileMessage.className = 'profile-message error';
+            profileMessage.style.display = 'block';
             return;
         }
 
         const spinner = document.getElementById('disableSpinner');
         spinner.classList.remove('d-none');
+        profileMessage.style.display = 'none';
 
         if (appConst.offlineMode) {
             // Mock disable for offline mode
@@ -322,8 +332,9 @@ function initMFA() {
             }).done(function(rs) {
                 disableMFA();
             }).fail(function(err) {
-                $("#errMsg").text(err.responseJSON.error.message);
-                $("#errMsg").show();
+                profileMessage.textContent = err.responseJSON.error.message;
+                profileMessage.className = 'profile-message error';
+                profileMessage.style.display = 'block';
             }).always(function() {
                 spinner.classList.add('d-none');
             });
@@ -407,7 +418,7 @@ $(document).ready(function() {
     $('#mfaVerificationModal').on('hidden.bs.modal', function () {
         pendingLoginData = null;
         document.getElementById('loginVerificationCode').value = '';
-        $("#errMsg").hide();
+        document.getElementById('mfaVerificationError').style.display = 'none';
     });
 
     // Add event listener to clear message when modal is closed

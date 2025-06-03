@@ -58,7 +58,6 @@
       </button>
     </div>
     <hr>
-    <div class="app-error-msg" id="errMsg">Error message</div>
     
     <!-- Add tabs -->
     <ul class="nav nav-tabs mb-3" id="videoTabs" role="tablist">
@@ -220,6 +219,7 @@
               <label for="loginVerificationCode">Enter verification code:</label>
               <input type="text" id="loginVerificationCode" class="form-control" placeholder="Enter 6-digit code">
             </div>
+            <div id="mfaVerificationError" class="profile-message error" style="display: none;"></div>
             <button id="verifyLoginMfaBtn" class="btn btn-primary mt-3">
               <span id="verifyLoginSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
               Verify & Login
