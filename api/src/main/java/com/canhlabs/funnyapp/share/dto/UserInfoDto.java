@@ -16,5 +16,7 @@ public class UserInfoDto extends BaseDto {
     @JsonInclude(JsonInclude.Include.ALWAYS)
     private String action;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String sessionToken;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private UserDetailDto user;
 }

@@ -29,7 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.canhlabs.funnyapp.service.impl.Converter.toUserInfo;
 
@@ -39,10 +41,16 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder bCrypt;
     private JwtProvider jwtProvider;
     private AuthenticationManager authenticationManager;
+    private MFASessionStore mfaSessionStore;
 
     @Autowired
     public void injectJwt(JwtProvider jwtProvider) {
         this.jwtProvider = jwtProvider;
+    }
+
+    @Autowired
+    public void injectMfaStore(MFASessionStore mfaSessionStore) {
+        this.mfaSessionStore = mfaSessionStore;
     }
 
     @Lazy
@@ -71,15 +79,17 @@ public class UserServiceImpl implements UserService {
                     loginDto.getPassword());
             authenticationManager.authenticate(authenticationToken);
             if (user.isMfaEnabled()) {
-                return toUserInfo(user, null, "MFA_REQUIRED");
+                String sessionToken = UUID.randomUUID().toString();
+                mfaSessionStore.storeSession(sessionToken, user.getUserName());
+                return toUserInfo(user, null, "MFA_REQUIRED", sessionToken);
 
             }
-            return toUserInfo(user, getToken(user), null);
+            return toUserInfo(user, getToken(user));
         }
         // create new user
         User newUser = toEntity(loginDto);
         newUser = userRepo.save(newUser);
-        return toUserInfo(newUser, getToken(newUser), null);
+        return toUserInfo(newUser, getToken(newUser));
 
     }
 
@@ -128,13 +138,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserInfoDto verifyMfa(MfaRequest mfaRequest) {
-        User user = userRepo.findAllByUserName(mfaRequest.username());
+        String sessionToken = mfaRequest.sessionToken();
+        Optional<String> userIdOpt = mfaSessionStore.getUserId(sessionToken);
+        if (userIdOpt.isEmpty()) {
+            throw  CustomException.builder()
+                    .message("Invalid or expired session")
+                    .build();
+        }
+        User user = userRepo.findAllByUserName(userIdOpt.get());
         if (!TotpUtil.verify(mfaRequest.otp(), user.getMfaSecret())) {
             throw  CustomException.builder()
                     .message("Otp is incorrectly")
                     .build();
         }
-        return  toUserInfo(user, getToken(user), null);
+        return  toUserInfo(user, getToken(user));
     }
 
     private User toEntity(LoginDto loginDto) {

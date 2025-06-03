@@ -11,10 +11,26 @@ import java.util.stream.Collectors;
 
 public class Converter {
     private Converter(){}
+    public static UserInfoDto toUserInfo(User user, String token, String action, String sessionToken) {
+        return UserInfoDto.builder()
+                .jwt(token)
+                .action(action)
+                .sessionToken(sessionToken)
+                .user(toUserDetail(user))
+                .build();
+    }
+
     public static UserInfoDto toUserInfo(User user, String token, String action) {
         return UserInfoDto.builder()
                 .jwt(token)
                 .action(action)
+                .user(toUserDetail(user))
+                .build();
+    }
+
+    public static UserInfoDto toUserInfo(User user, String token) {
+        return UserInfoDto.builder()
+                .jwt(token)
                 .user(toUserDetail(user))
                 .build();
     }

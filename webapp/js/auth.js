@@ -140,7 +140,8 @@ function verifyLoginMFA() {
             type: "POST",
             data: JSON.stringify({ 
                 otp: code,
-                username: pendingLoginData.user.email
+                username: pendingLoginData.user.email,
+                sessionToken: pendingLoginData.sessionToken
             }),
             contentType: "application/json",
             dataType: "json"
