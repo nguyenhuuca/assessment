@@ -37,12 +37,14 @@ body {
 .app-container .app-header .app-header__form {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 15px;
+    flex-wrap: nowrap;
 }
 
 .app-container .app-header .app-header__form .app-header__form-item {
-    margin: 4px 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
 }
 
 .app-container .app-header .app-header__form .app-header__form-item input {
@@ -50,10 +52,7 @@ body {
     padding: 8px 12px;
     border-radius: 6px;
     transition: all 0.3s ease;
-}
-
-.app-container .app-header .app-header__form .app-header__form-item input:focus {
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    margin: 0;
 }
 
 .app-container .app-header .app-header__form .app-header__form-item button {
@@ -61,10 +60,7 @@ body {
     border-radius: 6px;
     transition: all 0.3s ease;
     white-space: nowrap;
-}
-
-.app-container .app-header .app-header__form .app-header__form-item button:hover {
-    transform: translateY(-1px);
+    margin: 0;
 }
 
 .app-error-msg {
@@ -332,24 +328,18 @@ body {
     .app-header__form {
         flex-direction: column;
         width: 100%;
-        gap: 8px;
+        gap: 10px;
     }
 
-    .app-header__form-item {
+    .app-header__form .app-header__form-item {
         width: 100%;
-        margin: 2px 0;
+        margin: 0;
     }
 
-    .app-header__form-item input {
+    .app-header__form .app-header__form-item input,
+    .app-header__form .app-header__form-item button {
         width: 100%;
-        min-width: unset;
-        margin-bottom: 4px;
-    }
-
-    .app-header__form-item button {
-        width: 100%;
-        margin: 2px 0;
-        padding: 10px 16px;
+        margin: 0;
     }
 
     .app-header h1 {
@@ -427,9 +417,21 @@ body {
     }
 
     #messageInfo {
+        min-width: unset;
+        width: 100%;
         text-align: center;
-        margin-bottom: 6px;
+        margin-bottom: 5px;
         font-size: 1.1rem;
+    }
+
+    #loginBtn, #shareBtn {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .app-header__form-item input {
+        min-width: unset;
+        width: 100%;
     }
 }
 
@@ -457,6 +459,7 @@ body {
 
     .app-header__form-item button {
         font-size: 1rem;
+        padding: 10px;
     }
 
     #messageInfo {
@@ -660,10 +663,10 @@ body {
     color: var(--text-color);
     opacity: 0.9;
     margin-right: 8px;
-    width: 255px;
+    min-width: 200px;
 }
-#loginBtn {
-    min-width: 180px;
+#loginBtn, #shareBtn {
+    min-width: 140px;
 }
 /* #logoutBtn {
     min-width: 180px;
