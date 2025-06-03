@@ -166,7 +166,7 @@ body {
 }
 
 .modal-body .btn-share {
-    background-color: #007bff;
+    background-color: #FF0000;
     color: white;
     border: none;
     padding: 12px;
@@ -178,7 +178,7 @@ body {
 }
 
 .modal-body .btn-share:hover {
-    background-color: #0056b3;
+    background-color: #cc0000;
     transform: translateY(-2px);
 }
 
@@ -763,12 +763,36 @@ body {
     width: 100%;
     padding: 10px;
     font-weight: 500;
+    color: #FF0000;
+    border-color: #FF0000;
+}
+
+#setupMfaBtn:hover {
+    background-color: #FF0000;
+    color: white;
 }
 
 #verifyMfaBtn {
     width: 100%;
     padding: 10px;
     font-weight: 500;
+    background-color: #FF0000;
+    border-color: #FF0000;
+}
+
+#verifyMfaBtn:hover {
+    background-color: #cc0000;
+    border-color: #cc0000;
+}
+
+#verifyLoginMfaBtn {
+    background-color: #FF0000;
+    border-color: #FF0000;
+}
+
+#verifyLoginMfaBtn:hover {
+    background-color: #cc0000;
+    border-color: #cc0000;
 }
 
 /* Responsive adjustments */
