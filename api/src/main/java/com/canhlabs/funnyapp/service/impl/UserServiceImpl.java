@@ -70,12 +70,16 @@ public class UserServiceImpl implements UserService {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
                     loginDto.getPassword());
             authenticationManager.authenticate(authenticationToken);
-            return toUserInfo(user, getToken(user));
+            if (user.isMfaEnabled()) {
+                return toUserInfo(user, null, "MFA_REQUIRED");
+
+            }
+            return toUserInfo(user, getToken(user), null);
         }
         // create new user
         User newUser = toEntity(loginDto);
         newUser = userRepo.save(newUser);
-        return toUserInfo(newUser, getToken(newUser));
+        return toUserInfo(newUser, getToken(newUser), null);
 
     }
 
@@ -118,19 +122,19 @@ public class UserServiceImpl implements UserService {
                 "otpauth://totp/%s:%s?secret=%s&issuer=%s&digits=6&period=30",
                 issuer, userName, secret, issuer
         );
-        String qrCode = QrUtil.generateQRCodeBase64(otpAuthUrl, 250, 250);
+        String qrCode = QrUtil.generateQRCodeBase64(otpAuthUrl, 200, 200);
         return new SetupResponse(secret, qrCode);
     }
 
     @Override
-    public String verifyMfa(MfaRequest mfaRequest) {
+    public UserInfoDto verifyMfa(MfaRequest mfaRequest) {
         User user = userRepo.findAllByUserName(mfaRequest.username());
         if (!TotpUtil.verify(mfaRequest.otp(), user.getMfaSecret())) {
             throw  CustomException.builder()
                     .message("Otp is incorrectly")
                     .build();
         }
-        return "success";
+        return  toUserInfo(user, getToken(user), null);
     }
 
     private User toEntity(LoginDto loginDto) {

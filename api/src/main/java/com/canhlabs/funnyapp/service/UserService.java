@@ -27,7 +27,7 @@ public interface UserService extends UserDetailsService {
      */
     SetupResponse setupMfa(String userName);
 
-    String verifyMfa(MfaRequest mfaRequest) ;
+    UserInfoDto verifyMfa(MfaRequest mfaRequest) ;
 
 
 

@@ -11,9 +11,10 @@ import java.util.stream.Collectors;
 
 public class Converter {
     private Converter(){}
-    public static UserInfoDto toUserInfo(User user, String token) {
+    public static UserInfoDto toUserInfo(User user, String token, String action) {
         return UserInfoDto.builder()
                 .jwt(token)
+                .action(action)
                 .user(toUserDetail(user))
                 .build();
     }

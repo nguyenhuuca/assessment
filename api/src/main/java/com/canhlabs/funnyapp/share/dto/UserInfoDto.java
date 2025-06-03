@@ -11,8 +11,10 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @ToString
 public class UserInfoDto extends BaseDto {
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private String jwt;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private String action;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private UserDetailDto user;
 }

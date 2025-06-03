@@ -70,9 +70,9 @@ public class UserController extends BaseController {
 
     // Using to verify user in case user login and enabled MFA
     @PostMapping("/mfa/verify")
-    public ResponseEntity<ResultObjectInfo<String>> verify(@RequestBody MfaRequest req) {
-        String rs = userService.verifyMfa(req);
-        return new ResponseEntity<>(ResultObjectInfo.<String>builder()
+    public ResponseEntity<ResultObjectInfo<UserInfoDto>> verify(@RequestBody MfaRequest req) {
+        UserInfoDto rs = userService.verifyMfa(req);
+        return new ResponseEntity<>(ResultObjectInfo.<UserInfoDto>builder()
                 .status(ResultStatus.SUCCESS)
                 .data(rs)
                 .build(), HttpStatus.OK);

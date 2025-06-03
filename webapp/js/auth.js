@@ -65,7 +65,7 @@ function joinSystem() {
         handleLoginResponse(mockData);
     } else {
         $.ajax({
-            url: appConst.baseUrl.concat("/join"),
+            url: appConst.baseUrl.concat("/user/join"),
             type: "POST",
             data: JSON.stringify(userObj),
             contentType: "application/json",
@@ -87,10 +87,15 @@ function joinSystem() {
 function handleLoginResponse(data) {
     // Store the login data temporarily
     pendingLoginData = data;
+    let mfaEnabled;
 
     // Check MFA status from users list
-    const mfaEnabled = getUserMfaStatus(data.user.email);
-    
+    if(appConst.offlineMode) {
+        mfaEnabled = getUserMfaStatus(data.user.email);
+    } else {
+        mfaEnabled = data.action === "MFA_REQUIRED"
+    }
+
     // Update user's MFA status
     data.user.mfaEnabled = mfaEnabled;
 
@@ -131,16 +136,16 @@ function verifyLoginMFA() {
     } else {
         // Call API to verify code
         $.ajax({
-            url: appConst.baseUrl.concat("/mfa/verify-login"),
+            url: appConst.baseUrl.concat("/user/mfa/verify"),
             type: "POST",
             data: JSON.stringify({ 
-                code: code,
-                email: pendingLoginData.user.email 
+                otp: code,
+                username: pendingLoginData.user.email
             }),
             contentType: "application/json",
             dataType: "json"
         }).done(function(rs) {
-            processLoginSuccess(pendingLoginData);
+            processLoginSuccess(rs.data);
             $('#mfaVerificationModal').modal('hide');
         }).fail(function(err) {
             errorElement.textContent = err.responseJSON.error.message;
@@ -247,11 +252,13 @@ function initMFA() {
         } else {
             // Call API to get QR code
             $.ajax({
-                url: appConst.baseUrl.concat("/mfa/setup"),
+                url: appConst.baseUrl.concat("/user/mfa/setup").concat("?username=").concat(user.email),
                 type: "GET",
                 dataType: "json"
             }).done(function(rs) {
-                document.getElementById('qrCode').innerHTML = `<img src="${rs.data.qrCode}" alt="MFA QR Code">`;
+                user.secret=rs.data.secret
+                localStorage.setItem('user', JSON.stringify(user));
+                document.getElementById('qrCode').innerHTML = `<img src="data:data:image/png;base64,${rs.data.qrCode}" alt="MFA QR Code">`;
             }).fail(function(err) {
                 profileMessage.textContent = err.responseJSON.error.message;
                 profileMessage.className = 'profile-message error';
@@ -284,9 +291,9 @@ function initMFA() {
         } else {
             // Call API to verify code
             $.ajax({
-                url: appConst.baseUrl.concat("/mfa/verify"),
+                url: appConst.baseUrl.concat("/user/mfa/enable"),
                 type: "POST",
-                data: JSON.stringify({ code: code }),
+                data: JSON.stringify({ otp: code,  username: user.email, secret: user.secret }),
                 contentType: "application/json",
                 dataType: "json"
             }).done(function(rs) {
@@ -324,7 +331,7 @@ function initMFA() {
         } else {
             // Call API to disable MFA
             $.ajax({
-                url: appConst.baseUrl.concat("/mfa/disable"),
+                url: appConst.baseUrl.concat("user/mfa/disable"),
                 type: "POST",
                 data: JSON.stringify({ code: code }),
                 contentType: "application/json",

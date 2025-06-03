@@ -31,5 +31,6 @@ public class FunnyApp implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("No pre-processing after started");
+        // mailService.sendInvitation("nguyenhuuca@gmail.com", "Ca1", "canh-labs.com");
     }
 }

@@ -782,7 +782,6 @@ body.modal-open {
     height: 200px;
     margin: 0 auto 15px;
     background-color: white;
-    padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -797,6 +796,7 @@ body.modal-open {
 .verification-form {
     max-width: 300px;
     margin: 0 auto;
+    text-align: center;
 }
 
 .verification-form .form-group {
@@ -845,11 +845,20 @@ body.modal-open {
 #verifyLoginMfaBtn {
     background-color: #FF0000;
     border-color: #FF0000;
+    width: 100%;
+    padding: 10px;
+    font-weight: 500;
+    margin-top: 15px;
 }
 
 #verifyLoginMfaBtn:hover {
     background-color: #cc0000;
     border-color: #cc0000;
+    transform: translateY(-1px);
+}
+
+#verifyLoginMfaBtn .spinner-border {
+    margin-right: 8px;
 }
 
 /* Responsive adjustments */
