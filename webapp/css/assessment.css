@@ -120,6 +120,9 @@ body {
 }
 
 .modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
     background-color: var(--card-bg);
     border: none;
     border-radius: 15px;
@@ -197,7 +200,51 @@ body {
     transform: rotate(90deg);
 }
 
-/* Modal animation */
+/* Prevent scrollbar shift */
+html {
+    scrollbar-gutter: stable;
+}
+
+/* Modal styles */
+.modal-open {
+    overflow: hidden;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+    display: none;
+    width: 100%;
+    height: 100%;
+    outline: 0;
+}
+
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 1.75rem auto;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+}
+
+.modal-backdrop.fade {
+    opacity: 0;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5;
+}
+
 .modal.fade .modal-dialog {
     transform: scale(0.8);
     transition: transform 0.3s ease-in-out;
@@ -205,6 +252,11 @@ body {
 
 .modal.show .modal-dialog {
     transform: scale(1);
+}
+
+/* Remove Bootstrap's default padding-right */
+body.modal-open {
+    padding-right: 0 !important;
 }
 
 /* Theme toggle button */
