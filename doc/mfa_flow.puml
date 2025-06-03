@@ -12,6 +12,7 @@ skinparam sequence {
     NoteBorderColor black
 }
 
+AutoNumber
 actor User #DarkSeaGreen
 participant "Frontend" as FE #White
 participant "MfaController\n(Backend)" as BE #LightBlue

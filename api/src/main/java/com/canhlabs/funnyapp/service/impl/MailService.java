@@ -1,8 +1,10 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,6 +23,10 @@ public class MailService {
 
     private final JavaMailSender mailSender;
     private String htmlTemplate;
+    @Value("${spring.mail.username}")
+    private String fromAddress;
+
+
 
     public MailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -65,6 +71,7 @@ public class MailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(content, true); // true for HTML
+            helper.setFrom(new InternetAddress(fromAddress, "No Reply(canh-labs.com)"));
             mailSender.send(message);
         } catch (Exception e) {
             log.warn("Send email err", e);
