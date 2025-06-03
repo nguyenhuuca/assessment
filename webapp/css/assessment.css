@@ -1078,5 +1078,48 @@ body {
         font-size: 0.7rem;
     }
 }
+
+#shareBtn {
+    background-color: #FF0000 !important;
+    color: white !important;
+    border: none !important;
+    transition: all 0.3s ease;
+}
+
+#shareBtn:hover {
+    background-color: #cc0000 !important;
+    transform: translateY(-1px);
+}
+
+#loginBtn {
+    background-color: #FF0000 !important;
+    color: white !important;
+    border: none !important;
+    transition: all 0.3s ease;
+}
+
+#loginBtn:hover {
+    background-color: #cc0000 !important;
+    transform: translateY(-1px);
+}
+
+#loginBtn .spinner-border {
+    color: white;
+}
+
+.profile-button i {
+    font-size: 1.2rem;
+    color: #FF0000;
+}
+
+.profile-button:hover {
+    background-color: var(--border-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.profile-button:hover i {
+    color: #FF0000;
+}
   
   
