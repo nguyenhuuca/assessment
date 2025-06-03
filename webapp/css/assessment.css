@@ -39,6 +39,7 @@ body {
     align-items: center;
     gap: 15px;
     flex-wrap: nowrap;
+    margin-bottom: 15px;
 }
 
 .app-container .app-header .app-header__form .app-header__form-item {
@@ -381,6 +382,7 @@ body.modal-open {
         flex-direction: column;
         width: 100%;
         gap: 10px;
+        margin-bottom: 20px;
     }
 
     .app-header__form .app-header__form-item {
@@ -1299,6 +1301,11 @@ body.modal-open {
 /* Add margin to tabs when message is shown */
 .profile-message:not(:empty) + .nav-tabs {
     margin-top: 8px;
+}
+
+.app-container hr {
+    margin: 2px;
+    border-color: var(--border-color);
 }
   
   
