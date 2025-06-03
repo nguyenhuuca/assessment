@@ -1121,5 +1121,88 @@ body {
 .profile-button:hover i {
     color: #FF0000;
 }
+
+/* Profile Modal Tabs */
+.profile-section .nav-tabs {
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.profile-section .nav-tabs .nav-item {
+    margin-bottom: -2px;
+}
+
+.profile-section .nav-tabs .nav-link {
+    border: none;
+    color: var(--text-color);
+    font-weight: 500;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    margin-right: 5px;
+}
+
+.profile-section .nav-tabs .nav-link:hover {
+    color: #FF0000;
+    border: none;
+    background-color: rgba(255, 0, 0, 0.05);
+}
+
+.profile-section .nav-tabs .nav-link.active {
+    color: #FF0000;
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid #FF0000;
+}
+
+.profile-section .nav-tabs .nav-link.active:hover {
+    border-bottom: 3px solid #FF0000;
+}
+
+.profile-section .tab-content {
+    padding: 20px 0;
+}
+
+.profile-section .tab-pane {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* User Info Tab */
+.user-details-section {
+    margin-bottom: 0;
+    padding: 20px;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+/* MFA Setup Tab */
+.mfa-status {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.mfa-setup-section,
+.mfa-disable-section {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
   
   
