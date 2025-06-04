@@ -258,17 +258,10 @@ function displayVideos(videos) {
 
     // Sort videos by upvotes for popular tab
     const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
-    
-    // Display videos in appropriate tabs
-    videos.forEach(video => {
-        const videoHtml = bindingDataWhenLoad(video, loadTemplate());
-        if (video.category === 'funny') {
-            $("#list-video-funny").append(videoHtml);
-        }
-    });
+
 
     // Display popular videos (top 5)
-    sortedByPopularity.slice(0, 5).forEach(video => {
+    sortedByPopularity.forEach(video => {
         const videoHtml = bindingDataWhenLoad(video, loadTemplate());
         $("#list-video-popular").append(videoHtml);
     });
