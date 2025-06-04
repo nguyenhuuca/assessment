@@ -33,6 +33,7 @@ public class ConfigBean {
             @Override
             public void addCorsMappings(@NotNull CorsRegistry registry) {
                 registry.addMapping("/**")
+                        .allowedOrigins("*")
                         .allowedHeaders("*")
                         .allowedMethods("POST, PUT, GET, OPTIONS, DELETE");
             }

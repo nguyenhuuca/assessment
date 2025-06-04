@@ -57,6 +57,8 @@ public class WebSecurityConfig {
         return request -> {
             CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
             config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            config.setAllowedHeaders(List.of("*"));
+            config.setAllowedOrigins(List.of("*"));
             return config;
         };
     }
