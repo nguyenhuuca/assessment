@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.service.impl;
+package com.canhlabs.funnyapp.cache;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -11,17 +11,18 @@ import java.util.concurrent.TimeUnit;
 public class MFASessionStore {
 
     // key: sessionToken, value: userId
-    private final Cache<String, String> sessionCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(5, TimeUnit.MINUTES)   // TTL: 5m
-            .maximumSize(10000)                      // optional: limi ammount
-            .build();
+    private final AppCache<String, String> sessionCache;
+
+    public MFASessionStore(AppCacheFactory factory) {
+        this.sessionCache = factory.createCache(5, 10000); // TTL: 5m
+    }
 
     public void storeSession(String sessionToken, String userId) {
         sessionCache.put(sessionToken, userId);
     }
 
     public Optional<String> getUserId(String sessionToken) {
-        return Optional.ofNullable(sessionCache.getIfPresent(sessionToken));
+        return sessionCache.get(sessionToken);
     }
 
     public void remove(String sessionToken) {

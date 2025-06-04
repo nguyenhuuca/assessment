@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.MFASessionStore;
 import com.canhlabs.funnyapp.domain.User;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.service.UserService;

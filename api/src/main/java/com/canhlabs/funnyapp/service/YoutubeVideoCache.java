@@ -6,5 +6,5 @@ public interface YoutubeVideoCache {
     List<String> get(String key);
     void put(String key, List<String> videoIds);
     void put(String key, String videoId);
-    boolean contains(String key);;
+    boolean contains(String key);
 }
