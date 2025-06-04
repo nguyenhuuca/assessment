@@ -29,6 +29,8 @@ public interface UserService extends UserDetailsService {
 
     UserInfoDto verifyMfa(MfaRequest mfaRequest) ;
 
+    UserInfoDto joinSystemPaswordless(String token);
+
 
 
 }

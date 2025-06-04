@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.MFASessionStore;
 import com.canhlabs.funnyapp.domain.User;
+import com.canhlabs.funnyapp.domain.UserEmailRequest;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.share.AppUtils;
@@ -43,6 +44,12 @@ public class UserServiceImpl implements UserService {
     private JwtProvider jwtProvider;
     private AuthenticationManager authenticationManager;
     private MFASessionStore mfaSessionStore;
+    private InviteService inviteService;
+
+    @Autowired
+    public void injectInvite(InviteService inviteService) {
+        this.inviteService = inviteService;
+    }
 
     @Autowired
     public void injectJwt(JwtProvider jwtProvider) {
@@ -153,6 +160,31 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
         return  toUserInfo(user, getToken(user));
+    }
+
+    @Override
+    public UserInfoDto joinSystemPaswordless(String token) {
+        Optional<UserEmailRequest> userReq = inviteService.verifyToken(token);
+        if (userReq.isEmpty()) {
+            throw  CustomException.builder()
+                    .message("Token in invalid")
+                    .build();
+        }
+        User user = userRepo.findAllByUserName(userReq.get().getEmail());
+        if (user != null) {
+            if (user.isMfaEnabled()) {
+                String sessionToken = UUID.randomUUID().toString();
+                mfaSessionStore.storeSession(sessionToken, user.getUserName());
+                return toUserInfo(user, null, "MFA_REQUIRED", sessionToken);
+            }
+            return toUserInfo(user, getToken(user));
+        }
+        // create new user
+        User newUser = User.builder()
+                .userName(userReq.get().getEmail())
+                .build();
+        newUser = userRepo.save(newUser);
+        return toUserInfo(newUser, getToken(newUser));
     }
 
     private User toEntity(LoginDto loginDto) {

@@ -30,7 +30,6 @@
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <jsonwebtoken.version>0.11.5</jsonwebtoken.version>
-        <hibernate-types-52.version>2.21.1</hibernate-types-52.version>
         <springdoc-openapi.version>2.5.0</springdoc-openapi.version>
         <skipTests>true</skipTests>
     </properties>
@@ -127,9 +126,9 @@
         <!-- Hibernate Types -->
         <!-- https://mvnrepository.com/artifact/com.vladmihalcea/hibernate-types-60 -->
         <dependency>
-            <groupId>com.vladmihalcea</groupId>
-            <artifactId>hibernate-types-60</artifactId>
-            <version>2.21.1</version>
+            <groupId>io.hypersistence</groupId>
+            <artifactId>hypersistence-utils-hibernate-63</artifactId>
+            <version>3.9.10</version>
         </dependency>
 
         <!-- SpringDoc OpenAPI -->
