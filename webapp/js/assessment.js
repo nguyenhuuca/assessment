@@ -1,8 +1,4 @@
-let appConst = {
-    // baseUrl: "http://localhost:8081/v1/funny-app",
-    baseUrl: "https://canh-labs.com/api/v1/funny-app",
-    offlineMode: false  // Flag to control offline/online mode
-}
+
 /**
  * Using to holed video object
  * @param {*} id : id video after share
