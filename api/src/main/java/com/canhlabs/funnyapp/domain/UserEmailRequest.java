@@ -47,7 +47,7 @@ public class UserEmailRequest {
     @Column(length = 50, nullable = false)
     private String purpose;
 
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "metadata")
     private String metadata;
 
     @PrePersist

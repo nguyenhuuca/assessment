@@ -23,6 +23,7 @@ public class AppProperties {
     // query condition
     private String googlePart;
     private String gptKey;
+    private boolean usePasswordless;
 
 
 

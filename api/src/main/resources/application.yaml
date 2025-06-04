@@ -59,6 +59,7 @@ app:
   google-api-key: ${GOOGLE_KEY}
   google-part: snippet,contentDetails,statistics,statusKey
   gpt-key: ${GPT_KEY}
+  use-password-less: true
 
 # Springdoc (OpenAPI/Swagger) config
 springdoc:

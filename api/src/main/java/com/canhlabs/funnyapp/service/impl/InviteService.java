@@ -2,7 +2,9 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.domain.UserEmailRequest;
 import com.canhlabs.funnyapp.repo.UserEmailRequestRepository;
+import com.canhlabs.funnyapp.share.AppUtils;
 import com.canhlabs.funnyapp.share.enums.Status;
+import com.canhlabs.funnyapp.share.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,11 @@ public class InviteService {
      * Send link join system
      */
     public void inviteUser(String email, Long invitedByUserId) {
+        if (!AppUtils.isValidEmail(email)) {
+            throw CustomException.builder()
+                    .message("Invalid email")
+                    .build();
+        }
         String token = UUID.randomUUID().toString();
         Instant now = Instant.now();
 

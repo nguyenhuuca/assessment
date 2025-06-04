@@ -9,5 +9,5 @@ CREATE TABLE user_email_request (
                                     invited_by_user_id int4,
                                     user_id int4,
                                     purpose VARCHAR(50) NOT NULL DEFAULT 'JOIN_SYSTEM',
-                                    metadata JSONB
+                                    metadata Text
 );

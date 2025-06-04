@@ -39,7 +39,6 @@ body {
     align-items: center;
     gap: 15px;
     flex-wrap: nowrap;
-    margin-bottom: 15px;
 }
 
 .app-container .app-header .app-header__form .app-header__form-item {
@@ -71,7 +70,7 @@ body {
     color:red;
 }
 
-#errMsg-area {
+#msg-area {
     height: 15px;
 }
 
@@ -94,6 +93,8 @@ body {
 }
 
 .app-header {
+    width: 100%;
+    margin: auto;
     background-color: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
 }
@@ -1320,6 +1321,13 @@ body.modal-open {
 .app-container hr {
     margin: 2px;
     border-color: var(--border-color);
+}
+
+.error-msg {
+    color: red;
+}
+.success-msg {
+    color: green;
 }
   
   

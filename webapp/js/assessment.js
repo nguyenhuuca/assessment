@@ -1,8 +1,4 @@
-let appConst = {
-    //baseUrl: "http://localhost:8081/v1/funny-app",
-     baseUrl: "https://canh-labs.com/api/v1/funny-app",
-    offlineMode: false  // Flag to control offline/online mode
-}
+
 /**
  * Using to holed video object
  * @param {*} id : id video after share
@@ -67,8 +63,7 @@ function share() {
             $("#shareSpinner").hide();
             $('#shareModal').modal('hide');
         }).fail(function(err) {
-            $("#errMsg").text(err.responseJSON.error.message);
-            $("#errMsg").show();
+            showMessage(err.responseJSON.error.message, "error")
             $("#shareSpinner").hide();
         });
     }
@@ -78,7 +73,7 @@ function share() {
 $(document).ready(function() {
     $('#shareModal').on('hidden.bs.modal', function () {
         $("#shareSpinner").hide();
-        $("#errMsg").hide();
+        $("#mainMsg").hide();
         $("#urlYoutube").val('');
     });
 });
@@ -245,8 +240,7 @@ function loadData() {
             );
             displayVideos(videos);
         }).fail(function(err) {
-            $("#errMsg").text(err.responseJSON.error.message);
-            $("#errMsg").show();
+            showMessage(err.responseJSON.error.message, 'error')
         });
     }
 }
@@ -333,8 +327,7 @@ function deleteVideo(element) {
             // Remove the video element on successful deletion
             $(element).closest('.row').remove();
         }).fail(function(err) {
-            $("#errMsg").text(err.responseJSON.error.message);
-            $("#errMsg").show();
+            showMessage(err.responseJSON.error.message, "error")
         });
     }
 }

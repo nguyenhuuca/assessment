@@ -1,7 +1,9 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.service.UserService;
+import com.canhlabs.funnyapp.service.impl.InviteService;
 import com.canhlabs.funnyapp.share.AppConstant;
+import com.canhlabs.funnyapp.share.AppProperties;
 import com.canhlabs.funnyapp.share.ResultObjectInfo;
 import com.canhlabs.funnyapp.share.dto.EnableRequest;
 import com.canhlabs.funnyapp.share.dto.LoginDto;
@@ -29,6 +31,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController extends BaseController {
 
     private UserService userService;
+    private AppProperties appProperties;
+    private InviteService inviteService;
+
+    @Autowired
+    public void injectInvite(InviteService inviteService) {
+        this.inviteService = inviteService;
+    }
+
+    @Autowired
+    public void injectProp(AppProperties appProperties) {
+        this.appProperties = appProperties;
+    }
 
     @Autowired
     public void injectUser(UserService userService) {
@@ -41,10 +55,16 @@ public class UserController extends BaseController {
      */
     @PostMapping("/join")
     public ResponseEntity<ResultObjectInfo<UserInfoDto>> signIn(@RequestBody LoginDto loginDto) {
-        UserInfoDto rs = userService.joinSystem(loginDto);
+        UserInfoDto userInfoDto = UserInfoDto.builder().build();
+        if(!appProperties.isUsePasswordless()) {
+            userInfoDto = userService.joinSystem(loginDto);
+        } else {
+            inviteService.inviteUser(loginDto.getEmail(), null);
+            userInfoDto.setAction("INVITED_SEND");
+        }
         return new ResponseEntity<>(ResultObjectInfo.<UserInfoDto>builder()
                 .status(ResultStatus.SUCCESS)
-                .data(rs)
+                .data(userInfoDto)
                 .build(), HttpStatus.OK);
     }
 

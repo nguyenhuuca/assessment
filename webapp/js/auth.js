@@ -1,7 +1,8 @@
+
+
 /**
  * Authentication related functions
  */
-
 // Setup AJAX headers with JWT token
 $.ajaxSetup({
     headers:{
@@ -48,8 +49,7 @@ function getUserMfaStatus(email) {
 function joinSystem() {
     $("#loginSpinner").show();
     var userObj = {
-        email: $("#usr").val(),
-        password: $("#pwd").val()
+        email: $("#usr").val()
     }
 
     if (appConst.offlineMode) {
@@ -73,8 +73,7 @@ function joinSystem() {
         }).done(function(rs) {
             handleLoginResponse(rs.data);
         }).fail(function(err) {
-            $("#errMsg").text(err.responseJSON.error.message);
-            $("#errMsg").show();
+            showMessage(err.responseJSON.error.message, "error")
             $("#loginSpinner").hide();
         });
     }
@@ -92,8 +91,11 @@ function handleLoginResponse(data) {
     // Check MFA status from users list
     if(appConst.offlineMode) {
         mfaEnabled = getUserMfaStatus(data.user.email);
-    } else {
-        mfaEnabled = data.action === "MFA_REQUIRED"
+    } else if(data.action === STATUS.MFA_REQUIRED) {
+        mfaEnabled = true
+    } else if (data.action === STATUS.INVITED_SEND) {
+        showMessage("We've sent you an email. Please check your inbox", "success")
+        $("#loginSpinner").hide();
     }
 
     // Update user's MFA status
@@ -171,7 +173,7 @@ function processLoginSuccess(data) {
     $("#loginSpinner").hide();
     $("#grUser").hide();
     $("#grPass").hide();
-    $("#errMsg").hide();
+    $("#mainMsg").hide();
     
     // Save jwt and user info
     localStorage.setItem('jwt', data.jwt);
@@ -209,9 +211,8 @@ function initAuthState() {
     $("#logoutBtn").hide();
     $("#profileBtn").hide();
     $("#messageInfo").hide();
-    $("#errMsg").hide();
+    $("#mainMsg").hide();
     $("#grUser").show();
-    $("#grPass").show();
 
     // Check if user was previously logged in
     if(localStorage.getItem("jwt")) {
