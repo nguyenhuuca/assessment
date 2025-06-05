@@ -97,11 +97,13 @@ function handleLoginResponse(data) {
         return
     }
 
-
-
     if (mfaEnabled) {
         // Update user's MFA status
         data.user.mfaEnabled = mfaEnabled;
+        // Save updated user info to localStorage
+        localStorage.setItem('user', JSON.stringify(data.user));
+        // Save to users list
+        saveUser(data.user);
         // User has MFA enabled, show verification modal
         $('#mfaVerificationModal').modal('show');
         $("#loginSpinner").hide();

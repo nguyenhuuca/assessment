@@ -38,6 +38,7 @@ public class Converter {
         return UserDetailDto.builder()
                 .id(user.getId())
                 .email(user.getUserName())
+                .mfaEnabled(user.isMfaEnabled())
                 .build();
     }
 
