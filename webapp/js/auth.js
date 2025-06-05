@@ -437,6 +437,7 @@ function verifyMagicLinkToken(token) {
             if (rs.data.action === STATUS.MFA_REQUIRED) {
                 // Handle MFA flow without redirect
                 handleLoginResponse(rs.data);
+                window.history.replaceState({}, document.title, "/");
             } else {
                 // No MFA required, handle login and redirect
                 handleLoginResponse(rs.data);
@@ -473,6 +474,16 @@ function updateMfaSetupUI() {
     }
 }
 
+/**
+ * Update user info in the profile modal
+ */
+function updateUserInfo() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    document.getElementById('userEmail').textContent = user.email || '';
+    document.getElementById('memberSince').textContent = new Date().toLocaleDateString();
+    document.getElementById('lastLogin').textContent = new Date().toLocaleDateString();
+}
+
 // Initialize auth and check for magic link token when document is ready
 $(document).ready(function() {
     initAuthState();
@@ -495,9 +506,10 @@ $(document).ready(function() {
         profileMessage.textContent = '';
     });
 
-    // Update MFA setup UI when profile modal is opened
+    // Update UI when profile modal is opened
     $('#profileModal').on('show.bs.modal', function () {
         updateMfaSetupUI();
+        updateUserInfo();
     });
 
     // Get full query string
