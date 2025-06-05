@@ -357,18 +357,6 @@ function initMFA() {
  * Enable MFA for the user
  */
 function enableMFA() {
-    const mfaStatus = document.getElementById('mfaStatus');
-    const setupMfaBtn = document.getElementById('setupMfaBtn');
-    const mfaSetupSection = document.getElementById('mfaSetupSection');
-    const mfaDisableSection = document.getElementById('mfaDisableSection');
-
-    // Update UI
-    mfaStatus.textContent = 'Enabled';
-    mfaStatus.classList.add('enabled');
-    setupMfaBtn.style.display = 'none';
-    mfaSetupSection.classList.remove('active');
-    mfaDisableSection.classList.add('active');
-
     // Update user data
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     user.mfaEnabled = true;
@@ -376,6 +364,9 @@ function enableMFA() {
     
     // Save to users list
     saveUser(user);
+
+    // Update UI
+    updateMfaSetupUI();
 
     // Show success message in profile modal
     const profileMessage = document.getElementById('profileMessage');
@@ -457,6 +448,31 @@ function verifyMagicLinkToken(token) {
     }
 }
 
+/**
+ * Update MFA setup tab UI based on current MFA status
+ */
+function updateMfaSetupUI() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const mfaStatus = document.getElementById('mfaStatus');
+    const setupMfaBtn = document.getElementById('setupMfaBtn');
+    const mfaSetupSection = document.getElementById('mfaSetupSection');
+    const mfaDisableSection = document.getElementById('mfaDisableSection');
+
+    if (user.mfaEnabled) {
+        mfaStatus.textContent = 'Enabled';
+        mfaStatus.classList.add('enabled');
+        setupMfaBtn.style.display = 'none';
+        mfaSetupSection.classList.remove('active');
+        mfaDisableSection.classList.add('active');
+    } else {
+        mfaStatus.textContent = 'Disabled';
+        mfaStatus.classList.remove('enabled');
+        setupMfaBtn.style.display = 'block';
+        mfaSetupSection.classList.remove('active');
+        mfaDisableSection.classList.remove('active');
+    }
+}
+
 // Initialize auth and check for magic link token when document is ready
 $(document).ready(function() {
     initAuthState();
@@ -477,6 +493,11 @@ $(document).ready(function() {
         const profileMessage = document.getElementById('profileMessage');
         profileMessage.style.display = 'none';
         profileMessage.textContent = '';
+    });
+
+    // Update MFA setup UI when profile modal is opened
+    $('#profileModal').on('show.bs.modal', function () {
+        updateMfaSetupUI();
     });
 
     // Get full query string
