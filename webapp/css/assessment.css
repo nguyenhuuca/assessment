@@ -418,7 +418,12 @@ body.modal-open {
 
     /* Make video container full width */
     .ratio-16x9 {
-        margin-bottom: 15px;
+        margin: 0 -10px 15px -10px;
+        width: calc(100% + 20px);
+    }
+
+    .ratio-16x9 iframe {
+        border-radius: 0;
     }
 
     /* Adjust vote buttons for mobile */
