@@ -432,6 +432,8 @@ function verifyMagicLinkToken(token) {
             }
         };
         handleLoginResponse(mockData);
+        // Redirect to main domain in offline mode
+        window.location.href = "https://funnyapp.canh-labs.com";
     } else {
         $.ajax({
             url: appConst.baseUrl.concat("/user/verify-magic?token=").concat(token),
@@ -439,6 +441,8 @@ function verifyMagicLinkToken(token) {
             dataType: "json"
         }).done(function(rs) {
             handleLoginResponse(rs.data);
+            // Redirect to main domain after successful verification
+            window.location.href = "https://funnyapp.canh-labs.com";
         }).fail(function(err) {
             showMessage(err.responseJSON.error.message, "error");
         });

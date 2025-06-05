@@ -188,6 +188,7 @@ public class UserServiceImpl implements UserService {
                 .userName(userReq.get().getEmail())
                 .build();
         newUser = userRepo.save(newUser);
+        inviteService.markTokenAsUsed(userReq.get(), userReq.get().getUserId() );
         return toUserInfo(newUser, getToken(newUser));
     }
 
