@@ -1,5 +1,3 @@
-
-
 /**
  * Authentication related functions
  */
@@ -418,8 +416,38 @@ function disableMFA() {
     profileMessage.style.display = 'block';
 }
 
-// Initialize MFA when document is ready
+/**
+ * Handle magic link token verification
+ */
+function verifyMagicLinkToken(token) {
+    if (!token) return;
+
+    if (appConst.offlineMode) {
+        // Mock response for offline mode
+        const mockData = {
+            jwt: "mock-jwt-token",
+            user: {
+                email: "test@example.com",
+                mfaEnabled: false
+            }
+        };
+        handleLoginResponse(mockData);
+    } else {
+        $.ajax({
+            url: appConst.baseUrl.concat("/user/verify-magic?token=").concat(token),
+            type: "GET",
+            dataType: "json"
+        }).done(function(rs) {
+            handleLoginResponse(rs.data);
+        }).fail(function(err) {
+            showMessage(err.responseJSON.error.message, "error");
+        });
+    }
+}
+
+// Initialize auth and check for magic link token when document is ready
 $(document).ready(function() {
+    initAuthState();
     initMFA();
     
     // Add event listener for MFA verification button
@@ -438,4 +466,13 @@ $(document).ready(function() {
         profileMessage.style.display = 'none';
         profileMessage.textContent = '';
     });
+
+    // Get full query string
+    let queryString = window.location.search;
+    let params = new URLSearchParams(queryString);
+    let token = params.get('token');
+
+    if (token) {
+        verifyMagicLinkToken(token);
+    }
 }); 
