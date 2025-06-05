@@ -6,6 +6,7 @@ import com.canhlabs.funnyapp.share.AppUtils;
 import com.canhlabs.funnyapp.share.enums.Status;
 import com.canhlabs.funnyapp.share.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -13,13 +14,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InviteService {
 
     private final UserEmailRequestRepository requestRepo;
-    private final MailService emailSender; // bạn sẽ define riêng
-
+    private final MailService emailSender;
     /**
      * Send link join system
      */

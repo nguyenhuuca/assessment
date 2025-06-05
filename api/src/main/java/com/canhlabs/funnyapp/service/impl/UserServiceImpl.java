@@ -16,6 +16,7 @@ import com.canhlabs.funnyapp.share.dto.UserDetailDto;
 import com.canhlabs.funnyapp.share.dto.UserInfoDto;
 import com.canhlabs.funnyapp.share.exception.CustomException;
 import com.canhlabs.funnyapp.share.totp.TotpUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import java.util.UUID;
 
 import static com.canhlabs.funnyapp.service.impl.Converter.toUserInfo;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     private UserRepo userRepo;
@@ -170,6 +172,8 @@ public class UserServiceImpl implements UserService {
                     .message("Token in invalid")
                     .build();
         }
+        log.info("token was verified success for user {}", userReq.get().getEmail());
+
         User user = userRepo.findAllByUserName(userReq.get().getEmail());
         if (user != null) {
             if (user.isMfaEnabled()) {
