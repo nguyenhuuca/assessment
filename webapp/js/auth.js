@@ -440,9 +440,15 @@ function verifyMagicLinkToken(token) {
             type: "GET",
             dataType: "json"
         }).done(function(rs) {
-            handleLoginResponse(rs.data);
-            // Redirect to main domain after successful verification
-            window.location.href = "https://funnyapp.canh-labs.com";
+            // Check if MFA is required
+            if (rs.data.action === STATUS.MFA_REQUIRED) {
+                // Handle MFA flow without redirect
+                handleLoginResponse(rs.data);
+            } else {
+                // No MFA required, handle login and redirect
+                handleLoginResponse(rs.data);
+                window.location.href = "https://funnyapp.canh-labs.com";
+            }
         }).fail(function(err) {
             showMessage(err.responseJSON.error.message, "error");
         });
