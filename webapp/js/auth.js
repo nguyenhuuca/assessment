@@ -96,12 +96,14 @@ function handleLoginResponse(data) {
     } else if (data.action === STATUS.INVITED_SEND) {
         showMessage("We've sent you an email. Please check your inbox", "success")
         $("#loginSpinner").hide();
+        return
     }
 
-    // Update user's MFA status
-    data.user.mfaEnabled = mfaEnabled;
+
 
     if (mfaEnabled) {
+        // Update user's MFA status
+        data.user.mfaEnabled = mfaEnabled;
         // User has MFA enabled, show verification modal
         $('#mfaVerificationModal').modal('show');
         $("#loginSpinner").hide();

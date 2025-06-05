@@ -43,7 +43,7 @@ public class InviteService {
 
         requestRepo.save(request);
 
-        String frontendUrl = "https://canh-labs.com/join";
+        String frontendUrl = "https://funnyapp.canh-labs.com/join";
         String magicLink = frontendUrl + "?token=" + token;
 
         emailSender.sendInvitation(email, email, magicLink);
