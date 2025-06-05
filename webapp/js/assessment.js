@@ -168,7 +168,7 @@ function loadTemplate() {
             <iframe src="{{linkYotube}}" allowfullscreen></iframe>
         </div>
         </div>
-        <div class="col-6">
+        <div class="col-6 desc-video ">
         <div class="video-title">{{movi_title}}</div>
         <div class="video-meta">
             <div class="video-shared-by">

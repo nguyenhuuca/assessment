@@ -662,6 +662,10 @@ body.modal-open {
     padding-right: 0;
 }
 
+.desc-video {
+    padding-left: 5px!important;
+}
+
 .video-item:hover {
     transform: translateY(-2px);
 }
@@ -764,6 +768,10 @@ body.modal-open {
     .description-content {
         max-height: 70px;
         font-size: 0.75rem;
+    }
+
+    .desc-video {
+        padding-left: 15px;
     }
 }
 
