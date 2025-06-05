@@ -1,4 +1,3 @@
-
 /**
  * Using to holed video object
  * @param {*} id : id video after share
@@ -188,9 +187,16 @@ function loadTemplate() {
                 </div>
             </div>
         </div>
-        <div class="video-description">
-            <div class="description-label">Description:</div>
-            <div class="description-content">{{desc}}</div>
+        <div class="video-description-container">
+            <div class="description-header">
+                <div class="description-label">Description:</div>
+                <button class="description-toggle" onclick="toggleDescription(this)">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="video-description">
+                <div class="description-content">{{desc}}</div>
+            </div>
         </div>
         </div>
     </div>
@@ -331,4 +337,19 @@ function deleteVideo(element) {
         });
     }
 }
+
+// Handle description toggle
+$(document).on('click', '.description-toggle', function() {
+    const descriptionSection = $(this).closest('.video-description-container').find('.video-description');
+    const toggleIcon = $(this).find('i');
+    
+    descriptionSection.toggleClass('show');
+    $(this).toggleClass('active');
+    
+    if (descriptionSection.hasClass('show')) {
+        toggleIcon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    } else {
+        toggleIcon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    }
+});
 
