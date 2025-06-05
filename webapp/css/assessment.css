@@ -371,7 +371,7 @@ body.modal-open {
 /* Responsive styles */
 @media (max-width: 768px) {
     .app-container {
-        padding: 10px;
+        padding: 0;
     }
 
     .app-header {
@@ -417,13 +417,42 @@ body.modal-open {
     }
 
     /* Make video container full width */
+    .video-item {
+        padding: 0;
+        margin: 0;
+        border-radius: 0;
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        background-color: var(--bg-color);
+    }
+
     .ratio-16x9 {
-        margin: 0 -10px 15px -10px;
-        width: calc(100% + 20px);
+        margin: 0;
+        width: 100%;
     }
 
     .ratio-16x9 iframe {
         border-radius: 0;
+    }
+
+    /* Adjust content after video */
+    .video-item > .col-6:last-child {
+        padding: 15px;
+        max-width: 100%;
+    }
+
+    /* Remove padding from container */
+    .app-container {
+        padding: 0;
+    }
+
+    /* Add margin between video items */
+    .video-item + .video-item {
+        margin-top: 15px;
     }
 
     /* Adjust vote buttons for mobile */
@@ -622,10 +651,15 @@ body.modal-open {
 .video-item {
     background-color: var(--card-bg);
     border-radius: 12px;
-    padding: 20px;
+    padding: 0;
     margin-bottom: 30px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
+}
+
+.video-item .col-6 {
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .video-item:hover {
