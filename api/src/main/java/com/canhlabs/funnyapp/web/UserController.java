@@ -98,4 +98,12 @@ public class UserController extends BaseController {
                 .build(), HttpStatus.OK);
     }
 
+    @GetMapping("/verify-magic")
+    public ResponseEntity<ResultObjectInfo<UserInfoDto>> verifyLink(@RequestParam String token) {
+        return new ResponseEntity<>(ResultObjectInfo.<UserInfoDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(userService.joinSystemPaswordless(token))
+                .build(), HttpStatus.OK);
+    }
+
 }
