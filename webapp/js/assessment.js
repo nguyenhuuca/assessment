@@ -58,7 +58,7 @@ function share() {
             console.log(videoInfo);
             const video = new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
             let stringHtml = bindingDataWhenLoad(video, loadTemplate());
-            $("#list-video").prepend(stringHtml);
+            $("#list-video-private").prepend(stringHtml);
             $("#shareSpinner").hide();
             $('#shareModal').modal('hide');
         }).fail(function(err) {
@@ -211,7 +211,18 @@ function loadTemplate() {
  * @returns  string html after replace all data
  */
 function bindingDataWhenLoad(videoObj, templateHtml) {
-    let stringHtml = templateHtml.replace("{{linkYotube}}", videoObj.src);
+    let stringHtml = templateHtml;
+    
+    // Handle Google Drive URL
+    if (videoObj.src.includes('drive.google.com')) {
+        // Convert Google Drive URL to embed URL
+        const fileId = videoObj.src.match(/\/d\/(.*?)\//)?.[1];
+        if (fileId) {
+            videoObj.src = `https://drive.google.com/file/d/${fileId}/preview`;
+        }
+    }
+    
+    stringHtml = stringHtml.replace("{{linkYotube}}", videoObj.src);
     stringHtml = stringHtml.replace("{{movi_title}}", videoObj.title);
     stringHtml = stringHtml.replace("{{userName}}", videoObj.userShared);
     stringHtml = stringHtml.replace("{{desc}}", videoObj.desc);
@@ -232,7 +243,8 @@ function loadData() {
         const mockVideos = [
             new VideoObj("1", "user1@example.com", "Funny Cat Video", "https://www.youtube.com/embed/example1", "A hilarious cat video"),
             new VideoObj("2", "user2@example.com", "Cooking Tutorial", "https://www.youtube.com/embed/example2", "Learn to cook"),
-            new VideoObj("3", "user3@example.com", "Hài Hước - Stand Up Comedy", "https://www.youtube.com/embed/example3", "Funny stand up comedy show")
+            new VideoObj("3", "user3@example.com", "Hài Hước - Stand Up Comedy", "https://www.youtube.com/embed/example3", "Funny stand up comedy show"),
+            new VideoObj("4", "user4@example.com", "Private Drive Video", "https://drive.google.com/file/d/abcdd3345ggf/preview", "Private video from Google Drive")
         ];
         displayVideos(mockVideos);
     } else {
@@ -255,15 +267,19 @@ function displayVideos(videos) {
     // Clear all video lists
     $("#list-video-popular").empty();
     $("#list-video-funny").empty();
+    $("#list-video-private").empty();
 
     // Sort videos by upvotes for popular tab
     const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
 
-
     // Display popular videos (top 5)
     sortedByPopularity.forEach(video => {
         const videoHtml = bindingDataWhenLoad(video, loadTemplate());
-        $("#list-video-popular").append(videoHtml);
+        if (video.src.includes('drive.google.com')) {
+            $("#list-video-private").append(videoHtml);
+        } else {
+            $("#list-video-popular").append(videoHtml);
+        }
     });
 }
 
