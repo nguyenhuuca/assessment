@@ -335,7 +335,7 @@ function initMFA() {
         } else {
             // Call API to disable MFA
             $.ajax({
-                url: appConst.baseUrl.concat("user/mfa/disable"),
+                url: appConst.baseUrl.concat("/user/mfa/disable"),
                 type: "POST",
                 data: JSON.stringify({ code: code }),
                 contentType: "application/json",
