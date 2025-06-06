@@ -249,6 +249,76 @@ function logout() {
     $("#private-tab").hide();
 }
 
+// Global variable to store YouTube players
+let youtubePlayers = {};
+
+// This function is called automatically when YouTube API is ready
+function onYouTubeIframeAPIReady() {
+    // Initialize any existing YouTube videos
+    $('.youtube-player').each(function() {
+        const videoId = $(this).data('video-id');
+        if (videoId && !youtubePlayers[videoId]) {
+            createYouTubePlayer(videoId, this);
+        }
+    });
+}
+
+/**
+ * Create a new YouTube player
+ * @param {string} videoId - YouTube video ID
+ * @param {HTMLElement} element - Container element for the player
+ */
+function createYouTubePlayer(videoId, element) {
+    youtubePlayers[videoId] = new YT.Player(element, {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        playerVars: {
+            'playsinline': 1,
+            'rel': 0,
+            'modestbranding': 1
+        },
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+        }
+    });
+}
+
+/**
+ * Called when YouTube player is ready
+ * @param {Object} event - YouTube player event
+ */
+function onPlayerReady(event) {
+    // You can add custom controls or setup here
+}
+
+/**
+ * Called when YouTube player state changes
+ * @param {Object} event - YouTube player event
+ */
+function onPlayerStateChange(event) {
+    // You can handle video state changes here
+    // event.data can be:
+    // -1 (unstarted)
+    // 0 (ended)
+    // 1 (playing)
+    // 2 (paused)
+    // 3 (buffering)
+    // 5 (video cued)
+}
+
+/**
+ * Extract YouTube video ID from URL
+ * @param {string} url - YouTube URL
+ * @returns {string|null} YouTube video ID or null if not found
+ */
+function getYouTubeVideoId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
 /**
  * Using to return fix template for list video, each video will have item with fix fomat
  * @returns html with paramter by format: {{param}}
@@ -259,7 +329,11 @@ function loadTemplate() {
         <!-- 16:9 aspect ratio -->
         <div class="col-6">
         <div class="ratio ratio-16x9">
+            {{#if isYouTube}}
+            <div class="youtube-player" data-video-id="{{videoId}}"></div>
+            {{else}}
             <iframe src="{{linkYotube}}" allowfullscreen></iframe>
+            {{/if}}
         </div>
         </div>
         <div class="col-6 desc-video ">
@@ -307,13 +381,32 @@ function loadTemplate() {
 function bindingDataWhenLoad(videoObj, templateHtml) {
     let stringHtml = templateHtml;
     
-    // Handle Google Drive URL
-    if (videoObj.src.includes('drive.google.com')) {
-        // Convert Google Drive URL to embed URL
+    // Handle video source
+    if (videoObj.src.includes('youtube.com') || videoObj.src.includes('youtu.be')) {
+        const videoId = getYouTubeVideoId(videoObj.src);
+        if (videoId) {
+            stringHtml = stringHtml.replace("{{#if isYouTube}}", "");
+            stringHtml = stringHtml.replace("{{else}}", "");
+            stringHtml = stringHtml.replace("{{/if}}", "");
+            stringHtml = stringHtml.replace("{{videoId}}", videoId);
+        } else {
+            stringHtml = stringHtml.replace("{{#if isYouTube}}", "");
+            stringHtml = stringHtml.replace("{{else}}", "");
+            stringHtml = stringHtml.replace("{{/if}}", "");
+        }
+    } else if (videoObj.src.includes('drive.google.com')) {
+        // Handle Google Drive URL
         const fileId = videoObj.src.match(/\/d\/(.*?)\//)?.[1];
         if (fileId) {
             videoObj.src = `https://drive.google.com/file/d/${fileId}/preview`;
         }
+        stringHtml = stringHtml.replace("{{#if isYouTube}}", "");
+        stringHtml = stringHtml.replace("{{else}}", "");
+        stringHtml = stringHtml.replace("{{/if}}", "");
+    } else {
+        stringHtml = stringHtml.replace("{{#if isYouTube}}", "");
+        stringHtml = stringHtml.replace("{{else}}", "");
+        stringHtml = stringHtml.replace("{{/if}}", "");
     }
     
     stringHtml = stringHtml.replace("{{linkYotube}}", videoObj.src);
@@ -454,6 +547,16 @@ $(document).on('click', '.description-toggle', function() {
         toggleIcon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
     } else {
         toggleIcon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    }
+});
+
+// Add event listener for when new videos are added to the DOM
+$(document).on('DOMNodeInserted', function(e) {
+    if ($(e.target).hasClass('youtube-player')) {
+        const videoId = $(e.target).data('video-id');
+        if (videoId && !youtubePlayers[videoId]) {
+            createYouTubePlayer(videoId, e.target);
+        }
     }
 });
 
