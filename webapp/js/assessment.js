@@ -153,6 +153,100 @@ function initState() {
     initAuthState();
     initTheme();
     $("#shareSpinner").hide();
+    
+    // Hide private tab initially
+    $("#private-tab").hide();
+    
+    // Add click handler for private tab
+    $("#private-tab").on('click', function() {
+        loadPrivateVideos();
+    });
+}
+
+/**
+ * Load private videos from server
+ */
+function loadPrivateVideos() {
+    if (!localStorage.getItem("jwt")) {
+        return;
+    }
+
+    if (appConst.offlineMode) {
+        // Mock data for offline mode
+        const mockVideos = [
+            new VideoObj("4", "user4@example.com", "Private Drive Video", "https://drive.google.com/file/d/abcdd3345ggf/preview", "Private video from Google Drive")
+        ];
+        displayPrivateVideos(mockVideos);
+    } else {
+        $.ajax({
+            url: appConst.baseUrl.concat("/private-videos"),
+            type: "GET",
+            dataType: "json"
+        }).done(function(rs) {
+            const videos = rs.data.map(videoInfo => 
+                new VideoObj(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc)
+            );
+            displayPrivateVideos(videos);
+        }).fail(function(err) {
+            showMessage(err.responseJSON.error.message, 'error')
+        });
+    }
+}
+
+/**
+ * Display private videos in the private tab
+ */
+function displayPrivateVideos(videos) {
+    $("#list-video-private").empty();
+    videos.forEach(video => {
+        const videoHtml = bindingDataWhenLoad(video, loadTemplate());
+        $("#list-video-private").append(videoHtml);
+    });
+}
+
+/**
+ * Process successful login
+ * @param {Object} data - Login response data containing jwt and user info
+ */
+function processLoginSuccess(data) {
+    $("#shareBtn").show();
+    $("#logoutBtn").show();
+    $("#profileBtn").show();
+    $("#messageInfo").text(` Welcome ${data.user.email}`);
+    $("#messageInfo").show();
+    $("#loginBtn").hide();
+    $("#loginSpinner").hide();
+    $("#grUser").hide();
+    $("#grPass").hide();
+    $("#mainMsg").hide();
+    
+    // Show private tab when logged in
+    $("#private-tab").show();
+    
+    // Save jwt and user info
+    localStorage.setItem('jwt', data.jwt);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    // Update AJAX headers
+    $.ajaxSetup({
+        headers:{
+            'Authorization': localStorage.getItem("jwt")
+        }
+    });
+}
+
+/**
+ * Logout user by removing JWT token and user info
+ */
+function logout() {
+    console.log("logout system");
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("user");
+    initState();
+    $("#loginBtn").show();
+    $("#profileBtn").hide();
+    // Hide private tab when logged out
+    $("#private-tab").hide();
 }
 
 /**
@@ -243,8 +337,7 @@ function loadData() {
         const mockVideos = [
             new VideoObj("1", "user1@example.com", "Funny Cat Video", "https://www.youtube.com/embed/example1", "A hilarious cat video"),
             new VideoObj("2", "user2@example.com", "Cooking Tutorial", "https://www.youtube.com/embed/example2", "Learn to cook"),
-            new VideoObj("3", "user3@example.com", "Hài Hước - Stand Up Comedy", "https://www.youtube.com/embed/example3", "Funny stand up comedy show"),
-            new VideoObj("4", "user4@example.com", "Private Drive Video", "https://drive.google.com/file/d/abcdd3345ggf/preview", "Private video from Google Drive")
+            new VideoObj("3", "user3@example.com", "Hài Hước - Stand Up Comedy", "https://www.youtube.com/embed/example3", "Funny stand up comedy show")
         ];
         displayVideos(mockVideos);
     } else {
@@ -267,7 +360,6 @@ function displayVideos(videos) {
     // Clear all video lists
     $("#list-video-popular").empty();
     $("#list-video-funny").empty();
-    $("#list-video-private").empty();
 
     // Sort videos by upvotes for popular tab
     const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
@@ -275,11 +367,7 @@ function displayVideos(videos) {
     // Display popular videos (top 5)
     sortedByPopularity.forEach(video => {
         const videoHtml = bindingDataWhenLoad(video, loadTemplate());
-        if (video.src.includes('drive.google.com')) {
-            $("#list-video-private").append(videoHtml);
-        } else {
-            $("#list-video-popular").append(videoHtml);
-        }
+        $("#list-video-popular").append(videoHtml);
     });
 }
 
