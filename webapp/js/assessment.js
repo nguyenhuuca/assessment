@@ -3,7 +3,7 @@
  * Represents a video with its properties and methods
  */
 class Video {
-    constructor(id, userShared, title, src, desc) {
+    constructor(id, userShared, title, src, desc, isPrivate = false) {
         this.id = id;
         this.userShared = userShared;
         this.title = title;
@@ -11,6 +11,7 @@ class Video {
         this.desc = desc;
         this.upvotes = 0;
         this.downvotes = 0;
+        this.isPrivate = isPrivate;
         this.category = this.determineCategory();
     }
 
@@ -174,7 +175,11 @@ const VideoActions = {
 const VideoService = {
     share() {
         const link = $("#urlYoutube").val();
-        const shareObj = { url: link };
+        const isPrivate = $("#isPrivate").is(':checked');
+        const shareObj = { 
+            url: link,
+            isPrivate: isPrivate
+        };
 
         $("#shareSpinner").show();
         $.ajax({
@@ -185,9 +190,23 @@ const VideoService = {
             dataType: "json"
         }).done((rs) => {
             const videoInfo = rs.data;
-            const video = new Video(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc);
+            const video = new Video(
+                videoInfo.id, 
+                videoInfo.userShared, 
+                videoInfo.title, 
+                videoInfo.embedLink, 
+                videoInfo.desc,
+                videoInfo.isPrivate
+            );
             const videoHtml = VideoTemplate.bindData(video);
-            $("#list-video").prepend(videoHtml);
+            
+            // Add to appropriate list based on privacy
+            if (video.isPrivate) {
+                $("#list-video-private").prepend(videoHtml);
+            } else {
+                $("#list-video-popular").prepend(videoHtml);
+            }
+            
             $("#shareSpinner").hide();
             $('#shareModal').modal('hide');
         }).fail((err) => {
@@ -197,18 +216,49 @@ const VideoService = {
     },
 
     loadData() {
+        // Load public videos
         $.ajax({
             url: appConst.baseUrl.concat("/top-videos"),
             type: "GET",
             dataType: "json"
         }).done((rs) => {
             const videos = rs.data.map(videoInfo => 
-                new Video(videoInfo.id, videoInfo.userShared, videoInfo.title, videoInfo.embedLink, videoInfo.desc)
+                new Video(
+                    videoInfo.id, 
+                    videoInfo.userShared, 
+                    videoInfo.title, 
+                    videoInfo.embedLink, 
+                    videoInfo.desc,
+                    videoInfo.isPrivate
+                )
             );
             this.displayVideos(videos);
         }).fail((err) => {
             showMessage(err.responseJSON.error.message, 'error');
         });
+
+        // Load private videos if user is logged in
+        if (localStorage.getItem("jwt")) {
+            $.ajax({
+                url: appConst.baseUrl.concat("/private-videos"),
+                type: "GET",
+                dataType: "json"
+            }).done((rs) => {
+                const privateVideos = rs.data.map(videoInfo => 
+                    new Video(
+                        videoInfo.id, 
+                        videoInfo.userShared, 
+                        videoInfo.title, 
+                        videoInfo.embedLink, 
+                        videoInfo.desc,
+                        true
+                    )
+                );
+                this.displayPrivateVideos(privateVideos);
+            }).fail((err) => {
+                showMessage(err.responseJSON.error.message, 'error');
+            });
+        }
     },
 
     displayVideos(videos) {
@@ -216,10 +266,28 @@ const VideoService = {
         $("#list-video-funny").empty();
 
         const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
+        const funnyVideos = sortedByPopularity.filter(video => video.category === 'funny');
+        const regularVideos = sortedByPopularity.filter(video => video.category === 'regular');
 
-        sortedByPopularity.forEach(video => {
+        regularVideos.forEach(video => {
             const videoHtml = VideoTemplate.bindData(video);
             $("#list-video-popular").append(videoHtml);
+        });
+
+        funnyVideos.forEach(video => {
+            const videoHtml = VideoTemplate.bindData(video);
+            $("#list-video-funny").append(videoHtml);
+        });
+    },
+
+    displayPrivateVideos(videos) {
+        $("#list-video-private").empty();
+        
+        const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
+        
+        sortedByPopularity.forEach(video => {
+            const videoHtml = VideoTemplate.bindData(video);
+            $("#list-video-private").append(videoHtml);
         });
     }
 };
@@ -265,6 +333,13 @@ function initState() {
     Auth.initState();
     ThemeManager.init();
     $("#shareSpinner").hide();
+    
+    // Show/hide private tab based on login status
+    if (localStorage.getItem("jwt")) {
+        $("#private-tab").show();
+    } else {
+        $("#private-tab").hide();
+    }
 }
 
 /**
@@ -295,6 +370,7 @@ $(document).ready(function() {
         $("#shareSpinner").hide();
         $("#mainMsg").hide();
         $("#urlYoutube").val('');
+        $("#isPrivate").prop('checked', false);
     });
 });
 

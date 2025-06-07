@@ -235,7 +235,7 @@ const Auth = {
             $.ajax({
                 url: appConst.baseUrl.concat("/user/mfa/disable"),
                 type: "POST",
-                data: JSON.stringify({ code: code }),
+                data: JSON.stringify({ otp: code, username: user.email  }),
                 contentType: "application/json",
                 dataType: "json"
             }).done(() => {

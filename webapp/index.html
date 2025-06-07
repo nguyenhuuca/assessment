@@ -70,6 +70,11 @@
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="funny-tab" data-bs-toggle="tab" data-bs-target="#funny" type="button" role="tab" aria-controls="funny" aria-selected="false">Video Funny</button>
       </li>
+      <li class="nav-item" role="presentation" id="private-tab" style="display: none;">
+        <button class="nav-link" id="private-tab-btn" data-bs-toggle="tab" data-bs-target="#private" type="button" role="tab" aria-controls="private" aria-selected="false">
+          <i class="fas fa-lock me-2"></i>Private Videos
+        </button>
+      </li>
     </ul>
     
     <div class="tab-content" id="videoTabsContent">
@@ -78,6 +83,9 @@
       </div>
       <div class="tab-pane fade" id="funny" role="tabpanel" aria-labelledby="funny-tab">
         <div id="list-video-funny"></div>
+      </div>
+      <div class="tab-pane fade" id="private" role="tabpanel" aria-labelledby="private-tab">
+        <div id="list-video-private"></div>
       </div>
     </div>
   </div>
@@ -88,7 +96,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="shareModalLabel">
-            <i class="fas fa-share-alt me-2"></i>Share a Youtube movie
+            <i class="fas fa-share-alt me-2"></i>Share a Video
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -96,11 +104,19 @@
           <form>
             <div class="mb-3">
               <label for="urlYoutube" class="form-label">
-                <i class="fab fa-youtube me-2"></i>Youtube URL:
+                <i class="fas fa-link me-2"></i>Video URL:
               </label>
-              <input type="url" class="form-control" id="urlYoutube" placeholder="https://www.youtube.com/watch?v=...">
+              <input type="url" class="form-control" id="urlYoutube" placeholder="https://www.youtube.com/watch?v=... or https://drive.google.com/file/d/...">
+              <small class="form-text text-muted">Support YouTube and Google Drive links</small>
             </div>
-            <button type="button" class="btn btn-share" onclick="share()">
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="isPrivate">
+              <label class="form-check-label" for="isPrivate">
+                <i class="fas fa-lock me-2"></i>Make this video private
+              </label>
+              <small class="form-text text-muted d-block">Private videos are only visible to you when logged in</small>
+            </div>
+            <button type="button" class="btn btn-share" onclick="VideoService.share()">
               <span id="shareSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
               Share Video
             </button>
