@@ -48,26 +48,6 @@ const Auth = {
                 email: $("#usr").val()
             };
 
-            if (appConst.offlineMode) {
-                this.handleOfflineLogin(userObj);
-            } else {
-                this.handleOnlineLogin(userObj);
-            }
-        },
-
-        handleOfflineLogin(userObj) {
-            const mfaEnabled = Auth.UserStorage.getUserMfaStatus(userObj.email);
-            const mockData = {
-                jwt: "mock-jwt-token",
-                user: {
-                    email: userObj.email,
-                    mfaEnabled: mfaEnabled
-                }
-            };
-            this.handleLoginResponse(mockData);
-        },
-
-        handleOnlineLogin(userObj) {
             $.ajax({
                 url: appConst.baseUrl.concat("/user/join"),
                 type: "POST",
@@ -86,9 +66,7 @@ const Auth = {
             this.pendingLoginData = data;
             let mfaEnabled;
 
-            if (appConst.offlineMode) {
-                mfaEnabled = Auth.UserStorage.getUserMfaStatus(data.user.email);
-            } else if (data.action === STATUS.MFA_REQUIRED) {
+            if (data.action === STATUS.MFA_REQUIRED) {
                 mfaEnabled = true;
             } else if (data.action === STATUS.INVITED_SEND) {
                 showMessage("We've sent you an email. Please check your inbox", "success");
@@ -144,22 +122,6 @@ const Auth = {
             spinner.classList.remove('d-none');
             errorElement.style.display = 'none';
 
-            if (appConst.offlineMode) {
-                this.handleOfflineVerification(spinner);
-            } else {
-                this.handleOnlineVerification(code, spinner, errorElement);
-            }
-        },
-
-        handleOfflineVerification(spinner) {
-            setTimeout(() => {
-                Auth.LoginManager.processLoginSuccess(Auth.LoginManager.pendingLoginData);
-                $('#mfaVerificationModal').modal('hide');
-                spinner.classList.add('d-none');
-            }, 1000);
-        },
-
-        handleOnlineVerification(code, spinner, errorElement) {
             $.ajax({
                 url: appConst.baseUrl.concat("/user/mfa/verify"),
                 type: "POST",
@@ -210,20 +172,6 @@ const Auth = {
         },
 
         handleSetupMFA(user, mfaSetupSection, profileMessage) {
-            if (appConst.offlineMode) {
-                this.handleOfflineSetupMFA(mfaSetupSection);
-            } else {
-                this.handleOnlineSetupMFA(user, mfaSetupSection, profileMessage);
-            }
-        },
-
-        handleOfflineSetupMFA(mfaSetupSection) {
-            const mockQRCode = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
-            document.getElementById('qrCode').innerHTML = `<img src="${mockQRCode}" alt="MFA QR Code">`;
-            mfaSetupSection.classList.add('active');
-        },
-
-        handleOnlineSetupMFA(user, mfaSetupSection, profileMessage) {
             $.ajax({
                 url: appConst.baseUrl.concat("/user/mfa/setup").concat("?username=").concat(user.email),
                 type: "GET",
@@ -254,21 +202,6 @@ const Auth = {
             spinner.classList.remove('d-none');
             profileMessage.style.display = 'none';
 
-            if (appConst.offlineMode) {
-                this.handleOfflineVerifyMFA(spinner);
-            } else {
-                this.handleOnlineVerifyMFA(code, user, spinner, profileMessage);
-            }
-        },
-
-        handleOfflineVerifyMFA(spinner) {
-            setTimeout(() => {
-                this.enableMFA();
-                spinner.classList.add('d-none');
-            }, 1000);
-        },
-
-        handleOnlineVerifyMFA(code, user, spinner, profileMessage) {
             $.ajax({
                 url: appConst.baseUrl.concat("/user/mfa/enable"),
                 type: "POST",
@@ -299,21 +232,6 @@ const Auth = {
             spinner.classList.remove('d-none');
             profileMessage.style.display = 'none';
 
-            if (appConst.offlineMode) {
-                this.handleOfflineDisableMFA(spinner);
-            } else {
-                this.handleOnlineDisableMFA(code, spinner, profileMessage);
-            }
-        },
-
-        handleOfflineDisableMFA(spinner) {
-            setTimeout(() => {
-                this.disableMFA();
-                spinner.classList.add('d-none');
-            }, 1000);
-        },
-
-        handleOnlineDisableMFA(code, spinner, profileMessage) {
             $.ajax({
                 url: appConst.baseUrl.concat("/user/mfa/disable"),
                 type: "POST",
@@ -399,26 +317,6 @@ const Auth = {
         verifyToken(token) {
             if (!token) return;
 
-            if (appConst.offlineMode) {
-                this.handleOfflineVerification();
-            } else {
-                this.handleOnlineVerification(token);
-            }
-        },
-
-        handleOfflineVerification() {
-            const mockData = {
-                jwt: "mock-jwt-token",
-                user: {
-                    email: "test@example.com",
-                    mfaEnabled: false
-                }
-            };
-            Auth.LoginManager.handleLoginResponse(mockData);
-            window.location.href = "https://funnyapp.canh-labs.com";
-        },
-
-        handleOnlineVerification(token) {
             $.ajax({
                 url: appConst.baseUrl.concat("/user/verify-magic?token=").concat(token),
                 type: "GET",

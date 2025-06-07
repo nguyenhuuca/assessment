@@ -176,28 +176,6 @@ const VideoService = {
         const link = $("#urlYoutube").val();
         const shareObj = { url: link };
 
-        if (appConst.offlineMode) {
-            this.handleOfflineShare(shareObj);
-        } else {
-            this.handleOnlineShare(shareObj);
-        }
-    },
-
-    handleOfflineShare(shareObj) {
-        const mockVideoInfo = {
-            id: Date.now().toString(),
-            userShared: JSON.parse(localStorage.getItem("user"))?.email || "anonymous@example.com",
-            title: "Shared Video " + Date.now(),
-            embedLink: shareObj.url,
-            desc: "Shared in offline mode"
-        };
-        const video = new Video(mockVideoInfo.id, mockVideoInfo.userShared, mockVideoInfo.title, mockVideoInfo.embedLink, mockVideoInfo.desc);
-        const videoHtml = VideoTemplate.bindData(video);
-        $("#list-video").prepend(videoHtml);
-        $('#shareModal').modal('hide');
-    },
-
-    handleOnlineShare(shareObj) {
         $("#shareSpinner").show();
         $.ajax({
             url: appConst.baseUrl.concat("/share-links"),
@@ -219,23 +197,6 @@ const VideoService = {
     },
 
     loadData() {
-        if (appConst.offlineMode) {
-            this.loadOfflineData();
-        } else {
-            this.loadOnlineData();
-        }
-    },
-
-    loadOfflineData() {
-        const mockVideos = [
-            new Video("1", "user1@example.com", "Funny Cat Video", "https://www.youtube.com/embed/example1", "A hilarious cat video"),
-            new Video("2", "user2@example.com", "Cooking Tutorial", "https://www.youtube.com/embed/example2", "Learn to cook"),
-            new Video("3", "user3@example.com", "Hài Hước - Stand Up Comedy", "https://www.youtube.com/embed/example3", "Funny stand up comedy show")
-        ];
-        this.displayVideos(mockVideos);
-    },
-
-    loadOnlineData() {
         $.ajax({
             url: appConst.baseUrl.concat("/top-videos"),
             type: "GET",
@@ -314,23 +275,17 @@ function deleteVideo(element) {
     let id = $(element).attr("id");
     let videoId = id.split("_")[0];
     
-    if (appConst.offlineMode) {
-        // For offline mode, just remove the video element
+    $.ajax({
+        url: appConst.baseUrl.concat("/share-links/").concat(videoId),
+        type: "DELETE",
+        contentType: "application/json",
+        dataType: "json"
+    }).done(function() {
+        // Remove the video element on successful deletion
         $(element).closest('.row').remove();
-    } else {
-        // For online mode, call the API to delete
-        $.ajax({
-            url: appConst.baseUrl.concat("/share-links/").concat(videoId),
-            type: "DELETE",
-            contentType: "application/json",
-            dataType: "json"
-        }).done(function() {
-            // Remove the video element on successful deletion
-            $(element).closest('.row').remove();
-        }).fail(function(err) {
-            showMessage(err.responseJSON.error.message, "error")
-        });
-    }
+    }).fail(function(err) {
+        showMessage(err.responseJSON.error.message, "error")
+    });
 }
 
 // Initialize when document is ready
