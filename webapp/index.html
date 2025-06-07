@@ -21,7 +21,7 @@
 </head>
 <body>
   <!-- Theme toggle button -->
-  <div class="theme-toggle" onclick="toggleTheme()">
+  <div class="theme-toggle" onclick="ThemeManager.toggle()">
     <i class="fas fa-moon"></i>
   </div>
 
@@ -40,7 +40,7 @@
             <button id="shareBtn" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#shareModal">
               <i class="fas fa-share-alt me-2"></i>Share a movie
             </button>
-            <button id="loginBtn" onclick="joinSystem()" type="button" class="btn btn-light">
+            <button id="loginBtn" onclick="Auth.LoginManager.joinSystem()" type="button" class="btn btn-light">
               <span id="loginSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
               <i class="fas fa-sign-in-alt me-2"></i>Register / Login
             </button>
@@ -52,7 +52,7 @@
       <button id="profileBtn" type="button" class="btn btn-light profile-button" data-bs-toggle="modal" data-bs-target="#profileModal">
         <i class="fas fa-user"></i>
       </button>
-      <button id="logoutBtn" onclick="logout()" type="button" class="btn btn-light logout-button">
+      <button id="logoutBtn" onclick="Auth.logout()" type="button" class="btn btn-light logout-button">
         <i class="fas fa-power-off"></i>
       </button>
     </div>
@@ -236,8 +236,7 @@
   <script>
     // load all when init page
     initState();
-    loadData();
-    initTheme();
+    VideoService.loadData();
   </script>
 </body>
 </html>

@@ -1,500 +1,498 @@
 /**
- * Authentication related functions
+ * Authentication Module
+ * Handles all authentication related functionality
  */
-// Setup AJAX headers with JWT token
-$.ajaxSetup({
-    headers:{
-        'Authorization': localStorage.getItem("jwt")
-    }
-});
-
-let pendingLoginData = null;
-
-/**
- * Get all users from localStorage
- * @returns {Object} Object containing all users with their MFA status
- */
-function getUsers() {
-    return JSON.parse(localStorage.getItem('users') || '{}');
-}
-
-/**
- * Save user to localStorage
- * @param {Object} user - User object to save
- */
-function saveUser(user) {
-    const users = getUsers();
-    users[user.email] = {
-        mfaEnabled: user.mfaEnabled || false
-    };
-    localStorage.setItem('users', JSON.stringify(users));
-}
-
-/**
- * Get user's MFA status from localStorage
- * @param {string} email - User's email
- * @returns {boolean} MFA status
- */
-function getUserMfaStatus(email) {
-    const users = getUsers();
-    return users[email]?.mfaEnabled || false;
-}
-
-/**
- * User can login or register in case is new user
- * When call api joinSystem, will return user info and jwt token for old user and new user
- */
-function joinSystem() {
-    $("#loginSpinner").show();
-    var userObj = {
-        email: $("#usr").val()
-    }
-
-    if (appConst.offlineMode) {
-        // Check if user exists in users list
-        const mfaEnabled = getUserMfaStatus(userObj.email);
-        const mockData = {
-            jwt: "mock-jwt-token",
-            user: {
-                email: userObj.email,
-                mfaEnabled: mfaEnabled
+const Auth = {
+    /**
+     * Initialize AJAX headers with JWT token
+     */
+    initAjaxHeaders() {
+        $.ajaxSetup({
+            headers: {
+                'Authorization': localStorage.getItem("jwt")
             }
-        };
-        handleLoginResponse(mockData);
-    } else {
-        $.ajax({
-            url: appConst.baseUrl.concat("/user/join"),
-            type: "POST",
-            data: JSON.stringify(userObj),
-            contentType: "application/json",
-            dataType: "json"
-        }).done(function(rs) {
-            handleLoginResponse(rs.data);
-        }).fail(function(err) {
-            showMessage(err.responseJSON.error.message, "error")
-            $("#loginSpinner").hide();
         });
-    }
-}
+    },
 
-/**
- * Handle login response and check if MFA verification is needed
- * @param {Object} data - Login response data
- */
-function handleLoginResponse(data) {
-    // Store the login data temporarily
-    pendingLoginData = data;
-    let mfaEnabled;
+    /**
+     * User storage management
+     */
+    UserStorage: {
+        getUsers() {
+            return JSON.parse(localStorage.getItem('users') || '{}');
+        },
 
-    // Check MFA status from users list
-    if(appConst.offlineMode) {
-        mfaEnabled = getUserMfaStatus(data.user.email);
-    } else if(data.action === STATUS.MFA_REQUIRED) {
-        mfaEnabled = true
-    } else if (data.action === STATUS.INVITED_SEND) {
-        showMessage("We've sent you an email. Please check your inbox", "success")
-        $("#loginSpinner").hide();
-        return
-    }
+        saveUser(user) {
+            const users = this.getUsers();
+            users[user.email] = {
+                mfaEnabled: user.mfaEnabled || false
+            };
+            localStorage.setItem('users', JSON.stringify(users));
+        },
 
-    if (mfaEnabled) {
-        // Update user's MFA status
-        data.user.mfaEnabled = mfaEnabled;
-        // Save updated user info to localStorage
-        localStorage.setItem('user', JSON.stringify(data.user));
-        // Save to users list
-        saveUser(data.user);
-        // User has MFA enabled, show verification modal
-        $('#mfaVerificationModal').modal('show');
-        $("#loginSpinner").hide();
-    } else {
-        // No MFA required, process login directly
-        processLoginSuccess(data);
-    }
-}
-
-/**
- * Verify MFA code during login
- */
-function verifyLoginMFA() {
-    const code = document.getElementById('loginVerificationCode').value;
-    const errorElement = document.getElementById('mfaVerificationError');
-    
-    if (!code || code.length !== 6) {
-        errorElement.textContent = "Please enter a valid 6-digit code";
-        errorElement.style.display = 'block';
-        return;
-    }
-
-    const spinner = document.getElementById('verifyLoginSpinner');
-    spinner.classList.remove('d-none');
-    errorElement.style.display = 'none';
-
-    if (appConst.offlineMode) {
-        // Mock verification for offline mode
-        setTimeout(() => {
-            processLoginSuccess(pendingLoginData);
-            $('#mfaVerificationModal').modal('hide');
-            spinner.classList.add('d-none');
-        }, 1000);
-    } else {
-        // Call API to verify code
-        $.ajax({
-            url: appConst.baseUrl.concat("/user/mfa/verify"),
-            type: "POST",
-            data: JSON.stringify({ 
-                otp: code,
-                username: pendingLoginData.user.email,
-                sessionToken: pendingLoginData.sessionToken
-            }),
-            contentType: "application/json",
-            dataType: "json"
-        }).done(function(rs) {
-            processLoginSuccess(rs.data);
-            $('#mfaVerificationModal').modal('hide');
-        }).fail(function(err) {
-            errorElement.textContent = err.responseJSON.error.message;
-            errorElement.style.display = 'block';
-        }).always(function() {
-            spinner.classList.add('d-none');
-        });
-    }
-}
-
-/**
- * Process successful login
- * @param {Object} data - Login response data containing jwt and user info
- */
-function processLoginSuccess(data) {
-    $("#shareBtn").show();
-    $("#logoutBtn").show();
-    $("#profileBtn").show();
-    $("#messageInfo").text(` Welcome ${data.user.email}`);
-    $("#messageInfo").show();
-    $("#loginBtn").hide();
-    $("#loginSpinner").hide();
-    $("#grUser").hide();
-    $("#grPass").hide();
-    $("#mainMsg").hide();
-    
-    // Save jwt and user info
-    localStorage.setItem('jwt', data.jwt);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    
-    // Update AJAX headers
-    $.ajaxSetup({
-        headers:{
-            'Authorization': localStorage.getItem("jwt")
+        getUserMfaStatus(email) {
+            const users = this.getUsers();
+            return users[email]?.mfaEnabled || false;
         }
-    });
-}
+    },
 
-/**
- * Logout user by removing JWT token and user info
- * Using stateless web application, so no need to call server to logout
- * JWT is Self-contained (Transparent token)
- * If we want to revoke this token on server, we need to add it to blacklist
- */
-function logout() {
-    console.log("logout system");
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("user");
-    initState();
-    $("#loginBtn").show();
-    $("#profileBtn").hide();
-}
+    /**
+     * Login/Registration handling
+     */
+    LoginManager: {
+        pendingLoginData: null,
 
-/**
- * Initialize authentication state
- */
-function initAuthState() {
-    $("#loginSpinner").hide();
-    $("#shareBtn").hide();
-    $("#logoutBtn").hide();
-    $("#profileBtn").hide();
-    $("#messageInfo").hide();
-    $("#mainMsg").hide();
-    $("#grUser").show();
+        joinSystem() {
+            $("#loginSpinner").show();
+            const userObj = {
+                email: $("#usr").val()
+            };
 
-    // Check if user was previously logged in
-    if(localStorage.getItem("jwt")) {
-        const data = {
-            jwt: localStorage.getItem("jwt"),
-            user: JSON.parse(localStorage.getItem("user"))
-        };
-        processLoginSuccess(data);
-    }
-}
+            if (appConst.offlineMode) {
+                this.handleOfflineLogin(userObj);
+            } else {
+                this.handleOnlineLogin(userObj);
+            }
+        },
 
-/**
- * Initialize MFA setup
- */
-function initMFA() {
-    const setupMfaBtn = document.getElementById('setupMfaBtn');
-    const mfaSetupSection = document.getElementById('mfaSetupSection');
-    const mfaDisableSection = document.getElementById('mfaDisableSection');
-    const verifyMfaBtn = document.getElementById('verifyMfaBtn');
-    const disableMfaBtn = document.getElementById('disableMfaBtn');
-    const mfaStatus = document.getElementById('mfaStatus');
-    const profileMessage = document.getElementById('profileMessage');
+        handleOfflineLogin(userObj) {
+            const mfaEnabled = Auth.UserStorage.getUserMfaStatus(userObj.email);
+            const mockData = {
+                jwt: "mock-jwt-token",
+                user: {
+                    email: userObj.email,
+                    mfaEnabled: mfaEnabled
+                }
+            };
+            this.handleLoginResponse(mockData);
+        },
 
-    // Check if MFA is already enabled
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user.mfaEnabled) {
-        mfaStatus.textContent = 'Enabled';
-        mfaStatus.classList.add('enabled');
-        setupMfaBtn.style.display = 'none';
-        mfaDisableSection.classList.add('active');
-    }
+        handleOnlineLogin(userObj) {
+            $.ajax({
+                url: appConst.baseUrl.concat("/user/join"),
+                type: "POST",
+                data: JSON.stringify(userObj),
+                contentType: "application/json",
+                dataType: "json"
+            }).done((rs) => {
+                this.handleLoginResponse(rs.data);
+            }).fail((err) => {
+                showMessage(err.responseJSON.error.message, "error");
+                $("#loginSpinner").hide();
+            });
+        },
 
-    // Setup MFA button click handler
-    setupMfaBtn.addEventListener('click', function() {
-        if (appConst.offlineMode) {
-            // Mock QR code for offline mode
+        handleLoginResponse(data) {
+            this.pendingLoginData = data;
+            let mfaEnabled;
+
+            if (appConst.offlineMode) {
+                mfaEnabled = Auth.UserStorage.getUserMfaStatus(data.user.email);
+            } else if (data.action === STATUS.MFA_REQUIRED) {
+                mfaEnabled = true;
+            } else if (data.action === STATUS.INVITED_SEND) {
+                showMessage("We've sent you an email. Please check your inbox", "success");
+                $("#loginSpinner").hide();
+                return;
+            }
+
+            if (mfaEnabled) {
+                data.user.mfaEnabled = mfaEnabled;
+                localStorage.setItem('user', JSON.stringify(data.user));
+                Auth.UserStorage.saveUser(data.user);
+                $('#mfaVerificationModal').modal('show');
+                $("#loginSpinner").hide();
+            } else {
+                this.processLoginSuccess(data);
+            }
+        },
+
+        processLoginSuccess(data) {
+            $("#shareBtn").show();
+            $("#logoutBtn").show();
+            $("#profileBtn").show();
+            $("#messageInfo").text(` Welcome ${data.user.email}`);
+            $("#messageInfo").show();
+            $("#loginBtn").hide();
+            $("#loginSpinner").hide();
+            $("#grUser").hide();
+            $("#grPass").hide();
+            $("#mainMsg").hide();
+            
+            localStorage.setItem('jwt', data.jwt);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            Auth.initAjaxHeaders();
+        }
+    },
+
+    /**
+     * MFA (Multi-Factor Authentication) handling
+     */
+    MFA: {
+        verifyLoginMFA() {
+            const code = document.getElementById('loginVerificationCode').value;
+            const errorElement = document.getElementById('mfaVerificationError');
+            
+            if (!code || code.length !== 6) {
+                errorElement.textContent = "Please enter a valid 6-digit code";
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            const spinner = document.getElementById('verifyLoginSpinner');
+            spinner.classList.remove('d-none');
+            errorElement.style.display = 'none';
+
+            if (appConst.offlineMode) {
+                this.handleOfflineVerification(spinner);
+            } else {
+                this.handleOnlineVerification(code, spinner, errorElement);
+            }
+        },
+
+        handleOfflineVerification(spinner) {
+            setTimeout(() => {
+                Auth.LoginManager.processLoginSuccess(Auth.LoginManager.pendingLoginData);
+                $('#mfaVerificationModal').modal('hide');
+                spinner.classList.add('d-none');
+            }, 1000);
+        },
+
+        handleOnlineVerification(code, spinner, errorElement) {
+            $.ajax({
+                url: appConst.baseUrl.concat("/user/mfa/verify"),
+                type: "POST",
+                data: JSON.stringify({ 
+                    otp: code,
+                    username: Auth.LoginManager.pendingLoginData.user.email,
+                    sessionToken: Auth.LoginManager.pendingLoginData.sessionToken
+                }),
+                contentType: "application/json",
+                dataType: "json"
+            }).done((rs) => {
+                Auth.LoginManager.processLoginSuccess(rs.data);
+                $('#mfaVerificationModal').modal('hide');
+            }).fail((err) => {
+                errorElement.textContent = err.responseJSON.error.message;
+                errorElement.style.display = 'block';
+            }).always(() => {
+                spinner.classList.add('d-none');
+            });
+        },
+
+        init() {
+            const setupMfaBtn = document.getElementById('setupMfaBtn');
+            const mfaSetupSection = document.getElementById('mfaSetupSection');
+            const mfaDisableSection = document.getElementById('mfaDisableSection');
+            const verifyMfaBtn = document.getElementById('verifyMfaBtn');
+            const disableMfaBtn = document.getElementById('disableMfaBtn');
+            const mfaStatus = document.getElementById('mfaStatus');
+            const profileMessage = document.getElementById('profileMessage');
+
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.mfaEnabled) {
+                mfaStatus.textContent = 'Enabled';
+                mfaStatus.classList.add('enabled');
+                setupMfaBtn.style.display = 'none';
+                mfaDisableSection.classList.add('active');
+            }
+
+            this.setupEventListeners(setupMfaBtn, mfaSetupSection, mfaDisableSection, 
+                                   verifyMfaBtn, disableMfaBtn, mfaStatus, profileMessage, user);
+        },
+
+        setupEventListeners(setupMfaBtn, mfaSetupSection, mfaDisableSection, 
+                          verifyMfaBtn, disableMfaBtn, mfaStatus, profileMessage, user) {
+            setupMfaBtn.addEventListener('click', () => this.handleSetupMFA(user, mfaSetupSection, profileMessage));
+            verifyMfaBtn.addEventListener('click', () => this.handleVerifyMFA(user, profileMessage));
+            disableMfaBtn.addEventListener('click', () => this.handleDisableMFA(user, profileMessage));
+        },
+
+        handleSetupMFA(user, mfaSetupSection, profileMessage) {
+            if (appConst.offlineMode) {
+                this.handleOfflineSetupMFA(mfaSetupSection);
+            } else {
+                this.handleOnlineSetupMFA(user, mfaSetupSection, profileMessage);
+            }
+        },
+
+        handleOfflineSetupMFA(mfaSetupSection) {
             const mockQRCode = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
             document.getElementById('qrCode').innerHTML = `<img src="${mockQRCode}" alt="MFA QR Code">`;
-        } else {
-            // Call API to get QR code
+            mfaSetupSection.classList.add('active');
+        },
+
+        handleOnlineSetupMFA(user, mfaSetupSection, profileMessage) {
             $.ajax({
                 url: appConst.baseUrl.concat("/user/mfa/setup").concat("?username=").concat(user.email),
                 type: "GET",
                 dataType: "json"
-            }).done(function(rs) {
-                user.secret=rs.data.secret
+            }).done((rs) => {
+                user.secret = rs.data.secret;
                 localStorage.setItem('user', JSON.stringify(user));
-                document.getElementById('qrCode').innerHTML = `<img src="data:data:image/png;base64,${rs.data.qrCode}" alt="MFA QR Code">`;
-            }).fail(function(err) {
+                document.getElementById('qrCode').innerHTML = 
+                    `<img src="data:data:image/png;base64,${rs.data.qrCode}" alt="MFA QR Code">`;
+                mfaSetupSection.classList.add('active');
+            }).fail((err) => {
                 profileMessage.textContent = err.responseJSON.error.message;
                 profileMessage.className = 'profile-message error';
                 profileMessage.style.display = 'block';
             });
-        }
-        mfaSetupSection.classList.add('active');
-    });
+        },
 
-    // Verify MFA button click handler
-    verifyMfaBtn.addEventListener('click', function() {
-        const code = document.getElementById('verificationCode').value;
-        if (!code || code.length !== 6) {
-            profileMessage.textContent = "Please enter a valid 6-digit code";
-            profileMessage.className = 'profile-message error';
-            profileMessage.style.display = 'block';
-            return;
-        }
+        handleVerifyMFA(user, profileMessage) {
+            const code = document.getElementById('verificationCode').value;
+            if (!code || code.length !== 6) {
+                profileMessage.textContent = "Please enter a valid 6-digit code";
+                profileMessage.className = 'profile-message error';
+                profileMessage.style.display = 'block';
+                return;
+            }
 
-        const spinner = document.getElementById('verifySpinner');
-        spinner.classList.remove('d-none');
-        profileMessage.style.display = 'none';
+            const spinner = document.getElementById('verifySpinner');
+            spinner.classList.remove('d-none');
+            profileMessage.style.display = 'none';
 
-        if (appConst.offlineMode) {
-            // Mock verification for offline mode
+            if (appConst.offlineMode) {
+                this.handleOfflineVerifyMFA(spinner);
+            } else {
+                this.handleOnlineVerifyMFA(code, user, spinner, profileMessage);
+            }
+        },
+
+        handleOfflineVerifyMFA(spinner) {
             setTimeout(() => {
-                enableMFA();
+                this.enableMFA();
                 spinner.classList.add('d-none');
             }, 1000);
-        } else {
-            // Call API to verify code
+        },
+
+        handleOnlineVerifyMFA(code, user, spinner, profileMessage) {
             $.ajax({
                 url: appConst.baseUrl.concat("/user/mfa/enable"),
                 type: "POST",
-                data: JSON.stringify({ otp: code,  username: user.email, secret: user.secret }),
+                data: JSON.stringify({ otp: code, username: user.email, secret: user.secret }),
                 contentType: "application/json",
                 dataType: "json"
-            }).done(function(rs) {
-                enableMFA();
-            }).fail(function(err) {
+            }).done(() => {
+                this.enableMFA();
+            }).fail((err) => {
                 profileMessage.textContent = err.responseJSON.error.message;
                 profileMessage.className = 'profile-message error';
                 profileMessage.style.display = 'block';
-            }).always(function() {
+            }).always(() => {
                 spinner.classList.add('d-none');
             });
-        }
-    });
+        },
 
-    // Disable MFA button click handler
-    disableMfaBtn.addEventListener('click', function() {
-        const code = document.getElementById('disableVerificationCode').value;
-        if (!code || code.length !== 6) {
-            profileMessage.textContent = "Please enter a valid 6-digit code";
-            profileMessage.className = 'profile-message error';
-            profileMessage.style.display = 'block';
-            return;
-        }
+        handleDisableMFA(user, profileMessage) {
+            const code = document.getElementById('disableVerificationCode').value;
+            if (!code || code.length !== 6) {
+                profileMessage.textContent = "Please enter a valid 6-digit code";
+                profileMessage.className = 'profile-message error';
+                profileMessage.style.display = 'block';
+                return;
+            }
 
-        const spinner = document.getElementById('disableSpinner');
-        spinner.classList.remove('d-none');
-        profileMessage.style.display = 'none';
+            const spinner = document.getElementById('disableSpinner');
+            spinner.classList.remove('d-none');
+            profileMessage.style.display = 'none';
 
-        if (appConst.offlineMode) {
-            // Mock disable for offline mode
+            if (appConst.offlineMode) {
+                this.handleOfflineDisableMFA(spinner);
+            } else {
+                this.handleOnlineDisableMFA(code, spinner, profileMessage);
+            }
+        },
+
+        handleOfflineDisableMFA(spinner) {
             setTimeout(() => {
-                disableMFA();
+                this.disableMFA();
                 spinner.classList.add('d-none');
             }, 1000);
-        } else {
-            // Call API to disable MFA
+        },
+
+        handleOnlineDisableMFA(code, spinner, profileMessage) {
             $.ajax({
                 url: appConst.baseUrl.concat("/user/mfa/disable"),
                 type: "POST",
                 data: JSON.stringify({ code: code }),
                 contentType: "application/json",
                 dataType: "json"
-            }).done(function(rs) {
-                disableMFA();
-            }).fail(function(err) {
+            }).done(() => {
+                this.disableMFA();
+            }).fail((err) => {
                 profileMessage.textContent = err.responseJSON.error.message;
                 profileMessage.className = 'profile-message error';
                 profileMessage.style.display = 'block';
-            }).always(function() {
+            }).always(() => {
                 spinner.classList.add('d-none');
             });
-        }
-    });
-}
+        },
 
-/**
- * Enable MFA for the user
- */
-function enableMFA() {
-    // Update user data
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    user.mfaEnabled = true;
-    localStorage.setItem('user', JSON.stringify(user));
-    
-    // Save to users list
-    saveUser(user);
+        enableMFA() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            user.mfaEnabled = true;
+            localStorage.setItem('user', JSON.stringify(user));
+            Auth.UserStorage.saveUser(user);
+            this.updateMfaSetupUI();
+            this.showSuccessMessage("MFA has been enabled successfully!");
+        },
 
-    // Update UI
-    updateMfaSetupUI();
+        disableMFA() {
+            const mfaStatus = document.getElementById('mfaStatus');
+            const setupMfaBtn = document.getElementById('setupMfaBtn');
+            const mfaSetupSection = document.getElementById('mfaSetupSection');
+            const mfaDisableSection = document.getElementById('mfaDisableSection');
 
-    // Show success message in profile modal
-    const profileMessage = document.getElementById('profileMessage');
-    profileMessage.textContent = "MFA has been enabled successfully!";
-    profileMessage.className = 'profile-message success';
-    profileMessage.style.display = 'block';
-}
+            mfaStatus.textContent = 'Disabled';
+            mfaStatus.classList.remove('enabled');
+            setupMfaBtn.style.display = 'block';
+            mfaSetupSection.classList.remove('active');
+            mfaDisableSection.classList.remove('active');
 
-/**
- * Disable MFA for the user
- */
-function disableMFA() {
-    const mfaStatus = document.getElementById('mfaStatus');
-    const setupMfaBtn = document.getElementById('setupMfaBtn');
-    const mfaSetupSection = document.getElementById('mfaSetupSection');
-    const mfaDisableSection = document.getElementById('mfaDisableSection');
+            document.getElementById('disableVerificationCode').value = '';
 
-    // Update UI
-    mfaStatus.textContent = 'Disabled';
-    mfaStatus.classList.remove('enabled');
-    setupMfaBtn.style.display = 'block';
-    mfaSetupSection.classList.remove('active');
-    mfaDisableSection.classList.remove('active');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            user.mfaEnabled = false;
+            localStorage.setItem('user', JSON.stringify(user));
+            Auth.UserStorage.saveUser(user);
 
-    // Clear verification code
-    document.getElementById('disableVerificationCode').value = '';
+            this.showSuccessMessage("MFA has been disabled successfully!");
+        },
 
-    // Update user data
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    user.mfaEnabled = false;
-    localStorage.setItem('user', JSON.stringify(user));
-    
-    // Save to users list
-    saveUser(user);
+        updateMfaSetupUI() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const mfaStatus = document.getElementById('mfaStatus');
+            const setupMfaBtn = document.getElementById('setupMfaBtn');
+            const mfaSetupSection = document.getElementById('mfaSetupSection');
+            const mfaDisableSection = document.getElementById('mfaDisableSection');
 
-    // Show success message in profile modal
-    const profileMessage = document.getElementById('profileMessage');
-    profileMessage.textContent = "MFA has been disabled successfully!";
-    profileMessage.className = 'profile-message success';
-    profileMessage.style.display = 'block';
-}
-
-/**
- * Handle magic link token verification
- */
-function verifyMagicLinkToken(token) {
-    if (!token) return;
-
-    if (appConst.offlineMode) {
-        // Mock response for offline mode
-        const mockData = {
-            jwt: "mock-jwt-token",
-            user: {
-                email: "test@example.com",
-                mfaEnabled: false
-            }
-        };
-        handleLoginResponse(mockData);
-        // Redirect to main domain in offline mode
-        window.location.href = "https://funnyapp.canh-labs.com";
-    } else {
-        $.ajax({
-            url: appConst.baseUrl.concat("/user/verify-magic?token=").concat(token),
-            type: "GET",
-            dataType: "json"
-        }).done(function(rs) {
-            // Check if MFA is required
-            if (rs.data.action === STATUS.MFA_REQUIRED) {
-                // Handle MFA flow without redirect
-                handleLoginResponse(rs.data);
-                window.history.replaceState({}, document.title, "/");
+            if (user.mfaEnabled) {
+                mfaStatus.textContent = 'Enabled';
+                mfaStatus.classList.add('enabled');
+                setupMfaBtn.style.display = 'none';
+                mfaSetupSection.classList.remove('active');
+                mfaDisableSection.classList.add('active');
             } else {
-                // No MFA required, handle login and redirect
-                handleLoginResponse(rs.data);
-                window.location.href = "https://funnyapp.canh-labs.com";
+                mfaStatus.textContent = 'Disabled';
+                mfaStatus.classList.remove('enabled');
+                setupMfaBtn.style.display = 'block';
+                mfaSetupSection.classList.remove('active');
+                mfaDisableSection.classList.remove('active');
             }
-        }).fail(function(err) {
-            showMessage(err.responseJSON.error.message, "error");
-        });
+        },
+
+        showSuccessMessage(message) {
+            const profileMessage = document.getElementById('profileMessage');
+            profileMessage.textContent = message;
+            profileMessage.className = 'profile-message success';
+            profileMessage.style.display = 'block';
+        }
+    },
+
+    /**
+     * Magic Link handling
+     */
+    MagicLink: {
+        verifyToken(token) {
+            if (!token) return;
+
+            if (appConst.offlineMode) {
+                this.handleOfflineVerification();
+            } else {
+                this.handleOnlineVerification(token);
+            }
+        },
+
+        handleOfflineVerification() {
+            const mockData = {
+                jwt: "mock-jwt-token",
+                user: {
+                    email: "test@example.com",
+                    mfaEnabled: false
+                }
+            };
+            Auth.LoginManager.handleLoginResponse(mockData);
+            window.location.href = "https://funnyapp.canh-labs.com";
+        },
+
+        handleOnlineVerification(token) {
+            $.ajax({
+                url: appConst.baseUrl.concat("/user/verify-magic?token=").concat(token),
+                type: "GET",
+                dataType: "json"
+            }).done((rs) => {
+                if (rs.data.action === STATUS.MFA_REQUIRED) {
+                    Auth.LoginManager.handleLoginResponse(rs.data);
+                    window.history.replaceState({}, document.title, "/");
+                } else {
+                    Auth.LoginManager.handleLoginResponse(rs.data);
+                    window.location.href = "https://funnyapp.canh-labs.com";
+                }
+            }).fail((err) => {
+                showMessage(err.responseJSON.error.message, "error");
+            });
+        }
+    },
+
+    /**
+     * Profile management
+     */
+    Profile: {
+        updateUserInfo() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            document.getElementById('userEmail').textContent = user.email || '';
+            document.getElementById('memberSince').textContent = new Date().toLocaleDateString();
+            document.getElementById('lastLogin').textContent = new Date().toLocaleDateString();
+        }
+    },
+
+    /**
+     * Logout handling
+     */
+    logout() {
+        localStorage.removeItem("jwt");
+        localStorage.removeItem("user");
+        initState();
+        $("#loginBtn").show();
+        $("#profileBtn").hide();
+    },
+
+    /**
+     * Initialize authentication state
+     */
+    initState() {
+        $("#loginSpinner").hide();
+        $("#shareBtn").hide();
+        $("#logoutBtn").hide();
+        $("#profileBtn").hide();
+        $("#messageInfo").hide();
+        $("#mainMsg").hide();
+        $("#grUser").show();
+
+        if (localStorage.getItem("jwt")) {
+            const data = {
+                jwt: localStorage.getItem("jwt"),
+                user: JSON.parse(localStorage.getItem("user"))
+            };
+            this.LoginManager.processLoginSuccess(data);
+        }
     }
-}
+};
 
-/**
- * Update MFA setup tab UI based on current MFA status
- */
-function updateMfaSetupUI() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const mfaStatus = document.getElementById('mfaStatus');
-    const setupMfaBtn = document.getElementById('setupMfaBtn');
-    const mfaSetupSection = document.getElementById('mfaSetupSection');
-    const mfaDisableSection = document.getElementById('mfaDisableSection');
-
-    if (user.mfaEnabled) {
-        mfaStatus.textContent = 'Enabled';
-        mfaStatus.classList.add('enabled');
-        setupMfaBtn.style.display = 'none';
-        mfaSetupSection.classList.remove('active');
-        mfaDisableSection.classList.add('active');
-    } else {
-        mfaStatus.textContent = 'Disabled';
-        mfaStatus.classList.remove('enabled');
-        setupMfaBtn.style.display = 'block';
-        mfaSetupSection.classList.remove('active');
-        mfaDisableSection.classList.remove('active');
-    }
-}
-
-/**
- * Update user info in the profile modal
- */
-function updateUserInfo() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    document.getElementById('userEmail').textContent = user.email || '';
-    document.getElementById('memberSince').textContent = new Date().toLocaleDateString();
-    document.getElementById('lastLogin').textContent = new Date().toLocaleDateString();
-}
-
-// Initialize auth and check for magic link token when document is ready
+// Initialize when document is ready
 $(document).ready(function() {
-    initAuthState();
-    initMFA();
+    Auth.initState();
+    Auth.MFA.init();
     
     // Add event listener for MFA verification button
-    document.getElementById('verifyLoginMfaBtn').addEventListener('click', verifyLoginMFA);
+    document.getElementById('verifyLoginMfaBtn').addEventListener('click', () => Auth.MFA.verifyLoginMFA());
     
     // Clear pending login data when modal is closed
     $('#mfaVerificationModal').on('hidden.bs.modal', function () {
-        pendingLoginData = null;
+        Auth.LoginManager.pendingLoginData = null;
         document.getElementById('loginVerificationCode').value = '';
         document.getElementById('mfaVerificationError').style.display = 'none';
     });
@@ -508,16 +506,16 @@ $(document).ready(function() {
 
     // Update UI when profile modal is opened
     $('#profileModal').on('show.bs.modal', function () {
-        updateMfaSetupUI();
-        updateUserInfo();
+        Auth.MFA.updateMfaSetupUI();
+        Auth.Profile.updateUserInfo();
     });
 
-    // Get full query string
-    let queryString = window.location.search;
-    let params = new URLSearchParams(queryString);
-    let token = params.get('token');
+    // Check for magic link token
+    const queryString = window.location.search;
+    const params = new URLSearchParams(queryString);
+    const token = params.get('token');
 
     if (token) {
-        verifyMagicLinkToken(token);
+        Auth.MagicLink.verifyToken(token);
     }
 }); 
