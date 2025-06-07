@@ -100,7 +100,7 @@ public class UserController extends BaseController {
     }
 
     // Using to verify user in case user login and enabled MFA
-    @PostMapping("/mfa/disabled")
+    @PostMapping("/mfa/disable")
     public ResponseEntity<ResultObjectInfo<String>> verify(@RequestBody DisableRequest req) {
         String rs = userService.disableMfa(req.username(), req.otp());
         return new ResponseEntity<>(ResultObjectInfo.<String>builder()
