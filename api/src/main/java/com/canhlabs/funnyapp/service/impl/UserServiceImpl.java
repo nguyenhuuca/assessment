@@ -192,6 +192,23 @@ public class UserServiceImpl implements UserService {
         return toUserInfo(newUser, getToken(newUser));
     }
 
+    @Override
+    public String disableMfa(String userName, String otp) {
+        User user = userRepo.findAllByUserName(userName);
+        if (user == null) {
+             CustomException.raiseErr("User not exist");
+        }
+        if (!user.isMfaEnabled()) {
+            CustomException.raiseErr("Mfa already disabled");
+        }
+        boolean isValid = TotpUtil.verify(otp, user.getMfaSecret());
+        if (!isValid) CustomException.raiseErr("Otp is invalid!");
+
+        user.setMfaEnabled(false);
+        userRepo.save(user);
+        return "success";
+    }
+
     private User toEntity(LoginDto loginDto) {
         return User.builder()
                 .userName(loginDto.getEmail())

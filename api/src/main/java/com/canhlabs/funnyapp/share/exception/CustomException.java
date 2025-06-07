@@ -26,4 +26,8 @@ public class CustomException extends RuntimeException {
                 .timestamp(LocalDateTime.now().toString())
                 .build();
     }
+
+    public static void raiseErr(String msg) {
+        throw CustomException.builder().message(msg).build();
+    }
 }

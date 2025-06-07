@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.share.dto.LoginDto;
 import com.canhlabs.funnyapp.share.dto.MfaRequest;
 import com.canhlabs.funnyapp.share.dto.SetupResponse;
 import com.canhlabs.funnyapp.share.dto.UserInfoDto;
+import com.canhlabs.funnyapp.share.exception.CustomException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService extends UserDetailsService {
@@ -31,6 +32,7 @@ public interface UserService extends UserDetailsService {
 
     UserInfoDto joinSystemPaswordless(String token);
 
+    String disableMfa(String userName, String otp);
 
 
 }

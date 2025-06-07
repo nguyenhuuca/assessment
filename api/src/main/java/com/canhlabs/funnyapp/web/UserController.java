@@ -5,6 +5,7 @@ import com.canhlabs.funnyapp.service.impl.InviteService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.AppProperties;
 import com.canhlabs.funnyapp.share.ResultObjectInfo;
+import com.canhlabs.funnyapp.share.dto.DisableRequest;
 import com.canhlabs.funnyapp.share.dto.EnableRequest;
 import com.canhlabs.funnyapp.share.dto.LoginDto;
 import com.canhlabs.funnyapp.share.dto.MfaRequest;
@@ -93,6 +94,16 @@ public class UserController extends BaseController {
     public ResponseEntity<ResultObjectInfo<UserInfoDto>> verify(@RequestBody MfaRequest req) {
         UserInfoDto rs = userService.verifyMfa(req);
         return new ResponseEntity<>(ResultObjectInfo.<UserInfoDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(rs)
+                .build(), HttpStatus.OK);
+    }
+
+    // Using to verify user in case user login and enabled MFA
+    @PostMapping("/mfa/disabled")
+    public ResponseEntity<ResultObjectInfo<String>> verify(@RequestBody DisableRequest req) {
+        String rs = userService.disableMfa(req.username(), req.otp());
+        return new ResponseEntity<>(ResultObjectInfo.<String>builder()
                 .status(ResultStatus.SUCCESS)
                 .data(rs)
                 .build(), HttpStatus.OK);
