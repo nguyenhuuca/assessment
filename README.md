@@ -63,6 +63,8 @@ We integrate OpenAI's ChatGPT API to:
 
 - Display high-quality recommendations to users
 
+---
+
 ### Set up & Installation
 #### Installation:
 - OpenJDK/JDK 21 and export JAVA_HOME
