@@ -65,6 +65,28 @@ We integrate OpenAI's ChatGPT API to:
 
 ---
 
+### 🔐 Passwordless Login via Magic Link
+
+**Funny Movies** uses a **modern, secure, and frictionless login system**:
+
+> ✅ **No passwords. No reset flows. Just a click.**
+
+#### How it works:
+1. User enters their email
+2. A **magic link** is sent to the email
+3. Clicking the link signs them in instantly
+
+#### Benefits:
+- 🚫 No password reuse or phishing risks
+- 📬 Email-based identity = simple for users
+- 🔒 Secure tokens with short expiry and device binding
+
+> Powered by JWT & secure one-time use tokens.
+
+
+---
+
+
 ### Set up & Installation
 #### Installation:
 - OpenJDK/JDK 21 and export JAVA_HOME
@@ -107,7 +129,7 @@ cd api
 `Open webapp/index.html`
 
 #### To visit demo:
-Access https://funnapp.canh-labs.com
+Access https://funnyapp.canh-labs.com/
 
 #### To run tests:
 ```shell
