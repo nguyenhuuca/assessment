@@ -4,7 +4,7 @@ import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.service.impl.InviteService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.AppProperties;
-import com.canhlabs.funnyapp.share.ResultObjectInfo;
+import com.canhlabs.funnyapp.share.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.share.dto.DisableRequest;
 import com.canhlabs.funnyapp.share.dto.EnableRequest;
 import com.canhlabs.funnyapp.share.dto.LoginDto;

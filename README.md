@@ -1,5 +1,8 @@
 # Funny Moives
+---
+[![codecov](https://codecov.io/gh/nguyenhuuca/assessment/branch/main/graph/badge.svg)](https://codecov.io/gh/nguyenhuuca/assessment)
 
+---
 ### Description
 This is web application to share the Youtube videos
 

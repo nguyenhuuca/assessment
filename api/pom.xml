@@ -31,7 +31,7 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <jsonwebtoken.version>0.11.5</jsonwebtoken.version>
         <springdoc-openapi.version>2.5.0</springdoc-openapi.version>
-        <skipTests>true</skipTests>
+        <skipTests>false</skipTests>
     </properties>
 
     <dependencies>
@@ -220,6 +220,39 @@
                 <configuration>
                     <skipTests>${skipTests}</skipTests>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+            <!-- JaCoCo Plugin -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/jacoco-report</outputDirectory>
+                            <formats>
+                                <format>xml</format> <!-- cần cho Codecov -->
+                                <format>html</format>
+                            </formats>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

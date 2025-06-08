@@ -1,11 +1,9 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.service.ChatGptService;
-import com.canhlabs.funnyapp.service.YoutubeVideoCache;
 import com.canhlabs.funnyapp.share.AppProperties;
-import com.canhlabs.funnyapp.share.ChatGptRequest;
-import com.canhlabs.funnyapp.share.ChatGptResponse;
-import com.canhlabs.funnyapp.share.enums.CacheKey;
+import com.canhlabs.funnyapp.share.dto.ChatGptRequest;
+import com.canhlabs.funnyapp.share.dto.ChatGptResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service

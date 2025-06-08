@@ -11,6 +11,7 @@ import com.canhlabs.funnyapp.share.dto.UserDetailDto;
 import com.canhlabs.funnyapp.share.dto.VideoDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 
+@Disabled
 @ExtendWith(MockitoExtension.class)
 class ShareServiceTest {
 

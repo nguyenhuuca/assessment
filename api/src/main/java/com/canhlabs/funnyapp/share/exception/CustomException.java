@@ -1,11 +1,12 @@
 package com.canhlabs.funnyapp.share.exception;
 
-import com.canhlabs.funnyapp.share.ResultErrorInfo;
+import com.canhlabs.funnyapp.share.dto.webapi.ResultErrorInfo;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -29,5 +30,10 @@ public class CustomException extends RuntimeException {
 
     public static void raiseErr(String msg) {
         throw CustomException.builder().message(msg).build();
+    }
+
+    public static void raiseErr(List<String> errors) {
+        String errorsStr = String.join(";",errors);
+        throw CustomException.builder().message(errorsStr).build();
     }
 }

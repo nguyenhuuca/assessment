@@ -2,8 +2,8 @@ package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.service.ShareService;
 import com.canhlabs.funnyapp.share.AppConstant;
-import com.canhlabs.funnyapp.share.ResultListInfo;
-import com.canhlabs.funnyapp.share.ResultObjectInfo;
+import com.canhlabs.funnyapp.share.dto.webapi.ResultListInfo;
+import com.canhlabs.funnyapp.share.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.share.dto.ShareRequestDto;
 import com.canhlabs.funnyapp.share.dto.VideoDto;
 import com.canhlabs.funnyapp.share.enums.ResultStatus;

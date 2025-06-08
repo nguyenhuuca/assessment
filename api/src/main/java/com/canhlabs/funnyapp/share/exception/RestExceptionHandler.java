@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.share.exception;
 
-import com.canhlabs.funnyapp.share.ResultErrorInfo;
+import com.canhlabs.funnyapp.share.dto.webapi.ResultErrorInfo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;

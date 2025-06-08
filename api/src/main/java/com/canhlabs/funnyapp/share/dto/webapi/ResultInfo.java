@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.share;
+package com.canhlabs.funnyapp.share.dto.webapi;
 
 import com.canhlabs.funnyapp.share.enums.ResultStatus;
 import lombok.Builder;

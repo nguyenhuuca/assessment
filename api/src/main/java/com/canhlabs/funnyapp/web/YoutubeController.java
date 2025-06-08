@@ -1,11 +1,9 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.impl.YouTubeVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
-import com.canhlabs.funnyapp.share.ResultListInfo;
+import com.canhlabs.funnyapp.share.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.share.dto.VideoDto;
-import com.canhlabs.funnyapp.share.enums.CacheKey;
 import com.canhlabs.funnyapp.share.enums.ResultStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

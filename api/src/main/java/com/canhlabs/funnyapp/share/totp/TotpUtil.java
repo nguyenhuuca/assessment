@@ -11,6 +11,7 @@ import java.time.Instant;
 
 @Slf4j
 public class TotpUtil {
+    private TotpUtil() {}
 
     private static final long TIME_STEP = 30;
     private static final int DIGITS = 6;

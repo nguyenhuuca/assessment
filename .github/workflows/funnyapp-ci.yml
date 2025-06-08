@@ -6,6 +6,7 @@ on:
     paths:
       - 'api/**'
       - '.github/workflows/funnyapp-ci.yml'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,8 +25,29 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
-      - name: Build with Maven
-        run: mvn -B package --file api/pom.xml
+      - name: Build with Maven & run tests
+        run: mvn -B verify --file api/pom.xml
+
+      - name: Upload JUnit test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-reports
+          path: api/target/surefire-reports/
+
+      - name: Upload JaCoCo HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-html
+          path: api/target/site/jacoco/
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # repo public có thể bỏ dòng này
+          files: api/target/site/jacoco/jacoco.xml
+          flags: unittests
+          name: funny-app-coverage
+          fail_ci_if_error: true
 
       - name: Copy JAR file to remote server via SCP using SSH
         uses: appleboy/scp-action@master
@@ -36,7 +58,6 @@ jobs:
           key: ${{ secrets.SSH_DO_SECRET_KEY }}
           source: "api/target/funny-app-1.0.0.jar"
           target: "/opt/CICD/"
-
 
   deploy:
     needs: [ build ]
