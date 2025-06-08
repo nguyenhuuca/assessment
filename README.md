@@ -1,5 +1,8 @@
 # Funny Moives
 ---
+# Build status
+![Build Status](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml/badge.svg)
+# Code coverage (Codecov)
 [![codecov](https://codecov.io/gh/nguyenhuuca/assessment/branch/main/graph/badge.svg)](https://codecov.io/gh/nguyenhuuca/assessment)
 
 ---
