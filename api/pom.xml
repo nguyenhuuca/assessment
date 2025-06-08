@@ -246,10 +246,8 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/jacoco-report</outputDirectory>
-                            <formats>
-                                <format>xml</format> <!-- cần cho Codecov -->
-                                <format>html</format>
-                            </formats>
+                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                            <output>file</output> <!-- file output type -->
                         </configuration>
                     </execution>
                 </executions>
