@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.domain.UserEmailRequest;
 import com.canhlabs.funnyapp.repo.UserEmailRequestRepository;
+import com.canhlabs.funnyapp.share.AppProperties;
 import com.canhlabs.funnyapp.share.AppUtils;
 import com.canhlabs.funnyapp.share.enums.Status;
 import com.canhlabs.funnyapp.share.exception.CustomException;
@@ -14,6 +15,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.canhlabs.funnyapp.share.exception.CustomException.raiseErr;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -21,14 +24,13 @@ public class InviteService {
 
     private final UserEmailRequestRepository requestRepo;
     private final MailService emailSender;
+    private final AppProperties appProperties;
     /**
      * Send link join system
      */
     public void inviteUser(String email, Long invitedByUserId) {
         if (!AppUtils.isValidEmail(email)) {
-            throw CustomException.builder()
-                    .message("Invalid email")
-                    .build();
+           raiseErr("Invalid email");
         }
         String token = UUID.randomUUID().toString();
         Instant now = Instant.now();
@@ -43,9 +45,7 @@ public class InviteService {
                 .build();
 
         requestRepo.save(request);
-
-        String frontendUrl = "https://funnyapp.canh-labs.com/join";
-        String magicLink = frontendUrl + "?token=" + token;
+        String magicLink = appProperties.getDomain() + "/join/?token=" + token;
 
         emailSender.sendInvitation(email, email, magicLink);
     }

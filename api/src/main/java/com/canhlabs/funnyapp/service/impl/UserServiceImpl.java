@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.canhlabs.funnyapp.service.impl.Converter.toUserInfo;
+import static com.canhlabs.funnyapp.share.exception.CustomException.raiseErr;
 
 @Slf4j
 @Service
@@ -123,9 +124,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public String enableMfa(String userName, String secret, String otp) {
         if (!TotpUtil.verify(otp, secret))  {
-            throw  CustomException.builder()
-                    .message("Otp is incorrectly")
-                    .build();
+            raiseErr("Otp is incorrectly");
+
         }
         User user = userRepo.findAllByUserName(userName);
         user.setMfaEnabled(true);
@@ -151,15 +151,11 @@ public class UserServiceImpl implements UserService {
         String sessionToken = mfaRequest.sessionToken();
         Optional<String> userIdOpt = mfaSessionStore.getUserId(sessionToken);
         if (userIdOpt.isEmpty()) {
-            throw  CustomException.builder()
-                    .message("Invalid or expired session")
-                    .build();
+            raiseErr("Invalid or expired session");
         }
         User user = userRepo.findAllByUserName(userIdOpt.get());
         if (!TotpUtil.verify(mfaRequest.otp(), user.getMfaSecret())) {
-            throw  CustomException.builder()
-                    .message("Otp is incorrectly")
-                    .build();
+            raiseErr("Otp is incorrectly");
         }
         return  toUserInfo(user, getToken(user));
     }
@@ -168,9 +164,7 @@ public class UserServiceImpl implements UserService {
     public UserInfoDto joinSystemPaswordless(String token) {
         Optional<UserEmailRequest> userReq = inviteService.verifyToken(token);
         if (userReq.isEmpty()) {
-            throw  CustomException.builder()
-                    .message("Token in invalid")
-                    .build();
+            raiseErr("Token in invalid");
         }
         log.info("token was verified success for user {}", userReq.get().getEmail());
 
@@ -196,13 +190,13 @@ public class UserServiceImpl implements UserService {
     public String disableMfa(String userName, String otp) {
         User user = userRepo.findAllByUserName(userName);
         if (user == null) {
-             CustomException.raiseErr("User not exist");
+             raiseErr("User not exist");
         }
         if (!user.isMfaEnabled()) {
-            CustomException.raiseErr("Mfa already disabled");
+            raiseErr("Mfa already disabled");
         }
         boolean isValid = TotpUtil.verify(otp, user.getMfaSecret());
-        if (!isValid) CustomException.raiseErr("Otp is invalid!");
+        if (!isValid) raiseErr("Otp is invalid!");
 
         user.setMfaEnabled(false);
         userRepo.save(user);
@@ -224,15 +218,11 @@ public class UserServiceImpl implements UserService {
 
     private void validate(LoginDto loginDto) {
         if (StringUtils.isEmpty(loginDto.getEmail()) || StringUtils.isEmpty(loginDto.getPassword())) {
-            throw CustomException.builder()
-                    .message("Field is not empty")
-                    .build();
+          raiseErr("Field is not empty");
         }
 
         if (!AppUtils.isValidEmail(loginDto.getEmail())) {
-            throw CustomException.builder()
-                    .message("Invalid email")
-                    .build();
+          raiseErr("Invalid email");
         }
     }
 

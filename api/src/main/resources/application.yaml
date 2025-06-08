@@ -60,6 +60,7 @@ app:
   google-part: snippet,contentDetails,statistics,statusKey
   gpt-key: ${GPT_KEY}
   use-password-less: true
+  domain: 'https://funnyapp.canh-labs.com'
 
 # Springdoc (OpenAPI/Swagger) config
 springdoc:

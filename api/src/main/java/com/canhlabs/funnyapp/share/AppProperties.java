@@ -24,6 +24,7 @@ public class AppProperties {
     private String googlePart;
     private String gptKey;
     private boolean usePasswordless;
+    private String domain;
 
 
 

@@ -3,7 +3,7 @@ package com.canhlabs.funnyapp.cache;
 import org.springframework.stereotype.Component;
 
 @Component
- class AppCacheFactory {
+ public class AppCacheFactory {
 
     public <K, V> AppCache<K, V> createCache(long ttlMinutes, long maxSize) {
         return new GuavaAppCache<>(ttlMinutes, maxSize);

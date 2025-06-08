@@ -1,11 +1,8 @@
 package com.canhlabs.funnyapp.cache;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class MFASessionStore {

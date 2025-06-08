@@ -1,11 +1,13 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.domain.ShareLink;
+import com.canhlabs.funnyapp.domain.User;
 import com.canhlabs.funnyapp.repo.ShareLinkRepo;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.service.ShareService;
 import com.canhlabs.funnyapp.share.AppProperties;
 import com.canhlabs.funnyapp.share.AppUtils;
+import com.canhlabs.funnyapp.share.Contract;
 import com.canhlabs.funnyapp.share.dto.ShareRequestDto;
 import com.canhlabs.funnyapp.share.dto.UserDetailDto;
 import com.canhlabs.funnyapp.share.dto.VideoDto;
@@ -51,11 +53,7 @@ public class ShareServiceImpl implements ShareService {
     @Override
     public VideoDto shareLink(ShareRequestDto shareRequestDto) {
         VideoDto videoDto =  getInfoFromYoutube(shareRequestDto.getUrl());
-        if(videoDto == null) {
-            throw  CustomException.builder()
-                    .message("Cannot get video info")
-                    .build();
-        }
+        Contract.requireNonNull(videoDto, "Cannot get video info");
         ShareLink shareLink = toEntity(videoDto);
         shareLink = shareLinkRepo.save(shareLink);
         videoDto.setId(shareLink.getId());
@@ -65,7 +63,11 @@ public class ShareServiceImpl implements ShareService {
 
     @Override
     public List<VideoDto> getALLShare() {
-        List<ShareLink> shareLinks = shareLinkRepo.findByOrderByCreatedAtDesc();
+        UserDetailDto userDetail = AppUtils.getCurrentUser();
+        Contract.requireNonNull(userDetail, "User is not exist");
+        User  user = userRepo.findAllByUserName(userDetail.getEmail());
+        List<ShareLink> shareLinks = shareLinkRepo.findAllByUser(user);
+
         return Converter.videoDtoList(shareLinks);
     }
 
@@ -83,9 +85,7 @@ public class ShareServiceImpl implements ShareService {
             videoDto = requestYouTube(link,videoId);
             log.info(videoId);
         } catch (Exception ex) {
-            throw  CustomException.builder()
-                    .message("Cannot get video info")
-                    .build();
+            CustomException.raiseErr("annot get video info");
         }
         return videoDto;
     }
