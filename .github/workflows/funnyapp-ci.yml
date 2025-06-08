@@ -35,13 +35,13 @@ jobs:
           path: api/target/surefire-reports/
 
       - name: List jacoco folder
-        run: ls -l api/target/site/
+        run: ls -l api/target/
 
       - name: Upload JaCoCo HTML report
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-html
-          path: api/target/site/jacoco/
+          path: api/target/jacoco-report/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
