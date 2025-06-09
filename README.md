@@ -86,52 +86,69 @@ We integrate OpenAI's ChatGPT API to:
 
 ---
 
+### 🚀 Setup & Installation
 
-### Set up & Installation
-#### Installation:
-- OpenJDK/JDK 21 and export JAVA_HOME
-- Maven >=3.6 and export MAVEN_HOME
-- PostgresSQL.
-- Generate the GOOGE API KEY to use their API [link](https://console.cloud.google.com/apis/api/youtube.googleapis.com/credentials)
-- Creata database with name funnyapp.
-- Run sql script int db/dump.sql to create tables
+#### 🧰 Requirements:
+- **JDK 21+** – make sure to set `JAVA_HOME`
+- **Maven 3.6+** – make sure to set `MAVEN_HOME`
+- **PostgreSQL** installed and running
+- **Google API Key** – required for YouTube Data API  
+  👉 Get it from [Google Cloud Console](https://console.cloud.google.com/apis/api/youtube.googleapis.com/credentials)
 
+#### 🗃️ Database setup:
+1. Create a PostgreSQL database named `funnyapp`
+2. Run the SQL script in `db/dump.sql` to create the necessary tables
 
-### Running Appp on LocalHost:
-- Change file api/.env.example to api/.env and configure database info for postgres sql
+---
+
+### ▶️ Running App Locally
+
+#### 🔧 Configure environment variables:
+Copy the example `.env` file and edit:
+```shell
+cp api/.env.example api/.env
+```
+Edit api/.env and update values:
 ```shell
 DB_USER=postgres
-DB_NAME=assessment
-DB_PASS=[pass]
-DB_HOST=[host]
-GOOGLE_KEY=[key]
-JWT_SECRET=[jwt_secret]
-GOOGLE_KEY=[]
-GPT_KEY=[]
+DB_NAME=funnyapp
+DB_PASS=your_password
+DB_HOST=localhost
+GOOGLE_KEY=your_google_api_key
+JWT_SECRET=your_jwt_secret
+GPT_KEY=your_openai_key
 
-EMAIL_SENDER=[]
-EMAIL_PASS=[]
+EMAIL_SENDER=you@example.com
+EMAIL_PASS=your_email_password
 ```
-- Start app:
+
+▶ Start the application:
 ```shell
 cd api
-./startLocal 
+./startLocal
 ```
 
-#### To visit the endpoints running on the LocalHost:
-`http://localhost:8081/swagger-ui/`
+#### 🌐 Access Endpoints
 
-`http://localhost:8081/actutor/health`
+✅ API Endpoints
+- wagger UI: http://localhost:8081/swagger-ui/
 
-#### To visit the  web LocalHost:
-`Change baseURL in webapp/js/assesement.js to http://localhost:8081/v1/funny-app`
+- Health Check: http://localhost:8081/actutor/health
 
-`Open webapp/index.html`
+🖥️ Web UI
+1. Open webapp/js/assesement.js
 
-#### To visit demo:
-Access https://funnyapp.canh-labs.com/
+2. Update baseURL to:
+```js
+const baseURL = "http://localhost:8081/v1/funny-app";
+```
+3. Open webapp/index.html in your browser.
 
-#### To run tests:
+#### 🌍 Online Demo
+Visit: https://funnyapp.canh-labs.com/
+
+#### ✅ Running Unit Tests
+
 ```shell
 cd api
 ./unittest
