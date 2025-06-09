@@ -79,15 +79,16 @@ jobs:
       - name: Commit and push updated coverage threshold
         if: github.ref == 'refs/heads/main'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}
           
+          git pull origin main
           git add api/.coverage-threshold
           git commit -m "[skip ci] ⬆️ Auto-increase coverage threshold to next level" || echo "No changes to commit"
-          git push
+          git push origin main
 
       - name: Upload JUnit test reports
         uses: actions/upload-artifact@v4
