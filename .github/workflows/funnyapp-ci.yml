@@ -81,7 +81,7 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add .coverage-threshold
+          git add api/.coverage-threshold
           git commit -m "[skip ci] ⬆️ Auto-increase coverage threshold to next level"
           git push
 
