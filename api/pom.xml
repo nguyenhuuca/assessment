@@ -32,6 +32,7 @@
         <jsonwebtoken.version>0.11.5</jsonwebtoken.version>
         <springdoc-openapi.version>2.5.0</springdoc-openapi.version>
         <skipTests>false</skipTests>
+        <skipCoverage>true</skipCoverage>
     </properties>
 
     <dependencies>
@@ -247,7 +248,39 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/jacoco-report</outputDirectory>
                             <dataFile>${project.build.directory}/jacoco.exec</dataFile>
-                            <output>file</output> <!-- file output type -->
+                            <excludes>
+                                <exclude>**/config/**</exclude>
+                                <exclude>**/dto/**</exclude>
+                                <exclude>**/exception/**</exclude>
+                                <exclude>**/enums/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <!-- check coverage -->
+                    <execution>
+                        <id>check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.8</minimum> <!-- 80% line coverage -->
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.8</minimum> <!-- 70% branch coverage -->
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                            <skip>${skipCoverage}</skip>
                         </configuration>
                     </execution>
                 </executions>
