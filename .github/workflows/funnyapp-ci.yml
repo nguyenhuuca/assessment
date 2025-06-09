@@ -76,14 +76,17 @@ jobs:
           echo "$REQUIRED" > $THRESHOLD_FILE
           echo "✅ Coverage threshold updated to: $REQUIRED%"
 
+      - name: Debug git remote
+        run: |
+          git remote -v
       - name: Commit and push updated coverage threshold
         if: github.ref == 'refs/heads/main'
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
           
           git pull origin main
           git add api/.coverage-threshold
