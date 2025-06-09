@@ -17,6 +17,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Skip CI if last commit message contains [skip ci]
+        run: |
+          LAST_MSG=$(git log -1 --pretty=%B)
+          if echo "$LAST_MSG" | grep -q "\[skip ci\]"; then
+            echo "🚫 Skip CI because last commit contains [skip ci]"
+            exit 0
+          fi
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -27,6 +38,52 @@ jobs:
 
       - name: Build with Maven & run tests
         run: mvn -B verify --file api/pom.xml
+
+      - name: Install XML parser
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+
+      - name: Check coverage and enforce +1% increase
+        run: |
+          THRESHOLD_FILE="api/.coverage-threshold"
+          REPORT="api/target/jacoco-report/jacoco.xml"
+
+          if [ ! -f "$REPORT" ]; then
+            echo "❌ Coverage report not found!"
+            exit 1
+          fi
+
+          COVERED=$(xmllint --xpath "string(//report/counter[@type='LINE']/@covered)" "$REPORT")
+          MISSED=$(xmllint --xpath "string(//report/counter[@type='LINE']/@missed)" "$REPORT")
+          TOTAL=$((COVERED + MISSED))
+          COVERAGE=$(echo "scale=2; $COVERED * 100 / $TOTAL" | bc)
+
+          echo "📊 Actual coverage: $COVERAGE%"
+
+          if [ ! -f "$THRESHOLD_FILE" ]; then
+            echo "50" > "$THRESHOLD_FILE"
+          fi
+
+          OLD=$(cat "$THRESHOLD_FILE")
+          REQUIRED=$(echo "$OLD + 1" | bc)
+          echo "🔒 Required minimum: $REQUIRED% (last was $OLD%)"
+
+          TOO_LOW=$(echo "$COVERAGE < $REQUIRED" | bc)
+          if [ "$TOO_LOW" -eq 1 ]; then
+            echo "❌ Coverage not improved enough (got $COVERAGE%, need at least $REQUIRED%)"
+            exit 1
+          fi
+
+          echo "$REQUIRED" > $THRESHOLD_FILE
+          echo "✅ Coverage threshold updated to: $REQUIRED%"
+
+      - name: Commit and push updated coverage threshold
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add .coverage-threshold
+          git commit -m "[skip ci] ⬆️ Auto-increase coverage threshold to next level"
+          git push
 
       - name: Upload JUnit test reports
         uses: actions/upload-artifact@v4
@@ -46,8 +103,8 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }} # repo public có thể bỏ dòng này
-          files: api/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: api/target/jacoco-report/jacoco.xml
           flags: unittests
           name: funny-app-coverage
           fail_ci_if_error: true

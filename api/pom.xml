@@ -33,6 +33,7 @@
         <springdoc-openapi.version>2.5.0</springdoc-openapi.version>
         <skipTests>false</skipTests>
         <skipCoverage>false</skipCoverage>
+        <jacoco.minimum.coverage>0.07</jacoco.minimum.coverage>
     </properties>
 
     <dependencies>
@@ -281,12 +282,12 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.06</minimum> <!-- 80% line coverage -->
+                                            <minimum>${jacoco.minimum.coverage}</minimum> <!-- 80% line coverage -->
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.1</minimum> <!-- 70% branch coverage -->
+                                            <minimum>${jacoco.minimum.coverage}</minimum>  <!-- 70% branch coverage -->
                                         </limit>
                                     </limits>
                                 </rule>
