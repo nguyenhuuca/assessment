@@ -41,42 +41,49 @@ jobs:
       - name: Build with Maven & run tests
         run: mvn -B verify --file api/pom.xml
 
-      - name: Install XML parser
-        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+      - name: Install xmllint (if not already)
+        run: |
+          if ! command -v xmllint &> /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y libxml2-utils
+          else
+            echo "xmllint already installed"
+          fi
 
       - name: Check coverage and enforce +1% increase
         run: |
           THRESHOLD_FILE="api/.coverage-threshold"
           REPORT="api/target/jacoco-report/jacoco.xml"
-
+      
           if [ ! -f "$REPORT" ]; then
-            echo "❌ Coverage report not found!"
-            exit 1
+          echo "❌ Coverage report not found!"
+          exit 1
           fi
-
+      
           COVERED=$(xmllint --xpath "string(//report/counter[@type='LINE']/@covered)" "$REPORT")
           MISSED=$(xmllint --xpath "string(//report/counter[@type='LINE']/@missed)" "$REPORT")
           TOTAL=$((COVERED + MISSED))
-          COVERAGE=$(echo "scale=2; $COVERED * 100 / $TOTAL" | bc)
-
-          echo "📊 Actual coverage: $COVERAGE%"
-
+          COVERAGE=$(echo "scale=4; $COVERED / $TOTAL" | bc)
+      
+          echo "📊 Actual LINE coverage: $(echo "$COVERAGE * 100" | bc)%"
+      
+          # Nếu chưa có file threshold thì tạo mặc định là 0.10 (10%)
           if [ ! -f "$THRESHOLD_FILE" ]; then
-            echo "0.05" > "$THRESHOLD_FILE"
+          echo "0.10" > "$THRESHOLD_FILE"
           fi
-
+      
           OLD=$(cat "$THRESHOLD_FILE")
-          REQUIRED=$(echo "$OLD + 0.01"*100 | bc)
-          echo "🔒 Required minimum: $REQUIRED% (last was $OLD%)"
-
+          REQUIRED=$(echo "$OLD + 0.01" | bc)
+          echo "🔒 Required minimum: $(echo "$REQUIRED * 100" | bc)% (last was $(echo "$OLD * 100" | bc)%)"
+      
           TOO_LOW=$(echo "$COVERAGE < $REQUIRED" | bc)
           if [ "$TOO_LOW" -eq 1 ]; then
-            echo "❌ Coverage not improved enough (got $COVERAGE%, need at least $REQUIRED%)"
-            exit 1
+          echo "❌ Coverage not improved enough (got $COVERAGE, need at least $REQUIRED)"
+          exit 1
           fi
-
-          echo "$REQUIRED" > $THRESHOLD_FILE
-          echo "✅ Coverage threshold updated to: $REQUIRED%"
+      
+          echo "$REQUIRED" > "$THRESHOLD_FILE"
+          echo "✅ Coverage threshold updated to $REQUIRED"
 
       - name: Commit and push updated coverage threshold
         if: github.ref == 'refs/heads/main'
