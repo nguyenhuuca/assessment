@@ -20,6 +20,8 @@ jobs:
         with:
           persist-credentials: true
           fetch-depth: 0
+          repository: nguyenhuuca/assessment
+          token: ${{ secrets.GH_PAT }}
 
       - name: Skip CI if last commit message contains [skip ci]
         run: |
@@ -82,11 +84,11 @@ jobs:
       - name: Commit and push updated coverage threshold
         if: github.ref == 'refs/heads/main'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          git remote set-url origin https://github.com:nguyenhuuca/assessment.git
           
           git pull origin main
           git add api/.coverage-threshold
