@@ -76,7 +76,7 @@ public class ShareServiceImpl implements ShareService {
      * @param link post by user
      * @return video info
      */
-    private VideoDto getInfoFromYoutube(String link) {
+    VideoDto getInfoFromYoutube(String link) {
         VideoDto videoDto = null;
         try {
             URL url = new URL(link);

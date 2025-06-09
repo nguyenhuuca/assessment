@@ -1,6 +1,5 @@
-package com.canhlabs.funnyap.share;
+package com.canhlabs.funnyapp.share;
 
-import com.canhlabs.funnyapp.share.ContractDSL;
 import com.canhlabs.funnyapp.share.exception.CustomException;
 import org.junit.jupiter.api.Test;
 

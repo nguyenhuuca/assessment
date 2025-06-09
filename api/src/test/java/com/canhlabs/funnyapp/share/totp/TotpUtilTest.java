@@ -1,4 +1,4 @@
-package com.canhlabs.funnyap.share.totp;
+package com.canhlabs.funnyapp.share.totp;
 
 import com.canhlabs.funnyapp.share.totp.TotpUtil;
 import org.apache.commons.codec.binary.Base32;
