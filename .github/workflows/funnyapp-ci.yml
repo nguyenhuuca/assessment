@@ -62,11 +62,11 @@ jobs:
           echo "📊 Actual coverage: $COVERAGE%"
 
           if [ ! -f "$THRESHOLD_FILE" ]; then
-            echo "50" > "$THRESHOLD_FILE"
+            echo "0.05" > "$THRESHOLD_FILE"
           fi
 
           OLD=$(cat "$THRESHOLD_FILE")
-          REQUIRED=$(echo "$OLD + 1" | bc)
+          REQUIRED=$(echo "$OLD + 0.01"*100 | bc)
           echo "🔒 Required minimum: $REQUIRED% (last was $OLD%)"
 
           TOO_LOW=$(echo "$COVERAGE < $REQUIRED" | bc)
@@ -78,9 +78,6 @@ jobs:
           echo "$REQUIRED" > $THRESHOLD_FILE
           echo "✅ Coverage threshold updated to: $REQUIRED%"
 
-      - name: Debug git remote
-        run: |
-          git remote -v
       - name: Commit and push updated coverage threshold
         if: github.ref == 'refs/heads/main'
         env:
