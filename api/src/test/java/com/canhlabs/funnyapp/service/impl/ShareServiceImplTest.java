@@ -11,6 +11,7 @@ import com.canhlabs.funnyapp.share.dto.ShareRequestDto;
 import com.canhlabs.funnyapp.share.dto.UserDetailDto;
 import com.canhlabs.funnyapp.share.dto.VideoDto;
 import com.canhlabs.funnyapp.share.exception.CustomException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,13 +20,16 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestTemplate;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyString;
@@ -41,6 +45,9 @@ class ShareServiceImplTest {
     private UserRepo userRepo;
     @Mock
     private AppProperties props;
+
+    @Mock
+    private RestTemplate restTemplate;
 
     @InjectMocks
     private ShareServiceImpl shareService;
@@ -112,5 +119,99 @@ class ShareServiceImplTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining("User is not exist");
         }
+    }
+
+    @Test
+    void shareLink_throwsExceptionWhenVideoInfoIsNull() {
+        ShareRequestDto req = ShareRequestDto.builder().url("https://youtube.com/watch?v=notfound").build();
+        ShareServiceImpl spyService = Mockito.spy(shareService);
+        doReturn(null).when(spyService).getInfoFromYoutube(anyString());
+
+        assertThatThrownBy(() -> spyService.shareLink(req))
+                .hasMessageContaining("Cannot get video info");
+    }
+
+    @Test
+    void getInfoFromYoutube_ExceptionOccurs() {
+        ShareServiceImpl spyService = Mockito.spy(shareService);
+        // Pass an invalid URL to trigger exception
+        assertThatThrownBy(() -> {
+            VideoDto result = spyService.getInfoFromYoutube("invalid_url");
+        }).hasMessageContaining("Cannot get video info");
+
+    }
+
+    @Test
+    void getInfoFromYoutube_returnsVideoDtoForValidUrl() throws JsonProcessingException {
+        ShareServiceImpl spyService = Mockito.spy(shareService);
+        VideoDto mockDto = VideoDto.builder().title("t").desc("d").urlLink("u").embedLink("e").build();
+        doReturn(mockDto).when(spyService).requestYouTube(anyString(), anyString());
+
+        VideoDto result = spyService.getInfoFromYoutube("https://youtube.com/watch?v=abc123");
+        assertThat(result).isNotNull();
+        assertThat(result.getTitle()).isEqualTo("t");
+    }
+
+    @Test
+    void getQueryParam_parsesQueryCorrectly() throws Exception {
+        String query = "v=abc123&foo=bar";
+        java.lang.reflect.Method method = ShareServiceImpl.class.getDeclaredMethod("getQueryParam", String.class);
+        method.setAccessible(true);
+        Map<String, String> result = (Map<String, String>) method.invoke(shareService, query);
+        assertThat(result.get("v")).isEqualTo("abc123");
+        assertThat(result.get("foo")).isEqualTo("bar");
+    }
+
+    @Test
+    void toEntity_throwsExceptionWhenCurrentUserIsNull() throws Exception {
+        try (MockedStatic<AppUtils> appUtilsMockedStatic = Mockito.mockStatic(AppUtils.class)) {
+            appUtilsMockedStatic.when(AppUtils::getCurrentUser).thenReturn(null);
+            java.lang.reflect.Method method = ShareServiceImpl.class.getDeclaredMethod("toEntity", VideoDto.class);
+            method.setAccessible(true);
+            VideoDto dto = VideoDto.builder().title("t").desc("d").embedLink("e").urlLink("u").build();
+            try {
+                method.invoke(shareService, dto);
+            } catch (Exception e) {
+                String msg = ((CustomException) ((InvocationTargetException) e).getTargetException()).getMessage();
+                assertThat(msg.contains("User is not exist"));
+            }
+
+        }
+    }
+
+    @Test
+    void requestYouTube_returnsVideoDtoForValidResponse() throws Exception {
+        // Arrange
+        String videoId = "abc123";
+        String link = "https://youtube.com/watch?v=" + videoId;
+        String apiKey = "fake-api-key";
+        String part = "snippet";
+        String jsonResponse = """
+    {
+      "items": [
+        {
+          "snippet": {
+            "title": "Test Title",
+            "description": "Test Description"
+          }
+        }
+      ]
+    }
+    """;
+
+        when(props.getGoogleApiKey()).thenReturn(apiKey);
+        when(props.getGooglePart()).thenReturn(part);
+
+        when(restTemplate.getForObject(anyString(), eq(String.class))).thenReturn(jsonResponse);
+
+        // Act
+        VideoDto result = shareService.requestYouTube(link, videoId);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getTitle()).isEqualTo("Test Title");
+        assertThat(result.getDesc()).isEqualTo("Test Description");
+        assertThat(result.getEmbedLink()).isEqualTo("https://youtube.com/embed/" + videoId);
+        assertThat(result.getUrlLink()).isEqualTo(link);
     }
 }

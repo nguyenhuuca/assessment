@@ -33,7 +33,12 @@ public class ShareServiceImpl implements ShareService {
     private AppProperties props;
     private ShareLinkRepo shareLinkRepo;
     private UserRepo userRepo;
+    private RestTemplate restTemplate;
 
+    @Autowired
+    public  void injectRestTemplate(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
     @Autowired
     public void injectShareLink(ShareLinkRepo shareLinkRepo){
         this.shareLinkRepo = shareLinkRepo;
@@ -85,7 +90,7 @@ public class ShareServiceImpl implements ShareService {
             videoDto = requestYouTube(link,videoId);
             log.info(videoId);
         } catch (Exception ex) {
-            CustomException.raiseErr("annot get video info");
+            CustomException.raiseErr("Cannot get video info");
         }
         return videoDto;
     }
@@ -96,15 +101,14 @@ public class ShareServiceImpl implements ShareService {
      * @param videoId detect from link
      * @return video info
      */
-    private VideoDto requestYouTube(String link, String videoId) throws JsonProcessingException {
-        RestTemplate rest = new RestTemplate();
+    VideoDto requestYouTube(String link, String videoId) throws JsonProcessingException {
         String url = API_GOOGLE +
                 "id=" + videoId + "&" +
                 "key=" + props.getGoogleApiKey() + "&" +
                 "part=" + props.getGooglePart();
 
         // make an HTTP GET request
-        String json = rest.getForObject(url, String.class);
+        String json = restTemplate.getForObject(url, String.class);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
         JsonNode snippet = jsonNode.get("items").get(0).get("snippet");
