@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.service.impl;
+package com.canhlabs.funnyapp.share;
 
 import com.canhlabs.funnyapp.domain.ShareLink;
 import com.canhlabs.funnyapp.domain.User;

@@ -7,6 +7,7 @@ import com.canhlabs.funnyapp.repo.ShareLinkRepo;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.share.AppProperties;
 import com.canhlabs.funnyapp.share.AppUtils;
+import com.canhlabs.funnyapp.share.Converter;
 import com.canhlabs.funnyapp.share.dto.ShareRequestDto;
 import com.canhlabs.funnyapp.share.dto.UserDetailDto;
 import com.canhlabs.funnyapp.share.dto.VideoDto;

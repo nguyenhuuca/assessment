@@ -14,7 +14,6 @@ import com.canhlabs.funnyapp.share.dto.MfaRequest;
 import com.canhlabs.funnyapp.share.dto.SetupResponse;
 import com.canhlabs.funnyapp.share.dto.UserDetailDto;
 import com.canhlabs.funnyapp.share.dto.UserInfoDto;
-import com.canhlabs.funnyapp.share.exception.CustomException;
 import com.canhlabs.funnyapp.share.totp.TotpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base32;
@@ -36,7 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.canhlabs.funnyapp.service.impl.Converter.toUserInfo;
+import static com.canhlabs.funnyapp.share.Converter.toUserInfo;
 import static com.canhlabs.funnyapp.share.exception.CustomException.raiseErr;
 
 @Slf4j
