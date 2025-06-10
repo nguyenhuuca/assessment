@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.share.AppProperties;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 @Slf4j
 @Service
@@ -25,17 +25,18 @@ public class MailService {
     private String htmlTemplate;
     @Value("${spring.mail.username}")
     private String fromAddress;
+    private final AppProperties appProperties;
 
 
-
-    public MailService(JavaMailSender mailSender) {
+    public MailService(JavaMailSender mailSender, AppProperties appProperties) {
         this.mailSender = mailSender;
+        this.appProperties = appProperties;
     }
 
     @PostConstruct
     public void loadTemplate() throws IOException {
         // Load HTML template once at startup
-        ClassPathResource resource = new ClassPathResource("templates/email/invite.html");
+        ClassPathResource resource = new ClassPathResource(appProperties.getInviteTemplate());
         try (InputStream is = resource.getInputStream()) {
             htmlTemplate = new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }

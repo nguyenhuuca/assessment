@@ -1,21 +1,16 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.share.AppProperties;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.*;
 
 class MailServiceTest {
@@ -23,13 +18,15 @@ class MailServiceTest {
     @Mock
     private JavaMailSender mailSender;
 
+    @Mock
+    private AppProperties appProperties;
+
     @InjectMocks
     private MailService mailService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        // Set required fields via reflection
         ReflectionTestUtils.setField(mailService, "fromAddress", "noreply@canh-labs.com");
         ReflectionTestUtils.setField(mailService, "htmlTemplate", "<html>{{username}} {{loginUrl}}</html>");
     }
@@ -51,4 +48,29 @@ class MailServiceTest {
         verify(mailSender).send(any(MimeMessage.class));
     }
 
+    @Test
+    void sendEmail_handlesExceptionGracefully() {
+        // Simulate exception in mailSender.send
+        doThrow(new RuntimeException("Mail error")).when(mailSender).send(any(MimeMessage.class));
+        MimeMessage mimeMessage = mock(MimeMessage.class);
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+
+        assertThatCode(() ->
+                ReflectionTestUtils.invokeMethod(mailService, "sendEmail", "to@abc.com", "subject", "<html>content</html>")
+        ).doesNotThrowAnyException();
+    }
+    @Test
+    void loadTemplate_readsTemplateFile() throws Exception {
+        // Arrange
+        when(appProperties.getInviteTemplate()).thenReturn("templates/email/invite-test.html");
+        // Place a file named invite-test.html in src/test/resources with content: "Hello, {{username}}!"
+        MailService mailService = new MailService(mailSender, appProperties);
+
+        // Act
+        mailService.loadTemplate();
+
+        // Assert
+        String template = (String) ReflectionTestUtils.getField(mailService, "htmlTemplate");
+        assertThat(template).isEqualTo("Hello, {{username}}!");
+    }
 }

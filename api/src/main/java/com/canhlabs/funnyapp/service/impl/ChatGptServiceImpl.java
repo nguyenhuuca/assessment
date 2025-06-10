@@ -16,13 +16,12 @@ import java.util.List;
 @Service
 public class ChatGptServiceImpl implements ChatGptService {
 
-    private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";// Replace with your actual OpenAI API key
-
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final AppProperties props;
 
-    public ChatGptServiceImpl(ObjectMapper objectMapper, AppProperties props) {
+    public ChatGptServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper, AppProperties props) {
+        this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.props = props;
     }
@@ -47,7 +46,7 @@ public class ChatGptServiceImpl implements ChatGptService {
         HttpEntity<ChatGptRequest> entity = new HttpEntity<>(request, headers);
 
         ResponseEntity<ChatGptResponse> response = restTemplate.exchange(
-                OPENAI_URL,
+                props.getChatGptUrl(),
                 HttpMethod.POST,
                 entity,
                 ChatGptResponse.class

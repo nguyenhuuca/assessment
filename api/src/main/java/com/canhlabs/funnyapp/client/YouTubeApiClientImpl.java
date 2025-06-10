@@ -30,7 +30,7 @@ public class YouTubeApiClientImpl implements YouTubeApiClient {
 
         String ids = String.join(",", videoIds);
         String url = String.format(
-                "https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=%s&key=%s",
+                props.getYoutubeUrl().concat("?part=snippet,statistics&id=%s&key=%s"),
                 ids, props.getGoogleApiKey()
         );
 

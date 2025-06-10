@@ -25,6 +25,9 @@ public class AppProperties {
     private String gptKey;
     private boolean usePasswordless;
     private String domain;
+    private String inviteTemplate;
+    private String chatGptUrl;
+    private String youtubeUrl;
 
 
 
