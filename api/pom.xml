@@ -257,7 +257,7 @@
                                 <exclude>**/domain/**</exclude>
                                 <exclude>**/repo/**</exclude>
                                 <exclude>**/AppConstant.class</exclude>
-                                <exclude>**/AppProperties.class</exclude>
+                                <exclude>**/AppConstant$*.class</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -276,8 +276,8 @@
                                 <exclude>**/enums/**</exclude>
                                 <exclude>**/domain/**</exclude>
                                 <exclude>**/repo/**</exclude>
-                                <exclude>**/AppConstant.class</exclude>
-                                <exclude>**/AppProperties.class</exclude>
+                                <exclude>**/AppConstant**</exclude>
+                                <exclude>**/AppConstant$*.class</exclude>
                             </excludes>
                             <rules>
                                 <rule>

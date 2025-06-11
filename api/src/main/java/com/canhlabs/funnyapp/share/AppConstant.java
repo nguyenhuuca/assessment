@@ -17,11 +17,6 @@ public class AppConstant {
     private AppConstant() {
     }
 
-    // Common
-    // the constant will get all configure from application properties
-    // because properties can use for all class (int Spring context and not Spring context),
-    // so we need create the constant to load it
-    public static final AppProperties props = new AppProperties();
 
     public static class API {
         private API() {
@@ -44,14 +39,6 @@ public class AppConstant {
                 PathObject.builder().path("/thread/**").method(HttpMethod.GET.name()).build()
 
         );
-        public static final String[] WHITE_LIST_URLS =
-                WHITE_LIST_PATH.stream()
-                        .map(item -> {
-                            String basePath = item.getBasePath() != null ? item.getBasePath() : "";
-                            return basePath + item.getPath();
-                        })
-                        .distinct()
-                        .toArray(String[]::new);
 
         // apply for document swagger
         public static final List<String> SWAGGER_DOC = List.of(

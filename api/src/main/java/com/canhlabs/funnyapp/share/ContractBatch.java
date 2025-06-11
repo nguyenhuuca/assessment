@@ -4,7 +4,6 @@ import com.canhlabs.funnyapp.share.exception.CustomException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ContractBatch {
     private final List<ContractDSL<?>> checks = new ArrayList<>();
@@ -22,7 +21,7 @@ public class ContractBatch {
     public void validate() {
         List<String> allErrors = checks.stream()
                 .flatMap(c -> c.getErrors().stream())
-                .collect(Collectors.toList());
+                .toList();
 
         if (!allErrors.isEmpty()) {
             CustomException.raiseErr(allErrors);
