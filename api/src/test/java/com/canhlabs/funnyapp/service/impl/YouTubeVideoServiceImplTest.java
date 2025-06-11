@@ -15,7 +15,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-class YouTubeVideoServiceTest {
+class YouTubeVideoServiceImplTest {
 
     @Mock
     private YoutubeVideoRepo repository;
@@ -25,7 +25,7 @@ class YouTubeVideoServiceTest {
     private YouTubeApiClient youTubeApiClient;
 
     @InjectMocks
-    private YouTubeVideoService service;
+    private YouTubeVideoServiceImpl service;
 
     @BeforeEach
     void setUp() {

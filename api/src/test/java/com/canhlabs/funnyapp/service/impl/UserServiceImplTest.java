@@ -51,7 +51,7 @@ class UserServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
-    private com.canhlabs.funnyapp.service.impl.InviteService inviteService;
+    private InviteServiceImpl inviteService;
 
     @InjectMocks
     private UserServiceImpl userService;

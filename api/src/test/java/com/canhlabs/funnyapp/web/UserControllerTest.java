@@ -4,14 +4,12 @@ import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.*;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.service.UserService;
-import com.canhlabs.funnyapp.service.impl.InviteService;
+import com.canhlabs.funnyapp.service.impl.InviteServiceImpl;
 import com.canhlabs.funnyapp.share.enums.ResultStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.http.ResponseEntity;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,7 +21,7 @@ class UserControllerTest {
     @Mock
     private AppProperties appProperties;
     @Mock
-    private InviteService inviteService;
+    private InviteServiceImpl inviteService;
 
     @InjectMocks
     private UserController userController;

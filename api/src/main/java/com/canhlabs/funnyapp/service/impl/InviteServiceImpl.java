@@ -3,6 +3,8 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.domain.UserEmailRequest;
 import com.canhlabs.funnyapp.repo.UserEmailRequestRepository;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.service.InviteService;
+import com.canhlabs.funnyapp.service.MailService;
 import com.canhlabs.funnyapp.share.AppUtils;
 import com.canhlabs.funnyapp.share.enums.Status;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ import static com.canhlabs.funnyapp.share.exception.CustomException.raiseErr;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class InviteService {
+public class InviteServiceImpl implements InviteService {
 
     private final UserEmailRequestRepository requestRepo;
     private final MailService emailSender;
@@ -27,6 +29,7 @@ public class InviteService {
     /**
      * Send link join system
      */
+    @Override
     public void inviteUser(String email, Long invitedByUserId) {
         if (!AppUtils.isValidEmail(email)) {
            raiseErr("Invalid email");
@@ -52,6 +55,7 @@ public class InviteService {
     /**
      * Authenticate token from magic link
      */
+    @Override
     public Optional<UserEmailRequest> verifyToken(String token) {
         return requestRepo.findByToken(token)
                 .filter(req -> req.getStatus() == Status.PENDING)
@@ -61,6 +65,7 @@ public class InviteService {
     /**
      * Mart token was used
      */
+    @Override
     public void markTokenAsUsed(UserEmailRequest request, Long userId) {
         request.setStatus(Status.USED);
         request.setUsedAt(Instant.now());

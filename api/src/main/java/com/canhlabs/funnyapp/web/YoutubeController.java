@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.service.impl.YouTubeVideoService;
+import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.VideoDto;
@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 public class YoutubeController {
 
-    private final YouTubeVideoService youTubeVideoService;
+    private final com.canhlabs.funnyapp.service.YouTubeVideoService youTubeVideoService;
 
     public YoutubeController(YouTubeVideoService youTubeVideoService) {
         this.youTubeVideoService = youTubeVideoService;

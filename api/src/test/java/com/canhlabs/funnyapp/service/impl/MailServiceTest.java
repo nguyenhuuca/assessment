@@ -22,7 +22,7 @@ class MailServiceTest {
     private AppProperties appProperties;
 
     @InjectMocks
-    private MailService mailService;
+    private MailServiceImpl mailService;
 
     @BeforeEach
     void setUp() {
@@ -64,7 +64,7 @@ class MailServiceTest {
         // Arrange
         when(appProperties.getInviteTemplate()).thenReturn("templates/email/invite-test.html");
         // Place a file named invite-test.html in src/test/resources with content: "Hello, {{username}}!"
-        MailService mailService = new MailService(mailSender, appProperties);
+        MailServiceImpl mailService = new MailServiceImpl(mailSender, appProperties);
 
         // Act
         mailService.loadTemplate();

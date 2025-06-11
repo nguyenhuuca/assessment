@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class YouTubeVideoService {
+public class YouTubeVideoServiceImpl implements com.canhlabs.funnyapp.service.YouTubeVideoService {
 
     private final YoutubeVideoRepo repository;
     private final ChatGptService chatGptService;
     private final YouTubeApiClient youTubeApiClient;
 
-    public YouTubeVideoService(YoutubeVideoRepo repository, ChatGptService chatGptService, YouTubeApiClient youTubeApiClient) {
+    public YouTubeVideoServiceImpl(YoutubeVideoRepo repository, ChatGptService chatGptService, YouTubeApiClient youTubeApiClient) {
         this.repository = repository;
         this.chatGptService = chatGptService;
         this.youTubeApiClient = youTubeApiClient;
@@ -34,6 +34,7 @@ public class YouTubeVideoService {
     /**
      * Get list of video IDs by cacheKey with flow: cache -> DB -> ChatGPT
      */
+    @Override
     public List<VideoDto> getVideoIds() {
 
         // Step 2: Try get from DB
@@ -99,6 +100,7 @@ public class YouTubeVideoService {
         repository.saveAll(upserts);
     }
 
+    @Override
     public void processTop10YouTube(){
         List<String> videoIdsFromChatGpt = chatGptService.getTopYoutubeVideoIds();
 

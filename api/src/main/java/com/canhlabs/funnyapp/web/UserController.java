@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.service.UserService;
-import com.canhlabs.funnyapp.service.impl.InviteService;
+import com.canhlabs.funnyapp.service.impl.InviteServiceImpl;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
@@ -33,10 +33,10 @@ public class UserController extends BaseController {
 
     private UserService userService;
     private AppProperties appProperties;
-    private InviteService inviteService;
+    private InviteServiceImpl inviteService;
 
     @Autowired
-    public void injectInvite(InviteService inviteService) {
+    public void injectInvite(InviteServiceImpl inviteService) {
         this.inviteService = inviteService;
     }
 

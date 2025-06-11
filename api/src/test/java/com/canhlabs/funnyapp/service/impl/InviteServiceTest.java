@@ -32,12 +32,12 @@ class InviteServiceTest {
     @Mock
     private UserEmailRequestRepository requestRepo;
     @Mock
-    private MailService emailSender;
+    private MailServiceImpl emailSender;
     @Mock
     private AppProperties appProperties;
 
     @InjectMocks
-    private InviteService inviteService;
+    private InviteServiceImpl inviteService;
 
     @BeforeEach
     void setUp() {

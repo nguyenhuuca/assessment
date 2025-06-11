@@ -46,10 +46,10 @@ public class UserServiceImpl implements UserService {
     private JwtProvider jwtProvider;
     private AuthenticationManager authenticationManager;
     private MFASessionStore mfaSessionStore;
-    private InviteService inviteService;
+    private InviteServiceImpl inviteService;
 
     @Autowired
-    public void injectInvite(InviteService inviteService) {
+    public void injectInvite(InviteServiceImpl inviteService) {
         this.inviteService = inviteService;
     }
 

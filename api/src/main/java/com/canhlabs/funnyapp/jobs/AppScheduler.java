@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.jobs;
 
-import com.canhlabs.funnyapp.service.impl.YouTubeVideoService;
+import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppScheduler {
 
-    private final YouTubeVideoService service;
+    private final com.canhlabs.funnyapp.service.YouTubeVideoService service;
 
     public AppScheduler(YouTubeVideoService service) {
         this.service = service;

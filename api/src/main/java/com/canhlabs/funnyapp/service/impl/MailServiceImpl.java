@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.service.MailService;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -19,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
-public class MailService {
+public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
     private String htmlTemplate;
@@ -28,7 +29,7 @@ public class MailService {
     private final AppProperties appProperties;
 
 
-    public MailService(JavaMailSender mailSender, AppProperties appProperties) {
+    public MailServiceImpl(JavaMailSender mailSender, AppProperties appProperties) {
         this.mailSender = mailSender;
         this.appProperties = appProperties;
     }
@@ -42,6 +43,7 @@ public class MailService {
         }
     }
 
+    @Override
     public void sendSimpleMail(String to, String subject, String content) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("no-reply@canh-labs.com");
@@ -52,6 +54,7 @@ public class MailService {
     }
 
     @Async
+    @Override
     public void sendInvitation(String to, String username, String verifyUrl) {
         String subject = "Enable Your Account";
         // Replace placeholders
