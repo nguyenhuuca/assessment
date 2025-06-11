@@ -23,8 +23,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 @EnableAsync
 @Slf4j
 public class FunnyApp implements CommandLineRunner {
-    @Autowired
-    MailService mailService;
     public static void  main(String[] args) {
         SpringApplication.run(FunnyApp.class, args);
         log.info("Starting application");
@@ -33,6 +31,5 @@ public class FunnyApp implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("No pre-processing after started");
-        // mailService.sendInvitation("nguyenhuuca@gmail.com", "Ca1", "canh-labs.com");
     }
 }
