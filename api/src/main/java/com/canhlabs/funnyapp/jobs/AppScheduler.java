@@ -19,7 +19,6 @@ public class AppScheduler {
     @Scheduled(cron = "0 0 1 * * *",  zone = "UTC")
     public void scheduleProcessTop10() {
         log.info("Start running processTop10YouTube at 1AM");
-
         try {
             service.processTop10YouTube();
         } catch (Exception ex) {
