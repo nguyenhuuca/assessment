@@ -16,17 +16,10 @@
     <appender name="LogToRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIR}/funny-app.log</file>
 
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- Save archive -->
-            <fileNamePattern>${LOG_DIR}/archive/%d{yyyy-MM}/funny-app-%d{MM-dd-yyyy}-%i.log.gz</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- file size limit 50MB -->
-                <maxFileSize>50MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <!-- max 15 file backup -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/archive/%d{yyyy-MM}/funny-app-%d{yyyy-MM-dd}-%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
             <maxHistory>15</maxHistory>
-            <!-- total size 750MB (optional) -->
             <totalSizeCap>750MB</totalSizeCap>
         </rollingPolicy>
 
