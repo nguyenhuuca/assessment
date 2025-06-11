@@ -2,10 +2,10 @@ package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.service.ShareService;
 import com.canhlabs.funnyapp.share.AppConstant;
-import com.canhlabs.funnyapp.share.dto.webapi.ResultListInfo;
-import com.canhlabs.funnyapp.share.dto.webapi.ResultObjectInfo;
-import com.canhlabs.funnyapp.share.dto.ShareRequestDto;
-import com.canhlabs.funnyapp.share.dto.VideoDto;
+import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
+import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
+import com.canhlabs.funnyapp.dto.ShareRequestDto;
+import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.share.enums.ResultStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

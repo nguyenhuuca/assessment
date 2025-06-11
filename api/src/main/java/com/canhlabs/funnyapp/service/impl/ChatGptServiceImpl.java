@@ -1,9 +1,9 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.service.ChatGptService;
-import com.canhlabs.funnyapp.share.AppProperties;
-import com.canhlabs.funnyapp.share.dto.ChatGptRequest;
-import com.canhlabs.funnyapp.share.dto.ChatGptResponse;
+import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.dto.ChatGptRequest;
+import com.canhlabs.funnyapp.dto.ChatGptResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;

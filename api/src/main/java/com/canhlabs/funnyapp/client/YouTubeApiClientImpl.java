@@ -1,10 +1,9 @@
 package com.canhlabs.funnyapp.client;
 
-import com.canhlabs.funnyapp.share.AppProperties;
-import com.canhlabs.funnyapp.share.dto.YouTubeVideoDTO;
+import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.dto.YouTubeVideoDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;

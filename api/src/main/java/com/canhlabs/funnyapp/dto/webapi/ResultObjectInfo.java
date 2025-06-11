@@ -1,6 +1,5 @@
-package com.canhlabs.funnyapp.share.dto;
+package com.canhlabs.funnyapp.dto.webapi;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +9,6 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class ShareRequestDto  extends  BaseDto{
-    String url;
+public class ResultObjectInfo<T> extends ResultInfo {
+    private T data;
 }

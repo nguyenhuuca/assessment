@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.service;
 
-import com.canhlabs.funnyapp.share.dto.ShareRequestDto;
-import com.canhlabs.funnyapp.share.dto.VideoDto;
+import com.canhlabs.funnyapp.dto.ShareRequestDto;
+import com.canhlabs.funnyapp.dto.VideoDto;
 
 import java.util.List;
 

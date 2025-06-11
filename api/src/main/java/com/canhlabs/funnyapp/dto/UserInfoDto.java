@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.share.dto;
+package com.canhlabs.funnyapp.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;

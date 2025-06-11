@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.share.AppProperties;
+import com.canhlabs.funnyapp.config.AppProperties;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

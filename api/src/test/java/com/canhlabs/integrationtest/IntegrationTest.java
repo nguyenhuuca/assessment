@@ -1,8 +1,8 @@
 package com.canhlabs.integrationtest;
 
-import com.canhlabs.funnyapp.share.dto.LoginDto;
-import com.canhlabs.funnyapp.share.dto.ShareRequestDto;
-import com.canhlabs.funnyapp.share.dto.UserDetailDto;
+import com.canhlabs.funnyapp.dto.LoginDto;
+import com.canhlabs.funnyapp.dto.ShareRequestDto;
+import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;

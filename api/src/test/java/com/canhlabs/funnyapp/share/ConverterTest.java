@@ -3,9 +3,9 @@ package com.canhlabs.funnyapp.share;
 
 import com.canhlabs.funnyapp.domain.ShareLink;
 import com.canhlabs.funnyapp.domain.User;
-import com.canhlabs.funnyapp.share.dto.UserDetailDto;
-import com.canhlabs.funnyapp.share.dto.UserInfoDto;
-import com.canhlabs.funnyapp.share.dto.VideoDto;
+import com.canhlabs.funnyapp.dto.UserDetailDto;
+import com.canhlabs.funnyapp.dto.UserInfoDto;
+import com.canhlabs.funnyapp.dto.VideoDto;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;

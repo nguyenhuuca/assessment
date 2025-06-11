@@ -4,23 +4,18 @@ import com.canhlabs.funnyapp.client.YouTubeApiClient;
 import com.canhlabs.funnyapp.domain.YouTubeVideo;
 import com.canhlabs.funnyapp.repo.YoutubeVideoRepo;
 import com.canhlabs.funnyapp.service.ChatGptService;
-import com.canhlabs.funnyapp.service.YoutubeVideoCache;
-import com.canhlabs.funnyapp.share.dto.VideoDto;
-import com.canhlabs.funnyapp.share.dto.YouTubeVideoDTO;
-import com.canhlabs.funnyapp.share.enums.CacheKey;
+import com.canhlabs.funnyapp.dto.VideoDto;
+import com.canhlabs.funnyapp.dto.YouTubeVideoDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service

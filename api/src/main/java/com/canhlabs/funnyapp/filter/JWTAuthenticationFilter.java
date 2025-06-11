@@ -1,8 +1,8 @@
 package com.canhlabs.funnyapp.filter;
 
 import com.canhlabs.funnyapp.share.JwtProvider;
-import com.canhlabs.funnyapp.share.dto.JwtVerificationResultDto;
-import com.canhlabs.funnyapp.share.dto.UserDetailDto;
+import com.canhlabs.funnyapp.dto.JwtVerificationResultDto;
+import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.share.exception.UnauthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

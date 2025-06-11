@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.share.AppProperties;
+import com.canhlabs.funnyapp.config.AppProperties;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;

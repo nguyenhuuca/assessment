@@ -1,9 +1,10 @@
 package com.canhlabs.funnyapp.share;
 
-import com.canhlabs.funnyapp.share.dto.JwtGenerationDto;
-import com.canhlabs.funnyapp.share.dto.JwtVerificationResultDto;
-import com.canhlabs.funnyapp.share.dto.TokenDto;
-import com.canhlabs.funnyapp.share.dto.UserDetailDto;
+import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.dto.JwtGenerationDto;
+import com.canhlabs.funnyapp.dto.JwtVerificationResultDto;
+import com.canhlabs.funnyapp.dto.TokenDto;
+import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.share.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

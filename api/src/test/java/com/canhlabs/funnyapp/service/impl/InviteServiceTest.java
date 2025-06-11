@@ -3,7 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.domain.UserEmailRequest;
 import com.canhlabs.funnyapp.repo.UserEmailRequestRepository;
-import com.canhlabs.funnyapp.share.AppProperties;
+import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.share.AppUtils;
 import com.canhlabs.funnyapp.share.enums.Status;
 import com.canhlabs.funnyapp.share.exception.CustomException;

@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.share.dto.webapi;
+package com.canhlabs.funnyapp.dto.webapi;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

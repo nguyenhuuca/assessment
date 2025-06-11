@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.share;
 
+import com.canhlabs.funnyapp.config.AppProperties;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpMethod;

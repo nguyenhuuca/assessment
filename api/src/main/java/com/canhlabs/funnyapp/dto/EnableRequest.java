@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.share.dto;
+package com.canhlabs.funnyapp.dto;
 
 public record EnableRequest(String username, String otp, String secret) {
 }

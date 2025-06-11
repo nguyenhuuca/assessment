@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.share.AppProperties;
-import com.canhlabs.funnyapp.share.dto.ChatGptResponse;
+import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.dto.ChatGptResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

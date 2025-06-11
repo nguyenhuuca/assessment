@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.share;
+package com.canhlabs.funnyapp.config;
 
 import lombok.Getter;
 import lombok.Setter;

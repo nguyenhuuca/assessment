@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.share.exception;
 
-import com.canhlabs.funnyapp.share.dto.webapi.ResultErrorInfo;
+import com.canhlabs.funnyapp.dto.webapi.ResultErrorInfo;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
