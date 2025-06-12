@@ -330,13 +330,8 @@ const ThemeManager = {
  * When load page, need to init state for some element on page
  */
 function initState() {
-    // Initialize auth state
     Auth.initState();
-    
-    // Initialize theme
     ThemeManager.init();
-    
-    // Hide share spinner
     $("#shareSpinner").hide();
     
     // Show/hide private tab based on login status
@@ -370,7 +365,6 @@ function deleteVideo(element) {
 
 // Initialize when document is ready
 $(document).ready(function() {
-    initState()
     // Handle share modal
     $('#shareModal').on('hidden.bs.modal', function () {
         $("#shareSpinner").hide();
@@ -378,6 +372,5 @@ $(document).ready(function() {
         $("#urlYoutube").val('');
         $("#isPrivate").prop('checked', false);
     });
-    VideoService.loadData();
 });
 
