@@ -251,8 +251,10 @@
 
   <script>
     // load all when init page
-    initState();
-    VideoService.loadData();
+    $(document).ready(function() {
+      initState();
+      VideoService.loadData();
+    });
   </script>
 </body>
 </html>

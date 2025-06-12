@@ -330,8 +330,13 @@ const ThemeManager = {
  * When load page, need to init state for some element on page
  */
 function initState() {
+    // Initialize auth state
     Auth.initState();
+    
+    // Initialize theme
     ThemeManager.init();
+    
+    // Hide share spinner
     $("#shareSpinner").hide();
     
     // Show/hide private tab based on login status
