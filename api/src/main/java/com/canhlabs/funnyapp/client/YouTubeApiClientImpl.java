@@ -16,7 +16,12 @@ public class YouTubeApiClientImpl implements YouTubeApiClient {
 
     private AppProperties props;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate;
+
+    @Autowired
+    public  void injectRestTemplate(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Autowired
     public void injectProp(AppProperties props){
