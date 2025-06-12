@@ -370,6 +370,7 @@ function deleteVideo(element) {
 
 // Initialize when document is ready
 $(document).ready(function() {
+    initState()
     // Handle share modal
     $('#shareModal').on('hidden.bs.modal', function () {
         $("#shareSpinner").hide();
@@ -377,5 +378,6 @@ $(document).ready(function() {
         $("#urlYoutube").val('');
         $("#isPrivate").prop('checked', false);
     });
+    VideoService.loadData();
 });
 
