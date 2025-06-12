@@ -329,10 +329,7 @@ const ThemeManager = {
 /**
  * When load page, need to init state for some element on page
  */
-async function initState() {
-    // Check user session first
-    // await Auth.checkUserSession();
-    
+function initState() {
     Auth.initState();
     ThemeManager.init();
     $("#shareSpinner").hide();
