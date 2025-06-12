@@ -61,7 +61,7 @@
       <div id="mainMsg" class="" style="display: none;"></div>
     </div>
 
-    
+
     <!-- Add tabs -->
     <ul class="nav nav-tabs mb-3" id="videoTabs" role="tablist">
       <li class="nav-item" role="presentation">
@@ -76,7 +76,7 @@
         </button>
       </li>
     </ul>
-    
+
     <div class="tab-content" id="videoTabsContent">
       <div class="tab-pane fade show active" id="popular" role="tabpanel" aria-labelledby="popular-tab">
         <div id="list-video-popular"></div>
@@ -140,7 +140,7 @@
           <div class="profile-section">
             <!-- Common Message Area -->
             <div class="profile-message" id="profileMessage"></div>
-            
+
             <!-- Tabs -->
             <ul class="nav nav-tabs mb-3" id="profileTabs" role="tablist">
               <li class="nav-item" role="presentation">
@@ -250,22 +250,9 @@
   </div>
 
   <script>
-    // Wait for all scripts to load
-    window.addEventListener('load', function() {
-      // Initialize application
-      Auth.initState();
-      ThemeManager.init();
-      $("#shareSpinner").hide();
-      
-      // Show/hide private tab based on login status
-      if (localStorage.getItem("jwt")) {
-        $("#private-tab").show();
-      } else {
-        $("#private-tab").hide();
-      }
-      
-      VideoService.loadData();
-    });
+    // load all when init page
+    initState();
+    VideoService.loadData();
   </script>
 </body>
 </html>
