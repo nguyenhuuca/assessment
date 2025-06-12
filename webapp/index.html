@@ -18,23 +18,6 @@
   <script src="js/common.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/assessment.js"></script>
-  <script>
-    // load all when init page
-    $(document).ready(function() {
-      Auth.initState();
-      ThemeManager.init();
-      $("#shareSpinner").hide();
-      
-      // Show/hide private tab based on login status
-      if (localStorage.getItem("jwt")) {
-        $("#private-tab").show();
-      } else {
-        $("#private-tab").hide();
-      }
-      
-      VideoService.loadData();
-    });
-  </script>
 </head>
 <body>
   <!-- Theme toggle button -->
@@ -265,5 +248,24 @@
       </div>
     </div>
   </div>
+
+  <script>
+    // Wait for all scripts to load
+    window.addEventListener('load', function() {
+      // Initialize application
+      Auth.initState();
+      ThemeManager.init();
+      $("#shareSpinner").hide();
+      
+      // Show/hide private tab based on login status
+      if (localStorage.getItem("jwt")) {
+        $("#private-tab").show();
+      } else {
+        $("#private-tab").hide();
+      }
+      
+      VideoService.loadData();
+    });
+  </script>
 </body>
 </html>
