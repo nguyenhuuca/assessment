@@ -202,6 +202,11 @@ public class UserServiceImpl implements UserService {
         return "success";
     }
 
+    @Override
+    public UserDetailDto getCurrent() {
+        return AppUtils.getCurrentUser();
+    }
+
     private User toEntity(LoginDto loginDto) {
         return User.builder()
                 .userName(loginDto.getEmail())

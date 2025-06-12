@@ -15,6 +15,30 @@ const Auth = {
     },
 
     /**
+     * Check user session by calling /user/me API
+     * Returns true if session is valid, false otherwise
+     */
+    checkUserSession() {
+        const jwt = localStorage.getItem("jwt");
+        if (!jwt) return false;
+
+        return new Promise((resolve) => {
+            $.ajax({
+                url: appConst.baseUrl.concat("/user/me"),
+                type: "GET",
+                dataType: "json"
+            }).done(() => {
+                resolve(true);
+            }).fail((err) => {
+                if (err.status === 401 || err.status === 403) {
+                    this.logout();
+                }
+                resolve(false);
+            });
+        });
+    },
+
+    /**
      * User storage management
      */
     UserStorage: {

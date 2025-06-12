@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
+import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.service.impl.InviteServiceImpl;
 import com.canhlabs.funnyapp.share.AppConstant;
@@ -114,6 +115,16 @@ public class UserController extends BaseController {
         return new ResponseEntity<>(ResultObjectInfo.<UserInfoDto>builder()
                 .status(ResultStatus.SUCCESS)
                 .data(userService.joinSystemPaswordless(token))
+                .build(), HttpStatus.OK);
+    }
+
+
+    // Using to return current user detail by token
+    @GetMapping("/me")
+    public ResponseEntity<ResultObjectInfo<UserDetailDto>> getCurrent() {
+        return new ResponseEntity<>(ResultObjectInfo.<UserDetailDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(userService.getCurrent())
                 .build(), HttpStatus.OK);
     }
 
