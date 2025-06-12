@@ -47,7 +47,7 @@ public class InviteServiceImpl implements InviteService {
                 .build();
 
         requestRepo.save(request);
-        String magicLink = appProperties.getDomain() + "/join/?token=" + token;
+        String magicLink = appProperties.getDomain() + "/join?token=" + token;
 
         emailSender.sendInvitation(email, email, magicLink);
     }
