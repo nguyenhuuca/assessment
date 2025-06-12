@@ -331,7 +331,7 @@ const ThemeManager = {
  */
 async function initState() {
     // Check user session first
-    await Auth.checkUserSession();
+    // await Auth.checkUserSession();
     
     Auth.initState();
     ThemeManager.init();
