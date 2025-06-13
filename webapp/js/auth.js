@@ -16,25 +16,19 @@ const Auth = {
 
     /**
      * Check user session by calling /user/me API
-     * Returns true if session is valid, false otherwise
      */
     checkUserSession() {
         const jwt = localStorage.getItem("jwt");
-        if (!jwt) return false;
+        if (!jwt) return;
 
-        return new Promise((resolve) => {
-            $.ajax({
-                url: appConst.baseUrl.concat("/user/me"),
-                type: "GET",
-                dataType: "json"
-            }).done(() => {
-                resolve(true);
-            }).fail((err) => {
-                if (err.status === 401 || err.status === 403) {
-                    this.logout();
-                }
-                resolve(false);
-            });
+        $.ajax({
+            url: appConst.baseUrl.concat("/user/me"),
+            type: "GET",
+            dataType: "json"
+        }).fail((err) => {
+            if (err.status === 401 || err.status === 403) {
+                this.logout();
+            }
         });
     },
 
@@ -400,6 +394,8 @@ const Auth = {
                 user: JSON.parse(localStorage.getItem("user"))
             };
             this.LoginManager.processLoginSuccess(data);
+            // Check session after initializing state
+            this.checkUserSession();
         }
     }
 };
