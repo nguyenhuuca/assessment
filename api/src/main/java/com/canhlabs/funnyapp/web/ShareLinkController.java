@@ -54,4 +54,14 @@ public class ShareLinkController {
                 .data(rs)
                 .build(), HttpStatus.OK);
     }
+
+
+    @GetMapping("/private-videos")
+    public ResponseEntity<ResultListInfo<VideoDto>> getPrivateShareLink() {
+        List<VideoDto> rs = shareService.getALLShare();
+        return new ResponseEntity<>(ResultListInfo.<VideoDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(rs)
+                .build(), HttpStatus.OK);
+    }
 }

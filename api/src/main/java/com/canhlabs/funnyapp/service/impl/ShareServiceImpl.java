@@ -58,8 +58,20 @@ public class ShareServiceImpl implements ShareService {
     }
     @Override
     public VideoDto shareLink(ShareRequestDto shareRequestDto) {
-        VideoDto videoDto =  getInfoFromYoutube(shareRequestDto.getUrl());
+        VideoDto videoDto = null;
+        if(isGoogleDriveUrl(shareRequestDto.getUrl())) {
+           videoDto = VideoDto.builder()
+                    .title("")
+                    .desc("")
+                    .embedLink(shareRequestDto.getUrl())
+                    .urlLink(shareRequestDto.getUrl())
+                    .build();
+        } else {
+            videoDto =  getInfoFromYoutube(shareRequestDto.getUrl());
+        }
+
         Contract.requireNonNull(videoDto, "Cannot get video info");
+
         ShareLink shareLink = toEntity(videoDto);
         shareLink = shareLinkRepo.save(shareLink);
         videoDto.setId(shareLink.getId());
@@ -71,9 +83,17 @@ public class ShareServiceImpl implements ShareService {
     public List<VideoDto> getALLShare() {
         UserDetailDto userDetail = AppUtils.getCurrentUser();
         Contract.requireNonNull(userDetail, "User is not exist");
+
         User  user = userRepo.findAllByUserName(userDetail.getEmail());
         List<ShareLink> shareLinks = shareLinkRepo.findAllByUser(user);
 
+        return Converter.videoDtoList(shareLinks);
+    }
+
+    @Override
+    public List<VideoDto> getShareByUser(String userName) {
+        User user = userRepo.findAllByUserName(userName);
+        List<ShareLink> shareLinks = shareLinkRepo.findAllByUser(user);
         return Converter.videoDtoList(shareLinks);
     }
 
@@ -158,5 +178,8 @@ public class ShareServiceImpl implements ShareService {
                 .urlLink(videoDto.getUrlLink())
                 .user(userRepo.findAllById(currentUser.getId()))
                 .build();
+    }
+    private boolean isGoogleDriveUrl(String url) {
+        return url != null && (url.contains("drive.google.com") || url.contains("docs.google.com/file/d/"));
     }
 }

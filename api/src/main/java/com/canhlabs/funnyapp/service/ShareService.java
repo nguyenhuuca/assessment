@@ -20,5 +20,7 @@ public interface ShareService {
      */
     List<VideoDto> getALLShare();
 
+    List<VideoDto> getShareByUser(String userName);
+
 
 }
