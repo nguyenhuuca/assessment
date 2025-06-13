@@ -55,7 +55,7 @@ class InviteServiceTest {
             inviteService.inviteUser(email, invitedByUserId);
 
             verify(requestRepo).save(any(UserEmailRequest.class));
-            verify(emailSender).sendInvitation(eq(email), eq(email), contains("/join/?token="));
+            verify(emailSender).sendInvitation(eq(email), eq(email), contains("/join?token="));
         }
     }
 
