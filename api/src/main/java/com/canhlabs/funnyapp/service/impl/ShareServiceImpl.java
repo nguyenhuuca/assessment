@@ -111,6 +111,7 @@ public class ShareServiceImpl implements ShareService {
             videoDto = requestYouTube(link,videoId);
             log.info(videoId);
         } catch (Exception ex) {
+            log.error("Error get video info from youtube", ex);
             CustomException.raiseErr("Cannot get video info");
         }
         return videoDto;
