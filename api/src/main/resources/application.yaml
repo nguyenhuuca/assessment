@@ -57,7 +57,7 @@ app:
   token-expired: 86400000
   jwt-secret-key: ${JWT_SECRET:12345678901234567890123456789012}
   google-api-key: ${GOOGLE_KEY}
-  google-part: snippet,contentDetails,statistics,statusKey
+  google-part: snippet,contentDetails,statistics
   gpt-key: ${GPT_KEY}
   use-password-less: true
   domain: 'https://funnyapp.canh-labs.com'
