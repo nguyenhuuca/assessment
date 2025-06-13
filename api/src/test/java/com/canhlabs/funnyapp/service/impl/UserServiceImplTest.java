@@ -3,7 +3,9 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.cache.MFASessionStore;
 import com.canhlabs.funnyapp.domain.User;
 import com.canhlabs.funnyapp.domain.UserEmailRequest;
+import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.share.AppUtils;
 import com.canhlabs.funnyapp.share.JwtProvider;
 import com.canhlabs.funnyapp.share.QrUtil;
 import com.canhlabs.funnyapp.dto.JwtGenerationDto;
@@ -353,6 +355,19 @@ class UserServiceImplTest {
             assertThatThrownBy(() -> userService.disableMfa(userName, otp))
                     .isInstanceOf(CustomException.class)
                     .hasMessage("Otp is invalid!");
+        }
+    }
+
+    @Test
+    void getCurrent_returnsCurrentUserDetail() {
+        UserDetailDto mockUser = UserDetailDto.builder().id(1L).email("test@abc.com").build();
+
+        try (MockedStatic<AppUtils> appUtils = mockStatic(AppUtils.class)) {
+            appUtils.when(AppUtils::getCurrentUser).thenReturn(mockUser);
+
+            UserDetailDto result = userService.getCurrent();
+
+            assertThat(result).isEqualTo(mockUser);
         }
     }
 }

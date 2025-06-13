@@ -121,4 +121,17 @@ class UserControllerTest {
         assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
         assertEquals(userInfo, response.getBody().getData());
     }
+
+
+    @Test
+    void getCurrent_shouldReturnCurrentUserDetail() {
+        UserDetailDto userDetail = UserDetailDto.builder().id(1L).email("test@abc.com").build();
+        when(userService.getCurrent()).thenReturn(userDetail);
+
+        ResponseEntity<ResultObjectInfo<UserDetailDto>> response = userController.getCurrent();
+
+        assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
+        assertEquals(userDetail, response.getBody().getData());
+        verify(userService).getCurrent();
+    }
 }
