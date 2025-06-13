@@ -236,29 +236,30 @@ const VideoService = {
         }).fail((err) => {
             showMessage(err.responseJSON.error.message, 'error');
         });
+    },
 
-        // Load private videos if user is logged in
-        if (localStorage.getItem("jwt")) {
-            $.ajax({
-                url: appConst.baseUrl.concat("/private-videos"),
-                type: "GET",
-                dataType: "json"
-            }).done((rs) => {
-                const privateVideos = rs.data.map(videoInfo => 
-                    new Video(
-                        videoInfo.id, 
-                        videoInfo.userShared, 
-                        videoInfo.title, 
-                        videoInfo.embedLink, 
-                        videoInfo.desc,
-                        true
-                    )
-                );
-                this.displayPrivateVideos(privateVideos);
-            }).fail((err) => {
-                showMessage(err.responseJSON.error.message, 'error');
-            });
-        }
+    loadPrivateVideos() {
+        if (!localStorage.getItem("jwt")) return;
+
+        $.ajax({
+            url: appConst.baseUrl.concat("/private-videos"),
+            type: "GET",
+            dataType: "json"
+        }).done((rs) => {
+            const privateVideos = rs.data.map(videoInfo => 
+                new Video(
+                    videoInfo.id, 
+                    videoInfo.userShared, 
+                    videoInfo.title, 
+                    videoInfo.embedLink, 
+                    videoInfo.desc,
+                    true
+                )
+            );
+            this.displayPrivateVideos(privateVideos);
+        }).fail((err) => {
+            showMessage(err.responseJSON.error.message, 'error');
+        });
     },
 
     displayVideos(videos) {
@@ -371,6 +372,11 @@ $(document).ready(function() {
         $("#mainMsg").hide();
         $("#urlYoutube").val('');
         $("#isPrivate").prop('checked', false);
+    });
+
+    // Handle private video tab click
+    $('#private-tab-btn').on('click', function() {
+        VideoService.loadPrivateVideos();
     });
 });
 
