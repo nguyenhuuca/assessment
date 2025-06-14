@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
+import com.canhlabs.funnyapp.config.aop.AuditLog;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.service.impl.InviteServiceImpl;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(AppConstant.API.BASE_URL +"/user")
 @Validated
 @Slf4j
-
+@AuditLog("Audit all methods in UserController class")
 public class UserController extends BaseController {
 
     private UserService userService;

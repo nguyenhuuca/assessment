@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
+import com.canhlabs.funnyapp.config.aop.AuditLog;
 import com.canhlabs.funnyapp.service.ShareService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping(AppConstant.API.BASE_URL)
 @Validated
+@AuditLog("Audit all methods in ShareLinkController class")
 @Slf4j
 public class ShareLinkController {
     private ShareService shareService;
