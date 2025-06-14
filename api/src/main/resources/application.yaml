@@ -65,6 +65,10 @@ app:
   chatgpt-url: 'https://api.openai.com/v1/chat/completions'
   youtube-url: 'https://www.googleapis.com/youtube/v3/videos'
 
+logging:
+  masking:
+    fields: [password, token, secret, otp]
+
 # Springdoc (OpenAPI/Swagger) config
 springdoc:
   api-docs:

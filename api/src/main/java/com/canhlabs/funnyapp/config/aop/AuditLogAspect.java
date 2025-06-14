@@ -8,6 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -22,9 +23,9 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class AuditLogAspect {
-    private static final Set<String> SENSITIVE_FIELDS = Set.of(
-            "password", "token", "accessToken", "jwt", "refreshToken", "otp", "secret", "pin"
-    );
+
+    @Autowired
+    private MaskingUtils maskingUtil;
 
     @Around("execution(* *(..)) && (@within(com.canhlabs.funnyapp.config.aop.AuditLog) || @annotation(com.canhlabs.funnyapp.config.aop.AuditLog))")
     public Object logAudit(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -44,14 +45,14 @@ public class AuditLogAspect {
         String clientIp = getClientIP();
         String methodName = targetClass.getSimpleName() + "." + method.getName();
         String inputArgs = Arrays.stream(joinPoint.getArgs())
-                .map(this::maskSensitiveData)
-                .map(Object::toString)
-                .collect(Collectors.joining(", "));;
+                .map(maskingUtil::maskSensitiveFields)
+                .map(maskingUtil::toJsonSafe)
+                .collect(Collectors.joining(", "));
 
         Object result;
         try {
             result = joinPoint.proceed();
-            Object maskedResult = maskSensitiveData(result);
+            Object maskedResult = maskingUtil.toJsonSafe(maskingUtil.maskSensitiveFields(result));
             long duration = System.currentTimeMillis() - start;
 
             log.info("AUDIT | IP={} | Method={} | Input={} | Output={} | Time={}ms",
@@ -79,21 +80,4 @@ public class AuditLogAspect {
         }
     }
 
-    private Object maskSensitiveData(Object data) {
-        if (data == null) return null;
-
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            Map<String, Object> map = mapper.convertValue(data, new TypeReference<>() {});
-            for (String key : map.keySet()) {
-                if (SENSITIVE_FIELDS.contains(key)) {
-                    map.put(key, "***MASKED***");
-                }
-            }
-            return map;
-        } catch (IllegalArgumentException e) {
-            // return the original object if it cannot be converted to a map
-            return data;
-        }
-    }
 }

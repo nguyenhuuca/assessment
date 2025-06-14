@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.dto;
 
+import com.canhlabs.funnyapp.config.aop.Sensitive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginDto extends BaseDto {
+    @Sensitive
     private String email;
     private String password;
 
