@@ -53,6 +53,7 @@ const VideoTemplate = {
                             <i class="far fa-thumbs-down"></i>
                             <span class="vote-count" id="{{id_downCount}}">0</span>
                         </div>
+                        {{deleteButton}}
                     </div>
                 </div>
                 <div class="video-description-container">
@@ -81,6 +82,15 @@ const VideoTemplate = {
                 videoObj.src = `https://drive.google.com/file/d/${fileId}/preview`;
             }
         }
+
+        // Add delete button if video is private and shared by current user
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const deleteButton = videoObj.isPrivate && currentUser.email === videoObj.userShared
+            ? `<div class="delete-button" id="${videoObj.id}_delete" onclick="VideoService.deleteVideo(this)">
+                 <i class="fas fa-trash"></i>
+                 <span>Delete</span>
+               </div>`
+            : '';
         
         return template
             .replace("{{linkYotube}}", videoObj.src)
@@ -90,7 +100,8 @@ const VideoTemplate = {
             .replace("{{id_upCount}}", videoObj.id + "_upCount")
             .replace("{{id_downCount}}", videoObj.id + "_downCount")
             .replace("{{id_upVote}}", videoObj.id + "_upVote")
-            .replace("{{id_downVote}}", videoObj.id + "_downVote");
+            .replace("{{id_downVote}}", videoObj.id + "_downVote")
+            .replace("{{deleteButton}}", deleteButton);
     }
 };
 
@@ -290,6 +301,26 @@ const VideoService = {
             const videoHtml = VideoTemplate.bindData(video);
             $("#list-video-private").append(videoHtml);
         });
+    },
+
+    deleteVideo(element) {
+        if (!confirm('Are you sure you want to delete this video?')) return;
+
+        const id = $(element).attr("id");
+        const videoId = id.split("_")[0];
+        
+        $.ajax({
+            url: appConst.baseUrl.concat("/share-links/").concat(videoId),
+            type: "DELETE",
+            contentType: "application/json",
+            dataType: "json"
+        }).done(() => {
+            // Remove the video element on successful deletion
+            $(element).closest('.video-item').remove();
+            showMessage("Video deleted successfully", "success");
+        }).fail((err) => {
+            showMessage(err.responseJSON.error.message, "error");
+        });
     }
 };
 
@@ -341,27 +372,6 @@ function initState() {
     } else {
         $("#private-tab").hide();
     }
-}
-
-/**
- * Delete a video
- * @param {*} element The delete button element
- */
-function deleteVideo(element) {
-    let id = $(element).attr("id");
-    let videoId = id.split("_")[0];
-    
-    $.ajax({
-        url: appConst.baseUrl.concat("/share-links/").concat(videoId),
-        type: "DELETE",
-        contentType: "application/json",
-        dataType: "json"
-    }).done(function() {
-        // Remove the video element on successful deletion
-        $(element).closest('.row').remove();
-    }).fail(function(err) {
-        showMessage(err.responseJSON.error.message, "error")
-    });
 }
 
 // Initialize when document is ready
