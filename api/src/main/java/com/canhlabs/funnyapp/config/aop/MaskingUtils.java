@@ -29,7 +29,12 @@ public class MaskingUtils {
                 boolean isInConfiguredList = maskingProperties.getFields().contains(field.getName());
 
                 if (isAnnotated || isInConfiguredList) {
-                    field.set(clone, "***MASKED***");
+                    Object raw = field.get(clone);
+                    if (raw instanceof String str) {
+                        field.set(clone, MaskingUtils.maskFieldValue(field.getName(),str));
+                    } else {
+                        field.set(clone, "***MASKED***");
+                    }
                 }
             }
             return clone;
@@ -53,5 +58,29 @@ public class MaskingUtils {
         } catch (JsonProcessingException e) {
             return String.valueOf(obj);
         }
+    }
+
+    public static String maskHalfMiddle(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        int length = input.length();
+        if (length <= 2) return "*".repeat(length);
+
+        int unmaskedLen = length / 4;
+        int end = length - unmaskedLen;
+
+        return input.substring(0, unmaskedLen) +
+                "*".repeat(end - unmaskedLen) +
+                input.substring(end);
+    }
+    public static String maskAll(String input) {
+        return "*".repeat(input != null ? input.length() : 0);
+    }
+
+    public static String maskFieldValue(String fieldName, String value) {
+        if (value == null) return null;
+        return fieldName.equalsIgnoreCase("password")
+                ? maskAll(value)
+                : maskHalfMiddle(value);
     }
 }
