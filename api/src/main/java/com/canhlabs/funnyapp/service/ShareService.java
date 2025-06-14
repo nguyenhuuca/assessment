@@ -22,5 +22,7 @@ public interface ShareService {
 
     List<VideoDto> getShareByUser(String userName);
 
+    String deleteShareLink(Long videoId);
+
 
 }

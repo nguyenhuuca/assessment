@@ -97,6 +97,12 @@ public class ShareServiceImpl implements ShareService {
         return Converter.videoDtoList(shareLinks);
     }
 
+    @Override
+    public String deleteShareLink(Long videoId) {
+        shareLinkRepo.deleteById(videoId);
+        return "success";
+    }
+
     /**
      * Using to parse url post from user and get video info from youtube
      * @param link post by user

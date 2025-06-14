@@ -66,4 +66,13 @@ public class ShareLinkController {
                 .data(rs)
                 .build(), HttpStatus.OK);
     }
+
+    @DeleteMapping("/share-links/{videoId}")
+    public ResponseEntity<ResultObjectInfo<String>> deleteShareLink(@PathVariable("videoId") Long videoId) {
+        String rs = shareService.deleteShareLink(videoId);
+        return new ResponseEntity<>(ResultObjectInfo.<String>builder()
+                .status(ResultStatus.SUCCESS)
+                .message(rs)
+                .build(), HttpStatus.OK);
+    }
 }
