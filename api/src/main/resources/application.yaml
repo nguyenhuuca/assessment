@@ -67,7 +67,7 @@ app:
 
 logging:
   masking:
-    fields: [password, token, secret, otp]
+    fields: [password, token, secret, otp, apiKey, api_key, gptKey, gpt_key, googleApiKey, google_api_key, jwt]
 
 # Springdoc (OpenAPI/Swagger) config
 springdoc:
