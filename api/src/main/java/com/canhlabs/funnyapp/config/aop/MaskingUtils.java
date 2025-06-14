@@ -29,12 +29,7 @@ public class MaskingUtils {
                 boolean isInConfiguredList = maskingProperties.getFields().contains(field.getName());
 
                 if (isAnnotated || isInConfiguredList) {
-                    Object raw = field.get(clone);
-                    if (raw instanceof String str) {
-                        field.set(clone, MaskingUtils.maskFieldValue(field.getName(),str));
-                    } else {
-                        field.set(clone, "***MASKED***");
-                    }
+                    field.set(clone, "***MASKED***");
                 }
             }
             return clone;
