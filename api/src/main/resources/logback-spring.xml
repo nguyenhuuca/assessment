@@ -35,7 +35,7 @@
     </logger>
 
     <!-- Logger for Spring Framework -->
-    <logger name="org.springframework" level="${LOG_LEVEL:-INFO}" additivity="false">
+    <logger name="org.springframework" level="${LOG_LEVEL:-DEBUG}" additivity="false">
         <appender-ref ref="LogToConsole"/>
         <appender-ref ref="LogToRollingFile"/>
     </logger>
