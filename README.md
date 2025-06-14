@@ -9,8 +9,6 @@
 ![Virtual Threads](https://img.shields.io/badge/Threads-Virtual--Threads-orang)
 
 ![Build Status](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml/badge.svg)
-[![Tests](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml/badge.svg?branch=main&event=push&label=tests)](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml)
-[![Deploy](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml/badge.svg?branch=main&event=push&label=deploy)](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/nguyenhuuca/assessment/main)](https://codecov.io/gh/nguyenhuuca/assessment)
 
 ---
