@@ -402,7 +402,7 @@ const Auth = {
 
 // Initialize when document is ready
 $(document).ready(function() {
-    Auth.initState();
+    // Auth.initState();
     Auth.MFA.init();
     
     // Add event listener for MFA verification button
