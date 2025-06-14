@@ -2,13 +2,16 @@
 ---
 
 ### Build status
-![Build Status](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml/badge.svg)
+
 ![Java 21](https://img.shields.io/badge/Java-21-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring--Boot-3.x-brightgreen)
 ![ChatGPT Powered](https://img.shields.io/badge/AI-ChatGPT--Powered-purple)
 ![Virtual Threads](https://img.shields.io/badge/Threads-Virtual--Threads-orang)
 
-[![codecov](https://codecov.io/gh/nguyenhuuca/assessment/branch/main/graph/badge.svg)](https://codecov.io/gh/nguyenhuuca/assessment)
+![Build Status](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml/badge.svg)
+[![Tests](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml/badge.svg?branch=main&event=push&label=tests)](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml)
+[![Deploy](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml/badge.svg?branch=main&event=push&label=deploy)](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/nguyenhuuca/assessment/main)](https://codecov.io/gh/nguyenhuuca/assessment)
 
 ---
 ## 🔥 Overview
