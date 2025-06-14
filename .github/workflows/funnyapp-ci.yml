@@ -9,12 +9,13 @@ on:
 
 jobs:
   build:
+    name: 🧱 Build Application
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    outputs:
+      jar_path: ${{ steps.build.outputs.jar_path }}
 
     steps:
+      # Checkout the source code
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -23,6 +24,7 @@ jobs:
           repository: nguyenhuuca/assessment
           token: ${{ secrets.GH_PAT }}
 
+      # Skip CI if the last commit message includes [skip ci]
       - name: Skip CI if last commit message contains [skip ci]
         run: |
           LAST_MSG=$(git log -1 --pretty=%B)
@@ -31,6 +33,7 @@ jobs:
             exit 0
           fi
 
+      # Set up Java 21 using Temurin
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -38,54 +41,87 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
-      - name: Build with Maven & run tests
+      # Build the project without running tests
+      - name: Build project (skip tests)
+        run: mvn -B clean package -DskipTests=true --file api/pom.xml
+
+      # Pass JAR path to the next jobs
+      - name: Output JAR path
+        id: build
+        run: echo "jar_path=api/target/funny-app-1.0.0.jar" >> "$GITHUB_OUTPUT"
+
+  test:
+    name: 🧪 Run Tests & Coverage Check
+    runs-on: ubuntu-latest
+    needs: [ build ]
+
+    steps:
+      # Checkout the source code
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+          repository: nguyenhuuca/assessment
+          token: ${{ secrets.GH_PAT }}
+
+      # Set up Java 21
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      # Run unit tests and generate coverage report
+      - name: Run tests with coverage
         run: mvn -B verify --file api/pom.xml
 
-      - name: Install xmllint (if not already)
+      # Install xmllint to parse coverage XML report
+      - name: Install xmllint
         run: |
           if ! command -v xmllint &> /dev/null; then
             sudo apt-get update
             sudo apt-get install -y libxml2-utils
-          else
-            echo "xmllint already installed"
           fi
 
+      # Check coverage and enforce +1% increase rule
       - name: Check coverage and enforce +1% increase
         run: |
           THRESHOLD_FILE="api/.coverage-threshold"
           REPORT="api/target/jacoco-report/jacoco.xml"
-      
+
           if [ ! -f "$REPORT" ]; then
-          echo "❌ Coverage report not found!"
-          exit 1
+            echo "❌ Coverage report not found!"
+            exit 1
           fi
-      
+
           COVERED=$(xmllint --xpath "string(//report/counter[@type='LINE']/@covered)" "$REPORT")
           MISSED=$(xmllint --xpath "string(//report/counter[@type='LINE']/@missed)" "$REPORT")
           TOTAL=$((COVERED + MISSED))
           COVERAGE=$(echo "scale=4; $COVERED / $TOTAL" | bc)
-      
+
           echo "📊 Actual LINE coverage: $(echo "$COVERAGE * 100" | bc)%"
-      
-          # Nếu chưa có file threshold thì tạo mặc định là 0.10 (10%)
+
           if [ ! -f "$THRESHOLD_FILE" ]; then
-          echo "0.10" > "$THRESHOLD_FILE"
+            echo "0.10" > "$THRESHOLD_FILE"
           fi
-      
+
           OLD=$(cat "$THRESHOLD_FILE")
           REQUIRED=$(echo "$OLD + 0.01" | bc)
           echo "🔒 Required minimum: $(echo "$REQUIRED * 100" | bc)% (last was $(echo "$OLD * 100" | bc)%)"
-      
+
           TOO_LOW=$(echo "$COVERAGE < $REQUIRED" | bc)
           if [ "$TOO_LOW" -eq 1 ]; then
-          echo "❌ Coverage not improved enough (got $COVERAGE, need at least $REQUIRED)"
-          exit 1
+            echo "❌ Coverage not improved enough (got $COVERAGE, need at least $REQUIRED)"
+            exit 1
           fi
-      
+
           echo "$REQUIRED" > "$THRESHOLD_FILE"
           echo "✅ Coverage threshold updated to $REQUIRED"
 
-      - name: Commit and push updated coverage threshold
+      # Commit and push updated coverage threshold
+      - name: Commit updated coverage threshold
         if: github.ref == 'refs/heads/main'
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
@@ -93,27 +129,27 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}
-          
+
           git pull origin main
           git add api/.coverage-threshold
           git commit -m "[skip ci] ⬆️ Auto-increase coverage threshold to next level" || echo "No changes to commit"
           git push origin main
 
+      # Upload test reports
       - name: Upload JUnit test reports
         uses: actions/upload-artifact@v4
         with:
           name: junit-reports
           path: api/target/surefire-reports/
 
-      - name: List jacoco folder
-        run: ls -l api/target/
-
+      # Upload HTML JaCoCo report
       - name: Upload JaCoCo HTML report
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-html
           path: api/target/jacoco-report/
 
+      # Upload XML coverage to Codecov
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -123,7 +159,14 @@ jobs:
           name: funny-app-coverage
           fail_ci_if_error: true
 
-      - name: Copy JAR file to remote server via SCP using SSH
+  deploy:
+    name: 🚀 Deploy to Server
+    runs-on: ubuntu-latest
+    needs: [ test ]
+
+    steps:
+      # Deploy the JAR file to remote server
+      - name: Copy JAR to remote server via SCP
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -133,15 +176,8 @@ jobs:
           source: "api/target/funny-app-1.0.0.jar"
           target: "/opt/CICD/"
 
-  deploy:
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Run remote deployment script via SSH
+      # Run deployment script via SSH
+      - name: Run deployment script on remote server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
