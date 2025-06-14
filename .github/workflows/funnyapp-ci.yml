@@ -184,7 +184,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.PORT }}
           key: ${{ secrets.SSH_DO_SECRET_KEY }}
-          source: "api/target/funny-app-1.0.0.jar"
+          source: "./deploy-artifacts/funny-app-1.0.0.jar"
           target: "/opt/CICD/"
 
       # Run deployment script via SSH
