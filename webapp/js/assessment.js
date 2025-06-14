@@ -184,6 +184,8 @@ const VideoActions = {
  * Handles video data operations and API calls
  */
 const VideoService = {
+    currentDeleteVideoId: null,
+
     share() {
         const link = $("#urlYoutube").val();
         const isPrivate = $("#isPrivate").is(':checked');
@@ -304,22 +306,34 @@ const VideoService = {
     },
 
     deleteVideo(element) {
-        if (!confirm('Are you sure you want to delete this video?')) return;
-
         const id = $(element).attr("id");
-        const videoId = id.split("_")[0];
+        this.currentDeleteVideoId = id.split("_")[0];
         
+        // Show confirmation modal
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        deleteModal.show();
+    },
+
+    confirmDelete() {
+        if (!this.currentDeleteVideoId) return;
+
         $.ajax({
-            url: appConst.baseUrl.concat("/share-links/").concat(videoId),
+            url: appConst.baseUrl.concat("/share-links/").concat(this.currentDeleteVideoId),
             type: "DELETE",
             contentType: "application/json",
             dataType: "json"
         }).done(() => {
             // Remove the video element on successful deletion
-            $(element).closest('.video-item').remove();
+            $(`#${this.currentDeleteVideoId}_delete`).closest('.video-item').remove();
             showMessage("Video deleted successfully", "success");
+            
+            // Hide the modal
+            const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+            deleteModal.hide();
         }).fail((err) => {
             showMessage(err.responseJSON.error.message, "error");
+        }).always(() => {
+            this.currentDeleteVideoId = null;
         });
     }
 };
@@ -387,6 +401,16 @@ $(document).ready(function() {
     // Handle private video tab click
     $('#private-tab-btn').on('click', function() {
         VideoService.loadPrivateVideos();
+    });
+
+    // Handle delete confirmation
+    $('#confirmDeleteBtn').on('click', function() {
+        VideoService.confirmDelete();
+    });
+
+    // Clear currentDeleteVideoId when modal is closed
+    $('#deleteConfirmModal').on('hidden.bs.modal', function () {
+        VideoService.currentDeleteVideoId = null;
     });
 });
 
