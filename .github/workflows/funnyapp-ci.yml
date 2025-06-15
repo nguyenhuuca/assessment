@@ -197,5 +197,5 @@ jobs:
           key: ${{ secrets.SSH_DO_SECRET_KEY }}
           script_stop: true
           script: |
-            ./opt/CICD/deploy-script/deploy-funny-app.sh
+            . /opt/CICD/deploy-script/deploy-funny-app.sh
 
