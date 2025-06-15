@@ -447,11 +447,17 @@ body.modal-open {
         height: 100%;
         border: none;
         background-color: #000;
+        object-fit: contain;
     }
 
     .ratio-16x9 iframe[src*="drive.google.com"] {
         transform: scale(1.1);
         transform-origin: center center;
+    }
+
+    /* Prevent preview image scaling */
+    .ratio-16x9 iframe[src*="drive.google.com"]:not([src*="preview"]) {
+        transform: none;
     }
 
     /* Adjust content after video */
