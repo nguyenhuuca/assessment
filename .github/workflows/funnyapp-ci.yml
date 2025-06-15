@@ -197,11 +197,5 @@ jobs:
           key: ${{ secrets.SSH_DO_SECRET_KEY }}
           script_stop: true
           script: |
-            cd /opt/funnyapp
-            mkdir -p backup
-            if [ -f funny-app-1.0.0.jar ]; then
-              mv funny-app-1.0.0.jar backup/funny-app-1.0.0-$(date +%Y%m%d%H%M%S).jar
-            fi
-            cp /opt/CICD/deploy-artifacts/funny-app-1.0.0.jar .
-            ./stopServer.sh
-            ./startServer.sh
+            ./opt/CICD/deploy-script/deploy-funny-app.sh
+

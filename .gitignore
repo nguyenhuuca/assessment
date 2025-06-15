@@ -37,3 +37,6 @@ application-prod.properties
 .env
 .env.local
 /api/env.local
+
+deploy-funny-app.sh
+/api/deploy-funny-app.sh
