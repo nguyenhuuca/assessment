@@ -202,6 +202,6 @@ jobs:
             if [ -f funny-app-1.0.0.jar ]; then
               mv funny-app-1.0.0.jar backup/funny-app-1.0.0-$(date +%Y%m%d%H%M%S).jar
             fi
-            cp /opt/CICD/api/target/funny-app-1.0.0.jar .
+            cp /opt/CICD/deploy-artifacts/funny-app-1.0.0.jar .
             ./stopServer.sh
             ./startServer.sh
