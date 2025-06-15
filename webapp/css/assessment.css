@@ -433,7 +433,7 @@ body.modal-open {
     .ratio-16x9 {
         position: relative;
         width: 100%;
-        padding-top: 177.78%; /* 9:16 Aspect Ratio for Reel */
+        padding-top: 150%; /* 9:16 Aspect Ratio for Reel */
         background-color: #000;
         border-radius: 12px 12px 0 0;
         overflow: hidden;
@@ -451,7 +451,7 @@ body.modal-open {
     }
 
     .ratio-16x9 iframe[src*="drive.google.com"] {
-        transform: scale(1.1);
+        transform: scale(1);
         transform-origin: center center;
     }
 
