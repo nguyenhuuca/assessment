@@ -431,12 +431,27 @@ body.modal-open {
     }
 
     .ratio-16x9 {
-        margin: 0;
+        position: relative;
         width: 100%;
+        padding-top: 177.78%; /* 9:16 Aspect Ratio for Reel */
+        background-color: #000;
+        border-radius: 12px 12px 0 0;
+        overflow: hidden;
     }
 
     .ratio-16x9 iframe {
-        border-radius: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        background-color: #000;
+    }
+
+    .ratio-16x9 iframe[src*="drive.google.com"] {
+        transform: scale(1.1);
+        transform-origin: center center;
     }
 
     /* Adjust content after video */
@@ -660,49 +675,6 @@ body.modal-open {
 .video-item .col-6 {
     padding-left: 0;
     padding-right: 0;
-}
-
-/* Video container styling */
-.ratio-16x9 {
-    position: relative;
-    width: 100%;
-    padding-top: 56.25%; /* 16:9 Aspect Ratio for desktop */
-    background-color: #000;
-    border-radius: 12px 0 0 12px;
-    overflow: hidden;
-}
-
-.ratio-16x9 iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-    background-color: #000;
-}
-
-/* Google Drive specific styling */
-.ratio-16x9 iframe[src*="drive.google.com"] {
-    width: 100%;
-    height: 100%;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .video-item {
-        margin-bottom: 20px;
-    }
-
-    .ratio-16x9 {
-        border-radius: 12px 12px 0 0;
-        padding-top: 177.78%; /* 9:16 Aspect Ratio for mobile */
-    }
-
-    .ratio-16x9 iframe[src*="drive.google.com"] {
-        transform: scale(1.1);
-        transform-origin: center center;
-    }
 }
 
 .desc-video {
