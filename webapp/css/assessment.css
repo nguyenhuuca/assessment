@@ -666,7 +666,7 @@ body.modal-open {
 .ratio-16x9 {
     position: relative;
     width: 100%;
-    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    padding-top: 177.78%; /* 9:16 Aspect Ratio for Reel-like format */
     background-color: #000;
     border-radius: 12px 0 0 12px;
     overflow: hidden;
@@ -686,8 +686,8 @@ body.modal-open {
 .ratio-16x9 iframe[src*="drive.google.com"] {
     width: 100%;
     height: 100%;
-    transform: scale(1.2);
-    transform-origin: 0 0;
+    transform: scale(1.5);
+    transform-origin: center center;
 }
 
 /* Responsive adjustments */
@@ -701,7 +701,7 @@ body.modal-open {
     }
 
     .ratio-16x9 iframe[src*="drive.google.com"] {
-        transform: scale(1.1);
+        transform: scale(1.3);
     }
 }
 
