@@ -1424,7 +1424,7 @@ body.modal-open {
 
 .shorts-video {
     width: 100%;
-    max-width: 400px; /* giới hạn chiều ngang */
+    max-width: 400px; /* limit width */
     aspect-ratio: 9 / 16;
     position: relative;
 }

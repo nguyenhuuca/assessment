@@ -31,7 +31,7 @@ const VideoTemplate = {
         return `
         <div class="row video-item">
             <div class="col-6">
-                <div class="ratio ratio-16x9">
+                <div class="ratio ratio-16x9 shorts-video">
                     <iframe src="{{linkYotube}}" allowfullscreen></iframe>
                 </div>
             </div>
