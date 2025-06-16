@@ -29,9 +29,19 @@ public class ChatGptServiceImpl implements ChatGptService {
     @Override
     public List<String> getTopYoutubeVideoIds() {
         String prompt = """
-        List 10 historically most viewed YouTube video IDs of all time, as of 2023.
-        Only return a JSON array with the video IDs. No explanation.
-        Example: ["9bZkp7q19f0", "dQw4w9WgXcQ", ...]
+                Bạn là một công cụ tìm kiếm video YouTube ngắn (Shorts).
+   
+                Hãy liệt kê 10 video YouTube Shorts đang theo xu hướng (trending) trong tuần này tại Việt Nam.\s
+                Chỉ trả về một mảng JSON dạng: ["videoId1", "videoId2", ..., "videoId10"]
+                
+                ⚠️ Yêu cầu:
+                - Chỉ lấy video ngắn (YouTube Shorts)
+                - Ưu tiên video có nhiều lượt xem, thích hoặc bình luận gần đây
+                - Video phải phổ biến tại thị trường Việt Nam
+                - Không kèm tiêu đề, mô tả hay bất kỳ nội dung nào ngoài mảng JSON
+                
+                Ví dụ kết quả đúng:
+                ["9bZkp7q19f0", "dQw4w9WgXcQ", "abc123xyz"]
         """;
 
         ChatGptRequest request = new ChatGptRequest(
