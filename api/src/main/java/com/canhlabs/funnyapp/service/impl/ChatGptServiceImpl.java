@@ -31,7 +31,7 @@ public class ChatGptServiceImpl implements ChatGptService {
         String prompt = """
                 Bạn là một công cụ tìm kiếm video YouTube ngắn (Shorts).
    
-                Hãy tìm 10 video YouTube Shorts đang theo trend trong tuần này tại Việt Nam. Chỉ chọn video có:
+                Hãy tìm 10 video YouTube Shorts đang theo trend trong tuần. Chỉ chọn video có:
                 - Thời lượng dưới 60 giây
                 - Định dạng dọc (9:16)
                 - Lượt xem cao trong 7 ngày qua

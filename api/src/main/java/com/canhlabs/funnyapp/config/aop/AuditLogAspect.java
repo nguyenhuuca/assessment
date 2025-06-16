@@ -15,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,12 +53,19 @@ public class AuditLogAspect {
         Object result;
         try {
             result = joinPoint.proceed();
-            Object maskedResult = maskingUtil.toJsonSafe(maskingUtil.maskSensitiveFields(result));
+            Object maskedResult = maskingUtil.maskSensitiveFields(result);
+            String outputStr;
+            if (maskedResult instanceof List<?> listResult) {
+                outputStr = String.format("List(size=%d)", listResult.size());
+            } else {
+                outputStr = maskingUtil.toJsonSafe(maskedResult);
+            }
+
             long duration = System.currentTimeMillis() - start;
 
             log.info("AUDIT | IP={} | Method={} | Input={} | Output={} | Time={}ms",
                     clientIp, methodName, inputArgs,
-                    new ObjectMapper().writeValueAsString(maskedResult),
+                    new ObjectMapper().writeValueAsString(outputStr),
                     duration);
             return result;
         } catch (Throwable ex) {

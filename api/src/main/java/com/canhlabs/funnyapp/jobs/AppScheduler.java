@@ -16,7 +16,7 @@ public class AppScheduler {
     }
 
     // Run at 1:00 daily
-    @Scheduled(cron = "0 30 11 * * *",  zone = "Asia/Ho_Chi_Minh")
+    @Scheduled(cron = "0 0 12 * * *",  zone = "Asia/Ho_Chi_Minh")
     public void scheduleProcessTop10() {
         log.info("Start running processTop10YouTube at 1AM");
         try {
