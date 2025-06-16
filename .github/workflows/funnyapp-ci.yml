@@ -155,6 +155,8 @@ jobs:
           name: jacoco-html
           path: api/target/jacoco-report/
 
+      - name: Check jacoco.xml exists
+        run: ls -la api/target/jacoco-report/
       # Upload XML coverage to Codecov
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
