@@ -97,6 +97,8 @@ public class YouTubeVideoServiceImpl implements com.canhlabs.funnyapp.service.Yo
             upserts.add(entity);
         }
 
+        log.info("Updating video details: {}", upserts.size());
+
         repository.saveAll(upserts);
     }
 
@@ -109,6 +111,7 @@ public class YouTubeVideoServiceImpl implements com.canhlabs.funnyapp.service.Yo
         }
 
         List<YouTubeVideoDTO> dtos = youTubeApiClient.fetchVideoDetails(videoIdsFromChatGpt);
+        log.info("Fetched {} video details from YouTube API", dtos.size());
         updateVideoDetails(dtos);
 
     }
