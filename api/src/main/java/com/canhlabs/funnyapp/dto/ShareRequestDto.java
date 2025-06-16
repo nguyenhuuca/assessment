@@ -13,4 +13,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class ShareRequestDto  extends  BaseDto{
     String url;
+    boolean isPrivate;
+    String description;
+    String title;
 }

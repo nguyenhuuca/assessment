@@ -61,8 +61,8 @@ public class ShareServiceImpl implements ShareService {
         VideoDto videoDto = null;
         if(isGoogleDriveUrl(shareRequestDto.getUrl())) {
            videoDto = VideoDto.builder()
-                    .title("")
-                    .desc("")
+                    .title(shareRequestDto.getTitle())
+                    .desc(shareRequestDto.getDescription())
                     .embedLink(shareRequestDto.getUrl())
                     .urlLink(shareRequestDto.getUrl())
                     .build();

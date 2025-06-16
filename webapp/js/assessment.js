@@ -189,9 +189,13 @@ const VideoService = {
     share() {
         const link = $("#urlYoutube").val();
         const isPrivate = $("#isPrivate").is(':checked');
+        const description = $("#videoDescription").val();
+        const title = $("#videoTitle").val();
         const shareObj = { 
             url: link,
-            isPrivate: isPrivate
+            isPrivate: isPrivate,
+            description: description,
+            title: title
         };
 
         $("#shareSpinner").show();
@@ -395,6 +399,8 @@ $(document).ready(function() {
         $("#shareSpinner").hide();
         $("#mainMsg").hide();
         $("#urlYoutube").val('');
+        $("#videoTitle").val('');
+        $("#videoDescription").val('');
         $("#isPrivate").prop('checked', false);
     });
 
