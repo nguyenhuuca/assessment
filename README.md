@@ -9,8 +9,7 @@
 ![Virtual Threads](https://img.shields.io/badge/Threads-Virtual--Threads-orang)
 
 ![Build Status](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml/badge.svg)
-[![Coverage](https://img.shields.io/codecov/c/github/nguyenhuuca/assessment/main)](https://codecov.io/gh/nguyenhuuca/assessment)
-
+[![Codecov](https://codecov.io/gh/nguyenhuuca/assessment/branch/main/graph/badge.svg)](https://codecov.io/gh/nguyenhuuca/assessment)
 ---
 ## 🔥 Overview
 **Funny Movies** is a modern web application built with **Java 21** and **Spring Boot 3.x**, designed to deliver **high-performance video experiences**.
