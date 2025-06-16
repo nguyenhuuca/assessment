@@ -450,6 +450,10 @@ body.modal-open {
         object-fit: scale-down;
     }
 
+    .ratio-16x9 img {
+        object-fit: scale-down;
+    }
+
     .ratio-16x9 iframe[src*="drive.google.com"] {
         transform: scale(1);
         transform-origin: center center;
