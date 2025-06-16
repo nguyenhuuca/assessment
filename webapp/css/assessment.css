@@ -447,7 +447,7 @@ body.modal-open {
         height: 100%;
         border: none;
         background-color: #000;
-        object-fit: contain;
+        object-fit: scale-down;
     }
 
     .ratio-16x9 iframe[src*="drive.google.com"] {
@@ -1409,27 +1409,28 @@ body.modal-open {
     color: green;
 }
 
-/* Style for images inside iframes */
-.ratio-16x9 iframe img {
+.shorts-container {
+    height: 100vh; /* full screen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black;
+    overflow: hidden;
+}
+
+.shorts-video {
+    width: 100%;
+    max-width: 400px; /* giới hạn chiều ngang */
+    aspect-ratio: 9 / 16;
+    position: relative;
+}
+
+.shorts-video iframe {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    aspect-ratio: 16/9;
+    border: none;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
-
-/* Mobile-specific video styling */
-@media (max-width: 768px) {
-    .video-item {
-        margin-bottom: 20px;
-    }
-
-    .ratio-16x9 {
-        border-radius: 12px 12px 0 0;
-    }
-
-    .ratio-16x9 iframe img {
-        object-fit: contain;
-    }
-}
-  
   
