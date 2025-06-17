@@ -310,10 +310,15 @@ const VideoService = {
         
         const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
         
-        sortedByPopularity.forEach(video => {
-            const videoHtml = VideoTemplate.bindData(video);
+        // Initialize swipe with private videos
+        VideoActions.initSwipe(sortedByPopularity);
+
+        // Display first video
+        const firstVideo = sortedByPopularity[0];
+        if (firstVideo) {
+            const videoHtml = VideoTemplate.bindData(firstVideo);
             $("#list-video-private").append(videoHtml);
-        });
+        }
     },
 
     deleteVideo(element) {
