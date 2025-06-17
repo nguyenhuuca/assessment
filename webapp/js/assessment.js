@@ -32,7 +32,12 @@ const VideoTemplate = {
         <div class="video-swipe-container">
             <div class="video-swipe-wrapper">
                 <div class="video-swipe-item">
-                    <iframe src="{{linkYotube}}" allowfullscreen></iframe>
+                    <iframe src="{{linkYotube}}" 
+                            allowfullscreen 
+                            allow="autoplay; fullscreen" 
+                            referrerpolicy="origin"
+                            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                            loading="lazy"></iframe>
                 </div>
             </div>
             <div class="video-swipe-controls">
