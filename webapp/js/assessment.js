@@ -29,7 +29,7 @@ class Video {
 const VideoTemplate = {
     load() {
         return `
-        <div class="video-swipe-container">
+        <div class="video-swipe-container" id="{{containerId}}">
             <div class="video-swipe-wrapper">
                 <div class="video-swipe-item">
                     <iframe src="{{linkYotube}}" 
@@ -41,17 +41,17 @@ const VideoTemplate = {
                 </div>
             </div>
             <div class="video-swipe-controls">
-                <button class="swipe-button" onclick="VideoActions.swipeLeft()">
+                <button class="swipe-button" onclick="VideoActions.swipeLeft('{{containerId}}')">
                     <i class="fas fa-chevron-left"></i>
                 </button>
-                <button class="swipe-button" onclick="VideoActions.swipeRight()">
+                <button class="swipe-button" onclick="VideoActions.swipeRight('{{containerId}}')">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
         </div>`;
     },
 
-    bindData(videoObj) {
+    bindData(videoObj, containerId) {
         let template = this.load();
         
         // Handle Google Drive URL
@@ -80,7 +80,8 @@ const VideoTemplate = {
             .replace("{{id_downCount}}", videoObj.id + "_downCount")
             .replace("{{id_upVote}}", videoObj.id + "_upVote")
             .replace("{{id_downVote}}", videoObj.id + "_downVote")
-            .replace("{{deleteButton}}", deleteButton);
+            .replace("{{deleteButton}}", deleteButton)
+            .replace(/{{containerId}}/g, containerId);
     }
 };
 
@@ -157,28 +158,28 @@ const VideoActions = {
         }
     },
 
-    currentVideoIndex: 0,
-    videos: [],
+    currentVideoIndex: {},
+    videos: {},
 
-    swipeLeft() {
-        if (this.currentVideoIndex > 0) {
-            this.currentVideoIndex--;
-            this.updateVideo();
+    swipeLeft(containerId) {
+        if (this.currentVideoIndex[containerId] > 0) {
+            this.currentVideoIndex[containerId]--;
+            this.updateVideo(containerId);
         }
     },
 
-    swipeRight() {
-        if (this.currentVideoIndex < this.videos.length - 1) {
-            this.currentVideoIndex++;
-            this.updateVideo();
+    swipeRight(containerId) {
+        if (this.currentVideoIndex[containerId] < this.videos[containerId].length - 1) {
+            this.currentVideoIndex[containerId]++;
+            this.updateVideo(containerId);
         }
     },
 
-    updateVideo() {
-        const video = this.videos[this.currentVideoIndex];
+    updateVideo(containerId) {
+        const video = this.videos[containerId][this.currentVideoIndex[containerId]];
         if (!video) return;
 
-        const iframe = document.querySelector('.video-swipe-item iframe');
+        const iframe = document.querySelector(`#${containerId} .video-swipe-item iframe`);
         if (iframe) {
             // Handle Google Drive URL
             let videoUrl = video.src;
@@ -192,10 +193,10 @@ const VideoActions = {
         }
     },
 
-    initSwipe(videos) {
-        this.videos = videos;
-        this.currentVideoIndex = 0;
-        this.updateVideo();
+    initSwipe(videos, containerId) {
+        this.videos[containerId] = videos;
+        this.currentVideoIndex[containerId] = 0;
+        this.updateVideo(containerId);
     }
 };
 
@@ -235,7 +236,7 @@ const VideoService = {
                 videoInfo.desc,
                 videoInfo.isPrivate
             );
-            const videoHtml = VideoTemplate.bindData(video);
+            const videoHtml = VideoTemplate.bindData(video, 'popular-videos');
             
             // Add to appropriate list based on privacy
             if (video.isPrivate) {
@@ -308,12 +309,12 @@ const VideoService = {
         const regularVideos = sortedByPopularity.filter(video => video.category === 'regular');
 
         // Initialize swipe with all videos
-        VideoActions.initSwipe([...regularVideos, ...funnyVideos]);
+        VideoActions.initSwipe([...regularVideos, ...funnyVideos], 'popular-videos');
 
         // Display first video
         const firstVideo = regularVideos[0] || funnyVideos[0];
         if (firstVideo) {
-            const videoHtml = VideoTemplate.bindData(firstVideo);
+            const videoHtml = VideoTemplate.bindData(firstVideo, 'popular-videos');
             $("#list-video-popular").append(videoHtml);
         }
     },
@@ -324,12 +325,12 @@ const VideoService = {
         const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
         
         // Initialize swipe with private videos
-        VideoActions.initSwipe(sortedByPopularity);
+        VideoActions.initSwipe(sortedByPopularity, 'private-videos');
 
         // Display first video
         const firstVideo = sortedByPopularity[0];
         if (firstVideo) {
-            const videoHtml = VideoTemplate.bindData(firstVideo);
+            const videoHtml = VideoTemplate.bindData(firstVideo, 'private-videos');
             $("#list-video-private").append(videoHtml);
         }
     },
