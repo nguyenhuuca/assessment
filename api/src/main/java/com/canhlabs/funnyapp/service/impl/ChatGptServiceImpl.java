@@ -31,12 +31,7 @@ public class ChatGptServiceImpl implements ChatGptService {
         String prompt = """
                 Bạn là một công cụ tìm kiếm video YouTube ngắn (Shorts).
    
-                Hãy tìm 10 video YouTube Shorts tại Việt Nam. Chỉ chọn video có:
-                - Thời lượng dưới 60 giây
-                - Định dạng dọc (9:16)
-                - Lượt xem cao trong 7 ngày qua
-                - Không bị xóa hoặc ẩn
-                - Ưu tiên có tương tác tốt (like, bình luận)
+                Hãy tìm 10 video YouTube Shorts, ngẫu nhiên bất kể thời gian đăng tải nào
                 - Kết quả là danh sách video ID YouTube hợp lệ dạng ["id1", "id2", ...]
                 Ví dụ kết quả đúng:
                 ["9bZkp7q19f0", "dQw4w9WgXcQ", "abc123xyz"]
