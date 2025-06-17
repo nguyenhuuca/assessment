@@ -1437,4 +1437,85 @@ body.modal-open {
     top: 0;
     left: 0;
 }
+
+.video-swipe-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.video-swipe-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.video-swipe-item {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 9 / 16;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.video-swipe-item iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: black;
+}
+
+.video-swipe-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    z-index: 1000;
+}
+
+.swipe-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.swipe-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .video-swipe-container {
+        height: calc(100vh - 60px); /* Adjust for header */
+    }
+
+    .video-swipe-controls {
+        bottom: 10px;
+    }
+
+    .swipe-button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}
   

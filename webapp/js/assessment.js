@@ -29,47 +29,21 @@ class Video {
 const VideoTemplate = {
     load() {
         return `
-        <div class="row video-item">
-            <div class="col-6">
-                <div class="ratio ratio-16x9 shorts-video">
+        <div class="video-swipe-container">
+            <div class="video-swipe-wrapper">
+                <div class="video-swipe-item">
                     <iframe src="{{linkYotube}}" allowfullscreen></iframe>
                 </div>
             </div>
-            <div class="col-6 desc-video">
-                <div class="video-title">{{movi_title}}</div>
-                <div class="video-meta">
-                    <div class="video-shared-by">
-                        <span class="meta-label">Shared by:</span> 
-                        <span class="meta-value">{{userName}}</span>
-                    </div>
-                </div>
-                <div class="video-actions">
-                    <div class="vote-container">
-                        <div class="vote-button" id="{{id_upVote}}" onclick="VideoActions.voteUp(this)">
-                            <i class="far fa-thumbs-up"></i>
-                            <span class="vote-count" id="{{id_upCount}}">0</span>
-                        </div>
-                        <div class="vote-button" id="{{id_downVote}}" onclick="VideoActions.voteDown(this)">
-                            <i class="far fa-thumbs-down"></i>
-                            <span class="vote-count" id="{{id_downCount}}">0</span>
-                        </div>
-                        {{deleteButton}}
-                    </div>
-                </div>
-                <div class="video-description-container">
-                    <div class="description-header">
-                        <div class="description-label">Description:</div>
-                        <button class="description-toggle" onclick="VideoActions.toggleDescription(this)">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-                    <div class="video-description">
-                        <div class="description-content">{{desc}}</div>
-                    </div>
-                </div>
+            <div class="video-swipe-controls">
+                <button class="swipe-button" onclick="VideoActions.swipeLeft()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="swipe-button" onclick="VideoActions.swipeRight()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
-        </div>
-        </br>`;
+        </div>`;
     },
 
     bindData(videoObj) {
@@ -176,6 +150,39 @@ const VideoActions = {
         } else {
             toggleIcon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
         }
+    },
+
+    currentVideoIndex: 0,
+    videos: [],
+
+    swipeLeft() {
+        if (this.currentVideoIndex > 0) {
+            this.currentVideoIndex--;
+            this.updateVideo();
+        }
+    },
+
+    swipeRight() {
+        if (this.currentVideoIndex < this.videos.length - 1) {
+            this.currentVideoIndex++;
+            this.updateVideo();
+        }
+    },
+
+    updateVideo() {
+        const video = this.videos[this.currentVideoIndex];
+        if (!video) return;
+
+        const iframe = document.querySelector('.video-swipe-item iframe');
+        if (iframe) {
+            iframe.src = video.src;
+        }
+    },
+
+    initSwipe(videos) {
+        this.videos = videos;
+        this.currentVideoIndex = 0;
+        this.updateVideo();
     }
 };
 
@@ -287,15 +294,15 @@ const VideoService = {
         const funnyVideos = sortedByPopularity.filter(video => video.category === 'funny');
         const regularVideos = sortedByPopularity.filter(video => video.category === 'regular');
 
-        regularVideos.forEach(video => {
-            const videoHtml = VideoTemplate.bindData(video);
-            $("#list-video-popular").append(videoHtml);
-        });
+        // Initialize swipe with all videos
+        VideoActions.initSwipe([...regularVideos, ...funnyVideos]);
 
-        funnyVideos.forEach(video => {
-            const videoHtml = VideoTemplate.bindData(video);
-            $("#list-video-funny").append(videoHtml);
-        });
+        // Display first video
+        const firstVideo = regularVideos[0] || funnyVideos[0];
+        if (firstVideo) {
+            const videoHtml = VideoTemplate.bindData(firstVideo);
+            $("#list-video-popular").append(videoHtml);
+        }
     },
 
     displayPrivateVideos(videos) {
