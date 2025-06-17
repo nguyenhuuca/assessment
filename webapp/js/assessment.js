@@ -175,7 +175,15 @@ const VideoActions = {
 
         const iframe = document.querySelector('.video-swipe-item iframe');
         if (iframe) {
-            iframe.src = video.src;
+            // Handle Google Drive URL
+            let videoUrl = video.src;
+            if (videoUrl.includes('drive.google.com')) {
+                const fileId = videoUrl.match(/\/d\/(.*?)\//)?.[1];
+                if (fileId) {
+                    videoUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+                }
+            }
+            iframe.src = videoUrl;
         }
     },
 
