@@ -36,7 +36,6 @@ const VideoTemplate = {
                             allowfullscreen 
                             allow="autoplay; fullscreen" 
                             referrerpolicy="origin"
-                            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                             loading="lazy"></iframe>
                 </div>
             </div>
