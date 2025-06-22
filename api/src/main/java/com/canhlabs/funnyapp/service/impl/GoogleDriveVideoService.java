@@ -4,25 +4,16 @@ import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.domain.VideoSource;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
-import com.canhlabs.funnyapp.share.Contract;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.GeneralSecurityException;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -79,9 +70,8 @@ public class GoogleDriveVideoService {
         dto.setUserShared("unknown"); // set nếu có user info
         dto.setTitle("Video from " + source.getSourceType());
         dto.setDesc("Auto-generated video description");
-
-        dto.setUrlLink(appProperties.getDomain() + "/v1/funny-app/video/" + source.getSourceId());
-        dto.setEmbedLink(appProperties.getDomain()  + "v1/funny-app/video/" + source.getSourceId());
+        dto.setUrlLink("https://canh-labs.com//v1/funny-app/video-stream/stream/" + source.getSourceId());
+        dto.setEmbedLink("https://canh-labs.com/v1/funny-app/video-stream/stream/" + source.getSourceId());
         return dto;
     }
 }

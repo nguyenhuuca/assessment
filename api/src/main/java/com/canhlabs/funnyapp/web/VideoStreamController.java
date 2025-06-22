@@ -30,7 +30,7 @@ import java.util.List;
         this.videoService = videoService;
     }
 
-    @GetMapping("/{fileId}")
+    @GetMapping("/stream/{fileId}")
     public ResponseEntity<Resource> streamVideo(
             @PathVariable String fileId,
             @RequestHeader(value = "Range", required = false) String rangeHeader
