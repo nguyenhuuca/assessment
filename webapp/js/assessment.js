@@ -31,15 +31,8 @@ const VideoTemplate = {
         return `
         <div class="video-swipe-container" id="{{containerId}}">
             <div class="video-swipe-wrapper">
-                <div class="video-swipe-item">
-                    <video src="{{videoSrc}}" 
-                           controls 
-                           autoplay 
-                           muted
-                           playsinline
-                           preload="auto">
-                        Sorry, your browser doesn't support embedded videos.
-                    </video>
+                <div class="video-swipe-item" id="video-items-{{containerId}}">
+                    {{videoTags}}
                 </div>
             </div>
             <div class="video-swipe-controls">
@@ -53,27 +46,18 @@ const VideoTemplate = {
         </div>`;
     },
 
-    bindData(videoObj, containerId) {
+    bindData(videosArr, containerId, currentIndex = 0) {
         let template = this.load();
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-        const deleteButton = videoObj.isPrivate && currentUser.email === videoObj.userShared
-            ? `<div class="delete-button" id="${videoObj.id}_delete" onclick="VideoService.deleteVideo(this)">
-                 <i class="fas fa-trash"></i>
-                 <span>Delete</span>
-               </div>`
-            : '';
-        
-        // Just return HTML, do not set innerHTML here
+        let videoTags = '';
+        for (let i = 0; i < 5; i++) {
+            const v = videosArr[currentIndex + i];
+            if (!v) continue;
+            const isCurrent = i === 0;
+            videoTags += `<video id="${containerId}-video-${currentIndex + i}" src="${v.src}" controls autoplay muted playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+        }
         return template
-            .replace("{{videoSrc}}", videoObj.src)
-            .replace("{{movi_title}}", videoObj.title)
-            .replace("{{userName}}", videoObj.userShared)
-            .replace("{{desc}}", videoObj.desc)
-            .replace("{{id_upCount}}", videoObj.id + "_upCount")
-            .replace("{{id_downCount}}", videoObj.id + "_downCount")
-            .replace("{{id_upVote}}", videoObj.id + "_upVote")
-            .replace("{{id_downVote}}", videoObj.id + "_downVote")
-            .replace("{{deleteButton}}", deleteButton)
+            .replace("{{videoTags}}", videoTags)
             .replace(/{{containerId}}/g, containerId);
     }
 };
@@ -169,17 +153,30 @@ const VideoActions = {
     },
 
     updateVideo(containerId) {
-        const video = this.videos[containerId][this.currentVideoIndex[containerId]];
-        if (!video) return;
-
-        const videoElement = document.querySelector(`#${containerId} .video-swipe-item video`);
-        if (videoElement) {
-            let videoUrl = video.src;
-            videoElement.src = videoUrl;
-            videoElement.load();
-            videoElement.play().catch(error => {
-                console.log("Autoplay prevented: ", error);
+        const videos = this.videos[containerId];
+        const idx = this.currentVideoIndex[containerId];
+        if (!videos || typeof idx !== 'number') return;
+        // Pause, reset, and hide ALL <video> in the container except the current
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (container) {
+            const allVideos = container.querySelectorAll('video');
+            allVideos.forEach(vid => {
+                if (vid.id === `${containerId}-video-${idx}`) {
+                    vid.style.display = '';
+                } else {
+                    vid.style.display = 'none';
+                    vid.pause();
+                    vid.currentTime = 0;
+                }
             });
+        }
+        // Add auto-next event to the current video
+        const currentVid = document.getElementById(`${containerId}-video-${idx}`);
+        if (currentVid) {
+            currentVid.addEventListener('ended', function() {
+                VideoActions.swipeRight(containerId);
+            });
+            currentVid.play().catch(() => {});
         }
     },
 
@@ -297,45 +294,37 @@ const VideoService = {
         const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
         const funnyVideos = sortedByPopularity.filter(video => video.category === 'funny');
         const regularVideos = sortedByPopularity.filter(video => video.category === 'regular');
+        const allVideos = [...regularVideos, ...funnyVideos];
 
-        // Display first video
-        const firstVideo = regularVideos[0] || funnyVideos[0];
-        if (firstVideo) {
-            const videoHtml = VideoTemplate.bindData(firstVideo, 'popular-videos');
+        // Display first video and preload next 4
+        if (allVideos.length > 0) {
+            const videoHtml = VideoTemplate.bindData(allVideos, 'popular-videos', 0);
             $("#list-video-popular").html(videoHtml);
             // Add auto-next event
-            const videoEl = document.querySelector('#list-video-popular video');
+            const videoEl = document.getElementById('popular-videos-video-0');
             if (videoEl) {
                 videoEl.addEventListener('ended', function() {
                     VideoActions.swipeRight('popular-videos');
                 });
             }
         }
-
-        // Initialize swipe with all videos
-        VideoActions.initSwipe([...regularVideos, ...funnyVideos], 'popular-videos');
+        VideoActions.initSwipe(allVideos, 'popular-videos');
     },
 
     displayPrivateVideos(videos) {
         $("#list-video-private").empty();
-        
         const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
-        
-        // Display first video
-        const firstVideo = sortedByPopularity[0];
-        if (firstVideo) {
-            const videoHtml = VideoTemplate.bindData(firstVideo, 'private-videos');
+        if (sortedByPopularity.length > 0) {
+            const videoHtml = VideoTemplate.bindData(sortedByPopularity, 'private-videos', 0);
             $("#list-video-private").html(videoHtml);
             // Add auto-next event
-            const videoEl = document.querySelector('#list-video-private video');
+            const videoEl = document.getElementById('private-videos-video-0');
             if (videoEl) {
                 videoEl.addEventListener('ended', function() {
                     VideoActions.swipeRight('private-videos');
                 });
             }
         }
-
-        // Initialize swipe with private videos
         VideoActions.initSwipe(sortedByPopularity, 'private-videos');
     },
 
