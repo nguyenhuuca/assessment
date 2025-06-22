@@ -46,15 +46,18 @@ const VideoTemplate = {
         </div>`;
     },
 
+    // Render 5 consecutive videos around currentIndex (centered if possible)
     bindData(videosArr, containerId, currentIndex = 0) {
         let template = this.load();
-        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         let videoTags = '';
-        for (let i = 0; i < 5; i++) {
-            const v = videosArr[currentIndex + i];
+        const total = videosArr.length;
+        let start = Math.max(0, Math.min(currentIndex - 2, total - 5));
+        let end = Math.min(total, start + 5);
+        for (let i = start; i < end; i++) {
+            const v = videosArr[i];
             if (!v) continue;
-            const isCurrent = i === 0;
-            videoTags += `<video id="${containerId}-video-${currentIndex + i}" src="${v.src}" controls${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+            const isCurrent = i === currentIndex;
+            videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" controls${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
         }
         return template
             .replace("{{videoTags}}", videoTags)
