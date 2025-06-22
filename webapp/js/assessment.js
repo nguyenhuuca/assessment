@@ -66,7 +66,7 @@ const VideoTemplate = {
             : '';
         
         return template
-            .replace("{{videoSrc}}", "videoObj.src")
+            .replace("{{videoSrc}}", videoObj.src)
             .replace("{{movi_title}}", videoObj.title)
             .replace("{{userName}}", videoObj.userShared)
             .replace("{{desc}}", videoObj.desc)
@@ -247,7 +247,7 @@ const VideoService = {
     loadData() {
         // Load public videos
         $.ajax({
-            url: appConst.baseUrl.concat("/top-videos"),
+            url: appConst.baseUrl.concat("/video-stream/list"),
             type: "GET",
             dataType: "json"
         }).done((rs) => {
@@ -299,15 +299,15 @@ const VideoService = {
         const funnyVideos = sortedByPopularity.filter(video => video.category === 'funny');
         const regularVideos = sortedByPopularity.filter(video => video.category === 'regular');
 
-        // Initialize swipe with all videos
-        VideoActions.initSwipe([...regularVideos, ...funnyVideos], 'popular-videos');
-
         // Display first video
         const firstVideo = regularVideos[0] || funnyVideos[0];
         if (firstVideo) {
             const videoHtml = VideoTemplate.bindData(firstVideo, 'popular-videos');
             $("#list-video-popular").append(videoHtml);
         }
+
+        // Initialize swipe with all videos
+        VideoActions.initSwipe([...regularVideos, ...funnyVideos], 'popular-videos');
     },
 
     displayPrivateVideos(videos) {
@@ -315,15 +315,15 @@ const VideoService = {
         
         const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
         
-        // Initialize swipe with private videos
-        VideoActions.initSwipe(sortedByPopularity, 'private-videos');
-
         // Display first video
         const firstVideo = sortedByPopularity[0];
         if (firstVideo) {
             const videoHtml = VideoTemplate.bindData(firstVideo, 'private-videos');
             $("#list-video-private").append(videoHtml);
         }
+
+        // Initialize swipe with private videos
+        VideoActions.initSwipe(sortedByPopularity, 'private-videos');
     },
 
     deleteVideo(element) {
