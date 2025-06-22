@@ -35,7 +35,6 @@ const VideoTemplate = {
                     <video src="{{videoSrc}}" 
                            controls 
                            autoplay 
-                           loop
                            muted
                            playsinline
                            preload="auto">
@@ -56,7 +55,6 @@ const VideoTemplate = {
 
     bindData(videoObj, containerId) {
         let template = this.load();
-        
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         const deleteButton = videoObj.isPrivate && currentUser.email === videoObj.userShared
             ? `<div class="delete-button" id="${videoObj.id}_delete" onclick="VideoService.deleteVideo(this)">
@@ -65,6 +63,7 @@ const VideoTemplate = {
                </div>`
             : '';
         
+        // Just return HTML, do not set innerHTML here
         return template
             .replace("{{videoSrc}}", videoObj.src)
             .replace("{{movi_title}}", videoObj.title)
@@ -303,7 +302,14 @@ const VideoService = {
         const firstVideo = regularVideos[0] || funnyVideos[0];
         if (firstVideo) {
             const videoHtml = VideoTemplate.bindData(firstVideo, 'popular-videos');
-            $("#list-video-popular").append(videoHtml);
+            $("#list-video-popular").html(videoHtml);
+            // Add auto-next event
+            const videoEl = document.querySelector('#list-video-popular video');
+            if (videoEl) {
+                videoEl.addEventListener('ended', function() {
+                    VideoActions.swipeRight('popular-videos');
+                });
+            }
         }
 
         // Initialize swipe with all videos
@@ -319,7 +325,14 @@ const VideoService = {
         const firstVideo = sortedByPopularity[0];
         if (firstVideo) {
             const videoHtml = VideoTemplate.bindData(firstVideo, 'private-videos');
-            $("#list-video-private").append(videoHtml);
+            $("#list-video-private").html(videoHtml);
+            // Add auto-next event
+            const videoEl = document.querySelector('#list-video-private video');
+            if (videoEl) {
+                videoEl.addEventListener('ended', function() {
+                    VideoActions.swipeRight('private-videos');
+                });
+            }
         }
 
         // Initialize swipe with private videos
