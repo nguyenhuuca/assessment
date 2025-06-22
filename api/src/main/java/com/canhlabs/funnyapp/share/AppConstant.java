@@ -43,8 +43,8 @@ public class AppConstant {
         // apply for document swagger
         public static final List<String> SWAGGER_DOC = List.of(
                         "/",
-                        //"/actuator/**",
-                        // -- swagger ui
+                        "/v1/funny-app/video-stream",
+                        "/v1/funny-app/video-stream/**",
                         "/v3/api-docs/**", "/swagger-resources", "/swagger-resources/**","/swagger-ui/index.html",
                         "/configuration/ui", "/configuration/security", "/swagger-ui.html",
                         "/swagger-ui/**",

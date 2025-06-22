@@ -32,11 +32,15 @@ const VideoTemplate = {
         <div class="video-swipe-container" id="{{containerId}}">
             <div class="video-swipe-wrapper">
                 <div class="video-swipe-item">
-                    <iframe src="{{linkYotube}}" 
-                            allowfullscreen 
-                            allow="autoplay; fullscreen" 
-                            referrerpolicy="origin"
-                            loading="lazy"></iframe>
+                    <video src="{{videoSrc}}" 
+                           controls 
+                           autoplay 
+                           loop
+                           muted
+                           playsinline
+                           preload="auto">
+                        Sorry, your browser doesn't support embedded videos.
+                    </video>
                 </div>
             </div>
             <div class="video-swipe-controls">
@@ -53,15 +57,6 @@ const VideoTemplate = {
     bindData(videoObj, containerId) {
         let template = this.load();
         
-        // Handle Google Drive URL
-        if (videoObj.src.includes('drive.google.com')) {
-            const fileId = videoObj.src.match(/\/d\/(.*?)\//)?.[1];
-            if (fileId) {
-                videoObj.src = `https://drive.google.com/file/d/${fileId}/preview`;
-            }
-        }
-
-        // Add delete button if video is private and shared by current user
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         const deleteButton = videoObj.isPrivate && currentUser.email === videoObj.userShared
             ? `<div class="delete-button" id="${videoObj.id}_delete" onclick="VideoService.deleteVideo(this)">
@@ -71,7 +66,7 @@ const VideoTemplate = {
             : '';
         
         return template
-            .replace("{{linkYotube}}", videoObj.src)
+            .replace("{{videoSrc}}", "videoObj.src")
             .replace("{{movi_title}}", videoObj.title)
             .replace("{{userName}}", videoObj.userShared)
             .replace("{{desc}}", videoObj.desc)
@@ -178,17 +173,14 @@ const VideoActions = {
         const video = this.videos[containerId][this.currentVideoIndex[containerId]];
         if (!video) return;
 
-        const iframe = document.querySelector(`#${containerId} .video-swipe-item iframe`);
-        if (iframe) {
-            // Handle Google Drive URL
+        const videoElement = document.querySelector(`#${containerId} .video-swipe-item video`);
+        if (videoElement) {
             let videoUrl = video.src;
-            if (videoUrl.includes('drive.google.com')) {
-                const fileId = videoUrl.match(/\/d\/(.*?)\//)?.[1];
-                if (fileId) {
-                    videoUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-                }
-            }
-            iframe.src = videoUrl;
+            videoElement.src = videoUrl;
+            videoElement.load();
+            videoElement.play().catch(error => {
+                console.log("Autoplay prevented: ", error);
+            });
         }
     },
 

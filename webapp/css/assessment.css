@@ -1469,7 +1469,7 @@ body.modal-open {
     align-items: center;
 }
 
-.video-swipe-item iframe {
+.video-swipe-item video {
     width: 100%;
     height: 100%;
     border: none;
@@ -1477,6 +1477,7 @@ body.modal-open {
     top: 0;
     left: 0;
     background: black;
+    object-fit: contain;
 }
 
 .video-swipe-controls {

@@ -28,6 +28,7 @@ public class AppProperties {
     private String inviteTemplate;
     private String chatGptUrl;
     private String youtubeUrl;
+    private String googleCredentialPath;
 
 
 
