@@ -54,7 +54,7 @@ const VideoTemplate = {
             const v = videosArr[currentIndex + i];
             if (!v) continue;
             const isCurrent = i === 0;
-            videoTags += `<video id="${containerId}-video-${currentIndex + i}" src="${v.src}" controls autoplay muted playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+            videoTags += `<video id="${containerId}-video-${currentIndex + i}" src="${v.src}" controls${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
         }
         return template
             .replace("{{videoTags}}", videoTags)
@@ -68,6 +68,7 @@ const VideoTemplate = {
  */
 const VideoActions = {
     voteStates: {},
+    mutedState: {},
 
     voteUp(element) {
         const id = $(element).attr("id");
@@ -156,27 +157,40 @@ const VideoActions = {
         const videos = this.videos[containerId];
         const idx = this.currentVideoIndex[containerId];
         if (!videos || typeof idx !== 'number') return;
-        // Pause, reset, and hide ALL <video> in the container except the current
         const container = document.getElementById(`video-items-${containerId}`);
         if (container) {
-            const allVideos = container.querySelectorAll('video');
-            allVideos.forEach(vid => {
-                if (vid.id === `${containerId}-video-${idx}`) {
-                    vid.style.display = '';
-                } else {
-                    vid.style.display = 'none';
-                    vid.pause();
-                    vid.currentTime = 0;
-                }
+            // Pause and reset ALL existing <video> in the container before rendering new ones
+            const oldVideos = container.querySelectorAll('video');
+            oldVideos.forEach(vid => {
+                vid.pause();
+                vid.currentTime = 0;
             });
-        }
-        // Add auto-next event to the current video
-        const currentVid = document.getElementById(`${containerId}-video-${idx}`);
-        if (currentVid) {
-            currentVid.addEventListener('ended', function() {
-                VideoActions.swipeRight(containerId);
-            });
-            currentVid.play().catch(() => {});
+            // Lấy trạng thái muted từ biến toàn cục, mặc định true
+            let prevMuted = (typeof VideoActions.mutedState[containerId] === 'boolean') ? VideoActions.mutedState[containerId] : true;
+            container.innerHTML = VideoTemplate.bindData(videos, containerId, idx);
+            // Gán lại sự kiện auto-next và muted cho video hiện tại
+            const currentVid = document.getElementById(`${containerId}-video-${idx}`);
+            if (currentVid) {
+                currentVid.muted = prevMuted;
+                currentVid.addEventListener('ended', function() {
+                    VideoActions.swipeRight(containerId);
+                });
+                // Lắng nghe sự kiện volumechange để cập nhật trạng thái mute
+                currentVid.addEventListener('volumechange', function() {
+                    VideoActions.mutedState[containerId] = currentVid.muted;
+                });
+                // Khi play, pause tất cả video khác trong container
+                currentVid.addEventListener('play', function() {
+                    const allVideos = container.querySelectorAll('video');
+                    allVideos.forEach(vid => {
+                        if (vid !== currentVid) {
+                            vid.pause();
+                            vid.currentTime = 0;
+                        }
+                    });
+                });
+                currentVid.play().catch(() => {});
+            }
         }
     },
 
