@@ -338,6 +338,7 @@ const VideoService = {
             }
         }
         VideoActions.initSwipe(allVideos, 'popular-videos');
+        addSwipeEvents('popular-videos');
     },
 
     displayPrivateVideos(videos) {
@@ -355,6 +356,7 @@ const VideoService = {
             }
         }
         VideoActions.initSwipe(sortedByPopularity, 'private-videos');
+        addSwipeEvents('private-videos');
     },
 
     deleteVideo(element) {
@@ -467,4 +469,30 @@ $(document).ready(function() {
         VideoService.currentDeleteVideoId = null;
     });
 });
+
+// Add this function to support swipe gesture
+function addSwipeEvents(containerId) {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const threshold = 50; // px
+
+    // Use event delegation in case container is re-rendered
+    document.addEventListener('touchstart', function(e) {
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (!container || !container.contains(e.target)) return;
+        touchStartX = e.changedTouches[0].screenX;
+    }, false);
+
+    document.addEventListener('touchend', function(e) {
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (!container || !container.contains(e.target)) return;
+        touchEndX = e.changedTouches[0].screenX;
+        const diff = touchEndX - touchStartX;
+        if (diff > threshold) {
+            VideoActions.swipeLeft(containerId);
+        } else if (diff < -threshold) {
+            VideoActions.swipeRight(containerId);
+        }
+    }, false);
+}
 
