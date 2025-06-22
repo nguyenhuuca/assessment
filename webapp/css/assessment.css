@@ -1478,6 +1478,14 @@ body.modal-open {
     left: 0;
     background: black;
     object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: 1;
+}
+
+.video-swipe-item video.active {
+    opacity: 1;
+    z-index: 2;
 }
 
 .video-swipe-controls {

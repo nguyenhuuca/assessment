@@ -183,9 +183,12 @@ const VideoActions = {
             // Lấy trạng thái muted từ biến toàn cục, mặc định true
             let prevMuted = (typeof VideoActions.mutedState[containerId] === 'boolean') ? VideoActions.mutedState[containerId] : true;
             container.innerHTML = VideoTemplate.bindData(videos, containerId, idx);
-            // Gán lại sự kiện auto-next và muted cho video hiện tại
+            // Hiệu ứng fade: set active cho video hiện tại
+            const allVideos = container.querySelectorAll('video');
+            allVideos.forEach(vid => vid.classList.remove('active'));
             const currentVid = document.getElementById(`${containerId}-video-${idx}`);
             if (currentVid) {
+                currentVid.classList.add('active');
                 currentVid.muted = prevMuted;
                 currentVid.addEventListener('ended', function() {
                     VideoActions.swipeRight(containerId);
@@ -196,7 +199,6 @@ const VideoActions = {
                 });
                 // Khi play, pause tất cả video khác trong container
                 currentVid.addEventListener('play', function() {
-                    const allVideos = container.querySelectorAll('video');
                     allVideos.forEach(vid => {
                         if (vid !== currentVid) {
                             vid.pause();
