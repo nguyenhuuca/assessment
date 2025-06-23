@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
+import com.canhlabs.funnyapp.config.aop.AuditLog;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
@@ -22,8 +23,10 @@ import java.io.InputStream;
 import java.util.List;
 
 
+@AuditLog("Audit all methods in VideoStreamController class")
 @RequestMapping(AppConstant.API.BASE_URL + "/video-stream")
-@RestController public class VideoStreamController {
+@RestController
+public class VideoStreamController {
     private final GoogleDriveVideoService videoService;
 
     public VideoStreamController(GoogleDriveVideoService videoService) {
@@ -35,7 +38,6 @@ import java.util.List;
             @PathVariable String fileId,
             @RequestHeader(value = "Range", required = false) String rangeHeader
     ) throws IOException {
-
         long fileSize = videoService.getFileSize(fileId);
         long start = 0;
         long end = fileSize - 1;
