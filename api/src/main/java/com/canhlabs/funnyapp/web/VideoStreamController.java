@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-
-@AuditLog("Audit all methods in VideoStreamController class")
 @RequestMapping(AppConstant.API.BASE_URL + "/video-stream")
 @RestController
 public class VideoStreamController {
