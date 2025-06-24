@@ -1460,13 +1460,17 @@ body.modal-open {
 }
 
 .video-swipe-item {
-    position: relative;
     width: 100%;
     max-width: 400px;
     aspect-ratio: 9 / 16;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: relative;
+    margin: 0 auto;
+}
+
+.video-main {
+    width: 100%;
+    height: 100%;
+    position: relative;
 }
 
 .video-swipe-item video {
@@ -1525,6 +1529,179 @@ body.modal-open {
     .swipe-button {
         padding: 8px 16px;
         font-size: 0.9rem;
+    }
+
+    .video-main {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        z-index: 1;
+    }
+
+    .video-actions-vertical {
+        position: absolute;
+        top: 50%;
+        right: 2px;
+        transform: translateY(-50%);
+        gap: 12px;
+        z-index: 10;
+    }
+}
+
+.video-actions-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    z-index: 10;
+}
+
+.vote-action-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.video-actions-vertical .vote-button,
+.video-actions-vertical .delete-button {
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    margin: 0;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.vote-count {
+    display: block;
+    text-align: center;
+    font-size: 1rem;
+    color: #fff;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+.video-actions-vertical .vote-button.up {
+    color: #4caf50;
+}
+.video-actions-vertical .vote-button.down {
+    color: #f44336;
+}
+
+.video-actions-vertical .vote-button:hover,
+.video-actions-vertical .delete-button:hover {
+    background: #fff;
+    color: #FF0000;
+}
+
+/* Overlay on mobile, outside on desktop */
+@media (max-width: 768px) {
+    .video-actions-vertical {
+        position: absolute;
+        top: 50%;
+        right: 2px;
+        transform: translateY(-50%);
+        gap: 12px;
+    }
+    .video-actions-vertical .vote-button,
+    .video-actions-vertical .delete-button {
+        width: 38px;
+        height: 38px;
+        font-size: 1.05rem;
+    }
+    .vote-count {
+        font-size: 0.8rem;
+    }
+}
+@media (min-width: 769px) {
+    .video-swipe-item {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        position: relative;
+    }
+    .video-main {
+        flex: 1 1 0;
+        min-width: 0;
+        position: relative;
+        z-index: 1;
+        height: 100%;
+    }
+    .video-actions-vertical {
+        position: static;
+        transform: none;
+        margin-left: 18px;
+        height: 100%;
+        justify-content: center;
+        z-index: 2;
+    }
+}
+
+.action-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.action-count {
+    display: block;
+    text-align: center;
+    font-size: 1rem;
+    color: #fff;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+.video-actions-vertical .action-button {
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    margin: 0;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.video-actions-vertical .action-button.comment {
+    color: #2196f3;
+}
+
+.video-actions-vertical .action-button.share {
+    color: #ff9800;
+}
+
+.video-actions-vertical .action-button:hover {
+    background: #fff;
+    color: #FF0000;
+}
+
+@media (max-width: 768px) {
+    .action-count {
+        font-size: 0.8rem;
+    }
+    .video-actions-vertical .action-button {
+        width: 38px;
+        height: 38px;
+        font-size: 1.05rem;
     }
 }
   

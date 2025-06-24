@@ -31,8 +31,29 @@ const VideoTemplate = {
         return `
         <div class="video-swipe-container" id="{{containerId}}">
             <div class="video-swipe-wrapper">
-                <div class="video-swipe-item" id="video-items-{{containerId}}">
-                    {{videoTags}}
+                <div class="video-swipe-item" id="video-items-{{containerId}}" style="position:relative;">
+                    <div class="video-main">
+                        {{videoTags}}
+                    </div>
+                    <div class="video-actions-vertical">
+                        <div class="vote-action-group">
+                            <button class="vote-button up" id="{{id_upVote}}" onclick="VideoActions.voteUp(this)"><i class="fas fa-thumbs-up"></i></button>
+                            <span class="vote-count" id="{{id_upCount}}">0</span>
+                        </div>
+                        <div class="vote-action-group">
+                            <button class="vote-button down" id="{{id_downVote}}" onclick="VideoActions.voteDown(this)"><i class="fas fa-thumbs-down"></i></button>
+                            <span class="vote-count" id="{{id_downCount}}">0</span>
+                        </div>
+                        <div class="action-group">
+                            <button class="action-button comment" onclick="VideoActions.showComments('{{containerId}}')"><i class="fas fa-comment"></i></button>
+                            <span class="action-count">0</span>
+                        </div>
+                        <div class="action-group">
+                            <button class="action-button share" onclick="VideoActions.shareVideo('{{containerId}}')"><i class="fas fa-share"></i></button>
+                            <span class="action-count">Share</span>
+                        </div>
+                        {{deleteButton}}
+                    </div>
                 </div>
             </div>
             <div class="video-swipe-controls">
@@ -71,8 +92,19 @@ const VideoTemplate = {
             }
             videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" controls${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
         }
+        // Upvote/downvote count and delete button for current video
+        const v = videosArr[currentIndex];
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const deleteButton = v && v.isPrivate && currentUser.email === v.userShared
+            ? `<div class="delete-button" id="${v.id}_delete" onclick="VideoService.deleteVideo(this)"><i class="fas fa-trash"></i><span>Delete</span></div>`
+            : '';
         return template
             .replace("{{videoTags}}", videoTags)
+            .replace("{{id_upVote}}", v ? v.id + '_upVote' : '')
+            .replace("{{id_downVote}}", v ? v.id + '_downVote' : '')
+            .replace("{{id_upCount}}", v ? v.id + '_upCount' : '')
+            .replace("{{id_downCount}}", v ? v.id + '_downCount' : '')
+            .replace("{{deleteButton}}", deleteButton)
             .replace(/{{containerId}}/g, containerId);
     }
 };
@@ -215,6 +247,24 @@ const VideoActions = {
         this.videos[containerId] = videos;
         this.currentVideoIndex[containerId] = 0;
         this.updateVideo(containerId);
+    },
+
+    showComments(containerId) {
+        // TODO: Implement comments modal
+        alert('Comments feature coming soon!');
+    },
+
+    shareVideo(containerId) {
+        // TODO: Implement share functionality
+        const currentVideo = this.videos[containerId][this.currentVideoIndex[containerId]];
+        if (currentVideo) {
+            // Copy video URL to clipboard or open share modal
+            navigator.clipboard.writeText(currentVideo.src).then(() => {
+                alert('Video URL copied to clipboard!');
+            }).catch(() => {
+                alert('Share feature coming soon!');
+            });
+        }
     }
 };
 
