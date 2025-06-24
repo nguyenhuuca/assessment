@@ -95,7 +95,7 @@ const VideoTemplate = {
                     poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
                 }
             } else {
-                poster = 'https://picsum.photos/640/360?random=' + Math.floor(Math.random() * 1000);
+                poster = `./icons/poster.jpeg`;
             }
             videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
         }
@@ -283,7 +283,7 @@ const VideoActions = {
                             poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
                         }
                     } else {
-                        poster = 'https://picsum.photos/640/360?random=' + Math.floor(Math.random() * 1000);
+                        poster = './icons/poster.jpeg';
                     }
                     videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:-20px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
                 }
