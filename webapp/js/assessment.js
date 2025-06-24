@@ -42,6 +42,9 @@ const VideoTemplate = {
                         <div class="video-progress-container">
                             <div class="video-progress-bar"></div>
                         </div>
+                        <div class="video-info-overlay">
+                            <h4 class="video-title-overlay">{{videoTitle}}</h4>
+                        </div>
                     </div>
                     <div class="video-actions-vertical">
                         <div class="vote-action-group">
@@ -113,6 +116,7 @@ const VideoTemplate = {
             .replace("{{id_upCount}}", v ? v.id + '_upCount' : '')
             .replace("{{id_downCount}}", v ? v.id + '_downCount' : '')
             .replace("{{deleteButton}}", deleteButton)
+            .replace("{{videoTitle}}", v ? v.title : '')
             .replace(/{{containerId}}/g, containerId);
     }
 };
@@ -293,6 +297,12 @@ const VideoActions = {
             
             // Update action buttons for current video
             const v = videos[idx];
+
+            const titleOverlay = container.querySelector('.video-title-overlay');
+            if (titleOverlay && v) {
+                titleOverlay.textContent = v.title;
+            }
+
             const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
             const deleteButton = v && v.isPrivate && currentUser.email === v.userShared
                 ? `<div class="delete-button" id="${v.id}_delete" onclick="VideoService.deleteVideo(this)"><i class="fas fa-trash"></i><span>Delete</span></div>`

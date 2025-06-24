@@ -1907,6 +1907,40 @@ body.modal-open {
     }
 }
 
+/* Video Info Overlay */
+.video-info-overlay {
+    position: absolute;
+    bottom: 70px;
+    left: 15px;
+    right: 15px;
+    z-index: 5;
+    color: white;
+    padding: 10px;
+    background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+    pointer-events: none;
+    border-radius: 0 0 5px 5px;
+}
+
+.video-title-overlay {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+@media (max-width: 768px) {
+    .video-info-overlay {
+        bottom: 50px;
+        left: 10px;
+        right: 80px; /* Avoid vertical actions */
+        padding: 8px;
+    }
+
+    .video-title-overlay {
+        font-size: 1rem;
+    }
+}
+
 /* Mobile-only elements - hidden by default, shown on mobile */
 .mobile-only {
     display: none;
