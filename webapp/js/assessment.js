@@ -34,6 +34,7 @@ const VideoTemplate = {
                 <div class="video-swipe-item" id="video-items-{{containerId}}" style="position:relative;">
                     <div class="video-main">
                         {{videoTags}}
+                        <div class="video-loading-spinner"><div class="spinner-border text-light" role="status"></div></div>
                         <div class="video-overlay-controls">
                             <button class="overlay-button play-pause-btn" onclick="VideoActions.togglePlayPause('{{containerId}}')"><i class="fas fa-pause"></i></button>
                             <button class="overlay-button mute-unmute-btn" onclick="VideoActions.toggleMute('{{containerId}}')"><i class="fas fa-volume-up"></i></button>
@@ -337,6 +338,17 @@ const VideoActions = {
                 currentVid.classList.add('active');
                 currentVid.muted = prevMuted;
 
+                const loadingSpinner = container.querySelector('.video-loading-spinner');
+                const showLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'flex'; };
+                const hideLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'none'; };
+
+                currentVid.addEventListener('loadstart', showLoader);
+                currentVid.addEventListener('waiting', showLoader);
+                currentVid.addEventListener('stalled', showLoader);
+                currentVid.addEventListener('canplay', hideLoader);
+                currentVid.addEventListener('playing', hideLoader);
+                currentVid.addEventListener('error', hideLoader);
+
                 const progressContainer = container.querySelector('.video-progress-container');
                 const progressBar = container.querySelector('.video-progress-bar');
                 
@@ -377,6 +389,7 @@ const VideoActions = {
                 });
                 // Khi play, pause tất cả video khác trong container
                 currentVid.addEventListener('play', function() {
+                    hideLoader();
                     if (playIcon) playIcon.style.display = 'none';
                     const playPauseBtn = container.querySelector('.play-pause-btn i');
                     if (playPauseBtn) {
@@ -391,6 +404,7 @@ const VideoActions = {
                     });
                 });
                 currentVid.addEventListener('pause', function() {
+                    hideLoader();
                     if (playIcon) playIcon.style.display = 'flex';
                     const playPauseBtn = container.querySelector('.play-pause-btn i');
                     if (playPauseBtn) {
@@ -405,6 +419,7 @@ const VideoActions = {
                 };
                 
                 currentVid.play().catch(() => {
+                    hideLoader();
                     if (playIcon) playIcon.style.display = 'flex';
                 });
 

@@ -1846,6 +1846,18 @@ body.modal-open {
     /* animation: fadeIn 0.2s;*/
 }
 
+.video-loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4; /* Higher than play icon */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
 @media (max-width: 768px) {
     .video-overlay-controls {
         opacity: 1; /* Always visible on mobile */
