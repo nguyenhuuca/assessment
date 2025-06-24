@@ -34,6 +34,13 @@ const VideoTemplate = {
                 <div class="video-swipe-item" id="video-items-{{containerId}}" style="position:relative;">
                     <div class="video-main">
                         {{videoTags}}
+                        <div class="video-overlay-controls">
+                            <button class="overlay-button play-pause-btn" onclick="VideoActions.togglePlayPause('{{containerId}}')"><i class="fas fa-pause"></i></button>
+                            <button class="overlay-button mute-unmute-btn" onclick="VideoActions.toggleMute('{{containerId}}')"><i class="fas fa-volume-up"></i></button>
+                        </div>
+                        <div class="video-progress-container">
+                            <div class="video-progress-bar"></div>
+                        </div>
                     </div>
                     <div class="video-actions-vertical">
                         <div class="vote-action-group">
@@ -90,7 +97,7 @@ const VideoTemplate = {
             } else {
                 poster = 'https://picsum.photos/640/360?random=' + Math.floor(Math.random() * 1000);
             }
-            videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" controls${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+            videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
         }
         // Upvote/downvote count and delete button for current video
         const v = videosArr[currentIndex];
@@ -116,6 +123,39 @@ const VideoTemplate = {
 const VideoActions = {
     voteStates: {},
     mutedState: {},
+
+    togglePlayPause(containerId) {
+        const idx = this.currentVideoIndex[containerId];
+        const video = document.getElementById(`${containerId}-video-${idx}`);
+        if (!video) return;
+
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
+    },
+
+    toggleMute(containerId) {
+        const idx = this.currentVideoIndex[containerId];
+        const video = document.getElementById(`${containerId}-video-${idx}`);
+        const videoContainer = document.getElementById(`video-items-${containerId}`);
+        if (!video || !videoContainer) return;
+        
+        const btn = videoContainer.querySelector('.mute-unmute-btn i');
+        if (!btn) return;
+
+        video.muted = !video.muted;
+        this.mutedState[containerId] = video.muted;
+
+        if (video.muted) {
+            btn.classList.remove('fa-volume-up');
+            btn.classList.add('fa-volume-mute');
+        } else {
+            btn.classList.remove('fa-volume-mute');
+            btn.classList.add('fa-volume-up');
+        }
+    },
 
     voteUp(element) {
         const id = $(element).attr("id");
@@ -219,6 +259,10 @@ const VideoActions = {
             // Only update the video-main content, not the entire container
             const videoMain = container.querySelector('.video-main');
             if (videoMain) {
+                // Remove only old video elements, not the controls.
+                const oldVideosInMain = videoMain.querySelectorAll('video');
+                oldVideosInMain.forEach(v => v.remove());
+
                 let videoTags = '';
                 const total = videos.length;
                 let start = Math.max(0, Math.min(idx - 2, total - 5));
@@ -240,9 +284,9 @@ const VideoActions = {
                     } else {
                         poster = 'https://picsum.photos/640/360?random=' + Math.floor(Math.random() * 1000);
                     }
-                    videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" controls${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:-20px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+                    videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:-20px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
                 }
-                videoMain.innerHTML = videoTags;
+                videoMain.insertAdjacentHTML('afterbegin', videoTags);
             }
             
             // Update action buttons for current video
@@ -275,6 +319,15 @@ const VideoActions = {
                 }
             }
             
+            // Play-pause icon overlay
+            let playIcon = container.querySelector('.video-play-icon');
+            if (!playIcon) {
+                playIcon = document.createElement('div');
+                playIcon.className = 'video-play-icon';
+                playIcon.innerHTML = '<i class="fas fa-play"></i>';
+                container.querySelector('.video-main').appendChild(playIcon);
+            }
+            
             // Hiệu ứng fade: set active cho video hiện tại
             const allVideos = container.querySelectorAll('video');
             allVideos.forEach(vid => vid.classList.remove('active'));
@@ -282,15 +335,53 @@ const VideoActions = {
             if (currentVid) {
                 currentVid.classList.add('active');
                 currentVid.muted = prevMuted;
+
+                const progressContainer = container.querySelector('.video-progress-container');
+                const progressBar = container.querySelector('.video-progress-bar');
+                
+                if (progressContainer && progressBar) {
+                    currentVid.addEventListener('timeupdate', () => {
+                        if (currentVid.duration) {
+                            const progressPercent = (currentVid.currentTime / currentVid.duration) * 100;
+                            progressBar.style.width = `${progressPercent}%`;
+                        }
+                    });
+            
+                    progressContainer.addEventListener('click', (e) => {
+                        if (currentVid.duration) {
+                            const rect = progressContainer.getBoundingClientRect();
+                            const clickX = e.clientX - rect.left;
+                            const width = progressContainer.clientWidth;
+                            currentVid.currentTime = (clickX / width) * currentVid.duration;
+                        }
+                    });
+                }
+
                 currentVid.addEventListener('ended', function() {
                     VideoActions.swipeRight(containerId);
                 });
                 // Lắng nghe sự kiện volumechange để cập nhật trạng thái mute
                 currentVid.addEventListener('volumechange', function() {
                     VideoActions.mutedState[containerId] = currentVid.muted;
+                    const muteBtn = container.querySelector('.mute-unmute-btn i');
+                    if (muteBtn) {
+                        if (currentVid.muted) {
+                            muteBtn.classList.remove('fa-volume-up');
+                            muteBtn.classList.add('fa-volume-mute');
+                        } else {
+                            muteBtn.classList.remove('fa-volume-mute');
+                            muteBtn.classList.add('fa-volume-up');
+                        }
+                    }
                 });
                 // Khi play, pause tất cả video khác trong container
                 currentVid.addEventListener('play', function() {
+                    if (playIcon) playIcon.style.display = 'none';
+                    const playPauseBtn = container.querySelector('.play-pause-btn i');
+                    if (playPauseBtn) {
+                        playPauseBtn.classList.remove('fa-play');
+                        playPauseBtn.classList.add('fa-pause');
+                    }
                     allVideos.forEach(vid => {
                         if (vid !== currentVid) {
                             vid.pause();
@@ -298,7 +389,46 @@ const VideoActions = {
                         }
                     });
                 });
-                currentVid.play().catch(() => {});
+                currentVid.addEventListener('pause', function() {
+                    if (playIcon) playIcon.style.display = 'flex';
+                    const playPauseBtn = container.querySelector('.play-pause-btn i');
+                    if (playPauseBtn) {
+                        playPauseBtn.classList.remove('fa-pause');
+                        playPauseBtn.classList.add('fa-play');
+                    }
+                });
+                currentVid.parentElement.onclick = (e) => {
+                    if (e.target.closest('.overlay-button')) return;
+                    this.togglePlayPause(containerId);
+                };
+                currentVid.play().catch(() => {
+                    if (playIcon) playIcon.style.display = 'flex';
+                });
+
+                // init state
+                const muteBtn = container.querySelector('.mute-unmute-btn i');
+                if (muteBtn) {
+                    if (currentVid.muted) {
+                        muteBtn.classList.remove('fa-volume-up');
+                        muteBtn.classList.add('fa-volume-mute');
+                    } else {
+                        muteBtn.classList.remove('fa-volume-mute');
+                        muteBtn.classList.add('fa-volume-up');
+                    }
+                }
+                if (currentVid.paused) {
+                    if (playIcon) playIcon.style.display = 'flex';
+                    if (playPauseBtn) {
+                        playPauseBtn.classList.remove('fa-pause');
+                        playPauseBtn.classList.add('fa-play');
+                    }
+                } else {
+                    if (playIcon) playIcon.style.display = 'none';
+                    if (playPauseBtn) {
+                        playPauseBtn.classList.remove('fa-play');
+                        playPauseBtn.classList.add('fa-pause');
+                    }
+                }
             }
         }
     },
