@@ -1849,6 +1849,7 @@ body.modal-open {
 @media (max-width: 768px) {
     .video-overlay-controls {
         opacity: 1; /* Always visible on mobile */
+        top: 15px;
     }
 }
 
