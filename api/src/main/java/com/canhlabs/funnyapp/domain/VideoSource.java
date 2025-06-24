@@ -33,5 +33,11 @@ public class VideoSource extends BaseDomain {
     @Column(name = "credentials_ref", length = 255)
     private String credentialsRef;
 
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "description")
+    private String desc;
+
 
 }

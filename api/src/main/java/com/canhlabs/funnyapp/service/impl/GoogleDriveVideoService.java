@@ -68,8 +68,8 @@ public class GoogleDriveVideoService {
         VideoDto dto = new VideoDto();
         dto.setId(source.getId());
         dto.setUserShared("unknown"); // set nếu có user info
-        dto.setTitle("Video from " + source.getSourceType());
-        dto.setDesc("Auto-generated video description");
+        dto.setTitle(source.getTitle());
+        dto.setDesc(source.getDesc());
         dto.setUrlLink("https://canh-labs.com/api/v1/funny-app/video-stream/stream/" + source.getSourceId());
         dto.setEmbedLink("https://canh-labs.com/api/v1/funny-app/video-stream/stream/" + source.getSourceId());
         return dto;
