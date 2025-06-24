@@ -212,9 +212,69 @@ const VideoActions = {
                 vid.pause();
                 vid.currentTime = 0;
             });
+            
             // Lấy trạng thái muted từ biến toàn cục, mặc định true
             let prevMuted = (typeof VideoActions.mutedState[containerId] === 'boolean') ? VideoActions.mutedState[containerId] : true;
-            container.innerHTML = VideoTemplate.bindData(videos, containerId, idx);
+            
+            // Only update the video-main content, not the entire container
+            const videoMain = container.querySelector('.video-main');
+            if (videoMain) {
+                let videoTags = '';
+                const total = videos.length;
+                let start = Math.max(0, Math.min(idx - 2, total - 5));
+                let end = Math.min(total, start + 5);
+                
+                for (let i = start; i < end; i++) {
+                    const v = videos[i];
+                    if (!v) continue;
+                    const isCurrent = i === idx;
+                    // Poster logic
+                    let poster = '';
+                    if (v.poster) {
+                        poster = v.poster;
+                    } else if (v.src && v.src.includes('youtube.com')) {
+                        const match = v.src.match(/[?&]v=([^&#]+)/);
+                        if (match) {
+                            poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+                        }
+                    } else {
+                        poster = 'https://picsum.photos/640/360?random=' + Math.floor(Math.random() * 1000);
+                    }
+                    videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" controls${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+                }
+                videoMain.innerHTML = videoTags;
+            }
+            
+            // Update action buttons for current video
+            const v = videos[idx];
+            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+            const deleteButton = v && v.isPrivate && currentUser.email === v.userShared
+                ? `<div class="delete-button" id="${v.id}_delete" onclick="VideoService.deleteVideo(this)"><i class="fas fa-trash"></i><span>Delete</span></div>`
+                : '';
+            
+            // Update vote button IDs
+            const upVoteBtn = container.querySelector('.vote-button.up');
+            const downVoteBtn = container.querySelector('.vote-button.down');
+            const upCountSpan = container.querySelector('.vote-count');
+            const downCountSpan = container.querySelectorAll('.vote-count')[1];
+            
+            if (upVoteBtn && v) upVoteBtn.id = v.id + '_upVote';
+            if (downVoteBtn && v) downVoteBtn.id = v.id + '_downVote';
+            if (upCountSpan && v) upCountSpan.id = v.id + '_upCount';
+            if (downCountSpan && v) downCountSpan.id = v.id + '_downCount';
+            
+            // Update delete button
+            const existingDeleteBtn = container.querySelector('.delete-button');
+            if (existingDeleteBtn) {
+                existingDeleteBtn.remove();
+            }
+            if (deleteButton) {
+                const actionsContainer = container.querySelector('.video-actions-vertical');
+                if (actionsContainer) {
+                    actionsContainer.insertAdjacentHTML('beforeend', deleteButton);
+                }
+            }
+            
             // Hiệu ứng fade: set active cho video hiện tại
             const allVideos = container.querySelectorAll('video');
             allVideos.forEach(vid => vid.classList.remove('active'));
@@ -391,6 +451,7 @@ const VideoService = {
         }
         VideoActions.initSwipe(allVideos, 'popular-videos');
         addSwipeEvents('popular-videos');
+        addKeyboardEvents('popular-videos');
     },
 
     displayPrivateVideos(videos) {
@@ -409,6 +470,7 @@ const VideoService = {
         }
         VideoActions.initSwipe(sortedByPopularity, 'private-videos');
         addSwipeEvents('private-videos');
+        addKeyboardEvents('private-videos');
     },
 
     deleteVideo(element) {
@@ -546,5 +608,63 @@ function addSwipeEvents(containerId) {
             VideoActions.swipeRight(containerId);
         }
     }, false);
+}
+
+// Add keyboard navigation for desktop
+function addKeyboardEvents(containerId) {
+    document.addEventListener('keydown', function(e) {
+        // Only handle arrow keys when video container is visible
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (!container || !container.offsetParent) return;
+        
+        switch(e.key) {
+            case 'ArrowLeft':
+                e.preventDefault();
+                VideoActions.swipeLeft(containerId);
+                showNavigationFeedback('left');
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                VideoActions.swipeRight(containerId);
+                showNavigationFeedback('right');
+                break;
+        }
+    });
+}
+
+// Show visual feedback for keyboard navigation
+function showNavigationFeedback(direction) {
+    // Remove existing feedback
+    const existingFeedback = document.querySelector('.nav-feedback');
+    if (existingFeedback) {
+        existingFeedback.remove();
+    }
+    
+    // Create feedback element
+    const feedback = document.createElement('div');
+    feedback.className = 'nav-feedback';
+    feedback.innerHTML = `<i class="fas fa-arrow-${direction}"></i>`;
+    feedback.style.cssText = `
+        position: fixed;
+        top: 50%;
+        ${direction === 'left' ? 'left: 20px' : 'right: 20px'};
+        transform: translateY(-50%);
+        background: rgba(0, 123, 255, 0.9);
+        color: white;
+        padding: 15px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        z-index: 9999;
+        animation: navFeedback 0.5s ease-out;
+    `;
+    
+    document.body.appendChild(feedback);
+    
+    // Remove after animation
+    setTimeout(() => {
+        if (feedback.parentNode) {
+            feedback.remove();
+        }
+    }, 500);
 }
 
