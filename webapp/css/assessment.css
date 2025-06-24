@@ -1843,7 +1843,7 @@ body.modal-open {
     color: white;
     font-size: 1.8rem;
     pointer-events: none; /* Make it non-interactive */
-    animation: fadeIn 0.2s;
+    /* animation: fadeIn 0.2s;*/
 }
 
 @media (max-width: 768px) {
