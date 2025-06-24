@@ -246,6 +246,7 @@ const VideoActions = {
         if (!videos || typeof idx !== 'number') return;
         const container = document.getElementById(`video-items-${containerId}`);
         if (container) {
+            const playPauseBtn = container.querySelector('.play-pause-btn i');
             // Pause and reset ALL existing <video> in the container before rendering new ones
             const oldVideos = container.querySelectorAll('video');
             oldVideos.forEach(vid => {
@@ -397,10 +398,12 @@ const VideoActions = {
                         playPauseBtn.classList.add('fa-play');
                     }
                 });
+                
                 currentVid.parentElement.onclick = (e) => {
                     if (e.target.closest('.overlay-button')) return;
                     this.togglePlayPause(containerId);
                 };
+                
                 currentVid.play().catch(() => {
                     if (playIcon) playIcon.style.display = 'flex';
                 });
