@@ -38,6 +38,8 @@ public class VideoStreamController {
             @PathVariable String fileId,
             @RequestHeader(value = "Range", required = false) String rangeHeader
     ) throws IOException {
+        long startTime = System.currentTimeMillis();
+        log.info("Starting time: {} for fileID {}", System.currentTimeMillis() ,fileId);
         long fileSize = videoService.getFileSize(fileId);
         long start = 0;
         long end = fileSize - 1;
@@ -61,6 +63,7 @@ public class VideoStreamController {
             stream.close();
         };
         // InputStreamResource inputStreamResource = new InputStreamResource(stream);
+        log.info("End time: {}, Duration: {} ms for fileID {}", System.currentTimeMillis(), System.currentTimeMillis() - startTime, fileId);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
