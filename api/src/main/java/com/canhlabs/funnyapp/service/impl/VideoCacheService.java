@@ -1,7 +1,10 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.share.AppConstant;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,7 +24,7 @@ public class VideoCacheService {
 
     public boolean hasCache(String fileId, long requiredBytes) {
         File file = getCacheFile(fileId);
-        return file.exists() && file.length() >= requiredBytes;
+        return file.exists();
     }
 
     public InputStream getCache(String fileId) throws IOException {
@@ -35,17 +38,19 @@ public class VideoCacheService {
         }
 
         File file = getCacheFile(fileId);
-        try (OutputStream out = new FileOutputStream(file)) {
-            byte[] buffer = new byte[8192];
-            long remaining = CACHE_SIZE;
-            int bytesRead;
 
-            while (remaining > 0 && (bytesRead = inputStream.read(buffer, 0, (int) Math.min(buffer.length, remaining))) != -1) {
+        try (inputStream;
+             BufferedInputStream in = new BufferedInputStream(inputStream, 1024 * 1024);
+             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file), 1024 * 1024)
+        ) {
+            byte[] buffer = new byte[1024 * 1024];
+            long remaining = AppConstant.CACHE_SIZE;
+            int bytesRead;
+            while (remaining > 0 && (bytesRead = in.read(buffer, 0, (int) Math.min(buffer.length, remaining))) != -1) {
                 out.write(buffer, 0, bytesRead);
                 remaining -= bytesRead;
             }
-        } finally {
-            inputStream.close();
+            out.flush();
         }
     }
 }
