@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.domain.VideoSource;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.StorageVideoService;
+import com.canhlabs.funnyapp.share.AppConstant;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.services.drive.Drive;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
@@ -28,7 +30,12 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
     private static final String FOLDER_ID = "1uk7TUSvUkE9if6HYnY4ap2Kj0gSZ5qlz";
     private final Drive drive;
     private VideoSourceRepository videoSourceRepository;
+    private VideoCacheService videoCacheService;
 
+    @Autowired
+    public void injectCacheService(VideoCacheService videoCacheService) {
+        this.videoCacheService = videoCacheService;
+    }
     @Autowired
     public void injectRepo(VideoSourceRepository videoSourceRepository) {
         this.videoSourceRepository = videoSourceRepository;
@@ -40,6 +47,22 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
 
     @Override
     public InputStream getPartialFile(String fileId, long start, long end) throws IOException {
+        log.info("Requesting video file {} by range: {}-{}", fileId, start, end);
+        if (start == 0 && end < AppConstant.CACHE_SIZE) {
+            if (!videoCacheService.hasCache(fileId)) {
+                log.info("Cache not found for file {} from cache, fetching from Google Drive", fileId);
+                InputStream googleStream = fetchFromGoogleDrive(fileId, 0, AppConstant.CACHE_SIZE - 1);
+                log.info("Saving video file {} to cache", fileId);
+                videoCacheService.saveToCache(fileId, new BufferedInputStream(googleStream));
+            }
+            log.info("Getting video file {} from cache", fileId);
+            return videoCacheService.getCache(fileId);
+        }
+        log.info("Getting video file {} from Google Drive by range: {}-{}", fileId, start, end);
+        return fetchFromGoogleDrive(fileId, start, end);
+    }
+
+    private InputStream fetchFromGoogleDrive(String fileId, long start, long end) throws IOException {
         GenericUrl url = new GenericUrl("https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media");
 
         HttpRequest request = drive.getRequestFactory()

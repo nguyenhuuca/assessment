@@ -14,6 +14,9 @@ import static com.canhlabs.funnyapp.share.AppConstant.API.BASE_URL;
  */
 public class AppConstant {
 
+    public static final String CACHE_DIR = "video-cache/";
+    public static final long CACHE_SIZE = 1024 * 1024; // 1MB
+
     private AppConstant() {
     }
 
