@@ -129,12 +129,13 @@ const VideoActions = {
     voteStates: {},
     mutedState: {},
 
-    startMseStream(videoElement, videoUrl) {
-        if (!('MediaSource' in window) || !MediaSource.isTypeSupported('video/mp4')) {
-            console.warn('MSE not supported. Falling back to direct source.');
+    startMseStream(videoElement, videoUrl, shouldAutoplay = false, muted = true) {
+        const mimeCodec = 'video/mp4';
+        if (!('MediaSource' in window) || !MediaSource.isTypeSupported(mimeCodec)) {
+            console.warn(`MSE not supported for codec: ${mimeCodec}. Falling back to direct source.`);
             videoElement.src = videoUrl;
-            videoElement.muted = true;
-            videoElement.play().catch(e => {});
+            videoElement.muted = muted;
+            if (shouldAutoplay) videoElement.play().catch(e => {});
             return;
         }
 
@@ -146,12 +147,12 @@ const VideoActions = {
         
         const mediaSource = new MediaSource();
         videoElement.src = URL.createObjectURL(mediaSource);
-        videoElement.muted = true;
+        videoElement.muted = muted;
 
         mediaSource.addEventListener('sourceopen', () => {
             if (signal.aborted) return;
             
-            const sourceBuffer = mediaSource.addSourceBuffer('video/mp4');
+            const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
             let totalSize = 0;
             let currentByte = 0;
             const chunkSize = 1 * 1024 * 1024; // 1MB
@@ -208,11 +209,14 @@ const VideoActions = {
 
             sourceBuffer.addEventListener('updateend', () => {
                 if (!videoElement.hasAttribute('data-mse-playing') && !signal.aborted) {
-                    videoElement.muted = true;
-                    videoElement.play().catch(e => {});
+                    videoElement.muted = muted;
+                    if (shouldAutoplay) videoElement.play().catch(e => {});
                     videoElement.setAttribute('data-mse-playing', 'true');
                 }
-                fetchAndAppend(currentByte);
+                // Only preload the first chunk for non-active videos
+                if (shouldAutoplay || currentByte < chunkSize) {
+                    fetchAndAppend(currentByte);
+                }
             });
             
             // Start fetching the first chunk
@@ -368,6 +372,11 @@ const VideoActions = {
                 let start = Math.max(0, Math.min(idx - 2, total - 5));
                 let end = Math.min(total, start + 5);
                 
+                // Determine mute state for this container
+                var muted = true;
+                if (typeof this.mutedState[containerId] === 'boolean') {
+                    muted = this.mutedState[containerId];
+                }
                 for (let i = start; i < end; i++) {
                     const v = videos[i];
                     if (!v) continue;
@@ -438,14 +447,20 @@ const VideoActions = {
             const allVideos = container.querySelectorAll('video');
             allVideos.forEach(vid => vid.classList.remove('active'));
             const currentVid = document.getElementById(`${containerId}-video-${idx}`);
-            if (currentVid) {
-                const videoUrl = currentVid.dataset.src;
-                if(videoUrl) {
-                    this.startMseStream(currentVid, videoUrl);
+            // Preload 5 consecutive videos (centered if possible)
+            const total = videos.length;
+            let start = Math.max(0, Math.min(idx - 2, total - 5));
+            let end = Math.min(total, start + 5);
+            for (let i = start; i < end; i++) {
+                const preloadVid = document.getElementById(`${containerId}-video-${i}`);
+                if (preloadVid) {
+                    const videoUrl = preloadVid.dataset.src;
+                    this.startMseStream(preloadVid, videoUrl, i === idx, muted);
                 }
-
+            }
+            if (currentVid) {
                 currentVid.classList.add('active');
-                currentVid.muted = true;
+                currentVid.muted = muted;
 
                 const loadingSpinner = container.querySelector('.video-loading-spinner');
                 const showLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'flex'; };
