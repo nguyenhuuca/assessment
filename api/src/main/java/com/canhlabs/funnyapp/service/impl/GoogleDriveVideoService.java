@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,19 +71,22 @@ public class GoogleDriveVideoService {
     }
 
     public List<File> listFilesInFolder(Drive drive, String folderId) throws IOException {
-        String query = String.format("'%s' in parents and trashed = false", folderId);
+        // String query = String.format("'%s' in parents and trashed = false", folderId);
+        Instant fifteenMinutesAgo = Instant.now().minus(Duration.ofMinutes(15));
+        String isoTime = DateTimeFormatter.ISO_INSTANT.format(fifteenMinutesAgo);
 
+        String query = String.format("'%s' in parents and trashed = false and createdTime > '%s'", folderId, isoTime);
+        log.info("Querying files in folder {}: {}", folderId, query);
         List<File> files = new ArrayList<>();
         Drive.Files.List request = drive.files().list()
                 .setQ(query)
-                .setFields("nextPageToken, files(id, name)");
-
+                .setFields("nextPageToken, files(id, name, createdTime)");
         do {
             FileList fileList = request.execute();
             files.addAll(fileList.getFiles());
             request.setPageToken(fileList.getNextPageToken());
         } while (request.getPageToken() != null && !request.getPageToken().isEmpty());
-
+        log.info("Found {} files in folder {}", files.size(), folderId);
         return files;
     }
 
