@@ -49,7 +49,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
     public InputStream getPartialFile(String fileId, long start, long end) throws IOException {
         log.info("Requesting video file {} by range: {}-{}", fileId, start, end);
         if (start == 0 && end < AppConstant.CACHE_SIZE) {
-            if (!videoCacheService.hasCache(fileId)) {
+            if (!videoCacheService.hasCache(fileId, end + 1)) {
                 log.info("Cache not found for file {} from cache, fetching from Google Drive", fileId);
                 InputStream googleStream = fetchFromGoogleDrive(fileId, 0, AppConstant.CACHE_SIZE - 1);
                 log.info("Saving video file {} to cache", fileId);

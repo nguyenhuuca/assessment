@@ -19,9 +19,9 @@ public class VideoCacheService {
         return new File(CACHE_DIR + fileId + ".cache");
     }
 
-    public boolean hasCache(String fileId) {
+    public boolean hasCache(String fileId, long requiredBytes) {
         File file = getCacheFile(fileId);
-        return file.exists() && file.length() == CACHE_SIZE;
+        return file.exists() && file.length() >= requiredBytes;
     }
 
     public InputStream getCache(String fileId) throws IOException {
