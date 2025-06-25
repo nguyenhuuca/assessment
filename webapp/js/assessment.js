@@ -101,7 +101,7 @@ const VideoTemplate = {
             } else {
                 poster = `./icons/poster.jpeg`;
             }
-            videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+            videoTags += `<video id="${containerId}-video-${i}" data-src="${v.src}" poster="${poster}" playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
         }
         // Upvote/downvote count and delete button for current video
         const v = videosArr[currentIndex];
@@ -128,6 +128,97 @@ const VideoTemplate = {
 const VideoActions = {
     voteStates: {},
     mutedState: {},
+
+    startMseStream(videoElement, videoUrl) {
+        if (!('MediaSource' in window) || !MediaSource.isTypeSupported('video/mp4')) {
+            console.warn('MSE not supported. Falling back to direct source.');
+            videoElement.src = videoUrl;
+            videoElement.muted = true;
+            videoElement.play().catch(e => {});
+            return;
+        }
+
+        if (videoElement.abortController) {
+            videoElement.abortController.abort();
+        }
+        videoElement.abortController = new AbortController();
+        const signal = videoElement.abortController.signal;
+        
+        const mediaSource = new MediaSource();
+        videoElement.src = URL.createObjectURL(mediaSource);
+        videoElement.muted = true;
+
+        mediaSource.addEventListener('sourceopen', () => {
+            if (signal.aborted) return;
+            
+            const sourceBuffer = mediaSource.addSourceBuffer('video/mp4');
+            let totalSize = 0;
+            let currentByte = 0;
+            const chunkSize = 1 * 1024 * 1024; // 1MB
+            let firstAppend = true;
+
+            const fetchAndAppend = (start) => {
+                if (signal.aborted) return;
+                
+                if (totalSize && start >= totalSize) {
+                    if (mediaSource.readyState === 'open' && !sourceBuffer.updating) {
+                        try { mediaSource.endOfStream(); } catch(e) {}
+                    }
+                    return;
+                }
+
+                let end = start + chunkSize - 1;
+                if (totalSize) {
+                    end = Math.min(end, totalSize - 1);
+                }
+
+                const range = `bytes=${start}-${end}`;
+                fetch(videoUrl, { headers: { Range: range }, signal })
+                    .then(response => {
+                        if (!totalSize) {
+                            const contentRange = response.headers.get('Content-Range');
+                            if (contentRange) {
+                                totalSize = parseInt(contentRange.split('/')[1], 10);
+                            }
+                        }
+                        return response.arrayBuffer();
+                    })
+                    .then(data => {
+                        if (data.byteLength > 0 && !signal.aborted) {
+                            currentByte = end + 1;
+                            // Wait for any previous update to complete.
+                            const append = () => {
+                                if (sourceBuffer.updating) {
+                                    sourceBuffer.addEventListener('updateend', append, { once: true });
+                                } else if (mediaSource.readyState === 'open' && !signal.aborted) {
+                                    try { sourceBuffer.appendBuffer(data); } catch(e) { console.error("Error appending buffer", e) }
+                                }
+                            };
+                            append();
+                        } else if (mediaSource.readyState === 'open' && !sourceBuffer.updating) {
+                            try { mediaSource.endOfStream(); } catch(e) {}
+                        }
+                    })
+                    .catch(error => {
+                        if (error.name !== 'AbortError') {
+                            console.error('MSE Fetch Error:', error);
+                        }
+                    });
+            };
+
+            sourceBuffer.addEventListener('updateend', () => {
+                if (!videoElement.hasAttribute('data-mse-playing') && !signal.aborted) {
+                    videoElement.muted = true;
+                    videoElement.play().catch(e => {});
+                    videoElement.setAttribute('data-mse-playing', 'true');
+                }
+                fetchAndAppend(currentByte);
+            });
+            
+            // Start fetching the first chunk
+            fetchAndAppend(0);
+        }, { once: true });
+    },
 
     togglePlayPause(containerId) {
         const idx = this.currentVideoIndex[containerId];
@@ -255,6 +346,9 @@ const VideoActions = {
             // Pause and reset ALL existing <video> in the container before rendering new ones
             const oldVideos = container.querySelectorAll('video');
             oldVideos.forEach(vid => {
+                if (vid.abortController) {
+                    vid.abortController.abort();
+                }
                 vid.pause();
                 vid.currentTime = 0;
             });
@@ -290,7 +384,7 @@ const VideoActions = {
                     } else {
                         poster = './icons/poster.jpeg';
                     }
-                    videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:-20px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+                    videoTags += `<video id="${containerId}-video-${i}" data-src="${v.src}" poster="${poster}" playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:-20px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
                 }
                 videoMain.insertAdjacentHTML('afterbegin', videoTags);
             }
@@ -345,8 +439,13 @@ const VideoActions = {
             allVideos.forEach(vid => vid.classList.remove('active'));
             const currentVid = document.getElementById(`${containerId}-video-${idx}`);
             if (currentVid) {
+                const videoUrl = currentVid.dataset.src;
+                if(videoUrl) {
+                    this.startMseStream(currentVid, videoUrl);
+                }
+
                 currentVid.classList.add('active');
-                currentVid.muted = prevMuted;
+                currentVid.muted = true;
 
                 const loadingSpinner = container.querySelector('.video-loading-spinner');
                 const showLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'flex'; };
@@ -428,10 +527,11 @@ const VideoActions = {
                     this.togglePlayPause(containerId);
                 };
                 
-                currentVid.play().catch(() => {
-                    hideLoader();
-                    if (playIcon) playIcon.style.display = 'flex';
-                });
+                // The play call is now handled inside startMseStream
+                // currentVid.play().catch(() => {
+                //     hideLoader();
+                //     if (playIcon) playIcon.style.display = 'flex';
+                // });
 
                 // init state
                 const muteBtn = container.querySelector('.mute-unmute-btn i');
