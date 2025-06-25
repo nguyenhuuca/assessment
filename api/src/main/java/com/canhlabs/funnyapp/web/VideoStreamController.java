@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +34,7 @@ public class VideoStreamController {
     }
 
     @GetMapping("/stream/{fileId}")
-    public ResponseEntity<Resource> streamVideo(
+    public ResponseEntity<StreamingResponseBody> streamVideo(
             @PathVariable String fileId,
             @RequestHeader(value = "Range", required = false) String rangeHeader
     ) throws IOException {
@@ -50,14 +51,23 @@ public class VideoStreamController {
         }
 
         InputStream stream = videoService.getPartialFile(fileId, start, end);
-        InputStreamResource inputStreamResource = new InputStreamResource(stream);
+        StreamingResponseBody responseBody = outputStream -> {
+            byte[] buffer = new byte[1024 * 1024]; // ⚠️ buffer lớn: 1MB
+            int bytesRead;
+            while ((bytesRead = stream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+                outputStream.flush(); // Đảm bảo truyền liên tục
+            }
+            stream.close();
+        };
+        // InputStreamResource inputStreamResource = new InputStreamResource(stream);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
                 .header(HttpHeaders.ACCEPT_RANGES, "bytes")
                 .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(end - start + 1))
                 .header(HttpHeaders.CONTENT_RANGE, String.format("bytes %d-%d/%d", start, end, fileSize))
-                .body(inputStreamResource);
+                .body(responseBody);
     }
 
     @GetMapping("/list")
