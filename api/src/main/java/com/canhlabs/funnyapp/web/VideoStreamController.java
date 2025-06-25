@@ -56,7 +56,7 @@ public class VideoStreamController {
             int bytesRead;
             while ((bytesRead = stream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
-                outputStream.flush(); // Đảm bảo truyền liên tục
+                outputStream.flush();
             }
             stream.close();
         };
