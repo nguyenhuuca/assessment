@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.jobs;
 
+import com.canhlabs.funnyapp.service.StorageVideoService;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
-import com.canhlabs.funnyapp.service.impl.GoogleDriveVideoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 public class AppScheduler {
 
     private final YouTubeVideoService service;
-    private final GoogleDriveVideoService googleDriveVideoService;
+    private final StorageVideoService googleDriveVideoService;
 
-    public AppScheduler(YouTubeVideoService service, GoogleDriveVideoService googleDriveVideoService) {
+    public AppScheduler(YouTubeVideoService service, StorageVideoService googleDriveVideoService) {
         this.service = service;
         this.googleDriveVideoService = googleDriveVideoService;
     }

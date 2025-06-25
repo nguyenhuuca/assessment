@@ -1,10 +1,9 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.config.aop.AuditLog;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
-import com.canhlabs.funnyapp.service.impl.GoogleDriveVideoService;
+import com.canhlabs.funnyapp.service.StorageVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.enums.ResultStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +26,9 @@ import java.util.List;
 @RequestMapping(AppConstant.API.BASE_URL + "/video-stream")
 @RestController
 public class VideoStreamController {
-    private final GoogleDriveVideoService videoService;
+    private final StorageVideoService videoService;
 
-    public VideoStreamController(GoogleDriveVideoService videoService) {
+    public VideoStreamController(StorageVideoService videoService) {
         this.videoService = videoService;
     }
 

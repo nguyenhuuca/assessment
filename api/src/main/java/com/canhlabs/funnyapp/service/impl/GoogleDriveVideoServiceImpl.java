@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.domain.VideoSource;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
+import com.canhlabs.funnyapp.service.StorageVideoService;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.services.drive.Drive;
@@ -23,7 +24,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class GoogleDriveVideoService {
+public class GoogleDriveVideoServiceImpl implements StorageVideoService {
     private static final String FOLDER_ID = "1uk7TUSvUkE9if6HYnY4ap2Kj0gSZ5qlz";
     private final Drive drive;
     private VideoSourceRepository videoSourceRepository;
@@ -33,10 +34,11 @@ public class GoogleDriveVideoService {
         this.videoSourceRepository = videoSourceRepository;
     }
 
-    public GoogleDriveVideoService(Drive drive) {
+    public GoogleDriveVideoServiceImpl(Drive drive) {
         this.drive = drive;
     }
 
+    @Override
     public InputStream getPartialFile(String fileId, long start, long end) throws IOException {
         GenericUrl url = new GenericUrl("https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media");
 
@@ -47,30 +49,34 @@ public class GoogleDriveVideoService {
         return request.execute().getContent();
     }
 
+    @Override
     public long getFileSize(String fileId) throws IOException {
         File file = drive.files().get(fileId).setFields("size").execute();
         return file.getSize();
     }
 
+    @Override
     public List<VideoDto> getVideosToStream() {
         return videoSourceRepository.findAll().stream()
                 .map(this::toDto)
                 .toList();
     }
 
+    @Override
     public VideoDto getVideoById(Long id) {
         VideoSource source = videoSourceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found with id: " + id));
         return toDto(source);
     }
 
+    @Override
     public VideoDto getVideoBySourceId(String sourceId) {
         VideoSource source = videoSourceRepository.findBySourceId(sourceId)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found with sourceId: " + sourceId));
         return toDto(source);
     }
 
-    public List<File> listFilesInFolder(Drive drive, String folderId) throws IOException {
+     List<File> listFilesInFolder(Drive drive, String folderId) throws IOException {
         // String query = String.format("'%s' in parents and trashed = false", folderId);
         Instant fifteenMinutesAgo = Instant.now().minus(Duration.ofMinutes(15));
         String isoTime = DateTimeFormatter.ISO_INSTANT.format(fifteenMinutesAgo);
@@ -90,6 +96,7 @@ public class GoogleDriveVideoService {
         return files;
     }
 
+    @Override
     public void shareFile(Drive drive, String fileId, String email) throws IOException {
         Permission permission = new Permission()
                 .setType("user")
@@ -116,6 +123,7 @@ public class GoogleDriveVideoService {
 
     }
 
+    @Override
     public void shareFilesInFolder() {
         try {
             List<File> files = listFilesInFolder(drive, FOLDER_ID);
