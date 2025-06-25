@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class ConfigBean {
@@ -78,7 +79,7 @@ public class ConfigBean {
         }
         GoogleCredentials credentials = GoogleCredentials.fromStream(
                 inputStream
-        ).createScoped(Collections.singleton(DriveScopes.DRIVE_READONLY));
+        ).createScoped(List.of(DriveScopes.DRIVE));
 
         // Build the Drive client
         return new Drive.Builder(

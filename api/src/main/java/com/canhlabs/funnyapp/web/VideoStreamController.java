@@ -7,6 +7,7 @@ import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.service.impl.GoogleDriveVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.enums.ResultStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+@Slf4j
 @RequestMapping(AppConstant.API.BASE_URL + "/video-stream")
 @RestController
 public class VideoStreamController {
@@ -70,6 +72,7 @@ public class VideoStreamController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ResultObjectInfo<VideoDto>> getTopVideos(@PathVariable  Long id) {
+        videoService.shareFilesInFolder();
         VideoDto rs = videoService.getVideoById(id);
         return new ResponseEntity<>(ResultObjectInfo.<VideoDto>builder()
                 .status(ResultStatus.SUCCESS)
