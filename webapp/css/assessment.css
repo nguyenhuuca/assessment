@@ -1618,9 +1618,8 @@ body.modal-open {
     
     /* Add focus indicator for keyboard navigation */
     .video-swipe-item:focus-within {
-        outline: 2px solid #007bff;
-        outline-offset: 2px;
-        border-radius: 8px;
+        outline: none !important;
+        outline-offset: 0 !important;
     }
 }
 
@@ -1830,6 +1829,11 @@ body.modal-open {
 
 .overlay-button:hover {
     background: rgba(0, 0, 0, 0.6);
+}
+
+.overlay-button:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .video-play-icon {
