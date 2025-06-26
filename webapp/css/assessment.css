@@ -1441,7 +1441,7 @@ body.modal-open {
 .video-swipe-container {
     position: relative;
     width: 100%;
-    height: 100vh;
+    height: 90vh;
     overflow: hidden;
     background: black;
     display: flex;
