@@ -1915,30 +1915,67 @@ body.modal-open {
 /* Video Info Overlay */
 .video-info-overlay {
     position: absolute;
-    bottom: 70px;
+    top: 65px; /* just below the controls (40px button + 15px top + 10px gap) */
     left: 15px;
     right: 15px;
     z-index: 5;
     color: white;
-    padding: 10px;
+    padding: 10px 10px 6px 10px;
     background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
-    pointer-events: none;
+    pointer-events: all; /* Allow clicks on see more */
     border-radius: 0 0 5px 5px;
+    margin-top: 5px;
 }
 
 .video-title-overlay {
     font-size: 1.1rem;
     font-weight: 600;
-    margin: 0;
+    margin: 0 0 5px 0;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+.video-description-overlay {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.video-description-text {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    white-space: pre-line; /* Hiển thị xuống dòng */
+}
+
+.video-description-overlay.expanded .video-description-text {
+    -webkit-line-clamp: unset;
+    max-height: 120px; /* Adjust as needed */
+    overflow-y: auto;
+    padding-right: 5px; /* For scrollbar */
+}
+
+.see-more-btn {
+    background: none;
+    border: none;
+    color: #a0cff0;
+    padding: 2px 0;
+    margin-top: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.see-more-btn:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 768px) {
     .video-info-overlay {
-        bottom: 50px;
+        top: 65px;
         left: 10px;
         right: 80px; /* Avoid vertical actions */
-        padding: 8px;
+        padding: 8px 8px 4px 8px;
     }
 
     .video-title-overlay {

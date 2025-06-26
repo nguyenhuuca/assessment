@@ -39,11 +39,15 @@ const VideoTemplate = {
                             <button class="overlay-button play-pause-btn" onclick="VideoActions.togglePlayPause('{{containerId}}')"><i class="fas fa-pause"></i></button>
                             <button class="overlay-button mute-unmute-btn" onclick="VideoActions.toggleMute('{{containerId}}')"><i class="fas fa-volume-up"></i></button>
                         </div>
-                        <div class="video-progress-container">
-                            <div class="video-progress-bar"></div>
-                        </div>
                         <div class="video-info-overlay">
                             <h4 class="video-title-overlay">{{videoTitle}}</h4>
+                            <div class="video-description-overlay">
+                                <p class="video-description-text">{{videoDesc}}</p>
+                                <button class="see-more-btn" onclick="VideoActions.toggleDescription(this, '{{containerId}}', event)">See more</button>
+                            </div>
+                        </div>
+                        <div class="video-progress-container">
+                            <div class="video-progress-bar"></div>
                         </div>
                     </div>
                     <div class="video-actions-vertical">
@@ -117,6 +121,7 @@ const VideoTemplate = {
             .replace("{{id_downCount}}", v ? v.id + '_downCount' : '')
             .replace("{{deleteButton}}", deleteButton)
             .replace("{{videoTitle}}", v ? v.title : '')
+            .replace("{{videoDesc}}", v ? v.desc : '')
             .replace(/{{containerId}}/g, containerId);
     }
 };
@@ -214,17 +219,19 @@ const VideoActions = {
         }
     },
 
-    toggleDescription(element) {
-        const descriptionSection = $(element).closest('.video-description-container').find('.video-description');
-        const toggleIcon = $(element).find('i');
+    toggleDescription(button, containerId, event) {
+        if (event) event.stopPropagation();
+        const videoContainer = document.getElementById(`video-items-${containerId}`);
+        if (!videoContainer) return;
+
+        const descriptionOverlay = videoContainer.querySelector('.video-description-overlay');
         
-        descriptionSection.toggleClass('show');
-        $(element).toggleClass('active');
-        
-        if (descriptionSection.hasClass('show')) {
-            toggleIcon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        descriptionOverlay.classList.toggle('expanded');
+
+        if (descriptionOverlay.classList.contains('expanded')) {
+            button.textContent = 'See less';
         } else {
-            toggleIcon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            button.textContent = 'See more';
         }
     },
 
@@ -301,6 +308,28 @@ const VideoActions = {
             const titleOverlay = container.querySelector('.video-title-overlay');
             if (titleOverlay && v) {
                 titleOverlay.textContent = v.title;
+            }
+
+            const descriptionText = container.querySelector('.video-description-text');
+            if(descriptionText && v) {
+                descriptionText.textContent = v.desc;
+            }
+
+            const seeMoreBtn = container.querySelector('.see-more-btn');
+            if (seeMoreBtn) {
+                const descriptionOverlay = container.querySelector('.video-description-overlay');
+                descriptionOverlay.classList.remove('expanded');
+                seeMoreBtn.textContent = 'See more';
+                seeMoreBtn.style.display = 'block'; // reset display
+                // Show button only if text is overflowing
+                const textElement = descriptionOverlay.querySelector('.video-description-text');
+                 setTimeout(() => {
+                    if (textElement.scrollHeight > textElement.clientHeight) {
+                        seeMoreBtn.style.display = 'block';
+                    } else {
+                        seeMoreBtn.style.display = 'none';
+                    }
+                }, 50); // small delay to allow rendering
             }
 
             const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -465,6 +494,19 @@ const VideoActions = {
         this.videos[containerId] = videos;
         this.currentVideoIndex[containerId] = 0;
         this.updateVideo(containerId);
+        const videoContainer = document.getElementById(`video-items-${containerId}`);
+        const seeMoreBtn = videoContainer.querySelector('.see-more-btn');
+        const textElement = videoContainer.querySelector('.video-description-text');
+        
+        if (seeMoreBtn && textElement) {
+             setTimeout(() => {
+                if (textElement.scrollHeight > textElement.clientHeight) {
+                    seeMoreBtn.style.display = 'block';
+                } else {
+                    seeMoreBtn.style.display = 'none';
+                }
+            }, 50);
+        }
     },
 
     showComments(containerId) {
