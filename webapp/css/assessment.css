@@ -1873,7 +1873,7 @@ body.modal-open {
 /* Video Progress Bar */
 .video-progress-container {
     position: absolute;
-    bottom: 50px;
+    bottom: 5px;
     left: 0;
     width: 100%;
     height: 15px;
