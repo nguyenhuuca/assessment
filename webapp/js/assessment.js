@@ -101,7 +101,7 @@ const VideoTemplate = {
             } else {
                 poster = `./icons/poster.jpeg`;
             }
-            videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+            videoTags += `<video id="${containerId}-video-${i}" data-src="${v.src}" poster="${poster}" playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
         }
         // Upvote/downvote count and delete button for current video
         const v = videosArr[currentIndex];
@@ -128,6 +128,154 @@ const VideoTemplate = {
 const VideoActions = {
     voteStates: {},
     mutedState: {},
+    useMSE: false, // Temporarily disable MSE for now
+
+    startMseStream(videoElement, videoUrl, shouldAutoplay = false, muted = true) {
+        // Temporarily disable MSE for testing
+        if (!this.useMSE) {
+            console.log('Using direct video loading for:', videoUrl.split('/').pop());
+            videoElement.src = videoUrl;
+            videoElement.muted = muted;
+            if (shouldAutoplay) {
+                videoElement.play().then(() => {
+                    console.log('Direct video play successful:', videoUrl.split('/').pop());
+                }).catch(e => {
+                    console.error('Direct video play failed:', e, 'for video:', videoUrl.split('/').pop());
+                });
+            }
+            return;
+        }
+
+        const mimeCodec = 'video/mp4; codecs="avc1.64001E, mp4a.40.2"';
+        if (!('MediaSource' in window) || !MediaSource.isTypeSupported(mimeCodec)) {
+            console.warn(`MSE not supported for codec: ${mimeCodec}. Falling back to direct source.`);
+            videoElement.src = videoUrl;
+            videoElement.muted = muted;
+            if (shouldAutoplay) videoElement.play().catch(e => {});
+            return;
+        }
+
+        console.log('Starting MSE stream for:', videoUrl);
+        if (videoElement.abortController) {
+            videoElement.abortController.abort();
+        }
+        videoElement.abortController = new AbortController();
+        const signal = videoElement.abortController.signal;
+        
+        const mediaSource = new MediaSource();
+        videoElement.src = URL.createObjectURL(mediaSource);
+        videoElement.muted = muted;
+
+        mediaSource.addEventListener('sourceopen', () => {
+            console.log('MediaSource opened for:', videoUrl.split('/').pop());
+            if (signal.aborted) return;
+            
+            const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
+            let totalSize = 0;
+            let currentByte = 0;
+            let chunksLoaded = 0;
+            const chunkSize = 3 * 1024 * 1024; // 3MB
+            const minChunksForPlay = shouldAutoplay ? 1 : 1; // Only need 1 chunk now since it's 3MB
+
+            const fetchAndAppend = (start) => {
+                if (signal.aborted) return;
+                
+                if (totalSize && start >= totalSize) {
+                    console.log('Reached end of video:', videoUrl.split('/').pop());
+                    if (mediaSource.readyState === 'open' && !sourceBuffer.updating) {
+                        try { mediaSource.endOfStream(); } catch(e) {}
+                    }
+                    return;
+                }
+
+                let end = start + chunkSize - 1;
+                if (totalSize) {
+                    end = Math.min(end, totalSize - 1);
+                }
+
+                const range = `bytes=${start}-${end}`;
+                console.log('Fetching chunk:', range, 'for video:', videoUrl.split('/').pop());
+                fetch(videoUrl, { headers: { Range: range }, signal })
+                    .then(response => {
+                        console.log('Fetch response status:', response.status, 'for video:', videoUrl.split('/').pop());
+                        if (!totalSize) {
+                            const contentRange = response.headers.get('Content-Range');
+                            if (contentRange) {
+                                totalSize = parseInt(contentRange.split('/')[1], 10);
+                                console.log('Total video size:', totalSize, 'for video:', videoUrl.split('/').pop());
+                            }
+                        }
+                        return response.arrayBuffer();
+                    })
+                    .then(data => {
+                        console.log('Received chunk size:', data.byteLength, 'for video:', videoUrl.split('/').pop());
+                        if (data.byteLength > 0 && !signal.aborted) {
+                            currentByte = end + 1;
+                            // Wait for any previous update to complete.
+                            const append = () => {
+                                if (sourceBuffer.updating) {
+                                    sourceBuffer.addEventListener('updateend', append, { once: true });
+                                } else if (mediaSource.readyState === 'open' && !signal.aborted) {
+                                    try { 
+                                        sourceBuffer.appendBuffer(data);
+                                        console.log('Buffer appended successfully for video:', videoUrl.split('/').pop());
+                                    } catch(e) { 
+                                        console.error("Error appending buffer", e, 'for video:', videoUrl.split('/').pop()) 
+                                    }
+                                }
+                            };
+                            append();
+                        } else if (mediaSource.readyState === 'open' && !sourceBuffer.updating) {
+                            try { mediaSource.endOfStream(); } catch(e) {}
+                        }
+                    })
+                    .catch(error => {
+                        if (error.name !== 'AbortError') {
+                            console.error('MSE Fetch Error:', error, 'for video:', videoUrl.split('/').pop());
+                        }
+                    });
+            };
+
+            const attemptPlay = () => {
+                console.log('Attempting to play video:', videoUrl.split('/').pop(), 'readyState:', videoElement.readyState);
+                videoElement.play().then(() => {
+                    console.log('Video play successful:', videoUrl.split('/').pop());
+                }).catch(e => {
+                    console.error('Video play failed:', e, 'for video:', videoUrl.split('/').pop());
+                    // Retry after a short delay
+                    setTimeout(() => {
+                        if (!signal.aborted) {
+                            console.log('Retrying video play...', videoUrl.split('/').pop());
+                            videoElement.play().catch(e2 => console.error('Retry play failed:', e2, 'for video:', videoUrl.split('/').pop()));
+                        }
+                    }, 1000);
+                });
+            };
+
+            sourceBuffer.addEventListener('updateend', () => {
+                chunksLoaded++;
+                console.log('SourceBuffer updateend, shouldAutoplay:', shouldAutoplay, 'chunksLoaded:', chunksLoaded, 'for video:', videoUrl.split('/').pop());
+                
+                if (!videoElement.hasAttribute('data-mse-playing') && !signal.aborted) {
+                    videoElement.muted = muted;
+                    videoElement.setAttribute('data-mse-playing', 'true');
+                    
+                    if (shouldAutoplay && chunksLoaded >= minChunksForPlay) {
+                        // Wait a bit more for the buffer to be ready
+                        setTimeout(attemptPlay, 100);
+                    }
+                }
+                
+                // Continue loading chunks
+                if (shouldAutoplay || chunksLoaded < minChunksForPlay) {
+                    fetchAndAppend(currentByte);
+                }
+            });
+            
+            // Start fetching the first chunk
+            fetchAndAppend(0);
+        }, { once: true });
+    },
 
     togglePlayPause(containerId) {
         const idx = this.currentVideoIndex[containerId];
@@ -255,6 +403,9 @@ const VideoActions = {
             // Pause and reset ALL existing <video> in the container before rendering new ones
             const oldVideos = container.querySelectorAll('video');
             oldVideos.forEach(vid => {
+                if (vid.abortController) {
+                    vid.abortController.abort();
+                }
                 vid.pause();
                 vid.currentTime = 0;
             });
@@ -274,6 +425,11 @@ const VideoActions = {
                 let start = Math.max(0, Math.min(idx - 2, total - 5));
                 let end = Math.min(total, start + 5);
                 
+                // Determine mute state for this container
+                var muted = true;
+                if (typeof this.mutedState[containerId] === 'boolean') {
+                    muted = this.mutedState[containerId];
+                }
                 for (let i = start; i < end; i++) {
                     const v = videos[i];
                     if (!v) continue;
@@ -290,7 +446,7 @@ const VideoActions = {
                     } else {
                         poster = './icons/poster.jpeg';
                     }
-                    videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:-20px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+                    videoTags += `<video id="${containerId}-video-${i}" data-src="${v.src}" poster="${poster}" playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:-20px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
                 }
                 videoMain.insertAdjacentHTML('afterbegin', videoTags);
             }
@@ -344,9 +500,20 @@ const VideoActions = {
             const allVideos = container.querySelectorAll('video');
             allVideos.forEach(vid => vid.classList.remove('active'));
             const currentVid = document.getElementById(`${containerId}-video-${idx}`);
+            // Preload 5 consecutive videos (centered if possible)
+            const total = videos.length;
+            let start = Math.max(0, Math.min(idx - 2, total - 5));
+            let end = Math.min(total, start + 5);
+            for (let i = start; i < end; i++) {
+                const preloadVid = document.getElementById(`${containerId}-video-${i}`);
+                if (preloadVid) {
+                    const videoUrl = preloadVid.dataset.src;
+                    this.startMseStream(preloadVid, videoUrl, i === idx, muted);
+                }
+            }
             if (currentVid) {
                 currentVid.classList.add('active');
-                currentVid.muted = prevMuted;
+                currentVid.muted = muted;
 
                 const loadingSpinner = container.querySelector('.video-loading-spinner');
                 const showLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'flex'; };
@@ -428,10 +595,11 @@ const VideoActions = {
                     this.togglePlayPause(containerId);
                 };
                 
-                currentVid.play().catch(() => {
-                    hideLoader();
-                    if (playIcon) playIcon.style.display = 'flex';
-                });
+                // The play call is now handled inside startMseStream
+                // currentVid.play().catch(() => {
+                //     hideLoader();
+                //     if (playIcon) playIcon.style.display = 'flex';
+                // });
 
                 // init state
                 const muteBtn = container.querySelector('.mute-unmute-btn i');
