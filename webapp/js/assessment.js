@@ -825,4 +825,3 @@ function showNavigationFeedback(direction) {
         }
     }, 500);
 }
-
