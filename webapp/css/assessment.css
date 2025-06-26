@@ -1455,7 +1455,7 @@ body.modal-open {
     height: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
     transition: transform 0.3s ease;
 }
 
@@ -1465,12 +1465,17 @@ body.modal-open {
     aspect-ratio: 9 / 16;
     position: relative;
     margin: 0 auto;
+    max-height: 100%;
+    height: auto;
+    box-sizing: border-box;
 }
 
 .video-main {
     width: 100%;
     height: 100%;
     position: relative;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 .video-swipe-item video {
@@ -1481,7 +1486,7 @@ body.modal-open {
     top: 0;
     left: 0;
     background: black;
-    object-fit: contain;
+    object-fit: cover;
     opacity: 0;
     transition: opacity 0.4s;
     z-index: 1;

@@ -290,7 +290,7 @@ const VideoActions = {
                     } else {
                         poster = './icons/poster.jpeg';
                     }
-                    videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:-20px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+                    videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
                 }
                 videoMain.insertAdjacentHTML('afterbegin', videoTags);
             }
