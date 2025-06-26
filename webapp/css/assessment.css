@@ -1991,4 +1991,121 @@ body.modal-open {
 .mobile-only {
     display: none;
 }
+
+/* Comment Panel Modal (YouTube Shorts style) */
+.comment-panel-modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    max-width: 90vw;
+    height: 100vh;
+    background: rgba(30, 30, 30, 0.98);
+    box-shadow: -2px 0 16px rgba(0,0,0,0.25);
+    z-index: 2000;
+    display: none;
+    flex-direction: column;
+    animation: slideInRight 0.3s;
+}
+.comment-panel-modal.active {
+    display: flex;
+}
+@keyframes slideInRight {
+    from { right: -420px; opacity: 0; }
+    to { right: 0; opacity: 1; }
+}
+.comment-panel-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+}
+.comment-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 12px 20px;
+    border-bottom: 1px solid #444;
+}
+.comment-panel-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+}
+.comment-panel-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+}
+.comment-panel-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 16px 20px;
+    background: transparent;
+}
+.comment-item {
+    margin-bottom: 18px;
+}
+.comment-author {
+    font-weight: 600;
+    color: #4dabf7;
+    font-size: 0.97rem;
+    margin-bottom: 2px;
+}
+.comment-text {
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1.4;
+    word-break: break-word;
+}
+.comment-panel-input {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    border-top: 1px solid #444;
+    background: #232323;
+}
+.comment-panel-input input[type="text"] {
+    flex: 1 1 auto;
+    border: none;
+    border-radius: 18px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    margin-right: 10px;
+    background: #333;
+    color: #fff;
+    outline: none;
+}
+.comment-panel-input button {
+    background: #FF0000;
+    color: #fff;
+    border: none;
+    border-radius: 18px;
+    padding: 8px 18px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.comment-panel-input button:hover {
+    background: #cc0000;
+}
+@media (max-width: 600px) {
+    .comment-panel-modal {
+        width: 100vw;
+        max-width: 100vw;
+        border-radius: 0;
+    }
+    .comment-panel-content {
+        padding: 0;
+    }
+    .comment-panel-header, .comment-panel-input, .comment-panel-list {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
   

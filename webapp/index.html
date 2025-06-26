@@ -284,6 +284,31 @@
     </div>
   </div>
 
+  <!-- Comment Panel Modal (YouTube Shorts style) -->
+  <div id="commentPanelModal" class="comment-panel-modal">
+    <div class="comment-panel-content">
+      <div class="comment-panel-header">
+        <span class="comment-panel-title">Bình luận</span>
+        <button class="comment-panel-close" onclick="VideoActions.closeCommentPanel()">&times;</button>
+      </div>
+      <div class="comment-panel-list">
+        <!-- Danh sách comment mẫu -->
+        <div class="comment-item">
+          <div class="comment-author">User1</div>
+          <div class="comment-text">Video này hay quá!</div>
+        </div>
+        <div class="comment-item">
+          <div class="comment-author">User2</div>
+          <div class="comment-text">Tôi cũng thấy vậy, cười xỉu!</div>
+        </div>
+      </div>
+      <div class="comment-panel-input">
+        <input type="text" id="commentInput" placeholder="Viết bình luận..." />
+        <button id="sendCommentBtn">Gửi</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // load all when init page
     $(document).ready(function() {

@@ -510,8 +510,12 @@ const VideoActions = {
     },
 
     showComments(containerId) {
-        // TODO: Implement comments modal
-        alert('Comments feature coming soon!');
+        // Hiển thị modal comment panel bên phải
+        document.getElementById('commentPanelModal').classList.add('active');
+    },
+
+    closeCommentPanel() {
+        document.getElementById('commentPanelModal').classList.remove('active');
     },
 
     shareVideo(containerId) {
