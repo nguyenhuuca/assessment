@@ -2000,7 +2000,7 @@ body.modal-open {
     width: 400px;
     max-width: 90vw;
     height: 100vh;
-    background: rgba(30, 30, 30, 0.98);
+    background: rgba(30, 30, 30, 0.9); /* desktop 0.9 */
     box-shadow: -2px 0 16px rgba(0,0,0,0.25);
     z-index: 2000;
     display: none;
@@ -2099,6 +2099,7 @@ body.modal-open {
         width: 100vw;
         max-width: 100vw;
         border-radius: 0;
+        background: rgba(30,30,30,0.65); /* mobile 0.65 */
     }
     .comment-panel-content {
         padding: 0;
