@@ -80,7 +80,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
 
     @Override
     public List<VideoDto> getVideosToStream() {
-        return videoSourceRepository.findAll().stream()
+        return videoSourceRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(this::toDto)
                 .toList();
     }
