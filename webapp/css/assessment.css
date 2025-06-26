@@ -1800,7 +1800,7 @@ body.modal-open {
 /* Custom video controls */
 .video-overlay-controls {
     position: absolute;
-    top: 40px;
+    top: 15px;
     left: 15px;
     z-index: 3;
     display: flex;
