@@ -39,6 +39,7 @@ public class VideoStreamController {
             @RequestHeader(value = "Range", required = false) String rangeHeader
     ) throws IOException {
         long startTime = System.currentTimeMillis();
+        log.info("StreamVideo Thread: {}, isVirtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
         log.info("Starting time: {} for fileID {}", System.currentTimeMillis() ,fileId);
         long fileSize = videoService.getFileSize(fileId);
         long start = 0;
@@ -75,6 +76,7 @@ public class VideoStreamController {
 
     @GetMapping("/list")
     public ResponseEntity<ResultListInfo<VideoDto>> getTopVideos() {
+        log.info("getTopVideos Thread: {}, isVirtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
         List<VideoDto> rs = videoService.getVideosToStream();
         return new ResponseEntity<>(ResultListInfo.<VideoDto>builder()
                 .status(ResultStatus.SUCCESS)
