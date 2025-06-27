@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 public class ThreadController {
+
+    @Autowired
+    ChatGptService chatGptService;
     @GetMapping("/name")
     public String getThreadName() {
-        return Thread.currentThread().toString();
+        return chatGptService.makePoem("Dưỡng tâm");
     }
     @GetMapping("/load")
     public void doSomething() throws InterruptedException {

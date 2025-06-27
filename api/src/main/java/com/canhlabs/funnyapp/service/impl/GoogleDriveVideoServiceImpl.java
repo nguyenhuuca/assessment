@@ -53,18 +53,20 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
 
     @Override
     public InputStream getPartialFile(String fileId, long start, long end) throws IOException {
-        log.info("Requesting video file {} by range: {}-{}", fileId, start, end);
-        if (start == 0 && end < AppConstant.CACHE_SIZE) {
+        log.info("Requesting video {} range: {}-{}", fileId, start, end);
+        boolean isCacheRange = (start == 0 && end < AppConstant.CACHE_SIZE);
+        if (isCacheRange) {
             if (!videoCacheService.hasCache(fileId, end + 1)) {
-                log.info("Cache not found for file {} from cache, fetching from Google Drive", fileId);
-                InputStream googleStream = fetchFromGoogleDrive(fileId, 0, end);
-                log.info("Saving video file {} to cache", fileId);
-                videoCacheService.saveToCache(fileId, new BufferedInputStream(googleStream));
+                log.info("📥 Cache miss for file {}, fetching Google Drive", fileId);
+                try (InputStream in = new BufferedInputStream(fetchFromGoogleDrive(fileId, 0, end))) {
+                    videoCacheService.saveToCache(fileId, in);
+                }
             }
-            log.info("Getting video file {} from cache", fileId);
+            log.info("📤 Serving file {} from disk cache", fileId);
             return videoCacheService.getCache(fileId);
         }
-        log.info("Getting video file {} from Google Drive by range: {}-{}", fileId, start, end);
+
+        log.info("🌐 Fetching file {} from Google Drive by range {}-{}", fileId, start, end);
         return fetchFromGoogleDrive(fileId, start, end);
     }
 
