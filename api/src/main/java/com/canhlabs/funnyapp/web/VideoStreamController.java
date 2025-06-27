@@ -39,62 +39,50 @@ public class VideoStreamController {
             @RequestHeader(value = "Range", required = false) String rangeHeader
     ) throws IOException {
         long startTime = System.currentTimeMillis();
-        log.info("StreamVideo Thread: {}, isVirtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
-        log.info("Starting time: {} for fileID {}", System.currentTimeMillis() ,fileId);
+        log.info("▶️ Thread: {}, Virtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
+        log.info("🔽 Incoming stream request for fileId: {}", fileId);
+
         long fileSize = videoService.getFileSize(fileId);
         long start = 0;
         long end = fileSize - 1;
+        final long MAX_CHUNK_SIZE = 1_048_576L; // 1MB
 
         if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
+            log.info("📥 Range header: {}", rangeHeader);
             String[] ranges = rangeHeader.substring(6).split("-");
-            log.info("Range header received: {}", rangeHeader);
-            start = Long.parseLong(ranges[0]);
-            if (ranges.length > 1 && !ranges[1].isEmpty()) {
-                if(start == 0) {
-                    log.info("Start range is 0, setting end to 1MB limit");
-                    long endRangeRequested = Long.parseLong(ranges[1]);
-                    log.info("End range requested: {}", endRangeRequested);
-                    if (endRangeRequested >= 1_000_000L) {
-                        log.warn("Range requested is too large: {} bytes, limiting to 1MB", endRangeRequested);
-                        end =  1_000_000L; // limit
-                    } else {
-                        log.info("End range requested < 1_000_000L: {}", endRangeRequested);
-                        end = endRangeRequested;
-                    }
+            try {
+                start = Long.parseLong(ranges[0]);
+
+                if (ranges.length > 1 && !ranges[1].isEmpty()) {
+                    end = Math.min(Long.parseLong(ranges[1]), start + MAX_CHUNK_SIZE - 1);
                 } else {
-                    end = Long.parseLong(ranges[1]);
+                    end = Math.min(start + MAX_CHUNK_SIZE - 1, fileSize - 1);
                 }
-            } else {
-                log.warn("Range header is missing: {}", rangeHeader);
-                if(start == 0) {
-                    log.info("Start range is 0, setting end to 1MB limit");
-                    end = 1024 * 1024;
-                } else {
-                    long currentSise = start +(1024 * 1024);
-                    if(currentSise < end){
-                        end = currentSise;
-                    }
-                }
+
+                log.info("📦 Streaming bytes {} to {}", start, end);
+            } catch (NumberFormatException e) {
+                log.warn("⚠️ Invalid range format: {}, fallback to full stream", rangeHeader);
             }
         }
 
         InputStream stream = videoService.getPartialFile(fileId, start, end);
         StreamingResponseBody responseBody = outputStream -> {
-            byte[] buffer = new byte[1024 * 1024]; // ⚠️ buffer lớn: 1MB
-            int bytesRead;
-            while ((bytesRead = stream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-                outputStream.flush();
+            try (stream) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = stream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
             }
-            stream.close();
         };
-        // InputStreamResource inputStreamResource = new InputStreamResource(stream);
-        log.info("End time: {}, Duration: {} ms for fileID {}", System.currentTimeMillis(), System.currentTimeMillis() - startTime, fileId);
+
+        long contentLength = end - start + 1;
+        log.info("✅ Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
                 .header(HttpHeaders.ACCEPT_RANGES, "bytes")
-                .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(end - start + 1))
+                .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength))
                 .header(HttpHeaders.CONTENT_RANGE, String.format("bytes %d-%d/%d", start, end, fileSize))
                 .body(responseBody);
     }
