@@ -57,7 +57,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         if (start == 0 && end < AppConstant.CACHE_SIZE) {
             if (!videoCacheService.hasCache(fileId, end + 1)) {
                 log.info("Cache not found for file {} from cache, fetching from Google Drive", fileId);
-                InputStream googleStream = fetchFromGoogleDrive(fileId, 0, AppConstant.CACHE_SIZE - 1);
+                InputStream googleStream = fetchFromGoogleDrive(fileId, 0, end);
                 log.info("Saving video file {} to cache", fileId);
                 videoCacheService.saveToCache(fileId, new BufferedInputStream(googleStream));
             }
