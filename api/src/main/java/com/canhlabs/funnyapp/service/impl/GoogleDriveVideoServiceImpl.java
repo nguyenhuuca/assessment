@@ -139,12 +139,13 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
 
     public void saveInfo(String fileId, String title) {
         if (!videoSourceRepository.existsBySourceId(fileId)) {
+            String desc = chatGptService.makePoem(title);
             VideoSource entity = VideoSource.builder()
                     .videoId(System.nanoTime())
                     .sourceType("google_drive")
                     .sourceId(fileId)
                     .title(title)
-                    .desc("Video from Google Drive")
+                    .desc(desc)
                     .credentialsRef("")
                     .build();
             videoSourceRepository.save(entity);
