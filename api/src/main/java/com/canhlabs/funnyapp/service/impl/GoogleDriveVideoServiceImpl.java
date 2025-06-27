@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.domain.VideoSource;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
+import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.StorageVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.google.api.client.http.GenericUrl;
@@ -31,7 +32,12 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
     private final Drive drive;
     private VideoSourceRepository videoSourceRepository;
     private VideoCacheService videoCacheService;
+    private ChatGptService chatGptService;
 
+    @Autowired
+    public void injectChatGptService(ChatGptService chatGptService) {
+        this.chatGptService = chatGptService;
+    }
     @Autowired
     public void injectCacheService(VideoCacheService videoCacheService) {
         this.videoCacheService = videoCacheService;
@@ -157,6 +163,17 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
 
         } catch (IOException e) {
             log.error("Error listing files in folder", e);
+        }
+    }
+
+    @Override
+    public void updateDesc() {
+        List<VideoSource> sources = videoSourceRepository.findAllByDescIsNullOrDesc("");
+        for (VideoSource source : sources) {
+            String desc = chatGptService.makePoem(source.getTitle());
+            source.setDesc(desc);
+            videoSourceRepository.save(source);
+            log.info("Updated description for video ID: {}", source.getId());
         }
     }
 

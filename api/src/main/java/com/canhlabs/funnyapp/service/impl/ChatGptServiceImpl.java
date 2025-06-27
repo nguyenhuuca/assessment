@@ -28,19 +28,7 @@ public class ChatGptServiceImpl implements ChatGptService {
 
     @Override
     public List<String> getTopYoutubeVideoIds() {
-        String prompt = """
-                Bạn là một công cụ tìm kiếm video YouTube ngắn (Shorts).
-   
-                Hãy tìm 10 video YouTube Shorts, ngẫu nhiên bất kể thời gian đăng tải nào
-                - Kết quả là danh sách video ID YouTube hợp lệ dạng ["id1", "id2", ...]
-                Ví dụ kết quả đúng:
-                ["9bZkp7q19f0", "dQw4w9WgXcQ", "abc123xyz"]
-        """;
-
-        ChatGptRequest request = new ChatGptRequest(
-                "gpt-4.1",
-                List.of(new ChatGptRequest.Message("system", prompt))
-        );
+        ChatGptRequest request = getChatGptRequest();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -57,6 +45,73 @@ public class ChatGptServiceImpl implements ChatGptService {
 
         String content = response.getBody().getChoices().get(0).getMessage().getContent();
         return parseJsonArray(content);
+    }
+
+    private static ChatGptRequest getChatGptRequest() {
+        String prompt = """
+                Bạn là một công cụ tìm kiếm video YouTube ngắn (Shorts).
+   
+                Hãy tìm 10 video YouTube Shorts, ngẫu nhiên bất kể thời gian đăng tải nào
+                - Kết quả là danh sách video ID YouTube hợp lệ dạng ["id1", "id2", ...]
+                Ví dụ kết quả đúng:
+                ["9bZkp7q19f0", "dQw4w9WgXcQ", "abc123xyz"]
+        """;
+
+        return new ChatGptRequest(
+                "gpt-4.1",
+                List.of(new ChatGptRequest.Message("system", prompt))
+        );
+    }
+
+    @Override
+    public String makePoem(String title) {
+        ChatGptRequest request = getChatGptRequest(title);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(props.getGptKey()); // hoặc hardcode "Bearer sk-xxx"
+
+        HttpEntity<ChatGptRequest> entity = new HttpEntity<>(request, headers);
+
+        ResponseEntity<ChatGptResponse> response = restTemplate.exchange(
+                props.getChatGptUrl(), // ví dụ: https://api.openai.com/v1/chat/completions
+                HttpMethod.POST,
+                entity,
+                ChatGptResponse.class
+        );
+        String content = response.getBody().getChoices().get(0).getMessage().getContent();
+        log.info("Poem content: {}", content);
+        return content;
+    }
+
+    private static ChatGptRequest getChatGptRequest(String title) {
+        String systemPrompt = "Bạn là nhà thơ cổ điển chuyên làm thơ thất ngôn tứ tuyệt bằng Hán Việt và dịch nghĩa ra tiếng Việt.";
+
+        String userPrompt = String.format("""
+            Viết bài thơ thất ngôn tứ tuyệt với tiêu đề: %s.
+            
+            Yêu cầu:
+            - Hai câu đầu là thơ thất ngôn tứ tuyệt, dùng toàn từ gốc **Hán Việt** (viết bằng chữ Quốc ngữ), mang phong vị cổ.
+            - Hai câu sau là bản **dịch nghĩa tiếng Việt hiện đại**, giữ đúng nội dung, dễ hiểu.
+            - Không dùng từ thuần Việt như: lướt nhẹ, nở rộ, mơ màng, long lanh, xinh đẹp,...
+            - Gợi ý từ Hán Việt nên dùng: xuân, phong, nguyệt, tửu, yến, trúc, tình, vọng, vân, thủy, thiền, vũ, luyến, hoài, sắc, mộng, hoan, ca...
+            
+            Ví dụ mẫu đúng:
+            Thiên địa tiêu dao hoa vũ xứ  
+            Trúc viên u tĩnh nguyệt sơ khai  
+            (Mưa hoa lả tả giữa đất trời,  
+            Vườn trúc yên bình, trăng mới lên)
+            
+            Chỉ trả lại đúng 4 dòng thơ (2 Hán Việt + 2 dịch nghĩa)
+            """, title);
+
+        return new ChatGptRequest(
+                "gpt-4o",
+                List.of(
+                        new ChatGptRequest.Message("system", systemPrompt),
+                        new ChatGptRequest.Message("user", userPrompt)
+                )
+        );
     }
 
     private List<String> parseJsonArray(String content) {

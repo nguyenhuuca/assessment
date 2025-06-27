@@ -21,4 +21,5 @@ public interface StorageVideoService {
     void shareFile(Drive drive, String fileId, String email) throws IOException;
 
     void shareFilesInFolder();
+    void updateDesc();
 }
