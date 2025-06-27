@@ -47,14 +47,18 @@ public class VideoStreamController {
 
         if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
             String[] ranges = rangeHeader.substring(6).split("-");
+            log.info("Range header received: {}", rangeHeader);
             start = Long.parseLong(ranges[0]);
             if (ranges.length > 1 && !ranges[1].isEmpty()) {
                 if(start == 0) {
+                    log.info("Start range is 0, setting end to 1MB limit");
                     long endRangeRequested = Long.parseLong(ranges[1]);
+                    log.info("End range requested: {}", endRangeRequested);
                     if (endRangeRequested >= 1_000_000L) {
                         log.warn("Range requested is too large: {} bytes, limiting to 1MB", endRangeRequested);
                         end =  1_000_000L; // limit
                     } else {
+                        log.info("End range requested < 1_000_000L: {}", endRangeRequested);
                         end = endRangeRequested;
                     }
                 } else {
