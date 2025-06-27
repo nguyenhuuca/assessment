@@ -70,8 +70,10 @@ public class VideoStreamController {
                     log.info("Start range is 0, setting end to 1MB limit");
                     end = 1024 * 1024;
                 } else {
-                    end = start + (1024 * 1024); // default to 1MB limit
-                    log.info("Start range is not 0, setting end to start + 1MB limit: {}", end);
+                    long currentSise = start +(1024 * 1024);
+                    if(currentSise < end){
+                        end = currentSise;
+                    }
                 }
             }
         }
