@@ -39,7 +39,7 @@ public class AppScheduler {
         }
     }
 
-    @Scheduled(cron = "0 10 10 * * *", zone = "Asia/Ho_Chi_Minh")
+    @Scheduled(cron = "0 45 10 * * *", zone = "Asia/Ho_Chi_Minh")
     public void scheduleMakePoem() {
         log.info("Start running scheduleMakePoem at 10:10 ");
         try {
