@@ -64,6 +64,8 @@ public class VideoStreamController {
                 } else {
                     end = Long.parseLong(ranges[1]);
                 }
+            } else {
+                end = 1024 * 1024;
             }
         }
 
