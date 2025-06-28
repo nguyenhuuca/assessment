@@ -39,6 +39,7 @@ public class VideoStreamController {
             @PathVariable String fileId,
             @RequestHeader(value = "Range", required = false) String rangeHeader
     ) throws IOException {
+
         long startTime = System.currentTimeMillis();
         log.info("▶️ Thread: {}, Virtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
         log.info("🔽 Incoming stream request for fileId: {}", fileId);

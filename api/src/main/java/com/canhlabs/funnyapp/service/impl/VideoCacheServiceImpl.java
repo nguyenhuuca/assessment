@@ -5,6 +5,7 @@ import com.canhlabs.funnyapp.service.CacheStatsService;
 import com.canhlabs.funnyapp.service.VideoCacheService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.LimitedInputStream;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -103,6 +104,7 @@ public class VideoCacheServiceImpl implements VideoCacheService {
 
 
     @Override
+    @WithSpan
     public boolean hasChunk(String fileId, long start, long end) {
         File chunk = getChunkFile(fileId, start, end);
         boolean exists = chunk.exists();// && chunk.length() == (end - start + 1);
@@ -116,6 +118,7 @@ public class VideoCacheServiceImpl implements VideoCacheService {
     }
 
     @Override
+    @WithSpan
     public InputStream getChunk(String fileId, long start, long end) throws IOException {
         File chunk = getChunkFile(fileId, start, end);
         if (!chunk.exists()) throw new FileNotFoundException("Chunk not found");
@@ -124,6 +127,7 @@ public class VideoCacheServiceImpl implements VideoCacheService {
     }
 
     @Override
+    @WithSpan
     public void saveChunk(String fileId, long start, long end, InputStream stream) throws IOException {
         if (!chunkLockManager.tryLock(fileId, start, end)) {
             log.warn("⏳ Another thread is already saving chunk {} ({} - {}), skipping.", fileId, start, end);

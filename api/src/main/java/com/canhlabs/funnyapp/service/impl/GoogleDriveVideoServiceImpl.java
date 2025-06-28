@@ -13,6 +13,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.Permission;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
     }
 
     @Override
+    @WithSpan
     public InputStream getPartialFileByChunk(String fileId, long start, long end) throws IOException {
         if (videoCacheService.hasChunk(fileId, start, end)) {
             log.info("🟢 Cache hit: {} ({} - {})", fileId, start, end);
@@ -92,6 +94,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         return videoCacheService.getChunk(fileId, start, end);
     }
 
+    @WithSpan
     private InputStream fetchFromGoogleDrive(String fileId, long start, long end) throws IOException {
         GenericUrl url = new GenericUrl("https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media");
 
