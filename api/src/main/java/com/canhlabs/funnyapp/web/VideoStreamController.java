@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequestMapping(AppConstant.API.BASE_URL + "/video-stream")
@@ -90,7 +91,8 @@ public class VideoStreamController {
     @GetMapping("/list")
     public ResponseEntity<ResultListInfo<VideoDto>> getTopVideos() {
         log.info("getTopVideos Thread: {}, isVirtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
-        List<VideoDto> rs = videoService.getVideosToStream();
+        List<VideoDto> rs = videoService.getVideosToStream().stream()
+                .filter(item -> item.getId() == 2864341778303019L).toList();
         return new ResponseEntity<>(ResultListInfo.<VideoDto>builder()
                 .status(ResultStatus.SUCCESS)
                 .data(rs)
