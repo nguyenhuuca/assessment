@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static com.canhlabs.funnyapp.share.AppConstant.CACHE_DIR;
 
@@ -41,6 +40,7 @@ public class VideoCacheServiceImpl implements VideoCacheService {
     public void injectChunkLockManager(ChunkLockManager chunkLockManager) {
         this.chunkLockManager = chunkLockManager;
     }
+
     @Autowired
     public void injectCacheStatsService(CacheStatsService cacheStatsService) {
         this.cacheStatsService = cacheStatsService;
@@ -51,17 +51,20 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         return new File(CACHE_DIR + fileId + ".cache");
     }
 
+    @WithSpan
     @Override
     public boolean hasCache(String fileId, long requiredBytes) {
         File file = getCacheFile(fileId);
         return file.exists();
     }
 
+    @WithSpan
     @Override
     public InputStream getCache(String fileId) throws IOException {
         return new FileInputStream(getCacheFile(fileId));
     }
 
+    @WithSpan
     @Override
     public InputStream getCache(String fileId, long start, long end) throws IOException {
         File file = new File(CACHE_DIR + fileId + ".cache");
@@ -78,6 +81,7 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         };
     }
 
+    @WithSpan
     @Override
     public void saveToCache(String fileId, InputStream inputStream) throws IOException {
         File cacheDir = new File(CACHE_DIR);

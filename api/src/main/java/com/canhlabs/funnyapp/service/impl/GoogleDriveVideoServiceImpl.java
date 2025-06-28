@@ -40,10 +40,12 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
     public void injectChatGptService(ChatGptService chatGptService) {
         this.chatGptService = chatGptService;
     }
+
     @Autowired
     public void injectCacheService(VideoCacheService videoCacheService) {
         this.videoCacheService = videoCacheService;
     }
+
     @Autowired
     public void injectRepo(VideoSourceRepository videoSourceRepository) {
         this.videoSourceRepository = videoSourceRepository;
@@ -54,6 +56,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
     }
 
     @Override
+    @WithSpan
     public InputStream getPartialFile(String fileId, long start, long end) throws IOException {
         log.info("Requesting video {} range: {}-{}", fileId, start, end);
         boolean isCacheRange = (start == 0 && end < AppConstant.CACHE_SIZE);
@@ -105,12 +108,14 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         return request.execute().getContent();
     }
 
+    @WithSpan
     @Override
     public long getFileSize(String fileId) throws IOException {
         File file = drive.files().get(fileId).setFields("size").execute();
         return file.getSize();
     }
 
+    @WithSpan
     @Override
     public List<VideoDto> getVideosToStream() {
         return videoSourceRepository.findAllByOrderByCreatedAtDesc().stream()
@@ -118,6 +123,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
                 .toList();
     }
 
+    @WithSpan
     @Override
     public VideoDto getVideoById(Long id) {
         VideoSource source = videoSourceRepository.findById(id)
@@ -125,6 +131,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         return toDto(source);
     }
 
+    @WithSpan
     @Override
     public VideoDto getVideoBySourceId(String sourceId) {
         VideoSource source = videoSourceRepository.findBySourceId(sourceId)
@@ -132,7 +139,8 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         return toDto(source);
     }
 
-     List<File> listFilesInFolder(Drive drive, String folderId) throws IOException {
+    @WithSpan
+    List<File> listFilesInFolder(Drive drive, String folderId) throws IOException {
         // String query = String.format("'%s' in parents and trashed = false", folderId);
         Instant fifteenMinutesAgo = Instant.now().minus(Duration.ofMinutes(15));
         String isoTime = DateTimeFormatter.ISO_INSTANT.format(fifteenMinutesAgo);
@@ -153,6 +161,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
     }
 
     @Override
+    @WithSpan
     public void shareFile(Drive drive, String fileId, String email) throws IOException {
         Permission permission = new Permission()
                 .setType("user")
@@ -164,6 +173,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
                 .execute();
     }
 
+    @WithSpan
     public void saveInfo(String fileId, String title) {
         if (!videoSourceRepository.existsBySourceId(fileId)) {
             String desc = chatGptService.makePoem(title);
@@ -180,6 +190,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
 
     }
 
+    @WithSpan
     @Override
     public void shareFilesInFolder() {
         try {
@@ -194,6 +205,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         }
     }
 
+    @WithSpan
     @Override
     public void updateDesc() {
         List<VideoSource> sources = videoSourceRepository.findAllByDescIsNullOrDesc("");
