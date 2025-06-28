@@ -47,7 +47,9 @@ public class VideoStreamController {
         long fileSize = videoService.getFileSize(fileId);
         long start = 0;
         long end = fileSize - 1;
-        final long MAX_CHUNK_SIZE = 1_048_576L/2; // 1MB
+
+        final long FIRST_CHUNK_SIZE = 256 * 1024; // 256KB
+        final long NEXT_CHUNK_SIZE = 512 * 1024;  // 512KB
 
         if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
             log.info("📥 Range header: {}", rangeHeader);
@@ -56,9 +58,10 @@ public class VideoStreamController {
                 start = Long.parseLong(ranges[0]);
 
                 if (ranges.length > 1 && !ranges[1].isEmpty()) {
-                    end = Math.min(Long.parseLong(ranges[1]), start + MAX_CHUNK_SIZE - 1);
+                    end = Math.min(Long.parseLong(ranges[1]), fileSize - 1);
                 } else {
-                    end = Math.min(start + MAX_CHUNK_SIZE - 1, fileSize - 1);
+                    long chunkSize = (start == 0) ? FIRST_CHUNK_SIZE : NEXT_CHUNK_SIZE;
+                    end = Math.min(start + chunkSize - 1, fileSize - 1);
                 }
 
                 log.info("📦 Streaming bytes {} to {}", start, end);
@@ -79,7 +82,7 @@ public class VideoStreamController {
         };
 
         long contentLength = end - start + 1;
-        log.info("✅ Finished preparing response for fileId: {}, start {} - end {}. Duration: {} ms", fileId, start, end, System.currentTimeMillis() - startTime);
+        log.info("✅ Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
