@@ -21,7 +21,7 @@ public class CacheStatsServiceImpl implements CacheStatsService {
     private final AppCache<String, FileCacheStats> statsCache;
 
     public CacheStatsServiceImpl(AppCacheFactory appCacheFactory) {
-        this.statsCache = appCacheFactory.createCache(0, 10_000);
+        this.statsCache = appCacheFactory.createCache(1440, 10_000);
     }
 
     public void recordHit(String fileId) {
