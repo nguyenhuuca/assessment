@@ -45,7 +45,7 @@ public class VideoStreamController {
         long fileSize = videoService.getFileSize(fileId);
         long start = 0;
         long end = fileSize - 1;
-        final long MAX_CHUNK_SIZE = 1_048_576L; // 1MB
+        final long MAX_CHUNK_SIZE = 1_048_576L/2; // 1MB
 
         if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
             log.info("📥 Range header: {}", rangeHeader);
@@ -65,7 +65,7 @@ public class VideoStreamController {
             }
         }
 
-        InputStream stream = videoService.getPartialFile(fileId, start, end);
+        InputStream stream = videoService.getPartialFileByChunk(fileId, start, end);
         StreamingResponseBody responseBody = outputStream -> {
             try (stream) {
                 byte[] buffer = new byte[8192];

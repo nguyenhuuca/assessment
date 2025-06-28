@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface StorageVideoService {
     InputStream getPartialFile(String fileId, long start, long end) throws IOException;
+    InputStream getPartialFileByChunk(String fileId, long start, long end) throws IOException;
 
     long getFileSize(String fileId) throws IOException;
 

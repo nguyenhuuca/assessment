@@ -5,6 +5,7 @@ import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.StorageVideoService;
+import com.canhlabs.funnyapp.service.VideoCacheService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -68,6 +69,27 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
 
         log.info("🌐 Fetching file {} from Google Drive by range {}-{}", fileId, start, end);
         return fetchFromGoogleDrive(fileId, start, end);
+    }
+
+    @Override
+    public InputStream getPartialFileByChunk(String fileId, long start, long end) throws IOException {
+        if (videoCacheService.hasChunk(fileId, start, end)) {
+            log.info("🟢 Cache hit: {} ({} - {})", fileId, start, end);
+            return videoCacheService.getChunk(fileId, start, end);
+        }
+
+        log.info("🔴 Cache miss: fetching {} ({} - {}) from Google Drive", fileId, start, end);
+        InputStream googleStream = fetchFromGoogleDrive(fileId, start, end);
+
+        try (BufferedInputStream bufferedStream = new BufferedInputStream(googleStream)) {
+            log.info("💾 Saving chunk {} ({} - {}), size ≈ {} bytes", fileId, start, end, (end - start + 1));
+            videoCacheService.saveChunk(fileId, start, end, bufferedStream);
+        } catch (IOException e) {
+            log.warn("⚠️ Failed to save chunk to cache: {} ({} - {}), fallback to direct stream", fileId, start, end);
+            return fetchFromGoogleDrive(fileId, start, end);
+        }
+
+        return videoCacheService.getChunk(fileId, start, end);
     }
 
     private InputStream fetchFromGoogleDrive(String fileId, long start, long end) throws IOException {
