@@ -77,7 +77,7 @@ public class VideoStreamController {
         };
 
         long contentLength = end - start + 1;
-        log.info("✅ Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
+        log.info("✅ Finished preparing response for fileId: {}, start {} - end {}. Duration: {} ms", fileId, start, end, System.currentTimeMillis() - startTime);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
