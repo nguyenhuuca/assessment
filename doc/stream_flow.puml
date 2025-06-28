@@ -1,30 +1,14 @@
 @startuml
-' ==== Style ====
-skinparam monochrome false
-skinparam shadowing true
-skinparam sequence {
-    ParticipantBorderColor Black
-    LifeLineBorderColor Black
-    LifeLineBackgroundColor #FDF6E3
-    ActorBorderColor #2C3E50
-    ActorBackgroundColor #3498DB
-    ParticipantBackgroundColor #ECF0F1
-    ParticipantFontColor Black
-    ArrowColor Black
-    BoxBackgroundColor #E3F2FD
-    BoxBorderColor #90CAF9
-}
-
-actor Client #DarkSeaGreen
-participant "🎬 VideoController" as Controller #Linen
-participant "📦 VideoService" as Service #LightYellow
-participant "🗃️ VideoCacheService" as Cache #Cornsilk
-participant "🔒 ChunkLockManager" as LockManager #LightGray
-participant "💾 DiskStorage" as DiskStorage #Beige
-participant "☁️ GoogleDrive" as GoogleDrive #AliceBlue
+actor Client
+participant "VideoController" as Controller
+participant "VideoService" as Service
+participant "VideoCacheService" as Cache
+participant "ChunkLockManager" as LockManager
+participant "DiskStorage"
+participant "GoogleDriveService" as GoogleDrive
 
 Client -> Controller : GET /stream/{fileId}\nRange: bytes=start-end
-note right of Client #A3E4D7 : <video> tag sends Range header
+note right of Client : <video> tag sends Range header
 
 Controller -> Controller : Parse Range
 Controller -> Service : getPartialFileByChunk(fileId, start, end)
@@ -54,6 +38,6 @@ end
 Cache --> Service : InputStream
 Service --> Controller : InputStream
 Controller -> Client : HTTP 206 Partial Content
-note right of Controller #FFF2CC : StreamingResponseBody sends chunk
+note right of Controller : StreamingResponseBody
 
 @enduml

@@ -1,10 +1,14 @@
 package com.canhlabs.funnyapp.jobs;
 
+import com.canhlabs.funnyapp.dto.CacheStat;
+import com.canhlabs.funnyapp.service.CacheStatsService;
 import com.canhlabs.funnyapp.service.StorageVideoService;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -12,10 +16,13 @@ public class AppScheduler {
 
     private final YouTubeVideoService service;
     private final StorageVideoService googleDriveVideoService;
+    private final CacheStatsService cacheStatsService;
 
-    public AppScheduler(YouTubeVideoService service, StorageVideoService googleDriveVideoService) {
+
+    public AppScheduler(YouTubeVideoService service, StorageVideoService googleDriveVideoService, CacheStatsService cacheStatsService) {
         this.service = service;
         this.googleDriveVideoService = googleDriveVideoService;
+        this.cacheStatsService = cacheStatsService;
     }
 
     // Run at 1:00 daily
@@ -46,6 +53,18 @@ public class AppScheduler {
             googleDriveVideoService.updateDesc();
         } catch (Exception ex) {
             log.error("Error running scheduleMakePoem job", ex);
+        }
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void logStats() {
+        log.info("📝 Cron-based stats log every 5 minutes for logStats");
+        log.info("📊 Total hits: {}, Total misses: {}", cacheStatsService.getTotalHits(), cacheStatsService.getTotalMisses());
+        for (Map.Entry<String, CacheStat> entry : cacheStatsService.getFileStats().entrySet()) {
+            String fileId = entry.getKey();
+            CacheStat stat = entry.getValue();
+            log.info("🎯 fileId: {}, hits: {}, misses: {}, hitRatio: {}%",
+                    fileId, stat.getHits(), stat.getMisses(), cacheStatsService.calculateRatio());
         }
     }
 }

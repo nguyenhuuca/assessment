@@ -1,0 +1,45 @@
+@startuml
+' ==== Visual style ====
+skinparam sequence {
+    ParticipantBackgroundColor #F4F6F7
+    ActorBackgroundColor #82E0AA
+    LifeLineBackgroundColor #FDFEFE
+    LifeLineBorderColor #BFC9CA
+    ArrowColor Black
+    ParticipantBorderColor #5D6D7E
+}
+skinparam shadowing true
+skinparam maxMessageSize 120
+
+actor Client #A9DFBF
+participant "🎬 Controller" as Controller #F9E79F
+participant "📦 VideoService" as Service #FDEBD0
+participant "🗃️ CacheService" as Cache #D5F5E3
+participant "☁️ GoogleDrive" as Drive #D6EAF8
+
+== Request Chunk ==
+Client -> Controller : GET /stream/{fileId}\nRange: bytes=start-end
+Controller -> Service : getPartialFileByChunk(fileId, start, end)
+
+== Check Cache ==
+Service -> Cache : hasChunk(fileId, start, end)
+alt ✅ Cache HIT
+    Service -> Cache : getChunk(...)
+    note right of Cache #D4EFDF : Read chunk from disk
+    Cache --> Service : InputStream
+else ❌ Cache MISS
+    Service -> Drive : fetchFromGoogleDrive(...)
+    note right of Drive #F9EBEA : Download partial chunk
+
+    Service -> Cache : saveChunk(fileId, start, end, stream)
+    note right of Cache #FEF9E7 : Save chunk to local storage
+
+    Service -> Cache : getChunk(...)  ' After save
+end
+
+== Stream to Client ==
+Service --> Controller : InputStream
+Controller -> Client : HTTP 206 Partial Content
+note right of Controller #FDF2E9 : StreamingResponseBody writes bytes
+
+@enduml

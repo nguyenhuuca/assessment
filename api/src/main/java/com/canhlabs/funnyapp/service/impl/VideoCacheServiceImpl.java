@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.ChunkLockManager;
+import com.canhlabs.funnyapp.service.CacheStatsService;
 import com.canhlabs.funnyapp.service.VideoCacheService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.LimitedInputStream;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.canhlabs.funnyapp.share.AppConstant.CACHE_DIR;
 
@@ -31,8 +33,17 @@ public class VideoCacheServiceImpl implements VideoCacheService {
     private static final int MAX_CACHE_FILES = 6000;
     private static final long MAX_CACHE_SIZE_BYTES = 1024 * 1024 * 1024L; //1G
 
-    @Autowired
     private ChunkLockManager chunkLockManager;
+    private CacheStatsService cacheStatsService;
+
+    @Autowired
+    public void injectChunkLockManager(ChunkLockManager chunkLockManager) {
+        this.chunkLockManager = chunkLockManager;
+    }
+    @Autowired
+    public void injectCacheStatsService(CacheStatsService cacheStatsService) {
+        this.cacheStatsService = cacheStatsService;
+    }
 
     @Override
     public File getCacheFile(String fileId) {
@@ -90,11 +101,17 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         }
     }
 
+
     @Override
     public boolean hasChunk(String fileId, long start, long end) {
         File chunk = getChunkFile(fileId, start, end);
         boolean exists = chunk.exists();// && chunk.length() == (end - start + 1);
         log.info("Check chunk exists: {} [{}-{}] = {}", fileId, start, end, exists);
+        if (exists) {
+            cacheStatsService.recordHit(fileId);
+        } else {
+            cacheStatsService.recordMiss(fileId);
+        }
         return exists;
     }
 
