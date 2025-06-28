@@ -14,13 +14,8 @@ public class ChunkLockManager {
 
     public boolean tryLock(String fileId, long start, long end) {
         String key = buildKey(fileId, start, end);
-        synchronized (this) {
-            if (lockCache.get(key).isEmpty()) {
-                lockCache.put(key, true);
-                return true;
-            }
-            return false;
-        }
+        // atomic lock acquisition using putIfAbsent
+        return lockCache.asMap().putIfAbsent(key, Boolean.TRUE) == null;
     }
 
     public void release(String fileId, long start, long end) {
