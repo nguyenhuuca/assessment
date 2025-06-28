@@ -92,7 +92,7 @@ public class VideoStreamController {
     public ResponseEntity<ResultListInfo<VideoDto>> getTopVideos() {
         log.info("getTopVideos Thread: {}, isVirtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
         List<VideoDto> rs = videoService.getVideosToStream().stream()
-                .filter(item -> item.getId() == 2864341778303019L).toList();
+                .filter(item -> item.getId() == 19L).toList();
         return new ResponseEntity<>(ResultListInfo.<VideoDto>builder()
                 .status(ResultStatus.SUCCESS)
                 .data(rs)
