@@ -3,7 +3,6 @@
 ## 🔢 System Overview
 
 This architecture outlines a backend service (Java Spring Boot 3) that streams video using HTTP Range requests, caches video in chunks, and supports concurrency-safe operations using virtual threads.
-
 ---
 
 ## 🌀 Component Diagram
