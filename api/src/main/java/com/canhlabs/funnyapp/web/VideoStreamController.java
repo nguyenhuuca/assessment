@@ -68,7 +68,7 @@ public class VideoStreamController {
             }
         }
 
-        StreamChunkResult streamRs = videoService.getPartialFileByChunk(fileId, start, end);
+        StreamChunkResult streamRs = videoService.getPartialFileUsingRAF(fileId, start, end);
         InputStream stream = streamRs.getStream();
         StreamingResponseBody responseBody = outputStream -> {
             try (stream) {
