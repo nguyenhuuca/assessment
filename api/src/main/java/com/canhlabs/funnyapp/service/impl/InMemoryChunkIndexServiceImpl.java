@@ -25,7 +25,7 @@ public class InMemoryChunkIndexServiceImpl implements ChunkIndexService {
     @Override
     @WithSpan
     public void addChunk(String fileId, long start, long end) {
-        log.info("Adding chunk for fileId: {}, start: {}, end: {}", fileId, start, end);
+        log.info("Adding chunk to cache for fileId: {}, start: {}, end: {}", fileId, start, end);
         rangeCache.get(fileId, HashSet::new).add(new Range(start, end));
     }
 
