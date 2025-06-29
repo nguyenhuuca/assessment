@@ -119,8 +119,8 @@ public class VideoCacheServiceImpl implements VideoCacheService {
     @Override
     @WithSpan
     public boolean hasChunk(String fileId, long start, long end) {
-
-        boolean exists = chunkIndexService.hasChunk(fileId, start, end);
+        File chunk = getChunkFile(fileId, start, end);
+        boolean exists = chunk.exists();// && chunk.length() == (end - start + 1);
         log.info("Check chunk exists: {} [{}-{}] = {}", fileId, start, end, exists);
         if (exists) {
             cacheStatsService.recordHit(fileId);
