@@ -93,19 +93,21 @@ const VideoTemplate = {
             const v = videosArr[i];
             if (!v) continue;
             const isCurrent = i === currentIndex;
-            // Poster logic
+            // Poster logic - không hiển thị poster cho video hiện tại khi swipe
             let poster = '';
-            if (v.poster) {
-                poster = v.poster;
-            } else if (v.src && v.src.includes('youtube.com')) {
-                const match = v.src.match(/[?&]v=([^&#]+)/);
-                if (match) {
-                    poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+            if (!isCurrent) { // Chỉ set poster cho video không phải hiện tại
+                if (v.poster) {
+                    poster = v.poster;
+                } else if (v.src && v.src.includes('youtube.com')) {
+                    const match = v.src.match(/[?&]v=([^&#]+)/);
+                    if (match) {
+                        poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+                    }
+                } else {
+                    poster = './icons/poster.jpeg';
                 }
-            } else {
-                poster = `./icons/poster.jpeg`;
             }
-            videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+            videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
         }
         // Upvote/downvote count and delete button for current video
         const v = videosArr[currentIndex];
@@ -285,17 +287,19 @@ const VideoActions = {
                     const v = videos[i];
                     if (!v) continue;
                     const isCurrent = i === idx;
-                    // Poster logic
+                    // Poster logic - không hiển thị poster cho video hiện tại khi swipe
                     let poster = '';
-                    if (v.poster) {
-                        poster = v.poster;
-                    } else if (v.src && v.src.includes('youtube.com')) {
-                        const match = v.src.match(/[?&]v=([^&#]+)/);
-                        if (match) {
-                            poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+                    if (!isCurrent) { // Chỉ set poster cho video không phải hiện tại
+                        if (v.poster) {
+                            poster = v.poster;
+                        } else if (v.src && v.src.includes('youtube.com')) {
+                            const match = v.src.match(/[?&]v=([^&#]+)/);
+                            if (match) {
+                                poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+                            }
+                        } else {
+                            poster = './icons/poster.jpeg';
                         }
-                    } else {
-                        poster = './icons/poster.jpeg';
                     }
                     videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
                 }
