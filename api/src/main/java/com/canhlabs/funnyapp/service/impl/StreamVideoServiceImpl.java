@@ -113,6 +113,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
                 .build();
     }
 
+    @WithSpan
     @Override
     public StreamChunkResult getPartialFileUsingRAF(String fileId, long start, long end) throws IOException {
         InputStream stream = videoCacheService.getFileRangeFromDisk(fileId, start, end);

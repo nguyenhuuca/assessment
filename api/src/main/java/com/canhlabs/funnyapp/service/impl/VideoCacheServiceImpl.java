@@ -169,6 +169,7 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         return chunkIndexService.findNearestChunk(fileId, requestedStart, requestedEnd, tolerance);
     }
 
+    @WithSpan
     @Override
     public InputStream getFileRangeFromDisk(String fileId, long start, long end) throws IOException {
         File file = new File(AppConstant.CACHE_DIR, fileId + ".full");
