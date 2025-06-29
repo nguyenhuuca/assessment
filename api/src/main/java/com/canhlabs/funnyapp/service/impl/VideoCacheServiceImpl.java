@@ -169,6 +169,20 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         return chunkIndexService.findNearestChunk(fileId, requestedStart, requestedEnd, tolerance);
     }
 
+    @Override
+    public InputStream getFileRangeFromDisk(String fileId, long start, long end) throws IOException {
+        File file = new File(AppConstant.CACHE_DIR, fileId + ".full");
+        if (!file.exists()) {
+            throw new FileNotFoundException("Full file not found: " + file.getAbsolutePath());
+        }
+
+        long length = end - start + 1;
+        RandomAccessFile raf = new RandomAccessFile(file, "r");
+        raf.seek(start);
+
+        return new LimitedInputStream(new FileInputStream(raf.getFD()), length, raf);
+    }
+
     /**
      * Helper method to get the chunk file based on fileId and byte range.
      *

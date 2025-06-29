@@ -23,4 +23,6 @@ public interface VideoCacheService {
     InputStream getChunk(String fileId, long start, long end) throws IOException;
     void saveChunk(String fileId, long start, long end, InputStream stream) throws IOException;
     Optional<Range> findNearestChunk(String fileId, long requestedStart, long requestedEnd, long tolerance);
+
+    InputStream getFileRangeFromDisk(String fileId, long start, long end) throws IOException;
 }

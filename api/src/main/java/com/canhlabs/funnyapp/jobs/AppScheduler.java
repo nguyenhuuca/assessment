@@ -2,7 +2,7 @@ package com.canhlabs.funnyapp.jobs;
 
 import com.canhlabs.funnyapp.dto.CacheStat;
 import com.canhlabs.funnyapp.service.CacheStatsService;
-import com.canhlabs.funnyapp.service.StorageVideoService;
+import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,11 +15,11 @@ import java.util.Map;
 public class AppScheduler {
 
     private final YouTubeVideoService service;
-    private final StorageVideoService googleDriveVideoService;
+    private final StreamVideoService googleDriveVideoService;
     private final CacheStatsService cacheStatsService;
 
 
-    public AppScheduler(YouTubeVideoService service, StorageVideoService googleDriveVideoService, CacheStatsService cacheStatsService) {
+    public AppScheduler(YouTubeVideoService service, StreamVideoService googleDriveVideoService, CacheStatsService cacheStatsService) {
         this.service = service;
         this.googleDriveVideoService = googleDriveVideoService;
         this.cacheStatsService = cacheStatsService;

@@ -1,13 +1,11 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.domain.VideoSource;
-import com.canhlabs.funnyapp.dto.Range;
 import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
-import com.canhlabs.funnyapp.service.ChunkIndexService;
-import com.canhlabs.funnyapp.service.StorageVideoService;
+import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoCacheService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.google.api.client.http.GenericUrl;
@@ -29,11 +27,10 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
-public class GoogleDriveVideoServiceImpl implements StorageVideoService {
+public class StreamVideoServiceImpl implements StreamVideoService {
     private static final String FOLDER_ID = "1uk7TUSvUkE9if6HYnY4ap2Kj0gSZ5qlz";
     private final Drive drive;
     private VideoSourceRepository videoSourceRepository;
@@ -54,7 +51,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         this.videoSourceRepository = videoSourceRepository;
     }
 
-    public GoogleDriveVideoServiceImpl(Drive drive) {
+    public StreamVideoServiceImpl(Drive drive) {
         this.drive = drive;
     }
 
@@ -107,6 +104,16 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         }
         return  StreamChunkResult.builder()
                 .stream(videoCacheService.getChunk(fileId, start, end))
+                .actualStart(start)
+                .actualEnd(end)
+                .build();
+    }
+
+    @Override
+    public StreamChunkResult getPartialFileUsingRAF(String fileId, long start, long end) throws IOException {
+        InputStream stream = videoCacheService.getFileRangeFromDisk(fileId, start, end);
+        return  StreamChunkResult.builder()
+                .stream(stream)
                 .actualStart(start)
                 .actualEnd(end)
                 .build();
