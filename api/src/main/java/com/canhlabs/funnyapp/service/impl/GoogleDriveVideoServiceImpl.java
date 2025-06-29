@@ -131,7 +131,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         HttpRequest request = drive.getRequestFactory()
                 .buildGetRequest(url);
         request.getHeaders().setRange("bytes=" + start + "-" + end);
-        log.info("Start stream field {} by range: {}-{} and request {}", fileId, start, end, request);
+        log.info("Start stream from google drive , field {} by range: {}-{} and request {}", fileId, start, end, request);
         return request.execute().getContent();
     }
 
