@@ -10,6 +10,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -71,16 +74,16 @@ public class AppScheduler {
         }
     }
 
-    @Scheduled(cron = "0 */10 * * * *") // every 10 minutes
+    @Scheduled(cron = "0 */20 * * * *") // every 20 minutes
     public void syncDriveVideos() {
         log.info("📥 Syncing Google Drive folder...");
-
-        log.info("📥 Starting sync job...");
-
-        String uploadedAfter = "2025-01-01T00:00:00Z";
+        Instant fifteenMinutesAgo = Instant.now().minus(Duration.ofMinutes(20));
+        // iso format: "2025-01-01T00:00:00Z"
+        String isoTime = DateTimeFormatter.ISO_INSTANT.format(fifteenMinutesAgo);
 
         try {
-            googleDriveVideoService.downloadFileFromFolder(AppConstant.FOLDER_ID, uploadedAfter);
+            googleDriveVideoService.downloadFileFromFolder(AppConstant.FOLDER_ID, isoTime);
+            log.info("✅ Successfully synced from Google Drive");
         } catch (Exception e) {
             log.error("❌ Failed to sync from Google Drive", e);
         }
