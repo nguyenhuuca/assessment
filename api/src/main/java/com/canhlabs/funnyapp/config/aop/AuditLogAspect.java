@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.config.aop;
 
+import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +10,10 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -44,6 +49,7 @@ public class AuditLogAspect {
 
         // IP & input
         String clientIp = getClientIP();
+        String username = getUsername();
         String methodName = targetClass.getSimpleName() + "." + method.getName();
         String inputArgs = Arrays.stream(joinPoint.getArgs())
                 .map(maskingUtil::maskSensitiveFields)
@@ -55,26 +61,46 @@ public class AuditLogAspect {
             result = joinPoint.proceed();
             Object maskedResult = maskingUtil.maskSensitiveFields(result);
             String outputStr;
-            if (maskedResult instanceof List<?> listResult) {
-                outputStr = String.format("List(size=%d)", listResult.size());
+            if (maskedResult instanceof ResponseEntity<?> responseEntity) {
+                Object body = responseEntity.getBody();
+                if (body instanceof ResultListInfo<?> resultList) {
+                    outputStr = String.format("List(size=%d)", resultList.getData().size());
+
+                } else {
+                    outputStr = maskingUtil.toJsonSafe(maskedResult);
+                }
             } else {
                 outputStr = maskingUtil.toJsonSafe(maskedResult);
             }
 
             long duration = System.currentTimeMillis() - start;
 
-            log.info("AUDIT | IP={} | Method={} | Input={} | Output={} | Time={}ms",
-                    clientIp, methodName, inputArgs,
+            log.info("AUDIT | IP={} | User={} | Method={} | Input={} | Output={} | Time={}ms",
+                    clientIp, username, methodName, inputArgs,
                     new ObjectMapper().writeValueAsString(outputStr),
                     duration);
             return result;
         } catch (Throwable ex) {
             long duration = System.currentTimeMillis() - start;
-            log.error("AUDIT | IP={} | Method={} | Input={} | Exception={} | Time={}ms",
-                    clientIp, methodName, inputArgs,
+            log.error("AUDIT | IP={} | User={} | Method={} | Input={} | Exception={} | Time={}ms",
+                    clientIp, username, methodName, inputArgs,
                     ex.getMessage(), duration);
             throw ex;
         }
+    }
+
+    private static String getUsername() {
+        String username = "anonymous";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof UserDetails userDetails) {
+                username = userDetails.getUsername();
+            } else {
+                username = principal.toString();
+            }
+        }
+        return username;
     }
 
     private String getClientIP() {

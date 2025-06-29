@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.dto;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,9 +8,11 @@ import java.util.List;
 
 @Getter
 @Setter
+@Data
 public class ChatGptResponse {
     private List<Choice> choices;
 
+    @Data
     @Getter
     @Setter
     public static class Choice {
@@ -17,6 +20,7 @@ public class ChatGptResponse {
 
     }
 
+    @Data
     @Getter
     @Setter
     public static class Message {

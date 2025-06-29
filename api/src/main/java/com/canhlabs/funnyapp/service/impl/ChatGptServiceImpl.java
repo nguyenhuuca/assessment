@@ -28,19 +28,7 @@ public class ChatGptServiceImpl implements ChatGptService {
 
     @Override
     public List<String> getTopYoutubeVideoIds() {
-        String prompt = """
-                Bạn là một công cụ tìm kiếm video YouTube ngắn (Shorts).
-   
-                Hãy tìm 10 video YouTube Shorts, ngẫu nhiên bất kể thời gian đăng tải nào
-                - Kết quả là danh sách video ID YouTube hợp lệ dạng ["id1", "id2", ...]
-                Ví dụ kết quả đúng:
-                ["9bZkp7q19f0", "dQw4w9WgXcQ", "abc123xyz"]
-        """;
-
-        ChatGptRequest request = new ChatGptRequest(
-                "gpt-4.1",
-                List.of(new ChatGptRequest.Message("system", prompt))
-        );
+        ChatGptRequest request = getChatGptRequest();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -57,6 +45,83 @@ public class ChatGptServiceImpl implements ChatGptService {
 
         String content = response.getBody().getChoices().get(0).getMessage().getContent();
         return parseJsonArray(content);
+    }
+
+    private static ChatGptRequest getChatGptRequest() {
+        String prompt = """
+                Bạn là một công cụ tìm kiếm video YouTube ngắn (Shorts).
+   
+                Hãy tìm 10 video YouTube Shorts, ngẫu nhiên bất kể thời gian đăng tải nào
+                - Kết quả là danh sách video ID YouTube hợp lệ dạng ["id1", "id2", ...]
+                Ví dụ kết quả đúng:
+                ["9bZkp7q19f0", "dQw4w9WgXcQ", "abc123xyz"]
+        """;
+
+        return new ChatGptRequest(
+                "gpt-4.1",
+                List.of(new ChatGptRequest.Message("system", prompt))
+        );
+    }
+
+    @Override
+    public String makePoem(String title) {
+        ChatGptRequest request = getChatGptRequest(title);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(props.getGptKey()); // hoặc hardcode "Bearer sk-xxx"
+
+        HttpEntity<ChatGptRequest> entity = new HttpEntity<>(request, headers);
+
+        ResponseEntity<ChatGptResponse> response = restTemplate.exchange(
+                props.getChatGptUrl(), // ví dụ: https://api.openai.com/v1/chat/completions
+                HttpMethod.POST,
+                entity,
+                ChatGptResponse.class
+        );
+        String content = response.getBody().getChoices().get(0).getMessage().getContent();
+        log.info("Poem content: {}", content);
+        return content;
+    }
+
+    private static ChatGptRequest getChatGptRequest(String title) {
+        String systemPrompt = "Bạn là nhà thơ cổ điển, chuyên sáng tác thơ thất ngôn tứ tuyệt theo phong cách Đường thi.";
+
+        String userPrompt = String.format("""
+            Yêu cầu:
+           \s
+            1. Viết một bài thơ thất ngôn tứ tuyệt với tiêu đề: %s.
+            2. Hai câu đầu viết bằng chữ Quốc ngữ, nhưng toàn bộ dùng **từ Hán Việt** (tức là từ gốc Hán, không dùng từ thuần Việt).
+            3. Hai câu sau là **bản dịch nghĩa hiện đại**, dùng từ thông dụng dễ hiểu, giữ đúng ý thơ.
+            4. Chỉ trả về đúng 4 dòng thơ (2 Hán Việt + 2 dịch nghĩa).
+            5. Luôn đảm bảo thơ có hình ảnh, nhạc tính, gợi cảm.
+           \s
+            Hạn chế:
+            - Không dùng từ thuần Việt như: "lướt nhẹ", "rực rỡ", "xinh đẹp", "trong lành", "mơ màng",...
+            - Không dùng tiếng lóng, hiện đại hóa ngôn từ.
+            - Tránh vần điệu hiện đại hoặc diễn đạt thô.
+           \s
+            Danh sách từ Hán Việt nên ưu tiên sử dụng:
+            - **Thiên nhiên**: xuân, phong, vũ, nguyệt, vân, tuyết, sơn, xuyên, giang, hồ, trúc, tùng, mai, hoa, liễu, lộc, tịch
+            - **Tình cảm nội tâm**: tình, ý, mộng, hoài, luyến, vọng, ưu, sầu, bi, hận, tư, nguyện, mê, giác, ngộ
+            - **Không gian thời gian**: dạ, canh, tịch, sơ, cổ, kim, vãn, mộng cảnh, thiên địa
+            - **Con người/sinh hoạt**: tửu, yến, ca, vũ, thi, họa, khách, nhân, thi nhân, đạo
+            - **Triết lý cổ điển**: hư, vô, sắc, tịnh, thiền, không, hữu, sinh, tử, luân hồi
+
+            Ví dụ đúng:
+            Thiên sơn vạn lý hành nhân ảnh \s
+            Dạ nguyệt cô hoa vọng cố hương \s
+            (Núi ngàn xa tít bóng người qua, \s
+            Trăng đêm cô tịch nhớ quê nhà)
+       \s""", title);
+
+        return new ChatGptRequest(
+                "gpt-4o",
+                List.of(
+                        new ChatGptRequest.Message("system", systemPrompt),
+                        new ChatGptRequest.Message("user", userPrompt)
+                )
+        );
     }
 
     private List<String> parseJsonArray(String content) {

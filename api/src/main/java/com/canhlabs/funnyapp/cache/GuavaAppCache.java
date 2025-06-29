@@ -2,10 +2,16 @@ package com.canhlabs.funnyapp.cache;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
  class GuavaAppCache<K, V> implements AppCache<K, V> {
 
     private final Cache<K, V> cache;
@@ -36,4 +42,21 @@ import java.util.concurrent.TimeUnit;
     public void invalidateAll() {
         cache.invalidateAll();
     }
+
+     @Override
+     public V get(K key, Callable<? extends V> loader)  {
+         try {
+             return cache.get(key, loader);
+         } catch (ExecutionException e) {
+             log.error("Error getting value from cache for key: {}", key, e);
+             throw new RuntimeException(e);
+         }
+     }
+
+    @Override
+    public Map<K, V> asMap() {
+        return cache.asMap();
+    }
+
+
 }

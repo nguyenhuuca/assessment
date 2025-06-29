@@ -9,4 +9,6 @@ public interface ChatGptService {
      * @return A list of YouTube video IDs (e.g., ["9bZkp7q19f0", "dQw4w9WgXcQ", ...])
      */
     List<String> getTopYoutubeVideoIds();
+
+    String makePoem(String title);
 }

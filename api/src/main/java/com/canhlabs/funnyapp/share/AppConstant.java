@@ -14,6 +14,9 @@ import static com.canhlabs.funnyapp.share.AppConstant.API.BASE_URL;
  */
 public class AppConstant {
 
+    public static final String CACHE_DIR = "video-cache/";
+    public static final long CACHE_SIZE = 20 * 1024 * 1024; // 5MB
+
     private AppConstant() {
     }
 
@@ -43,8 +46,8 @@ public class AppConstant {
         // apply for document swagger
         public static final List<String> SWAGGER_DOC = List.of(
                         "/",
-                        //"/actuator/**",
-                        // -- swagger ui
+                        "/v1/funny-app/video-stream",
+                        "/v1/funny-app/video-stream/**",
                         "/v3/api-docs/**", "/swagger-resources", "/swagger-resources/**","/swagger-ui/index.html",
                         "/configuration/ui", "/configuration/security", "/swagger-ui.html",
                         "/swagger-ui/**",

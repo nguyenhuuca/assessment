@@ -31,12 +31,44 @@ const VideoTemplate = {
         return `
         <div class="video-swipe-container" id="{{containerId}}">
             <div class="video-swipe-wrapper">
-                <div class="video-swipe-item">
-                    <iframe src="{{linkYotube}}" 
-                            allowfullscreen 
-                            allow="autoplay; fullscreen" 
-                            referrerpolicy="origin"
-                            loading="lazy"></iframe>
+                <div class="video-swipe-item" id="video-items-{{containerId}}" style="position:relative;">
+                    <div class="video-main">
+                        {{videoTags}}
+                        <div class="video-loading-spinner"><div class="spinner-border text-light" role="status"></div></div>
+                        <div class="video-overlay-controls">
+                            <button class="overlay-button play-pause-btn" onclick="VideoActions.togglePlayPause('{{containerId}}')"><i class="fas fa-pause"></i></button>
+                            <button class="overlay-button mute-unmute-btn" onclick="VideoActions.toggleMute('{{containerId}}')"><i class="fas fa-volume-up"></i></button>
+                        </div>
+                        <div class="video-info-overlay">
+                            <h4 class="video-title-overlay">{{videoTitle}}</h4>
+                            <div class="video-description-overlay">
+                                <p class="video-description-text">{{videoDesc}}</p>
+                                <button class="see-more-btn" onclick="VideoActions.toggleDescription(this, '{{containerId}}', event)">See more</button>
+                            </div>
+                        </div>
+                        <div class="video-progress-container">
+                            <div class="video-progress-bar"></div>
+                        </div>
+                    </div>
+                    <div class="video-actions-vertical">
+                        <div class="vote-action-group">
+                            <button class="vote-button up" id="{{id_upVote}}" onclick="VideoActions.voteUp(this)"><i class="fas fa-thumbs-up"></i></button>
+                            <span class="vote-count" id="{{id_upCount}}">0</span>
+                        </div>
+                        <div class="vote-action-group">
+                            <button class="vote-button down" id="{{id_downVote}}" onclick="VideoActions.voteDown(this)"><i class="fas fa-thumbs-down"></i></button>
+                            <span class="vote-count" id="{{id_downCount}}">0</span>
+                        </div>
+                        <div class="action-group">
+                            <button class="action-button comment" onclick="VideoActions.showComments('{{containerId}}')"><i class="fas fa-comment"></i></button>
+                            <span class="action-count">0</span>
+                        </div>
+                        <div class="action-group">
+                            <button class="action-button share" onclick="VideoActions.shareVideo('{{containerId}}')"><i class="fas fa-share"></i></button>
+                            <span class="action-count">Share</span>
+                        </div>
+                        {{deleteButton}}
+                    </div>
                 </div>
             </div>
             <div class="video-swipe-controls">
@@ -50,36 +82,46 @@ const VideoTemplate = {
         </div>`;
     },
 
-    bindData(videoObj, containerId) {
+    // Render 5 consecutive videos around currentIndex (centered if possible)
+    bindData(videosArr, containerId, currentIndex = 0) {
         let template = this.load();
-        
-        // Handle Google Drive URL
-        if (videoObj.src.includes('drive.google.com')) {
-            const fileId = videoObj.src.match(/\/d\/(.*?)\//)?.[1];
-            if (fileId) {
-                videoObj.src = `https://drive.google.com/file/d/${fileId}/preview`;
+        let videoTags = '';
+        const total = videosArr.length;
+        let start = Math.max(0, Math.min(currentIndex - 2, total - 5));
+        let end = Math.min(total, start + 5);
+        for (let i = start; i < end; i++) {
+            const v = videosArr[i];
+            if (!v) continue;
+            const isCurrent = i === currentIndex;
+            // Poster logic
+            let poster = '';
+            if (v.poster) {
+                poster = v.poster;
+            } else if (v.src && v.src.includes('youtube.com')) {
+                const match = v.src.match(/[?&]v=([^&#]+)/);
+                if (match) {
+                    poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+                }
+            } else {
+                poster = `./icons/poster.jpeg`;
             }
+            videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
         }
-
-        // Add delete button if video is private and shared by current user
+        // Upvote/downvote count and delete button for current video
+        const v = videosArr[currentIndex];
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-        const deleteButton = videoObj.isPrivate && currentUser.email === videoObj.userShared
-            ? `<div class="delete-button" id="${videoObj.id}_delete" onclick="VideoService.deleteVideo(this)">
-                 <i class="fas fa-trash"></i>
-                 <span>Delete</span>
-               </div>`
+        const deleteButton = v && v.isPrivate && currentUser.email === v.userShared
+            ? `<div class="delete-button" id="${v.id}_delete" onclick="VideoService.deleteVideo(this)"><i class="fas fa-trash"></i><span>Delete</span></div>`
             : '';
-        
         return template
-            .replace("{{linkYotube}}", videoObj.src)
-            .replace("{{movi_title}}", videoObj.title)
-            .replace("{{userName}}", videoObj.userShared)
-            .replace("{{desc}}", videoObj.desc)
-            .replace("{{id_upCount}}", videoObj.id + "_upCount")
-            .replace("{{id_downCount}}", videoObj.id + "_downCount")
-            .replace("{{id_upVote}}", videoObj.id + "_upVote")
-            .replace("{{id_downVote}}", videoObj.id + "_downVote")
+            .replace("{{videoTags}}", videoTags)
+            .replace("{{id_upVote}}", v ? v.id + '_upVote' : '')
+            .replace("{{id_downVote}}", v ? v.id + '_downVote' : '')
+            .replace("{{id_upCount}}", v ? v.id + '_upCount' : '')
+            .replace("{{id_downCount}}", v ? v.id + '_downCount' : '')
             .replace("{{deleteButton}}", deleteButton)
+            .replace("{{videoTitle}}", v ? v.title : '')
+            .replace("{{videoDesc}}", v ? v.desc : '')
             .replace(/{{containerId}}/g, containerId);
     }
 };
@@ -90,6 +132,40 @@ const VideoTemplate = {
  */
 const VideoActions = {
     voteStates: {},
+    mutedState: {},
+
+    togglePlayPause(containerId) {
+        const idx = this.currentVideoIndex[containerId];
+        const video = document.getElementById(`${containerId}-video-${idx}`);
+        if (!video) return;
+
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
+    },
+
+    toggleMute(containerId) {
+        const idx = this.currentVideoIndex[containerId];
+        const video = document.getElementById(`${containerId}-video-${idx}`);
+        const videoContainer = document.getElementById(`video-items-${containerId}`);
+        if (!video || !videoContainer) return;
+        
+        const btn = videoContainer.querySelector('.mute-unmute-btn i');
+        if (!btn) return;
+
+        video.muted = !video.muted;
+        this.mutedState[containerId] = video.muted;
+
+        if (video.muted) {
+            btn.classList.remove('fa-volume-up');
+            btn.classList.add('fa-volume-mute');
+        } else {
+            btn.classList.remove('fa-volume-mute');
+            btn.classList.add('fa-volume-up');
+        }
+    },
 
     voteUp(element) {
         const id = $(element).attr("id");
@@ -143,17 +219,19 @@ const VideoActions = {
         }
     },
 
-    toggleDescription(element) {
-        const descriptionSection = $(element).closest('.video-description-container').find('.video-description');
-        const toggleIcon = $(element).find('i');
+    toggleDescription(button, containerId, event) {
+        if (event) event.stopPropagation();
+        const videoContainer = document.getElementById(`video-items-${containerId}`);
+        if (!videoContainer) return;
+
+        const descriptionOverlay = videoContainer.querySelector('.video-description-overlay');
         
-        descriptionSection.toggleClass('show');
-        $(element).toggleClass('active');
-        
-        if (descriptionSection.hasClass('show')) {
-            toggleIcon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        descriptionOverlay.classList.toggle('expanded');
+
+        if (descriptionOverlay.classList.contains('expanded')) {
+            button.textContent = 'See less';
         } else {
-            toggleIcon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            button.textContent = 'See more';
         }
     },
 
@@ -175,20 +253,240 @@ const VideoActions = {
     },
 
     updateVideo(containerId) {
-        const video = this.videos[containerId][this.currentVideoIndex[containerId]];
-        if (!video) return;
+        const videos = this.videos[containerId];
+        const idx = this.currentVideoIndex[containerId];
+        if (!videos || typeof idx !== 'number') return;
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (container) {
+            const playPauseBtn = container.querySelector('.play-pause-btn i');
+            // Pause and reset ALL existing <video> in the container before rendering new ones
+            const oldVideos = container.querySelectorAll('video');
+            oldVideos.forEach(vid => {
+                vid.pause();
+                vid.currentTime = 0;
+            });
+            
+            // Lấy trạng thái muted từ biến toàn cục, mặc định true
+            let prevMuted = (typeof VideoActions.mutedState[containerId] === 'boolean') ? VideoActions.mutedState[containerId] : true;
+            
+            // Only update the video-main content, not the entire container
+            const videoMain = container.querySelector('.video-main');
+            if (videoMain) {
+                // Remove only old video elements, not the controls.
+                const oldVideosInMain = videoMain.querySelectorAll('video');
+                oldVideosInMain.forEach(v => v.remove());
 
-        const iframe = document.querySelector(`#${containerId} .video-swipe-item iframe`);
-        if (iframe) {
-            // Handle Google Drive URL
-            let videoUrl = video.src;
-            if (videoUrl.includes('drive.google.com')) {
-                const fileId = videoUrl.match(/\/d\/(.*?)\//)?.[1];
-                if (fileId) {
-                    videoUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+                let videoTags = '';
+                const total = videos.length;
+                let start = Math.max(0, Math.min(idx - 2, total - 5));
+                let end = Math.min(total, start + 5);
+                
+                for (let i = start; i < end; i++) {
+                    const v = videos[i];
+                    if (!v) continue;
+                    const isCurrent = i === idx;
+                    // Poster logic
+                    let poster = '';
+                    if (v.poster) {
+                        poster = v.poster;
+                    } else if (v.src && v.src.includes('youtube.com')) {
+                        const match = v.src.match(/[?&]v=([^&#]+)/);
+                        if (match) {
+                            poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+                        }
+                    } else {
+                        poster = './icons/poster.jpeg';
+                    }
+                    videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+                }
+                videoMain.insertAdjacentHTML('afterbegin', videoTags);
+            }
+            
+            // Update action buttons for current video
+            const v = videos[idx];
+
+            const titleOverlay = container.querySelector('.video-title-overlay');
+            if (titleOverlay && v) {
+                titleOverlay.textContent = v.title;
+            }
+
+            const descriptionText = container.querySelector('.video-description-text');
+            if(descriptionText && v) {
+                descriptionText.textContent = v.desc;
+            }
+
+            const seeMoreBtn = container.querySelector('.see-more-btn');
+            if (seeMoreBtn) {
+                const descriptionOverlay = container.querySelector('.video-description-overlay');
+                descriptionOverlay.classList.remove('expanded');
+                seeMoreBtn.textContent = 'See more';
+                seeMoreBtn.style.display = 'block'; // reset display
+                // Show button only if text is overflowing
+                const textElement = descriptionOverlay.querySelector('.video-description-text');
+                 setTimeout(() => {
+                    if (textElement.scrollHeight > textElement.clientHeight) {
+                        seeMoreBtn.style.display = 'block';
+                    } else {
+                        seeMoreBtn.style.display = 'none';
+                    }
+                }, 50); // small delay to allow rendering
+            }
+
+            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+            const deleteButton = v && v.isPrivate && currentUser.email === v.userShared
+                ? `<div class="delete-button" id="${v.id}_delete" onclick="VideoService.deleteVideo(this)"><i class="fas fa-trash"></i><span>Delete</span></div>`
+                : '';
+            
+            // Update vote button IDs
+            const upVoteBtn = container.querySelector('.vote-button.up');
+            const downVoteBtn = container.querySelector('.vote-button.down');
+            const upCountSpan = container.querySelector('.vote-count');
+            const downCountSpan = container.querySelectorAll('.vote-count')[1];
+            
+            if (upVoteBtn && v) upVoteBtn.id = v.id + '_upVote';
+            if (downVoteBtn && v) downVoteBtn.id = v.id + '_downVote';
+            if (upCountSpan && v) upCountSpan.id = v.id + '_upCount';
+            if (downCountSpan && v) downCountSpan.id = v.id + '_downCount';
+            
+            // Update delete button
+            const existingDeleteBtn = container.querySelector('.delete-button');
+            if (existingDeleteBtn) {
+                existingDeleteBtn.remove();
+            }
+            if (deleteButton) {
+                const actionsContainer = container.querySelector('.video-actions-vertical');
+                if (actionsContainer) {
+                    actionsContainer.insertAdjacentHTML('beforeend', deleteButton);
                 }
             }
-            iframe.src = videoUrl;
+            
+            // Play-pause icon overlay
+            let playIcon = container.querySelector('.video-play-icon');
+            if (!playIcon) {
+                playIcon = document.createElement('div');
+                playIcon.className = 'video-play-icon';
+                playIcon.innerHTML = '<i class="fas fa-play"></i>';
+                container.querySelector('.video-main').appendChild(playIcon);
+            }
+            
+            // Hiệu ứng fade: set active cho video hiện tại
+            const allVideos = container.querySelectorAll('video');
+            allVideos.forEach(vid => vid.classList.remove('active'));
+            const currentVid = document.getElementById(`${containerId}-video-${idx}`);
+            if (currentVid) {
+                currentVid.classList.add('active');
+                currentVid.muted = prevMuted;
+
+                const loadingSpinner = container.querySelector('.video-loading-spinner');
+                const showLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'flex'; };
+                const hideLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'none'; };
+
+                currentVid.addEventListener('loadstart', showLoader);
+                currentVid.addEventListener('waiting', showLoader);
+                currentVid.addEventListener('stalled', showLoader);
+                currentVid.addEventListener('canplay', hideLoader);
+                currentVid.addEventListener('playing', hideLoader);
+                currentVid.addEventListener('error', hideLoader);
+
+                const progressContainer = container.querySelector('.video-progress-container');
+                const progressBar = container.querySelector('.video-progress-bar');
+                
+                if (progressContainer && progressBar) {
+                    currentVid.addEventListener('timeupdate', () => {
+                        if (currentVid.duration) {
+                            const progressPercent = (currentVid.currentTime / currentVid.duration) * 100;
+                            progressBar.style.width = `${progressPercent}%`;
+                        }
+                    });
+            
+                    progressContainer.addEventListener('click', (e) => {
+                        if (currentVid.duration) {
+                            const rect = progressContainer.getBoundingClientRect();
+                            const clickX = e.clientX - rect.left;
+                            const width = progressContainer.clientWidth;
+                            currentVid.currentTime = (clickX / width) * currentVid.duration;
+                        }
+                    });
+                }
+
+                currentVid.addEventListener('ended', function() {
+                    VideoActions.swipeRight(containerId);
+                });
+                // Lắng nghe sự kiện volumechange để cập nhật trạng thái mute
+                currentVid.addEventListener('volumechange', function() {
+                    VideoActions.mutedState[containerId] = currentVid.muted;
+                    const muteBtn = container.querySelector('.mute-unmute-btn i');
+                    if (muteBtn) {
+                        if (currentVid.muted) {
+                            muteBtn.classList.remove('fa-volume-up');
+                            muteBtn.classList.add('fa-volume-mute');
+                        } else {
+                            muteBtn.classList.remove('fa-volume-mute');
+                            muteBtn.classList.add('fa-volume-up');
+                        }
+                    }
+                });
+                // Khi play, pause tất cả video khác trong container
+                currentVid.addEventListener('play', function() {
+                    hideLoader();
+                    if (playIcon) playIcon.style.display = 'none';
+                    const playPauseBtn = container.querySelector('.play-pause-btn i');
+                    if (playPauseBtn) {
+                        playPauseBtn.classList.remove('fa-play');
+                        playPauseBtn.classList.add('fa-pause');
+                    }
+                    allVideos.forEach(vid => {
+                        if (vid !== currentVid) {
+                            vid.pause();
+                            vid.currentTime = 0;
+                        }
+                    });
+                });
+                currentVid.addEventListener('pause', function() {
+                    hideLoader();
+                    if (playIcon) playIcon.style.display = 'flex';
+                    const playPauseBtn = container.querySelector('.play-pause-btn i');
+                    if (playPauseBtn) {
+                        playPauseBtn.classList.remove('fa-pause');
+                        playPauseBtn.classList.add('fa-play');
+                    }
+                });
+                
+                currentVid.parentElement.onclick = (e) => {
+                    if (e.target.closest('.overlay-button')) return;
+                    this.togglePlayPause(containerId);
+                };
+                
+                currentVid.play().catch(() => {
+                    hideLoader();
+                    if (playIcon) playIcon.style.display = 'flex';
+                });
+
+                // init state
+                const muteBtn = container.querySelector('.mute-unmute-btn i');
+                if (muteBtn) {
+                    if (currentVid.muted) {
+                        muteBtn.classList.remove('fa-volume-up');
+                        muteBtn.classList.add('fa-volume-mute');
+                    } else {
+                        muteBtn.classList.remove('fa-volume-mute');
+                        muteBtn.classList.add('fa-volume-up');
+                    }
+                }
+                if (currentVid.paused) {
+                    if (playIcon) playIcon.style.display = 'flex';
+                    if (playPauseBtn) {
+                        playPauseBtn.classList.remove('fa-pause');
+                        playPauseBtn.classList.add('fa-play');
+                    }
+                } else {
+                    if (playIcon) playIcon.style.display = 'none';
+                    if (playPauseBtn) {
+                        playPauseBtn.classList.remove('fa-play');
+                        playPauseBtn.classList.add('fa-pause');
+                    }
+                }
+            }
         }
     },
 
@@ -196,6 +494,41 @@ const VideoActions = {
         this.videos[containerId] = videos;
         this.currentVideoIndex[containerId] = 0;
         this.updateVideo(containerId);
+        const videoContainer = document.getElementById(`video-items-${containerId}`);
+        const seeMoreBtn = videoContainer.querySelector('.see-more-btn');
+        const textElement = videoContainer.querySelector('.video-description-text');
+        
+        if (seeMoreBtn && textElement) {
+             setTimeout(() => {
+                if (textElement.scrollHeight > textElement.clientHeight) {
+                    seeMoreBtn.style.display = 'block';
+                } else {
+                    seeMoreBtn.style.display = 'none';
+                }
+            }, 50);
+        }
+    },
+
+    showComments(containerId) {
+        // Hiển thị modal comment panel bên phải
+        document.getElementById('commentPanelModal').classList.add('active');
+    },
+
+    closeCommentPanel() {
+        document.getElementById('commentPanelModal').classList.remove('active');
+    },
+
+    shareVideo(containerId) {
+        // TODO: Implement share functionality
+        const currentVideo = this.videos[containerId][this.currentVideoIndex[containerId]];
+        if (currentVideo) {
+            // Copy video URL to clipboard or open share modal
+            navigator.clipboard.writeText(currentVideo.src).then(() => {
+                alert('Video URL copied to clipboard!');
+            }).catch(() => {
+                alert('Share feature coming soon!');
+            });
+        }
     }
 };
 
@@ -255,7 +588,7 @@ const VideoService = {
     loadData() {
         // Load public videos
         $.ajax({
-            url: appConst.baseUrl.concat("/top-videos"),
+            url: appConst.baseUrl.concat("/video-stream/list"),
             type: "GET",
             dataType: "json"
         }).done((rs) => {
@@ -306,32 +639,42 @@ const VideoService = {
         const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
         const funnyVideos = sortedByPopularity.filter(video => video.category === 'funny');
         const regularVideos = sortedByPopularity.filter(video => video.category === 'regular');
+        const allVideos = [...regularVideos, ...funnyVideos];
 
-        // Initialize swipe with all videos
-        VideoActions.initSwipe([...regularVideos, ...funnyVideos], 'popular-videos');
-
-        // Display first video
-        const firstVideo = regularVideos[0] || funnyVideos[0];
-        if (firstVideo) {
-            const videoHtml = VideoTemplate.bindData(firstVideo, 'popular-videos');
-            $("#list-video-popular").append(videoHtml);
+        // Display first video and preload next 4
+        if (allVideos.length > 0) {
+            const videoHtml = VideoTemplate.bindData(allVideos, 'popular-videos', 0);
+            $("#list-video-popular").html(videoHtml);
+            // Add auto-next event
+            const videoEl = document.getElementById('popular-videos-video-0');
+            if (videoEl) {
+                videoEl.addEventListener('ended', function() {
+                    VideoActions.swipeRight('popular-videos');
+                });
+            }
         }
+        VideoActions.initSwipe(allVideos, 'popular-videos');
+        addSwipeEvents('popular-videos');
+        addKeyboardEvents('popular-videos');
     },
 
     displayPrivateVideos(videos) {
         $("#list-video-private").empty();
-        
         const sortedByPopularity = [...videos].sort((a, b) => b.upvotes - a.upvotes);
-        
-        // Initialize swipe with private videos
-        VideoActions.initSwipe(sortedByPopularity, 'private-videos');
-
-        // Display first video
-        const firstVideo = sortedByPopularity[0];
-        if (firstVideo) {
-            const videoHtml = VideoTemplate.bindData(firstVideo, 'private-videos');
-            $("#list-video-private").append(videoHtml);
+        if (sortedByPopularity.length > 0) {
+            const videoHtml = VideoTemplate.bindData(sortedByPopularity, 'private-videos', 0);
+            $("#list-video-private").html(videoHtml);
+            // Add auto-next event
+            const videoEl = document.getElementById('private-videos-video-0');
+            if (videoEl) {
+                videoEl.addEventListener('ended', function() {
+                    VideoActions.swipeRight('private-videos');
+                });
+            }
         }
+        VideoActions.initSwipe(sortedByPopularity, 'private-videos');
+        addSwipeEvents('private-videos');
+        addKeyboardEvents('private-videos');
     },
 
     deleteVideo(element) {
@@ -445,3 +788,86 @@ $(document).ready(function() {
     });
 });
 
+// Add this function to support swipe gesture
+function addSwipeEvents(containerId) {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const threshold = 50; // px
+
+    // Use event delegation in case container is re-rendered
+    document.addEventListener('touchstart', function(e) {
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (!container || !container.contains(e.target)) return;
+        touchStartX = e.changedTouches[0].screenX;
+    }, false);
+
+    document.addEventListener('touchend', function(e) {
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (!container || !container.contains(e.target)) return;
+        touchEndX = e.changedTouches[0].screenX;
+        const diff = touchEndX - touchStartX;
+        if (diff > threshold) {
+            VideoActions.swipeLeft(containerId);
+        } else if (diff < -threshold) {
+            VideoActions.swipeRight(containerId);
+        }
+    }, false);
+}
+
+// Add keyboard navigation for desktop
+function addKeyboardEvents(containerId) {
+    document.addEventListener('keydown', function(e) {
+        // Only handle arrow keys when video container is visible
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (!container || !container.offsetParent) return;
+        
+        switch(e.key) {
+            case 'ArrowLeft':
+                e.preventDefault();
+                VideoActions.swipeLeft(containerId);
+                showNavigationFeedback('left');
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                VideoActions.swipeRight(containerId);
+                showNavigationFeedback('right');
+                break;
+        }
+    });
+}
+
+// Show visual feedback for keyboard navigation
+function showNavigationFeedback(direction) {
+    // Remove existing feedback
+    const existingFeedback = document.querySelector('.nav-feedback');
+    if (existingFeedback) {
+        existingFeedback.remove();
+    }
+    
+    // Create feedback element
+    const feedback = document.createElement('div');
+    feedback.className = 'nav-feedback';
+    feedback.innerHTML = `<i class="fas fa-arrow-${direction}"></i>`;
+    feedback.style.cssText = `
+        position: fixed;
+        top: 50%;
+        ${direction === 'left' ? 'left: 20px' : 'right: 20px'};
+        transform: translateY(-50%);
+        background: rgba(0, 123, 255, 0.9);
+        color: white;
+        padding: 15px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        z-index: 9999;
+        animation: navFeedback 0.5s ease-out;
+    `;
+    
+    document.body.appendChild(feedback);
+    
+    // Remove after animation
+    setTimeout(() => {
+        if (feedback.parentNode) {
+            feedback.remove();
+        }
+    }, 500);
+}
