@@ -106,6 +106,18 @@ const VideoTemplate = {
                 } else {
                     poster = './icons/poster.jpeg';
                 }
+            } else {
+                // Video hiện tại vẫn cần poster để tránh chớp đen
+                if (v.poster) {
+                    poster = v.poster;
+                } else if (v.src && v.src.includes('youtube.com')) {
+                    const match = v.src.match(/[?&]v=([^&#]+)/);
+                    if (match) {
+                        poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+                    }
+                } else {
+                    poster = './icons/poster.jpeg';
+                }
             }
             
             // Video mới sẽ bắt đầu từ vị trí bên ngoài
@@ -323,6 +335,18 @@ const VideoActions = {
                 // Poster logic - không hiển thị poster cho video hiện tại khi swipe
                 let poster = '';
                 if (!isCurrent) { // Chỉ set poster cho video không phải hiện tại
+                    if (v.poster) {
+                        poster = v.poster;
+                    } else if (v.src && v.src.includes('youtube.com')) {
+                        const match = v.src.match(/[?&]v=([^&#]+)/);
+                        if (match) {
+                            poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+                        }
+                    } else {
+                        poster = './icons/poster.jpeg';
+                    }
+                } else {
+                    // Video hiện tại vẫn cần poster để tránh chớp đen
                     if (v.poster) {
                         poster = v.poster;
                     } else if (v.src && v.src.includes('youtube.com')) {
