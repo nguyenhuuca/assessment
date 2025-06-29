@@ -107,7 +107,17 @@ const VideoTemplate = {
                     poster = './icons/poster.jpeg';
                 }
             }
-            videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
+            
+            // Video mới sẽ bắt đầu từ vị trí bên ngoài
+            let initialTransform = '';
+            let preloadValue = 'auto';
+            if (isCurrent && typeof direction !== 'undefined' && direction) {
+                initialTransform = direction === 'right' ? 'transform: translateX(100%);' : 'transform: translateX(-100%);';
+            } else if (!isCurrent) {
+                preloadValue = 'metadata'; // Chỉ preload metadata cho video không phải hiện tại
+            }
+            
+            videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="${preloadValue}" style="width:100%;height:100%;position:absolute;top:0px;left:0;${initialTransform}"></video>`;
         }
         // Upvote/downvote count and delete button for current video
         const v = videosArr[currentIndex];
@@ -243,230 +253,238 @@ const VideoActions = {
     swipeLeft(containerId) {
         if (this.currentVideoIndex[containerId] > 0) {
             this.currentVideoIndex[containerId]--;
-            this.updateVideo(containerId);
+            this.updateVideo(containerId, 'left');
         }
     },
 
     swipeRight(containerId) {
         if (this.currentVideoIndex[containerId] < this.videos[containerId].length - 1) {
             this.currentVideoIndex[containerId]++;
-            this.updateVideo(containerId);
+            this.updateVideo(containerId, 'right');
         }
     },
 
-    updateVideo(containerId) {
+    updateVideo(containerId, direction = 'right') {
         const videos = this.videos[containerId];
         const idx = this.currentVideoIndex[containerId];
         if (!videos || typeof idx !== 'number') return;
         const container = document.getElementById(`video-items-${containerId}`);
         if (container) {
             const playPauseBtn = container.querySelector('.play-pause-btn i');
-            // Pause and reset ALL existing <video> in the container before rendering new ones
-            const oldVideos = container.querySelectorAll('video');
-            oldVideos.forEach(vid => {
-                vid.pause();
-                vid.currentTime = 0;
-            });
+            
+            // Tạo video mới trước, sau đó mới xử lý video cũ
+            this.createNewVideo(containerId, idx, direction);
+            
+            // Lấy video hiện tại để tạo hiệu ứng slide
+            const currentVideo = container.querySelector('video.active');
+            if (currentVideo) {
+                // Thêm hiệu ứng slide cho video cũ
+                currentVideo.classList.add(direction === 'right' ? 'slide-left' : 'slide-right');
+                
+                // Video mới sẽ trượt vào cùng lúc
+                setTimeout(() => {
+                    const newVideo = document.getElementById(`${containerId}-video-${idx}`);
+                    if (newVideo) {
+                        newVideo.classList.add('slide-in');
+                    }
+                }, 50);
+            }
+        }
+    },
+
+    createNewVideo(containerId, idx, direction) {
+        const videos = this.videos[containerId];
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (!container) return;
+
+        // Pause and reset ALL existing <video> in the container before rendering new ones
+        const oldVideos = container.querySelectorAll('video');
+        oldVideos.forEach(vid => {
+            vid.pause();
+            vid.currentTime = 0;
+        });
+        
+        // Only update the video-main content, not the entire container
+        const videoMain = container.querySelector('.video-main');
+        if (videoMain) {
+            // Remove only old video elements, not the controls.
+            const oldVideosInMain = videoMain.querySelectorAll('video');
+            oldVideosInMain.forEach(v => v.remove());
+
+            let videoTags = '';
+            const total = videos.length;
+            let start = Math.max(0, Math.min(idx - 2, total - 5));
+            let end = Math.min(total, start + 5);
+            
+            for (let i = start; i < end; i++) {
+                const v = videos[i];
+                if (!v) continue;
+                const isCurrent = i === idx;
+                // Poster logic - không hiển thị poster cho video hiện tại khi swipe
+                let poster = '';
+                if (!isCurrent) { // Chỉ set poster cho video không phải hiện tại
+                    if (v.poster) {
+                        poster = v.poster;
+                    } else if (v.src && v.src.includes('youtube.com')) {
+                        const match = v.src.match(/[?&]v=([^&#]+)/);
+                        if (match) {
+                            poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+                        }
+                    } else {
+                        poster = './icons/poster.jpeg';
+                    }
+                }
+                
+                // Video mới sẽ bắt đầu từ vị trí bên ngoài
+                let initialTransform = '';
+                let preloadValue = 'auto';
+                if (isCurrent && typeof direction !== 'undefined' && direction) {
+                    initialTransform = direction === 'right' ? 'transform: translateX(100%);' : 'transform: translateX(-100%);';
+                } else if (!isCurrent) {
+                    preloadValue = 'metadata'; // Chỉ preload metadata cho video không phải hiện tại
+                }
+                
+                videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="${preloadValue}" style="width:100%;height:100%;position:absolute;top:0px;left:0;${initialTransform}"></video>`;
+            }
+            videoMain.insertAdjacentHTML('afterbegin', videoTags);
+        }
+        
+        // Update action buttons for current video
+        const v = videos[idx];
+
+        const titleOverlay = container.querySelector('.video-title-overlay');
+        if (titleOverlay && v) {
+            titleOverlay.textContent = v.title;
+        }
+
+        const descriptionText = container.querySelector('.video-description-text');
+        if(descriptionText && v) {
+            descriptionText.textContent = v.desc;
+        }
+
+        const seeMoreBtn = container.querySelector('.see-more-btn');
+        if (seeMoreBtn) {
+            const descriptionOverlay = container.querySelector('.video-description-overlay');
+            descriptionOverlay.classList.remove('expanded');
+            seeMoreBtn.textContent = 'See more';
+            seeMoreBtn.style.display = 'block'; // reset display
+            // Show button only if text is overflowing
+            const textElement = descriptionOverlay.querySelector('.video-description-text');
+             setTimeout(() => {
+                if (textElement.scrollHeight > textElement.clientHeight) {
+                    seeMoreBtn.style.display = 'block';
+                } else {
+                    seeMoreBtn.style.display = 'none';
+                }
+            }, 50); // small delay to allow rendering
+        }
+
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const deleteButton = v && v.isPrivate && currentUser.email === v.userShared
+            ? `<div class="delete-button" id="${v.id}_delete" onclick="VideoService.deleteVideo(this)"><i class="fas fa-trash"></i><span>Delete</span></div>`
+            : '';
+        
+        // Update vote button IDs
+        const upVoteBtn = container.querySelector('.vote-button.up');
+        const downVoteBtn = container.querySelector('.vote-button.down');
+        const upCountSpan = container.querySelector('.vote-count');
+        const downCountSpan = container.querySelectorAll('.vote-count')[1];
+        
+        if (upVoteBtn && v) upVoteBtn.id = v.id + '_upVote';
+        if (downVoteBtn && v) downVoteBtn.id = v.id + '_downVote';
+        if (upCountSpan && v) upCountSpan.id = v.id + '_upCount';
+        if (downCountSpan && v) downCountSpan.id = v.id + '_downCount';
+        
+        // Update delete button
+        const existingDeleteBtn = container.querySelector('.delete-button');
+        if (existingDeleteBtn) {
+            existingDeleteBtn.remove();
+        }
+        if (deleteButton) {
+            const actionsContainer = container.querySelector('.video-actions-vertical');
+            if (actionsContainer) {
+                actionsContainer.insertAdjacentHTML('beforeend', deleteButton);
+            }
+        }
+        
+        // Play-pause icon overlay
+        let playIcon = container.querySelector('.video-play-icon');
+        if (!playIcon) {
+            playIcon = document.createElement('div');
+            playIcon.className = 'video-play-icon';
+            playIcon.innerHTML = '<i class="fas fa-play"></i>';
+            container.querySelector('.video-main').appendChild(playIcon);
+        }
+        
+        // Hiệu ứng fade: set active cho video hiện tại
+        const allVideos = container.querySelectorAll('video');
+        allVideos.forEach(vid => vid.classList.remove('active'));
+        const currentVid = document.getElementById(`${containerId}-video-${idx}`);
+        if (currentVid) {
+            // Video mới đã có transform ban đầu, chỉ cần thêm class slide-in để trượt vào
+            currentVid.classList.add('active');
             
             // Lấy trạng thái muted từ biến toàn cục, mặc định true
             let prevMuted = (typeof VideoActions.mutedState[containerId] === 'boolean') ? VideoActions.mutedState[containerId] : true;
-            
-            // Only update the video-main content, not the entire container
-            const videoMain = container.querySelector('.video-main');
-            if (videoMain) {
-                // Remove only old video elements, not the controls.
-                const oldVideosInMain = videoMain.querySelectorAll('video');
-                oldVideosInMain.forEach(v => v.remove());
+            currentVid.muted = prevMuted;
 
-                let videoTags = '';
-                const total = videos.length;
-                let start = Math.max(0, Math.min(idx - 2, total - 5));
-                let end = Math.min(total, start + 5);
-                
-                for (let i = start; i < end; i++) {
-                    const v = videos[i];
-                    if (!v) continue;
-                    const isCurrent = i === idx;
-                    // Poster logic - không hiển thị poster cho video hiện tại khi swipe
-                    let poster = '';
-                    if (!isCurrent) { // Chỉ set poster cho video không phải hiện tại
-                        if (v.poster) {
-                            poster = v.poster;
-                        } else if (v.src && v.src.includes('youtube.com')) {
-                            const match = v.src.match(/[?&]v=([^&#]+)/);
-                            if (match) {
-                                poster = `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
-                            }
-                        } else {
-                            poster = './icons/poster.jpeg';
-                        }
+            const loadingSpinner = container.querySelector('.video-loading-spinner');
+            const showLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'flex'; };
+            const hideLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'none'; };
+
+            currentVid.addEventListener('loadstart', showLoader);
+            currentVid.addEventListener('waiting', showLoader);
+            currentVid.addEventListener('stalled', showLoader);
+            currentVid.addEventListener('canplay', hideLoader);
+            currentVid.addEventListener('playing', hideLoader);
+            currentVid.addEventListener('error', hideLoader);
+
+            // Đảm bảo video sẵn sàng trước khi slide
+            if (currentVid.readyState >= 2) { // HAVE_CURRENT_DATA
+                setTimeout(() => {
+                    const newVideo = document.getElementById(`${containerId}-video-${idx}`);
+                    if (newVideo) {
+                        newVideo.classList.add('slide-in');
                     }
-                    videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="auto" style="width:100%;height:100%;position:absolute;top:0px;left:0;${isCurrent ? '' : 'display:none;'}"></video>`;
-                }
-                videoMain.insertAdjacentHTML('afterbegin', videoTags);
-            }
-            
-            // Update action buttons for current video
-            const v = videos[idx];
-
-            const titleOverlay = container.querySelector('.video-title-overlay');
-            if (titleOverlay && v) {
-                titleOverlay.textContent = v.title;
-            }
-
-            const descriptionText = container.querySelector('.video-description-text');
-            if(descriptionText && v) {
-                descriptionText.textContent = v.desc;
-            }
-
-            const seeMoreBtn = container.querySelector('.see-more-btn');
-            if (seeMoreBtn) {
-                const descriptionOverlay = container.querySelector('.video-description-overlay');
-                descriptionOverlay.classList.remove('expanded');
-                seeMoreBtn.textContent = 'See more';
-                seeMoreBtn.style.display = 'block'; // reset display
-                // Show button only if text is overflowing
-                const textElement = descriptionOverlay.querySelector('.video-description-text');
-                 setTimeout(() => {
-                    if (textElement.scrollHeight > textElement.clientHeight) {
-                        seeMoreBtn.style.display = 'block';
-                    } else {
-                        seeMoreBtn.style.display = 'none';
-                    }
-                }, 50); // small delay to allow rendering
-            }
-
-            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-            const deleteButton = v && v.isPrivate && currentUser.email === v.userShared
-                ? `<div class="delete-button" id="${v.id}_delete" onclick="VideoService.deleteVideo(this)"><i class="fas fa-trash"></i><span>Delete</span></div>`
-                : '';
-            
-            // Update vote button IDs
-            const upVoteBtn = container.querySelector('.vote-button.up');
-            const downVoteBtn = container.querySelector('.vote-button.down');
-            const upCountSpan = container.querySelector('.vote-count');
-            const downCountSpan = container.querySelectorAll('.vote-count')[1];
-            
-            if (upVoteBtn && v) upVoteBtn.id = v.id + '_upVote';
-            if (downVoteBtn && v) downVoteBtn.id = v.id + '_downVote';
-            if (upCountSpan && v) upCountSpan.id = v.id + '_upCount';
-            if (downCountSpan && v) downCountSpan.id = v.id + '_downCount';
-            
-            // Update delete button
-            const existingDeleteBtn = container.querySelector('.delete-button');
-            if (existingDeleteBtn) {
-                existingDeleteBtn.remove();
-            }
-            if (deleteButton) {
-                const actionsContainer = container.querySelector('.video-actions-vertical');
-                if (actionsContainer) {
-                    actionsContainer.insertAdjacentHTML('beforeend', deleteButton);
-                }
-            }
-            
-            // Play-pause icon overlay
-            let playIcon = container.querySelector('.video-play-icon');
-            if (!playIcon) {
-                playIcon = document.createElement('div');
-                playIcon.className = 'video-play-icon';
-                playIcon.innerHTML = '<i class="fas fa-play"></i>';
-                container.querySelector('.video-main').appendChild(playIcon);
-            }
-            
-            // Hiệu ứng fade: set active cho video hiện tại
-            const allVideos = container.querySelectorAll('video');
-            allVideos.forEach(vid => vid.classList.remove('active'));
-            const currentVid = document.getElementById(`${containerId}-video-${idx}`);
-            if (currentVid) {
-                currentVid.classList.add('active');
-                currentVid.muted = prevMuted;
-
-                const loadingSpinner = container.querySelector('.video-loading-spinner');
-                const showLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'flex'; };
-                const hideLoader = () => { if (loadingSpinner) loadingSpinner.style.display = 'none'; };
-
-                currentVid.addEventListener('loadstart', showLoader);
-                currentVid.addEventListener('waiting', showLoader);
-                currentVid.addEventListener('stalled', showLoader);
-                currentVid.addEventListener('canplay', hideLoader);
-                currentVid.addEventListener('playing', hideLoader);
-                currentVid.addEventListener('error', hideLoader);
-
-                const progressContainer = container.querySelector('.video-progress-container');
-                const progressBar = container.querySelector('.video-progress-bar');
-                
-                if (progressContainer && progressBar) {
-                    currentVid.addEventListener('timeupdate', () => {
-                        if (currentVid.duration) {
-                            const progressPercent = (currentVid.currentTime / currentVid.duration) * 100;
-                            progressBar.style.width = `${progressPercent}%`;
+                }, 50);
+            } else {
+                currentVid.addEventListener('canplay', () => {
+                    setTimeout(() => {
+                        const newVideo = document.getElementById(`${containerId}-video-${idx}`);
+                        if (newVideo) {
+                            newVideo.classList.add('slide-in');
                         }
-                    });
-            
-                    progressContainer.addEventListener('click', (e) => {
-                        if (currentVid.duration) {
-                            const rect = progressContainer.getBoundingClientRect();
-                            const clickX = e.clientX - rect.left;
-                            const width = progressContainer.clientWidth;
-                            currentVid.currentTime = (clickX / width) * currentVid.duration;
-                        }
-                    });
-                }
+                    }, 50);
+                }, { once: true });
+            }
 
-                currentVid.addEventListener('ended', function() {
-                    VideoActions.swipeRight(containerId);
-                });
-                // Lắng nghe sự kiện volumechange để cập nhật trạng thái mute
-                currentVid.addEventListener('volumechange', function() {
-                    VideoActions.mutedState[containerId] = currentVid.muted;
-                    const muteBtn = container.querySelector('.mute-unmute-btn i');
-                    if (muteBtn) {
-                        if (currentVid.muted) {
-                            muteBtn.classList.remove('fa-volume-up');
-                            muteBtn.classList.add('fa-volume-mute');
-                        } else {
-                            muteBtn.classList.remove('fa-volume-mute');
-                            muteBtn.classList.add('fa-volume-up');
-                        }
+            const progressContainer = container.querySelector('.video-progress-container');
+            const progressBar = container.querySelector('.video-progress-bar');
+            
+            if (progressContainer && progressBar) {
+                currentVid.addEventListener('timeupdate', () => {
+                    if (currentVid.duration) {
+                        const progressPercent = (currentVid.currentTime / currentVid.duration) * 100;
+                        progressBar.style.width = `${progressPercent}%`;
                     }
                 });
-                // Khi play, pause tất cả video khác trong container
-                currentVid.addEventListener('play', function() {
-                    hideLoader();
-                    if (playIcon) playIcon.style.display = 'none';
-                    const playPauseBtn = container.querySelector('.play-pause-btn i');
-                    if (playPauseBtn) {
-                        playPauseBtn.classList.remove('fa-play');
-                        playPauseBtn.classList.add('fa-pause');
-                    }
-                    allVideos.forEach(vid => {
-                        if (vid !== currentVid) {
-                            vid.pause();
-                            vid.currentTime = 0;
-                        }
-                    });
-                });
-                currentVid.addEventListener('pause', function() {
-                    hideLoader();
-                    if (playIcon) playIcon.style.display = 'flex';
-                    const playPauseBtn = container.querySelector('.play-pause-btn i');
-                    if (playPauseBtn) {
-                        playPauseBtn.classList.remove('fa-pause');
-                        playPauseBtn.classList.add('fa-play');
+        
+                progressContainer.addEventListener('click', (e) => {
+                    if (currentVid.duration) {
+                        const rect = progressContainer.getBoundingClientRect();
+                        const clickX = e.clientX - rect.left;
+                        const width = progressContainer.clientWidth;
+                        currentVid.currentTime = (clickX / width) * currentVid.duration;
                     }
                 });
-                
-                currentVid.parentElement.onclick = (e) => {
-                    if (e.target.closest('.overlay-button')) return;
-                    this.togglePlayPause(containerId);
-                };
-                
-                currentVid.play().catch(() => {
-                    hideLoader();
-                    if (playIcon) playIcon.style.display = 'flex';
-                });
+            }
 
-                // init state
+            currentVid.addEventListener('ended', function() {
+                VideoActions.swipeRight(containerId);
+            });
+            // Lắng nghe sự kiện volumechange để cập nhật trạng thái mute
+            currentVid.addEventListener('volumechange', function() {
+                VideoActions.mutedState[containerId] = currentVid.muted;
                 const muteBtn = container.querySelector('.mute-unmute-btn i');
                 if (muteBtn) {
                     if (currentVid.muted) {
@@ -477,18 +495,67 @@ const VideoActions = {
                         muteBtn.classList.add('fa-volume-up');
                     }
                 }
-                if (currentVid.paused) {
-                    if (playIcon) playIcon.style.display = 'flex';
-                    if (playPauseBtn) {
-                        playPauseBtn.classList.remove('fa-pause');
-                        playPauseBtn.classList.add('fa-play');
+            });
+            // Khi play, pause tất cả video khác trong container
+            currentVid.addEventListener('play', function() {
+                hideLoader();
+                if (playIcon) playIcon.style.display = 'none';
+                const playPauseBtn = container.querySelector('.play-pause-btn i');
+                if (playPauseBtn) {
+                    playPauseBtn.classList.remove('fa-play');
+                    playPauseBtn.classList.add('fa-pause');
+                }
+                allVideos.forEach(vid => {
+                    if (vid !== currentVid) {
+                        vid.pause();
+                        vid.currentTime = 0;
                     }
+                });
+            });
+            currentVid.addEventListener('pause', function() {
+                hideLoader();
+                if (playIcon) playIcon.style.display = 'flex';
+                const playPauseBtn = container.querySelector('.play-pause-btn i');
+                if (playPauseBtn) {
+                    playPauseBtn.classList.remove('fa-pause');
+                    playPauseBtn.classList.add('fa-play');
+                }
+            });
+            
+            currentVid.parentElement.onclick = (e) => {
+                if (e.target.closest('.overlay-button')) return;
+                this.togglePlayPause(containerId);
+            };
+            
+            currentVid.play().catch(() => {
+                hideLoader();
+                if (playIcon) playIcon.style.display = 'flex';
+            });
+
+            // init state
+            const muteBtn = container.querySelector('.mute-unmute-btn i');
+            if (muteBtn) {
+                if (currentVid.muted) {
+                    muteBtn.classList.remove('fa-volume-up');
+                    muteBtn.classList.add('fa-volume-mute');
                 } else {
-                    if (playIcon) playIcon.style.display = 'none';
-                    if (playPauseBtn) {
-                        playPauseBtn.classList.remove('fa-play');
-                        playPauseBtn.classList.add('fa-pause');
-                    }
+                    muteBtn.classList.remove('fa-volume-mute');
+                    muteBtn.classList.add('fa-volume-up');
+                }
+            }
+            if (currentVid.paused) {
+                if (playIcon) playIcon.style.display = 'flex';
+                const playPauseBtn = container.querySelector('.play-pause-btn i');
+                if (playPauseBtn) {
+                    playPauseBtn.classList.remove('fa-pause');
+                    playPauseBtn.classList.add('fa-play');
+                }
+            } else {
+                if (playIcon) playIcon.style.display = 'none';
+                const playPauseBtn = container.querySelector('.play-pause-btn i');
+                if (playPauseBtn) {
+                    playPauseBtn.classList.remove('fa-play');
+                    playPauseBtn.classList.add('fa-pause');
                 }
             }
         }
@@ -497,7 +564,7 @@ const VideoActions = {
     initSwipe(videos, containerId) {
         this.videos[containerId] = videos;
         this.currentVideoIndex[containerId] = 0;
-        this.updateVideo(containerId);
+        this.updateVideo(containerId, 'right');
         const videoContainer = document.getElementById(`video-items-${containerId}`);
         const seeMoreBtn = videoContainer.querySelector('.see-more-btn');
         const textElement = videoContainer.querySelector('.video-description-text');

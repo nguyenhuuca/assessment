@@ -1488,13 +1488,29 @@ body.modal-open {
     background: black;
     object-fit: cover;
     opacity: 0;
-    transition: opacity 0.4s;
+    transition: opacity 0.4s, transform 0.3s ease;
     z-index: 1;
 }
 
 .video-swipe-item video.active {
     opacity: 1;
     z-index: 2;
+    transform: translateX(0) !important;
+}
+
+.video-swipe-item video.slide-left {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.video-swipe-item video.slide-right {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.video-swipe-item video.slide-in {
+    transform: translateX(0) !important;
+    opacity: 1;
 }
 
 .video-swipe-controls {
