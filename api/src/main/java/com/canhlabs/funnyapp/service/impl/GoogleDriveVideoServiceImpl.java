@@ -91,18 +91,6 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
 
         }
 
-        // 🔍 Check if there is any nearby chunk (e.g. distance ≤ 100KB)
-        Optional<Range> nearby = videoCacheService.findNearestChunk(fileId, start, end, AppConstant.TOLERANCE_BYTES);
-        if (nearby.isPresent()) {
-            Range range = nearby.get();
-            log.info("🟡 Fallback to nearby chunk: {} ({} - {})", fileId, range.start(), range.end());
-            return StreamChunkResult.builder()
-                    .stream(videoCacheService.getChunk(fileId, range.start(), range.end()))
-                    .actualStart(range.start())
-                    .actualEnd(range.end())
-                    .build();
-        }
-
         log.info("🔴 Cache miss: fetching {} ({} - {}) from Google Drive", fileId, start, end);
         InputStream googleStream = fetchFromGoogleDrive(fileId, start, end);
         try (BufferedInputStream bufferedStream = new BufferedInputStream(googleStream)) {
