@@ -20,18 +20,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.canhlabs.funnyapp.share.AppConstant.FOLDER_ID;
+
 @Slf4j
 @Service
 public class StreamVideoServiceImpl implements StreamVideoService {
-    private static final String FOLDER_ID = "1uk7TUSvUkE9if6HYnY4ap2Kj0gSZ5qlz";
+
     private final Drive drive;
     private VideoSourceRepository videoSourceRepository;
     private VideoCacheService videoCacheService;
@@ -180,6 +184,36 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         } while (request.getPageToken() != null && !request.getPageToken().isEmpty());
         log.info("Found {} files in folder {}", files.size(), folderId);
         return files;
+    }
+
+    public void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException {
+        List<File> files = listFilesInFolder(folderId, uploadedAfter);
+
+        for (File file : files) {
+            java.io.File localFile = new java.io.File(AppConstant.CACHE_DIR, file.getId().concat(".full"));
+            if (localFile.exists()) {
+                log.info("✅ File already exists: {}, skipping", file.getName());
+                continue;
+            }
+
+            log.info("⬇️ Downloading {} ({} bytes)", file.getName(), file.getSize());
+            downloadFile(file.getId(), localFile);
+        }
+    }
+
+    public List<File> listFilesInFolder(String folderId, String uploadedAfter) throws IOException {
+        String query = String.format("'%s' in parents and trashed = false and createdTime >= '%s'", folderId, uploadedAfter);
+        return drive.files().list()
+                .setQ(query)
+                .setFields("files(id, name, size, createdTime)")
+                .execute()
+                .getFiles();
+    }
+
+    public void downloadFile(String fileId, java.io.File destination) throws IOException {
+        try (OutputStream out = new FileOutputStream(destination)) {
+            drive.files().get(fileId).executeMediaAndDownloadTo(out);
+        }
     }
 
     @Override

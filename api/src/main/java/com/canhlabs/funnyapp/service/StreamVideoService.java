@@ -91,4 +91,5 @@ public interface StreamVideoService {
     void shareFilesInFolder();
     void updateDesc();
 
+    void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException;
 }

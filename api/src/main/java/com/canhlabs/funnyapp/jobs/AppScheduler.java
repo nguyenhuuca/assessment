@@ -4,10 +4,13 @@ import com.canhlabs.funnyapp.dto.CacheStat;
 import com.canhlabs.funnyapp.service.CacheStatsService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
+import com.canhlabs.funnyapp.share.AppConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -65,6 +68,21 @@ public class AppScheduler {
             CacheStat stat = entry.getValue();
             log.info("🎯 fileId: {}, hits: {}, misses: {}, hitRatio: {}%",
                     fileId, stat.getHits(), stat.getMisses(), cacheStatsService.calculateRatio());
+        }
+    }
+
+    @Scheduled(cron = "0 */10 * * * *") // every 10 minutes
+    public void syncDriveVideos() {
+        log.info("📥 Syncing Google Drive folder...");
+
+        log.info("📥 Starting sync job...");
+
+        String uploadedAfter = "2025-01-01T00:00:00Z";
+
+        try {
+            googleDriveVideoService.downloadFileFromFolder(AppConstant.FOLDER_ID, uploadedAfter);
+        } catch (Exception e) {
+            log.error("❌ Failed to sync from Google Drive", e);
         }
     }
 }
