@@ -25,4 +25,5 @@ public interface VideoCacheService {
     Optional<Range> findNearestChunk(String fileId, long requestedStart, long requestedEnd, long tolerance);
 
     InputStream getFileRangeFromDisk(String fileId, long start, long end) throws IOException;
+    long getFileSizeFromDisk(String fileId) throws IOException;
 }

@@ -183,6 +183,15 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         return new LimitedInputStream(new FileInputStream(raf.getFD()), length, raf);
     }
 
+    @Override
+    public long getFileSizeFromDisk(String fileId) throws IOException {
+        File file = new File(AppConstant.CACHE_DIR, fileId + ".full");
+        if (!file.exists()) {
+            throw new FileNotFoundException("Full file not found: " + file.getAbsolutePath());
+        }
+        return file.length();
+    }
+
     /**
      * Helper method to get the chunk file based on fileId and byte range.
      *

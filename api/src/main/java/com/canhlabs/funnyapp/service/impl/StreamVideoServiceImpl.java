@@ -137,8 +137,9 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @WithSpan
     @Override
     public long getFileSize(String fileId) throws IOException {
-        File file = drive.files().get(fileId).setFields("size").execute();
-        return file.getSize();
+        return videoCacheService.getFileSizeFromDisk(fileId);
+//        File file = drive.files().get(fileId).setFields("size").execute();
+//        return file.getSize();
     }
 
     @WithSpan
