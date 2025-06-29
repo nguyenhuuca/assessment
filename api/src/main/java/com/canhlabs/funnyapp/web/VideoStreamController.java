@@ -1,14 +1,13 @@
 package com.canhlabs.funnyapp.web;
 
+import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
-import com.canhlabs.funnyapp.service.StorageVideoService;
+import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.enums.ResultStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +21,14 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequestMapping(AppConstant.API.BASE_URL + "/video-stream")
 @RestController
 public class VideoStreamController {
-    private final StorageVideoService videoService;
+    private final StreamVideoService videoService;
 
-    public VideoStreamController(StorageVideoService videoService) {
+    public VideoStreamController(StreamVideoService videoService) {
         this.videoService = videoService;
     }
 
@@ -70,7 +68,8 @@ public class VideoStreamController {
             }
         }
 
-        InputStream stream = videoService.getPartialFileByChunk(fileId, start, end);
+        StreamChunkResult streamRs = videoService.getPartialFileByChunk(fileId, start, end);
+        InputStream stream = streamRs.getStream();
         StreamingResponseBody responseBody = outputStream -> {
             try (stream) {
                 byte[] buffer = new byte[8192];
@@ -81,14 +80,14 @@ public class VideoStreamController {
             }
         };
 
-        long contentLength = end - start + 1;
+        long contentLength = streamRs.getActualEnd() - streamRs.getActualStart() + 1;
         log.info("✅ Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
                 .header(HttpHeaders.ACCEPT_RANGES, "bytes")
                 .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength))
-                .header(HttpHeaders.CONTENT_RANGE, String.format("bytes %d-%d/%d", start, end, fileSize))
+                .header(HttpHeaders.CONTENT_RANGE, String.format("bytes %d-%d/%d", streamRs.getActualStart(), streamRs.getActualEnd(), fileSize))
                 .body(responseBody);
     }
 

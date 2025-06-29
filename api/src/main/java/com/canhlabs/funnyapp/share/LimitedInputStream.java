@@ -35,8 +35,41 @@ public class LimitedInputStream extends InputStream {
     }
 
     @Override
+    public long skip(long n) throws IOException {
+        long remaining = maxBytes - bytesRead;
+        long toSkip = Math.min(n, remaining);
+        long skipped = in.skip(toSkip);
+        bytesRead += skipped;
+        return skipped;
+    }
+
+    @Override
+    public int available() throws IOException {
+        return (int) Math.min(in.available(), maxBytes - bytesRead);
+    }
+
+    @Override
     public void close() throws IOException {
-        in.close();
-        raf.close(); // important: close RandomAccessFile
+        try {
+            in.close();
+        } finally {
+            raf.close(); // close the RandomAccessFile as well
+        }
+    }
+
+    @Override
+    public void mark(int readlimit) {
+        in.mark(readlimit);
+    }
+
+    @Override
+    public  void reset() throws IOException {
+        in.reset();
+        bytesRead = 0; // reset bytesRead to 0 when resetting
+    }
+
+    @Override
+    public boolean markSupported() {
+        return in.markSupported();
     }
 }

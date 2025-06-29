@@ -1,7 +1,9 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.ChunkLockManager;
+import com.canhlabs.funnyapp.dto.Range;
 import com.canhlabs.funnyapp.service.CacheStatsService;
+import com.canhlabs.funnyapp.service.ChunkIndexService;
 import com.canhlabs.funnyapp.service.VideoCacheService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.LimitedInputStream;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static com.canhlabs.funnyapp.share.AppConstant.CACHE_DIR;
 
@@ -35,6 +38,12 @@ public class VideoCacheServiceImpl implements VideoCacheService {
 
     private ChunkLockManager chunkLockManager;
     private CacheStatsService cacheStatsService;
+    private ChunkIndexService chunkIndexService;
+
+    @Autowired
+    public void injectChunkIndexService(ChunkIndexService chunkIndexService) {
+        this.chunkIndexService = chunkIndexService;
+    }
 
     @Autowired
     public void injectChunkLockManager(ChunkLockManager chunkLockManager) {
@@ -149,8 +158,29 @@ public class VideoCacheServiceImpl implements VideoCacheService {
             }
         } finally {
             chunkLockManager.release(fileId, start, end);
+            chunkIndexService.addChunk(fileId, start, end);
             log.info("✅ Released lock for chunk {} ({} - {})", fileId, start, end);
         }
+    }
+
+    @Override
+    public Optional<Range> findNearestChunk(String fileId, long requestedStart, long requestedEnd, long tolerance) {
+
+        return chunkIndexService.findNearestChunk(fileId, requestedStart, requestedEnd, tolerance);
+    }
+
+    @Override
+    public InputStream getFileRangeFromDisk(String fileId, long start, long end) throws IOException {
+        File file = new File(AppConstant.CACHE_DIR, fileId + ".full");
+        if (!file.exists()) {
+            throw new FileNotFoundException("Full file not found: " + file.getAbsolutePath());
+        }
+
+        long length = end - start + 1;
+        RandomAccessFile raf = new RandomAccessFile(file, "r");
+        raf.seek(start);
+
+        return new LimitedInputStream(new FileInputStream(raf.getFD()), length, raf);
     }
 
     /**

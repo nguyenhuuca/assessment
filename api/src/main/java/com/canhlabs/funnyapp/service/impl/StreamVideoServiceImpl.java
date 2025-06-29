@@ -1,10 +1,11 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.domain.VideoSource;
+import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
-import com.canhlabs.funnyapp.service.StorageVideoService;
+import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoCacheService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.google.api.client.http.GenericUrl;
@@ -29,13 +30,12 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class GoogleDriveVideoServiceImpl implements StorageVideoService {
+public class StreamVideoServiceImpl implements StreamVideoService {
     private static final String FOLDER_ID = "1uk7TUSvUkE9if6HYnY4ap2Kj0gSZ5qlz";
     private final Drive drive;
     private VideoSourceRepository videoSourceRepository;
     private VideoCacheService videoCacheService;
     private ChatGptService chatGptService;
-
     @Autowired
     public void injectChatGptService(ChatGptService chatGptService) {
         this.chatGptService = chatGptService;
@@ -51,7 +51,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         this.videoSourceRepository = videoSourceRepository;
     }
 
-    public GoogleDriveVideoServiceImpl(Drive drive) {
+    public StreamVideoServiceImpl(Drive drive) {
         this.drive = drive;
     }
 
@@ -77,24 +77,46 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
 
     @Override
     @WithSpan
-    public InputStream getPartialFileByChunk(String fileId, long start, long end) throws IOException {
+    public StreamChunkResult getPartialFileByChunk(String fileId, long start, long end) throws IOException {
         if (videoCacheService.hasChunk(fileId, start, end)) {
             log.info("🟢 Cache hit: {} ({} - {})", fileId, start, end);
-            return videoCacheService.getChunk(fileId, start, end);
+            return  StreamChunkResult.builder()
+                    .stream(videoCacheService.getChunk(fileId, start, end))
+                    .actualStart(start)
+                    .actualEnd(end)
+                    .build();
+
         }
 
         log.info("🔴 Cache miss: fetching {} ({} - {}) from Google Drive", fileId, start, end);
         InputStream googleStream = fetchFromGoogleDrive(fileId, start, end);
-
         try (BufferedInputStream bufferedStream = new BufferedInputStream(googleStream)) {
             log.info("💾 Saving chunk {} ({} - {}), size ≈ {} bytes", fileId, start, end, (end - start + 1));
             videoCacheService.saveChunk(fileId, start, end, bufferedStream);
         } catch (IOException e) {
             log.warn("⚠️ Failed to save chunk to cache: {} ({} - {}), fallback to direct stream", fileId, start, end);
-            return fetchFromGoogleDrive(fileId, start, end);
-        }
+            return StreamChunkResult.builder()
+                    .stream(fetchFromGoogleDrive(fileId, start, end))
+                    .actualStart(start)
+                    .actualEnd(end)
+                    .build();
 
-        return videoCacheService.getChunk(fileId, start, end);
+        }
+        return  StreamChunkResult.builder()
+                .stream(videoCacheService.getChunk(fileId, start, end))
+                .actualStart(start)
+                .actualEnd(end)
+                .build();
+    }
+
+    @Override
+    public StreamChunkResult getPartialFileUsingRAF(String fileId, long start, long end) throws IOException {
+        InputStream stream = videoCacheService.getFileRangeFromDisk(fileId, start, end);
+        return  StreamChunkResult.builder()
+                .stream(stream)
+                .actualStart(start)
+                .actualEnd(end)
+                .build();
     }
 
     @WithSpan
@@ -104,7 +126,7 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
         HttpRequest request = drive.getRequestFactory()
                 .buildGetRequest(url);
         request.getHeaders().setRange("bytes=" + start + "-" + end);
-        log.info("Start stream field {} by range: {}-{} and request {}", fileId, start, end, request);
+        log.info("Start stream from google drive , field {} by range: {}-{} and request {}", fileId, start, end, request);
         return request.execute().getContent();
     }
 
