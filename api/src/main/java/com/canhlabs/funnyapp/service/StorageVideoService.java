@@ -1,11 +1,14 @@
 package com.canhlabs.funnyapp.service;
 
+import com.canhlabs.funnyapp.dto.Range;
+import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.google.api.services.drive.Drive;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 public interface StorageVideoService {
 
@@ -28,7 +31,7 @@ public interface StorageVideoService {
      * @return An InputStream to read the specified range of the file content.
      * @throws IOException If an error occurs while accessing the file.
      */
-    InputStream getPartialFileByChunk(String fileId, long start, long end) throws IOException;
+    StreamChunkResult getPartialFileByChunk(String fileId, long start, long end) throws IOException;
 
     /**
      * Gets the size of a file in bytes.
@@ -78,4 +81,5 @@ public interface StorageVideoService {
      */
     void shareFilesInFolder();
     void updateDesc();
+
 }

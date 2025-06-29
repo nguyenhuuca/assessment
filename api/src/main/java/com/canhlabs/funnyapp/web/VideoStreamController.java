@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
+import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
@@ -70,7 +71,8 @@ public class VideoStreamController {
             }
         }
 
-        InputStream stream = videoService.getPartialFileByChunk(fileId, start, end);
+        StreamChunkResult streamRs = videoService.getPartialFileByChunk(fileId, start, end);
+        InputStream stream = streamRs.getStream();
         StreamingResponseBody responseBody = outputStream -> {
             try (stream) {
                 byte[] buffer = new byte[8192];
@@ -81,14 +83,14 @@ public class VideoStreamController {
             }
         };
 
-        long contentLength = end - start + 1;
+        long contentLength = streamRs.getActualEnd() - streamRs.getActualStart() + 1;
         log.info("✅ Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
                 .header(HttpHeaders.ACCEPT_RANGES, "bytes")
                 .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength))
-                .header(HttpHeaders.CONTENT_RANGE, String.format("bytes %d-%d/%d", start, end, fileSize))
+                .header(HttpHeaders.CONTENT_RANGE, String.format("bytes %d-%d/%d", streamRs.getActualStart(), streamRs.getActualEnd(), fileSize))
                 .body(responseBody);
     }
 

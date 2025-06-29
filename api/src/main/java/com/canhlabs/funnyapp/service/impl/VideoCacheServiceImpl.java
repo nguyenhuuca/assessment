@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.ChunkLockManager;
+import com.canhlabs.funnyapp.dto.Range;
 import com.canhlabs.funnyapp.service.CacheStatsService;
 import com.canhlabs.funnyapp.service.VideoCacheService;
 import com.canhlabs.funnyapp.share.AppConstant;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static com.canhlabs.funnyapp.share.AppConstant.CACHE_DIR;
 
@@ -151,6 +153,35 @@ public class VideoCacheServiceImpl implements VideoCacheService {
             chunkLockManager.release(fileId, start, end);
             log.info("✅ Released lock for chunk {} ({} - {})", fileId, start, end);
         }
+    }
+
+    @Override
+    public Optional<Range> findNearestChunk(String fileId, long requestedStart, long requestedEnd, long tolerance) {
+        File dir = new File(CACHE_DIR, fileId);
+        if (!dir.exists() || !dir.isDirectory()) return Optional.empty();
+
+        File[] files = dir.listFiles((d, name) -> name.endsWith(".cache"));
+        if (files == null) return Optional.empty();
+
+        for (File file : files) {
+            String name = file.getName(); // e.g., "3932160-4456447.cache"
+            String[] parts = name.replace(".cache", "").split("-");
+            if (parts.length != 2) continue;
+
+            long start = Long.parseLong(parts[0]);
+            long end = Long.parseLong(parts[1]);
+
+            boolean overlap =
+                    Math.abs(start - requestedStart) <= tolerance ||  // near left
+                            Math.abs(end - requestedEnd) <= tolerance ||      // near right
+                            (start <= requestedStart && end >= requestedEnd); // fully contains
+
+            if (overlap) {
+                return Optional.of(new Range(start, end));
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**

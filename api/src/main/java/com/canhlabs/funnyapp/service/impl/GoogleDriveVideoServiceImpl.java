@@ -1,6 +1,8 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.domain.VideoSource;
+import com.canhlabs.funnyapp.dto.Range;
+import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
@@ -26,6 +28,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -77,24 +80,48 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
 
     @Override
     @WithSpan
-    public InputStream getPartialFileByChunk(String fileId, long start, long end) throws IOException {
+    public StreamChunkResult getPartialFileByChunk(String fileId, long start, long end) throws IOException {
         if (videoCacheService.hasChunk(fileId, start, end)) {
             log.info("🟢 Cache hit: {} ({} - {})", fileId, start, end);
-            return videoCacheService.getChunk(fileId, start, end);
+            return  StreamChunkResult.builder()
+                    .stream(videoCacheService.getChunk(fileId, start, end))
+                    .actualStart(start)
+                    .actualEnd(end)
+                    .build();
+
+        }
+
+        // 🔍 Check if there is any nearby chunk (e.g. distance ≤ 100KB)
+        Optional<Range> nearby = videoCacheService.findNearestChunk(fileId, start, end, AppConstant.TOLERANCE_BYTES);
+        if (nearby.isPresent()) {
+            Range range = nearby.get();
+            log.info("🟡 Fallback to nearby chunk: {} ({} - {})", fileId, range.start(), range.end());
+            return StreamChunkResult.builder()
+                    .stream(videoCacheService.getChunk(fileId, range.start(), range.end()))
+                    .actualStart(range.start())
+                    .actualEnd(range.end())
+                    .build();
         }
 
         log.info("🔴 Cache miss: fetching {} ({} - {}) from Google Drive", fileId, start, end);
         InputStream googleStream = fetchFromGoogleDrive(fileId, start, end);
-
         try (BufferedInputStream bufferedStream = new BufferedInputStream(googleStream)) {
             log.info("💾 Saving chunk {} ({} - {}), size ≈ {} bytes", fileId, start, end, (end - start + 1));
             videoCacheService.saveChunk(fileId, start, end, bufferedStream);
         } catch (IOException e) {
             log.warn("⚠️ Failed to save chunk to cache: {} ({} - {}), fallback to direct stream", fileId, start, end);
-            return fetchFromGoogleDrive(fileId, start, end);
-        }
+            return StreamChunkResult.builder()
+                    .stream(fetchFromGoogleDrive(fileId, start, end))
+                    .actualStart(start)
+                    .actualEnd(end)
+                    .build();
 
-        return videoCacheService.getChunk(fileId, start, end);
+        }
+        return  StreamChunkResult.builder()
+                .stream(videoCacheService.getChunk(fileId, start, end))
+                .actualStart(start)
+                .actualEnd(end)
+                .build();
     }
 
     @WithSpan
