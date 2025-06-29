@@ -6,6 +6,7 @@ import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
+import com.canhlabs.funnyapp.service.ChunkIndexService;
 import com.canhlabs.funnyapp.service.StorageVideoService;
 import com.canhlabs.funnyapp.service.VideoCacheService;
 import com.canhlabs.funnyapp.share.AppConstant;
@@ -38,7 +39,6 @@ public class GoogleDriveVideoServiceImpl implements StorageVideoService {
     private VideoSourceRepository videoSourceRepository;
     private VideoCacheService videoCacheService;
     private ChatGptService chatGptService;
-
     @Autowired
     public void injectChatGptService(ChatGptService chatGptService) {
         this.chatGptService = chatGptService;

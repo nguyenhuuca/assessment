@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.cache.ChunkLockManager;
 import com.canhlabs.funnyapp.dto.Range;
 import com.canhlabs.funnyapp.service.CacheStatsService;
+import com.canhlabs.funnyapp.service.ChunkIndexService;
 import com.canhlabs.funnyapp.service.VideoCacheService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.LimitedInputStream;
@@ -37,6 +38,12 @@ public class VideoCacheServiceImpl implements VideoCacheService {
 
     private ChunkLockManager chunkLockManager;
     private CacheStatsService cacheStatsService;
+    private ChunkIndexService chunkIndexService;
+
+    @Autowired
+    public void injectChunkIndexService(ChunkIndexService chunkIndexService) {
+        this.chunkIndexService = chunkIndexService;
+    }
 
     @Autowired
     public void injectChunkLockManager(ChunkLockManager chunkLockManager) {
@@ -112,8 +119,8 @@ public class VideoCacheServiceImpl implements VideoCacheService {
     @Override
     @WithSpan
     public boolean hasChunk(String fileId, long start, long end) {
-        File chunk = getChunkFile(fileId, start, end);
-        boolean exists = chunk.exists();// && chunk.length() == (end - start + 1);
+
+        boolean exists = chunkIndexService.hasChunk(fileId, start, end);
         log.info("Check chunk exists: {} [{}-{}] = {}", fileId, start, end, exists);
         if (exists) {
             cacheStatsService.recordHit(fileId);
@@ -151,37 +158,15 @@ public class VideoCacheServiceImpl implements VideoCacheService {
             }
         } finally {
             chunkLockManager.release(fileId, start, end);
+            chunkIndexService.addChunk(fileId, start, end);
             log.info("✅ Released lock for chunk {} ({} - {})", fileId, start, end);
         }
     }
 
     @Override
     public Optional<Range> findNearestChunk(String fileId, long requestedStart, long requestedEnd, long tolerance) {
-        File dir = new File(CACHE_DIR, fileId);
-        if (!dir.exists() || !dir.isDirectory()) return Optional.empty();
 
-        File[] files = dir.listFiles((d, name) -> name.endsWith(".cache"));
-        if (files == null) return Optional.empty();
-
-        for (File file : files) {
-            String name = file.getName(); // e.g., "3932160-4456447.cache"
-            String[] parts = name.replace(".cache", "").split("-");
-            if (parts.length != 2) continue;
-
-            long start = Long.parseLong(parts[0]);
-            long end = Long.parseLong(parts[1]);
-
-            boolean overlap =
-                    Math.abs(start - requestedStart) <= tolerance ||  // near left
-                            Math.abs(end - requestedEnd) <= tolerance ||      // near right
-                            (start <= requestedStart && end >= requestedEnd); // fully contains
-
-            if (overlap) {
-                return Optional.of(new Range(start, end));
-            }
-        }
-
-        return Optional.empty();
+        return chunkIndexService.findNearestChunk(fileId, requestedStart, requestedEnd, tolerance);
     }
 
     /**

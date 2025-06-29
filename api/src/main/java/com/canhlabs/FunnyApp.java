@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 @Slf4j
 public class FunnyApp implements CommandLineRunner {
+
     public static void  main(String[] args) {
         SpringApplication.run(FunnyApp.class, args);
         log.info("Starting application");
@@ -27,4 +28,5 @@ public class FunnyApp implements CommandLineRunner {
     public void run(String... args) throws Exception {
         log.info("No pre-processing after started");
     }
+
 }

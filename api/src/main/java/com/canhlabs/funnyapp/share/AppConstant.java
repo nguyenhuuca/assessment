@@ -16,7 +16,7 @@ public class AppConstant {
 
     public static final String CACHE_DIR = "video-cache/";
     public static final long CACHE_SIZE = 20 * 1024 * 1024; // 5MB
-    public  static final long TOLERANCE_BYTES = 100 * 1024;
+    public  static final long TOLERANCE_BYTES = 5 * 1024;  // 5k
 
     private AppConstant() {
     }
