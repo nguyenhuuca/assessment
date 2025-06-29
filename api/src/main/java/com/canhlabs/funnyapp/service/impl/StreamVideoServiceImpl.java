@@ -59,25 +59,6 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         this.drive = drive;
     }
 
-    @Override
-    @WithSpan
-    public InputStream getPartialFile(String fileId, long start, long end) throws IOException {
-        log.info("Requesting video {} range: {}-{}", fileId, start, end);
-        boolean isCacheRange = (start == 0 && end < AppConstant.CACHE_SIZE);
-        if (isCacheRange) {
-            if (!videoCacheService.hasCache(fileId, end + 1)) {
-                log.info("📥 Cache miss for file {}, fetching Google Drive", fileId);
-                try (InputStream in = new BufferedInputStream(fetchFromGoogleDrive(fileId, 0, end))) {
-                    videoCacheService.saveToCache(fileId, in);
-                }
-            }
-            log.info("📤 Serving file {} from disk cache", fileId);
-            return videoCacheService.getCache(fileId);
-        }
-
-        log.info("🌐 Fetching file {} from Google Drive by range {}-{}", fileId, start, end);
-        return fetchFromGoogleDrive(fileId, start, end);
-    }
 
     @Override
     @WithSpan
@@ -188,6 +169,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         return files;
     }
 
+    @WithSpan
     public void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException {
         List<File> files = listFilesInFolder(folderId, uploadedAfter);
 
@@ -203,6 +185,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         }
     }
 
+    @WithSpan
     public List<File> listFilesInFolder(String folderId, String uploadedAfter) throws IOException {
         String query = String.format("'%s' in parents and trashed = false and createdTime >= '%s'", folderId, uploadedAfter);
         return drive.files().list()
@@ -212,6 +195,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
                 .getFiles();
     }
 
+    @WithSpan
     public void downloadFile(String fileId, java.io.File destination) throws IOException {
         try (OutputStream out = new FileOutputStream(destination)) {
             drive.files().get(fileId).executeMediaAndDownloadTo(out);

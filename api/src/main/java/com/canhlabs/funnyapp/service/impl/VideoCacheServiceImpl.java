@@ -62,19 +62,6 @@ public class VideoCacheServiceImpl implements VideoCacheService {
 
     @WithSpan
     @Override
-    public boolean hasCache(String fileId, long requiredBytes) {
-        File file = getCacheFile(fileId);
-        return file.exists();
-    }
-
-    @WithSpan
-    @Override
-    public InputStream getCache(String fileId) throws IOException {
-        return new FileInputStream(getCacheFile(fileId));
-    }
-
-    @WithSpan
-    @Override
     public InputStream getCache(String fileId, long start, long end) throws IOException {
         File file = new File(CACHE_DIR + fileId + ".cache");
 
@@ -90,30 +77,6 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         };
     }
 
-    @WithSpan
-    @Override
-    public void saveToCache(String fileId, InputStream inputStream) throws IOException {
-        File cacheDir = new File(CACHE_DIR);
-        if (!cacheDir.exists()) {
-            cacheDir.mkdirs();
-        }
-
-        File file = getCacheFile(fileId);
-
-        try (inputStream;
-             BufferedInputStream in = new BufferedInputStream(inputStream, 1024 * 1024);
-             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file), 1024 * 1024)
-        ) {
-            byte[] buffer = new byte[64 * 1024];
-            long remaining = AppConstant.CACHE_SIZE;
-            int bytesRead;
-            while (remaining > 0 && (bytesRead = in.read(buffer, 0, (int) Math.min(buffer.length, remaining))) != -1) {
-                out.write(buffer, 0, bytesRead);
-                remaining -= bytesRead;
-            }
-            out.flush();
-        }
-    }
 
 
     @Override
@@ -176,7 +139,7 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         if (!file.exists()) {
             throw new FileNotFoundException("Full file not found: " + file.getAbsolutePath());
         }
-
+        cacheStatsService.recordHit(fileId);
         long length = end - start + 1;
         RandomAccessFile raf = new RandomAccessFile(file, "r");
         raf.seek(start);
