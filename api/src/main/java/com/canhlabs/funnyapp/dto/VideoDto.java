@@ -18,4 +18,5 @@ public class VideoDto extends BaseDto {
     private String desc;
     private String embedLink;
     private String urlLink;
+    private String fileId;
 }

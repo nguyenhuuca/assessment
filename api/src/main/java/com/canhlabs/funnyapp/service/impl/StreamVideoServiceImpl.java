@@ -20,9 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.time.Duration;
 import java.time.Instant;
@@ -262,9 +264,34 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         }
     }
 
+    public void generateThumbnail(String videoPath, String outputImagePath, int second) throws IOException, InterruptedException {
+        List<String> command = List.of(
+                "ffmpeg",
+                "-i", videoPath,
+                "-ss", "00:00:" + String.format("%02d", second),
+                "-vframes", "1",
+                "-q:v", "2",
+                outputImagePath
+        );
+
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.redirectErrorStream(true); // merge stderr vào stdout
+        Process process = pb.start();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            reader.lines().forEach(item -> log.info("FFmpeg output: {}", item));
+        }
+
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            log.error("FFmpeg failed with exit code " + exitCode);
+        }
+    }
+
     public VideoDto toDto(VideoSource source) {
         VideoDto dto = new VideoDto();
         dto.setId(source.getId());
+        dto.setFileId(source.getSourceId());
         dto.setUserShared("unknown"); // set nếu có user info
         dto.setTitle(source.getTitle());
         dto.setDesc(source.getDesc());
