@@ -98,11 +98,15 @@ const VideoTemplate = {
             
             // Video mới sẽ bắt đầu từ vị trí bên ngoài
             let initialTransform = '';
-            let preloadValue = 'auto';
+            let preloadValue = 'metadata'; // Mặc định chỉ preload metadata
+            
+            // Preload auto cho 3 video: hiện tại, trước và sau
+            if (isCurrent || i === currentIndex - 1 || i === currentIndex + 1) {
+                preloadValue = 'auto';
+            }
+            
             if (isCurrent && typeof direction !== 'undefined' && direction) {
                 initialTransform = direction === 'right' ? 'transform: translateX(100%);' : 'transform: translateX(-100%);';
-            } else if (!isCurrent) {
-                preloadValue = 'metadata'; // Chỉ preload metadata cho video không phải hiện tại
             }
             
             videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="${preloadValue}" style="width:100%;height:100%;position:absolute;top:0px;left:0;${initialTransform}"></video>`;
@@ -275,7 +279,7 @@ const VideoActions = {
                     if (newVideo) {
                         newVideo.classList.add('slide-in');
                     }
-                }, 50);
+                }, 200);
             }
         }
     },
@@ -313,11 +317,15 @@ const VideoActions = {
                 
                 // Video mới sẽ bắt đầu từ vị trí bên ngoài
                 let initialTransform = '';
-                let preloadValue = 'auto';
+                let preloadValue = 'metadata'; // Mặc định chỉ preload metadata
+                
+                // Preload auto cho 3 video: hiện tại, trước và sau
+                if (isCurrent || i === idx - 1 || i === idx + 1) {
+                    preloadValue = 'auto';
+                }
+                
                 if (isCurrent && typeof direction !== 'undefined' && direction) {
                     initialTransform = direction === 'right' ? 'transform: translateX(100%);' : 'transform: translateX(-100%);';
-                } else if (!isCurrent) {
-                    preloadValue = 'metadata'; // Chỉ preload metadata cho video không phải hiện tại
                 }
                 
                 videoTags += `<video id="${containerId}-video-${i}" src="${v.src}" poster="${poster}" ${isCurrent ? ' autoplay' : ''} playsinline preload="${preloadValue}" style="width:100%;height:100%;position:absolute;top:0px;left:0;${initialTransform}"></video>`;
@@ -422,7 +430,7 @@ const VideoActions = {
                     if (newVideo) {
                         newVideo.classList.add('slide-in');
                     }
-                }, 50);
+                }, 200);
             } else {
                 currentVid.addEventListener('canplay', () => {
                     setTimeout(() => {
@@ -430,7 +438,7 @@ const VideoActions = {
                         if (newVideo) {
                             newVideo.classList.add('slide-in');
                         }
-                    }, 50);
+                    }, 200);
                 }, { once: true });
             }
 
