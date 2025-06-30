@@ -6,7 +6,7 @@
 spring:
   threads:
     virtual:
-      enabled: true
+      enabled: false
   jpa:
     hibernate:
       ddl-auto: none
