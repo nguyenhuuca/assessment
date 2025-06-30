@@ -42,7 +42,7 @@ public class AppScheduler {
         }
     }
 
-    @Scheduled(cron = "0 */15 * * * *", zone = "Asia/Ho_Chi_Minh")
+    // @Scheduled(cron = "0 */15 * * * *", zone = "Asia/Ho_Chi_Minh")
     public void scheduleProcessShareFile() {
         log.info("Start running scheduleProcessShareFile each 15 minutes");
         try {
@@ -62,7 +62,7 @@ public class AppScheduler {
         }
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 5*60000)
     public void logStats() {
         log.info("📝 Cron-based stats log every 5 minutes for logStats");
         log.info("📊 Total hits: {}, Total misses: {}", cacheStatsService.getTotalHits(), cacheStatsService.getTotalMisses());
@@ -74,7 +74,7 @@ public class AppScheduler {
         }
     }
 
-    @Scheduled(cron = "0 */20 * * * *") // every 20 minutes
+    @Scheduled(cron = "0 */15 * * * *") // every 20 minutes
     public void syncDriveVideos() {
         log.info("📥 Syncing Google Drive folder...");
         Instant fifteenMinutesAgo = Instant.now().minus(Duration.ofMinutes(20));

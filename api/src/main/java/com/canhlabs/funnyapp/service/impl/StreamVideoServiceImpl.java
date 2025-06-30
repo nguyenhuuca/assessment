@@ -182,6 +182,9 @@ public class StreamVideoServiceImpl implements StreamVideoService {
 
             log.info("⬇️ Downloading {} ({} bytes)", file.getName(), file.getSize());
             downloadFile(file.getId(), localFile);
+            log.info("Downloaded file {} completely", file.getName());
+            // update info in database
+            saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""));
         }
     }
 
