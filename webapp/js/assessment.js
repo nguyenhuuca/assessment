@@ -3,7 +3,7 @@
  * Represents a video with its properties and methods
  */
 class Video {
-    constructor(id, userShared, title, src, desc, isPrivate = false) {
+    constructor(id, userShared, title, src, desc, isPrivate = false, fileId) {
         this.id = id;
         this.userShared = userShared;
         this.title = title;
@@ -13,6 +13,7 @@ class Video {
         this.downvotes = 0;
         this.isPrivate = isPrivate;
         this.category = this.determineCategory();
+        this.fileId = fileId;
     }
 
     determineCategory() {
@@ -93,8 +94,11 @@ const VideoTemplate = {
             const v = videosArr[i];
             if (!v) continue;
             const isCurrent = i === currentIndex;
-            // Poster logic - loại bỏ poster hoàn toàn
+            // Poster logic - dùng fileId nếu có
             let poster = '';
+            if (v.fileId) {
+                poster = `./icons/${v.fileId}.jpg`;
+            }
             
             // Video mới sẽ bắt đầu từ vị trí bên ngoài
             let initialTransform = '';
@@ -312,8 +316,11 @@ const VideoActions = {
                 const v = videos[i];
                 if (!v) continue;
                 const isCurrent = i === idx;
-                // Poster logic - loại bỏ poster hoàn toàn
+                // Poster logic - dùng fileId nếu có
                 let poster = '';
+                if (v.fileId) {
+                    poster = `./icons/${v.fileId}.jpg`;
+                }
                 
                 // Video mới sẽ bắt đầu từ vị trí bên ngoài
                 let initialTransform = '';
@@ -621,7 +628,8 @@ const VideoService = {
                 videoInfo.title, 
                 videoInfo.embedLink, 
                 videoInfo.desc,
-                videoInfo.isPrivate
+                videoInfo.isPrivate,
+                videoInfo.fileId
             );
             const videoHtml = VideoTemplate.bindData(video, 'popular-videos');
             
@@ -654,7 +662,8 @@ const VideoService = {
                     videoInfo.title, 
                     videoInfo.embedLink, 
                     videoInfo.desc,
-                    videoInfo.isPrivate
+                    videoInfo.isPrivate,
+                    videoInfo.fileId
                 )
             );
             this.displayVideos(videos);
@@ -678,7 +687,8 @@ const VideoService = {
                     videoInfo.title, 
                     videoInfo.embedLink, 
                     videoInfo.desc,
-                    true
+                    true,
+                    videoInfo.fileId
                 )
             );
             this.displayPrivateVideos(privateVideos);
