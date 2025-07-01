@@ -123,3 +123,8 @@ Enable Vitual Threads
 Disaable Vitual Threads
 ![img_2.png](img_2.png)
 ![img_3.png](img_3.png)
+
+
+---
+Using Channel to handle request
+![img_4.png](img_4.png)

@@ -84,6 +84,22 @@ public interface StreamVideoService {
 
     void updateDesc();
 
+    /**
+     * Downloads a file from a specified folder that was uploaded after a certain date.
+     *
+     * @param folderId       The ID of the googloe folder to download from.
+     * @param uploadedAfter  The date after which files should be downloaded (in ISO 8601 format).
+     * @throws IOException If an error occurs while downloading the file.
+     */
     void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException;
+
+    /**
+     * Asynchronously retrieves a partial file from storage.
+     *
+     * @param fileId The ID of the file to retrieve.
+     * @param start  The starting byte position.
+     * @param end    The ending byte position.
+     * @return A CompletableFuture that resolves to an InputStream for the specified range of the file content.
+     */
     CompletableFuture<InputStream> getPartialFileAsync(String fileId, long start, long end);
 }
