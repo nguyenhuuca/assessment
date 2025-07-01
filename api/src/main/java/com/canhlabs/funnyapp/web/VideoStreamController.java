@@ -1,6 +1,5 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
@@ -21,6 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RequestMapping(AppConstant.API.BASE_URL + "/video-stream")
@@ -68,26 +68,44 @@ public class VideoStreamController {
             }
         }
 
-        StreamChunkResult streamRs = videoService.getPartialFileUsingRAF(fileId, start, end);
-        InputStream stream = streamRs.getStream();
+//        StreamChunkResult streamRs = videoService.getPartialFileUsingRAF(fileId, start, end);
+//        InputStream stream = streamRs.getStream();
+//        StreamingResponseBody responseBody = outputStream -> {
+//            try (stream) {
+//                byte[] buffer = new byte[8192];
+//                int bytesRead;
+//                while ((bytesRead = stream.read(buffer)) != -1) {
+//                    outputStream.write(buffer, 0, bytesRead);
+//                }
+//            }
+//        };
+//        long contentLength = streamRs.getActualEnd() - streamRs.getActualStart() + 1;
+        long contentLength = end - start + 1;
+        CompletableFuture<InputStream> streamFuture = videoService.getPartialFileAsync(fileId, start, end);
+
         StreamingResponseBody responseBody = outputStream -> {
-            try (stream) {
-                byte[] buffer = new byte[8192];
+            try  {
+                InputStream inputStream = streamFuture.get();
+                byte[] buffer = new byte[1024 * 128]; // 128KB
                 int bytesRead;
-                while ((bytesRead = stream.read(buffer)) != -1) {
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
+                    outputStream.flush();
                 }
+            } catch (Exception e) {
+                log.error("❌ Error while streaming video: {}", e.getMessage(), e);
+                throw new RuntimeException(e);
             }
         };
 
-        long contentLength = streamRs.getActualEnd() - streamRs.getActualStart() + 1;
+
         log.info("✅ Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
                 .header(HttpHeaders.ACCEPT_RANGES, "bytes")
                 .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength))
-                .header(HttpHeaders.CONTENT_RANGE, String.format("bytes %d-%d/%d", streamRs.getActualStart(), streamRs.getActualEnd(), fileSize))
+                .header(HttpHeaders.CONTENT_RANGE, String.format("bytes %d-%d/%d", start, end, fileSize))
                 .body(responseBody);
     }
 

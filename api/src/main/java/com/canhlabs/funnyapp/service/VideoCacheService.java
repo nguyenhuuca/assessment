@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public interface VideoCacheService {
     File getCacheFile(String fileId);
@@ -21,4 +22,5 @@ public interface VideoCacheService {
 
     InputStream getFileRangeFromDisk(String fileId, long start, long end) throws IOException;
     long getFileSizeFromDisk(String fileId) throws IOException;
+    CompletableFuture<InputStream> getPartialFileAsync(String fileId, long start, long end) throws IOException;
 }

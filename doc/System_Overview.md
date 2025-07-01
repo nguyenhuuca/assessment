@@ -107,3 +107,19 @@ Client (HTML5 <video>)
 
 **Owner:** Canh Labs / \[nguyenhuuca]
 **Last Updated:** 2025-06-28
+
+
+Performance test:
+Number of thread: 200
+Ram-up period: 10 seconds
+Duration: 100 seconds
+
+Enable Vitual Threads
+
+
+![img.png](img.png)
+![img_1.png](img_1.png)
+
+Disaable Vitual Threads
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)

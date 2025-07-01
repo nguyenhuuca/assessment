@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static com.canhlabs.funnyapp.share.AppConstant.FOLDER_ID;
 
@@ -187,6 +188,17 @@ public class StreamVideoServiceImpl implements StreamVideoService {
             log.info("Downloaded file {} completely", file.getName());
             // update info in database
             saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""));
+        }
+    }
+
+    @WithSpan
+    @Override
+    public CompletableFuture<InputStream> getPartialFileAsync(String fileId, long start, long end) {
+        try {
+            return videoCacheService.getPartialFileAsync(fileId, start, end);
+        } catch (IOException e) {
+            log.error("Error getting partial file asynchronously for fileId: {}, start: {}, end: {}", fileId, start, end, e);
+            throw new RuntimeException(e);
         }
     }
 

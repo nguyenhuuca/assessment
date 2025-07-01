@@ -5,7 +5,9 @@ import com.canhlabs.funnyapp.dto.VideoDto;
 import com.google.api.services.drive.Drive;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface StreamVideoService {
 
@@ -83,4 +85,5 @@ public interface StreamVideoService {
     void updateDesc();
 
     void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException;
+    CompletableFuture<InputStream> getPartialFileAsync(String fileId, long start, long end);
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,11 +22,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static com.canhlabs.funnyapp.share.AppConstant.CACHE_DIR;
 
@@ -76,7 +80,6 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         return new LimitedInputStream(new FileInputStream(raf.getFD()), length, raf) {
         };
     }
-
 
 
     @Override
@@ -147,6 +150,7 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         return new LimitedInputStream(new FileInputStream(raf.getFD()), length, raf);
     }
 
+    @WithSpan
     @Override
     public long getFileSizeFromDisk(String fileId) throws IOException {
         File file = new File(AppConstant.CACHE_DIR, fileId + ".full");
@@ -154,6 +158,43 @@ public class VideoCacheServiceImpl implements VideoCacheService {
             throw new FileNotFoundException("Full file not found: " + file.getAbsolutePath());
         }
         return file.length();
+    }
+
+    @Override
+    @WithSpan
+    public CompletableFuture<InputStream> getPartialFileAsync(String fileId, long start, long end) throws IOException {
+        Path path = Paths.get(CACHE_DIR, fileId.concat(".full"));
+        AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
+
+        int length = (int) (end - start + 1);
+        ByteBuffer buffer = ByteBuffer.allocate(length);
+
+        CompletableFuture<InputStream> future = new CompletableFuture<>();
+        channel.read(buffer, start, buffer, new CompletionHandler<Integer, ByteBuffer>() {
+            @Override
+            public void completed(Integer result, ByteBuffer attachment) {
+                attachment.flip();
+                byte[] bytes = new byte[attachment.remaining()];
+                attachment.get(bytes);
+                future.complete(new ByteArrayInputStream(bytes));
+                try {
+                    channel.close();
+                } catch (IOException ignored) {
+                    log.error("Failed to close channel for fileId: {}", fileId, ignored);
+                }
+            }
+
+            @Override
+            public void failed(Throwable exc, ByteBuffer attachment) {
+                future.completeExceptionally(exc);
+                try {
+                    channel.close();
+                } catch (IOException ignored) {
+                }
+            }
+        });
+
+        return future;
     }
 
     /**
