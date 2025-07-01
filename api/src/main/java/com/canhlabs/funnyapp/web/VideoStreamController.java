@@ -51,18 +51,18 @@ public class VideoStreamController {
         CompletableFuture<InputStream> streamFuture = videoService.getPartialFileAsync(fileId, range.start(), range.end());
 
         StreamingResponseBody responseBody = outputStream -> {
-            streamFuture.thenAcceptAsync(inputStream -> {
-                try (InputStream in = inputStream) {
-                    byte[] buffer = new byte[128 * 1024];
-                    int bytesRead;
-                    while ((bytesRead = in.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, bytesRead);
-                        outputStream.flush();
-                    }
-                } catch (IOException e) {
-                    log.error("❌ Stream write error: {}", e.getMessage(), e);
+            try  {
+                InputStream inputStream = streamFuture.get();
+                byte[] buffer = new byte[1024 * 128]; // 128KB
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                    outputStream.flush();
                 }
-            });
+            } catch (Exception e) {
+                log.error("❌ Error while streaming video: {}", e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
         };
 
 
