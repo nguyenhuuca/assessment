@@ -171,32 +171,4 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         return new File(dir, start + "-" + end + ".cache");
     }
 
-    private void cleanOldCacheIfNeeded() {
-        File root = new File(CACHE_DIR);
-        File[] allFiles = root.listFiles(file -> file.getName().endsWith(".cache") || file.isDirectory());
-
-        if (allFiles == null || allFiles.length <= MAX_CACHE_FILES) return;
-
-        log.info("🧹 Running cache cleanup...");
-        List<File> candidates = new ArrayList<>();
-        for (File file : allFiles) {
-            if (file.isFile()) {
-                candidates.add(file);
-            } else {
-                candidates.addAll(Arrays.asList(file.listFiles()));
-            }
-        }
-
-        candidates.sort(Comparator.comparingLong(File::lastModified));
-        long totalSize = candidates.stream().mapToLong(File::length).sum();
-
-        for (File file : candidates) {
-            if (totalSize <= MAX_CACHE_SIZE_BYTES) break;
-            long size = file.length();
-            if (file.delete()) {
-                totalSize -= size;
-                log.info("🗑 Deleted cache file: {} ({} bytes)", file.getName(), size);
-            }
-        }
-    }
 }

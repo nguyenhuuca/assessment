@@ -108,7 +108,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     }
 
     @WithSpan
-    private InputStream fetchFromGoogleDrive(String fileId, long start, long end) throws IOException {
+    InputStream fetchFromGoogleDrive(String fileId, long start, long end) throws IOException {
         GenericUrl url = new GenericUrl("https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media");
 
         HttpRequest request = drive.getRequestFactory()
