@@ -4,7 +4,7 @@ import com.canhlabs.funnyapp.cache.ChunkLockManager;
 import com.canhlabs.funnyapp.dto.Range;
 import com.canhlabs.funnyapp.service.CacheStatsService;
 import com.canhlabs.funnyapp.service.ChunkIndexService;
-import com.canhlabs.funnyapp.service.VideoCacheService;
+import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.LimitedInputStream;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,21 +21,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.channels.CompletionHandler;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import static com.canhlabs.funnyapp.share.AppConstant.CACHE_DIR;
 
 
 @Slf4j
 @Service
-public class VideoCacheServiceImpl implements VideoCacheService {
+public class VideoStorageServiceImpl implements VideoStorageService {
     private static final int MAX_CACHE_FILES = 6000;
     private static final long MAX_CACHE_SIZE_BYTES = 1024 * 1024 * 1024L; //1G
 

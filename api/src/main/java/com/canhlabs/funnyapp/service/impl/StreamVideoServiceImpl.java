@@ -1,12 +1,13 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.VideoCacheStore;
 import com.canhlabs.funnyapp.domain.VideoSource;
 import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
-import com.canhlabs.funnyapp.service.VideoCacheService;
+import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -31,7 +32,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static com.canhlabs.funnyapp.share.AppConstant.FOLDER_ID;
 
@@ -41,16 +41,21 @@ public class StreamVideoServiceImpl implements StreamVideoService {
 
     private final Drive drive;
     private VideoSourceRepository videoSourceRepository;
-    private VideoCacheService videoCacheService;
+    private VideoStorageService videoStorageService;
     private ChatGptService chatGptService;
+    private VideoCacheStore videoCacheStore;
+    @Autowired
+    public  void injectVideoCacheStore(VideoCacheStore videoCacheStore) {
+        this.videoCacheStore = videoCacheStore;
+    }
     @Autowired
     public void injectChatGptService(ChatGptService chatGptService) {
         this.chatGptService = chatGptService;
     }
 
     @Autowired
-    public void injectCacheService(VideoCacheService videoCacheService) {
-        this.videoCacheService = videoCacheService;
+    public void injectCacheService(VideoStorageService videoStorageService) {
+        this.videoStorageService = videoStorageService;
     }
 
     @Autowired
@@ -66,10 +71,10 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @Override
     @WithSpan
     public StreamChunkResult getPartialFileByChunk(String fileId, long start, long end) throws IOException {
-        if (videoCacheService.hasChunk(fileId, start, end)) {
+        if (videoStorageService.hasChunk(fileId, start, end)) {
             log.info("🟢 Cache hit: {} ({} - {})", fileId, start, end);
             return  StreamChunkResult.builder()
-                    .stream(videoCacheService.getChunk(fileId, start, end))
+                    .stream(videoStorageService.getChunk(fileId, start, end))
                     .actualStart(start)
                     .actualEnd(end)
                     .build();
@@ -80,7 +85,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         InputStream googleStream = fetchFromGoogleDrive(fileId, start, end);
         try (BufferedInputStream bufferedStream = new BufferedInputStream(googleStream)) {
             log.info("💾 Saving chunk {} ({} - {}), size ≈ {} bytes", fileId, start, end, (end - start + 1));
-            videoCacheService.saveChunk(fileId, start, end, bufferedStream);
+            videoStorageService.saveChunk(fileId, start, end, bufferedStream);
         } catch (IOException e) {
             log.warn("⚠️ Failed to save chunk to cache: {} ({} - {}), fallback to direct stream", fileId, start, end);
             return StreamChunkResult.builder()
@@ -91,7 +96,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
 
         }
         return  StreamChunkResult.builder()
-                .stream(videoCacheService.getChunk(fileId, start, end))
+                .stream(videoStorageService.getChunk(fileId, start, end))
                 .actualStart(start)
                 .actualEnd(end)
                 .build();
@@ -100,7 +105,11 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @WithSpan
     @Override
     public StreamChunkResult getPartialFileUsingRAF(String fileId, long start, long end) throws IOException {
-        InputStream stream = videoCacheService.getFileRangeFromDisk(fileId, start, end);
+        InputStream stream = videoCacheStore.getChunkStream(fileId, start, end, () -> {
+            log.info("🔴 Cache miss: fetching {} ({} - {}) from disk", fileId, start, end);
+            return  videoStorageService.getFileRangeFromDisk(fileId, start, end).readAllBytes();
+        });
+
         return  StreamChunkResult.builder()
                 .stream(stream)
                 .actualStart(start)
@@ -122,7 +131,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @WithSpan
     @Override
     public long getFileSize(String fileId) throws IOException {
-        return videoCacheService.getFileSizeFromDisk(fileId);
+        return videoStorageService.getFileSizeFromDisk(fileId);
 //        File file = drive.files().get(fileId).setFields("size").execute();
 //        return file.getSize();
     }

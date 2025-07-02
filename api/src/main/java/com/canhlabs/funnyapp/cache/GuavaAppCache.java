@@ -2,7 +2,6 @@ package com.canhlabs.funnyapp.cache;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
- class GuavaAppCache<K, V> implements AppCache<K, V> {
+class GuavaAppCache<K, V> implements AppCache<K, V> {
 
     private final Cache<K, V> cache;
 
@@ -20,6 +19,34 @@ import java.util.concurrent.TimeUnit;
         this.cache = CacheBuilder.newBuilder()
                 .expireAfterWrite(ttlMinutes, TimeUnit.MINUTES)
                 .maximumSize(maxSize)
+                .build();
+    }
+
+    // ✅ Constructor theo RAM (maximumWeight, bytes)
+    public GuavaAppCache(long ttlMinutes, long maxWeightInBytes, boolean useWeight) {
+        this.cache = CacheBuilder.newBuilder()
+                .expireAfterWrite(ttlMinutes, TimeUnit.MINUTES)
+                .maximumWeight(maxWeightInBytes)
+                .weigher((K key, V value) -> {
+                    if (value instanceof byte[]) {
+                        return ((byte[]) value).length;
+                    }
+                    return 1; // fallback
+                })
+                .build();
+    }
+
+
+    public GuavaAppCache(long ttlMinutes, long maxWeightInBytes, long maxSize) {
+        this.cache = CacheBuilder.newBuilder()
+                .expireAfterWrite(ttlMinutes, TimeUnit.MINUTES)
+                .maximumWeight(maxWeightInBytes)
+                .weigher((K key, V value) -> {
+                    if (value instanceof byte[]) {
+                        return ((byte[]) value).length;
+                    }
+                    return 1; // fallback
+                })
                 .build();
     }
 
@@ -43,15 +70,15 @@ import java.util.concurrent.TimeUnit;
         cache.invalidateAll();
     }
 
-     @Override
-     public V get(K key, Callable<? extends V> loader)  {
-         try {
-             return cache.get(key, loader);
-         } catch (ExecutionException e) {
-             log.error("Error getting value from cache for key: {}", key, e);
-             throw new RuntimeException(e);
-         }
-     }
+    @Override
+    public V get(K key, Callable<? extends V> loader) {
+        try {
+            return cache.get(key, loader);
+        } catch (ExecutionException e) {
+            log.error("Error getting value from cache for key: {}", key, e);
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public Map<K, V> asMap() {

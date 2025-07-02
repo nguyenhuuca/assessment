@@ -17,7 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class VideoCacheServiceImplTest {
+class VideoStorageServiceImplTest {
     @Mock
     private ChunkLockManager chunkLockManager;
     @Mock
@@ -26,12 +26,12 @@ class VideoCacheServiceImplTest {
     private ChunkIndexService chunkIndexService;
 
     @InjectMocks
-    private VideoCacheServiceImpl videoCacheService;
+    private VideoStorageServiceImpl videoCacheService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        videoCacheService = new VideoCacheServiceImpl();
+        videoCacheService = new VideoStorageServiceImpl();
         videoCacheService.injectChunkLockManager(chunkLockManager);
         videoCacheService.injectCacheStatsService(cacheStatsService);
         videoCacheService.injectChunkIndexService(chunkIndexService);
