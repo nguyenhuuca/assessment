@@ -22,5 +22,5 @@ public interface VideoCacheService {
 
     InputStream getFileRangeFromDisk(String fileId, long start, long end) throws IOException;
     long getFileSizeFromDisk(String fileId) throws IOException;
-    CompletableFuture<InputStream> getPartialFileAsync(String fileId, long start, long end) throws IOException;
+
 }

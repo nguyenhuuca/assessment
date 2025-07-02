@@ -36,9 +36,9 @@ spring:
 
 server:
   port: ${SERVER_PORT:8081}
-  tomcat:
-    threads:
-      max: 10
+#  tomcat:
+#    threads:
+#      max: 10
 #    accept-count: 500
 #    connection-timeout: 30000
 

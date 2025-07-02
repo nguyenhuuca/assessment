@@ -160,43 +160,6 @@ public class VideoCacheServiceImpl implements VideoCacheService {
         return file.length();
     }
 
-    @Override
-    @WithSpan
-    public CompletableFuture<InputStream> getPartialFileAsync(String fileId, long start, long end) throws IOException {
-        Path path = Paths.get(CACHE_DIR, fileId.concat(".full"));
-        AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
-
-        int length = (int) (end - start + 1);
-        ByteBuffer buffer = ByteBuffer.allocate(length);
-
-        CompletableFuture<InputStream> future = new CompletableFuture<>();
-        channel.read(buffer, start, buffer, new CompletionHandler<Integer, ByteBuffer>() {
-            @Override
-            public void completed(Integer result, ByteBuffer attachment) {
-                attachment.flip();
-                byte[] bytes = new byte[attachment.remaining()];
-                attachment.get(bytes);
-                future.complete(new ByteArrayInputStream(bytes));
-                try {
-                    channel.close();
-                } catch (IOException ignored) {
-                    log.error("Failed to close channel for fileId: {}", fileId, ignored);
-                }
-            }
-
-            @Override
-            public void failed(Throwable exc, ByteBuffer attachment) {
-                future.completeExceptionally(exc);
-                try {
-                    channel.close();
-                } catch (IOException ignored) {
-                }
-            }
-        });
-
-        return future;
-    }
-
     /**
      * Helper method to get the chunk file based on fileId and byte range.
      *

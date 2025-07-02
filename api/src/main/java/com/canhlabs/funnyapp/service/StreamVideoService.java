@@ -93,13 +93,4 @@ public interface StreamVideoService {
      */
     void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException;
 
-    /**
-     * Asynchronously retrieves a partial file from storage.
-     *
-     * @param fileId The ID of the file to retrieve.
-     * @param start  The starting byte position.
-     * @param end    The ending byte position.
-     * @return A CompletableFuture that resolves to an InputStream for the specified range of the file content.
-     */
-    CompletableFuture<InputStream> getPartialFileAsync(String fileId, long start, long end);
 }

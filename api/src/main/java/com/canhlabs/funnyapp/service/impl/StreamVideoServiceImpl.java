@@ -192,17 +192,6 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     }
 
     @WithSpan
-    @Override
-    public CompletableFuture<InputStream> getPartialFileAsync(String fileId, long start, long end) {
-        try {
-            return videoCacheService.getPartialFileAsync(fileId, start, end);
-        } catch (IOException e) {
-            log.error("Error getting partial file asynchronously for fileId: {}, start: {}, end: {}", fileId, start, end, e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    @WithSpan
     public List<File> listFilesInFolder(String folderId, String uploadedAfter) throws IOException {
         String query = String.format("'%s' in parents and trashed = false and createdTime >= '%s'", folderId, uploadedAfter);
         return drive.files().list()
