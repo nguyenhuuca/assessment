@@ -88,7 +88,7 @@ public class StreamVideoServiceImplTest {
     @Test
     void testGetVideosToStream() {
         VideoSource videoSource = VideoSource.builder().id(1L).sourceId("src1").title("title").desc("desc").build();
-        when(videoSourceRepository.findAllByOrderByCreatedAtDesc()).thenReturn(List.of(videoSource));
+        when(videoSourceRepository.findAllByHideOrderByCreatedAtDesc(Boolean.FALSE)).thenReturn(List.of(videoSource));
         List<VideoDto> videos = streamVideoService.getVideosToStream();
         assertNotNull(videos);
         assertEquals(1, videos.size());

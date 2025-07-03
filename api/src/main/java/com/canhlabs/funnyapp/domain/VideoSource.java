@@ -46,4 +46,11 @@ public class VideoSource extends BaseDomain {
     private String desc;
 
 
+    @Column(name = "is_hide", nullable = false)
+    private boolean isHide = false;
+
+    @Column(name = "thumbnail_path")
+    private String thumbnailPath;
+
+
 }
