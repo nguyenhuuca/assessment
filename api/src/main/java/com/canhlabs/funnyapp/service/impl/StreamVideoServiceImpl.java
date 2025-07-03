@@ -139,7 +139,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @WithSpan
     @Override
     public List<VideoDto> getVideosToStream() {
-        return videoSourceRepository.findAllByHideOrderByCreatedAtDesc(Boolean.FALSE).stream()
+        return videoSourceRepository.findAllByIsHideOrderByCreatedAtDesc(Boolean.FALSE).stream()
                 .map(this::toDto)
                 .toList();
     }
