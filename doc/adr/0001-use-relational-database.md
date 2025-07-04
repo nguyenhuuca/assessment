@@ -24,4 +24,4 @@ We use PostgreSQL as the relational database due to:
 
 ## Related
 - Task: Design video_source and video_comments table
-- Migration tool: Flyway
+- Migration tool: Liquibase for schema management
