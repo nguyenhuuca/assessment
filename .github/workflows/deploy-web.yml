@@ -6,7 +6,6 @@ on:
     paths:
       - 'webapp/**'
       - '.github/workflows/deploy-web.yml'
-
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
