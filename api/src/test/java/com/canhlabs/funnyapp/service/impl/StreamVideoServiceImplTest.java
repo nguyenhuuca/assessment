@@ -5,6 +5,7 @@ import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
+import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.google.api.services.drive.Drive;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,8 @@ public class StreamVideoServiceImplTest {
     private VideoStorageService videoStorageService;
     @Mock
     private ChatGptService chatGptService;
+    @Mock
+    FfmpegService ffmpegService;
 
     @InjectMocks
     private StreamVideoServiceImpl streamVideoService;
@@ -45,6 +48,7 @@ public class StreamVideoServiceImplTest {
         streamVideoService.injectRepo(videoSourceRepository);
         streamVideoService.injectCacheService(videoStorageService);
         streamVideoService.injectChatGptService(chatGptService);
+        streamVideoService.injectFfmpegService(ffmpegService);
     }
 
     @Test
@@ -191,13 +195,14 @@ public class StreamVideoServiceImplTest {
         com.google.api.services.drive.model.File file = new com.google.api.services.drive.model.File();
         file.setId("id2"); file.setName("name2.mp4");
         doReturn(List.of(file)).when(spyService).listFilesInFolder(anyString(), anyString());
+        doNothing().when(ffmpegService).generateThumbnail(anyString(),anyString());
         doNothing().when(spyService).downloadFile(eq("id2"), any(java.io.File.class));
-        doNothing().when(spyService).saveInfo(eq("id2"), anyString());
+        doNothing().when(spyService).saveInfo(eq("id2"), anyString(), anyString());
         java.io.File localFile = new java.io.File("video-cache/id2.full");
         if (localFile.exists()) localFile.delete();
         spyService.downloadFileFromFolder("folder", "2024-01-01T00:00:00Z");
         // file should be created by downloadFile, but we mock it, so just check saveInfo called
-        verify(spyService).saveInfo(eq("id2"), anyString());
+        verify(spyService).saveInfo(eq("id2"), anyString(), anyString());
     }
 
     @Test
@@ -245,9 +250,9 @@ public class StreamVideoServiceImplTest {
         com.google.api.services.drive.model.File file = new com.google.api.services.drive.model.File();
         file.setId("id4"); file.setName("name4.mp4");
         doReturn(List.of(file)).when(spyService).listFilesInFolder(any(Drive.class), anyString());
-        doNothing().when(spyService).saveInfo(eq("id4"), anyString());
+        doNothing().when(spyService).saveInfo(eq("id4"), anyString() ,anyString());
         spyService.shareFilesInFolder();
-        verify(spyService).saveInfo(eq("id4"), anyString());
+        verify(spyService).saveInfo(eq("id4"), anyString(), anyString());
     }
 
     @Test
