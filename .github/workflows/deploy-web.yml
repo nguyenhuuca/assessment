@@ -2,7 +2,7 @@ name: Deploy Frontend (Static Copy)
 
 on:
   push:
-    branches: [main, next_volution]
+    branches: [main, 'VID-*']
     paths:
       - 'webapp/**'
       - '.github/workflows/deploy-web.yml'
