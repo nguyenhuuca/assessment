@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
+import com.canhlabs.funnyapp.dto.Range;
 import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
@@ -26,6 +27,8 @@ import java.util.List;
 @RequestMapping(AppConstant.API.BASE_URL + "/video-stream")
 @RestController
 public class VideoStreamController {
+    private final long FIRST_CHUNK_SIZE = 256 * 1024; // 256KB
+    private final long NEXT_CHUNK_SIZE = 512 * 1024;  // 512KB
     private final StreamVideoService videoService;
 
     public VideoStreamController(StreamVideoService videoService) {
@@ -46,29 +49,13 @@ public class VideoStreamController {
         long start = 0;
         long end = fileSize - 1;
 
-        final long FIRST_CHUNK_SIZE = 256 * 1024; // 256KB
-        final long NEXT_CHUNK_SIZE = 512 * 1024;  // 512KB
-
-        if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
-            log.info("📥 Range header: {}", rangeHeader);
-            String[] ranges = rangeHeader.substring(6).split("-");
-            try {
-                start = Long.parseLong(ranges[0]);
-
-                if (ranges.length > 1 && !ranges[1].isEmpty()) {
-                    end = Math.min(Long.parseLong(ranges[1]), fileSize - 1);
-                } else {
-                    long chunkSize = (start == 0) ? FIRST_CHUNK_SIZE : NEXT_CHUNK_SIZE;
-                    end = Math.min(start + chunkSize - 1, fileSize - 1);
-                }
-
-                log.info("📦 Streaming bytes {} to {}", start, end);
-            } catch (NumberFormatException e) {
-                log.warn("⚠️ Invalid range format: {}, fallback to full stream", rangeHeader);
-            }
+        Range range = parseRangeHeader(rangeHeader, fileSize);
+        if (range != null) {
+            start = range.start();
+            end = range.end();
+            log.info("📦 Streaming bytes {} to {}", start, end);
         }
-
-        StreamChunkResult streamRs = videoService.getPartialFileByChunk(fileId, start, end);
+        StreamChunkResult streamRs = videoService.getPartialFileUsingRAF(fileId, start, end);
         InputStream stream = streamRs.getStream();
         StreamingResponseBody responseBody = outputStream -> {
             try (stream) {
@@ -109,5 +96,26 @@ public class VideoStreamController {
                 .status(ResultStatus.SUCCESS)
                 .data(rs)
                 .build(), HttpStatus.OK);
+    }
+
+    private Range parseRangeHeader(String rangeHeader, long fileSize) {
+        if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
+            log.info("📥 Range header: {}", rangeHeader);
+            String[] ranges = rangeHeader.substring(6).split("-");
+            try {
+                long start = Long.parseLong(ranges[0]);
+                long end;
+                if (ranges.length > 1 && !ranges[1].isEmpty()) {
+                    end = Math.min(Long.parseLong(ranges[1]), fileSize - 1);
+                } else {
+                    long chunkSize = (start == 0) ? FIRST_CHUNK_SIZE : NEXT_CHUNK_SIZE;
+                    end = Math.min(start + chunkSize - 1, fileSize - 1);
+                }
+                return new Range(start, end);
+            } catch (NumberFormatException e) {
+                log.warn("⚠️ Invalid range format: {}, fallback to full stream", rangeHeader);
+            }
+        }
+        return null;
     }
 }

@@ -6,7 +6,7 @@
 spring:
   threads:
     virtual:
-      enabled: true
+      enabled: ${ENABLED_VIRTUAL_THREAD:true}
   jpa:
     hibernate:
       ddl-auto: none
@@ -36,6 +36,11 @@ spring:
 
 server:
   port: ${SERVER_PORT:8081}
+#  tomcat:
+#    threads:
+#      max: 10
+#    accept-count: 500
+#    connection-timeout: 30000
 
 
 management:

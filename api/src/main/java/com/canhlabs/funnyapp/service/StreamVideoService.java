@@ -7,25 +7,17 @@ import com.google.api.services.drive.Drive;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface StreamVideoService {
 
 
     /**
-     * Retrieves a file from storage by its ID.
-     *
-     * @param fileId The ID of the file to retrieve.
-     * @return An InputStream to read the file content.
-     * @throws IOException If an error occurs while accessing the file.
-     */
-    InputStream getPartialFile(String fileId, long start, long end) throws IOException;
-
-    /**
      * Retrieves a file from storage by its ID and specified byte range.
      *
      * @param fileId The ID of the file to retrieve.
-     * @param start The starting byte position.
-     * @param end The ending byte position.
+     * @param start  The starting byte position.
+     * @param end    The ending byte position.
      * @return An InputStream to read the specified range of the file content.
      * @throws IOException If an error occurs while accessing the file.
      */
@@ -35,8 +27,8 @@ public interface StreamVideoService {
      * Retrieves a file from storage using Random Access File (RAF) for partial reads.
      *
      * @param fileId The ID of the file to retrieve.
-     * @param start The starting byte position.
-     * @param end The ending byte position.
+     * @param start  The starting byte position.
+     * @param end    The ending byte position.
      * @return A StreamChunkResult containing the file content and metadata.
      * @throws IOException If an error occurs while accessing the file.
      */
@@ -44,6 +36,7 @@ public interface StreamVideoService {
 
     /**
      * Gets the size of a file in bytes.
+     *
      * @param fileId The ID of the file to check.
      * @return The size of the file in bytes.
      * @throws IOException If an error occurs while accessing the file.
@@ -77,18 +70,27 @@ public interface StreamVideoService {
     /**
      * Shares a file with a specified email address.
      *
-     * @param drive The Google Drive service instance.
+     * @param drive  The Google Drive service instance.
      * @param fileId The ID of the file to share.
-     * @param email The email address to share the file with.
+     * @param email  The email address to share the file with.
      * @throws IOException If an error occurs while sharing the file.
      */
     void shareFile(Drive drive, String fileId, String email) throws IOException;
 
     /**
      * Shares all files in a specified folder.
-     *
      */
     void shareFilesInFolder();
+
     void updateDesc();
+
+    /**
+     * Downloads a file from a specified folder that was uploaded after a certain date.
+     *
+     * @param folderId       The ID of the googloe folder to download from.
+     * @param uploadedAfter  The date after which files should be downloaded (in ISO 8601 format).
+     * @throws IOException If an error occurs while downloading the file.
+     */
+    void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException;
 
 }

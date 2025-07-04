@@ -17,7 +17,9 @@ public class ThreadController {
     ChatGptService chatGptService;
     @GetMapping("/name")
     public String getThreadName() {
-        return chatGptService.makePoem("Dưỡng tâm");
+        return "thread name: " + Thread.currentThread().getName() +
+                ", is virtual: " + Thread.currentThread().isVirtual();
+        // return chatGptService.makePoem("Dưỡng tâm");
     }
     @GetMapping("/load")
     public void doSomething() throws InterruptedException {

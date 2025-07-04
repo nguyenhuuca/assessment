@@ -1,12 +1,13 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.VideoCacheStore;
 import com.canhlabs.funnyapp.domain.VideoSource;
 import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
-import com.canhlabs.funnyapp.service.VideoCacheService;
+import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -20,30 +21,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.canhlabs.funnyapp.share.AppConstant.FOLDER_ID;
+
 @Slf4j
 @Service
 public class StreamVideoServiceImpl implements StreamVideoService {
-    private static final String FOLDER_ID = "1uk7TUSvUkE9if6HYnY4ap2Kj0gSZ5qlz";
+
     private final Drive drive;
     private VideoSourceRepository videoSourceRepository;
-    private VideoCacheService videoCacheService;
+    private VideoStorageService videoStorageService;
     private ChatGptService chatGptService;
+    private VideoCacheStore videoCacheStore;
+    @Autowired
+    public  void injectVideoCacheStore(VideoCacheStore videoCacheStore) {
+        this.videoCacheStore = videoCacheStore;
+    }
     @Autowired
     public void injectChatGptService(ChatGptService chatGptService) {
         this.chatGptService = chatGptService;
     }
 
     @Autowired
-    public void injectCacheService(VideoCacheService videoCacheService) {
-        this.videoCacheService = videoCacheService;
+    public void injectCacheService(VideoStorageService videoStorageService) {
+        this.videoStorageService = videoStorageService;
     }
 
     @Autowired
@@ -55,33 +67,14 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         this.drive = drive;
     }
 
-    @Override
-    @WithSpan
-    public InputStream getPartialFile(String fileId, long start, long end) throws IOException {
-        log.info("Requesting video {} range: {}-{}", fileId, start, end);
-        boolean isCacheRange = (start == 0 && end < AppConstant.CACHE_SIZE);
-        if (isCacheRange) {
-            if (!videoCacheService.hasCache(fileId, end + 1)) {
-                log.info("📥 Cache miss for file {}, fetching Google Drive", fileId);
-                try (InputStream in = new BufferedInputStream(fetchFromGoogleDrive(fileId, 0, end))) {
-                    videoCacheService.saveToCache(fileId, in);
-                }
-            }
-            log.info("📤 Serving file {} from disk cache", fileId);
-            return videoCacheService.getCache(fileId);
-        }
-
-        log.info("🌐 Fetching file {} from Google Drive by range {}-{}", fileId, start, end);
-        return fetchFromGoogleDrive(fileId, start, end);
-    }
 
     @Override
     @WithSpan
     public StreamChunkResult getPartialFileByChunk(String fileId, long start, long end) throws IOException {
-        if (videoCacheService.hasChunk(fileId, start, end)) {
+        if (videoStorageService.hasChunk(fileId, start, end)) {
             log.info("🟢 Cache hit: {} ({} - {})", fileId, start, end);
             return  StreamChunkResult.builder()
-                    .stream(videoCacheService.getChunk(fileId, start, end))
+                    .stream(videoStorageService.getChunk(fileId, start, end))
                     .actualStart(start)
                     .actualEnd(end)
                     .build();
@@ -92,7 +85,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         InputStream googleStream = fetchFromGoogleDrive(fileId, start, end);
         try (BufferedInputStream bufferedStream = new BufferedInputStream(googleStream)) {
             log.info("💾 Saving chunk {} ({} - {}), size ≈ {} bytes", fileId, start, end, (end - start + 1));
-            videoCacheService.saveChunk(fileId, start, end, bufferedStream);
+            videoStorageService.saveChunk(fileId, start, end, bufferedStream);
         } catch (IOException e) {
             log.warn("⚠️ Failed to save chunk to cache: {} ({} - {}), fallback to direct stream", fileId, start, end);
             return StreamChunkResult.builder()
@@ -103,15 +96,20 @@ public class StreamVideoServiceImpl implements StreamVideoService {
 
         }
         return  StreamChunkResult.builder()
-                .stream(videoCacheService.getChunk(fileId, start, end))
+                .stream(videoStorageService.getChunk(fileId, start, end))
                 .actualStart(start)
                 .actualEnd(end)
                 .build();
     }
 
+    @WithSpan
     @Override
     public StreamChunkResult getPartialFileUsingRAF(String fileId, long start, long end) throws IOException {
-        InputStream stream = videoCacheService.getFileRangeFromDisk(fileId, start, end);
+        InputStream stream = videoCacheStore.getChunkStream(fileId, start, end, () -> {
+            log.info("🔴 Cache miss: fetching {} ({} - {}) from disk", fileId, start, end);
+            return  videoStorageService.getFileRangeFromDisk(fileId, start, end).readAllBytes();
+        });
+
         return  StreamChunkResult.builder()
                 .stream(stream)
                 .actualStart(start)
@@ -120,7 +118,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     }
 
     @WithSpan
-    private InputStream fetchFromGoogleDrive(String fileId, long start, long end) throws IOException {
+    InputStream fetchFromGoogleDrive(String fileId, long start, long end) throws IOException {
         GenericUrl url = new GenericUrl("https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media");
 
         HttpRequest request = drive.getRequestFactory()
@@ -133,14 +131,15 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @WithSpan
     @Override
     public long getFileSize(String fileId) throws IOException {
-        File file = drive.files().get(fileId).setFields("size").execute();
-        return file.getSize();
+        return videoStorageService.getFileSizeFromDisk(fileId);
+//        File file = drive.files().get(fileId).setFields("size").execute();
+//        return file.getSize();
     }
 
     @WithSpan
     @Override
     public List<VideoDto> getVideosToStream() {
-        return videoSourceRepository.findAllByOrderByCreatedAtDesc().stream()
+        return videoSourceRepository.findAllByIsHideOrderByCreatedAtDesc(Boolean.FALSE).stream()
                 .map(this::toDto)
                 .toList();
     }
@@ -180,6 +179,42 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         } while (request.getPageToken() != null && !request.getPageToken().isEmpty());
         log.info("Found {} files in folder {}", files.size(), folderId);
         return files;
+    }
+
+    @WithSpan
+    public void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException {
+        List<File> files = listFilesInFolder(folderId, uploadedAfter);
+
+        for (File file : files) {
+            java.io.File localFile = new java.io.File(AppConstant.CACHE_DIR, file.getId().concat(".full"));
+            if (localFile.exists()) {
+                log.info("✅ File already exists: {}, skipping", file.getName());
+                continue;
+            }
+
+            log.info("⬇️ Downloading {} ({} bytes)", file.getName(), file.getSize());
+            downloadFile(file.getId(), localFile);
+            log.info("Downloaded file {} completely", file.getName());
+            // update info in database
+            saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""));
+        }
+    }
+
+    @WithSpan
+    public List<File> listFilesInFolder(String folderId, String uploadedAfter) throws IOException {
+        String query = String.format("'%s' in parents and trashed = false and createdTime >= '%s'", folderId, uploadedAfter);
+        return drive.files().list()
+                .setQ(query)
+                .setFields("files(id, name, size, createdTime)")
+                .execute()
+                .getFiles();
+    }
+
+    @WithSpan
+    public void downloadFile(String fileId, java.io.File destination) throws IOException {
+        try (OutputStream out = new FileOutputStream(destination)) {
+            drive.files().get(fileId).executeMediaAndDownloadTo(out);
+        }
     }
 
     @Override
@@ -239,9 +274,34 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         }
     }
 
+    public void generateThumbnail(String videoPath, String outputImagePath, int second) throws IOException, InterruptedException {
+        List<String> command = List.of(
+                "ffmpeg",
+                "-i", videoPath,
+                "-ss", "00:00:" + String.format("%02d", second),
+                "-vframes", "1",
+                "-q:v", "2",
+                outputImagePath
+        );
+
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.redirectErrorStream(true); // merge stderr vào stdout
+        Process process = pb.start();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            reader.lines().forEach(item -> log.info("FFmpeg output: {}", item));
+        }
+
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            log.error("FFmpeg failed with exit code " + exitCode);
+        }
+    }
+
     public VideoDto toDto(VideoSource source) {
         VideoDto dto = new VideoDto();
         dto.setId(source.getId());
+        dto.setFileId(source.getSourceId());
         dto.setUserShared("unknown"); // set nếu có user info
         dto.setTitle(source.getTitle());
         dto.setDesc(source.getDesc());

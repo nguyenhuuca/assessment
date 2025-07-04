@@ -1441,12 +1441,14 @@ body.modal-open {
 .video-swipe-container {
     position: relative;
     width: 100%;
-    height: 90vh;
+    height: 100vh; /* Use full viewport height */
     overflow: hidden;
     background: black;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 5px; /* Add padding to constrain the video size */
+    box-sizing: border-box; /* Ensure padding is included in height calculation */
 }
 
 .video-swipe-wrapper {
@@ -1460,12 +1462,11 @@ body.modal-open {
 }
 
 .video-swipe-item {
-    width: 100%;
-    max-width: 400px;
+    max-width: 100%;
+    max-height: 100%;
     aspect-ratio: 9 / 16;
     position: relative;
     margin: 0 auto;
-    max-height: 100%;
     height: auto;
     box-sizing: border-box;
 }
@@ -1488,13 +1489,29 @@ body.modal-open {
     background: black;
     object-fit: cover;
     opacity: 0;
-    transition: opacity 0.4s;
+    transition: opacity 0.4s, transform 0.3s ease;
     z-index: 1;
 }
 
 .video-swipe-item video.active {
     opacity: 1;
     z-index: 2;
+    transform: translateX(0) !important;
+}
+
+.video-swipe-item video.slide-left {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.video-swipe-item video.slide-right {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.video-swipe-item video.slide-in {
+    transform: translateX(0) !important;
+    opacity: 1;
 }
 
 .video-swipe-controls {
@@ -1702,8 +1719,6 @@ body.modal-open {
         flex-direction: row;
         justify-content: flex-end;
         align-items: center;
-        width: 100%;
-        max-width: 400px;
         margin: 0 auto;
         position: relative;
     }
