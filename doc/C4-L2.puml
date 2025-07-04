@@ -1,0 +1,26 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+title Video Streaming System - Container Diagram
+
+Person(user, "User", "Watches videos via browser")
+
+Enterprise_Boundary(system, "Video Streaming System") {
+
+  Container(fe, "Frontend", "Vanilla JS + Bootstrap", "Web UI served via Nginx")
+  Container(be, "Backend", "Spring Boot", "Handles REST API, streaming, caching, cron jobs")
+  ContainerDb(db, "PostgreSQL", "Relational DB", "Stores video metadata")
+  Container(mon, "Monitoring", "OTel + Prometheus + Grafana Cloud", "Metrics, logs, traces")
+}
+
+Lay_R(user, fe)
+
+Rel(user, fe, "Uses")
+Rel(fe, be, "Calls REST API (e.g., /stream/{id})")
+Rel(be, fe, "Streams video content (HTTP 206)")
+Rel(be, db, "Reads/Writes")
+Rel(be, mon, "Sends telemetry")
+
+@enduml

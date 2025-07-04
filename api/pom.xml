@@ -157,6 +157,12 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-java21 -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-java21</artifactId>
+            <version>1.15.1</version>
+        </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>

@@ -1,0 +1,23 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+title Video Streaming System - System Context Diagram
+
+Person(user, "User", "Watches videos via browser")
+
+System(videoSystem, "Video Streaming System", "Delivers video content to users on demand")
+
+System_Ext(grafana, "Grafana Cloud", "Receives logs, metrics, traces")
+System_Ext(drive, "Google Drive", "Stores source video files")
+System_Ext(redis, "Redis (future)", "External cache for video chunks")
+System_Ext(devops, "DevOps Monitoring", "Deploys and monitors backend services")
+
+Rel(user, videoSystem, "Streams video, views UI via browser")
+Rel(videoSystem, grafana, "Sends telemetry data (metrics, traces, logs)")
+Rel(videoSystem, drive, "Downloads videos via cron job")
+Rel(videoSystem, redis, "Planned: store video chunks (cache)", "Future")
+Rel(devops, videoSystem, "Deploys and monitors")
+
+@enduml
