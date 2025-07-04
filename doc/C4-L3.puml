@@ -1,0 +1,34 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+title Backend - Component Diagram
+
+Person(user, "User", "Watches videos via browser")
+
+System_Ext(db, "PostgreSQL", "Relational DB")
+System_Ext(redis, "Redis (future)", "Planned external cache")
+System_Ext(monitor, "Monitoring", "OTel + Grafana Cloud")
+
+Container_Boundary(be, "Backend (Spring Boot)") {
+
+  Component(api, "VideoController", "Spring REST Controller", "Handles HTTP requests like /stream/{id}")
+  Component(service, "VideoStreamService", "Service", "Streams video files, uses cache")
+  Component(cache, "VideoChunkCache", "Guava In-Memory Cache", "Caches video chunks by fileId + byte range")
+  Component(job, "CronJobScheduler", "Scheduled Job", "Downloads videos from Google Drive")
+  Component(repo, "VideoRepository", "Spring Data JPA", "Accesses video metadata in DB")
+}
+
+Rel(user, api, "Calls")
+
+Rel(api, service, "Uses")
+Rel(service, cache, "Reads/Writes")
+Rel(service, repo, "Fetches metadata")
+Rel(repo, db, "Reads/Writes")
+
+Rel(job, repo, "Saves video info")
+Rel(service, redis, "Planned: use Redis for cache", "Future")
+Rel(be, monitor, "Sends metrics/traces/logs")
+
+@enduml
