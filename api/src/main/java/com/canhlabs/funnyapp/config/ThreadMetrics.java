@@ -5,10 +5,6 @@ import io.micrometer.java21.instrument.binder.jdk.VirtualThreadMetrics;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
-
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 
 @Configuration
 @Slf4j
@@ -21,8 +17,7 @@ public class ThreadMetrics {
     }
 
     @PostConstruct
-    public void init() {
+    public void bindVirtualThreadMetrics() {
         new VirtualThreadMetrics().bindTo(registry);
-        log.info("Initializing thread metrics...");
     }
 }
