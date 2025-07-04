@@ -117,12 +117,12 @@ Duration: 100 seconds
 Enable Vitual Threads
 
 
-![img.png](img.png)
-![img_1.png](img_1.png)
+![img.png](images/img.png)
+![img_1.png](images/img_1.png)
 
 Disaable Vitual Threads
-![img_2.png](img_2.png)
-![img_3.png](img_3.png)
+![img_2.png](images/img_2.png)
+![img_3.png](images/img_3.png)
 
 
 ---
