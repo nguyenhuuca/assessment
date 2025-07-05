@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.share;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.filter.JwtProvider;
 import com.canhlabs.funnyapp.dto.JwtGenerationDto;
 import com.canhlabs.funnyapp.dto.JwtVerificationResultDto;
 import com.canhlabs.funnyapp.dto.TokenDto;
