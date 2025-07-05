@@ -29,6 +29,9 @@ public class AppProperties {
     private String chatGptUrl;
     private String youtubeUrl;
     private String googleCredentialPath;
+    private String imageUrl;
+    private String mainDomain;
+    private String imageStoragePath;
 
 
 

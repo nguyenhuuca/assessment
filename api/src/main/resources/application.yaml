@@ -70,6 +70,9 @@ app:
   invite-template: 'templates/email/invite.html'
   chatgpt-url: 'https://api.openai.com/v1/chat/completions'
   youtube-url: 'https://www.googleapis.com/youtube/v3/videos'
+  image-url: 'https://image.canh-labs.com'
+  main-domain: 'https://canh-labs.com'
+  image-storage-path: '/opt/data/images'
 
 logging:
   masking:

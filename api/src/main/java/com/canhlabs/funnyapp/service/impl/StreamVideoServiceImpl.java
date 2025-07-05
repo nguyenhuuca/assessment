@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.VideoCacheStore;
+import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.domain.VideoSource;
 import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
@@ -47,6 +48,12 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     private ChatGptService chatGptService;
     private VideoCacheStore videoCacheStore;
     private FfmpegService ffmpegService;
+    private AppProperties appProps;
+
+    @Autowired
+    public void injectAppProperties(AppProperties appProps) {
+        this.appProps = appProps;
+    }
 
     @Autowired
     public void injectFfmpegService(FfmpegService ffmpegService) {
@@ -204,10 +211,11 @@ public class StreamVideoServiceImpl implements StreamVideoService {
             downloadFile(file.getId(), localFile);
             log.info("Downloaded file {} completely", file.getName());
             // ✅ Generate thumbnail
-            String thumbnailPath = Paths.get("/var/www/funnyapp.canh-labs.com/images/thumbnails/", file.getId() + ".jpg").toString();
+            String imageName = file.getId().concat(".jpg");
+            String thumbnailPath = Paths.get(appProps.getImageStoragePath().concat("/thumbnails"), imageName).toString();
             ffmpegService.generateThumbnail(localFile.getAbsolutePath(), thumbnailPath);
             // update info in database
-            saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""), thumbnailPath);
+            saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""), appProps.getImageUrl().concat("/") + imageName);
         }
     }
 

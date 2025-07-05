@@ -20,7 +20,7 @@ public class FfmpegServiceImpl implements FfmpegService {
                     "-ss", "00:00:01",   // snapshot at 1 second
                     "-i", videoPath,
                     "-frames:v", "1",
-                    "-q:v", "2",
+                    "-q:v", "7",
                     thumbnailPath
             );
 
