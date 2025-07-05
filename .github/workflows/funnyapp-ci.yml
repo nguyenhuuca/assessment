@@ -8,13 +8,12 @@ on:
       - '.github/workflows/funnyapp-ci.yml'
 jobs:
   build:
-    name: 🧱 Build Application
+    name: 🧱 Build and Analyze
     runs-on: ubuntu-latest
     outputs:
       jar_path: ${{ steps.build.outputs.jar_path }}
 
     steps:
-      # Checkout the source code
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -23,7 +22,6 @@ jobs:
           repository: nguyenhuuca/assessment
           token: ${{ secrets.GH_PAT }}
 
-      # Skip CI if the last commit message includes [skip ci]
       - name: Skip CI if last commit message contains [skip ci]
         run: |
           LAST_MSG=$(git log -1 --pretty=%B)
@@ -32,7 +30,6 @@ jobs:
             exit 0
           fi
 
-      # Set up Java 21 using Temurin
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -40,11 +37,27 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
-      # Build the project without running tests
-      - name: Build project (skip tests)
-        run: mvn -B clean package -DskipTests=true --file api/pom.xml
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
-      # Pass JAR path to the next jobs
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build and analyze with SonarQube
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -DskipTests=true \
+            -Dsonar.projectKey=nguyenhuuca_assessment
       - name: Output JAR path
         id: build
         run: echo "jar_path=api/target/funny-app-1.0.0.jar" >> "$GITHUB_OUTPUT"
@@ -54,6 +67,7 @@ jobs:
         with:
           name: built-jar
           path: api/target/funny-app-1.0.0.jar
+
 
   test:
     name: 🧪 Run Tests & Coverage Check

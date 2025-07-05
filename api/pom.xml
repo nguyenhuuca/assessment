@@ -34,6 +34,8 @@
         <skipTests>false</skipTests>
         <skipCoverage>false</skipCoverage>
         <jacoco.minimum.coverage>0.07</jacoco.minimum.coverage>
+        <sonar.organization>canh-labs</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencies>
