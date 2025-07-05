@@ -57,7 +57,7 @@ jobs:
         run: |
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -DskipTests=true \
-            -Dsonar.projectKey=nguyenhuuca_assessment
+            -Dsonar.projectKey=nguyenhuuca_assessment --file api/pom.xml
       - name: Output JAR path
         id: build
         run: echo "jar_path=api/target/funny-app-1.0.0.jar" >> "$GITHUB_OUTPUT"
