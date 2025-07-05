@@ -1,6 +1,5 @@
-package com.canhlabs.funnyapp.config;
+package com.canhlabs.funnyapp.filter;
 
-import com.canhlabs.funnyapp.filter.JWTAuthenticationFilter;
 import com.canhlabs.funnyapp.share.AppConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

@@ -6,7 +6,6 @@ on:
     paths:
       - 'api/**'
       - '.github/workflows/funnyapp-ci.yml'
-
 jobs:
   build:
     name: 🧱 Build Application

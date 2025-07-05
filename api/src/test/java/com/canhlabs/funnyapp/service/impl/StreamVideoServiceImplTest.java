@@ -1,18 +1,22 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.domain.VideoSource;
 import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
+import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.google.api.services.drive.Drive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class StreamVideoServiceImplTest {
     @Mock
     private Drive drive;
@@ -34,17 +39,23 @@ public class StreamVideoServiceImplTest {
     private VideoStorageService videoStorageService;
     @Mock
     private ChatGptService chatGptService;
+    @Mock
+    FfmpegService ffmpegService;
+    @Mock
+    AppProperties appProperties;
 
     @InjectMocks
     private StreamVideoServiceImpl streamVideoService;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         streamVideoService = new StreamVideoServiceImpl(drive);
         streamVideoService.injectRepo(videoSourceRepository);
         streamVideoService.injectCacheService(videoStorageService);
         streamVideoService.injectChatGptService(chatGptService);
+        streamVideoService.injectFfmpegService(ffmpegService);
+        streamVideoService.injectAppProperties(appProperties);
+
     }
 
     @Test
@@ -141,7 +152,7 @@ public class StreamVideoServiceImplTest {
         InputStream fallbackStream = new ByteArrayInputStream(new byte[]{7,8,9});
         when(videoStorageService.hasChunk(fileId, start, end)).thenReturn(false);
         StreamVideoServiceImpl spyService = spy(streamVideoService);
-        doReturn(googleStream).when(spyService).fetchFromGoogleDrive(fileId, start, end);
+        lenient().doReturn(googleStream).when(spyService).fetchFromGoogleDrive(fileId, start, end);
         doThrow(new IOException("fail")).when(videoStorageService).saveChunk(eq(fileId), eq(start), eq(end), any(InputStream.class));
         doReturn(fallbackStream).when(spyService).fetchFromGoogleDrive(fileId, start, end);
 
@@ -190,14 +201,17 @@ public class StreamVideoServiceImplTest {
         StreamVideoServiceImpl spyService = spy(streamVideoService);
         com.google.api.services.drive.model.File file = new com.google.api.services.drive.model.File();
         file.setId("id2"); file.setName("name2.mp4");
+        when(appProperties.getImageStoragePath()).thenReturn("/var/test");
+        when(appProperties.getImageUrl()).thenReturn("http://localhost:8080/images/");
         doReturn(List.of(file)).when(spyService).listFilesInFolder(anyString(), anyString());
+        doNothing().when(ffmpegService).generateThumbnail(anyString(),anyString());
         doNothing().when(spyService).downloadFile(eq("id2"), any(java.io.File.class));
-        doNothing().when(spyService).saveInfo(eq("id2"), anyString());
+        doNothing().when(spyService).saveInfo(eq("id2"), anyString(), anyString());
         java.io.File localFile = new java.io.File("video-cache/id2.full");
         if (localFile.exists()) localFile.delete();
         spyService.downloadFileFromFolder("folder", "2024-01-01T00:00:00Z");
         // file should be created by downloadFile, but we mock it, so just check saveInfo called
-        verify(spyService).saveInfo(eq("id2"), anyString());
+        verify(spyService).saveInfo(eq("id2"), anyString(), anyString());
     }
 
     @Test
@@ -245,9 +259,9 @@ public class StreamVideoServiceImplTest {
         com.google.api.services.drive.model.File file = new com.google.api.services.drive.model.File();
         file.setId("id4"); file.setName("name4.mp4");
         doReturn(List.of(file)).when(spyService).listFilesInFolder(any(Drive.class), anyString());
-        doNothing().when(spyService).saveInfo(eq("id4"), anyString());
+        doNothing().when(spyService).saveInfo(eq("id4"), anyString() ,anyString());
         spyService.shareFilesInFolder();
-        verify(spyService).saveInfo(eq("id4"), anyString());
+        verify(spyService).saveInfo(eq("id4"), anyString(), anyString());
     }
 
     @Test

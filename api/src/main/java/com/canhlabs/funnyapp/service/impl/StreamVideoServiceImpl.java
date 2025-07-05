@@ -1,11 +1,13 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.VideoCacheStore;
+import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.domain.VideoSource;
 import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
+import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.share.AppConstant;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -44,6 +47,18 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     private VideoStorageService videoStorageService;
     private ChatGptService chatGptService;
     private VideoCacheStore videoCacheStore;
+    private FfmpegService ffmpegService;
+    private AppProperties appProps;
+
+    @Autowired
+    public void injectAppProperties(AppProperties appProps) {
+        this.appProps = appProps;
+    }
+
+    @Autowired
+    public void injectFfmpegService(FfmpegService ffmpegService) {
+        this.ffmpegService = ffmpegService;
+    }
     @Autowired
     public  void injectVideoCacheStore(VideoCacheStore videoCacheStore) {
         this.videoCacheStore = videoCacheStore;
@@ -195,8 +210,12 @@ public class StreamVideoServiceImpl implements StreamVideoService {
             log.info("⬇️ Downloading {} ({} bytes)", file.getName(), file.getSize());
             downloadFile(file.getId(), localFile);
             log.info("Downloaded file {} completely", file.getName());
+            // ✅ Generate thumbnail
+            String imageName = file.getId().concat(".jpg");
+            String thumbnailPath = Paths.get(appProps.getImageStoragePath().concat("/thumbnails"), imageName).toString();
+            ffmpegService.generateThumbnail(localFile.getAbsolutePath(), thumbnailPath);
             // update info in database
-            saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""));
+            saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""), appProps.getImageUrl().concat("/") + imageName);
         }
     }
 
@@ -231,7 +250,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     }
 
     @WithSpan
-    public void saveInfo(String fileId, String title) {
+    public void saveInfo(String fileId, String title, String thumbnailPath) {
         if (!videoSourceRepository.existsBySourceId(fileId)) {
             String desc = chatGptService.makePoem(title);
             VideoSource entity = VideoSource.builder()
@@ -241,6 +260,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
                     .title(title)
                     .desc(desc)
                     .credentialsRef("")
+                    .thumbnailPath(thumbnailPath)
                     .build();
             videoSourceRepository.save(entity);
         }
@@ -253,7 +273,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         try {
             List<File> files = listFilesInFolder(drive, FOLDER_ID);
             for (File file : files) {
-                saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""));
+                saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""), "");
                 log.info("Shared file: {}", file.getName());
             }
 
@@ -271,30 +291,6 @@ public class StreamVideoServiceImpl implements StreamVideoService {
             source.setDesc(desc);
             videoSourceRepository.save(source);
             log.info("Updated description for video ID: {}", source.getId());
-        }
-    }
-
-    public void generateThumbnail(String videoPath, String outputImagePath, int second) throws IOException, InterruptedException {
-        List<String> command = List.of(
-                "ffmpeg",
-                "-i", videoPath,
-                "-ss", "00:00:" + String.format("%02d", second),
-                "-vframes", "1",
-                "-q:v", "2",
-                outputImagePath
-        );
-
-        ProcessBuilder pb = new ProcessBuilder(command);
-        pb.redirectErrorStream(true); // merge stderr vào stdout
-        Process process = pb.start();
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            reader.lines().forEach(item -> log.info("FFmpeg output: {}", item));
-        }
-
-        int exitCode = process.waitFor();
-        if (exitCode != 0) {
-            log.error("FFmpeg failed with exit code " + exitCode);
         }
     }
 

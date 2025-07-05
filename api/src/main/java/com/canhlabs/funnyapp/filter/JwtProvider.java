@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.share;
+package com.canhlabs.funnyapp.filter;
 
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.JwtGenerationDto;
@@ -24,7 +24,6 @@ import static com.canhlabs.funnyapp.share.AppUtils.getNonNull;
 
 /**
  * Using to generate/verify token, revoke token in case it become invalid: supend user, in-active user
- *
  */
 @Component
 @Slf4j
@@ -38,9 +37,8 @@ public class JwtProvider {
 
 
     /**
-     *
      * @param request hold the user info that was included to token string,
-     * Default expire time for token is 24h
+     *                Default expire time for token is 24h
      * @return token string
      */
     public TokenDto generateToken(JwtGenerationDto request) {
@@ -57,6 +55,7 @@ public class JwtProvider {
 
     /**
      * Checking token invalid
+     *
      * @param token to verify that sent by client
      * @return result verification, include http status and sub code
      */
@@ -77,13 +76,12 @@ public class JwtProvider {
         } catch (Exception ex) {
             throw new UnauthorizedException("TOKEN_INVALID", 601);
         }
-        return  rs;
+        return rs;
 
     }
 
 
     /**
-     *
      * @param request get expire time from request, default is 24h
      * @return date expire
      */
@@ -98,6 +96,7 @@ public class JwtProvider {
 
     /**
      * Using get jwt secret key from configure file, keys have to length = 32(256bit)
+     *
      * @return Key  that use to sign when generate token
      */
     private Key getKey() {
@@ -106,6 +105,7 @@ public class JwtProvider {
 
     /**
      * Creating the body for token
+     *
      * @param request user info will be added into token body
      * @return Map value to add to token builder
      */
