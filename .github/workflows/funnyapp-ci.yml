@@ -98,6 +98,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.coverage.jacoco.xmlReportPaths=api/target/jacoco-report/jacoco.xml \`
             -Dsonar.projectKey=nguyenhuuca_assessment --file api/pom.xml
 
       # Install xmllint to parse coverage XML report
