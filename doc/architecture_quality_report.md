@@ -89,7 +89,6 @@
 
 - ✅ **Keep current structure**, no major refactors needed.
 - 🔍 Monitor ACD and CCD in core components.
-- ⚖️ Define architectural rules in Sonargraph DSL to lock intended layering.
 - 🔐 Integrate into CI/CD to enforce architectural compliance.
 - 📊 Use this report as a baseline for future regressions.
 
