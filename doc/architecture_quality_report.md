@@ -84,6 +84,10 @@
 🚀 Very low complexity, highly readable and testable code.
 
 ---
+## 📊 A/I Chart
+
+![AIChart.jpg](AIChart.jpg)
+---
 
 ## 📝 Recommendations
 
