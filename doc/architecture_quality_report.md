@@ -88,6 +88,38 @@
 
 ![AIChart.jpg](AIChart.jpg)
 
+### Abstractness vs Instability Analysis
+
+#### Overview
+
+This chart is based on principles from *Robert C. Martin* and visualizes the tradeoff between **Abstractness (A)** and **Instability (I)** of each module. It helps assess the internal architecture quality of a system and guides refactoring efforts.
+
+- **Abstractness (A)**: Ratio of abstract classes and interfaces in a module.
+- **Instability (I)**: How likely a module is to change (i.e., how many modules depend on it vs how many it depends on).
+- **Distance (D)**: Deviation from the "Main Sequence" (ideal balance between A and I), computed as `D = |A + I - 1|`.
+
+#### Zones
+
+The chart is divided into three main zones:
+
+| Zone | Description |
+|------|-------------|
+| ✅ **Safe Zone** | Modules near the "Main Sequence" (A + I ≈ 1). These have a good balance between abstraction and stability. |
+| ❌ **Zone of Pain** | Modules with low A and low I. They are stable but too concrete, making changes risky and expensive. |
+| ⚠ **Useless Abstraction Zone** | Modules with high A and high I. Highly abstract but unused, which adds unnecessary complexity. |
+
+#### Example Modules
+
+| Module         | Abstractness (A) | Instability (I) | Distance (D) | Zone                    |
+|----------------|------------------|------------------|---------------|--------------------------|
+| `app module`   | 0.18             | 0.47             | 0.35          | Near **Zone of Pain**    |
+| `service layer`| 1.00             | 0.33             | 0.33          | Slightly **overabstracted** |
+
+#### Recommendations
+
+- Consider refactoring `app module` to extract interfaces or reduce fan-in to reduce architectural debt.
+- `service layer` is acceptable, assuming it provides shared contracts, but should be monitored for overengineering.
+
 ---
 
 ## 📝 Recommendations
