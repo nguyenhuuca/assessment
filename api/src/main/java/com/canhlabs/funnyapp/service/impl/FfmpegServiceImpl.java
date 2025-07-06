@@ -29,13 +29,12 @@ public class FfmpegServiceImpl implements FfmpegService {
             int exitCode = process.waitFor();
 
             if (exitCode != 0) {
-                throw new RuntimeException("FFmpeg failed with exit code " + exitCode);
+                log.error("❌ FFmpeg failed to generate thumbnail for {}. Exit code: {}", videoPath, exitCode);
             }
 
             log.info("🖼️ Thumbnail generated at {}", thumbnailPath);
         } catch (Exception e) {
-            log.error("❌ Failed to generate thumbnail for {}: {}", videoPath, e.getMessage());
-            throw new RuntimeException("Failed to generate thumbnail", e);
+            log.error("❌ Failed to generate thumbnail for {}: {}", videoPath, e.getMessage(), e);
         }
 
     }
