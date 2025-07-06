@@ -87,6 +87,7 @@
 ## 📊 A/I Chart
 
 ![AIChart.jpg](AIChart.jpg)
+
 ---
 
 ## 📝 Recommendations
