@@ -3,19 +3,19 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.cache.MFASessionStore;
 import com.canhlabs.funnyapp.domain.User;
 import com.canhlabs.funnyapp.domain.UserEmailRequest;
-import com.canhlabs.funnyapp.dto.UserDetailDto;
-import com.canhlabs.funnyapp.repo.UserRepo;
-import com.canhlabs.funnyapp.share.AppUtils;
-import com.canhlabs.funnyapp.filter.JwtProvider;
-import com.canhlabs.funnyapp.share.QrUtil;
 import com.canhlabs.funnyapp.dto.JwtGenerationDto;
 import com.canhlabs.funnyapp.dto.LoginDto;
 import com.canhlabs.funnyapp.dto.MfaRequest;
 import com.canhlabs.funnyapp.dto.SetupResponse;
 import com.canhlabs.funnyapp.dto.TokenDto;
+import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.dto.UserInfoDto;
+import com.canhlabs.funnyapp.filter.JwtProvider;
+import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.share.AppUtils;
+import com.canhlabs.funnyapp.share.QrUtil;
 import com.canhlabs.funnyapp.share.exception.CustomException;
-import com.canhlabs.funnyapp.share.totp.TotpUtil;
+import com.canhlabs.funnyapp.share.totp.Totp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -54,6 +54,8 @@ class UserServiceImplTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private InviteServiceImpl inviteService;
+    @Mock
+    private Totp totp;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -67,6 +69,7 @@ class UserServiceImplTest {
         userService.injectMfaStore(mfaSessionStore);
         userService.injectBCrypt(passwordEncoder);
         userService.injectInvite(inviteService);
+        userService.injectTotp(totp);
     }
 
     @Test
@@ -155,16 +158,14 @@ class UserServiceImplTest {
         User user = User.builder().userName(userName).build();
         when(userRepo.findAllByUserName(userName)).thenReturn(user);
         when(userRepo.save(any())).thenReturn(user);
+        when(totp.verify( otp, secret)).thenReturn(true);
 
-        try (MockedStatic<TotpUtil> totp = mockStatic(TotpUtil.class)) {
-            totp.when(() -> TotpUtil.verify(otp, secret)).thenReturn(true);
+        String result = userService.enableMfa(userName, secret, otp);
 
-            String result = userService.enableMfa(userName, secret, otp);
+        assertThat(result).isEqualTo("success");
+        assertThat(user.isMfaEnabled()).isTrue();
+        assertThat(user.getMfaSecret()).isEqualTo(secret);
 
-            assertThat(result).isEqualTo("success");
-            assertThat(user.isMfaEnabled()).isTrue();
-            assertThat(user.getMfaSecret()).isEqualTo(secret);
-        }
     }
 
     @Test
@@ -175,13 +176,13 @@ class UserServiceImplTest {
         User user = User.builder().userName(userName).build();
         when(userRepo.findAllByUserName(userName)).thenReturn(user);
 
-        try (MockedStatic<TotpUtil> totp = mockStatic(TotpUtil.class)) {
-            totp.when(() -> TotpUtil.verify(otp, secret)).thenReturn(false);
 
-            assertThatThrownBy(() -> userService.enableMfa(userName, secret, otp))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage("Otp is incorrectly");
-        }
+        when(totp.verify(secret, otp)).thenReturn(false);
+
+        assertThatThrownBy(() -> userService.enableMfa(userName, secret, otp))
+                .isInstanceOf(CustomException.class)
+                .hasMessage("Otp is incorrectly");
+
     }
 
     @Test
@@ -209,14 +210,12 @@ class UserServiceImplTest {
         when(mfaSessionStore.getUserId(sessionToken)).thenReturn(Optional.of("test@abc.com"));
         when(userRepo.findAllByUserName("test@abc.com")).thenReturn(user);
         when(jwtProvider.generateToken(any(JwtGenerationDto.class))).thenReturn(TokenDto.builder().token("jwt").build());
+        when(totp.verify(otp, mfaSecret)).thenReturn(true);
 
-        try (MockedStatic<TotpUtil> totp = mockStatic(TotpUtil.class)) {
-            totp.when(() -> TotpUtil.verify(otp, mfaSecret)).thenReturn(true);
+        UserInfoDto result = userService.verifyMfa(req);
 
-            UserInfoDto result = userService.verifyMfa(req);
+        assertThat(result.getJwt()).isEqualTo("jwt");
 
-            assertThat(result.getJwt()).isEqualTo("jwt");
-        }
     }
 
     @Test
@@ -240,13 +239,12 @@ class UserServiceImplTest {
         when(mfaSessionStore.getUserId(sessionToken)).thenReturn(Optional.of("test@abc.com"));
         when(userRepo.findAllByUserName("test@abc.com")).thenReturn(user);
 
-        try (MockedStatic<TotpUtil> totp = mockStatic(TotpUtil.class)) {
-            totp.when(() -> TotpUtil.verify(otp, mfaSecret)).thenReturn(false);
+        when(totp.verify(mfaSecret, otp)).thenReturn(false);
 
-            assertThatThrownBy(() -> userService.verifyMfa(req))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage("Otp is incorrectly");
-        }
+        assertThatThrownBy(() -> userService.verifyMfa(req))
+                .isInstanceOf(CustomException.class)
+                .hasMessage("Otp is incorrectly");
+
     }
 
     @Test
@@ -312,14 +310,13 @@ class UserServiceImplTest {
         when(userRepo.findAllByUserName(userName)).thenReturn(user);
         when(userRepo.save(any())).thenReturn(user);
 
-        try (MockedStatic<TotpUtil> totp = mockStatic(TotpUtil.class)) {
-            totp.when(() -> TotpUtil.verify(otp, mfaSecret)).thenReturn(true);
+        when(totp.verify(otp, mfaSecret)).thenReturn(true);
 
-            String result = userService.disableMfa(userName, otp);
+        String result = userService.disableMfa(userName, otp);
 
-            assertThat(result).isEqualTo("success");
-            assertThat(user.isMfaEnabled()).isFalse();
-        }
+        assertThat(result).isEqualTo("success");
+        assertThat(user.isMfaEnabled()).isFalse();
+
     }
 
     @Test
@@ -348,14 +345,11 @@ class UserServiceImplTest {
         String mfaSecret = "SECRET";
         User user = User.builder().userName(userName).mfaEnabled(true).mfaSecret(mfaSecret).build();
         when(userRepo.findAllByUserName(userName)).thenReturn(user);
+        when(totp.verify(mfaSecret, otp)).thenReturn(true);
+        assertThatThrownBy(() -> userService.disableMfa(userName, otp))
+                .isInstanceOf(CustomException.class)
+                .hasMessage("Otp is invalid!");
 
-        try (MockedStatic<TotpUtil> totp = mockStatic(TotpUtil.class)) {
-            totp.when(() -> TotpUtil.verify(otp, mfaSecret)).thenReturn(false);
-
-            assertThatThrownBy(() -> userService.disableMfa(userName, otp))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage("Otp is invalid!");
-        }
     }
 
     @Test
