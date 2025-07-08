@@ -3,18 +3,18 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.cache.MFASessionStore;
 import com.canhlabs.funnyapp.domain.User;
 import com.canhlabs.funnyapp.domain.UserEmailRequest;
-import com.canhlabs.funnyapp.repo.UserRepo;
-import com.canhlabs.funnyapp.service.UserService;
-import com.canhlabs.funnyapp.share.AppUtils;
-import com.canhlabs.funnyapp.filter.JwtProvider;
-import com.canhlabs.funnyapp.share.QrUtil;
 import com.canhlabs.funnyapp.dto.JwtGenerationDto;
 import com.canhlabs.funnyapp.dto.LoginDto;
 import com.canhlabs.funnyapp.dto.MfaRequest;
 import com.canhlabs.funnyapp.dto.SetupResponse;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.dto.UserInfoDto;
-import com.canhlabs.funnyapp.share.totp.TotpUtil;
+import com.canhlabs.funnyapp.filter.JwtProvider;
+import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.service.UserService;
+import com.canhlabs.funnyapp.share.AppUtils;
+import com.canhlabs.funnyapp.share.QrUtil;
+import com.canhlabs.funnyapp.share.totp.Totp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +47,12 @@ public class UserServiceImpl implements UserService {
     private AuthenticationManager authenticationManager;
     private MFASessionStore mfaSessionStore;
     private InviteServiceImpl inviteService;
+    private Totp totp;
+
+    @Autowired
+    public void injectTotp(Totp totp) {
+        this.totp = totp;
+    }
 
     @Autowired
     public void injectInvite(InviteServiceImpl inviteService) {
@@ -122,7 +128,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String enableMfa(String userName, String secret, String otp) {
-        if (!TotpUtil.verify(otp, secret))  {
+        if (!totp.verify(otp, secret)) {
             raiseErr("Otp is incorrectly");
 
         }
@@ -153,10 +159,10 @@ public class UserServiceImpl implements UserService {
             raiseErr("Invalid or expired session");
         }
         User user = userRepo.findAllByUserName(userIdOpt.get());
-        if (!TotpUtil.verify(mfaRequest.otp(), user.getMfaSecret())) {
+        if (!totp.verify(mfaRequest.otp(), user.getMfaSecret())) {
             raiseErr("Otp is incorrectly");
         }
-        return  toUserInfo(user, getToken(user));
+        return toUserInfo(user, getToken(user));
     }
 
     @Override
@@ -181,7 +187,7 @@ public class UserServiceImpl implements UserService {
                 .userName(userReq.get().getEmail())
                 .build();
         newUser = userRepo.save(newUser);
-        inviteService.markTokenAsUsed(userReq.get(), userReq.get().getUserId() );
+        inviteService.markTokenAsUsed(userReq.get(), userReq.get().getUserId());
         return toUserInfo(newUser, getToken(newUser));
     }
 
@@ -189,12 +195,12 @@ public class UserServiceImpl implements UserService {
     public String disableMfa(String userName, String otp) {
         User user = userRepo.findAllByUserName(userName);
         if (user == null) {
-             raiseErr("User not exist");
+            raiseErr("User not exist");
         }
         if (!user.isMfaEnabled()) {
             raiseErr("Mfa already disabled");
         }
-        boolean isValid = TotpUtil.verify(otp, user.getMfaSecret());
+        boolean isValid = totp.verify(otp, user.getMfaSecret());
         if (!isValid) raiseErr("Otp is invalid!");
 
         user.setMfaEnabled(false);
@@ -222,11 +228,11 @@ public class UserServiceImpl implements UserService {
 
     private void validate(LoginDto loginDto) {
         if (StringUtils.isEmpty(loginDto.getEmail()) || StringUtils.isEmpty(loginDto.getPassword())) {
-          raiseErr("Field is not empty");
+            raiseErr("Field is not empty");
         }
 
         if (!AppUtils.isValidEmail(loginDto.getEmail())) {
-          raiseErr("Invalid email");
+            raiseErr("Invalid email");
         }
     }
 
