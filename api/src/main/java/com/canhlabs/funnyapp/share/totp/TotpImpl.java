@@ -10,13 +10,13 @@ import java.time.Instant;
 
 
 @Slf4j
-public class TotpUtil {
-    private TotpUtil() {}
+public class TotpImpl implements Totp {
+    public TotpImpl() {}
 
     private static final long TIME_STEP = 30;
     private static final int DIGITS = 6;
 
-    public static String generateTOTP(String base32Secret) {
+    public String generateTOTP(String base32Secret) {
         try {
             long t = Instant.now().getEpochSecond() / TIME_STEP;
             byte[] key = decodeBase32(base32Secret);
@@ -29,7 +29,7 @@ public class TotpUtil {
         }
     }
 
-    public static boolean verify(String code, String secret) {
+    public boolean verify(String code, String secret) {
         long time = Instant.now().getEpochSecond() / TIME_STEP;
 
         try {

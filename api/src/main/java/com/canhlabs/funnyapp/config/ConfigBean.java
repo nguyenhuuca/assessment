@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.config;
 
+import com.canhlabs.funnyapp.share.totp.Totp;
+import com.canhlabs.funnyapp.share.totp.TotpImpl;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
@@ -25,7 +27,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -89,6 +90,8 @@ public class ConfigBean {
         ).setApplicationName("VideoStreamApp").build();
     }
 
-
-
+    @Bean
+    public Totp totp(){
+       return  new TotpImpl();
+    }
 }
