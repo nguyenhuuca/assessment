@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp;
+package com.canhlabs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
