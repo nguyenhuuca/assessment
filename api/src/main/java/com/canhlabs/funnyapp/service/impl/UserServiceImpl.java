@@ -35,7 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.canhlabs.funnyapp.share.Converter.toUserInfo;
+import static com.canhlabs.funnyapp.service.impl.Converter.toUserInfo;
 import static com.canhlabs.funnyapp.share.exception.CustomException.raiseErr;
 
 @Slf4j

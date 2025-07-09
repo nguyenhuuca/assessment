@@ -16,7 +16,7 @@
     @BeforeEach
     void setUp() {
         AppCacheFactory factory = new AppCacheFactory();
-        store = new MFASessionStore(factory);
+        store = new MFASessionStoreImpl(factory);
         defaultCache = factory.createDefaultCache();
     }
 

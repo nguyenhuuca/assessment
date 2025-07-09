@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
         return new GuavaAppCache<>(5, 1000);
     }
 
-    // Dùng theo RAM (ví dụ 150MB)
+    // By RAM limit (ví dụ 150MB)
     public <K, V> AppCache<K, V> createCacheByWeight(long ttlMinutes, long maxBytes) {
         return new GuavaAppCache<>(ttlMinutes, maxBytes, true);
     }
