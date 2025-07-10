@@ -5,7 +5,7 @@ import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.service.ShareService;
-import com.canhlabs.funnyapp.share.enums.ResultStatus;
+import com.canhlabs.funnyapp.enums.ResultStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;

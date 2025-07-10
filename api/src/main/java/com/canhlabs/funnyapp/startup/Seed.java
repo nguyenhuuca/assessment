@@ -1,6 +1,5 @@
 package com.canhlabs.funnyapp.startup;
 
-import com.canhlabs.funnyapp.config.aop.AuditLog;
 import com.canhlabs.funnyapp.dto.Range;
 import com.canhlabs.funnyapp.service.ChunkIndexService;
 import jakarta.annotation.PostConstruct;

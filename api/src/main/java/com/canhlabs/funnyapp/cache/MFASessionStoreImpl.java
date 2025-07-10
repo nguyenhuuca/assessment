@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.cache;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -10,8 +11,8 @@ public class MFASessionStoreImpl implements MFASessionStore {
     // key: sessionToken, value: userId
     private final AppCache<String, String> sessionCache;
 
-    public MFASessionStoreImpl(AppCacheFactory factory) {
-        this.sessionCache = factory.createCache(5, 10000); // TTL: 5m
+    public MFASessionStoreImpl(@Qualifier("mfaSessionCache") AppCache<String, String> sessionCache) {
+        this.sessionCache = sessionCache;
     }
 
     @Override

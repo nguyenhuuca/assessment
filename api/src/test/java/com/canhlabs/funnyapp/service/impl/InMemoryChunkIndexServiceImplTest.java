@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.AppCacheFactory;
+import com.canhlabs.funnyapp.cache.CacheProperties;
 import com.canhlabs.funnyapp.dto.Range;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,9 @@ public class InMemoryChunkIndexServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        // Sử dụng mock AppCacheFactory để inject cache vào service
-        AppCacheFactory factory = new AppCacheFactory();
+        CacheProperties cacheProperties = new CacheProperties();
+        cacheProperties.setType("guava");
+        AppCacheFactory factory = new AppCacheFactory(cacheProperties);
         chunkIndexService = new InMemoryChunkIndexServiceImpl(factory);
     }
 

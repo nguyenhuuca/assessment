@@ -1,11 +1,11 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.config.aop.AuditLog;
+import com.canhlabs.funnyapp.annotation.AuditLog;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.VideoDto;
-import com.canhlabs.funnyapp.share.enums.ResultStatus;
+import com.canhlabs.funnyapp.enums.ResultStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

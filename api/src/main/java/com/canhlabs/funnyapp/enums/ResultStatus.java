@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.share.enums;
+package com.canhlabs.funnyapp.enums;
 
 public enum ResultStatus {
     SUCCESS(0), FAILED(1);

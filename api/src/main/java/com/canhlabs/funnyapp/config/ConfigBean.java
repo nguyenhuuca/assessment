@@ -38,6 +38,7 @@ public class ConfigBean {
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
+
     // initialize bean for rest template
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
@@ -73,7 +74,7 @@ public class ConfigBean {
     public Drive googleDrive() throws IOException, GeneralSecurityException {
         // Load credentials from file
         InputStream inputStream;
-        if(credentialPath.startsWith("classpath:")) {
+        if (credentialPath.startsWith("classpath:")) {
             inputStream = getClass().getClassLoader().getResourceAsStream(credentialPath.substring(10));
         } else {
             inputStream = new FileInputStream(credentialPath);
@@ -91,7 +92,7 @@ public class ConfigBean {
     }
 
     @Bean
-    public Totp totp(){
-       return  new TotpImpl();
+    public Totp totp() {
+        return new TotpImpl();
     }
 }

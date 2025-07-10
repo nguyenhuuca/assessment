@@ -1,4 +1,5 @@
 package com.canhlabs.funnyapp.config.aop;
+import com.canhlabs.funnyapp.annotation.Sensitive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -6,7 +6,7 @@ import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.service.InviteService;
 import com.canhlabs.funnyapp.service.MailService;
 import com.canhlabs.funnyapp.share.AppUtils;
-import com.canhlabs.funnyapp.share.enums.Status;
+import com.canhlabs.funnyapp.enums.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

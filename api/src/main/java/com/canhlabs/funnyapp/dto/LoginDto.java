@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.dto;
 
-import com.canhlabs.funnyapp.config.aop.Sensitive;
+import com.canhlabs.funnyapp.annotation.Sensitive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
