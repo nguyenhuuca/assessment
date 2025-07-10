@@ -1,13 +1,13 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.config.aop.AuditLog;
+import com.canhlabs.funnyapp.annotation.AuditLog;
 import com.canhlabs.funnyapp.service.ShareService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.dto.ShareRequestDto;
 import com.canhlabs.funnyapp.dto.VideoDto;
-import com.canhlabs.funnyapp.share.enums.ResultStatus;
+import com.canhlabs.funnyapp.enums.ResultStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

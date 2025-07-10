@@ -1,9 +1,9 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.cache.ChunkLockManager;
+import com.canhlabs.funnyapp.cache.LockManager;
 import com.canhlabs.funnyapp.dto.Range;
-import com.canhlabs.funnyapp.service.CacheStatsService;
-import com.canhlabs.funnyapp.service.ChunkIndexService;
+import com.canhlabs.funnyapp.cache.StatsCache;
+import com.canhlabs.funnyapp.cache.ChunkIndexCache;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.LimitedInputStream;
@@ -32,23 +32,23 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     private static final int MAX_CACHE_FILES = 6000;
     private static final long MAX_CACHE_SIZE_BYTES = 1024 * 1024 * 1024L; //1G
 
-    private ChunkLockManager chunkLockManager;
-    private CacheStatsService cacheStatsService;
-    private ChunkIndexService chunkIndexService;
+    private LockManager lockManager;
+    private StatsCache statsCache;
+    private ChunkIndexCache chunkIndexCache;
 
     @Autowired
-    public void injectChunkIndexService(ChunkIndexService chunkIndexService) {
-        this.chunkIndexService = chunkIndexService;
+    public void injectChunkIndexService(ChunkIndexCache chunkIndexCache) {
+        this.chunkIndexCache = chunkIndexCache;
     }
 
     @Autowired
-    public void injectChunkLockManager(ChunkLockManager chunkLockManager) {
-        this.chunkLockManager = chunkLockManager;
+    public void injectChunkLockManager(LockManager lockManager) {
+        this.lockManager = lockManager;
     }
 
     @Autowired
-    public void injectCacheStatsService(CacheStatsService cacheStatsService) {
-        this.cacheStatsService = cacheStatsService;
+    public void injectCacheStatsService(StatsCache statsCache) {
+        this.statsCache = statsCache;
     }
 
     @Override
@@ -81,9 +81,9 @@ public class VideoStorageServiceImpl implements VideoStorageService {
         boolean exists = chunk.exists();// && chunk.length() == (end - start + 1);
         log.info("Check chunk exists: {} [{}-{}] = {}", fileId, start, end, exists);
         if (exists) {
-            cacheStatsService.recordHit(fileId);
+            statsCache.recordHit(fileId);
         } else {
-            cacheStatsService.recordMiss(fileId);
+            statsCache.recordMiss(fileId);
         }
         return exists;
     }
@@ -100,7 +100,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     @Override
     @WithSpan
     public void saveChunk(String fileId, long start, long end, InputStream stream) throws IOException {
-        if (!chunkLockManager.tryLock(fileId, start, end)) {
+        if (!lockManager.tryLock(fileId, start, end)) {
             log.warn("⏳ Another thread is already saving chunk {} ({} - {}), skipping.", fileId, start, end);
             throw new IOException("Chunk is being saved by another thread");
         }
@@ -115,8 +115,8 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 total += bytesRead;
             }
         } finally {
-            chunkLockManager.release(fileId, start, end);
-            chunkIndexService.addChunk(fileId, start, end);
+            lockManager.release(fileId, start, end);
+            chunkIndexCache.addChunk(fileId, start, end);
             log.info("✅ Released lock for chunk {} ({} - {})", fileId, start, end);
         }
     }
@@ -124,7 +124,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     @Override
     public Optional<Range> findNearestChunk(String fileId, long requestedStart, long requestedEnd, long tolerance) {
 
-        return chunkIndexService.findNearestChunk(fileId, requestedStart, requestedEnd, tolerance);
+        return chunkIndexCache.findNearestChunk(fileId, requestedStart, requestedEnd, tolerance);
     }
 
     @WithSpan
@@ -134,7 +134,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
         if (!file.exists()) {
             throw new FileNotFoundException("Full file not found: " + file.getAbsolutePath());
         }
-        cacheStatsService.recordHit(fileId);
+        statsCache.recordHit(fileId);
         long length = end - start + 1;
         RandomAccessFile raf = new RandomAccessFile(file, "r");
         raf.seek(start);

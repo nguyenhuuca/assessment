@@ -15,8 +15,10 @@
 
     @BeforeEach
     void setUp() {
-        AppCacheFactory factory = new AppCacheFactory();
-        store = new MFASessionStore(factory);
+        CacheProperties cacheProperties = new CacheProperties();
+        cacheProperties.setType("guava");
+        AppCacheFactory factory = new AppCacheFactory(cacheProperties);
+        store = new MFASessionStoreImpl(factory.createDefaultCache());
         defaultCache = factory.createDefaultCache();
     }
 

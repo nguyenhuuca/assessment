@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.cache;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -13,40 +14,44 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
-public class VideoCacheStore {
+public class VideoCacheImpl implements VideoCache {
 
     private final AppCache<String, byte[]> chunkCache;
     private static final int CACHE_THRESHOLD = 5;
     private final ConcurrentMap<String, AtomicInteger> accessCounter = new ConcurrentHashMap<>();
 
-
-    public VideoCacheStore(AppCacheFactory cacheFactory) {
-        this.chunkCache = cacheFactory.createCache(60 * 24, 2000);
+    public VideoCacheImpl(@Qualifier("videoCache") AppCache<String, byte[]> chunkCache) {
+        this.chunkCache = chunkCache;
     }
 
     private String makeKey(String fileId, long start, long end) {
         return fileId + "_" + start + "_" + end;
     }
 
+    @Override
     public byte[] getOrLoadChunk(String fileId, long start, long end, Callable<byte[]> loader) {
         String key = makeKey(fileId, start, end);
         return chunkCache.get(key, loader);
     }
 
+    @Override
     public void putChunk(String fileId, long start, long end, byte[] data) {
         String key = makeKey(fileId, start, end);
         chunkCache.put(key, data);
     }
 
+    @Override
     public Optional<byte[]> getCachedChunk(String fileId, long start, long end) {
         String key = makeKey(fileId, start, end);
         return chunkCache.get(key);
     }
 
+    @Override
     public void invalidateChunk(String fileId, long start, long end) {
         chunkCache.invalidate(makeKey(fileId, start, end));
     }
 
+    @Override
     public InputStream getChunkStream(String fileId, long start, long end, Callable<byte[]> loader) {
         String key = makeKey(fileId, start, end);
 
@@ -81,6 +86,7 @@ public class VideoCacheStore {
         }
     }
 
+    @Override
     public void invalidateAllChunks() {
         chunkCache.invalidateAll();
         accessCounter.clear();

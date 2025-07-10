@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.config.aop.AuditLog;
+import com.canhlabs.funnyapp.annotation.AuditLog;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.service.impl.InviteServiceImpl;
@@ -13,7 +13,7 @@ import com.canhlabs.funnyapp.dto.LoginDto;
 import com.canhlabs.funnyapp.dto.MfaRequest;
 import com.canhlabs.funnyapp.dto.SetupResponse;
 import com.canhlabs.funnyapp.dto.UserInfoDto;
-import com.canhlabs.funnyapp.share.enums.ResultStatus;
+import com.canhlabs.funnyapp.enums.ResultStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

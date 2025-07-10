@@ -1,8 +1,7 @@
 package com.canhlabs.funnyapp.startup;
 
-import com.canhlabs.funnyapp.config.aop.AuditLog;
 import com.canhlabs.funnyapp.dto.Range;
-import com.canhlabs.funnyapp.service.ChunkIndexService;
+import com.canhlabs.funnyapp.cache.ChunkIndexCache;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,7 @@ import static com.canhlabs.funnyapp.share.AppConstant.CACHE_DIR;
 @Slf4j
 public class Seed {
     @Autowired
-    ChunkIndexService chunkIndexService;
+    ChunkIndexCache chunkIndexCache;
 
     @PostConstruct
     public void preloadAll() {
@@ -41,7 +40,7 @@ public class Seed {
                     ranges.add(new Range(start, end));
                 }
             }
-            chunkIndexService.preload(fileId, ranges);
+            chunkIndexCache.preload(fileId, ranges);
         }
     }
 }

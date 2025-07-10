@@ -8,7 +8,6 @@ import com.canhlabs.funnyapp.service.ShareService;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.share.AppUtils;
 import com.canhlabs.funnyapp.share.Contract;
-import com.canhlabs.funnyapp.share.Converter;
 import com.canhlabs.funnyapp.dto.ShareRequestDto;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.dto.VideoDto;

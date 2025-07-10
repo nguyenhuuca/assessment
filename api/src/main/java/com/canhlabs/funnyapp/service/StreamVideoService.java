@@ -5,9 +5,7 @@ import com.canhlabs.funnyapp.dto.VideoDto;
 import com.google.api.services.drive.Drive;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public interface StreamVideoService {
 
@@ -87,8 +85,8 @@ public interface StreamVideoService {
     /**
      * Downloads a file from a specified folder that was uploaded after a certain date.
      *
-     * @param folderId       The ID of the googloe folder to download from.
-     * @param uploadedAfter  The date after which files should be downloaded (in ISO 8601 format).
+     * @param folderId      The ID of the googloe folder to download from.
+     * @param uploadedAfter The date after which files should be downloaded (in ISO 8601 format).
      * @throws IOException If an error occurs while downloading the file.
      */
     void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException;

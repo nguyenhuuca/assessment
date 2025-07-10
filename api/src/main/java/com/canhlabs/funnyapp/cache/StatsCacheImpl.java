@@ -1,13 +1,9 @@
-package com.canhlabs.funnyapp.service.impl;
+package com.canhlabs.funnyapp.cache;
 
-import com.canhlabs.funnyapp.cache.AppCache;
-import com.canhlabs.funnyapp.cache.AppCacheFactory;
 import com.canhlabs.funnyapp.dto.CacheStat;
-import com.canhlabs.funnyapp.service.CacheStatsService;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -16,12 +12,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 @Slf4j
-public class CacheStatsServiceImpl implements CacheStatsService {
+public class StatsCacheImpl implements StatsCache {
 
     private final AppCache<String, FileCacheStats> statsCache;
 
-    public CacheStatsServiceImpl(AppCacheFactory appCacheFactory) {
-        this.statsCache = appCacheFactory.createCache(1440, 10_000);
+    public StatsCacheImpl(@Qualifier("statsCache")  AppCache<String, FileCacheStats> statsCache) {
+        this.statsCache = statsCache;
     }
 
     public void recordHit(String fileId) {

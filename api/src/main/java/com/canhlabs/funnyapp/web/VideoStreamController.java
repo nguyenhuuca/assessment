@@ -7,7 +7,7 @@ import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
-import com.canhlabs.funnyapp.share.enums.ResultStatus;
+import com.canhlabs.funnyapp.enums.ResultStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

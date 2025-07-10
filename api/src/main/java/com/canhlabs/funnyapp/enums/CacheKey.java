@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.share.enums;
+package com.canhlabs.funnyapp.enums;
 
 import lombok.Getter;
 

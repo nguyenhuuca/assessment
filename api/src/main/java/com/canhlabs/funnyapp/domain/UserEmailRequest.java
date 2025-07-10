@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.domain;
 
-import com.canhlabs.funnyapp.share.enums.Status;
+import com.canhlabs.funnyapp.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;

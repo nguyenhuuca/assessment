@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.config.aop;
 
+import com.canhlabs.funnyapp.annotation.AuditLog;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ public class AuditLogAspect {
     @Autowired
     private MaskingUtils maskingUtil;
 
-    @Around("execution(* *(..)) && (@within(com.canhlabs.funnyapp.config.aop.AuditLog) || @annotation(com.canhlabs.funnyapp.config.aop.AuditLog))")
+    @Around("execution(* *(..)) && (@within(com.canhlabs.funnyapp.annotation.AuditLog) || @annotation(com.canhlabs.funnyapp.annotation.AuditLog))")
     public Object logAudit(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
 

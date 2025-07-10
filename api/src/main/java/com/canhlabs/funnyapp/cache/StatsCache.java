@@ -1,10 +1,10 @@
-package com.canhlabs.funnyapp.service;
+package com.canhlabs.funnyapp.cache;
 
 import com.canhlabs.funnyapp.dto.CacheStat;
 
 import java.util.Map;
 
-public interface CacheStatsService {
+public interface StatsCache {
     void recordHit(String fileId);
     void recordMiss(String fileId);
     long getTotalHits();
