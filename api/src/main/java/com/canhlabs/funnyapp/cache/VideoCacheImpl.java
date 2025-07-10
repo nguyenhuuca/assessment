@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.cache;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -13,15 +14,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
-public class VideoCacheStoreImpl implements VideoCacheStore {
+public class VideoCacheImpl implements VideoCache {
 
     private final AppCache<String, byte[]> chunkCache;
     private static final int CACHE_THRESHOLD = 5;
     private final ConcurrentMap<String, AtomicInteger> accessCounter = new ConcurrentHashMap<>();
 
-
-    public VideoCacheStoreImpl(AppCacheFactory cacheFactory) {
-        this.chunkCache = cacheFactory.createCache(60 * 24, 2000);
+    public VideoCacheImpl(@Qualifier("videoCache") AppCache<String, byte[]> chunkCache) {
+        this.chunkCache = chunkCache;
     }
 
     private String makeKey(String fileId, long start, long end) {

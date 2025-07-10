@@ -1,7 +1,5 @@
-package com.canhlabs.funnyapp.service.impl;
+package com.canhlabs.funnyapp.cache;
 
-import com.canhlabs.funnyapp.cache.AppCacheFactory;
-import com.canhlabs.funnyapp.cache.CacheProperties;
 import com.canhlabs.funnyapp.dto.Range;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,15 +8,15 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class InMemoryChunkIndexServiceImplTest {
-    private InMemoryChunkIndexServiceImpl chunkIndexService;
+public class ChunkIndexCacheImplTest {
+    private ChunkIndexCacheImpl chunkIndexService;
 
     @BeforeEach
     void setUp() {
         CacheProperties cacheProperties = new CacheProperties();
         cacheProperties.setType("guava");
         AppCacheFactory factory = new AppCacheFactory(cacheProperties);
-        chunkIndexService = new InMemoryChunkIndexServiceImpl(factory);
+        chunkIndexService = new ChunkIndexCacheImpl(factory.createDefaultCache());
     }
 
     @Test

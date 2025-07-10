@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.jobs;
 
 import com.canhlabs.funnyapp.dto.CacheStat;
-import com.canhlabs.funnyapp.service.CacheStatsService;
+import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
@@ -9,11 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -22,13 +20,13 @@ public class AppScheduler {
 
     private final YouTubeVideoService service;
     private final StreamVideoService googleDriveVideoService;
-    private final CacheStatsService cacheStatsService;
+    private final StatsCache statsCache;
 
 
-    public AppScheduler(YouTubeVideoService service, StreamVideoService googleDriveVideoService, CacheStatsService cacheStatsService) {
+    public AppScheduler(YouTubeVideoService service, StreamVideoService googleDriveVideoService, StatsCache statsCache) {
         this.service = service;
         this.googleDriveVideoService = googleDriveVideoService;
-        this.cacheStatsService = cacheStatsService;
+        this.statsCache = statsCache;
     }
 
     // Run at 1:00 daily
@@ -65,12 +63,12 @@ public class AppScheduler {
     @Scheduled(fixedRate = 5*60000)
     public void logStats() {
         log.info("📝 Cron-based stats log every 5 minutes for logStats");
-        log.info("📊 Total hits: {}, Total misses: {}", cacheStatsService.getTotalHits(), cacheStatsService.getTotalMisses());
-        for (Map.Entry<String, CacheStat> entry : cacheStatsService.getFileStats().entrySet()) {
+        log.info("📊 Total hits: {}, Total misses: {}", statsCache.getTotalHits(), statsCache.getTotalMisses());
+        for (Map.Entry<String, CacheStat> entry : statsCache.getFileStats().entrySet()) {
             String fileId = entry.getKey();
             CacheStat stat = entry.getValue();
             log.info("🎯 fileId: {}, hits: {}, misses: {}, hitRatio: {}%",
-                    fileId, stat.getHits(), stat.getMisses(), cacheStatsService.calculateRatio());
+                    fileId, stat.getHits(), stat.getMisses(), statsCache.calculateRatio());
         }
     }
 

@@ -1,11 +1,9 @@
-package com.canhlabs.funnyapp.service.impl;
+package com.canhlabs.funnyapp.cache;
 
-import com.canhlabs.funnyapp.cache.AppCache;
-import com.canhlabs.funnyapp.cache.AppCacheFactory;
 import com.canhlabs.funnyapp.dto.Range;
-import com.canhlabs.funnyapp.service.ChunkIndexService;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -14,12 +12,12 @@ import java.util.HashSet;
 
 @Service
 @Slf4j
-public class InMemoryChunkIndexServiceImpl implements ChunkIndexService {
+public class ChunkIndexCacheImpl implements ChunkIndexCache {
 
     private final AppCache<String, Set<Range>> rangeCache;
 
-    public InMemoryChunkIndexServiceImpl(AppCacheFactory factory) {
-        this.rangeCache = factory.createCache(24 * 60, 10_000);
+    public ChunkIndexCacheImpl( @Qualifier("chunkIdxCache") AppCache<String, Set<Range>> rangeCache) {
+        this.rangeCache = rangeCache;
     }
 
     @Override

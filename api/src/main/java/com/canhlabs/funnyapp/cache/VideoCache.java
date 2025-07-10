@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-public interface VideoCacheStore {
+public interface VideoCache {
     byte[] getOrLoadChunk(String fileId, long start, long end, Callable<byte[]> loader);
 
     void putChunk(String fileId, long start, long end, byte[] data);

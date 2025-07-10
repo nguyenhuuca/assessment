@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.cache.VideoCacheStore;
+import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.domain.VideoSource;
 import com.canhlabs.funnyapp.dto.StreamChunkResult;
@@ -23,11 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -46,7 +44,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     private VideoSourceRepository videoSourceRepository;
     private VideoStorageService videoStorageService;
     private ChatGptService chatGptService;
-    private VideoCacheStore videoCacheStore;
+    private VideoCache videoCache;
     private FfmpegService ffmpegService;
     private AppProperties appProps;
 
@@ -60,8 +58,8 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         this.ffmpegService = ffmpegService;
     }
     @Autowired
-    public  void injectVideoCacheStore(VideoCacheStore videoCacheStore) {
-        this.videoCacheStore = videoCacheStore;
+    public  void injectVideoCacheStore(VideoCache videoCache) {
+        this.videoCache = videoCache;
     }
     @Autowired
     public void injectChatGptService(ChatGptService chatGptService) {
@@ -120,7 +118,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @WithSpan
     @Override
     public StreamChunkResult getPartialFileUsingRAF(String fileId, long start, long end) throws IOException {
-        InputStream stream = videoCacheStore.getChunkStream(fileId, start, end, () -> {
+        InputStream stream = videoCache.getChunkStream(fileId, start, end, () -> {
             log.info("🔴 Cache miss: fetching {} ({} - {}) from disk", fileId, start, end);
             return  videoStorageService.getFileRangeFromDisk(fileId, start, end).readAllBytes();
         });

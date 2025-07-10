@@ -1,17 +1,19 @@
 package com.canhlabs.funnyapp.cache;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ChunkLockManagerImpl implements ChunkLockManager {
+public class LockManagerImpl implements LockManager {
 
     private final AppCache<String, Boolean> lockCache;
 
-    public ChunkLockManagerImpl(AppCacheFactory appCacheFactory) {
-        // TTL = 30 giây, max 10_000 keys
-        this.lockCache = appCacheFactory.createCache(1, 10_000);
+    public LockManagerImpl(@Qualifier("lockManagerCache") AppCache<String, Boolean> lockCache) {
+        this.lockCache = lockCache;
+        log.info("ChunkLockManager initialized with cache: {}", lockCache.getClass().getSimpleName());
+
     }
 
     @Override
