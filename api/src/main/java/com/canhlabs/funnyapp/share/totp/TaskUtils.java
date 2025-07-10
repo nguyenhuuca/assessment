@@ -3,6 +3,9 @@ package com.canhlabs.funnyapp.share.totp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.StructuredTaskScope;
 
 /**
@@ -102,5 +105,60 @@ public class TaskUtils {
         public Throwable getError() {
             return error;
         }
+    }
+    /**
+     * Run all tasks asynchronously and return a CompletableFuture that completes
+     * with all results if successful, or exceptionally if any task fails.
+     */
+    public static <T> CompletableFuture<List<T>> runAllAsync(List<Callable<T>> tasks) {
+        // Use virtual thread per task (Java 21+)
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+
+        List<CompletableFuture<T>> futures = tasks.stream()
+                .map(task -> CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return task.call();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e); // wrap checked exception
+                    }
+                }, executor))
+                .toList();
+
+        // Combine all futures
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(voidd -> futures.stream()
+                        .map(CompletableFuture::join) // join is safe here because allOf already ensured completion
+                        .toList()
+                )
+                .whenComplete((res, ex) -> executor.close()); // auto-shutdown virtual thread executor
+    }
+
+    public static <T> CompletableFuture<List<Result<T>>> runAllAsyncIgnoreError(List<Callable<T>> tasks) {
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+
+        List<CompletableFuture<Result<T>>> futures = new ArrayList<>();
+        for (Callable<T> task : tasks) {
+            CompletableFuture<Result<T>> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    T result = task.call();
+                    return Result.success(result);
+                } catch (Throwable e) {
+                    return Result.failure(e);
+                }
+            }, executor);
+            futures.add(future);
+        }
+
+        CompletableFuture<Void> allDone = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+        return allDone
+                .thenApply(v -> futures.stream()
+                        .map(CompletableFuture::join)
+                        .toList()
+                )
+                .whenComplete((res, ex) -> {
+                    // ✅ Always shutdown executor
+                    executor.close();
+                });
     }
 }
