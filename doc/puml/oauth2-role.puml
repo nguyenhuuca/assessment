@@ -1,0 +1,24 @@
+@startuml
+actor User as "User\n(Resource Owner)"
+participant Client as "Client App\n(ReactJS / Backend)"
+participant AuthServer as "Authorization Server\n(Google OAuth)"
+participant ResourceServer as "Resource Server\n(Your API)"
+
+== Step 1: Authorization Request ==
+User -> Client : Wants to log in with Google
+Client -> AuthServer : Redirect to login (Auth Code Flow)
+AuthServer -> User : Show Google login form
+User -> AuthServer : Log in and grant permission
+
+== Step 2: Receive Authorization Code ==
+AuthServer -> Client : Return Authorization Code
+
+== Step 3: Get Access Token ==
+Client -> AuthServer : Send Authorization Code\n(client_id, secret)
+AuthServer -> Client : Return Access Token (and ID Token)
+
+== Step 4: Access Protected Resource ==
+Client -> ResourceServer : Send API request with Bearer Token
+ResourceServer -> Client : Return data (if token is valid)
+
+@enduml
