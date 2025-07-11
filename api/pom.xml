@@ -22,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>24</java.version>
         <lombok.version>1.18.38</lombok.version>
-        <common-lang.version>3.12.0</common-lang.version>
+        <common-lang.version>3.17.0</common-lang.version>
         <json-lib.version>20231013</json-lib.version>
         <commons-validator.version>1.7</commons-validator.version>
         <spring-boot-admin-starter-client.version>3.2.5</spring-boot-admin-starter-client.version>
@@ -154,6 +154,7 @@
             <artifactId>liquibase-core</artifactId>
             <version>4.32.0</version>
         </dependency>
+
 
         <!-- Prometheus Metrics -->
         <dependency>
