@@ -2,7 +2,7 @@ name: Funny App Build and Deploy
 
 on:
   push:
-    branches: [ main, 'VID-*' ]
+    branches: [ main, 'VID-*', 'use_jdk_24' ]
     paths:
       - 'api/**'
       - '.github/workflows/funnyapp-ci.yml'
@@ -37,7 +37,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '24'
           cache: 'maven'
 
       # Build the project without running tests
@@ -75,7 +75,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '24'
           cache: 'maven'
 
       - name: Cache SonarQube packages

@@ -14,15 +14,15 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>3.5.0</version>
         <relativePath/>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>21</java.version>
-        <lombok.version>1.18.30</lombok.version>
-        <common-lang.version>3.12.0</common-lang.version>
+        <java.version>24</java.version>
+        <lombok.version>1.18.38</lombok.version>
+        <common-lang.version>3.17.0</common-lang.version>
         <json-lib.version>20231013</json-lib.version>
         <commons-validator.version>1.7</commons-validator.version>
         <spring-boot-admin-starter-client.version>3.2.5</spring-boot-admin-starter-client.version>
@@ -30,7 +30,7 @@
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <jsonwebtoken.version>0.11.5</jsonwebtoken.version>
-        <springdoc-openapi.version>2.5.0</springdoc-openapi.version>
+        <springdoc-openapi.version>2.7.0</springdoc-openapi.version>
         <skipTests>false</skipTests>
         <skipCoverage>false</skipCoverage>
         <jacoco.minimum.coverage>0.07</jacoco.minimum.coverage>
@@ -152,7 +152,9 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
+            <version>4.32.0</version>
         </dependency>
+
 
         <!-- Prometheus Metrics -->
         <dependency>
@@ -210,6 +212,19 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Override version byte-buddy -->
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.17.5</version> <!-- >= 1.14.10 trở lên -->
+        </dependency>
+
+        <!-- Override version mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.18.0</version> <!-- hoặc mới hơn -->
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -219,6 +234,11 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-properties-migrator</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
@@ -236,6 +256,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.5.3</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -254,7 +275,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.11</version>
+                <version>0.8.13</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -324,6 +345,21 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>24</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
             </plugin>
         </plugins>
     </build>
