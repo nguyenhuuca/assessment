@@ -33,6 +33,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.StructuredTaskScope;
 
 import static com.canhlabs.funnyapp.share.AppConstant.FOLDER_ID;
 
@@ -198,23 +199,33 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     public void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException {
         List<File> files = listFilesInFolder(folderId, uploadedAfter);
 
-        for (File file : files) {
-            java.io.File localFile = new java.io.File(AppConstant.CACHE_DIR, file.getId().concat(".full"));
-            if (localFile.exists()) {
-                log.info("✅ File already exists: {}, skipping", file.getName());
-                continue;
-            }
+        try(var scope = new StructuredTaskScope<>("download", Thread.ofPlatform().factory())){
+            for (File file : files) {
+               scope.fork(() -> {
+                   java.io.File localFile = new java.io.File(AppConstant.CACHE_DIR, file.getId().concat(".full"));
+                   if (localFile.exists()) {
+                       log.info("✅ File already exists: {}, skipping", file.getName());
+                       return  null;
+                   }
 
-            log.info("⬇️ Downloading {} ({} bytes)", file.getName(), file.getSize());
-            downloadFile(file.getId(), localFile);
-            log.info("Downloaded file {} completely", file.getName());
-            // ✅ Generate thumbnail
-            String imageName = file.getId().concat(".jpg");
-            String thumbnailPath = Paths.get(appProps.getImageStoragePath().concat("/thumbnails"), imageName).toString();
-            ffmpegService.generateThumbnail(localFile.getAbsolutePath(), thumbnailPath);
-            // update info in database
-            saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""), appProps.getImageUrl().concat("/") + imageName);
+                   log.info("⬇️ Downloading {} ({} bytes)", file.getName(), file.getSize());
+                   downloadFile(file.getId(), localFile);
+                   log.info("Downloaded file {} completely", file.getName());
+                   // ✅ Generate thumbnail
+                   String imageName = file.getId().concat(".jpg");
+                   String thumbnailPath = Paths.get(appProps.getImageStoragePath().concat("/thumbnails"), imageName).toString();
+                   ffmpegService.generateThumbnail(localFile.getAbsolutePath(), thumbnailPath);
+                   // update info in database
+                   saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""), appProps.getImageUrl().concat("/") + imageName);
+                return   null;
+               });
+            }
+            scope.join(); // Wait for all downloads to complete
+        } catch (InterruptedException e) {
+            log.error("Error downloading files from folder {}: {}", folderId, e.getMessage());
+            throw new RuntimeException(e);
         }
+
     }
 
     @WithSpan
