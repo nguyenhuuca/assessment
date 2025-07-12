@@ -93,9 +93,9 @@ public class MailServiceImpl implements MailService {
     }
 
     private boolean shouldSend(String email) {
-        List<String> whitelist = appProperties.getEmailPreview().getWhitelistAsList();// đã parse từ CSV env
-        int percentage = appProperties.getEmailPreview().getPercentage();
-        int maxPerDay = appProperties.getEmailPreview().getMaxDailyEmails();
+        List<String> whitelist = appProperties.getEmailSetting().getWhitelistAsList();// đã parse từ CSV env
+        int percentage = appProperties.getEmailSetting().getPercentage();
+        int maxPerDay = appProperties.getEmailSetting().getMaxDailyEmails();
 
         if (isWhitelisted(email, whitelist)) return true;
 
@@ -106,7 +106,7 @@ public class MailServiceImpl implements MailService {
         }
 
         // Randomly decide to send email based on percentage
-        if(appProperties.getEmailPreview().isEnabled()) {
+        if(appProperties.getEmailSetting().isEnablePreviewMode()) {
             int rand = ThreadLocalRandom.current().nextInt(100);
             if (rand < percentage) {
                 return true;

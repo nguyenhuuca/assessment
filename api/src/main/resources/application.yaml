@@ -73,8 +73,8 @@ app:
   image-url: 'https://image.canh-labs.com'
   main-domain: 'https://canh-labs.com'
   image-storage-path: '/opt/data/images'
-  email-preview:
-      enabled: true
+  email-setting:
+      enable-preview-mode: false
       percentage: 10
       max-daily-emails: 200
       whitelist: ${EMAIL_PREVIEW_WHITELIST:canh@canh-labs.com,@canh-labs.com}

@@ -35,13 +35,13 @@ public class AppProperties {
     private String imageUrl;
     private String mainDomain;
     private String imageStoragePath;
-    private EmailPreview emailPreview = new EmailPreview();
+    private EmailSetting emailSetting = new EmailSetting();
 
 
     @Getter
     @Setter
-    public static class EmailPreview {
-        private boolean enabled;
+    public static class EmailSetting {
+        private boolean enablePreviewMode;
         private int percentage;
         private int maxDailyEmails;
         private String whitelist; // CSV format from env or YAML

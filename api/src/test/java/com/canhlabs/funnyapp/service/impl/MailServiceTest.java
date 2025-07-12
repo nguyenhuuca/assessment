@@ -25,7 +25,7 @@ class MailServiceTest {
     private AppProperties appProperties;
 
     @Mock
-    private AppProperties.EmailPreview emailPreview;
+    private AppProperties.EmailSetting emailSetting;
 
     @Mock
     EmailCacheLimiter emailCacheLimiter;
@@ -53,9 +53,9 @@ class MailServiceTest {
 
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         // mock cấu hình
-        when(appProperties.getEmailPreview()).thenReturn(emailPreview);
-        when(emailPreview.getWhitelist()).thenReturn("ceo@abc.com,@trusted.com");
-        when(emailPreview.getWhitelistAsList()).thenReturn(List.of("ceo@abc.com","@trusted.com"));
+        when(appProperties.getEmailSetting()).thenReturn(emailSetting);
+        when(emailSetting.getWhitelist()).thenReturn("ceo@abc.com,@trusted.com");
+        when(emailSetting.getWhitelistAsList()).thenReturn(List.of("ceo@abc.com","@trusted.com"));
 
 
         mailService.sendInvitation("ceo@abc.com", "testuser", "http://verify.url");
