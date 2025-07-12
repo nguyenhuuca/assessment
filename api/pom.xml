@@ -264,6 +264,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <skipTests>${skipTests}</skipTests>
+                    <argLine>--enable-preview</argLine>
                 </configuration>
             </plugin>
             <plugin>
