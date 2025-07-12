@@ -264,7 +264,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <skipTests>${skipTests}</skipTests>
-                    <argLine>--enable-preview</argLine>
+                    <argLine>${jacoco.agent.argLine} --enable-preview</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -283,6 +283,9 @@
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <propertyName>jacoco.agent.argLine</propertyName>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>report</id>
