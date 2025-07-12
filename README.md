@@ -48,11 +48,145 @@
 
 Thanks to **Project Loom**, Funny Movies uses **Virtual Threads** and `StructuredTaskScope` to handle thousands of concurrent tasks efficiently, especially for I/O-heavy operations like:
 
-- Fetching YouTube metadata
-- Calling OpenAI GPT
-- Sending emails
-- Writing logs & analytics
+- Fetching YouTube metadata  
+- Calling OpenAI GPT  
+- Sending emails  
+- Writing logs & analytics  
 
 ### ✅ Benefits:
 
-- Minimal memo
+- Minimal memory usage  
+- Fast context switching  
+- Safe concurrent task coordination  
+- Easier error handling (`shutdownOnFailure`, etc.)
+
+```java
+try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    var metadataTask = scope.fork(() -> youtubeService.fetchVideoMetadata(id));
+    var thumbnailTask = scope.fork(() -> ffmpegService.generateThumbnail(id));
+
+    scope.join();
+    scope.throwIfFailed();
+
+    VideoMeta meta = metadataTask.get();
+    String thumbnail = thumbnailTask.get();
+}
+```
+
+---
+
+## 🧠 How ChatGPT Works
+
+We integrate OpenAI's ChatGPT API to:
+
+- Prompt trending video suggestions  
+  > _e.g._ "Suggest 10 funny trending videos on YouTube this week"  
+- Filter and analyze titles/descriptions  
+- Display high-quality recommendations to users
+
+---
+
+## 🔐 Passwordless Login via Magic Link
+
+**Funny Movies** uses a modern, secure, and frictionless login system:
+
+> ✅ **No passwords. No reset flows. Just a click.**
+
+### How it works:
+
+1. User enters their email  
+2. A **magic link** is sent  
+3. Clicking it signs them in instantly
+
+### Benefits:
+
+- 🚫 No password reuse or phishing risks  
+- 📬 Email-based identity = simple  
+- 🔒 Secure, expirable tokens with device binding
+
+> Powered by JWT & one-time secure tokens.
+
+---
+
+## 🛠️ Setup & Installation
+
+### 🧰 Requirements
+
+- **JDK 24** (with preview features enabled)  
+- **Maven 3.6+**  
+- **PostgreSQL**  
+- **Google API Key** (YouTube Data API)  
+  👉 https://console.cloud.google.com/apis/api/youtube.googleapis.com/credentials
+
+---
+
+### 🗃️ Database Setup
+
+1. Create a PostgreSQL database named `funnyapp`
+2. Run `db/dump.sql` to create the schema & tables
+
+---
+
+### ▶️ Running App Locally
+
+#### 1. Configure environment variables
+
+Copy and edit:
+
+```bash
+cp api/.env.example api/.env
+```
+
+```env
+DB_USER=postgres
+DB_NAME=funnyapp
+DB_PASS=your_password
+DB_HOST=localhost
+
+GOOGLE_KEY=your_google_api_key
+JWT_SECRET=your_jwt_secret
+GPT_KEY=your_openai_key
+
+EMAIL_SENDER=you@example.com
+EMAIL_PASS=your_email_password
+```
+
+#### 2. Start the app
+
+```bash
+cd api
+./startLocal
+```
+
+#### 3. Access endpoints
+
+- ✅ Swagger UI: [http://localhost:8081/swagger-ui/](http://localhost:8081/swagger-ui/)  
+- ✅ Health Check: [http://localhost:8081/actuator/health](http://localhost:8081/actuator/health)
+
+#### 4. Web UI
+
+- Open `webapp/js/assessment.js`
+- Update:
+
+```js
+const baseURL = "http://localhost:8081/v1/funny-app";
+```
+
+- Open `webapp/index.html` in your browser
+
+---
+
+### ✅ Run Unit Tests
+
+```bash
+cd api
+./unittest
+```
+
+> Jacoco report will be generated under `/target/site/jacoco`
+
+---
+
+## 🌍 Online Demo
+
+🔗 [https://funnyapp.canh-labs.com/](https://funnyapp.canh-labs.com/)
