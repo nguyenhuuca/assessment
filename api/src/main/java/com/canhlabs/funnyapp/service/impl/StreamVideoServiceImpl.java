@@ -198,6 +198,10 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @WithSpan
     public void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException {
         List<File> files = listFilesInFolder(folderId, uploadedAfter);
+        if (files.isEmpty()) {
+            log.info("No new files found in folder {}", folderId);
+            return;
+        }
 
         try(var scope = new StructuredTaskScope<>("download", Thread.ofPlatform().factory())){
             for (File file : files) {

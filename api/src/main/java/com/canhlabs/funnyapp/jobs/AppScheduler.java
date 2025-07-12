@@ -75,7 +75,7 @@ public class AppScheduler {
     @Scheduled(cron = "0 */15 * * * *") // every 20 minutes
     public void syncDriveVideos() {
         log.info("📥 Syncing Google Drive folder...");
-        Instant fifteenMinutesAgo = Instant.now().minus(Duration.ofMinutes(20));
+        Instant fifteenMinutesAgo = Instant.now().minus(Duration.ofMinutes(60));
         // iso format: "2025-01-01T00:00:00Z"
         String isoTime = DateTimeFormatter.ISO_INSTANT.format(fifteenMinutesAgo);
 
