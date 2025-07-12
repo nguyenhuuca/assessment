@@ -7,4 +7,4 @@ Monitoring via OpenTelemetry and Grafana Cloud.
 
 - [Video Streaming System Architecture.md](Video%20Streaming%20System%20Architecture.md)
 - [architecture_quality_report.md](architecture_quality_report.md)
-
+- [Sequence-Diagram.puml](Sequence-Diagram.md)
