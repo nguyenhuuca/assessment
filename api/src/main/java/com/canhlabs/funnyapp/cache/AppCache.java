@@ -14,5 +14,5 @@ public interface AppCache<K, V> {
     void invalidateAll();
 
     V get(K key, Callable<? extends V> loader);
-    Map<K, V> asMap(); // ➕ thêm hàm này
+    Map<K, V> asMap();
 }

@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Using to load all the properties when start application
  * Can autowire this class in class that register to Spring Application Context
@@ -32,6 +35,27 @@ public class AppProperties {
     private String imageUrl;
     private String mainDomain;
     private String imageStoragePath;
+    private EmailSetting emailSetting = new EmailSetting();
+
+
+    @Getter
+    @Setter
+    public static class EmailSetting {
+        private boolean enablePreviewMode;
+        private int percentage;
+        private int maxDailyEmails;
+        private String whitelist; // CSV format from env or YAML
+
+        public List<String> getWhitelistAsList() {
+            if (whitelist == null || whitelist.isBlank()) {
+                return List.of();
+            }
+            return Arrays.stream(whitelist.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
+        }
+    }
 
 
 

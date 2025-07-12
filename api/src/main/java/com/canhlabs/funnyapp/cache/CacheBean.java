@@ -33,5 +33,10 @@ public class CacheBean {
     public  AppCache<String, Set<Range>> chunkIdxCache(AppCacheFactory factory, CacheProperties props) {
         return factory.createDefaultCache();
     }
+
+    @Bean(name = "emailLimiterCache")
+    public  AppCache<String, Integer> emailLimiterCache(AppCacheFactory factory, CacheProperties props) {
+        return factory.createDefaultCache();
+    }
 }
 

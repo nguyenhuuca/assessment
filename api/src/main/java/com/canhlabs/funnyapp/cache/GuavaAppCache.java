@@ -10,6 +10,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Implementation of AppCache using Guava Cache.
+ * Supports TTL, maximum size, and weight-based eviction.
+ *
+ * @param <K> Type of keys maintained by this cache
+ * @param <V> Type of mapped values
+ */
 @Slf4j
 class GuavaAppCache<K, V> implements AppCache<K, V> {
 
