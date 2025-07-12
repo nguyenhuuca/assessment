@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.EmailCacheLimiter;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.service.MailService;
 import jakarta.annotation.PostConstruct;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
@@ -27,11 +31,12 @@ public class MailServiceImpl implements MailService {
     @Value("${spring.mail.username}")
     private String fromAddress;
     private final AppProperties appProperties;
+    private final EmailCacheLimiter  emailLimiter;
 
-
-    public MailServiceImpl(JavaMailSender mailSender, AppProperties appProperties) {
+    public MailServiceImpl(JavaMailSender mailSender, AppProperties appProperties, EmailCacheLimiter emailCacheLimiter) {
         this.mailSender = mailSender;
         this.appProperties = appProperties;
+        this.emailLimiter = emailCacheLimiter;
     }
 
     @PostConstruct
@@ -56,6 +61,10 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendInvitation(String to, String username, String verifyUrl) {
+        if(!shouldSend(to)) {
+            log.warn("Email to {} is not sent due to preview settings", to);
+            return;
+        }
         String subject = "Enable Your Account";
         // Replace placeholders
         String content = htmlTemplate
@@ -63,6 +72,7 @@ public class MailServiceImpl implements MailService {
                 .replace("{{loginUrl}}", verifyUrl);
 
         sendEmail(to, subject, content);
+        emailLimiter.incrementDailyCount(LocalDate.now());
         log.info("Send email to {} success", to);
     }
 
@@ -80,5 +90,46 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             log.warn("Send email err", e);
         }
+    }
+
+    private boolean shouldSend(String email) {
+        List<String> whitelist = appProperties.getEmailPreview().getWhitelistAsList();// đã parse từ CSV env
+        int percentage = appProperties.getEmailPreview().getPercentage();
+        int maxPerDay = appProperties.getEmailPreview().getMaxDailyEmails();
+
+        if (isWhitelisted(email, whitelist)) return true;
+
+        int count = emailLimiter.getDailyCount(LocalDate.now());
+        if (count >= maxPerDay) {
+            log.warn("Email limit exceeded, email limit reached {} for today", maxPerDay);
+            return false;
+        }
+
+        // Randomly decide to send email based on percentage
+        if(appProperties.getEmailPreview().isEnabled()) {
+            int rand = ThreadLocalRandom.current().nextInt(100);
+            if (rand < percentage) {
+                return true;
+            } else {
+                log.warn("Email {} is not sent, random percentage {} >= {}", email, rand, percentage);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isWhitelisted(String email, List<String> whitelist) {
+        for (String entry : whitelist) {
+            entry = entry.trim().toLowerCase();
+            if (entry.startsWith("@")) {
+                // domain match
+                if (email.toLowerCase().endsWith(entry)) return true;
+            } else {
+                // exact match
+                if (email.equalsIgnoreCase(entry)) return true;
+            }
+        }
+        log.warn("Email {} is not whitelisted", email);
+        return false;
     }
 }

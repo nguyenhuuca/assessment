@@ -73,9 +73,13 @@ app:
   image-url: 'https://image.canh-labs.com'
   main-domain: 'https://canh-labs.com'
   image-storage-path: '/opt/data/images'
-
+  email-preview:
+      enabled: true
+      percentage: 10
+      max-daily-emails: 200
+      whitelist: ${EMAIL_PREVIEW_WHITELIST:canh@canh-labs.com,@canh-labs.com}
 cache:
-  type: guava # hoặc "redis"
+  type: guava # or "redis"
   mfa:
     ttl-minutes: 5
     max-size: 10000
@@ -96,5 +100,6 @@ springdoc:
     # path: /swagger-ui/index.html
     enabled: true
   show-actuator: true
+
 
 

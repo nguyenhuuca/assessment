@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.EmailCacheLimiter;
 import com.canhlabs.funnyapp.config.AppProperties;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +9,8 @@ import org.mockito.*;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -20,6 +23,12 @@ class MailServiceTest {
 
     @Mock
     private AppProperties appProperties;
+
+    @Mock
+    private AppProperties.EmailPreview emailPreview;
+
+    @Mock
+    EmailCacheLimiter emailCacheLimiter;
 
     @InjectMocks
     private MailServiceImpl mailService;
@@ -41,9 +50,15 @@ class MailServiceTest {
     @Test
     void sendInvitation_sendsHtmlMail() throws Exception {
         MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        mailService.sendInvitation("to@abc.com", "testuser", "http://verify.url");
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        // mock cấu hình
+        when(appProperties.getEmailPreview()).thenReturn(emailPreview);
+        when(emailPreview.getWhitelist()).thenReturn("ceo@abc.com,@trusted.com");
+        when(emailPreview.getWhitelistAsList()).thenReturn(List.of("ceo@abc.com","@trusted.com"));
+
+
+        mailService.sendInvitation("ceo@abc.com", "testuser", "http://verify.url");
 
         verify(mailSender).send(any(MimeMessage.class));
     }
@@ -64,7 +79,7 @@ class MailServiceTest {
         // Arrange
         when(appProperties.getInviteTemplate()).thenReturn("templates/email/invite-test.html");
         // Place a file named invite-test.html in src/test/resources with content: "Hello, {{username}}!"
-        MailServiceImpl mailService = new MailServiceImpl(mailSender, appProperties);
+        MailServiceImpl mailService = new MailServiceImpl(mailSender, appProperties , emailCacheLimiter);
 
         // Act
         mailService.loadTemplate();
