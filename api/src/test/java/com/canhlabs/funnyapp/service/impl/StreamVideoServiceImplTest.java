@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
@@ -25,12 +24,24 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class StreamVideoServiceImplTest {
+ class StreamVideoServiceImplTest {
     @Mock
     private Drive drive;
     @Mock
@@ -62,7 +73,7 @@ public class StreamVideoServiceImplTest {
     void testGetPartialFileByChunk_CacheHit() throws IOException {
         String fileId = "file123";
         long start = 0, end = 10;
-        InputStream mockStream = new ByteArrayInputStream(new byte[]{1,2,3});
+        InputStream mockStream = new ByteArrayInputStream(new byte[]{1, 2, 3});
         when(videoStorageService.hasChunk(fileId, start, end)).thenReturn(true);
         when(videoStorageService.getChunk(fileId, start, end)).thenReturn(mockStream);
 
@@ -78,7 +89,7 @@ public class StreamVideoServiceImplTest {
     void testGetPartialFileUsingRAF() throws IOException {
         String fileId = "file123";
         long start = 0, end = 10;
-        InputStream mockStream = new ByteArrayInputStream(new byte[]{1,2,3});
+        InputStream mockStream = new ByteArrayInputStream(new byte[]{1, 2, 3});
         when(videoStorageService.getFileRangeFromDisk(fileId, start, end)).thenReturn(mockStream);
         StreamChunkResult result = streamVideoService.getPartialFileUsingRAF(fileId, start, end);
         assertNotNull(result);
@@ -103,7 +114,7 @@ public class StreamVideoServiceImplTest {
         List<VideoDto> videos = streamVideoService.getVideosToStream();
         assertNotNull(videos);
         assertEquals(1, videos.size());
-        assertEquals("src1", videos.get(0).getFileId());
+        assertEquals("src1", videos.getFirst().getFileId());
     }
 
     @Test
@@ -128,8 +139,8 @@ public class StreamVideoServiceImplTest {
     void testGetPartialFileByChunk_CacheMiss_SaveSuccess() throws IOException {
         String fileId = "file456";
         long start = 0, end = 10;
-        InputStream googleStream = new ByteArrayInputStream(new byte[]{4,5,6});
-        InputStream cachedStream = new ByteArrayInputStream(new byte[]{4,5,6});
+        InputStream googleStream = new ByteArrayInputStream(new byte[]{4, 5, 6});
+        InputStream cachedStream = new ByteArrayInputStream(new byte[]{4, 5, 6});
         when(videoStorageService.hasChunk(fileId, start, end)).thenReturn(false);
         // Mock fetchFromGoogleDrive via spy
         StreamVideoServiceImpl spyService = spy(streamVideoService);
@@ -148,8 +159,8 @@ public class StreamVideoServiceImplTest {
     void testGetPartialFileByChunk_CacheMiss_SaveFails() throws IOException {
         String fileId = "file789";
         long start = 0, end = 10;
-        InputStream googleStream = new ByteArrayInputStream(new byte[]{7,8,9});
-        InputStream fallbackStream = new ByteArrayInputStream(new byte[]{7,8,9});
+        InputStream googleStream = new ByteArrayInputStream(new byte[]{7, 8, 9});
+        InputStream fallbackStream = new ByteArrayInputStream(new byte[]{7, 8, 9});
         when(videoStorageService.hasChunk(fileId, start, end)).thenReturn(false);
         StreamVideoServiceImpl spyService = spy(streamVideoService);
         lenient().doReturn(googleStream).when(spyService).fetchFromGoogleDrive(fileId, start, end);
@@ -168,7 +179,8 @@ public class StreamVideoServiceImplTest {
         Drive.Files files = mock(Drive.Files.class);
         Drive.Files.List list = mock(Drive.Files.List.class);
         com.google.api.services.drive.model.File file = new com.google.api.services.drive.model.File();
-        file.setId("id1"); file.setName("name1");
+        file.setId("id1");
+        file.setName("name1");
         com.google.api.services.drive.model.FileList fileList = new com.google.api.services.drive.model.FileList();
         fileList.setFiles(List.of(file));
         when(drive.files()).thenReturn(files);
@@ -178,14 +190,15 @@ public class StreamVideoServiceImplTest {
         when(list.execute()).thenReturn(fileList);
         List<com.google.api.services.drive.model.File> result = streamVideoService.listFilesInFolder("folder", "2024-01-01T00:00:00Z");
         assertEquals(1, result.size());
-        assertEquals("id1", result.get(0).getId());
+        assertEquals("id1", result.getFirst().getId());
     }
 
     @Test
     void testDownloadFileFromFolder_SkipIfExists() throws Exception {
         StreamVideoServiceImpl spyService = spy(streamVideoService);
         com.google.api.services.drive.model.File file = new com.google.api.services.drive.model.File();
-        file.setId("id1"); file.setName("name1.mp4");
+        file.setId("id1");
+        file.setName("name1.mp4");
         java.io.File localFile = new java.io.File("video-cache/id1.full");
         localFile.getParentFile().mkdirs();
         localFile.createNewFile();
@@ -200,11 +213,12 @@ public class StreamVideoServiceImplTest {
     void testDownloadFileFromFolder_DownloadsAndSavesInfo() throws Exception {
         StreamVideoServiceImpl spyService = spy(streamVideoService);
         com.google.api.services.drive.model.File file = new com.google.api.services.drive.model.File();
-        file.setId("id2"); file.setName("name2.mp4");
+        file.setId("id2");
+        file.setName("name2.mp4");
         when(appProperties.getImageStoragePath()).thenReturn("/var/test");
         when(appProperties.getImageUrl()).thenReturn("http://localhost:8080/images/");
         doReturn(List.of(file)).when(spyService).listFilesInFolder(anyString(), anyString());
-        doNothing().when(ffmpegService).generateThumbnail(anyString(),anyString());
+        doNothing().when(ffmpegService).generateThumbnail(anyString(), anyString());
         doNothing().when(spyService).downloadFile(eq("id2"), any(java.io.File.class));
         doNothing().when(spyService).saveInfo(eq("id2"), anyString(), anyString());
         java.io.File localFile = new java.io.File("video-cache/id2.full");
@@ -257,9 +271,10 @@ public class StreamVideoServiceImplTest {
     void testShareFilesInFolder_Success() throws Exception {
         StreamVideoServiceImpl spyService = spy(streamVideoService);
         com.google.api.services.drive.model.File file = new com.google.api.services.drive.model.File();
-        file.setId("id4"); file.setName("name4.mp4");
+        file.setId("id4");
+        file.setName("name4.mp4");
         doReturn(List.of(file)).when(spyService).listFilesInFolder(any(Drive.class), anyString());
-        doNothing().when(spyService).saveInfo(eq("id4"), anyString() ,anyString());
+        doNothing().when(spyService).saveInfo(eq("id4"), anyString(), anyString());
         spyService.shareFilesInFolder();
         verify(spyService).saveInfo(eq("id4"), anyString(), anyString());
     }
@@ -279,11 +294,13 @@ public class StreamVideoServiceImplTest {
         Drive.Files files = mock(Drive.Files.class);
         Drive.Files.List list = mock(Drive.Files.List.class);
         com.google.api.services.drive.model.File file1 = new com.google.api.services.drive.model.File();
-        file1.setId("id1"); file1.setName("name1");
+        file1.setId("id1");
+        file1.setName("name1");
         com.google.api.services.drive.model.File file2 = new com.google.api.services.drive.model.File();
-        file2.setId("id2"); file2.setName("name2");
+        file2.setId("id2");
+        file2.setName("name2");
         com.google.api.services.drive.model.FileList fileList1 = new com.google.api.services.drive.model.FileList();
-        fileList1.setFiles(List.of(file1,file2));
+        fileList1.setFiles(List.of(file1, file2));
         fileList1.setNextPageToken("token2");
         com.google.api.services.drive.model.FileList fileList2 = new com.google.api.services.drive.model.FileList();
         fileList2.setFiles(List.of(file2));

@@ -106,7 +106,7 @@ class ShareServiceImplTest {
 
                 List<VideoDto> result = shareService.getALLShare();
                 assertThat(result).hasSize(2);
-                assertThat(result.get(0).getTitle()).isEqualTo("t1");
+                assertThat(result.getFirst().getTitle()).isEqualTo("t1");
             }
         }
     }
@@ -135,9 +135,7 @@ class ShareServiceImplTest {
     void getInfoFromYoutube_ExceptionOccurs() {
         ShareServiceImpl spyService = Mockito.spy(shareService);
         // Pass an invalid URL to trigger exception
-        assertThatThrownBy(() -> {
-            VideoDto result = spyService.getInfoFromYoutube("invalid_url");
-        }).hasMessageContaining("Cannot get video info");
+        assertThatThrownBy(() -> spyService.getInfoFromYoutube("invalid_url")).hasMessageContaining("Cannot get video info");
 
     }
 
@@ -152,6 +150,7 @@ class ShareServiceImplTest {
         assertThat(result.getTitle()).isEqualTo("t");
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void getQueryParam_parsesQueryCorrectly() throws Exception {
         String query = "v=abc123&foo=bar";
@@ -173,7 +172,7 @@ class ShareServiceImplTest {
                 method.invoke(shareService, dto);
             } catch (Exception e) {
                 String msg = ((CustomException) ((InvocationTargetException) e).getTargetException()).getMessage();
-                assertThat(msg.contains("User is not exist"));
+                assertThat(msg).contains("Error get current user");
             }
 
         }
@@ -187,17 +186,17 @@ class ShareServiceImplTest {
         String apiKey = "fake-api-key";
         String part = "snippet";
         String jsonResponse = """
-    {
-      "items": [
-        {
-          "snippet": {
-            "title": "Test Title",
-            "description": "Test Description"
-          }
-        }
-      ]
-    }
-    """;
+                {
+                  "items": [
+                    {
+                      "snippet": {
+                        "title": "Test Title",
+                        "description": "Test Description"
+                      }
+                    }
+                  ]
+                }
+                """;
 
         when(props.getGoogleApiKey()).thenReturn(apiKey);
         when(props.getGooglePart()).thenReturn(part);

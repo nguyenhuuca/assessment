@@ -1,6 +1,5 @@
 package com.canhlabs.funnyapp.config.aop;
 
-import com.canhlabs.funnyapp.annotation.AuditLog;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,8 +26,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuditLogAspect {
 
-    @Autowired
     private MaskingUtils maskingUtil;
+
+    @Autowired
+    public void injectMaskingUtil(MaskingUtils maskingUtil) {
+        this.maskingUtil = maskingUtil;
+    }
 
     @Around("execution(* *(..)) && (@within(com.canhlabs.funnyapp.annotation.AuditLog) || @annotation(com.canhlabs.funnyapp.annotation.AuditLog))")
     public Object logAudit(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -37,12 +40,6 @@ public class AuditLogAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         Class<?> targetClass = method.getDeclaringClass();
-
-        // get annotation from method/ class
-        AuditLog auditLog = method.getAnnotation(AuditLog.class);
-        if (auditLog == null) {
-            auditLog = targetClass.getAnnotation(AuditLog.class);
-        }
 
         // IP & input
         String clientIp = getClientIP();
@@ -107,6 +104,7 @@ public class AuditLogAspect {
             String forwarded = request.getHeader("X-Forwarded-For");
             return forwarded != null ? forwarded.split(",")[0] : request.getRemoteAddr();
         } catch (Exception e) {
+            log.error("getClientIP error", e);
             return "N/A";
         }
     }

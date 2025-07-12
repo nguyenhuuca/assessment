@@ -16,6 +16,7 @@ public class ThreadMetrics {
         this.registry = registry;
     }
 
+    @SuppressWarnings("java:S2095")
     @PostConstruct
     public void bindVirtualThreadMetrics() {
         new VirtualThreadMetrics().bindTo(registry);

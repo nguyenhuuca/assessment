@@ -8,10 +8,6 @@ import java.io.InputStream;
 import java.util.Optional;
 
 public interface VideoStorageService {
-    File getCacheFile(String fileId);
-
-    InputStream getCache(String fileId, long start, long end) throws IOException;
-
 
     // Chunk functionality
     boolean hasChunk(String fileId, long start, long end);

@@ -50,30 +50,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     public void injectCacheStatsService(StatsCache statsCache) {
         this.statsCache = statsCache;
     }
-
-    @Override
-    public File getCacheFile(String fileId) {
-        return new File(CACHE_DIR + fileId + ".cache");
-    }
-
-    @WithSpan
-    @Override
-    public InputStream getCache(String fileId, long start, long end) throws IOException {
-        File file = new File(CACHE_DIR + fileId + ".cache");
-
-        if (!file.exists()) {
-            throw new FileNotFoundException("Cache not found for file: " + fileId);
-        }
-
-        long length = end - start + 1;
-        RandomAccessFile raf = new RandomAccessFile(file, "r");
-        raf.seek(start);
-
-        return new LimitedInputStream(new FileInputStream(raf.getFD()), length, raf) {
-        };
-    }
-
-
+    
     @Override
     @WithSpan
     public boolean hasChunk(String fileId, long start, long end) {
