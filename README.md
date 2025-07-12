@@ -183,7 +183,7 @@ cd api
 ./unittest
 ```
 
-> Jacoco report will be generated under `/target/site/jacoco`
+> Jacoco report will be generated under `/target/jacoco-report`
 
 ---
 
