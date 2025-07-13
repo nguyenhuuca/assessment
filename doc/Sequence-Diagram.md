@@ -17,3 +17,10 @@
 
 ---
 ![stream_flow.png](images/stream_flow.png)
+
+---
+
+### Sequence Diagram for the Video Job Fetching
+
+---
+![JobGetVideo.png](images/JobGetVideo.png)

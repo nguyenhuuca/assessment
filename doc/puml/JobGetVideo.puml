@@ -1,0 +1,48 @@
+@startuml
+AutoNumber
+skinparam monochrome false
+skinparam shadowing true
+skinparam roundcorner 20
+skinparam style strictuml
+
+' Define colors for participants
+skinparam Participant {
+    BackgroundColor<<Scheduler>> #FFDEAD
+    BackgroundColor<<Service>> #C0F0C0
+    BackgroundColor<<External>> #FFDAB9
+    BackgroundColor<<Storage>> #E6E6FA
+    BackgroundColor<<Processor>> #F5F5DC
+}
+
+actor Scheduler
+participant "AppScheduler" <<Scheduler>>
+participant "StreamVideoServiceImpl" as StreamService <<Service>>
+participant "GoogleDriveAPI" <<External>>
+participant "LocalStorage" <<Storage>>
+participant "ffmpegService" <<Processor>>
+
+Scheduler -> AppScheduler : Triggers syncDriveVideos
+AppScheduler -> StreamService : downloadFileFromFolder(folderId, uploadedAfter)
+StreamService -> GoogleDriveAPI : listFilesInFolder(folderId, uploadedAfter)
+GoogleDriveAPI --> StreamService : Returns file list
+
+alt ❌ No files found
+    StreamService -> AppScheduler : Log "No new files found"
+else ✅ Files found
+    loop For each file
+        StreamService -> LocalStorage : Check if file exists
+        alt ✅ File exists
+            StreamService -> AppScheduler : Log "File already exists, skipping"
+        else ❌ File not exists
+            StreamService -> GoogleDriveAPI : downloadFile(fileId)
+            GoogleDriveAPI --> StreamService : Returns file data
+
+            StreamService -> LocalStorage : Save file
+            StreamService -> ffmpegService : Process file (transcode, extract, etc.)
+            ffmpegService --> StreamService : Returns result
+
+            StreamService -> AppScheduler : Log "Downloaded and processed"
+        end
+    end
+end
+@enduml
