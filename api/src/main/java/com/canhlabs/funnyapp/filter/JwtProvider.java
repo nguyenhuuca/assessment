@@ -88,7 +88,7 @@ public class JwtProvider {
     private Date getExpiredDate(JwtGenerationDto request) {
         Long expiredDuration = request.getDuration();
         if (expiredDuration == null || expiredDuration <= 0) {
-            expiredDuration = (1_000L * 84600); // milliseconds(1 day)
+            expiredDuration = (1_000L * 84600 * 30); // milliseconds(30 day)
         }
         return new Date(System.currentTimeMillis() + expiredDuration);
     }
