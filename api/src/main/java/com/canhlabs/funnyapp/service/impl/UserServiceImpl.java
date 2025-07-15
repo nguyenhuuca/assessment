@@ -175,6 +175,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepo.findAllByUserName(userReq.get().getEmail());
         if (user != null) {
+            inviteService.markTokenAsUsed(userReq.get(), userReq.get().getUserId());
             if (user.isMfaEnabled()) {
                 String sessionToken = UUID.randomUUID().toString();
                 mfaSessionStore.storeSession(sessionToken, user.getUserName());
