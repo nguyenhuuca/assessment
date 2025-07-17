@@ -58,6 +58,12 @@ Adopt Spring Boot monolith with clearly defined layers and caching mechanism, an
 
 ---
 
+### Deployment Diagram
+
+![Deployment.png](images/Deployment.png)
+
+---
+
 ## Consequences
 
 - Easy to scale the backend horizontally
