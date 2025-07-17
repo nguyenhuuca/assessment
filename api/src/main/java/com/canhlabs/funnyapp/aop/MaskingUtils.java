@@ -1,6 +1,5 @@
-package com.canhlabs.funnyapp.config.aop;
+package com.canhlabs.funnyapp.aop;
 
-import com.canhlabs.funnyapp.annotation.Sensitive;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;

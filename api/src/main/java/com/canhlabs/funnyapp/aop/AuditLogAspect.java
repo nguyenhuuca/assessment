@@ -1,6 +1,5 @@
-package com.canhlabs.funnyapp.config.aop;
+package com.canhlabs.funnyapp.aop;
 
-import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +8,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Aspect
@@ -33,7 +32,7 @@ public class AuditLogAspect {
         this.maskingUtil = maskingUtil;
     }
 
-    @Around("execution(* *(..)) && (@within(com.canhlabs.funnyapp.annotation.AuditLog) || @annotation(com.canhlabs.funnyapp.annotation.AuditLog))")
+    @Around("execution(* *(..)) && (@within(com.canhlabs.funnyapp.aop.AuditLog) || @annotation(com.canhlabs.funnyapp.aop.AuditLog))")
     public Object logAudit(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
 
@@ -55,14 +54,8 @@ public class AuditLogAspect {
             result = joinPoint.proceed();
             Object maskedResult = maskingUtil.maskSensitiveFields(result);
             String outputStr;
-            if (maskedResult instanceof ResponseEntity<?> responseEntity) {
-                Object body = responseEntity.getBody();
-                if (body instanceof ResultListInfo<?> resultList) {
-                    outputStr = String.format("List(size=%d)", resultList.getData().size());
-
-                } else {
-                    outputStr = maskingUtil.toJsonSafe(maskedResult);
-                }
+            if (maskedResult instanceof List<?> listResult) {
+                outputStr = String.format("List(size=%d)", listResult.size());
             } else {
                 outputStr = maskingUtil.toJsonSafe(maskedResult);
             }

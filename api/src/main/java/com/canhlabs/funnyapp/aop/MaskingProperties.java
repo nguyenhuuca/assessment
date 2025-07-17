@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.config.aop;
+package com.canhlabs.funnyapp.aop;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.config.aop;
-import com.canhlabs.funnyapp.annotation.Sensitive;
+import com.canhlabs.funnyapp.aop.MaskingProperties;
+import com.canhlabs.funnyapp.aop.MaskingUtils;
+import com.canhlabs.funnyapp.aop.Sensitive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

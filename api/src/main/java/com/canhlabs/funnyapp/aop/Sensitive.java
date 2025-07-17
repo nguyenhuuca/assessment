@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.annotation;
+package com.canhlabs.funnyapp.aop;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

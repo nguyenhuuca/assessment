@@ -51,7 +51,7 @@ class TotpImplTest {
         assertFalse(totp.verify(wrongOtp, secret));
     }
 
-    @Disabled
+    //@Disabled
     @Test
     void testOtpExpiredFails() throws InterruptedException {
         Totp totp = new TotpImpl();
@@ -70,7 +70,6 @@ class TotpImplTest {
         String secret = generateSecret();
         String otp = totp.generateTOTP(secret);
 
-        // Delay 20s => vẫn trong khoảng ±30s
         Thread.sleep(1000);
 
         assertTrue(totp.verify(otp, secret));

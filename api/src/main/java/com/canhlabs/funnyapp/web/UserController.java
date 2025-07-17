@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.annotation.AuditLog;
+import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.service.impl.InviteServiceImpl;
