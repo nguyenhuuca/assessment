@@ -17,3 +17,4 @@ Monitoring via OpenTelemetry and Grafana Cloud.
 - [0003-use-cache.md](adr/0003-use-cache.md)
 - [0004-frontend-structure.md](adr/0004-frontend-structure.md)
 - [0005-use_lru_cache_video_streaming.md](adr/0005-use_lru_cache_video_streaming.md)
+
