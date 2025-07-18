@@ -58,7 +58,6 @@ class TotpImplTest {
         String secret = generateSecret();
         String otp = totp.generateTOTP(secret);
 
-        // Sleep vượt qua window ±1 (~60s)
         Thread.sleep(35000);
 
         assertFalse(totp.verify(otp, secret));
