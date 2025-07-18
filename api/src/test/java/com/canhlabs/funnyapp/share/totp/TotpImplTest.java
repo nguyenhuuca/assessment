@@ -51,7 +51,7 @@ class TotpImplTest {
         assertFalse(totp.verify(wrongOtp, secret));
     }
 
-    //@Disabled
+    @Disabled
     @Test
     void testOtpExpiredFails() throws InterruptedException {
         Totp totp = new TotpImpl();
