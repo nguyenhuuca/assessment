@@ -89,6 +89,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserInfoDto joinSystem(LoginDto loginDto) {
         validate(loginDto);
+        log.info( "User join system with email: {}", loginDto.getEmail());
         User user = userRepo.findAllByUserName(loginDto.getEmail());
         if (user != null) {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
@@ -171,7 +172,7 @@ public class UserServiceImpl implements UserService {
         if (userReq.isEmpty()) {
             raiseErr("Token in invalid");
         }
-        log.info("token was verified success for user {}", userReq.get().getEmail());
+        log.info("Token was verified success for user {}", userReq.get().getEmail());
 
         User user = userRepo.findAllByUserName(userReq.get().getEmail());
         if (user != null) {
