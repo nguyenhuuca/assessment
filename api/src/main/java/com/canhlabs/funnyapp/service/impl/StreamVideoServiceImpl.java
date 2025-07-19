@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.domain.VideoSource;
@@ -146,10 +147,9 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @Override
     public long getFileSize(String fileId) throws IOException {
         return videoStorageService.getFileSizeFromDisk(fileId);
-//        File file = drive.files().get(fileId).setFields("size").execute();
-//        return file.getSize();
     }
 
+    @AuditLog("getALLShare")
     @WithSpan
     @Override
     public List<VideoDto> getVideosToStream() {

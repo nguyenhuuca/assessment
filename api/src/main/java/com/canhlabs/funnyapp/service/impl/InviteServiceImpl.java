@@ -50,6 +50,7 @@ public class InviteServiceImpl implements InviteService {
         String magicLink = appProperties.getDomain() + "/join?token=" + token;
 
         emailSender.sendInvitation(email, email, magicLink);
+        log.info("User join system via magic link with email: {}", email);
     }
 
     /**

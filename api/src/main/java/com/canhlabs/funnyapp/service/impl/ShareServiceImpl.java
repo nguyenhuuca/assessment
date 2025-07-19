@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.domain.ShareLink;
 import com.canhlabs.funnyapp.domain.User;
 import com.canhlabs.funnyapp.repo.ShareLinkRepo;

@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.client.YouTubeApiClient;
 import com.canhlabs.funnyapp.domain.YouTubeVideo;
 import com.canhlabs.funnyapp.repo.YoutubeVideoRepo;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@AuditLog("Audit all methods in YouTubeVideoServiceImpl class")
 public class YouTubeVideoServiceImpl implements com.canhlabs.funnyapp.service.YouTubeVideoService {
 
     private final YoutubeVideoRepo repository;

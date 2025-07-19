@@ -15,7 +15,6 @@ import java.util.List;
 
 @RequestMapping(AppConstant.API.BASE_URL)
 @RestController
-@AuditLog("Audit all methods in YoutubeController class")
 public class YoutubeController {
 
     private final com.canhlabs.funnyapp.service.YouTubeVideoService youTubeVideoService;
