@@ -54,6 +54,11 @@ management:
   metrics:
     enable:
       all: true
+    distribution:
+        percentiles-histogram:
+            all: true
+        percentiles:
+            all: [0.5, 0.75, 0.95, 0.99]
 
 
 #  servlet:
