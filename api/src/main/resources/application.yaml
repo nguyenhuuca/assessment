@@ -46,7 +46,7 @@ server:
 management:
   endpoint:
     prometheus:
-      enabled: true
+      access: unrestricted
   endpoints:
     web:
       exposure:
@@ -55,10 +55,12 @@ management:
     enable:
       all: true
     distribution:
-        percentiles-histogram:
-            all: true
-        percentiles:
-            all: [0.5, 0.75, 0.95, 0.99]
+      percentiles-histogram:
+        http.client.requests: true
+        http.server.requests: true
+      percentiles:
+        http.client.requests: [0.5, 0.95, 0.99]
+        http.server.requests: [0.5, 0.95, 0.99]
 
 
 #  servlet:

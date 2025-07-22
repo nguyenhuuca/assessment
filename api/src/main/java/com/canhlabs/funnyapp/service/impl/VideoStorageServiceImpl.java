@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.cache.LockManager;
 import com.canhlabs.funnyapp.dto.Range;
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.cache.ChunkIndexCache;
+import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.share.LimitedInputStream;
@@ -35,7 +36,12 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     private LockManager lockManager;
     private StatsCache statsCache;
     private ChunkIndexCache chunkIndexCache;
+    private VideoAccessService videoAccessService;
 
+    @Autowired
+    public void injectVideoAccessService(VideoAccessService videoAccessService) {
+        this.videoAccessService = videoAccessService;
+    }
     @Autowired
     public void injectChunkIndexService(ChunkIndexCache chunkIndexCache) {
         this.chunkIndexCache = chunkIndexCache;
@@ -59,6 +65,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
         log.info("Check chunk exists: {} [{}-{}] = {}", fileId, start, end, exists);
         if (exists) {
             statsCache.recordHit(fileId);
+            videoAccessService.recordAccess(fileId);
         } else {
             statsCache.recordMiss(fileId);
         }
@@ -112,6 +119,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
             throw new FileNotFoundException("Full file not found: " + file.getAbsolutePath());
         }
         statsCache.recordHit(fileId);
+        videoAccessService.recordAccess(fileId);
         long length = end - start + 1;
         RandomAccessFile raf = new RandomAccessFile(file, "r");
         raf.seek(start);
