@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.jobs;
 import com.canhlabs.funnyapp.dto.CacheStat;
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.service.StreamVideoService;
+import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -19,14 +21,18 @@ import java.util.Map;
 public class AppScheduler {
 
     private final YouTubeVideoService service;
-    private final StreamVideoService googleDriveVideoService;
+    private final StreamVideoService streamVideoService;
     private final StatsCache statsCache;
+    private final VideoAccessService videoAccessService;
 
 
-    public AppScheduler(YouTubeVideoService service, StreamVideoService googleDriveVideoService, StatsCache statsCache) {
+    public AppScheduler(YouTubeVideoService service, StreamVideoService streamVideoService,
+                        StatsCache statsCache, VideoAccessService videoAccessService
+    ) {
         this.service = service;
-        this.googleDriveVideoService = googleDriveVideoService;
+        this.streamVideoService = streamVideoService;
         this.statsCache = statsCache;
+        this.videoAccessService = videoAccessService;
     }
 
     // Run at 1:00 daily
@@ -44,7 +50,7 @@ public class AppScheduler {
     public void scheduleProcessShareFile() {
         log.info("Start running scheduleProcessShareFile each 15 minutes");
         try {
-            googleDriveVideoService.shareFilesInFolder();
+            streamVideoService.shareFilesInFolder();
         } catch (Exception ex) {
             log.error("Error running scheduleProcessShareFile job", ex);
         }
@@ -54,7 +60,7 @@ public class AppScheduler {
     public void scheduleMakePoem() {
         log.info("Start running scheduleMakePoem at 10:10 ");
         try {
-            googleDriveVideoService.updateDesc();
+            streamVideoService.updateDesc();
         } catch (Exception ex) {
             log.error("Error running scheduleMakePoem job", ex);
         }
@@ -80,10 +86,19 @@ public class AppScheduler {
         String isoTime = DateTimeFormatter.ISO_INSTANT.format(fifteenMinutesAgo);
 
         try {
-            googleDriveVideoService.downloadFileFromFolder(AppConstant.FOLDER_ID, isoTime);
+            streamVideoService.downloadFileFromFolder(AppConstant.FOLDER_ID, isoTime);
             log.info("✅ Successfully synced from Google Drive");
         } catch (Exception e) {
             log.error("❌ Failed to sync from Google Drive", e);
+        }
+    }
+
+
+    @Scheduled(cron = "0 0 3 30 2 *")
+    public void cleanUpOldVideos() {
+        List<String> candidates = videoAccessService.getLeastAccessedVideos(Duration.ofDays(1000), 100);
+        for (String videoId : candidates) {
+            //storageService.deleteIfEligible(videoId);
         }
     }
 }
