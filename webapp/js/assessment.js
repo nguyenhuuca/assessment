@@ -97,7 +97,7 @@ const VideoTemplate = {
             // Poster logic - dùng fileId nếu có
             let poster = '';
             if (v.fileId) {
-                poster = `./icons/${v.fileId}.jpg`;
+                poster = `https://images.canh-labs.com/${v.fileId}.jpg`;
             }
             
             // Video mới sẽ bắt đầu từ vị trí bên ngoài
@@ -319,7 +319,7 @@ const VideoActions = {
                 // Poster logic - dùng fileId nếu có
                 let poster = '';
                 if (v.fileId) {
-                    poster = `./icons/${v.fileId}.jpg`;
+                    poster = `https://images.canh-labs.com/${v.fileId}.jpg`;
                 }
                 
                 // Video mới sẽ bắt đầu từ vị trí bên ngoài
