@@ -41,9 +41,6 @@ class VideoStorageServiceImplTest {
     @Mock
     private StatsCache statsCache;
     @Mock
-    private ChunkIndexCache chunkIndexCache;
-
-    @Mock
     VideoAccessService videoAccessService;
     @Mock
     private Drive drive;
@@ -64,7 +61,6 @@ class VideoStorageServiceImplTest {
         MockitoAnnotations.openMocks(this);
         videoStorageService = new VideoStorageServiceImpl();
         videoStorageService.injectCacheStatsService(statsCache);
-        videoStorageService.injectChunkIndexService(chunkIndexCache);
         videoStorageService.injectVideoAccessService(videoAccessService);
         videoStorageService.injectFfmpegService(ffmpegService);
         videoStorageService.injectAppProperties(appProperties);
@@ -87,16 +83,6 @@ class VideoStorageServiceImplTest {
         });
     }
 
-    @Test
-    void testFindNearestChunk_Delegates() {
-        String fileId = "f";
-        long start = 0, end = 10, tol = 5;
-        Range range = new Range(0, 10);
-        when(chunkIndexCache.findNearestChunk(fileId, start, end, tol)).thenReturn(Optional.of(range));
-        Optional<Range> result = videoStorageService.findNearestChunk(fileId, start, end, tol);
-        assertTrue(result.isPresent());
-        assertEquals(range, result.get());
-    }
 
     @Test
     void testDownloadFileFromFolder_DownloadsAndSavesInfo() throws Exception {

@@ -1,10 +1,8 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.cache.ChunkIndexCache;
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.domain.VideoSource;
-import com.canhlabs.funnyapp.dto.Range;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.FfmpegService;
@@ -33,7 +31,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.StructuredTaskScope;
 
 
@@ -41,8 +38,8 @@ import java.util.concurrent.StructuredTaskScope;
 @Service
 public class VideoStorageServiceImpl implements VideoStorageService {
 
+    public static final String EXTENSION = ".full";
     private StatsCache statsCache;
-    private ChunkIndexCache chunkIndexCache;
     private VideoAccessService videoAccessService;
     private FfmpegService ffmpegService;
     private AppProperties appProps;
@@ -82,26 +79,15 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     }
 
     @Autowired
-    public void injectChunkIndexService(ChunkIndexCache chunkIndexCache) {
-        this.chunkIndexCache = chunkIndexCache;
-    }
-
-
-    @Autowired
     public void injectCacheStatsService(StatsCache statsCache) {
         this.statsCache = statsCache;
     }
 
-    @Override
-    public Optional<Range> findNearestChunk(String fileId, long requestedStart, long requestedEnd, long tolerance) {
-
-        return chunkIndexCache.findNearestChunk(fileId, requestedStart, requestedEnd, tolerance);
-    }
 
     @WithSpan
     @Override
     public InputStream getFileRangeFromDisk(String fileId, long start, long end) throws IOException {
-        File file = new File(AppConstant.CACHE_DIR, fileId + ".full");
+        File file = new File(AppConstant.CACHE_DIR, fileId + EXTENSION);
         if (!file.exists()) {
             throw new FileNotFoundException("Full file not found: " + file.getAbsolutePath());
         }
@@ -117,7 +103,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     @WithSpan
     @Override
     public long getFileSizeFromDisk(String fileId) throws IOException {
-        File file = new File(AppConstant.CACHE_DIR, fileId + ".full");
+        File file = new File(AppConstant.CACHE_DIR, fileId + EXTENSION);
         if (!file.exists()) {
             throw new FileNotFoundException("Full file not found: " + file.getAbsolutePath());
         }
@@ -135,7 +121,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
         try (var scope = new StructuredTaskScope<>("download", Thread.ofPlatform().factory())) {
             for (com.google.api.services.drive.model.File file : files) {
                 scope.fork(() -> {
-                    java.io.File localFile = new java.io.File(AppConstant.CACHE_DIR, file.getId().concat(".full"));
+                    java.io.File localFile = new java.io.File(AppConstant.CACHE_DIR, file.getId().concat(EXTENSION));
                     if (localFile.exists()) {
                         log.info("✅ File already exists: {}, skipping", file.getName());
                         return null;
@@ -180,7 +166,6 @@ public class VideoStorageServiceImpl implements VideoStorageService {
 
     @WithSpan
     List<com.google.api.services.drive.model.File> listFilesInFolder(Drive drive, String folderId) throws IOException {
-        // String query = String.format("'%s' in parents and trashed = false", folderId);
         Instant fifteenMinutesAgo = Instant.now().minus(Duration.ofMinutes(15));
         String isoTime = DateTimeFormatter.ISO_INSTANT.format(fifteenMinutesAgo);
 
