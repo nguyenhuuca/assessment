@@ -6,6 +6,8 @@ import com.canhlabs.funnyapp.share.AppConstant;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.enums.ResultStatus;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,8 @@ public class YoutubeController {
         this.youTubeVideoService = youTubeVideoService;
     }
 
+    @Operation(summary = "Get top videos from YouTube", description = "Fetches a list of top videos from YouTube.")
+    @WithSpan
     @GetMapping("/top-videos")
     public ResponseEntity<ResultListInfo<VideoDto>> getTopVideos() {
         List<VideoDto> rs = youTubeVideoService.getVideoIds();

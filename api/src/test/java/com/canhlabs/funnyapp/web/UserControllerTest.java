@@ -1,18 +1,30 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.canhlabs.funnyapp.dto.*;
+import com.canhlabs.funnyapp.dto.DisableRequest;
+import com.canhlabs.funnyapp.dto.EnableRequest;
+import com.canhlabs.funnyapp.dto.LoginDto;
+import com.canhlabs.funnyapp.dto.MfaRequest;
+import com.canhlabs.funnyapp.dto.SetupResponse;
+import com.canhlabs.funnyapp.dto.UserDetailDto;
+import com.canhlabs.funnyapp.dto.UserInfoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
+import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.service.impl.InviteServiceImpl;
-import com.canhlabs.funnyapp.enums.ResultStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class UserControllerTest {
 
@@ -104,7 +116,7 @@ class UserControllerTest {
         DisableRequest req = new DisableRequest("user", "otp");
         when(userService.disableMfa("user", "otp")).thenReturn("disabled");
 
-        ResponseEntity<ResultObjectInfo<String>> response = userController.verify(req);
+        ResponseEntity<ResultObjectInfo<String>> response = userController.disable(req);
 
         assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
         assertEquals("disabled", response.getBody().getData());
