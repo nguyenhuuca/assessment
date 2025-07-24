@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.repo;
 
-import com.canhlabs.funnyapp.domain.VideoAccessStats;
+import com.canhlabs.funnyapp.entity.VideoAccessStats;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

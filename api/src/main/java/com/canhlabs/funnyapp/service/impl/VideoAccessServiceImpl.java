@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.domain.VideoAccessStats;
+import com.canhlabs.funnyapp.entity.VideoAccessStats;
 import com.canhlabs.funnyapp.repo.VideoAccessStatsRepo;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import lombok.extern.slf4j.Slf4j;

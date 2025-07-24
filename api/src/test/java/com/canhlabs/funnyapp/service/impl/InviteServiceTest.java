@@ -1,12 +1,12 @@
 // File: api/src/test/java/com/canhlabs/funnyapp/service/impl/InviteServiceTest.java
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.domain.UserEmailRequest;
+import com.canhlabs.funnyapp.entity.UserEmailRequest;
 import com.canhlabs.funnyapp.repo.UserEmailRequestRepository;
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.canhlabs.funnyapp.share.AppUtils;
+import com.canhlabs.funnyapp.utils.AppUtils;
 import com.canhlabs.funnyapp.enums.Status;
-import com.canhlabs.funnyapp.share.exception.CustomException;
+import com.canhlabs.funnyapp.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.service;
 
-import com.canhlabs.funnyapp.domain.UserEmailRequest;
+import com.canhlabs.funnyapp.entity.UserEmailRequest;
 
 import java.util.Optional;
 

@@ -1,8 +1,8 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.MFASessionStore;
-import com.canhlabs.funnyapp.domain.User;
-import com.canhlabs.funnyapp.domain.UserEmailRequest;
+import com.canhlabs.funnyapp.entity.User;
+import com.canhlabs.funnyapp.entity.UserEmailRequest;
 import com.canhlabs.funnyapp.dto.JwtGenerationDto;
 import com.canhlabs.funnyapp.dto.LoginDto;
 import com.canhlabs.funnyapp.dto.MfaRequest;
@@ -12,10 +12,10 @@ import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.dto.UserInfoDto;
 import com.canhlabs.funnyapp.filter.JwtProvider;
 import com.canhlabs.funnyapp.repo.UserRepo;
-import com.canhlabs.funnyapp.share.AppUtils;
-import com.canhlabs.funnyapp.share.QrUtil;
-import com.canhlabs.funnyapp.share.exception.CustomException;
-import com.canhlabs.funnyapp.share.totp.Totp;
+import com.canhlabs.funnyapp.utils.AppUtils;
+import com.canhlabs.funnyapp.utils.QrUtil;
+import com.canhlabs.funnyapp.exception.CustomException;
+import com.canhlabs.funnyapp.utils.totp.Totp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

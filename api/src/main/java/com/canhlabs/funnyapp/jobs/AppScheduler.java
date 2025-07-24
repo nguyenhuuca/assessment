@@ -6,7 +6,7 @@ import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
-import com.canhlabs.funnyapp.share.AppConstant;
+import com.canhlabs.funnyapp.utils.AppConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

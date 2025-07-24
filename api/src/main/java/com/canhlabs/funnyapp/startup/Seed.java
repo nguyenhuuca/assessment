@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.canhlabs.funnyapp.share.AppConstant.CACHE_DIR;
+import static com.canhlabs.funnyapp.utils.AppConstant.CACHE_DIR;
 
 @Component
 @Slf4j

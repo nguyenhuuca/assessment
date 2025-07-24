@@ -5,7 +5,7 @@ import com.canhlabs.funnyapp.dto.JwtGenerationDto;
 import com.canhlabs.funnyapp.dto.JwtVerificationResultDto;
 import com.canhlabs.funnyapp.dto.TokenDto;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
-import com.canhlabs.funnyapp.share.exception.UnauthorizedException;
+import com.canhlabs.funnyapp.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.canhlabs.funnyapp.share.AppUtils.getNonNull;
+import static com.canhlabs.funnyapp.utils.AppUtils.getNonNull;
 
 /**
  * Using to generate/verify token, revoke token in case it become invalid: supend user, in-active user

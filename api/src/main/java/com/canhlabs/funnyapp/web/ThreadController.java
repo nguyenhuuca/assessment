@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.service.ChatGptService;
-import com.canhlabs.funnyapp.share.AppConstant;
+import com.canhlabs.funnyapp.utils.AppConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.config;
 
-import com.canhlabs.funnyapp.share.totp.Totp;
-import com.canhlabs.funnyapp.share.totp.TotpImpl;
+import com.canhlabs.funnyapp.utils.totp.Totp;
+import com.canhlabs.funnyapp.utils.totp.TotpImpl;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;

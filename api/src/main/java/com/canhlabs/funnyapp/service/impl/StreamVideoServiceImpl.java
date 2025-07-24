@@ -2,7 +2,7 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.cache.VideoCache;
-import com.canhlabs.funnyapp.domain.VideoSource;
+import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
