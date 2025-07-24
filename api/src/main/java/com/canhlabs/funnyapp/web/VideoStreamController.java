@@ -90,7 +90,6 @@ public class VideoStreamController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ResultObjectInfo<VideoDto>> getTopVideos(@PathVariable  Long id) {
-        videoService.shareFilesInFolder();
         VideoDto rs = videoService.getVideoById(id);
         return new ResponseEntity<>(ResultObjectInfo.<VideoDto>builder()
                 .status(ResultStatus.SUCCESS)
