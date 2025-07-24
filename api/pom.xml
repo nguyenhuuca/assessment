@@ -301,7 +301,7 @@
                                 <exclude>**/dto/**</exclude>
                                 <exclude>**/exception/**</exclude>
                                 <exclude>**/enums/**</exclude>
-                                <exclude>**/domain/**</exclude>
+                                <exclude>**/entity/**</exclude>
                                 <exclude>**/repo/**</exclude>
                                 <exclude>**/FunnyApp.class</exclude>
                                 <exclude>**/AppConstant.class</exclude>
