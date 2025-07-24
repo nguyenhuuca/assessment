@@ -4,7 +4,7 @@ import com.canhlabs.funnyapp.dto.JwtGenerationDto;
 import com.canhlabs.funnyapp.dto.JwtVerificationResultDto;
 import com.canhlabs.funnyapp.dto.TokenDto;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
-import com.canhlabs.funnyapp.share.exception.UnauthorizedException;
+import com.canhlabs.funnyapp.exception.UnauthorizedException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;

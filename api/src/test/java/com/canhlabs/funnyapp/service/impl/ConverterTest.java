@@ -1,8 +1,8 @@
 // File: src/test/java/com/canhlabs/funnyapp/share/ConverterTest.java
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.domain.ShareLink;
-import com.canhlabs.funnyapp.domain.User;
+import com.canhlabs.funnyapp.entity.ShareLink;
+import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.dto.UserInfoDto;
 import com.canhlabs.funnyapp.dto.VideoDto;

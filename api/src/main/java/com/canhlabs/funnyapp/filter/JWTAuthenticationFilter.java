@@ -2,7 +2,7 @@ package com.canhlabs.funnyapp.filter;
 
 import com.canhlabs.funnyapp.dto.JwtVerificationResultDto;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
-import com.canhlabs.funnyapp.share.exception.UnauthorizedException;
+import com.canhlabs.funnyapp.exception.UnauthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,8 +20,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 
-import static com.canhlabs.funnyapp.share.AppConstant.WebIgnoringConfig.SWAGGER_DOC;
-import static com.canhlabs.funnyapp.share.AppConstant.WebIgnoringConfig.WHITE_LIST_PATH;
+import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.SWAGGER_DOC;
+import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.WHITE_LIST_PATH;
 
 
 /**

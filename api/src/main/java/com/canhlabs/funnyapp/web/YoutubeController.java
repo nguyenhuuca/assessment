@@ -1,8 +1,7 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
-import com.canhlabs.funnyapp.share.AppConstant;
+import com.canhlabs.funnyapp.utils.AppConstant;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.enums.ResultStatus;

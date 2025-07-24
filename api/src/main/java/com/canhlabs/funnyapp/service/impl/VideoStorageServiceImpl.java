@@ -2,14 +2,14 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.canhlabs.funnyapp.domain.VideoSource;
+import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
-import com.canhlabs.funnyapp.share.AppConstant;
-import com.canhlabs.funnyapp.share.LimitedInputStream;
+import com.canhlabs.funnyapp.utils.AppConstant;
+import com.canhlabs.funnyapp.utils.LimitedInputStream;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.FileList;
 import io.opentelemetry.instrumentation.annotations.WithSpan;

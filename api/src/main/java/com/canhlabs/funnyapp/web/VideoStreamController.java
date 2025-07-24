@@ -7,7 +7,7 @@ import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.service.StreamVideoService;
-import com.canhlabs.funnyapp.share.AppConstant;
+import com.canhlabs.funnyapp.utils.AppConstant;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;

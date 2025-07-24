@@ -1,16 +1,16 @@
 // File: src/test/java/com/canhlabs/funnyapp/service/impl/ShareServiceImplTest.java
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.domain.ShareLink;
-import com.canhlabs.funnyapp.domain.User;
+import com.canhlabs.funnyapp.entity.ShareLink;
+import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.repo.ShareLinkRepo;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.canhlabs.funnyapp.share.AppUtils;
+import com.canhlabs.funnyapp.utils.AppUtils;
 import com.canhlabs.funnyapp.dto.ShareRequestDto;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.dto.VideoDto;
-import com.canhlabs.funnyapp.share.exception.CustomException;
+import com.canhlabs.funnyapp.exception.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

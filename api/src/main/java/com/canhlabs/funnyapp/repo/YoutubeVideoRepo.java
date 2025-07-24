@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.repo;
 
-import com.canhlabs.funnyapp.domain.YouTubeVideo;
+import com.canhlabs.funnyapp.entity.YouTubeVideo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

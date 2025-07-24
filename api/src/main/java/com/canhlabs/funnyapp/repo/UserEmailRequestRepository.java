@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.repo;
 
-import com.canhlabs.funnyapp.domain.UserEmailRequest;
+import com.canhlabs.funnyapp.entity.UserEmailRequest;
 import com.canhlabs.funnyapp.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 

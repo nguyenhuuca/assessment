@@ -2,7 +2,7 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.client.YouTubeApiClient;
-import com.canhlabs.funnyapp.domain.YouTubeVideo;
+import com.canhlabs.funnyapp.entity.YouTubeVideo;
 import com.canhlabs.funnyapp.repo.YoutubeVideoRepo;
 import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.dto.VideoDto;
