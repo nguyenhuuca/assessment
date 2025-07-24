@@ -8,6 +8,8 @@ import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.dto.ShareRequestDto;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.enums.ResultStatus;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,8 @@ public class ShareLinkController {
      * @param shareRequestDto hold share url
      * @return detail for video that user shared.
      */
+    @Operation(summary = "Share a video link", description = "Allows users to share a video link by providing the URL and other details.")
+    @WithSpan
     @PostMapping("/share-links")
     public ResponseEntity<ResultObjectInfo<VideoDto>> shareLink(@RequestBody ShareRequestDto shareRequestDto) {
         VideoDto rs = shareService.shareLink(shareRequestDto);
@@ -48,6 +52,8 @@ public class ShareLinkController {
      * Get all shared link return to client
      * @return detail of video that user shared
      */
+    @Operation(summary = "Get all shared links", description = "Fetches all shared video links.")
+    @WithSpan
     @GetMapping("/share-links")
     public ResponseEntity<ResultListInfo<VideoDto>> getShareLink() {
         List<VideoDto> rs = shareService.getALLShare();
@@ -58,6 +64,8 @@ public class ShareLinkController {
     }
 
 
+    @Operation(summary = "Get private shared links", description = "Fetches all private shared video links.")
+    @WithSpan
     @GetMapping("/private-videos")
     public ResponseEntity<ResultListInfo<VideoDto>> getPrivateShareLink() {
         List<VideoDto> rs = shareService.getALLShare();
@@ -67,6 +75,8 @@ public class ShareLinkController {
                 .build(), HttpStatus.OK);
     }
 
+    @Operation(summary = "Delete a shared link", description = "Deletes a shared video link by its ID.")
+    @WithSpan
     @DeleteMapping("/share-links/{videoId}")
     public ResponseEntity<ResultObjectInfo<String>> deleteShareLink(@PathVariable("videoId") Long videoId) {
         String rs = shareService.deleteShareLink(videoId);

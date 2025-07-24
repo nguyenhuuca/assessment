@@ -5,9 +5,11 @@ import com.canhlabs.funnyapp.dto.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
+import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.share.AppConstant;
-import com.canhlabs.funnyapp.enums.ResultStatus;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,14 +29,16 @@ import java.util.List;
 @RequestMapping(AppConstant.API.BASE_URL + "/video-stream")
 @RestController
 public class VideoStreamController {
-    private final long FIRST_CHUNK_SIZE = 256 * 1024; // 256KB
-    private final long NEXT_CHUNK_SIZE = 512 * 1024;  // 512KB
+    private final long FIRST_CHUNK_SIZE = 256 * 1024L; // 256KB
+    private final long NEXT_CHUNK_SIZE = 512 * 1024L;  // 512KB
     private final StreamVideoService videoService;
 
     public VideoStreamController(StreamVideoService videoService) {
         this.videoService = videoService;
     }
 
+    @Operation(summary = "Stream video by fileId", description = "Streams a video file in chunks based on the Range header provided by the client.")
+    @WithSpan
     @GetMapping("/stream/{fileId}")
     public ResponseEntity<StreamingResponseBody> streamVideo(
             @PathVariable String fileId,
@@ -78,8 +82,10 @@ public class VideoStreamController {
                 .body(responseBody);
     }
 
+    @Operation(summary = "Get list of videos to stream", description = "Returns a list of video metadata for streaming.")
+    @WithSpan
     @GetMapping("/list")
-    public ResponseEntity<ResultListInfo<VideoDto>> getTopVideos() {
+    public ResponseEntity<ResultListInfo<VideoDto>> getListVideoStream() {
         log.info("getTopVideos Thread: {}, isVirtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
         List<VideoDto> rs = videoService.getVideosToStream();
         return new ResponseEntity<>(ResultListInfo.<VideoDto>builder()
@@ -88,8 +94,10 @@ public class VideoStreamController {
                 .build(), HttpStatus.OK);
     }
 
+    @Operation(summary = "Get video by ID", description = "Retrieves video metadata by its ID.")
+    @WithSpan
     @GetMapping("/{id}")
-    public ResponseEntity<ResultObjectInfo<VideoDto>> getTopVideos(@PathVariable  Long id) {
+    public ResponseEntity<ResultObjectInfo<VideoDto>> getVideoStream(@PathVariable Long id) {
         VideoDto rs = videoService.getVideoById(id);
         return new ResponseEntity<>(ResultObjectInfo.<VideoDto>builder()
                 .status(ResultStatus.SUCCESS)
