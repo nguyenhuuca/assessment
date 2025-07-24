@@ -12,18 +12,14 @@ import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.share.AppConstant;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-import com.google.api.services.drive.model.Permission;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,10 +55,12 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     public void injectFfmpegService(FfmpegService ffmpegService) {
         this.ffmpegService = ffmpegService;
     }
+
     @Autowired
-    public  void injectVideoCacheStore(VideoCache videoCache) {
+    public void injectVideoCacheStore(VideoCache videoCache) {
         this.videoCache = videoCache;
     }
+
     @Autowired
     public void injectChatGptService(ChatGptService chatGptService) {
         this.chatGptService = chatGptService;
@@ -83,64 +81,19 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     }
 
 
-    @Override
-    @WithSpan
-    public StreamChunkResult getPartialFileByChunk(String fileId, long start, long end) throws IOException {
-        if (videoStorageService.hasChunk(fileId, start, end)) {
-            log.info("🟢 Cache hit: {} ({} - {})", fileId, start, end);
-            return  StreamChunkResult.builder()
-                    .stream(videoStorageService.getChunk(fileId, start, end))
-                    .actualStart(start)
-                    .actualEnd(end)
-                    .build();
-
-        }
-
-        log.info("🔴 Cache miss: fetching {} ({} - {}) from Google Drive", fileId, start, end);
-        InputStream googleStream = fetchFromGoogleDrive(fileId, start, end);
-        try (BufferedInputStream bufferedStream = new BufferedInputStream(googleStream)) {
-            log.info("💾 Saving chunk {} ({} - {}), size ≈ {} bytes", fileId, start, end, (end - start + 1));
-            videoStorageService.saveChunk(fileId, start, end, bufferedStream);
-        } catch (IOException e) {
-            log.warn("⚠️ Failed to save chunk to cache: {} ({} - {}), fallback to direct stream", fileId, start, end);
-            return StreamChunkResult.builder()
-                    .stream(fetchFromGoogleDrive(fileId, start, end))
-                    .actualStart(start)
-                    .actualEnd(end)
-                    .build();
-
-        }
-        return  StreamChunkResult.builder()
-                .stream(videoStorageService.getChunk(fileId, start, end))
-                .actualStart(start)
-                .actualEnd(end)
-                .build();
-    }
-
     @WithSpan
     @Override
     public StreamChunkResult getPartialFileUsingRAF(String fileId, long start, long end) throws IOException {
         InputStream stream = videoCache.getChunkStream(fileId, start, end, () -> {
             log.info("🔴 Cache miss: fetching {} ({} - {}) from disk", fileId, start, end);
-            return  videoStorageService.getFileRangeFromDisk(fileId, start, end).readAllBytes();
+            return videoStorageService.getFileRangeFromDisk(fileId, start, end).readAllBytes();
         });
 
-        return  StreamChunkResult.builder()
+        return StreamChunkResult.builder()
                 .stream(stream)
                 .actualStart(start)
                 .actualEnd(end)
                 .build();
-    }
-
-    @WithSpan
-    InputStream fetchFromGoogleDrive(String fileId, long start, long end) throws IOException {
-        GenericUrl url = new GenericUrl("https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media");
-
-        HttpRequest request = drive.getRequestFactory()
-                .buildGetRequest(url);
-        request.getHeaders().setRange("bytes=" + start + "-" + end);
-        log.info("Start stream from google drive , field {} by range: {}-{} and request {}", fileId, start, end, request);
-        return request.execute().getContent();
     }
 
     @WithSpan
@@ -203,26 +156,26 @@ public class StreamVideoServiceImpl implements StreamVideoService {
             return;
         }
 
-        try(var scope = new StructuredTaskScope<>("download", Thread.ofPlatform().factory())){
+        try (var scope = new StructuredTaskScope<>("download", Thread.ofPlatform().factory())) {
             for (File file : files) {
-               scope.fork(() -> {
-                   java.io.File localFile = new java.io.File(AppConstant.CACHE_DIR, file.getId().concat(".full"));
-                   if (localFile.exists()) {
-                       log.info("✅ File already exists: {}, skipping", file.getName());
-                       return  null;
-                   }
+                scope.fork(() -> {
+                    java.io.File localFile = new java.io.File(AppConstant.CACHE_DIR, file.getId().concat(".full"));
+                    if (localFile.exists()) {
+                        log.info("✅ File already exists: {}, skipping", file.getName());
+                        return null;
+                    }
 
-                   log.info("⬇️ Downloading {} ({} bytes)", file.getName(), file.getSize());
-                   downloadFile(file.getId(), localFile);
-                   log.info("Downloaded file {} completely", file.getName());
-                   // ✅ Generate thumbnail
-                   String imageName = file.getId().concat(".jpg");
-                   String thumbnailPath = Paths.get(appProps.getImageStoragePath().concat("/thumbnails"), imageName).toString();
-                   ffmpegService.generateThumbnail(localFile.getAbsolutePath(), thumbnailPath);
-                   // update info in database
-                   saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""), appProps.getImageUrl().concat("/") + imageName);
-                return   null;
-               });
+                    log.info("⬇️ Downloading {} ({} bytes)", file.getName(), file.getSize());
+                    downloadFile(file.getId(), localFile);
+                    log.info("Downloaded file {} completely", file.getName());
+                    // ✅ Generate thumbnail
+                    String imageName = file.getId().concat(".jpg");
+                    String thumbnailPath = Paths.get(appProps.getImageStoragePath().concat("/thumbnails"), imageName).toString();
+                    ffmpegService.generateThumbnail(localFile.getAbsolutePath(), thumbnailPath);
+                    // update info in database
+                    saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""), appProps.getImageUrl().concat("/") + imageName);
+                    return null;
+                });
             }
             scope.join(); // Wait for all downloads to complete
         } catch (InterruptedException e) {
@@ -243,23 +196,10 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     }
 
     @WithSpan
-    public void downloadFile(String fileId, java.io.File destination) throws IOException {
+     void downloadFile(String fileId, java.io.File destination) throws IOException {
         try (OutputStream out = new FileOutputStream(destination)) {
             drive.files().get(fileId).executeMediaAndDownloadTo(out);
         }
-    }
-
-    @Override
-    @WithSpan
-    public void shareFile(Drive drive, String fileId, String email) throws IOException {
-        Permission permission = new Permission()
-                .setType("user")
-                .setRole("reader")
-                .setEmailAddress(email);
-
-        drive.permissions().create(fileId, permission)
-                .setSendNotificationEmail(false)
-                .execute();
     }
 
     @WithSpan

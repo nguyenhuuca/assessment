@@ -33,15 +33,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
- class StreamVideoServiceImplTest {
+class StreamVideoServiceImplTest {
     @Mock
     private Drive drive;
     @Mock
@@ -69,20 +67,6 @@ import static org.mockito.Mockito.when;
 
     }
 
-    @Test
-    void testGetPartialFileByChunk_CacheHit() throws IOException {
-        String fileId = "file123";
-        long start = 0, end = 10;
-        InputStream mockStream = new ByteArrayInputStream(new byte[]{1, 2, 3});
-        when(videoStorageService.hasChunk(fileId, start, end)).thenReturn(true);
-        when(videoStorageService.getChunk(fileId, start, end)).thenReturn(mockStream);
-
-        StreamChunkResult result = streamVideoService.getPartialFileByChunk(fileId, start, end);
-        assertNotNull(result);
-        assertEquals(start, result.getActualStart());
-        assertEquals(end, result.getActualEnd());
-        assertEquals(mockStream, result.getStream());
-    }
 
     @Disabled
     @Test
@@ -133,45 +117,6 @@ import static org.mockito.Mockito.when;
         VideoDto dto = streamVideoService.getVideoBySourceId("src1");
         assertNotNull(dto);
         assertEquals(1L, dto.getId());
-    }
-
-    @Test
-    void testGetPartialFileByChunk_CacheMiss_SaveSuccess() throws IOException {
-        String fileId = "file456";
-        long start = 0, end = 10;
-        InputStream googleStream = new ByteArrayInputStream(new byte[]{4, 5, 6});
-        InputStream cachedStream = new ByteArrayInputStream(new byte[]{4, 5, 6});
-        when(videoStorageService.hasChunk(fileId, start, end)).thenReturn(false);
-        // Mock fetchFromGoogleDrive via spy
-        StreamVideoServiceImpl spyService = spy(streamVideoService);
-        doReturn(googleStream).when(spyService).fetchFromGoogleDrive(fileId, start, end);
-        doNothing().when(videoStorageService).saveChunk(eq(fileId), eq(start), eq(end), any(InputStream.class));
-        when(videoStorageService.getChunk(fileId, start, end)).thenReturn(cachedStream);
-
-        StreamChunkResult result = spyService.getPartialFileByChunk(fileId, start, end);
-        assertNotNull(result);
-        assertEquals(start, result.getActualStart());
-        assertEquals(end, result.getActualEnd());
-        assertEquals(cachedStream, result.getStream());
-    }
-
-    @Test
-    void testGetPartialFileByChunk_CacheMiss_SaveFails() throws IOException {
-        String fileId = "file789";
-        long start = 0, end = 10;
-        InputStream googleStream = new ByteArrayInputStream(new byte[]{7, 8, 9});
-        InputStream fallbackStream = new ByteArrayInputStream(new byte[]{7, 8, 9});
-        when(videoStorageService.hasChunk(fileId, start, end)).thenReturn(false);
-        StreamVideoServiceImpl spyService = spy(streamVideoService);
-        lenient().doReturn(googleStream).when(spyService).fetchFromGoogleDrive(fileId, start, end);
-        doThrow(new IOException("fail")).when(videoStorageService).saveChunk(eq(fileId), eq(start), eq(end), any(InputStream.class));
-        doReturn(fallbackStream).when(spyService).fetchFromGoogleDrive(fileId, start, end);
-
-        StreamChunkResult result = spyService.getPartialFileByChunk(fileId, start, end);
-        assertNotNull(result);
-        assertEquals(start, result.getActualStart());
-        assertEquals(end, result.getActualEnd());
-        assertEquals(fallbackStream, result.getStream());
     }
 
     @Test
@@ -248,24 +193,7 @@ import static org.mockito.Mockito.when;
         dest.getParentFile().delete();
     }
 
-    @Test
-    void testShareFile_Success() throws Exception {
-        Drive.Permissions permissions = mock(Drive.Permissions.class);
-        Drive.Permissions.Create create = mock(Drive.Permissions.Create.class);
-        when(drive.permissions()).thenReturn(permissions);
-        when(permissions.create(anyString(), any())).thenReturn(create);
-        when(create.setSendNotificationEmail(false)).thenReturn(create);
-        when(create.execute()).thenReturn(null);
-        streamVideoService.shareFile(drive, "fileId", "test@example.com");
-        verify(permissions).create(eq("fileId"), any());
-    }
 
-    @Test
-    void testShareFilesInFolder_HandlesIOException() throws Exception {
-        StreamVideoServiceImpl spyService = spy(streamVideoService);
-        doThrow(new IOException("fail")).when(spyService).listFilesInFolder(any(Drive.class), anyString());
-        spyService.shareFilesInFolder(); // Should log error, not throw
-    }
 
     @Test
     void testShareFilesInFolder_Success() throws Exception {
