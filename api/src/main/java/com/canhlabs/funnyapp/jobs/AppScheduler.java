@@ -61,19 +61,19 @@ public class AppScheduler {
 
     @Scheduled(fixedRate = 5 * 60000)
     public void logStats() {
-        log.info("📝 Cron-based stats log every 5 minutes for logStats");
-        log.info("📊 Total hits: {}, Total misses: {}", statsCache.getTotalHits(), statsCache.getTotalMisses());
+        log.info("Cron-based stats log every 5 minutes for logStats");
+        log.info("Total hits: {}, Total misses: {}", statsCache.getTotalHits(), statsCache.getTotalMisses());
         for (Map.Entry<String, CacheStat> entry : statsCache.getFileStats().entrySet()) {
             String fileId = entry.getKey();
             CacheStat stat = entry.getValue();
-            log.info("🎯 fileId: {}, hits: {}, misses: {}, hitRatio: {}%",
+            log.info("fileId: {}, hits: {}, misses: {}, hitRatio: {}%",
                     fileId, stat.getHits(), stat.getMisses(), statsCache.calculateRatio());
         }
     }
 
     @Scheduled(cron = "0 */15 * * * *") // every 20 minutes
     public void syncDriveVideos() {
-        log.info("📥 Syncing Google Drive folder...");
+        log.info("Syncing Google Drive folder...");
         Instant fifteenMinutesAgo = Instant.now().minus(Duration.ofMinutes(60));
         // iso format: "2025-01-01T00:00:00Z"
         String isoTime = DateTimeFormatter.ISO_INSTANT.format(fifteenMinutesAgo);

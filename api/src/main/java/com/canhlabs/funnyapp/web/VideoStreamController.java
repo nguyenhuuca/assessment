@@ -46,8 +46,8 @@ public class VideoStreamController {
     ) throws IOException {
 
         long startTime = System.currentTimeMillis();
-        log.info("▶️ Thread: {}, Virtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
-        log.info("🔽 Incoming stream request for fileId: {}", fileId);
+        log.info("Thread: {}, Virtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
+        log.info("Incoming stream request for fileId: {}", fileId);
 
         long fileSize = videoService.getFileSize(fileId);
         long start = 0;
@@ -57,7 +57,7 @@ public class VideoStreamController {
         if (range != null) {
             start = range.start();
             end = range.end();
-            log.info("📦 Streaming bytes {} to {}", start, end);
+            log.info("Streaming bytes {} to {}", start, end);
         }
         StreamChunkResult streamRs = videoService.getPartialFileUsingRAF(fileId, start, end);
         InputStream stream = streamRs.getStream();
@@ -72,7 +72,7 @@ public class VideoStreamController {
         };
 
         long contentLength = streamRs.getActualEnd() - streamRs.getActualStart() + 1;
-        log.info("✅ Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
+        log.info("Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
@@ -107,7 +107,7 @@ public class VideoStreamController {
 
     private Range parseRangeHeader(String rangeHeader, long fileSize) {
         if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
-            log.info("📥 Range header: {}", rangeHeader);
+            log.info("Range header: {}", rangeHeader);
             String[] ranges = rangeHeader.substring(6).split("-");
             try {
                 long start = Long.parseLong(ranges[0]);

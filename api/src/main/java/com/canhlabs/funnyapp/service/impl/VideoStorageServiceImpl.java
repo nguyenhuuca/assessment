@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
@@ -123,14 +125,14 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 scope.fork(() -> {
                     java.io.File localFile = new java.io.File(AppConstant.CACHE_DIR, file.getId().concat(EXTENSION));
                     if (localFile.exists()) {
-                        log.info("✅ File already exists: {}, skipping", file.getName());
+                        log.info("File already exists: {}, skipping", file.getName());
                         return null;
                     }
 
-                    log.info("⬇️ Downloading {} ({} bytes)", file.getName(), file.getSize());
+                    log.info("Downloading {} ({} bytes)", file.getName(), file.getSize());
                     downloadFile(file.getId(), localFile);
                     log.info("Downloaded file {} completely", file.getName());
-                    // ✅ Generate thumbnail
+                    // Generate thumbnail
                     String imageName = file.getId().concat(".jpg");
                     String thumbnailPath = Paths.get(appProps.getImageStoragePath().concat("/thumbnails"), imageName).toString();
                     ffmpegService.generateThumbnail(localFile.getAbsolutePath(), thumbnailPath);
@@ -145,6 +147,18 @@ public class VideoStorageServiceImpl implements VideoStorageService {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @WithSpan
+    @Override
+    public void deleteIfEligible(String fileId) {
+        // AppConstant.CACHE_DIR, file.getId().concat(EXTENSION)
+        Path filePath = Paths.get(AppConstant.CACHE_DIR, fileId.concat(EXTENSION));
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            log.error("Failed to delete file {}: {}", filePath, e.getMessage(), e);
+        }
     }
 
     @WithSpan

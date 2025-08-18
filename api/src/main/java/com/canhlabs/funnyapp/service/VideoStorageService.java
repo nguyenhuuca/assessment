@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 
 public interface VideoStorageService {
 
@@ -17,5 +18,13 @@ public interface VideoStorageService {
      * @throws IOException If an error occurs while downloading the file.
      */
     void downloadFileFromFolder(String folderId, String uploadedAfter) throws IOException;
+
+
+    /**
+     * Deletes a file if it is eligible for deletion based on its last access time.
+     *
+     * @param fileId The ID of the file to delete.
+     */
+    void deleteIfEligible(String fileId);
 
 }

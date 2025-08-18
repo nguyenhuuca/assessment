@@ -73,9 +73,9 @@ public class VideoCacheImpl implements VideoCache {
             if (start == 0 && hits >= CACHE_THRESHOLD) {
                 chunkCache.put(key, data);
                 accessCounter.remove(key);
-                log.info("🔥 [CACHED] Chunk {} ({} - {}) after {} hits", fileId, start, end, hits);
+                log.info("[CACHED] Chunk {} ({} - {}) after {} hits", fileId, start, end, hits);
             } else {
-                log.warn("⏳ [MISS] Chunk {} ({} - {}) hit count = {}", fileId, start, end, hits);
+                log.warn("[MISS] Chunk {} ({} - {}) hit count = {}", fileId, start, end, hits);
             }
 
             return new ByteArrayInputStream(data);
@@ -90,6 +90,6 @@ public class VideoCacheImpl implements VideoCache {
     public void invalidateAllChunks() {
         chunkCache.invalidateAll();
         accessCounter.clear();
-        log.info("🔄 Cache & counter cleared");
+        log.info("Cache & counter cleared");
     }
 }

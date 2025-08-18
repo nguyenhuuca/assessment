@@ -16,7 +16,7 @@
 
 ---
 
-## 🔥 Overview
+##  Overview
 
 **Funny Movies** is a modern web application built with **Java 24** and **Spring Boot 3.x**, designed to deliver **high-performance video experiences**.
 
@@ -29,7 +29,7 @@
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
 | Technology            | Description                                                 |
 |-----------------------|-------------------------------------------------------------|
@@ -44,7 +44,7 @@
 
 ---
 
-## ⚙️ Why Virtual Threads & StructuredTaskScope?
+##  Why Virtual Threads & StructuredTaskScope?
 
 Thanks to **Project Loom**, Funny Movies uses **Virtual Threads** and `StructuredTaskScope` to handle thousands of concurrent tasks efficiently, especially for I/O-heavy operations like:
 
@@ -53,7 +53,7 @@ Thanks to **Project Loom**, Funny Movies uses **Virtual Threads** and `Structure
 - Sending emails  
 - Writing logs & analytics  
 
-### ✅ Benefits:
+###  Benefits:
 
 - Minimal memory usage  
 - Fast context switching  
@@ -75,7 +75,7 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
 
 ---
 
-## 🧠 How ChatGPT Works
+## How ChatGPT Works
 
 We integrate OpenAI's ChatGPT API to:
 
@@ -86,11 +86,11 @@ We integrate OpenAI's ChatGPT API to:
 
 ---
 
-## 🔐 Passwordless Login via Magic Link
+##  Passwordless Login via Magic Link
 
 **Funny Movies** uses a modern, secure, and frictionless login system:
 
-> ✅ **No passwords. No reset flows. Just a click.**
+> **No passwords. No reset flows. Just a click.**
 
 ### How it works:
 
@@ -100,17 +100,17 @@ We integrate OpenAI's ChatGPT API to:
 
 ### Benefits:
 
-- 🚫 No password reuse or phishing risks  
-- 📬 Email-based identity = simple  
-- 🔒 Secure, expirable tokens with device binding
+-  No password reuse or phishing risks  
+-  Email-based identity = simple  
+-  Secure, expirable tokens with device binding
 
 > Powered by JWT & one-time secure tokens.
 
 ---
 
-## 🛠️ Setup & Installation
+##  Setup & Installation
 
-### 🧰 Requirements
+###  Requirements
 
 - **JDK 24** (with preview features enabled)  
 - **Maven 3.6+**  
@@ -120,14 +120,14 @@ We integrate OpenAI's ChatGPT API to:
 
 ---
 
-### 🗃️ Database Setup
+###  Database Setup
 
 1. Create a PostgreSQL database named `funnyapp`
 2. Run `db/dump.sql` to create the schema & tables
 
 ---
 
-### ▶️ Running App Locally
+###  Running App Locally
 
 #### 1. Configure environment variables
 
@@ -160,8 +160,8 @@ cd api
 
 #### 3. Access endpoints
 
-- ✅ Swagger UI: [http://localhost:8081/swagger-ui/](http://localhost:8081/swagger-ui/)  
-- ✅ Health Check: [http://localhost:8081/actuator/health](http://localhost:8081/actuator/health)
+-  Swagger UI: [http://localhost:8081/swagger-ui/](http://localhost:8081/swagger-ui/)  
+-  Health Check: [http://localhost:8081/actuator/health](http://localhost:8081/actuator/health)
 
 #### 4. Web UI
 
@@ -176,7 +176,7 @@ const baseURL = "http://localhost:8081/v1/funny-app";
 
 ---
 
-### ✅ Run Unit Tests
+###  Run Unit Tests
 
 ```bash
 cd api
@@ -187,6 +187,6 @@ cd api
 
 ---
 
-## 🌍 Online Demo
+##  Online Demo
 
 🔗 [https://funnyapp.canh-labs.com/](https://funnyapp.canh-labs.com/)
