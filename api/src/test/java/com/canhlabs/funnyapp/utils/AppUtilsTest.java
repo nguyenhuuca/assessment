@@ -57,4 +57,28 @@ class AppUtilsTest {
 
         SecurityContextHolder.clearContext();
     }
+
+    @Test
+    void getNonNull_returnsEmptyString_whenNull() {
+        assertThat(AppUtils.getNonNull(null)).isEqualTo("");
+    }
+
+    @Test
+    void getNonNull_returnsString_whenNotNull() {
+        assertThat(AppUtils.getNonNull(123)).isEqualTo("123");
+        assertThat(AppUtils.getNonNull("abc")).isEqualTo("abc");
+    }
+
+    @Test
+    void isValidEmail_returnsTrue_forValidEmail() {
+        assertThat(AppUtils.isValidEmail("test@example.com")).isTrue();
+        assertThat(AppUtils.isValidEmail("user.name+tag@domain.co.uk")).isTrue();
+    }
+
+    @Test
+    void isValidEmail_returnsFalse_forInvalidEmail() {
+        assertThat(AppUtils.isValidEmail("invalid-email")).isFalse();
+        assertThat(AppUtils.isValidEmail("@no-local-part.com")).isFalse();
+        assertThat(AppUtils.isValidEmail(null)).isFalse();
+    }
 }
