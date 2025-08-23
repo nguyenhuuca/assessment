@@ -6,13 +6,17 @@ LAYOUT_WITH_LEGEND()
 title Video Streaming System - Container Diagram
 
 Person(user, "User", "Watches videos via browser")
+System_Ext(redis, "Redis (future)", "Planned external cache")
+System_Ext(mon, "Monitoring", "Grafana Cloud")
+System_Ext(drive, "Google Drive", "Stores source video files")
 
 Enterprise_Boundary(system, "Video Streaming System") {
 
   Container(fe, "Frontend", "Vanilla JS + Bootstrap", "Web UI served via Nginx")
   Container(be, "Backend", "Spring Boot", "Handles REST API, streaming, caching, cron jobs")
   ContainerDb(db, "PostgreSQL", "Relational DB", "Stores video metadata")
-  Container(mon, "Monitoring", "OTel + Prometheus + Grafana Cloud", "Metrics, logs, traces")
+  'Container(mon, "Monitoring", "OTel + Prometheus + Grafana Cloud", "Metrics, logs, traces")
+
 }
 
 Lay_R(user, fe)
@@ -21,6 +25,9 @@ Rel(user, fe, "Uses")
 Rel(fe, be, "Calls REST API (e.g., /stream/{id})")
 Rel(be, fe, "Streams video content (HTTP 206)")
 Rel(be, db, "Reads/Writes")
-Rel(be, mon, "Sends telemetry")
+Rel_L(be, mon, "Sends telemetry")
+Rel_R(be, redis, "cache chunks", "")
+Rel_D(be, drive, "Downloads videos", "cron job")
+
 
 @enduml

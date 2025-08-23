@@ -7,9 +7,10 @@ title Backend - Component Diagram
 
 Person(user, "User", "Watches videos via browser")
 
-System_Ext(db, "PostgreSQL", "Relational DB")
+'System_Ext(db, "PostgreSQL", "Relational DB")
 System_Ext(redis, "Redis (future)", "Planned external cache")
 System_Ext(monitor, "Monitoring", "OTel + Grafana Cloud")
+System_Ext(drive, "Google Drive", "Stores source video files")
 
 Container_Boundary(be, "Backend (Spring Boot)") {
 
@@ -18,6 +19,7 @@ Container_Boundary(be, "Backend (Spring Boot)") {
   Component(cache, "VideoChunkCache", "Guava In-Memory Cache", "Caches video chunks by fileId + byte range")
   Component(job, "CronJobScheduler", "Scheduled Job", "Downloads videos from Google Drive")
   Component(repo, "VideoRepository", "Spring Data JPA", "Accesses video metadata in DB")
+  ContainerDb(db, "PostgreSQL", "Relational DB", "Stores video metadata")
 }
 
 Rel(user, api, "Calls")
@@ -30,5 +32,6 @@ Rel(repo, db, "Reads/Writes")
 Rel(job, repo, "Saves video info")
 Rel(service, redis, "Planned: use Redis for cache", "Future")
 Rel(be, monitor, "Sends metrics/traces/logs")
+Rel_L(job, drive, "Downloads videos", "cron job")
 
 @enduml
