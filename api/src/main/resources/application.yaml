@@ -17,6 +17,7 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+    open-in-view: false
   mail:
     host: smtp.gmail.com
     port: 587
