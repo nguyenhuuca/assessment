@@ -39,8 +39,6 @@ public class WebSecurityConfig {
                     // Whitelisted endpoints
                     AppConstant.WebIgnoringConfig.WHITE_LIST_PATH.forEach(item -> auth.requestMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()).permitAll());
                     auth.requestMatchers(swaggerWhiteList).permitAll();
-                    auth.requestMatchers("/v1/funny-app/videos/*/comments").permitAll();
-                    auth.requestMatchers("/v1/funny-app/comments/*").permitAll();
                     auth.anyRequest().permitAll();
 
                 })
