@@ -4,9 +4,14 @@ import com.canhlabs.funnyapp.aop.RateLimited;
 import com.canhlabs.funnyapp.dto.CommentNode;
 import com.canhlabs.funnyapp.dto.CreateCommentRequest;
 import com.canhlabs.funnyapp.dto.CreateCommentResponse;
+import com.canhlabs.funnyapp.dto.VideoDto;
+import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
+import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
+import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.service.impl.VideoCommentServiceImpl;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,17 +36,23 @@ public class CommentController {
     }
 
     @GetMapping("/videos/{videoId}/comments")
-    public ResponseEntity<List<CommentNode>> getComments(@PathVariable String videoId) {
-        return ResponseEntity.ok(service.getNestedComments(videoId));
+    public ResponseEntity<ResultListInfo<CommentNode>> getComments(@PathVariable String videoId) {
+        return new ResponseEntity<>(ResultListInfo.<CommentNode>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(service.getNestedComments(videoId))
+                .build(), HttpStatus.OK);
     }
 
     @RateLimited(permit = 5, windowInSeconds = 60) // 5 requests per minute
     @PostMapping("/videos/{videoId}/comments")
-    public ResponseEntity<CreateCommentResponse> create(
+    public ResponseEntity<ResultObjectInfo<CreateCommentResponse>> create(
             @PathVariable String videoId,
             @Valid @RequestBody CreateCommentRequest req
     ) {
-        return ResponseEntity.ok(service.createComment(videoId, req));
+            return new ResponseEntity<>(ResultObjectInfo.<CreateCommentResponse>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(service.createComment(videoId, req))
+                .build(), HttpStatus.OK);
     }
 
     /**
@@ -49,11 +60,14 @@ public class CommentController {
      * Guests must send header: X-Guest-Token: <token>
      */
     @DeleteMapping("/comments/{id}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<ResultObjectInfo<String>> delete(
             @PathVariable String id,
             @RequestHeader(name = "X-Guest-Token", required = false) String guestToken
     ) {
         service.deleteComment(UUID.fromString(id), guestToken);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(ResultObjectInfo.<String>builder()
+                .status(ResultStatus.SUCCESS)
+                .data("Comment deleted")
+                .build(), HttpStatus.OK);
     }
 }
