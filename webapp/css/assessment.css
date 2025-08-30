@@ -2065,17 +2065,41 @@ body.modal-open {
 .comment-item {
     margin-bottom: 18px;
 }
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
 .comment-author {
     font-weight: 600;
     color: #4dabf7;
     font-size: 0.97rem;
-    margin-bottom: 2px;
+}
+.delete-comment-btn {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+}
+.delete-comment-btn:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    transform: scale(1.1);
 }
 .comment-text {
     color: #fff;
     font-size: 1rem;
     line-height: 1.4;
     word-break: break-word;
+}
+.comment-time {
+    color: #888;
+    font-size: 0.8rem;
+    margin-top: 4px;
 }
 .comment-panel-input {
     display: flex;

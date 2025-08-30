@@ -572,12 +572,212 @@ const VideoActions = {
     },
 
     showComments(containerId) {
+        // Lưu containerId hiện tại
+        this.currentCommentContainerId = containerId;
         // Hiển thị modal comment panel bên phải
         document.getElementById('commentPanelModal').classList.add('active');
+        // TODO: Load comments for current video
+        this.loadComments(containerId);
     },
 
     closeCommentPanel() {
         document.getElementById('commentPanelModal').classList.remove('active');
+        this.currentCommentContainerId = null;
+    },
+
+    loadComments(containerId) {
+        const currentVideo = this.getCurrentVideo();
+        if (!currentVideo) return;
+
+        // Hiển thị loading
+        const commentList = document.querySelector('.comment-panel-list');
+        if (commentList) {
+            commentList.innerHTML = '<div class="text-center text-muted mt-4"><div class="spinner-border spinner-border-sm" role="status"></div> Đang tải bình luận...</div>';
+        }
+
+        $.ajax({
+            url: appConst.baseUrl.concat(`/videos/${currentVideo.id}/comments`),
+            type: "GET",
+            dataType: "json"
+        }).done((rs) => {
+            console.log('Comments response:', rs);
+            // Lấy comments từ rs.data
+            const comments = Array.isArray(rs.data) ? rs.data : [];
+            this.renderComments(comments);
+        }).fail((err) => {
+            console.error('Failed to load comments:', err);
+            const commentList = document.querySelector('.comment-panel-list');
+            if (commentList) {
+                commentList.innerHTML = '<div class="text-center text-muted mt-4">Không thể tải bình luận</div>';
+            }
+        });
+    },
+
+    renderComments(comments) {
+        const commentList = document.querySelector('.comment-panel-list');
+        if (!commentList) return;
+
+        // Đảm bảo comments là array
+        if (!Array.isArray(comments) || comments.length === 0) {
+            commentList.innerHTML = '<div class="text-center text-muted mt-4">Chưa có bình luận nào</div>';
+            return;
+        }
+
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const jwt = localStorage.getItem('jwt');
+        const currentGuestToken = localStorage.getItem('guestToken');
+
+        const commentsHtml = comments.map(comment => {
+            const isOwnComment = (jwt && comment.userId === currentUser.email) || 
+                                (!jwt && comment.guestToken === currentGuestToken);
+            
+            // Tạo tên Anonymous1, Anonymous2... cho anonymous users dựa trên guestToken
+            let authorDisplay;
+            if (comment.guestName && comment.guestToken) {
+                // Tạo số thứ tự từ guestToken để mỗi anonymous user có tên khác nhau
+                const hash = this.hashCode(comment.guestToken);
+                const anonymousNumber = Math.abs(hash % 1000) + 1; // 1-1000
+                authorDisplay = `Anonymous${anonymousNumber}`;
+            } else if (comment.userId) {
+                authorDisplay = comment.userId;
+            } else {
+                authorDisplay = 'Anonymous';
+            }
+            
+            return `
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <div class="comment-author">${authorDisplay}</div>
+                        ${isOwnComment ? `<button class="delete-comment-btn" onclick="VideoActions.deleteComment('${comment.id}')" title="Xóa bình luận"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                    <div class="comment-text">${comment.content}</div>
+                    <div class="comment-time">${this.formatCommentTime(comment.createdAt)}</div>
+                </div>
+            `;
+        }).join('');
+
+        commentList.innerHTML = commentsHtml;
+    },
+
+    // Hàm tạo hash từ string để tạo tên ngẫu nhiên
+    hashCode(str) {
+        let hash = 0;
+        if (str.length === 0) return hash;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash;
+    },
+
+    formatCommentTime(createdAt) {
+        const date = new Date(createdAt);
+        const now = new Date();
+        const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+        
+        if (diffInMinutes < 1) return 'Vừa xong';
+        if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
+        if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} giờ trước`;
+        return date.toLocaleDateString('vi-VN');
+    },
+
+    deleteComment(commentId) {
+        if (!confirm('Bạn có chắc muốn xóa bình luận này?')) return;
+
+        const currentVideo = this.getCurrentVideo();
+        if (!currentVideo) return;
+
+        $.ajax({
+            url: appConst.baseUrl.concat(`/videos/${currentVideo.id}/comments/${commentId}`),
+            type: "DELETE",
+            dataType: "json"
+        }).done(() => {
+            showMessage('Đã xóa bình luận thành công!', 'success');
+            // Reload comments
+            this.loadComments(this.currentCommentContainerId);
+        }).fail((err) => {
+            showMessage(err.responseJSON?.error?.message || 'Không thể xóa bình luận', 'error');
+        });
+    },
+
+    sendComment() {
+        const commentInput = document.getElementById('commentInput');
+        const content = commentInput.value.trim();
+        
+        if (!content) {
+            showMessage('Vui lòng nhập nội dung bình luận', 'error');
+            return;
+        }
+
+        const currentVideo = this.getCurrentVideo();
+        if (!currentVideo) {
+            showMessage('Không tìm thấy video hiện tại', 'error');
+            return;
+        }
+
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const jwt = localStorage.getItem('jwt');
+        
+        const commentData = {
+            content: content,
+            parentId: null // Có thể mở rộng cho reply comment sau
+        };
+
+        // Xử lý user đã login vs chưa login
+        if (jwt && currentUser.email) {
+            commentData.userId = currentUser.email;
+            commentData.guestName = null;
+        } else {
+            commentData.userId = null;
+            commentData.guestName = 'anonymous';
+        }
+
+        // Hiển thị loading
+        const sendBtn = document.getElementById('sendCommentBtn');
+        const originalText = sendBtn.textContent;
+        sendBtn.textContent = 'Đang gửi...';
+        sendBtn.disabled = true;
+
+        $.ajax({
+            url: appConst.baseUrl.concat(`/videos/${currentVideo.id}/comments`),
+            type: "POST",
+            data: JSON.stringify(commentData),
+            contentType: "application/json",
+            dataType: "json"
+        }).done((rs) => {
+            // Lưu guestToken nếu có
+            if (rs.data.guestToken) {
+                localStorage.setItem('guestToken', rs.data.guestToken);
+                // Cập nhật header cho các request tiếp theo
+                Auth.initAjaxHeaders();
+            }
+            
+            // Clear input và reload comments
+            commentInput.value = '';
+            this.loadComments(this.currentCommentContainerId);
+            showMessage('Bình luận đã được gửi thành công!', 'success');
+        }).fail((err) => {
+            showMessage(err.responseJSON?.error?.message || 'Có lỗi xảy ra khi gửi bình luận', 'error');
+        }).always(() => {
+            // Reset button
+            sendBtn.textContent = originalText;
+            sendBtn.disabled = false;
+        });
+    },
+
+    getCurrentVideo() {
+        // Lấy video hiện tại từ container đang active
+        const containerId = this.getCurrentContainerId();
+        if (!containerId || !this.videos[containerId]) return null;
+        
+        const currentIndex = this.currentVideoIndex[containerId];
+        return this.videos[containerId][currentIndex];
+    },
+
+    getCurrentContainerId() {
+        // Trả về containerId đã lưu khi mở comment panel
+        return this.currentCommentContainerId;
     },
 
     shareVideo(containerId) {
@@ -850,6 +1050,18 @@ $(document).ready(function() {
     // Clear currentDeleteVideoId when modal is closed
     $('#deleteConfirmModal').on('hidden.bs.modal', function () {
         VideoService.currentDeleteVideoId = null;
+    });
+
+    // Handle comment send button
+    $('#sendCommentBtn').on('click', function() {
+        VideoActions.sendComment();
+    });
+
+    // Handle comment input enter key
+    $('#commentInput').on('keypress', function(e) {
+        if (e.which === 13) { // Enter key
+            VideoActions.sendComment();
+        }
     });
 });
 
