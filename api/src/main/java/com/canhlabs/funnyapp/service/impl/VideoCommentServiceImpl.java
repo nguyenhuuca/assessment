@@ -64,7 +64,7 @@ public class VideoCommentServiceImpl {
 
         VideoComment saved = repo.save(VideoComment.builder()
                 .videoId(videoId)
-                .userId(isGuest ? null : req.getUserId())
+                .userId(isGuest ? "" : req.getUserId())
                 .guestName(isGuest ? req.getGuestName() : null)
                 .guestTokenHash(isGuest ? tokenHash : null)
                 .content(req.getContent())
