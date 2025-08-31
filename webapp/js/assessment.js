@@ -626,18 +626,32 @@ const VideoActions = {
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         const jwt = localStorage.getItem('jwt');
         const currentGuestToken = localStorage.getItem('guestToken');
+        const guestNameFromCookie = localStorage.getItem('guestName');
 
         const commentsHtml = comments.map(comment => {
-            const isOwnComment = (jwt && comment.userId === currentUser.email) || 
-                                (!jwt && comment.guestToken === currentGuestToken);
+            // Tính số từ currentGuestToken để so sánh
+            let currentAnonymousNumber = null;
+            let guestNameGenerated = comment.guestName;
+            if (!jwt && currentGuestToken) {
+                const hash = this.hashCode(currentGuestToken);
+                currentAnonymousNumber = Math.abs(hash % 1000) + 1;
+                guestNameGenerated = `${comment.guestName}${currentAnonymousNumber}`;
+            }
             
-            // Tạo tên Anonymous1, Anonymous2... cho anonymous users dựa trên guestToken
+            // So sánh dựa trên số trong guestName
+            const isOwnComment = (jwt && comment.userId === currentUser.email) || 
+                                (!jwt && comment.guestName && comment.guestName.includes('Anonymous') && 
+                                 currentAnonymousNumber && guestNameGenerated === guestNameFromCookie);
+            
+            // Tạo tên Anonymous1, Anonymous2... cho anonymous users dựa trên guestName đã lưu
             let authorDisplay;
-            if (comment.guestName && comment.guestToken) {
-                // Tạo số thứ tự từ guestToken để mỗi anonymous user có tên khác nhau
-                const hash = this.hashCode(comment.guestToken);
-                const anonymousNumber = Math.abs(hash % 1000) + 1; // 1-1000
-                authorDisplay = `Anonymous${anonymousNumber}`;
+            if (comment.guestName) {
+                // Sử dụng guestName đã được generate và lưu
+                if(isOwnComment) {
+                    authorDisplay = guestNameFromCookie
+                } else {
+                    authorDisplay = comment.guestName;
+                }
             } else if (comment.userId) {
                 authorDisplay = comment.userId;
             } else {
@@ -701,6 +715,44 @@ const VideoActions = {
         });
     },
 
+    appendNewComment(commentData) {
+        const commentList = document.querySelector('.comment-panel-list');
+        if (!commentList) return;
+
+        // Kiểm tra nếu commentList đang hiển thị "Chưa có bình luận nào"
+        if (commentList.innerHTML.includes('Chưa có bình luận nào')) {
+            commentList.innerHTML = '';
+        }
+
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const jwt = localStorage.getItem('jwt');
+        const currentGuestName = localStorage.getItem('guestName');
+        const currentGuestToken = localStorage.getItem('guestToken');
+
+        // Sử dụng data từ input thay vì từ API response
+        const commentContent = commentData.content || '';
+        const commentId = commentData.id;
+        const guestName = currentGuestName || commentData.guestName;
+        const userId = currentUser.email || commentData.userId;
+
+        // Tạo comment HTML mới - comment mới luôn là của chính mình
+        const isOwnComment = true; // Comment mới vừa được tạo bởi user hiện tại
+
+        const commentHtml = `
+            <div class="comment-item">
+                <div class="comment-header">
+                    <div class="comment-author">${guestName || userId || 'Anonymous'}</div>
+                    ${isOwnComment ? `<button class="delete-comment-btn" onclick="VideoActions.deleteComment('${commentId}')" title="Xóa bình luận"><i class="fas fa-trash"></i></button>` : ''}
+                </div>
+                <div class="comment-text">${commentContent}</div>
+                <div class="comment-time">Vừa xong</div>
+            </div>
+        `;
+
+        // Append vào đầu list (comment mới nhất ở trên cùng)
+        commentList.insertAdjacentHTML('afterbegin', commentHtml);
+    },
+
     sendComment() {
         const commentInput = document.getElementById('commentInput');
         const content = commentInput.value.trim();
@@ -730,7 +782,7 @@ const VideoActions = {
             commentData.guestName = null;
         } else {
             commentData.userId = null;
-            commentData.guestName = 'anonymous';
+            commentData.guestName = 'Anonymous';
         }
 
         // Hiển thị loading
@@ -739,23 +791,53 @@ const VideoActions = {
         sendBtn.textContent = 'Đang gửi...';
         sendBtn.disabled = true;
 
+        // Chuẩn bị headers
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        // Thêm X-Guest-Token nếu có (để server biết user cũ hay mới)
+        const existingGuestToken = localStorage.getItem('guestToken');
+        if (existingGuestToken) {
+            headers['X-Guest-Token'] = existingGuestToken;
+        }
+
         $.ajax({
             url: appConst.baseUrl.concat(`/videos/${currentVideo.id}/comments`),
             type: "POST",
             data: JSON.stringify(commentData),
             contentType: "application/json",
-            dataType: "json"
+            dataType: "json",
+            headers: headers
         }).done((rs) => {
             // Lưu guestToken nếu có
             if (rs.data.guestToken) {
                 localStorage.setItem('guestToken', rs.data.guestToken);
+                
+                // Generate và lưu guestName cho anonymous user
+                if (!jwt) {
+                    const hash = this.hashCode(rs.data.guestToken);
+                    const anonymousNumber = Math.abs(hash % 1000) + 1;
+                    const guestName = `Anonymous${anonymousNumber}`;
+                    localStorage.setItem('guestName', guestName);
+                }
+                
                 // Cập nhật header cho các request tiếp theo
                 Auth.initAjaxHeaders();
             }
             
-            // Clear input và reload comments
+            // Lấy content trước khi clear input
+            const commentContent = commentInput.value;
+            
+            // Clear input
             commentInput.value = '';
-            this.loadComments(this.currentCommentContainerId);
+            
+            // Append comment mới vào list thay vì reload
+            this.appendNewComment({
+                id: rs.data.id,
+                content: commentContent
+            });
+            
             showMessage('Bình luận đã được gửi thành công!', 'success');
         }).fail((err) => {
             showMessage(err.responseJSON?.error?.message || 'Có lỗi xảy ra khi gửi bình luận', 'error');
