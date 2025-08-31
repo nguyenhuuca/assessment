@@ -47,11 +47,12 @@ public class CommentController {
     @PostMapping("/videos/{videoId}/comments")
     public ResponseEntity<ResultObjectInfo<CreateCommentResponse>> create(
             @PathVariable String videoId,
+            @RequestHeader(name = "X-Guest-Token", required = false) String guestToken,
             @Valid @RequestBody CreateCommentRequest req
     ) {
             return new ResponseEntity<>(ResultObjectInfo.<CreateCommentResponse>builder()
                 .status(ResultStatus.SUCCESS)
-                .data(service.createComment(videoId, req))
+                .data(service.createComment(videoId, req, guestToken))
                 .build(), HttpStatus.OK);
     }
 

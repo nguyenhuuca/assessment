@@ -52,28 +52,28 @@ public class VideoCommentServiceImpl {
     }
 
     @Transactional
-    public CreateCommentResponse createComment(String videoId, CreateCommentRequest req) {
+    public CreateCommentResponse createComment(String videoId, CreateCommentRequest req, String guestToken) {
         boolean isGuest = (req.getUserId() == null || req.getUserId().isBlank());
-        String plainToken = null;
-        String tokenHash = null;
 
-        if (isGuest) {
-            plainToken = UUID.randomUUID().toString();
-            tokenHash = passwordEncoder.encode(plainToken);
+        // same guest token must be used for subsequent comments and new comment
+        String token = guestToken;
+
+        if (isGuest && guestToken == null ) {
+            token = UUID.randomUUID().toString();
         }
 
         VideoComment saved = repo.save(VideoComment.builder()
                 .videoId(videoId)
                 .userId(isGuest ? "" : req.getUserId())
                 .guestName(isGuest ? req.getGuestName() : null)
-                .guestTokenHash(isGuest ? tokenHash : null)
+                .guestTokenHash(isGuest ? token : null)
                 .content(req.getContent())
                 .parentId(req.getParentId())
                 .build());
 
         return CreateCommentResponse.builder()
                 .id(saved.getId())
-                .guestToken(isGuest ? plainToken : null) // return once for guests
+                .guestToken(isGuest ? token : null) // return once for guests
                 .build();
     }
 
@@ -98,7 +98,7 @@ public class VideoCommentServiceImpl {
 
         boolean guestOk = false;
         if (c.getUserId() == null && c.getGuestTokenHash() != null && guestTokenIfAny != null) {
-            guestOk = passwordEncoder.matches(guestTokenIfAny, c.getGuestTokenHash());
+            guestOk = guestTokenIfAny.equals(c.getGuestTokenHash());
         }
 
         if (!( isOwnerUser || guestOk)) {
