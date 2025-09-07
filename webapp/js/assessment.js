@@ -94,17 +94,17 @@ const VideoTemplate = {
             const v = videosArr[i];
             if (!v) continue;
             const isCurrent = i === currentIndex;
-            // Poster logic - dùng fileId nếu có
+            // Poster logic - use fileId if available
             let poster = '';
             if (v.fileId) {
                 poster = `https://images.canh-labs.com/${v.fileId}.jpg`;
             }
             
-            // Video mới sẽ bắt đầu từ vị trí bên ngoài
+            // New video will start from outside position
             let initialTransform = '';
-            let preloadValue = 'metadata'; // Mặc định chỉ preload metadata
+            let preloadValue = 'metadata'; // Default only preload metadata
             
-            // Preload auto cho 3 video: hiện tại, trước và sau
+            // Preload auto for 3 videos: current, previous and next
             if (isCurrent || i === currentIndex - 1 || i === currentIndex + 1) {
                 preloadValue = 'auto';
             }
@@ -268,16 +268,16 @@ const VideoActions = {
         if (container) {
             const playPauseBtn = container.querySelector('.play-pause-btn i');
             
-            // Tạo video mới trước, sau đó mới xử lý video cũ
+            // Create new video first, then handle old video
             this.createNewVideo(containerId, idx, direction);
             
-            // Lấy video hiện tại để tạo hiệu ứng slide
+            // Get current video to create slide effect
             const currentVideo = container.querySelector('video.active');
             if (currentVideo) {
-                // Thêm hiệu ứng slide cho video cũ
+                // Add slide effect for old video
                 currentVideo.classList.add(direction === 'right' ? 'slide-left' : 'slide-right');
                 
-                // Video mới sẽ trượt vào cùng lúc
+                // New video will slide in at the same time
                 setTimeout(() => {
                     const newVideo = document.getElementById(`${containerId}-video-${idx}`);
                     if (newVideo) {
@@ -316,17 +316,17 @@ const VideoActions = {
                 const v = videos[i];
                 if (!v) continue;
                 const isCurrent = i === idx;
-                // Poster logic - dùng fileId nếu có
+                // Poster logic - use fileId if available
                 let poster = '';
                 if (v.fileId) {
                     poster = `https://images.canh-labs.com/${v.fileId}.jpg`;
                 }
                 
-                // Video mới sẽ bắt đầu từ vị trí bên ngoài
+                // New video will start from outside position
                 let initialTransform = '';
-                let preloadValue = 'metadata'; // Mặc định chỉ preload metadata
+                let preloadValue = 'metadata'; // Default only preload metadata
                 
-                // Preload auto cho 3 video: hiện tại, trước và sau
+                // Preload auto for 3 videos: current, previous and next
                 if (isCurrent || i === idx - 1 || i === idx + 1) {
                     preloadValue = 'auto';
                 }
@@ -407,15 +407,15 @@ const VideoActions = {
             container.querySelector('.video-main').appendChild(playIcon);
         }
         
-        // Hiệu ứng fade: set active cho video hiện tại
+                    // Fade effect: set active for current video
         const allVideos = container.querySelectorAll('video');
         allVideos.forEach(vid => vid.classList.remove('active'));
         const currentVid = document.getElementById(`${containerId}-video-${idx}`);
         if (currentVid) {
-            // Video mới đã có transform ban đầu, chỉ cần thêm class slide-in để trượt vào
+            // New video already has initial transform, just add slide-in class to slide in
             currentVid.classList.add('active');
             
-            // Lấy trạng thái muted từ biến toàn cục, mặc định true
+            // Get muted state from global variable, default true
             let prevMuted = (typeof VideoActions.mutedState[containerId] === 'boolean') ? VideoActions.mutedState[containerId] : true;
             currentVid.muted = prevMuted;
 
@@ -430,7 +430,7 @@ const VideoActions = {
             currentVid.addEventListener('playing', hideLoader);
             currentVid.addEventListener('error', hideLoader);
 
-            // Đảm bảo video sẵn sàng trước khi slide
+            // Ensure video is ready before sliding
             if (currentVid.readyState >= 2) { // HAVE_CURRENT_DATA
                 setTimeout(() => {
                     const newVideo = document.getElementById(`${containerId}-video-${idx}`);
@@ -473,7 +473,7 @@ const VideoActions = {
             currentVid.addEventListener('ended', function() {
                 VideoActions.swipeRight(containerId);
             });
-            // Lắng nghe sự kiện volumechange để cập nhật trạng thái mute
+            // Listen to volumechange event to update mute state
             currentVid.addEventListener('volumechange', function() {
                 VideoActions.mutedState[containerId] = currentVid.muted;
                 const muteBtn = container.querySelector('.mute-unmute-btn i');
@@ -487,7 +487,7 @@ const VideoActions = {
                     }
                 }
             });
-            // Khi play, pause tất cả video khác trong container
+            // When play, pause all other videos in container
             currentVid.addEventListener('play', function() {
                 hideLoader();
                 if (playIcon) playIcon.style.display = 'none';
@@ -572,9 +572,9 @@ const VideoActions = {
     },
 
     showComments(containerId) {
-        // Lưu containerId hiện tại
+        // Save current containerId
         this.currentCommentContainerId = containerId;
-        // Hiển thị modal comment panel bên phải
+        // Show comment panel modal on the right
         document.getElementById('commentPanelModal').classList.add('active');
         // TODO: Load comments for current video
         this.loadComments(containerId);
@@ -589,10 +589,10 @@ const VideoActions = {
         const currentVideo = this.getCurrentVideo();
         if (!currentVideo) return;
 
-        // Hiển thị loading
+        // Show loading
         const commentList = document.querySelector('.comment-panel-list');
         if (commentList) {
-            commentList.innerHTML = '<div class="text-center text-muted mt-4"><div class="spinner-border spinner-border-sm" role="status"></div> Đang tải bình luận...</div>';
+            commentList.innerHTML = '<div class="text-center text-muted mt-4"><div class="spinner-border spinner-border-sm" role="status"></div> Loading comments...</div>';
         }
 
         $.ajax({
@@ -601,14 +601,14 @@ const VideoActions = {
             dataType: "json"
         }).done((rs) => {
             console.log('Comments response:', rs);
-            // Lấy comments từ rs.data
+            // Get comments from rs.data
             const comments = Array.isArray(rs.data) ? rs.data : [];
             this.renderComments(comments);
         }).fail((err) => {
             console.error('Failed to load comments:', err);
             const commentList = document.querySelector('.comment-panel-list');
             if (commentList) {
-                commentList.innerHTML = '<div class="text-center text-muted mt-4">Không thể tải bình luận</div>';
+                commentList.innerHTML = '<div class="text-center text-muted mt-4">Cannot load comments</div>';
             }
         });
     },
@@ -617,9 +617,9 @@ const VideoActions = {
         const commentList = document.querySelector('.comment-panel-list');
         if (!commentList) return;
 
-        // Đảm bảo comments là array
+        // Ensure comments is an array
         if (!Array.isArray(comments) || comments.length === 0) {
-            commentList.innerHTML = '<div class="text-center text-muted mt-4">Chưa có bình luận nào</div>';
+            commentList.innerHTML = '<div class="text-center text-muted mt-4">No comments yet</div>';
             return;
         }
 
@@ -629,7 +629,7 @@ const VideoActions = {
         const guestNameFromCookie = localStorage.getItem('guestName');
 
         const commentsHtml = comments.map(comment => {
-            // Tính số từ currentGuestToken để so sánh
+            // Calculate number from currentGuestToken for comparison
             let currentAnonymousNumber = null;
             let guestNameGenerated = comment.guestName;
             if (!jwt && currentGuestToken) {
@@ -638,15 +638,15 @@ const VideoActions = {
                 guestNameGenerated = `${comment.guestName}${currentAnonymousNumber}`;
             }
             
-            // So sánh dựa trên số trong guestName
+            // Compare based on number in guestName
             const isOwnComment = (jwt && comment.userId === currentUser.email) || 
                                 (!jwt && comment.guestName && comment.guestName.includes('Anonymous') && 
                                  currentAnonymousNumber && guestNameGenerated === guestNameFromCookie);
             
-            // Tạo tên Anonymous1, Anonymous2... cho anonymous users dựa trên guestName đã lưu
+            // Create Anonymous1, Anonymous2... names for anonymous users based on saved guestName
             let authorDisplay;
             if (comment.guestName) {
-                // Sử dụng guestName đã được generate và lưu
+                // Use generated and saved guestName
                 if(isOwnComment) {
                     authorDisplay = guestNameFromCookie
                 } else {
@@ -662,7 +662,7 @@ const VideoActions = {
                 <div class="comment-item">
                     <div class="comment-header">
                         <div class="comment-author">${authorDisplay}</div>
-                        ${isOwnComment ? `<button class="delete-comment-btn" onclick="VideoActions.deleteComment('${comment.id}')" title="Xóa bình luận"><i class="fas fa-trash"></i></button>` : ''}
+                        ${isOwnComment ? `<button class="delete-comment-btn" onclick="VideoActions.deleteComment('${comment.id}')" title="Delete comment"><i class="fas fa-trash"></i></button>` : ''}
                     </div>
                     <div class="comment-text">${comment.content}</div>
                     <div class="comment-time">${this.formatCommentTime(comment.createdAt)}</div>
@@ -673,7 +673,7 @@ const VideoActions = {
         commentList.innerHTML = commentsHtml;
     },
 
-    // Hàm tạo hash từ string để tạo tên ngẫu nhiên
+    // Function to create hash from string to generate random names
     hashCode(str) {
         let hash = 0;
         if (str.length === 0) return hash;
@@ -690,14 +690,14 @@ const VideoActions = {
         const now = new Date();
         const diffInMinutes = Math.floor((now - date) / (1000 * 60));
         
-        if (diffInMinutes < 1) return 'Vừa xong';
-        if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
-        if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} giờ trước`;
+        if (diffInMinutes < 1) return 'Just now';
+        if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+        if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
         return date.toLocaleDateString('vi-VN');
     },
 
     deleteComment(commentId) {
-        if (!confirm('Bạn có chắc muốn xóa bình luận này?')) return;
+        if (!confirm('Are you sure you want to delete this comment?')) return;
 
         const currentVideo = this.getCurrentVideo();
         if (!currentVideo) return;
@@ -707,11 +707,11 @@ const VideoActions = {
             type: "DELETE",
             dataType: "json"
         }).done(() => {
-            showMessage('Đã xóa bình luận thành công!', 'success');
+            showMessage('Comment deleted successfully!', 'success');
             // Reload comments
             this.loadComments(this.currentCommentContainerId);
         }).fail((err) => {
-            showMessage(err.responseJSON?.error?.message || 'Không thể xóa bình luận', 'error');
+            showMessage(err.responseJSON?.error?.message || 'Cannot delete comment', 'error');
         });
     },
 
@@ -719,8 +719,8 @@ const VideoActions = {
         const commentList = document.querySelector('.comment-panel-list');
         if (!commentList) return;
 
-        // Kiểm tra nếu commentList đang hiển thị "Chưa có bình luận nào"
-        if (commentList.innerHTML.includes('Chưa có bình luận nào')) {
+        // Check if commentList is showing "No comments yet"
+        if (commentList.innerHTML.includes('No comments yet')) {
             commentList.innerHTML = '';
         }
 
@@ -729,28 +729,28 @@ const VideoActions = {
         const currentGuestName = localStorage.getItem('guestName');
         const currentGuestToken = localStorage.getItem('guestToken');
 
-        // Sử dụng data từ input thay vì từ API response
+        // Use data from input instead of API response
         const commentContent = commentData.content || '';
         const commentId = commentData.id;
         const guestName = currentGuestName || commentData.guestName;
         const userId = currentUser.email || commentData.userId;
 
-        // Tạo comment HTML mới - comment mới luôn là của chính mình
-        const isOwnComment = true; // Comment mới vừa được tạo bởi user hiện tại
+        // Create new comment HTML - new comment is always from current user
+        const isOwnComment = true; // New comment was just created by current user
 
         const commentHtml = `
             <div class="comment-item">
                 <div class="comment-header">
                     <div class="comment-author">${guestName || userId || 'Anonymous'}</div>
-                    ${isOwnComment ? `<button class="delete-comment-btn" onclick="VideoActions.deleteComment('${commentId}')" title="Xóa bình luận"><i class="fas fa-trash"></i></button>` : ''}
+                                            ${isOwnComment ? `<button class="delete-comment-btn" onclick="VideoActions.deleteComment('${commentId}')" title="Delete comment"><i class="fas fa-trash"></i></button>` : ''}
                 </div>
                 <div class="comment-text">${commentContent}</div>
-                <div class="comment-time">Vừa xong</div>
+                <div class="comment-time">Just now</div>
             </div>
         `;
 
-        // Append vào đầu list (comment mới nhất ở trên cùng)
-        commentList.insertAdjacentHTML('afterbegin', commentHtml);
+        // Append to end of list (newest comment at bottom)
+        commentList.insertAdjacentHTML('beforeend', commentHtml);
     },
 
     sendComment() {
@@ -758,13 +758,13 @@ const VideoActions = {
         const content = commentInput.value.trim();
         
         if (!content) {
-            showMessage('Vui lòng nhập nội dung bình luận', 'error');
+            showMessage('Please enter comment content', 'error');
             return;
         }
 
         const currentVideo = this.getCurrentVideo();
         if (!currentVideo) {
-            showMessage('Không tìm thấy video hiện tại', 'error');
+            showMessage('Current video not found', 'error');
             return;
         }
 
@@ -773,10 +773,10 @@ const VideoActions = {
         
         const commentData = {
             content: content,
-            parentId: null // Có thể mở rộng cho reply comment sau
+            parentId: null // Can be extended for reply comments later
         };
 
-        // Xử lý user đã login vs chưa login
+        // Handle logged in vs not logged in users
         if (jwt && currentUser.email) {
             commentData.userId = currentUser.email;
             commentData.guestName = null;
@@ -785,18 +785,18 @@ const VideoActions = {
             commentData.guestName = 'Anonymous';
         }
 
-        // Hiển thị loading
+        // Show loading
         const sendBtn = document.getElementById('sendCommentBtn');
         const originalText = sendBtn.textContent;
         sendBtn.textContent = 'Đang gửi...';
         sendBtn.disabled = true;
 
-        // Chuẩn bị headers
+        // Prepare headers
         const headers = {
             'Content-Type': 'application/json'
         };
         
-        // Thêm X-Guest-Token nếu có (để server biết user cũ hay mới)
+        // Add X-Guest-Token if available (so server knows if user is new or existing)
         const existingGuestToken = localStorage.getItem('guestToken');
         if (existingGuestToken) {
             headers['X-Guest-Token'] = existingGuestToken;
@@ -810,11 +810,11 @@ const VideoActions = {
             dataType: "json",
             headers: headers
         }).done((rs) => {
-            // Lưu guestToken nếu có
+            // Save guestToken if available
             if (rs.data.guestToken) {
                 localStorage.setItem('guestToken', rs.data.guestToken);
                 
-                // Generate và lưu guestName cho anonymous user
+                // Generate and save guestName for anonymous user
                 if (!jwt) {
                     const hash = this.hashCode(rs.data.guestToken);
                     const anonymousNumber = Math.abs(hash % 1000) + 1;
@@ -822,25 +822,25 @@ const VideoActions = {
                     localStorage.setItem('guestName', guestName);
                 }
                 
-                // Cập nhật header cho các request tiếp theo
+                // Update headers for subsequent requests
                 Auth.initAjaxHeaders();
             }
             
-            // Lấy content trước khi clear input
+            // Get content before clearing input
             const commentContent = commentInput.value;
             
             // Clear input
             commentInput.value = '';
             
-            // Append comment mới vào list thay vì reload
+            // Append new comment to list instead of reloading
             this.appendNewComment({
                 id: rs.data.id,
                 content: commentContent
             });
             
-            showMessage('Bình luận đã được gửi thành công!', 'success');
+            showMessage('Comment sent successfully!', 'success');
         }).fail((err) => {
-            showMessage(err.responseJSON?.error?.message || 'Có lỗi xảy ra khi gửi bình luận', 'error');
+            showMessage(err.responseJSON?.error?.message || 'Error occurred while sending comment', 'error');
         }).always(() => {
             // Reset button
             sendBtn.textContent = originalText;
@@ -849,7 +849,7 @@ const VideoActions = {
     },
 
     getCurrentVideo() {
-        // Lấy video hiện tại từ container đang active
+        // Get current video from active container
         const containerId = this.getCurrentContainerId();
         if (!containerId || !this.videos[containerId]) return null;
         
@@ -858,7 +858,7 @@ const VideoActions = {
     },
 
     getCurrentContainerId() {
-        // Trả về containerId đã lưu khi mở comment panel
+        // Return saved containerId when comment panel is opened
         return this.currentCommentContainerId;
     },
 
