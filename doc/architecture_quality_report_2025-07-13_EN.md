@@ -1,4 +1,4 @@
-# 📊 Sonargraph Code Quality Report
+#  Sonargraph Code Quality Report
 
 **Tool used:** Sonargraph by hello2morrow  
 **Scope:** Full project  
@@ -8,7 +8,7 @@
 
 ## CODE QUALITY REPORT (ENGLISH)
 
-### 🧠 1. Code Analysis
+###  1. Code Analysis
 | Metric | Value | Comment |
 |--------|--------|----------|
 | Issue Density | 0.00 | ✅ No issues found |
@@ -18,7 +18,7 @@
 
 ---
 
-### 🔗 2. Coupling and Cohesion
+###  2. Coupling and Cohesion
 | Metric | Value | Comment |
 |--------|--------|----------|
 | ACD (Average Component Dependency) | 5.08 | ⚠️ Could be improved to reduce tight coupling |
@@ -29,7 +29,7 @@
 
 ---
 
-### ⚙️ 3. Complexity
+###  3. Complexity
 | Metric | Value | Comment |
 |--------|--------|----------|
 | Average Complexity (McCabe) | 1.65 | ✅ Very low – easy-to-understand code |
@@ -37,7 +37,7 @@
 
 ---
 
-### 🔄 4. Cyclic Dependencies
+###  4. Cyclic Dependencies
 | Metric | Value | Comment |
 |--------|--------|----------|
 | Cyclic Components/Packages | 0 | ✅ No cycles found |
@@ -45,7 +45,7 @@
 
 ---
 
-### 📏 5. System Size
+###  5. System Size
 | Metric | Value |
 |--------|--------|
 | Lines of Code | 6,735 |
@@ -55,7 +55,7 @@
 
 ---
 
-### ✅ Summary
+###  Summary
 - ✅ **Very clean and maintainable codebase with no redundancy, no technical debt, and no cyclic dependencies**
 - ⚠️ **Consider lowering ACD to reduce tight coupling**
 - 📌 **Scalable structure ready for growth**

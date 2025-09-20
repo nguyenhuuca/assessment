@@ -20,12 +20,12 @@
 
 **Funny Movies** is a modern web application built with **Java 24** and **Spring Boot 3.x**, designed to deliver **high-performance video experiences**.
 
-### ✨ Key Highlights
+###  Key Highlights
 
-- ⚡ Uses **Java 24 Virtual Threads** and `StructuredTaskScope` for lightweight concurrency
-- 😂 Users can share and view funny videos
-- 🤖 Uses **ChatGPT AI** to suggest trending YouTube content
-- 🔍 Integrates with the **YouTube API** to fetch and analyze video metadata
+-  Uses **Java 24 Virtual Threads** and `StructuredTaskScope` for lightweight concurrency
+-  Users can share and view funny videos
+-  Uses **ChatGPT AI** to suggest trending YouTube content
+-  Integrates with the **YouTube API** to fetch and analyze video metadata
 
 ---
 
