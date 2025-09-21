@@ -40,19 +40,19 @@ Adopt Spring Boot monolith with clearly defined layers and caching mechanism, an
 
 ## Architecture Overview (C4 Model)
 
-### 🌐 Level 1 - System Context
+### Level 1 - System Context
 
 ![img.png](images/C4-L1.png)
 
 ---
 
-### 🧱 Level 2 - Container Diagram
+### Level 2 - Container Diagram
 
 ![img_1.png](images/C4-L2.png)
 
 ---
 
-### 🧩 Level 3 - Component Diagram (Backend)
+### Level 3 - Component Diagram (Backend)
 
 ![img_2.png](images/C4-L3.png)
 
@@ -82,7 +82,7 @@ Adopt Spring Boot monolith with clearly defined layers and caching mechanism, an
 
 ---
 
-## 🌟 Future Improvements
+##  Future Improvements
 
 * Switch to **HLS** or **DASH** for adaptive bitrate
 * Upload background jobs to **warm cache** by pre-fetching popular videos
@@ -91,7 +91,7 @@ Adopt Spring Boot monolith with clearly defined layers and caching mechanism, an
 
 ---
 
-## 📚 Notes
+##  Notes
 
 - Virtual Threads are used in Backend for efficient streaming
 - In-memory cache with Guava used until Redis is integrated
