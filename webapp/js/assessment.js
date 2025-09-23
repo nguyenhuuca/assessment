@@ -635,7 +635,6 @@ const VideoActions = {
             if (!jwt && currentGuestToken) {
                 const hash = this.hashCode(currentGuestToken);
                 currentAnonymousNumber = Math.abs(hash % 1000) + 1;
-                guestNameGenerated = `${comment.guestName}${currentAnonymousNumber}`;
             }
             
             // Compare based on number in guestName
