@@ -5,6 +5,7 @@ import com.canhlabs.funnyapp.dto.CreateCommentRequest;
 import com.canhlabs.funnyapp.dto.CreateCommentResponse;
 import com.canhlabs.funnyapp.entity.VideoComment;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
+import com.canhlabs.funnyapp.utils.AppUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -58,7 +59,7 @@ public class VideoCommentServiceImpl {
         // same guest token must be used for subsequent comments and new comment
         String token = guestToken;
 
-        if (isGuest && guestToken == null ) {
+        if (isGuest && guestToken == null) {
             token = UUID.randomUUID().toString();
         }
 
@@ -101,7 +102,7 @@ public class VideoCommentServiceImpl {
             guestOk = guestTokenIfAny.equals(c.getGuestTokenHash());
         }
 
-        if (!( isOwnerUser || guestOk)) {
+        if (!(isOwnerUser || guestOk)) {
             throw new SecurityException("Not authorized to delete this comment");
         }
 
@@ -118,11 +119,14 @@ public class VideoCommentServiceImpl {
     }
 
     private static CommentNode toNode(VideoComment c) {
+        int hash = AppUtils.hashCode(c.getGuestTokenHash());
+        int anonymousNumber = Math.abs(hash % 1000) + 1;
+        String guestName = "Anonymous" + anonymousNumber;
         return CommentNode.builder()
                 .id(c.getId())
                 .videoId(c.getVideoId())
                 .userId(c.getUserId())
-                .guestName(c.getGuestName())
+                .guestName(guestName)
                 .content(c.getContent())
                 .createdAt(c.getCreatedAt())
                 .updatedAt(c.getUpdatedAt())

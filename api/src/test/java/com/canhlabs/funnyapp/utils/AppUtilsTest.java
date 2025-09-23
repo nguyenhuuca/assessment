@@ -81,4 +81,43 @@ class AppUtilsTest {
         assertThat(AppUtils.isValidEmail("@no-local-part.com")).isFalse();
         assertThat(AppUtils.isValidEmail(null)).isFalse();
     }
+
+    @Test
+    void hashCode_returnsZero_whenStringIsNull() {
+        assertThat(AppUtils.hashCode(null)).isZero();
+    }
+
+    @Test
+    void hashCode_returnsZero_whenStringIsEmpty() {
+        assertThat(AppUtils.hashCode("")).isZero();
+    }
+
+    @Test
+    void hashCode_returnsConsistentHash_forSameString() {
+        String input = "f8409762-f8c3-48dd-9039-840034e8fddd";
+        int hash1 = AppUtils.hashCode(input);
+        int hash2 = AppUtils.hashCode(input);
+        assertThat(hash1).isEqualTo(hash2);
+    }
+
+    @Test
+    void hashCode_returnsDifferentHash_forDifferentStrings() {
+        int hash1 = AppUtils.hashCode("string1");
+        int hash2 = AppUtils.hashCode("string2");
+        assertThat(hash1).isNotEqualTo(hash2);
+    }
+
+    @Test
+    void hashCode_handlesSpecialCharactersInString() {
+        String input = "!@#$%^&*()_+";
+        int hash = AppUtils.hashCode(input);
+        assertThat(hash).isNotZero();
+    }
+
+    @Test
+    void hashCode_handlesUnicodeCharactersInString() {
+        String input = "こんにちは世界"; // "Hello World" in Japanese
+        int hash = AppUtils.hashCode(input);
+        assertThat(hash).isNotZero();
+    }
 }

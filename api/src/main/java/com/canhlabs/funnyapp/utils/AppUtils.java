@@ -31,4 +31,18 @@ public class AppUtils {
         return patEmail.matcher(email).matches();
     }
 
+    // Function to create hash from string to generate random names
+    public static int hashCode(String str) {
+        int hash = 0;
+        if (str == null || str.isEmpty()) {
+            return hash;
+        }
+        for (int i = 0; i < str.length(); i++) {
+            int ch = str.charAt(i); // charCodeAt
+            hash = ((hash << 5) - hash) + ch;
+            hash = hash & 0xFFFFFFFF;
+        }
+        return hash;
+    }
+
 }
