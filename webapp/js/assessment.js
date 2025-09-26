@@ -94,17 +94,17 @@ const VideoTemplate = {
             const v = videosArr[i];
             if (!v) continue;
             const isCurrent = i === currentIndex;
-            // Poster logic - dùng fileId nếu có
+            // Poster logic - use fileId if available
             let poster = '';
             if (v.fileId) {
                 poster = `https://images.canh-labs.com/${v.fileId}.jpg`;
             }
             
-            // Video mới sẽ bắt đầu từ vị trí bên ngoài
+            // New video will start from outside position
             let initialTransform = '';
-            let preloadValue = 'metadata'; // Mặc định chỉ preload metadata
+            let preloadValue = 'metadata'; // Default only preload metadata
             
-            // Preload auto cho 3 video: hiện tại, trước và sau
+            // Preload auto for 3 videos: current, previous and next
             if (isCurrent || i === currentIndex - 1 || i === currentIndex + 1) {
                 preloadValue = 'auto';
             }
@@ -268,16 +268,16 @@ const VideoActions = {
         if (container) {
             const playPauseBtn = container.querySelector('.play-pause-btn i');
             
-            // Tạo video mới trước, sau đó mới xử lý video cũ
+            // Create new video first, then handle old video
             this.createNewVideo(containerId, idx, direction);
             
-            // Lấy video hiện tại để tạo hiệu ứng slide
+            // Get current video to create slide effect
             const currentVideo = container.querySelector('video.active');
             if (currentVideo) {
-                // Thêm hiệu ứng slide cho video cũ
+                // Add slide effect for old video
                 currentVideo.classList.add(direction === 'right' ? 'slide-left' : 'slide-right');
                 
-                // Video mới sẽ trượt vào cùng lúc
+                // New video will slide in at the same time
                 setTimeout(() => {
                     const newVideo = document.getElementById(`${containerId}-video-${idx}`);
                     if (newVideo) {
@@ -316,17 +316,17 @@ const VideoActions = {
                 const v = videos[i];
                 if (!v) continue;
                 const isCurrent = i === idx;
-                // Poster logic - dùng fileId nếu có
+                // Poster logic - use fileId if available
                 let poster = '';
                 if (v.fileId) {
                     poster = `https://images.canh-labs.com/${v.fileId}.jpg`;
                 }
                 
-                // Video mới sẽ bắt đầu từ vị trí bên ngoài
+                // New video will start from outside position
                 let initialTransform = '';
-                let preloadValue = 'metadata'; // Mặc định chỉ preload metadata
+                let preloadValue = 'metadata'; // Default only preload metadata
                 
-                // Preload auto cho 3 video: hiện tại, trước và sau
+                // Preload auto for 3 videos: current, previous and next
                 if (isCurrent || i === idx - 1 || i === idx + 1) {
                     preloadValue = 'auto';
                 }
@@ -407,15 +407,15 @@ const VideoActions = {
             container.querySelector('.video-main').appendChild(playIcon);
         }
         
-        // Hiệu ứng fade: set active cho video hiện tại
+                    // Fade effect: set active for current video
         const allVideos = container.querySelectorAll('video');
         allVideos.forEach(vid => vid.classList.remove('active'));
         const currentVid = document.getElementById(`${containerId}-video-${idx}`);
         if (currentVid) {
-            // Video mới đã có transform ban đầu, chỉ cần thêm class slide-in để trượt vào
+            // New video already has initial transform, just add slide-in class to slide in
             currentVid.classList.add('active');
             
-            // Lấy trạng thái muted từ biến toàn cục, mặc định true
+            // Get muted state from global variable, default true
             let prevMuted = (typeof VideoActions.mutedState[containerId] === 'boolean') ? VideoActions.mutedState[containerId] : true;
             currentVid.muted = prevMuted;
 
@@ -430,7 +430,7 @@ const VideoActions = {
             currentVid.addEventListener('playing', hideLoader);
             currentVid.addEventListener('error', hideLoader);
 
-            // Đảm bảo video sẵn sàng trước khi slide
+            // Ensure video is ready before sliding
             if (currentVid.readyState >= 2) { // HAVE_CURRENT_DATA
                 setTimeout(() => {
                     const newVideo = document.getElementById(`${containerId}-video-${idx}`);
@@ -473,7 +473,7 @@ const VideoActions = {
             currentVid.addEventListener('ended', function() {
                 VideoActions.swipeRight(containerId);
             });
-            // Lắng nghe sự kiện volumechange để cập nhật trạng thái mute
+            // Listen to volumechange event to update mute state
             currentVid.addEventListener('volumechange', function() {
                 VideoActions.mutedState[containerId] = currentVid.muted;
                 const muteBtn = container.querySelector('.mute-unmute-btn i');
@@ -487,7 +487,7 @@ const VideoActions = {
                     }
                 }
             });
-            // Khi play, pause tất cả video khác trong container
+            // When play, pause all other videos in container
             currentVid.addEventListener('play', function() {
                 hideLoader();
                 if (playIcon) playIcon.style.display = 'none';
@@ -572,12 +572,293 @@ const VideoActions = {
     },
 
     showComments(containerId) {
-        // Hiển thị modal comment panel bên phải
+        // Save current containerId
+        this.currentCommentContainerId = containerId;
+        // Show comment panel modal on the right
         document.getElementById('commentPanelModal').classList.add('active');
+        // TODO: Load comments for current video
+        this.loadComments(containerId);
     },
 
     closeCommentPanel() {
         document.getElementById('commentPanelModal').classList.remove('active');
+        this.currentCommentContainerId = null;
+    },
+
+    loadComments(containerId) {
+        const currentVideo = this.getCurrentVideo();
+        if (!currentVideo) return;
+
+        // Show loading
+        const commentList = document.querySelector('.comment-panel-list');
+        if (commentList) {
+            commentList.innerHTML = '<div class="text-center text-muted mt-4"><div class="spinner-border spinner-border-sm" role="status"></div> Loading comments...</div>';
+        }
+
+        $.ajax({
+            url: appConst.baseUrl.concat(`/videos/${currentVideo.id}/comments`),
+            type: "GET",
+            dataType: "json"
+        }).done((rs) => {
+            console.log('Comments response:', rs);
+            // Get comments from rs.data
+            const comments = Array.isArray(rs.data) ? rs.data : [];
+            this.renderComments(comments);
+        }).fail((err) => {
+            console.error('Failed to load comments:', err);
+            const commentList = document.querySelector('.comment-panel-list');
+            if (commentList) {
+                commentList.innerHTML = '<div class="text-center text-muted mt-4">Cannot load comments</div>';
+            }
+        });
+    },
+
+    renderComments(comments) {
+        const commentList = document.querySelector('.comment-panel-list');
+        if (!commentList) return;
+
+        // Ensure comments is an array
+        if (!Array.isArray(comments) || comments.length === 0) {
+            commentList.innerHTML = '<div class="text-center text-muted mt-4">No comments yet</div>';
+            return;
+        }
+
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const jwt = localStorage.getItem('jwt');
+        const currentGuestToken = localStorage.getItem('guestToken');
+        const guestNameFromCookie = localStorage.getItem('guestName');
+
+        const commentsHtml = comments.map(comment => {
+            // Calculate number from currentGuestToken for comparison
+            let currentAnonymousNumber = null;
+            let guestNameGenerated = comment.guestName;
+            if (!jwt && currentGuestToken) {
+                const hash = this.hashCode(currentGuestToken);
+                currentAnonymousNumber = Math.abs(hash % 1000) + 1;
+            }
+            
+            // Compare based on number in guestName
+            const isOwnComment = (jwt && comment.userId === currentUser.email) || 
+                                (!jwt && comment.guestName && comment.guestName.includes('Anonymous') && 
+                                 currentAnonymousNumber && guestNameGenerated === guestNameFromCookie);
+            
+            // Create Anonymous1, Anonymous2... names for anonymous users based on saved guestName
+            let authorDisplay;
+            if (comment.guestName) {
+                // Use generated and saved guestName
+                if(isOwnComment) {
+                    authorDisplay = guestNameFromCookie
+                } else {
+                    authorDisplay = comment.guestName;
+                }
+            } else if (comment.userId) {
+                authorDisplay = comment.userId;
+            } else {
+                authorDisplay = 'Anonymous';
+            }
+            
+            return `
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <div class="comment-author">${authorDisplay}</div>
+                        ${isOwnComment ? `<button class="delete-comment-btn" onclick="VideoActions.deleteComment('${comment.id}')" title="Delete comment"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                    <div class="comment-text">${comment.content}</div>
+                    <div class="comment-time">${this.formatCommentTime(comment.createdAt)}</div>
+                </div>
+            `;
+        }).join('');
+
+        commentList.innerHTML = commentsHtml;
+    },
+
+    // Function to create hash from string to generate random names
+    hashCode(str) {
+        let hash = 0;
+        if (str.length === 0) return hash;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash;
+    },
+
+    formatCommentTime(createdAt) {
+        const date = new Date(createdAt);
+        const now = new Date();
+        const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+        
+        if (diffInMinutes < 1) return 'Just now';
+        if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+        if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
+        return date.toLocaleDateString('vi-VN');
+    },
+
+    deleteComment(commentId) {
+        if (!confirm('Are you sure you want to delete this comment?')) return;
+
+        const currentVideo = this.getCurrentVideo();
+        if (!currentVideo) return;
+
+        $.ajax({
+            url: appConst.baseUrl.concat(`/videos/${currentVideo.id}/comments/${commentId}`),
+            type: "DELETE",
+            dataType: "json"
+        }).done(() => {
+            showMessage('Comment deleted successfully!', 'success');
+            // Reload comments
+            this.loadComments(this.currentCommentContainerId);
+        }).fail((err) => {
+            showMessage(err.responseJSON?.error?.message || 'Cannot delete comment', 'error');
+        });
+    },
+
+    appendNewComment(commentData) {
+        const commentList = document.querySelector('.comment-panel-list');
+        if (!commentList) return;
+
+        // Check if commentList is showing "No comments yet"
+        if (commentList.innerHTML.includes('No comments yet')) {
+            commentList.innerHTML = '';
+        }
+
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const jwt = localStorage.getItem('jwt');
+        const currentGuestName = localStorage.getItem('guestName');
+        const currentGuestToken = localStorage.getItem('guestToken');
+
+        // Use data from input instead of API response
+        const commentContent = commentData.content || '';
+        const commentId = commentData.id;
+        const guestName = currentGuestName || commentData.guestName;
+        const userId = currentUser.email || commentData.userId;
+
+        // Create new comment HTML - new comment is always from current user
+        const isOwnComment = true; // New comment was just created by current user
+
+        const commentHtml = `
+            <div class="comment-item">
+                <div class="comment-header">
+                    <div class="comment-author">${guestName || userId || 'Anonymous'}</div>
+                                            ${isOwnComment ? `<button class="delete-comment-btn" onclick="VideoActions.deleteComment('${commentId}')" title="Delete comment"><i class="fas fa-trash"></i></button>` : ''}
+                </div>
+                <div class="comment-text">${commentContent}</div>
+                <div class="comment-time">Just now</div>
+            </div>
+        `;
+
+        // Append to end of list (newest comment at bottom)
+        commentList.insertAdjacentHTML('beforeend', commentHtml);
+    },
+
+    sendComment() {
+        const commentInput = document.getElementById('commentInput');
+        const content = commentInput.value.trim();
+        
+        if (!content) {
+            showMessage('Please enter comment content', 'error');
+            return;
+        }
+
+        const currentVideo = this.getCurrentVideo();
+        if (!currentVideo) {
+            showMessage('Current video not found', 'error');
+            return;
+        }
+
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const jwt = localStorage.getItem('jwt');
+        
+        const commentData = {
+            content: content,
+            parentId: null // Can be extended for reply comments later
+        };
+
+        // Handle logged in vs not logged in users
+        if (jwt && currentUser.email) {
+            commentData.userId = currentUser.email;
+            commentData.guestName = null;
+        } else {
+            commentData.userId = null;
+            commentData.guestName = 'Anonymous';
+        }
+
+        // Show loading
+        const sendBtn = document.getElementById('sendCommentBtn');
+        const originalText = sendBtn.textContent;
+        sendBtn.textContent = 'Đang gửi...';
+        sendBtn.disabled = true;
+
+        // Prepare headers
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        // Add X-Guest-Token if available (so server knows if user is new or existing)
+        const existingGuestToken = localStorage.getItem('guestToken');
+        if (existingGuestToken) {
+            headers['X-Guest-Token'] = existingGuestToken;
+        }
+
+        $.ajax({
+            url: appConst.baseUrl.concat(`/videos/${currentVideo.id}/comments`),
+            type: "POST",
+            data: JSON.stringify(commentData),
+            contentType: "application/json",
+            dataType: "json",
+            headers: headers
+        }).done((rs) => {
+            // Save guestToken if available
+            if (rs.data.guestToken) {
+                localStorage.setItem('guestToken', rs.data.guestToken);
+                
+                // Generate and save guestName for anonymous user
+                if (!jwt) {
+                    const hash = this.hashCode(rs.data.guestToken);
+                    const anonymousNumber = Math.abs(hash % 1000) + 1;
+                    const guestName = `Anonymous${anonymousNumber}`;
+                    localStorage.setItem('guestName', guestName);
+                }
+                
+                // Update headers for subsequent requests
+                Auth.initAjaxHeaders();
+            }
+            
+            // Get content before clearing input
+            const commentContent = commentInput.value;
+            
+            // Clear input
+            commentInput.value = '';
+            
+            // Append new comment to list instead of reloading
+            this.appendNewComment({
+                id: rs.data.id,
+                content: commentContent
+            });
+            
+            showMessage('Comment sent successfully!', 'success');
+        }).fail((err) => {
+            showMessage(err.responseJSON?.error?.message || 'Error occurred while sending comment', 'error');
+        }).always(() => {
+            // Reset button
+            sendBtn.textContent = originalText;
+            sendBtn.disabled = false;
+        });
+    },
+
+    getCurrentVideo() {
+        // Get current video from active container
+        const containerId = this.getCurrentContainerId();
+        if (!containerId || !this.videos[containerId]) return null;
+        
+        const currentIndex = this.currentVideoIndex[containerId];
+        return this.videos[containerId][currentIndex];
+    },
+
+    getCurrentContainerId() {
+        // Return saved containerId when comment panel is opened
+        return this.currentCommentContainerId;
     },
 
     shareVideo(containerId) {
@@ -850,6 +1131,18 @@ $(document).ready(function() {
     // Clear currentDeleteVideoId when modal is closed
     $('#deleteConfirmModal').on('hidden.bs.modal', function () {
         VideoService.currentDeleteVideoId = null;
+    });
+
+    // Handle comment send button
+    $('#sendCommentBtn').on('click', function() {
+        VideoActions.sendComment();
+    });
+
+    // Handle comment input enter key
+    $('#commentInput').on('keypress', function(e) {
+        if (e.which === 13) { // Enter key
+            VideoActions.sendComment();
+        }
     });
 });
 

@@ -1,4 +1,4 @@
-# 📊 Sonargraph Code Quality Report
+#  Sonargraph Code Quality Report
 
 **Tool used:** Sonargraph by hello2morrow  
 **Scope:** Full project  
@@ -8,7 +8,7 @@
 
 ## BÁO CÁO ĐÁNH GIÁ CHẤT LƯỢNG MÃ NGUỒN (TIẾNG VIỆT)
 
-### 🧠 1. Phân tích mã nguồn
+###  1. Phân tích mã nguồn
 | Chỉ số | Giá trị | Nhận xét |
 |--------|--------|----------|
 | Mật độ lỗi (Issue Density) | 0.00 | ✅ Không có vấn đề được phát hiện |
@@ -18,7 +18,7 @@
 
 ---
 
-### 🔗 2. Tính kết nối và phụ thuộc
+###  2. Tính kết nối và phụ thuộc
 | Chỉ số | Giá trị | Nhận xét |
 |--------|--------|----------|
 | ACD (Độ phụ thuộc TB) | 5.08 | ⚠️ Có thể cải thiện bằng cách giảm phụ thuộc |
@@ -29,7 +29,7 @@
 
 ---
 
-### ⚙️ 3. Độ phức tạp
+###  3. Độ phức tạp
 | Chỉ số | Giá trị | Nhận xét |
 |--------|--------|----------|
 | Độ phức tạp trung bình (McCabe) | 1.65 | ✅ Rất thấp, code dễ hiểu |
@@ -37,7 +37,7 @@
 
 ---
 
-### 🔄 4. Vòng lặp phụ thuộc (Cyclic Dependency)
+###  4. Vòng lặp phụ thuộc (Cyclic Dependency)
 | Chỉ số | Giá trị | Nhận xét |
 |--------|--------|----------|
 | Số vòng lặp phụ thuộc | 0 | ✅ Không có |
@@ -45,7 +45,7 @@
 
 ---
 
-### 📏 5. Quy mô hệ thống
+###  5. Quy mô hệ thống
 | Chỉ số | Giá trị |
 |--------|---------|
 | Dòng mã (LOC) | 6,735 |
@@ -55,7 +55,7 @@
 
 ---
 
-### ✅ Tổng kết
+###  Tổng kết
 - ✅ **Code sạch, maintainability cao, không có duplication, debt hoặc cyclic dependency**
 - ⚠️ **ACD có thể được cải thiện để giảm coupling giữa các thành phần**
 - 📌 **Phù hợp để mở rộng tiếp mà không lo nợ kỹ thuật**

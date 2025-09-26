@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -33,12 +34,10 @@ public class WebSecurityConfig {
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     // Whitelisted endpoints
-                    AppConstant.WebIgnoringConfig.WHITE_LIST_PATH.forEach(item -> {
-                        auth.requestMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()).permitAll();
-                    });
+                    AppConstant.WebIgnoringConfig.WHITE_LIST_PATH.forEach(item -> auth.requestMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()).permitAll());
                     auth.requestMatchers(swaggerWhiteList).permitAll();
                     auth.anyRequest().permitAll();
 
@@ -48,7 +47,6 @@ public class WebSecurityConfig {
 
         return http.build();
     }
-
 
 
     @Bean

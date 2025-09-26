@@ -1,24 +1,29 @@
 @startuml
 actor User as "User\n(Resource Owner)"
-participant Client as "Client App\n(ReactJS / Backend)"
-participant AuthServer as "Authorization Server\n(Google OAuth)"
-participant ResourceServer as "Resource Server\n(Your API)"
+participant Client as "Client App\n(SPA / Backend)"
+participant AuthServer as "Authorization Server"
+participant ResourceServer as "Resource Server"
 
 == Step 1: Authorization Request ==
-User -> Client : Wants to log in with Google
-Client -> AuthServer : Redirect to login (Auth Code Flow)
-AuthServer -> User : Show Google login form
-User -> AuthServer : Log in and grant permission
+User -> Client : Wants to log in
+Client -> AuthServer : Redirect to /authorize (client_id,\nredirect_uri, response_type=code,\nscope, state, code_challenge)
+AuthServer -> User : Show login & consent form
+User -> AuthServer : Authenticate and approve
 
-== Step 2: Receive Authorization Code ==
-AuthServer -> Client : Return Authorization Code
+== Step 2: Authorization Code ==
+AuthServer -> Client : Redirect back with Authorization Code (+ state)
 
-== Step 3: Get Access Token ==
-Client -> AuthServer : Send Authorization Code\n(client_id, secret)
-AuthServer -> Client : Return Access Token (and ID Token)
+== Step 3: Token Request ==
+Client -> AuthServer : POST /token (grant_type=authorization_code,\ncode, redirect_uri,\nclient_id, code_verifier)
+AuthServer -> Client : Return **JWT Access Token** (+ optional Refresh Token,\n+ optional ID Token if OIDC)
 
 == Step 4: Access Protected Resource ==
-Client -> ResourceServer : Send API request with Bearer Token
-ResourceServer -> Client : Return data (if token is valid)
+Client -> ResourceServer : API request with Authorization: Bearer <JWT>
+ResourceServer -> AuthServer : (Optional, first time) Fetch JWKS (public keys)
+ResourceServer -> Client : Verify JWT signature, claims (iss, aud, exp, scope)\nReturn protected resource
+
+== Step 5: Refresh Token Flow (optional) ==
+Client -> AuthServer : POST /token (grant_type=refresh_token,\nrefresh_token, client_id)
+AuthServer -> Client : Return new JWT Access Token
 
 @enduml

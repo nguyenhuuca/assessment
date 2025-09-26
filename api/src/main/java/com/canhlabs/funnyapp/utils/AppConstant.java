@@ -57,7 +57,9 @@ public class AppConstant {
                 "/webjars/**",
                 "/actuator/**",
                 "/v1/funny-app/top-videos",
-                "/v1/funny-app/top-videos/**"
+                "/v1/funny-app/top-videos/**",
+                "/v1/funny-app/videos/*/comments",
+                "/v1/funny-app/comments/*"
                 // other public endpoints of your API may be appended to this array
         );
 

@@ -72,7 +72,7 @@ public class JwtProvider {
 
         } catch (ExpiredJwtException exExpire) {
             log.error("Token expire: {}", exExpire.getMessage());
-            throw new UnauthorizedException("TOKEN_EXPIRED", 601);
+            throw new UnauthorizedException("TOKEN_EXPIRED", 602);
         } catch (Exception ex) {
             throw new UnauthorizedException("TOKEN_INVALID", 601);
         }

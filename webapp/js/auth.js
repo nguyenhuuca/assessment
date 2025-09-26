@@ -7,10 +7,20 @@ const Auth = {
      * Initialize AJAX headers with JWT token
      */
     initAjaxHeaders() {
+        const headers = {};
+        const jwt = localStorage.getItem("jwt");
+        const guestToken = localStorage.getItem("guestToken");
+        
+        if (jwt) {
+            headers['Authorization'] = jwt;
+        }
+        
+        if (guestToken) {
+            headers['X-Guest-Token'] = guestToken;
+        }
+        
         $.ajaxSetup({
-            headers: {
-                'Authorization': localStorage.getItem("jwt")
-            }
+            headers: headers
         });
     },
 
