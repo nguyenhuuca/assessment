@@ -2157,6 +2157,7 @@ body.modal-open {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        padding-bottom: 72px; /* reserve space for input bar */
     }
     .comment-panel-header, .comment-panel-input, .comment-panel-list {
         padding-left: 15px;
@@ -2167,8 +2168,11 @@ body.modal-open {
         background: #1a1a1a !important;
         border-top: 1px solid #555 !important;
         flex-shrink: 0; /* prevent shrinking */
-        position: relative;
-        z-index: 10;
+        position: fixed; /* fixed to viewport bottom */
+        left: 0;
+        right: 0;
+        bottom: env(safe-area-inset-bottom, 0px); /* default when no keyboard */
+        z-index: 10000;
     }
     .comment-panel-input input[type="text"] {
         font-size: 16px !important; /* Prevent zoom on iOS */

@@ -913,18 +913,20 @@ const VideoActions = {
             const vv = window.visualViewport;
             const heightDiff = Math.max(0, window.innerHeight - vv.height);
             if (heightDiff > 0) {
-                inputBar.style.transform = `translateY(-${heightDiff}px)`;
-                content.style.paddingBottom = `${heightDiff + 16}px`;
+                // Move input bar up by setting bottom offset
+                inputBar.style.bottom = `${heightDiff}px`;
+                // Ensure content area reserves space
+                content.style.paddingBottom = `${heightDiff + 88}px`;
                 try { list.scrollTop = list.scrollHeight; } catch (e) {}
             } else {
-                inputBar.style.transform = '';
+                inputBar.style.bottom = '';
                 content.style.paddingBottom = '';
             }
         };
 
         const onFocus = () => applyInset();
         const onBlur = () => {
-            inputBar.style.transform = '';
+            inputBar.style.bottom = '';
             content.style.paddingBottom = '';
         };
 
@@ -942,7 +944,7 @@ const VideoActions = {
             }
             input.removeEventListener('focus', onFocus);
             input.removeEventListener('blur', onBlur);
-            inputBar.style.transform = '';
+            inputBar.style.bottom = '';
             content.style.paddingBottom = '';
         };
 
