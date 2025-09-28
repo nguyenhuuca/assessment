@@ -575,7 +575,19 @@ const VideoActions = {
         // Save current containerId
         this.currentCommentContainerId = containerId;
         // Show comment panel modal on the right
-        document.getElementById('commentPanelModal').classList.add('active');
+        const commentPanel = document.getElementById('commentPanelModal');
+        commentPanel.classList.add('active');
+        
+        // Focus input after a short delay to ensure panel is visible
+        setTimeout(() => {
+            const commentInput = document.getElementById('commentInput');
+            if (commentInput) {
+                commentInput.focus();
+                // Scroll to bottom to show input on mobile
+                commentInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 350); // Wait for animation to complete
+        
         // TODO: Load comments for current video
         this.loadComments(containerId);
     },
@@ -836,6 +848,11 @@ const VideoActions = {
                 id: rs.data.id,
                 content: commentContent
             });
+            
+            // Focus input again for mobile
+            setTimeout(() => {
+                commentInput.focus();
+            }, 100);
             
             showMessage('Comment sent successfully!', 'success');
         }).fail((err) => {
