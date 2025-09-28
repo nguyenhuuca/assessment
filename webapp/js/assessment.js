@@ -577,6 +577,8 @@ const VideoActions = {
         // Show comment panel modal on the right
         const commentPanel = document.getElementById('commentPanelModal');
         commentPanel.classList.add('active');
+        // Setup keyboard avoidance on mobile
+        try { VideoActions._setupKeyboardAvoidance(); } catch (e) {}
         
         // Focus input after a short delay to ensure panel is visible
         setTimeout(() => {
@@ -595,6 +597,11 @@ const VideoActions = {
     closeCommentPanel() {
         document.getElementById('commentPanelModal').classList.remove('active');
         this.currentCommentContainerId = null;
+        // Cleanup keyboard avoidance listeners if any
+        if (typeof VideoActions._kbCleanup === 'function') {
+            try { VideoActions._kbCleanup(); } catch (e) {}
+            VideoActions._kbCleanup = null;
+        }
     },
 
     loadComments(containerId) {
@@ -889,6 +896,58 @@ const VideoActions = {
                 alert('Share feature coming soon!');
             });
         }
+    },
+
+    // Keyboard avoidance for mobile virtual keyboard
+    _setupKeyboardAvoidance() {
+        const panel = document.getElementById('commentPanelModal');
+        if (!panel) return;
+        const inputBar = panel.querySelector('.comment-panel-input');
+        const content = panel.querySelector('.comment-panel-content');
+        const list = panel.querySelector('.comment-panel-list');
+        const input = document.getElementById('commentInput');
+        if (!inputBar || !content || !list || !input) return;
+
+        const applyInset = () => {
+            if (!window.visualViewport) return;
+            const vv = window.visualViewport;
+            const heightDiff = Math.max(0, window.innerHeight - vv.height);
+            if (heightDiff > 0) {
+                inputBar.style.transform = `translateY(-${heightDiff}px)`;
+                content.style.paddingBottom = `${heightDiff + 16}px`;
+                try { list.scrollTop = list.scrollHeight; } catch (e) {}
+            } else {
+                inputBar.style.transform = '';
+                content.style.paddingBottom = '';
+            }
+        };
+
+        const onFocus = () => applyInset();
+        const onBlur = () => {
+            inputBar.style.transform = '';
+            content.style.paddingBottom = '';
+        };
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', applyInset);
+            window.visualViewport.addEventListener('scroll', applyInset);
+        }
+        input.addEventListener('focus', onFocus);
+        input.addEventListener('blur', onBlur);
+
+        VideoActions._kbCleanup = () => {
+            if (window.visualViewport) {
+                window.visualViewport.removeEventListener('resize', applyInset);
+                window.visualViewport.removeEventListener('scroll', applyInset);
+            }
+            input.removeEventListener('focus', onFocus);
+            input.removeEventListener('blur', onBlur);
+            inputBar.style.transform = '';
+            content.style.paddingBottom = '';
+        };
+
+        // Initial apply
+        applyInset();
     }
 };
 
