@@ -37,6 +37,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     // Whitelisted endpoints
+                    auth.requestMatchers("/admin/**").authenticated();
                     AppConstant.WebIgnoringConfig.WHITE_LIST_PATH.forEach(item -> auth.requestMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()).permitAll());
                     auth.requestMatchers(swaggerWhiteList).permitAll();
                     auth.anyRequest().permitAll();
@@ -55,7 +56,11 @@ public class WebSecurityConfig {
             CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
             config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             config.setAllowedHeaders(List.of("*"));
-            config.setAllowedOrigins(List.of("*"));
+            config.setAllowedOriginPatterns(List.of(
+                    "http://localhost:*",
+                    "https://*.canh-labs.com",
+                    "https://canh-labs.com"
+            ));
             return config;
         };
     }
