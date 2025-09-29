@@ -2,6 +2,43 @@
 # This file is used to configure common settings for all profiles
 #######################################################
 
+spring:
+  profiles:
+    active: prod   # prod (swagger disable)
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+# Springdoc (OpenAPI/Swagger) config
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    # path: /swagger-ui/index.html
+    enabled: true
+  show-actuator: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+# Springdoc (OpenAPI/Swagger) config
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: false
+  swagger-ui:
+    # path: /swagger-ui/index.html
+    enabled: false
+  show-actuator: true
+
+---
+#### Default config for all profiles
 # Hibernate - SQL configure
 spring:
   threads:
@@ -100,14 +137,7 @@ logging:
   masking:
     fields: [password, token, secret, otp, apiKey, api_key, gptKey, gpt_key, googleApiKey, google_api_key, jwt]
 
-# Springdoc (OpenAPI/Swagger) config
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    # path: /swagger-ui/index.html
-    enabled: true
-  show-actuator: true
+
 
 
 

@@ -575,7 +575,21 @@ const VideoActions = {
         // Save current containerId
         this.currentCommentContainerId = containerId;
         // Show comment panel modal on the right
-        document.getElementById('commentPanelModal').classList.add('active');
+        const commentPanel = document.getElementById('commentPanelModal');
+        commentPanel.classList.add('active');
+        // Setup keyboard avoidance on mobile
+        try { VideoActions._setupKeyboardAvoidance(); } catch (e) {}
+        
+        // Focus input after a short delay to ensure panel is visible
+        setTimeout(() => {
+            const commentInput = document.getElementById('commentInput');
+            if (commentInput) {
+                commentInput.focus();
+                // Scroll to bottom to show input on mobile
+                commentInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 350); // Wait for animation to complete
+        
         // TODO: Load comments for current video
         this.loadComments(containerId);
     },
@@ -583,6 +597,11 @@ const VideoActions = {
     closeCommentPanel() {
         document.getElementById('commentPanelModal').classList.remove('active');
         this.currentCommentContainerId = null;
+        // Cleanup keyboard avoidance listeners if any
+        if (typeof VideoActions._kbCleanup === 'function') {
+            try { VideoActions._kbCleanup(); } catch (e) {}
+            VideoActions._kbCleanup = null;
+        }
     },
 
     loadComments(containerId) {
@@ -837,6 +856,11 @@ const VideoActions = {
                 content: commentContent
             });
             
+            // Focus input again for mobile
+            setTimeout(() => {
+                commentInput.focus();
+            }, 100);
+            
             showMessage('Comment sent successfully!', 'success');
         }).fail((err) => {
             showMessage(err.responseJSON?.error?.message || 'Error occurred while sending comment', 'error');
@@ -872,6 +896,60 @@ const VideoActions = {
                 alert('Share feature coming soon!');
             });
         }
+    },
+
+    // Keyboard avoidance for mobile virtual keyboard
+    _setupKeyboardAvoidance() {
+        const panel = document.getElementById('commentPanelModal');
+        if (!panel) return;
+        const inputBar = panel.querySelector('.comment-panel-input');
+        const content = panel.querySelector('.comment-panel-content');
+        const list = panel.querySelector('.comment-panel-list');
+        const input = document.getElementById('commentInput');
+        if (!inputBar || !content || !list || !input) return;
+
+        const applyInset = () => {
+            if (!window.visualViewport) return;
+            const vv = window.visualViewport;
+            const heightDiff = Math.max(0, window.innerHeight - vv.height);
+            if (heightDiff > 0) {
+                // Move input bar up by setting bottom offset
+                inputBar.style.bottom = `${heightDiff}px`;
+                // Ensure content area reserves space
+                content.style.paddingBottom = `${heightDiff + 88}px`;
+                try { list.scrollTop = list.scrollHeight; } catch (e) {}
+            } else {
+                inputBar.style.bottom = '';
+                content.style.paddingBottom = '';
+            }
+        };
+
+        const onFocus = () => applyInset();
+        const onBlur = () => {
+            inputBar.style.bottom = '';
+            content.style.paddingBottom = '';
+        };
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', applyInset);
+            window.visualViewport.addEventListener('scroll', applyInset);
+        }
+        input.addEventListener('focus', onFocus);
+        input.addEventListener('blur', onBlur);
+
+        VideoActions._kbCleanup = () => {
+            if (window.visualViewport) {
+                window.visualViewport.removeEventListener('resize', applyInset);
+                window.visualViewport.removeEventListener('scroll', applyInset);
+            }
+            input.removeEventListener('focus', onFocus);
+            input.removeEventListener('blur', onBlur);
+            inputBar.style.bottom = '';
+            content.style.paddingBottom = '';
+        };
+
+        // Initial apply
+        applyInset();
     }
 };
 
