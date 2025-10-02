@@ -24,6 +24,10 @@ public class RateLimitAspect {
     }
 
 
+    /**
+     * Aspect to enforce rate limiting on methods annotated with @RateLimited.
+     * Limits requests based on user authentication or IP address.
+     */
     @Around("@annotation(rateLimited)")
     public Object rateLimit(ProceedingJoinPoint joinPoint, RateLimited rateLimited) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();

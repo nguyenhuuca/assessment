@@ -32,6 +32,11 @@ public class AuditLogAspect {
         this.maskingUtil = maskingUtil;
     }
 
+    /**
+     * Aspect to log audit information for methods annotated with @AuditLog or within classes annotated with @AuditLog.
+     * Logs method name, input parameters (with sensitive fields masked), output (with sensitive fields masked),
+     * execution time, client IP, and username.
+     */
     @Around("execution(* *(..)) && (@within(com.canhlabs.funnyapp.aop.AuditLog) || @annotation(com.canhlabs.funnyapp.aop.AuditLog))")
     public Object logAudit(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
@@ -76,6 +81,9 @@ public class AuditLogAspect {
         }
     }
 
+    /*
+     * Get username from Spring Security context, or "anonymous" if not authenticated
+     */
     private static String getUsername() {
         String username = "anonymous";
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -90,6 +98,7 @@ public class AuditLogAspect {
         return username;
     }
 
+    // Get client IP address from request headers or remote address
     private String getClientIP() {
         try {
             HttpServletRequest request =
