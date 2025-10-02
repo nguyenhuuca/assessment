@@ -41,6 +41,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      * Handle MissingServletRequestParameterException. Triggered when a 'required'
      * request parameter is missing.
      */
+
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(ex.getMessage(), ex);

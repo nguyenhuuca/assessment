@@ -4,7 +4,6 @@ import com.canhlabs.funnyapp.aop.RateLimited;
 import com.canhlabs.funnyapp.dto.CommentNode;
 import com.canhlabs.funnyapp.dto.CreateCommentRequest;
 import com.canhlabs.funnyapp.dto.CreateCommentResponse;
-import com.canhlabs.funnyapp.dto.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ResultStatus;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -43,7 +41,7 @@ public class CommentController {
                 .build(), HttpStatus.OK);
     }
 
-    @RateLimited(permit = 5, windowInSeconds = 60) // 5 requests per minute
+    @RateLimited(permit = 5) // 5 requests per minute
     @PostMapping("/videos/{videoId}/comments")
     public ResponseEntity<ResultObjectInfo<CreateCommentResponse>> create(
             @PathVariable String videoId,

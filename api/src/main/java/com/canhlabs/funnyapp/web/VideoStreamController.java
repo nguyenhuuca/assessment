@@ -29,8 +29,8 @@ import java.util.List;
 @RequestMapping(AppConstant.API.BASE_URL + "/video-stream")
 @RestController
 public class VideoStreamController {
-    private final long FIRST_CHUNK_SIZE = 256 * 1024L; // 256KB
-    private final long NEXT_CHUNK_SIZE = 512 * 1024L;  // 512KB
+    private static final long FIRST_CHUNK_SIZE = 256 * 1024L; // 256KB
+    private static final long NEXT_CHUNK_SIZE = 512 * 1024L;  // 512KB
     private final StreamVideoService videoService;
 
     public VideoStreamController(StreamVideoService videoService) {
@@ -119,8 +119,9 @@ public class VideoStreamController {
                     end = Math.min(start + chunkSize - 1, fileSize - 1);
                 }
                 return new Range(start, end);
-            } catch (NumberFormatException e) {
-                log.warn("⚠️ Invalid range format: {}, fallback to full stream", rangeHeader);
+            } catch (NumberFormatException numE) {
+                log.error("NumberFormatException", numE);
+                log.warn("Invalid range format: {}, fallback to full stream", rangeHeader);
             }
         }
         return null;

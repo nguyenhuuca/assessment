@@ -5,12 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Builder
 public class CustomException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = -2885187154886758927L;
     private final transient Object error;
     private final String message;
