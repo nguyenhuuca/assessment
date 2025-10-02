@@ -22,10 +22,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>24</java.version>
         <lombok.version>1.18.38</lombok.version>
-        <common-lang.version>3.17.0</common-lang.version>
+        <common-lang.version>3.18.0</common-lang.version>
         <json-lib.version>20231013</json-lib.version>
         <commons-validator.version>1.7</commons-validator.version>
-        <spring-boot-admin-starter-client.version>3.2.5</spring-boot-admin-starter-client.version>
         <guava.version>32.1.2-jre</guava.version>
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
