@@ -286,6 +286,16 @@ const VideoActions = {
                 }, 200);
             }
         }
+
+        // If comment panel is open, auto reload comments for the new current video
+        const commentPanel = document.getElementById('commentPanelModal');
+        if (commentPanel && commentPanel.classList.contains('active') && this.currentCommentContainerId === containerId) {
+            try {
+                this.loadComments(containerId);
+            } catch (e) {
+                console.error('Failed to auto-load comments on video change', e);
+            }
+        }
     },
 
     createNewVideo(containerId, idx, direction) {
@@ -610,8 +620,12 @@ const VideoActions = {
 
         // Show loading
         const commentList = document.querySelector('.comment-panel-list');
+        const titleEl = document.querySelector('.comment-panel-title');
         if (commentList) {
             commentList.innerHTML = '<div class="text-center text-muted mt-4"><div class="spinner-border spinner-border-sm" role="status"></div> Loading comments...</div>';
+        }
+        if (titleEl) {
+            titleEl.innerHTML = 'Bình luận <span class="spinner-border spinner-border-sm ms-2" role="status"></span>';
         }
 
         $.ajax({
@@ -623,12 +637,17 @@ const VideoActions = {
             // Get comments from rs.data
             const comments = Array.isArray(rs.data) ? rs.data : [];
             this.renderComments(comments);
+            // Update count on icon
+            this.updateCommentBadgeCount(comments.length);
         }).fail((err) => {
             console.error('Failed to load comments:', err);
             const commentList = document.querySelector('.comment-panel-list');
             if (commentList) {
                 commentList.innerHTML = '<div class="text-center text-muted mt-4">Cannot load comments</div>';
             }
+        }).always(() => {
+            const titleFinal = document.querySelector('.comment-panel-title');
+            if (titleFinal) titleFinal.textContent = 'Bình luận';
         });
     },
 
@@ -639,6 +658,8 @@ const VideoActions = {
         // Ensure comments is an array
         if (!Array.isArray(comments) || comments.length === 0) {
             commentList.innerHTML = '<div class="text-center text-muted mt-4">No comments yet</div>';
+            // Ensure scroll bottom (noop when empty) and badge count
+            try { commentList.scrollTop = commentList.scrollHeight; } catch (e) {}
             return;
         }
 
@@ -689,6 +710,8 @@ const VideoActions = {
         }).join('');
 
         commentList.innerHTML = commentsHtml;
+        // Auto scroll to latest
+        try { commentList.scrollTop = commentList.scrollHeight; } catch (e) {}
     },
 
     // Function to create hash from string to generate random names
@@ -769,6 +792,11 @@ const VideoActions = {
 
         // Append to end of list (newest comment at bottom)
         commentList.insertAdjacentHTML('beforeend', commentHtml);
+        // Auto scroll to latest
+        try { commentList.scrollTop = commentList.scrollHeight; } catch (e) {}
+
+        // Increment badge count
+        this.incrementCommentBadgeCount(1);
     },
 
     sendComment() {
@@ -896,6 +924,32 @@ const VideoActions = {
                 alert('Share feature coming soon!');
             });
         }
+    },
+
+    // Update the small badge showing comment count next to the comment icon in the action bar
+    updateCommentBadgeCount(count) {
+        const containerId = this.getCurrentContainerId();
+        if (!containerId) return;
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (!container) return;
+        const commentBtn = container.querySelector('.action-group .action-button.comment');
+        if (!commentBtn) return;
+        const countSpan = commentBtn.parentElement.querySelector('.action-count');
+        if (!countSpan) return;
+        countSpan.textContent = String(count);
+    },
+
+    incrementCommentBadgeCount(delta) {
+        const containerId = this.getCurrentContainerId();
+        if (!containerId) return;
+        const container = document.getElementById(`video-items-${containerId}`);
+        if (!container) return;
+        const commentBtn = container.querySelector('.action-group .action-button.comment');
+        if (!commentBtn) return;
+        const countSpan = commentBtn.parentElement.querySelector('.action-count');
+        if (!countSpan) return;
+        const curr = parseInt(countSpan.textContent || '0', 10) || 0;
+        countSpan.textContent = String(Math.max(0, curr + delta));
     },
 
     // Keyboard avoidance for mobile virtual keyboard
