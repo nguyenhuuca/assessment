@@ -56,11 +56,12 @@ public class WebSecurityConfig {
             CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
             config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             config.setAllowedHeaders(List.of("*"));
-            config.setAllowedOriginPatterns(List.of(
-                    "http://localhost:*",
-                    "https://*.canh-labs.com",
-                    "https://canh-labs.com"
-            ));
+            config.setAllowedOrigins(List.of("*"));
+//            config.setAllowedOriginPatterns(List.of(
+//                    "http://localhost:*",
+//                    "https://*.canh-labs.com",
+//                    "https://canh-labs.com"
+//            ));
             return config;
         };
     }
