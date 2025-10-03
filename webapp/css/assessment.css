@@ -2107,16 +2107,12 @@ body.modal-open {
 .comment-panel-input {
     display: flex;
     align-items: center;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 14px;
-    padding-bottom: 5px;
-    /* padding: 14px 20px; */
+    padding: 14px 20px;
     border-top: 1px solid #444;
     background: #232323;
     position: sticky; /* keep visible within panel */
     bottom: 0; /* stick to bottom of panel */
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px)); /* account for notches */
+    padding-bottom: calc(env(safe-area-inset-bottom, 2px)); /* account for notches */
 }
 .comment-panel-input input[type="text"] {
     flex: 1 1 auto;
