@@ -743,10 +743,22 @@ const VideoActions = {
         const currentVideo = this.getCurrentVideo();
         if (!currentVideo) return;
 
+        // Prepare headers
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        // Add X-Guest-Token if available (so server knows if user is new or existing)
+        const existingGuestToken = localStorage.getItem('guestToken');
+        if (existingGuestToken) {
+            headers['X-Guest-Token'] = existingGuestToken;
+        }
+
         $.ajax({
             url: appConst.baseUrl.concat(`/videos/${currentVideo.id}/comments/${commentId}`),
             type: "DELETE",
-            dataType: "json"
+            dataType: "json",
+            headers: headers
         }).done(() => {
             showMessage('Comment deleted successfully!', 'success');
             // Reload comments
