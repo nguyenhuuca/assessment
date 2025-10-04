@@ -187,6 +187,20 @@ cd api
 
 ---
 
+## Docker options
+
+Build your JAR:
+```
+mvn clean package
+```
+Build the Docker image:
+```
+docker build -t funny-app .
+```
+Run the container:
+```
+docker run -p 8080:8080 --env-file env.local funny-app
+```
 ##  Online Demo
 
 🔗 [https://funnyapp.canh-labs.com/](https://funnyapp.canh-labs.com/)
