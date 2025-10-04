@@ -6,6 +6,7 @@ import com.canhlabs.funnyapp.dto.CreateCommentResponse;
 import com.canhlabs.funnyapp.entity.VideoComment;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.utils.AppUtils;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -98,7 +99,7 @@ public class VideoCommentServiceImpl {
         }
 
         boolean guestOk = false;
-        if (c.getUserId() == null && c.getGuestTokenHash() != null && guestTokenIfAny != null) {
+        if (StringUtils.isEmpty(c.getUserId()) && c.getGuestTokenHash() != null && guestTokenIfAny != null) {
             guestOk = guestTokenIfAny.equals(c.getGuestTokenHash());
         }
 
