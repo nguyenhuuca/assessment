@@ -42,12 +42,13 @@ public class AppConstant {
                 PathObject.builder().path("/share-links").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/health").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build(),
-                PathObject.builder().path("/thread/**").method(HttpMethod.GET.name()).build()
+                PathObject.builder().path("/thread/**").method(HttpMethod.GET.name()).build(),
+                PathObject.builder().path("/videos/*/comments/*").method(HttpMethod.DELETE.name()).build()
 
         );
 
         // apply for document swagger
-        public static final List<String> SWAGGER_DOC = List.of(
+        public static final List<String> ALLOW_ALL_METHOD = List.of(
                 "/",
                 "/v1/funny-app/video-stream",
                 "/v1/funny-app/video-stream/**",
@@ -58,8 +59,7 @@ public class AppConstant {
                 "/actuator/**",
                 "/v1/funny-app/top-videos",
                 "/v1/funny-app/top-videos/**",
-                "/v1/funny-app/videos/*/comments",
-                "/v1/funny-app/comments/*"
+                "/v1/funny-app/videos/*/comments"
                 // other public endpoints of your API may be appended to this array
         );
 

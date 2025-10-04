@@ -24,8 +24,8 @@ class AppConstantTest {
 
     @Test
     void testSwaggerDocList() {
-        assertTrue(AppConstant.WebIgnoringConfig.SWAGGER_DOC.contains("/swagger-ui.html"));
-        assertTrue(AppConstant.WebIgnoringConfig.SWAGGER_DOC.contains("/v3/api-docs/**"));
+        assertTrue(AppConstant.WebIgnoringConfig.ALLOW_ALL_METHOD.contains("/swagger-ui.html"));
+        assertTrue(AppConstant.WebIgnoringConfig.ALLOW_ALL_METHOD.contains("/v3/api-docs/**"));
     }
 
     @Test

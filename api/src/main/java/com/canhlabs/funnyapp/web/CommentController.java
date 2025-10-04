@@ -58,8 +58,9 @@ public class CommentController {
      * DELETE is publicly reachable; service enforces auth/guest token policy.
      * Guests must send header: X-Guest-Token: <token>
      */
-    @DeleteMapping("/comments/{id}")
+    @DeleteMapping("/videos/{videoId}/comments/{id}")
     public ResponseEntity<ResultObjectInfo<String>> delete(
+            @PathVariable String videoId,
             @PathVariable String id,
             @RequestHeader(name = "X-Guest-Token", required = false) String guestToken
     ) {

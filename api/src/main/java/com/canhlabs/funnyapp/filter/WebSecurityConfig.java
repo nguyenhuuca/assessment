@@ -30,7 +30,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // Build a white list from your AppConstant config
-        String[] swaggerWhiteList = AppConstant.WebIgnoringConfig.SWAGGER_DOC.toArray(new String[0]);
+        String[] swaggerWhiteList = AppConstant.WebIgnoringConfig.ALLOW_ALL_METHOD.toArray(new String[0]);
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))

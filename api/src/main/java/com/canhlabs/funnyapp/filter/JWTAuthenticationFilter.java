@@ -20,7 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 
-import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.SWAGGER_DOC;
+import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.ALLOW_ALL_METHOD;
 import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.WHITE_LIST_PATH;
 
 
@@ -68,7 +68,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         String method = request.getMethod();
         boolean isWhitePath = WHITE_LIST_PATH.stream().anyMatch(p -> pathMatcher.match(p.getFullPath(), path) && p.getMethod().equals(method));
-        boolean isApiDocPath = SWAGGER_DOC.stream().anyMatch(p -> pathMatcher.match(p, path));
+        boolean isApiDocPath = ALLOW_ALL_METHOD.stream().anyMatch(p -> pathMatcher.match(p, path));
         return isWhitePath || isApiDocPath;
     }
 
