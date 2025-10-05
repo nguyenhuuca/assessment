@@ -20,7 +20,7 @@ autoscaling:
 
 resources:
   requests:
-    cpu: "500m"      # tối thiểu 0.1 CPU
+    cpu: "400m"      # tối thiểu 0.1 CPU
     memory: "1000Mi"  # tối thiểu 256 MB RAM
   limits:
     cpu: "500m"      # tối đa 0.5 CPU
