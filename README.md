@@ -199,7 +199,7 @@ docker build -t funny-app .
 ```
 Run the container:
 ```
-docker run -p 8080:8080 --env-file env.local funny-app
+docker run -p 8081:8081 --env-file env.local funny-app
 ```
 ##  Online Demo
 
