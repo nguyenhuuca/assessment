@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: funny-app
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: funny-app
+  template:
+    metadata:
+      labels:
+        app: funny-app
+    spec:
+      containers:
+        - name: funny-app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.containerPort }}
+          env:
+            {{- range .Values.env }}
+              - name: {{ .name }}
+                value: "{{ .value }}"
+            {{- end }}
+
+

@@ -1,0 +1,55 @@
+# values.yaml
+namespace: funny-app
+
+replicaCount: 1
+
+image:
+  repository: registry:5000/funny-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+ingress:
+  enabled: false
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 1
+  targetCPUUtilizationPercentage: 80
+
+resources:
+  requests:
+    cpu: "500m"      # tối thiểu 0.1 CPU
+    memory: "1000Mi"  # tối thiểu 256 MB RAM
+  limits:
+    cpu: "500m"      # tối đa 0.5 CPU
+    memory: "600Mi"  # tối đa 512 MB RAM
+
+service:
+  type: NodePort
+  port: 8081
+  targetPort: 8081
+  nodePort: 30080
+
+containerPort: 8080
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: "dev"
+  - name: JAVA_OPTS
+    value: "-Xms256m -Xmx512m"
+  - name: DB_USER
+    value: "postgres"
+  - name: DB_NAME
+    value: "funnyapp"
+  - name: DB_PASS
+    value: "123456"
+  - name: DB_HOST
+    value: "host.docker.internal"
+  - name: DB_USER
+    value: "postgres"
+  - name: EMAIL_SENDER
+    value: "no-reply@abc.com"
+  - name: EMAIL_PASS
+    value: "111"
+
