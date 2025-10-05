@@ -49,7 +49,7 @@ env:
   - name: DB_USER
     value: "postgres"
   - name: EMAIL_SENDER
-    value: "no-reply@abc.com"
+    value: "no-reply@abcd.com"
   - name: EMAIL_PASS
     value: "111"
 
