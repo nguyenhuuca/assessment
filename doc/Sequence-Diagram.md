@@ -24,3 +24,19 @@
 
 ---
 ![JobGetVideo.png](images/JobGetVideo.png)
+
+---
+
+
+### Deployment Diagram for SSH Deployment via CI/CD Flow
+
+---
+![funny-app-ssh-deploy-CI_CD_Flow___SSH_Deployment__Funny_App_.png](images/funny-app-ssh-deploy-CI_CD_Flow___SSH_Deployment__Funny_App_.png)
+
+---
+
+### Deployment Diagram for Kubernetes Deployment via CI/CD Flow
+
+![funny-app-helm-argocd-CI_CD_Flow___Helm___ArgoCD_Deployment__Funny_App_.png](images/funny-app-helm-argocd-CI_CD_Flow___Helm___ArgoCD_Deployment__Funny_App_.png)
+
+---

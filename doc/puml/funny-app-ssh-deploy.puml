@@ -1,0 +1,28 @@
+@startuml
+title CI/CD Flow - SSH Deployment (Funny-App)
+
+actor Developer
+participant "GitHub Actions" as GH
+participant "Remote Server (SSH)" as SSH
+
+== Code Commit ==
+Developer -> GH: Push code to main branch
+note right of GH
+# Continuous Integration
+- Trigger build on push
+- Run unit tests
+- Package JAR (funny-app-1.0.0.jar)
+end note
+
+== Build & Test ==
+GH -> GH: Build with Maven\n(run tests, generate funny-app-1.0.0.jar)
+
+== Deploy via SSH ==
+GH -> SSH: Copy funny-app-1.0.0.jar via SSH
+SSH -> SSH: Stop old app\nRun new funny-app-1.0.0.jar
+SSH -> Developer: Report deployment success
+
+== Monitoring ==
+Developer <- SSH: Optional logs or status via SSH
+
+@enduml
