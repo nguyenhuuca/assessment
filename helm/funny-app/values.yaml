@@ -71,6 +71,6 @@ readinessProbe:
   periodSeconds: 5
 
 gcpCredentials:
-  hostPath: "D:\DO\assessment\api\src\main\resources\googlekey.json" # đường dẫn trên host Windows
+  hostPath: "D:/DO/assessment/api/src/main/resources/googlekey.json" # đường dẫn trên host Windows
   containerPath: "/secrets/googlekey.json"
 
