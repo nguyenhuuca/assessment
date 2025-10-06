@@ -50,9 +50,15 @@ env:
   - name: DB_USER
     value: "postgres"
   - name: EMAIL_SENDER
-    value: "no-reply@abcd.com"
+    valueFrom:
+      secretKeyRef:
+        name: email-credentials
+        key: EMAIL_SENDER
   - name: EMAIL_PASS
-    value: "111"
+    valueFrom:
+      secretKeyRef:
+        name: email-credentials
+        key: EMAIL_PASS
   - name: GOOGLE_CREDENTIAL_PATH
     value: "/secrets/googlekey.json"
 
