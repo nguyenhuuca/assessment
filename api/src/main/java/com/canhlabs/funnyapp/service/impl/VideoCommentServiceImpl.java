@@ -8,6 +8,7 @@ import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.utils.AppUtils;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VideoCommentServiceImpl {
     private final VideoCommentRepository repo;
     private final PasswordEncoder passwordEncoder;
@@ -92,6 +94,8 @@ public class VideoCommentServiceImpl {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAuthed = (auth != null && auth.isAuthenticated());
         boolean isOwnerUser = false;
+        log.info("Delete comment request: isAuthed={}, userId={}, commentUserId={}, guestTokenIfAny={}",
+                isAuthed, auth != null ? auth.getName() : null, c.getUserId(), guestTokenIfAny != null ? "[PROVIDED]" : "[NOT_PROVIDED]");
 
         if (isAuthed && c.getUserId() != null) {
             String principalName = auth.getName();
