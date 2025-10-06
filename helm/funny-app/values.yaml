@@ -53,6 +53,8 @@ env:
     value: "no-reply@abcd.com"
   - name: EMAIL_PASS
     value: "111"
+  - name: GOOGLE_APPLICATION_CREDENTIALS
+    value: "/secrets/googlekey.json"
 
 livenessProbe:
   enabled: true
