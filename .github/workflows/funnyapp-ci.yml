@@ -226,7 +226,7 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Check built JAR
-        run: ls -la api/target/
+        run: ls -la target/
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
