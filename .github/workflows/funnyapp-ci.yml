@@ -263,7 +263,7 @@ jobs:
       - name: Update Helm values.yaml with new Docker tag
         run: |
           VERSION_FILE="api/.funny-app.version"
-          HELM_VALUES="helm/values.yaml"
+          HELM_VALUES="helm/funny-app/values.yaml"
       
           # Read new version
           NEW_VERSION=$(cat $VERSION_FILE)
