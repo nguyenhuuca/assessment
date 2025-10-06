@@ -41,5 +41,16 @@ spec:
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
           {{- end }}
+          volumeMounts:
+            - name: gcp-creds
+              mountPath: {{ .Values.gcpCredentials.containerPath }}
+              subPath: googlekey.json
+      volumes:
+        - name: gcp-creds
+          hostPath:
+            path: {{ .Values.gcpCredentials.hostPath }}
+            type: File
+
+
 
 
