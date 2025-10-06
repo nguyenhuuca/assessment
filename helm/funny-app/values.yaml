@@ -47,20 +47,16 @@ env:
     value: "123456"
   - name: DB_HOST
     value: "host.docker.internal"
-  - name: DB_USER
-    value: "postgres"
-  - name: EMAIL_SENDER
-    valueFrom:
-      secretKeyRef:
-        name: email-credentials
-        key: EMAIL_SENDER
-  - name: EMAIL_PASS
-    valueFrom:
-      secretKeyRef:
-        name: email-credentials
-        key: EMAIL_PASS
   - name: GOOGLE_CREDENTIAL_PATH
     value: "/secrets/googlekey.json"
+
+envFromSecret:
+  - name: EMAIL_SENDER
+    secretName: email-credentials
+    key: EMAIL_SENDER
+  - name: EMAIL_PASS
+    secretName: email-credentials
+    key: EMAIL_PASS
 
 livenessProbe:
   enabled: true

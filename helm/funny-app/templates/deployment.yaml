@@ -25,6 +25,14 @@ spec:
                 value: "{{ .value }}"
             {{- end }}
 
+            {{- range .Values.envFromSecret }}
+              - name: {{ .name }}
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ .secretName }}
+                    key: {{ .key }}
+            {{- end }}
+
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
