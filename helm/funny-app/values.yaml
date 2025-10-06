@@ -33,7 +33,7 @@ service:
   targetPort: 8081
   nodePort: 30080
 
-containerPort: 8080
+containerPort: 8081
 env:
   - name: SPRING_PROFILES_ACTIVE
     value: "dev"
