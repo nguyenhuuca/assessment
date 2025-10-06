@@ -60,20 +60,24 @@ envFromSecret:
 
 livenessProbe:
   enabled: true
-  httpGet:
-    path: /actuator/health
-    port: 8081
-  initialDelaySeconds: 120
+  exec:
+    command: [ "curl", "-f", "http://localhost:8081/actuator/health" ]
+#  httpGet:
+#    path: /actuator/health
+#    port: 8081
+  initialDelaySeconds: 60
   periodSeconds: 10
   timeoutSeconds: 10
   failureThreshold: 10
 
 readinessProbe:
   enabled: true
-  httpGet:
-    path: /actuator/health
-    port: 8081
-  initialDelaySeconds: 120
+  exec:
+    command: [ "curl", "-f", "http://localhost:8081/actuator/health" ]
+#  httpGet:
+#    path: /actuator/health
+#    port: 8081
+  initialDelaySeconds: 60
   periodSeconds: 5
   timeoutSeconds: 10
   failureThreshold: 10

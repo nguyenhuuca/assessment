@@ -35,20 +35,36 @@ spec:
 
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
+            {{- if .Values.livenessProbe.exec }}
+            exec:
+              command: {{ toYaml .Values.livenessProbe.exec.command | nindent 4 }}
+            {{- else if .Values.livenessProbe.httpGet }}
             httpGet:
               path: {{ .Values.livenessProbe.httpGet.path }}
               port: {{ .Values.livenessProbe.httpGet.port }}
+            {{- end }}
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 1 }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
           {{- end }}
+
           {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
+            {{- if .Values.readinessProbe.exec }}
+            exec:
+              command: {{ toYaml .Values.readinessProbe.exec.command | nindent 4 }}
+            {{- else if .Values.readinessProbe.httpGet }}
             httpGet:
               path: {{ .Values.readinessProbe.httpGet.path }}
               port: {{ .Values.readinessProbe.httpGet.port }}
+            {{- end }}
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 1 }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
           {{- end }}
+
           volumeMounts:
             - name: gcp-creds
               mountPath: {{ .Values.gcpCredentials.mountPath  }}
