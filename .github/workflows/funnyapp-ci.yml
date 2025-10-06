@@ -250,13 +250,41 @@ jobs:
         run: |
           echo "${{ steps.next_version.outputs.next_version }}" > api/.funny-app.version
 
-      - name: Commit and push new version
+      - name: Bump new version
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add api/.funny-app.version
           git commit -m "[skip ci] 🔢 bump version to ${{ steps.next_version.outputs.next_version }}" || echo "No changes"
+          
+          git pull --rebase origin main
           git push origin main
+          
+      - name: Update Helm values.yaml with new Docker tag
+        run: |
+          VERSION_FILE="api/.funny-app.version"
+          HELM_VALUES="helm/values.yaml"
+      
+          # Read new version
+          NEW_VERSION=$(cat $VERSION_FILE)
+          echo "Updating Helm tag to prod-$NEW_VERSION"
+      
+          # Update tag in values.yaml
+          # Keep indent 2 spaces
+          sed -i "s/^  tag: .*/  tag: prod-$NEW_VERSION/" $HELM_VALUES
+      
+          # Commit and push
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+          git add $HELM_VALUES
+          git commit -m "[skip ci] 🔢 update Helm chart image tag to prod-$NEW_VERSION" || echo "No changes to commit"
+    
+          # Pull remote 
+          git pull --rebase origin main
+      
+          git push origin main
+
 
       - name: Create git tag
         run: |
