@@ -43,13 +43,12 @@ spec:
           {{- end }}
           volumeMounts:
             - name: gcp-creds
-              mountPath: {{ .Values.gcpCredentials.containerPath }}
+              mountPath: {{ .Values.gcpCredentials.mountPath  }}
               subPath: googlekey.json
       volumes:
         - name: gcp-creds
-          hostPath:
-            path: {{ .Values.gcpCredentials.hostPath }}
-            type: File
+          secret:
+            secretName: {{ .Values.gcpCredentials.secretName }}
 
 
 
