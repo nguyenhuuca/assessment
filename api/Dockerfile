@@ -12,7 +12,7 @@ COPY entrypoint.sh entrypoint.sh
 RUN chmod +x entrypoint.sh
 
 # Expose the default Spring Boot port
-EXPOSE 8080
+EXPOSE 8081
 
 # Use entrypoint script to inject JVM and env variables
 ENTRYPOINT ["./entrypoint.sh"]
