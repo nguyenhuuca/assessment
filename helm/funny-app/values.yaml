@@ -63,7 +63,7 @@ livenessProbe:
   httpGet:
     path: /actuator/health
     port: 8081
-  initialDelaySeconds: 10
+  initialDelaySeconds: 30
   periodSeconds: 10
 
 readinessProbe:
@@ -71,7 +71,7 @@ readinessProbe:
   httpGet:
     path: /actuator/health
     port: 8081
-  initialDelaySeconds: 5
+  initialDelaySeconds: 30
   periodSeconds: 5
 
 gcpCredentials:
