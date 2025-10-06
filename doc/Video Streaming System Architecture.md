@@ -64,6 +64,12 @@ Adopt Spring Boot monolith with clearly defined layers and caching mechanism, an
 
 ---
 
+### Gitops Continuous Deployment
+
+![Gitops-arch.png](images/Gitops-arch.png)
+
+------
+
 ## Consequences
 
 - Easy to scale the backend horizontally
