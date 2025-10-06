@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   # repository: registry:5000/funny-app
   repository: nguyenhuuca/funny-app
-  tag: prod-6
+  tag: prod-7
   pullPolicy: IfNotPresent
 
 ingress:
