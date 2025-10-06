@@ -5,7 +5,7 @@ FROM eclipse-temurin:24-jre
 WORKDIR /app
 
 # Copy the Spring Boot JAR file
-COPY api/target/funny-app-1.0.0.jar app.jar
+COPY ./target/funny-app-1.0.0.jar app.jar
 
 # Copy entrypoint script
 COPY entrypoint.sh entrypoint.sh
