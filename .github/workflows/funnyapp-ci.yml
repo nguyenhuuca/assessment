@@ -189,7 +189,7 @@ jobs:
   docker:
     name: 🐳 Build & Push Docker Image
     runs-on: ubuntu-latest
-    needs: [ test ]
+    needs: [ build ]
 
     permissions:
       contents: write   # để commit file version
