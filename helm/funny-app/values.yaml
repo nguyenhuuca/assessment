@@ -54,3 +54,19 @@ env:
   - name: EMAIL_PASS
     value: "111"
 
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /actuator/health
+    port: 8081
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /actuator/health
+    port: 8081
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
