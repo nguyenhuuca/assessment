@@ -4,8 +4,9 @@ namespace: funny-app
 replicaCount: 1
 
 image:
-  repository: registry:5000/funny-app
-  tag: latest
+  # repository: registry:5000/funny-app
+  repository: nguyenhuuca/funny-app
+  tag: prod-2
   pullPolicy: IfNotPresent
 
 ingress:
