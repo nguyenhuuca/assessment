@@ -37,15 +37,15 @@ spec:
           livenessProbe:
             {{- if .Values.livenessProbe.exec }}
             exec:
-              command: {{ toYaml .Values.livenessProbe.exec.command | nindent 4 }}
+              command: {{ .Values.livenessProbe.exec.command }}
             {{- else if .Values.livenessProbe.httpGet }}
             httpGet:
               path: {{ .Values.livenessProbe.httpGet.path }}
               port: {{ .Values.livenessProbe.httpGet.port }}
             {{- end }}
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 1 }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 20 }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 5 }}
             failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
           {{- end }}
 
@@ -53,15 +53,15 @@ spec:
           readinessProbe:
             {{- if .Values.readinessProbe.exec }}
             exec:
-              command: {{ toYaml .Values.readinessProbe.exec.command | nindent 4 }}
+              command: {{ .Values.readinessProbe.exec.command }}
             {{- else if .Values.readinessProbe.httpGet }}
             httpGet:
               path: {{ .Values.readinessProbe.httpGet.path }}
               port: {{ .Values.readinessProbe.httpGet.port }}
             {{- end }}
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 1 }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 5 }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 5 }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
           {{- end }}
 
