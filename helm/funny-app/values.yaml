@@ -63,16 +63,20 @@ livenessProbe:
   httpGet:
     path: /actuator/health
     port: 8081
-  initialDelaySeconds: 30
+  initialDelaySeconds: 120
   periodSeconds: 10
+  timeoutSeconds: 10
+  failureThreshold: 10
 
 readinessProbe:
   enabled: true
   httpGet:
     path: /actuator/health
     port: 8081
-  initialDelaySeconds: 30
+  initialDelaySeconds: 120
   periodSeconds: 5
+  timeoutSeconds: 10
+  failureThreshold: 10
 
 gcpCredentials:
   secretName: gcp-credentials
