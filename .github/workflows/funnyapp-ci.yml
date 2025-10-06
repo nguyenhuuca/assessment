@@ -232,8 +232,8 @@ jobs:
           file: ./api/Dockerfile   # point to Dockerfile
           push: true
           tags: |
-            ca-nguyen/funny-app:prod-${{ steps.next_version.outputs.next_version }}
-            ca-nguyen/funny-app:latest
+            nguyennhuuca/funny-app:prod-${{ steps.next_version.outputs.next_version }}
+            nguyenhuuca/funny-app:latest
 
       - name: Update version file
         run: |
