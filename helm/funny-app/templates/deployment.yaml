@@ -37,7 +37,7 @@ spec:
           livenessProbe:
             {{- if .Values.livenessProbe.exec }}
             exec:
-              command: {{ .Values.livenessProbe.exec.command }}
+              command: {{ .Values.livenessProbe.exec.command | toJson }}
             {{- else if .Values.livenessProbe.httpGet }}
             httpGet:
               path: {{ .Values.livenessProbe.httpGet.path }}
@@ -53,7 +53,7 @@ spec:
           readinessProbe:
             {{- if .Values.readinessProbe.exec }}
             exec:
-              command: {{ .Values.readinessProbe.exec.command }}
+              command: {{ .Values.readinessProbe.exec.command | toJson }}
             {{- else if .Values.readinessProbe.httpGet }}
             httpGet:
               path: {{ .Values.readinessProbe.httpGet.path }}
