@@ -64,7 +64,13 @@ Adopt Spring Boot monolith with clearly defined layers and caching mechanism, an
 
 ---
 
-### Gitops Continuous Deployment
+### Tradition Deployment (Current CICD) 
+
+![CiCd-Deployment.png](images/CiCd-Deployment.png)
+
+---
+
+### Gitops Continuous Deployment (Future improvement)
 
 ![Gitops-arch.png](images/Gitops-arch.png)
 
