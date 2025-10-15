@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.aop.AuditLog;
+import com.canhlabs.funnyapp.aop.RateLimited;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.service.impl.InviteServiceImpl;
@@ -61,6 +62,7 @@ public class UserController extends BaseController {
     @Operation(summary = "Login/register to system", description = "If user already registered, it will return token. If not, it will register user and return token")
     @PostMapping("/join")
     @WithSpan
+    @RateLimited(permit = 5)
     public ResponseEntity<ResultObjectInfo<UserInfoDto>> signIn(@RequestBody LoginDto loginDto) {
         UserInfoDto userInfoDto = UserInfoDto.builder().build();
         if(!appProperties.isUsePasswordless()) {
