@@ -45,19 +45,6 @@ public class ConfigBean {
         return builder.build();
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(@NotNull CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedHeaders("*")
-                        .allowedMethods("POST, PUT, GET, OPTIONS, DELETE");
-            }
-        };
-    }
-
     // To enable AuthenticationManager injection if needed
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
