@@ -45,7 +45,7 @@
 
 ---
 
-## 🧱 Code Analysis & Structural Quality
+## Code Analysis & Structural Quality
 
 | Metric | Value |
 |--------|-------|
@@ -59,7 +59,7 @@
 
 ---
 
-## 🧠 Coupling & Cohesion
+## Coupling & Cohesion
 
 | Metric | Value | Notes |
 |--------|-------|-------|
@@ -69,11 +69,11 @@
 | Propagation Cost | 3.92% | ✅ Low |
 | Maintainability Level | 91.68% | ✅ Excellent |
 
-📅 Consider reviewing high fan-out components for better modularity.
+ Consider reviewing high fan-out components for better modularity.
 
 ---
 
-## 📊 Complexity Metrics
+## Complexity Metrics
 
 | Metric | Value |
 |--------|-------|
@@ -81,10 +81,10 @@
 | Avg. Nesting Depth | 0.95 |
 | Avg. McCabe Complexity | 2.09 |
 
-🚀 Very low complexity, highly readable and testable code.
+ Very low complexity, highly readable and testable code.
 
 ---
-## 📊 A/I Chart
+##  A/I Chart
 
 ![AIChart.jpg](images/AIChart.jpg)
 
