@@ -169,7 +169,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
         String query = String.format("'%s' in parents and trashed = false and createdTime >= '%s'", folderId, uploadedAfter);
         return drive.files().list()
                 .setQ(query)
-                .setFields("files(id, name, size, createdTime)")
+                .setFields("files(id, name, size, createdTime, parents)")
                 .execute()
                 .getFiles();
     }
