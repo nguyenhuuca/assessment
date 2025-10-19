@@ -119,6 +119,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
             log.info("No new files found in folder {}", folderId);
             return;
         }
+        log.info("Forder file : {} ",files.getFirst().getParents().getFirst());
 
         try (var scope = new StructuredTaskScope<>("download", Thread.ofPlatform().factory())) {
             for (com.google.api.services.drive.model.File file : files) {
