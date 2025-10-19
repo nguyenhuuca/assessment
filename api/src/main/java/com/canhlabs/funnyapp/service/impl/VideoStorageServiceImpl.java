@@ -10,6 +10,7 @@ import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import com.canhlabs.funnyapp.utils.LimitedInputStream;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.FileList;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
@@ -48,6 +49,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     private Drive drive;
     private VideoSourceRepository videoSourceRepository;
     private ChatGptService chatGptService;
+    private JsonMapper mapper = new JsonMapper();
 
     @Autowired
     public void injectChatGptService(ChatGptService chatGptService) {
@@ -119,7 +121,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
             log.info("No new files found in folder {}", folderId);
             return;
         }
-        log.info("Forder file : {} ",files.getFirst().getParents().getFirst());
+        log.info("Forder file : {} ",mapper.writeValueAsString(files));
 
         try (var scope = new StructuredTaskScope<>("download", Thread.ofPlatform().factory())) {
             for (com.google.api.services.drive.model.File file : files) {
