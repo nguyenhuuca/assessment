@@ -90,6 +90,7 @@ class VideoStorageServiceImplTest {
         com.google.api.services.drive.model.File file = new com.google.api.services.drive.model.File();
         file.setId("id2");
         file.setName("name2.mp4");
+        file.setParents(List.of("testFolder"));
         when(appProperties.getImageStoragePath()).thenReturn("/var/test");
         when(appProperties.getImageUrl()).thenReturn("http://localhost:8080/images/");
         doReturn(List.of(file)).when(spyService).listFilesInFolder(anyString(), anyString());
