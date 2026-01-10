@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -85,9 +86,9 @@ public class VideoStreamController {
     @Operation(summary = "Get list of videos to stream", description = "Returns a list of video metadata for streaming.")
     @WithSpan
     @GetMapping("/list")
-    public ResponseEntity<ResultListInfo<VideoDto>> getListVideoStream() {
+    public ResponseEntity<ResultListInfo<VideoDto>> getListVideoStream(@RequestParam(required = false) String videoType) {
         log.info("getTopVideos Thread: {}, isVirtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
-        List<VideoDto> rs = videoService.getVideosToStream();
+        List<VideoDto> rs = videoService.getVideosToStream(videoType);
         return new ResponseEntity<>(ResultListInfo.<VideoDto>builder()
                 .status(ResultStatus.SUCCESS)
                 .data(rs)

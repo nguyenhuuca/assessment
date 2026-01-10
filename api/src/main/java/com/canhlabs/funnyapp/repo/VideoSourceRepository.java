@@ -18,6 +18,7 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
     List<VideoSource> findAllByOrderByCreatedAtDesc();
     List<VideoSource> findAllByDescIsNullOrDesc(String desc);
     List<VideoSource> findAllByIsHideOrderByCreatedAtDesc(boolean hide);
+    List<VideoSource> findAllByIsHideAndVideoTypeOrderByCreatedAtDesc(boolean hide, String type);
 
 
 }

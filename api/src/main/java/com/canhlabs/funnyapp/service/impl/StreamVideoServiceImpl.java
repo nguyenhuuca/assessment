@@ -11,6 +11,7 @@ import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -71,7 +72,13 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @AuditLog("getALLShare")
     @WithSpan
     @Override
-    public List<VideoDto> getVideosToStream() {
+    public List<VideoDto> getVideosToStream(String videoType) {
+        log.info("Fetching videos to stream of type: {}", videoType);
+        if(!StringUtils.isBlank(videoType)) {
+            return videoSourceRepository.findAllByIsHideAndVideoTypeOrderByCreatedAtDesc(Boolean.FALSE,videoType).stream()
+                    .map(this::toDto)
+                    .toList();
+        }
         return videoSourceRepository.findAllByIsHideOrderByCreatedAtDesc(Boolean.FALSE).stream()
                 .map(this::toDto)
                 .toList();

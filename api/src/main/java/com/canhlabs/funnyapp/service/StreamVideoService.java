@@ -36,7 +36,7 @@ public interface StreamVideoService {
      *
      * @return A list of VideoDto objects representing the videos.
      */
-    List<VideoDto> getVideosToStream();
+    List<VideoDto> getVideosToStream(String videoType);
 
     /**
      * Retrieves a video by its ID.

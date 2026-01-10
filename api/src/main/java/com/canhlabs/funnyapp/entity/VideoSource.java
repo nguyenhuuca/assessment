@@ -51,5 +51,8 @@ public class VideoSource extends BaseDomain {
     @Column(name = "thumbnail_path")
     private String thumbnailPath;
 
+    @Column(name = "video_type", length = 50)
+    private String videoType;
+
 
 }
