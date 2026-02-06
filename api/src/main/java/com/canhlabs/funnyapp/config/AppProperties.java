@@ -57,7 +57,5 @@ public class AppProperties {
         }
     }
 
-
-
 }
 
