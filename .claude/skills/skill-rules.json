@@ -469,6 +469,17 @@
       "priority": "low"
     },
     {
+      "name": "java",
+      "path": ".claude/skills/languages/java/SKILL.md",
+      "description": "Java development with Spring Boot, Maven/Gradle. Use when working with .java files, pom.xml, or Java applications.",
+      "triggers": {
+        "keywords": ["java", "spring", "spring boot", "maven", "gradle", "jpa", "hibernate"],
+        "intent_patterns": ["java.*code", "spring.*boot", "write.*java", "maven.*project"],
+        "file_patterns": ["*.java", "pom.xml", "build.gradle"]
+      },
+      "priority": "high"
+    },
+    {
       "name": "chaos-engineering",
       "path": ".claude/skills/operations/chaos-engineering/SKILL.md",
       "description": "Test system resilience through controlled failures and chaos experiments",
