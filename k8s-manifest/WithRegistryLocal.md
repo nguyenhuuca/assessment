@@ -1,4 +1,4 @@
-Perfect 👍 — here’s the **updated README** including **local Docker registry integration** so you can build, push, and deploy your own Docker images inside Kind.
+Here’s the **updated README** including **local Docker registry integration** so you can build, push, and deploy your own Docker images inside Kind.
 
 ---
 
