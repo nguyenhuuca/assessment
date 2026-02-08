@@ -29,6 +29,13 @@
         "-y",
         "@upstash/context7-mcp"
       ]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-fetch"
+      ]
     }
   }
 }
