@@ -44,10 +44,10 @@ This file provides guidance to Claude Code when working with this repository.
 - Daily budget: <$0.50 for normal development
 
 ### Anti-patterns to Avoid
- - Reading entire codebase without filtering
- - Using Sonnet/Opus for simple searches
- - Repeating same analysis multiple times
- - Loading unnecessary context
+❌ Reading entire codebase without filtering
+❌ Using Sonnet/Opus for simple searches
+❌ Repeating same analysis multiple times
+❌ Loading unnecessary context
 
 ## Efficient Workflows
 ✅ "Use Haiku to find X, then read specific files"
