@@ -6,6 +6,81 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Funny Movies** is a high-performance video streaming application built with Java 24, Spring Boot 3.x, and PostgreSQL. The application leverages cutting-edge Java features including Virtual Threads (Project Loom) and `StructuredTaskScope` for efficient concurrency. It integrates with YouTube API and ChatGPT for AI-powered video suggestions, and implements passwordless authentication via magic links.
 
+## Model Usage Guidelines (Cost Optimization)
+
+To optimize API costs when using Claude Code, always select the appropriate model for each task:
+
+### Model Selection Rules
+
+**Use Haiku (Cheapest - ~$0.001/task):**
+- File searches and pattern matching (glob, grep operations)
+- Reading and summarizing code structure
+- Finding files by name or content
+- Quick codebase exploration
+- Listing files, directories, or dependencies
+- Simple "what/where" questions
+
+**Use Sonnet (Default - ~$0.05-0.20/task):**
+- Writing new code or features
+- Refactoring existing code
+- Code reviews and analysis
+- Debugging issues
+- Test implementation
+- Complex "how" questions
+
+**Use Opus (Most Expensive - ~$0.50+/task):**
+- Major architecture decisions only
+- System design problems
+- Complex trade-off analysis
+- Reserve for critical design work
+
+### How to Specify Model
+
+**Option 1 - Explicit instruction:**
+```
+"Use Haiku to find all files containing 'authentication'"
+"Use Sonnet to refactor the UserService class"
+```
+
+**Option 2 - Use appropriate agent types:**
+```
+worker-explorer    → Auto uses Haiku (searches, exploration)
+worker-builder     → Auto uses Sonnet (implementation)
+worker-architect   → Auto uses Opus (design)
+```
+
+**Option 3 - In Task tool:**
+```
+subagent_type: "general-purpose"
+model: "haiku"  // Override to cheaper model for simple tasks
+```
+
+### Cost-Efficient Workflows
+
+**Bad (expensive):**
+```
+"Find and analyze all services, then refactor them"  → All Sonnet
+Cost: ~$0.50
+```
+
+**Good (optimized):**
+```
+Step 1: "Use Haiku to find all service files"        → Haiku
+Step 2: "Read UserService.java specifically"         → Haiku
+Step 3: "Refactor UserService with these changes"    → Sonnet
+Cost: ~$0.12 (60% savings)
+```
+
+### Guidelines Summary
+
+- **Search first with Haiku**, then implement with Sonnet
+- **Batch similar operations** in one request when possible
+- **Be specific** about which files to analyze (avoid "analyze everything")
+- **Use Opus sparingly** - only for critical architectural decisions
+- **Keep sessions focused** - cache expires after 5 minutes of inactivity
+
+Target: **~$0.10-0.15 per productive hour** with proper model selection.
+
 ## Project Structure
 
 ```
