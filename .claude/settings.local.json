@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(venv/Scripts/python.exe:*)",
+      "Bash(dir:*)",
+      "mcp__trello-python__trello_get_card",
+      "mcp__trello-python__trello_get_cards_by_label",
+      "Bash(python:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "sequential-thinking",
+    "chrome-devtools",
+    "github",
+    "context7",
+    "fetch"
+  ]
+}
