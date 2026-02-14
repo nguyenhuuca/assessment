@@ -42,23 +42,33 @@ Test names should describe the behavior being tested.
 
 ## Test Patterns
 
-### Arrange-Act-Assert (AAA) (TypeScript Example)
+### Arrange-Act-Assert (AAA) (Java + JUnit 5)
 
-```typescript
-test("user registration sends welcome email", async () => {
-  // Arrange
-  const emailService = new MockEmailService();
-  const userService = new UserService(emailService);
+```java
+@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
+    @Mock
+    private EmailService emailService;
 
-  // Act
-  await userService.register("test@example.com");
+    @InjectMocks
+    private UserService userService;
 
-  // Assert
-  expect(emailService.sentEmails).toContainEqual({
-    to: "test@example.com",
-    subject: "Welcome!"
-  });
-});
+    @Test
+    void registerUser_ValidEmail_SendsWelcomeEmail() {
+        // Arrange
+        String email = "test@example.com";
+        ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
+
+        // Act
+        userService.register(email);
+
+        // Assert
+        verify(emailService).send(emailCaptor.capture());
+        Email sentEmail = emailCaptor.getValue();
+        assertThat(sentEmail.getTo()).isEqualTo("test@example.com");
+        assertThat(sentEmail.getSubject()).isEqualTo("Welcome!");
+    }
+}
 ```
 
 ## E2E Testing with Chrome DevTools
@@ -72,18 +82,26 @@ test("user registration sends welcome email", async () => {
 // - Check console for errors
 ```
 
-## Commands (Examples by Language)
+## Commands (Java/Maven)
 
 ```bash
-# Run tests
-npm test
-pytest
-go test ./...
+# Run unit tests
+mvn test
 
-# With coverage
-npm test -- --coverage
-pytest --cov=src
-go test -cover ./...
+# Run tests with coverage
+mvn verify
+
+# Run specific test class
+mvn test -Dtest=UserServiceTest
+
+# Run specific test method
+mvn test -Dtest=UserServiceTest#registerUser_ValidEmail_SendsWelcomeEmail
+
+# Generate coverage report
+mvn jacoco:report
+
+# View coverage report
+open target/site/jacoco/index.html
 ```
 
 ## Finding Untested Code

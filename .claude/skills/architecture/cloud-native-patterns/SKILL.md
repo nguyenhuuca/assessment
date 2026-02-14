@@ -23,44 +23,84 @@ allowed-tools: Read, Write, Glob, Grep
 
 ## Resilience Patterns
 
-### Circuit Breaker
+### Circuit Breaker (Resilience4j + Spring Boot)
 Prevent cascading failures by failing fast.
 
-```typescript
-class CircuitBreaker {
-  private failures = 0;
-  private lastFailure?: Date;
+```java
+// Add dependency: io.github.resilience4j:resilience4j-spring-boot3
 
-  async call<T>(fn: () => Promise<T>): Promise<T> {
-    if (this.isOpen()) {
-      throw new Error('Circuit is open');
+// Configuration
+@Configuration
+public class ResilienceConfig {
+    @Bean
+    public CircuitBreakerConfig circuitBreakerConfig() {
+        return CircuitBreakerConfig.custom()
+            .failureRateThreshold(50)
+            .waitDurationInOpenState(Duration.ofSeconds(30))
+            .slidingWindowSize(10)
+            .build();
     }
-    try {
-      const result = await fn();
-      this.reset();
-      return result;
-    } catch (error) {
-      this.recordFailure();
-      throw error;
+}
+
+// Service with circuit breaker
+@Service
+public class ExternalApiService {
+    private final RestTemplate restTemplate;
+    private final CircuitBreaker circuitBreaker;
+
+    @CircuitBreaker(name = "externalApi", fallbackMethod = "fallback")
+    public String callExternalApi(String request) {
+        return restTemplate.getForObject(
+            "https://api.example.com/data",
+            String.class
+        );
     }
-  }
+
+    private String fallback(String request, Exception ex) {
+        return "Fallback response: Service unavailable";
+    }
 }
 ```
 
-### Retry with Backoff
-```typescript
-async function withRetry<T>(
-  fn: () => Promise<T>,
-  maxRetries = 3
-): Promise<T> {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await fn();
-    } catch (error) {
-      if (i === maxRetries - 1) throw error;
-      await sleep(Math.pow(2, i) * 1000); // Exponential backoff
+### Retry with Backoff (Resilience4j)
+```java
+// Configuration
+@Configuration
+public class RetryConfig {
+    @Bean
+    public io.github.resilience4j.retry.RetryConfig retryConfig() {
+        return io.github.resilience4j.retry.RetryConfig.custom()
+            .maxAttempts(3)
+            .waitDuration(Duration.ofSeconds(1))
+            .retryExceptions(IOException.class, TimeoutException.class)
+            .ignoreExceptions(BusinessException.class)
+            .build();
     }
-  }
+}
+
+// Service with retry
+@Service
+public class DataService {
+    @Retry(name = "dataService", fallbackMethod = "fallback")
+    public Data fetchData(Long id) {
+        // May throw transient exceptions
+        return externalDataSource.fetch(id);
+    }
+
+    private Data fallback(Long id, Exception ex) {
+        // Return cached or default value
+        return Data.defaultValue();
+    }
+}
+
+// Spring Retry alternative (simpler)
+@Retryable(
+    value = {RemoteAccessException.class},
+    maxAttempts = 3,
+    backoff = @Backoff(delay = 1000, multiplier = 2)
+)
+public String callRemoteService() {
+    return restTemplate.getForObject(url, String.class);
 }
 ```
 
@@ -77,23 +117,73 @@ Isolate failures to prevent system-wide impact.
 - Message queues (RabbitMQ, SQS)
 - Event streaming (Kafka)
 
-## Health Checks
+## Health Checks (Spring Boot Actuator)
 
-```typescript
-app.get('/health', (req, res) => {
-  res.json({ status: 'healthy' });
-});
+```java
+// Add dependency: spring-boot-starter-actuator
 
-app.get('/ready', async (req, res) => {
-  const dbHealthy = await checkDatabase();
-  const cacheHealthy = await checkCache();
+// application.yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
 
-  if (dbHealthy && cacheHealthy) {
-    res.json({ status: 'ready' });
-  } else {
-    res.status(503).json({ status: 'not ready' });
-  }
-});
+// Built-in endpoints
+// GET /actuator/health - Overall health
+// GET /actuator/health/liveness - Kubernetes liveness probe
+// GET /actuator/health/readiness - Kubernetes readiness probe
+
+// Custom health indicator
+@Component
+public class DatabaseHealthIndicator implements HealthIndicator {
+    private final DataSource dataSource;
+
+    @Override
+    public Health health() {
+        try (Connection conn = dataSource.getConnection()) {
+            if (conn.isValid(1000)) {
+                return Health.up()
+                    .withDetail("database", "PostgreSQL")
+                    .withDetail("status", "reachable")
+                    .build();
+            }
+        } catch (Exception e) {
+            return Health.down()
+                .withException(e)
+                .build();
+        }
+        return Health.down().build();
+    }
+}
+
+// Custom readiness check
+@Component
+public class CacheReadinessIndicator implements HealthIndicator {
+    private final CacheManager cacheManager;
+
+    @Override
+    public Health health() {
+        try {
+            // Test cache connectivity
+            boolean cacheHealthy = testCache();
+            if (cacheHealthy) {
+                return Health.up().build();
+            }
+        } catch (Exception e) {
+            return Health.down().withException(e).build();
+        }
+        return Health.down().build();
+    }
+}
 ```
 
 ## Container Best Practices

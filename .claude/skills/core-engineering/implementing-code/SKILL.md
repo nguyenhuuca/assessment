@@ -22,41 +22,69 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 
 ## Reference Implementation
 
-### SOLID Compliant Class (TypeScript)
+### SOLID Compliant Class (Java + Spring Boot)
 
-```typescript
+```java
 // Abstraction (Interface Segregation)
-interface ILogger {
-  log(message: string): void;
+public interface Logger {
+    void log(String message);
 }
 
-interface IUserRepository {
-  save(user: User): Promise<void>;
+public interface UserRepository extends JpaRepository<User, Long> {
+    boolean existsByEmail(String email);
 }
 
 // Domain Entity
-class User {
-  constructor(public readonly id: string, public readonly email: string) {}
+@Entity
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email is required")
+    private String email;
+
+    @Builder.Default
+    private Instant createdAt = Instant.now();
 }
 
 // Implementation (Single Responsibility)
-class UserService {
-  constructor(
-    private readonly userRepository: IUserRepository,
-    private readonly logger: ILogger
-  ) {}
+@Service
+@Transactional
+public class UserService {
+    private final UserRepository userRepository;
+    private final Logger logger;
 
-  public async registerUser(email: string): Promise<User> {
-    if (!email.includes('@')) {
-      throw new Error("Invalid email format");
+    public UserService(UserRepository userRepository, Logger logger) {
+        this.userRepository = userRepository;
+        this.logger = logger;
     }
 
-    const user = new User(crypto.randomUUID(), email);
-    await this.userRepository.save(user);
-    this.logger.log(`User registered: ${user.id}`);
+    public User registerUser(String email) {
+        // Validation
+        if (!email.contains("@")) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
 
-    return user;
-  }
+        if (userRepository.existsByEmail(email)) {
+            throw new DuplicateEmailException("Email already exists");
+        }
+
+        // Business logic
+        User user = User.builder()
+            .email(email)
+            .build();
+
+        User saved = userRepository.save(user);
+        logger.log("User registered: " + saved.getId());
+
+        return saved;
+    }
 }
 ```
 

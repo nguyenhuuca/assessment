@@ -48,30 +48,93 @@ allowed-tools: Read, Glob, Grep
 - [ ] Sensitive data not logged
 - [ ] Logs protected from tampering
 
-## Code Patterns to Flag
+## Code Patterns to Flag (Java)
 
 ### SQL Injection
-```typescript
-// DANGER
-db.query(`SELECT * FROM users WHERE id = ${id}`);
+```java
+// ❌ DANGER - SQL Injection
+String query = "SELECT * FROM users WHERE id = " + userId;
+jdbcTemplate.queryForObject(query, User.class);
+
+// ✅ SAFE - Use JPA or parameterized queries
+@Query("SELECT u FROM User u WHERE u.id = :id")
+Optional<User> findById(@Param("id") Long id);
 ```
 
-### XSS
-```typescript
-// DANGER
-element.innerHTML = userInput;
+### XSS (Cross-Site Scripting)
+```java
+// ❌ DANGER - Unescaped output in templates
+@GetMapping("/profile")
+public String profile(Model model, @RequestParam String name) {
+    model.addAttribute("name", name); // If rendered without escaping
+    return "profile";
+}
+
+// ✅ SAFE - Use Thymeleaf with proper escaping
+<!-- Thymeleaf auto-escapes by default -->
+<p th:text="${name}">Name here</p>
+
+// ✅ SAFE - Manual escaping if needed
+import org.springframework.web.util.HtmlUtils;
+String safe = HtmlUtils.htmlEscape(userInput);
 ```
 
 ### Hardcoded Secrets
-```typescript
-// DANGER
-const API_KEY = "sk-abc123...";
+```java
+// ❌ DANGER - Hardcoded credentials
+public class ApiClient {
+    private static final String API_KEY = "sk-abc123...";
+    private static final String DB_PASSWORD = "password123";
+}
+
+// ✅ SAFE - Use environment variables
+@Value("${api.key}")
+private String apiKey;
+
+@Value("${spring.datasource.password}")
+private String dbPassword;
 ```
 
 ### Insecure Random
-```typescript
-// DANGER
-Math.random(); // For security purposes
+```java
+// ❌ DANGER - Predictable random for security
+Random random = new Random();
+String token = String.valueOf(random.nextInt());
+
+// ✅ SAFE - Use SecureRandom for security purposes
+SecureRandom secureRandom = new SecureRandom();
+byte[] token = new byte[32];
+secureRandom.nextBytes(token);
+String tokenStr = Base64.getUrlEncoder().encodeToString(token);
+```
+
+### Path Traversal
+```java
+// ❌ DANGER - Path traversal vulnerability
+@GetMapping("/files/{filename}")
+public ResponseEntity<Resource> getFile(@PathVariable String filename) {
+    File file = new File("/uploads/" + filename);
+    return ResponseEntity.ok(new FileSystemResource(file));
+}
+
+// ✅ SAFE - Validate and sanitize path
+@GetMapping("/files/{filename}")
+public ResponseEntity<Resource> getFile(@PathVariable String filename) {
+    // Reject path traversal attempts
+    if (filename.contains("..") || filename.contains("/")) {
+        throw new IllegalArgumentException("Invalid filename");
+    }
+
+    Path basePath = Paths.get("/uploads").toAbsolutePath().normalize();
+    Path filePath = basePath.resolve(filename).normalize();
+
+    // Ensure resolved path is within base directory
+    if (!filePath.startsWith(basePath)) {
+        throw new SecurityException("Path traversal detected");
+    }
+
+    return ResponseEntity.ok(new FileSystemResource(filePath));
+}
 ```
 
 ## Security Review Report
@@ -88,12 +151,16 @@ Math.random(); // For security purposes
 ### Findings
 
 #### [CRITICAL] SQL Injection in UserService
-**Location**: src/services/user.ts:47
+**Location**: api/src/main/java/com/example/service/UserService.java:47
 **Description**: User input concatenated into SQL query
-**Remediation**: Use parameterized queries
+**Remediation**: Use JPA with named parameters
 **Code**:
-```typescript
+```java
 // Current (vulnerable)
-// Recommended fix
+String query = "SELECT * FROM users WHERE email = '" + email + "'";
+
+// ✅ Recommended fix
+@Query("SELECT u FROM User u WHERE u.email = :email")
+Optional<User> findByEmail(@Param("email") String email);
 ```
 ```

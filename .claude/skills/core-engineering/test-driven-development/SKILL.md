@@ -21,31 +21,40 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 - [ ] **Refactor**: Clean up while tests stay green
 - [ ] **Repeat**: Next test case
 
-## TDD Example
+## TDD Example (Java + JUnit 5)
 
 ### Step 1: Red - Write Failing Test
 
-```typescript
-describe("Calculator", () => {
-  test("adds two numbers", () => {
-    const calc = new Calculator();
-    expect(calc.add(2, 3)).toBe(5);
-  });
-});
+```java
+class CalculatorTest {
+    @Test
+    void add_TwoNumbers_ReturnsSum() {
+        // Arrange
+        Calculator calc = new Calculator();
 
-// Run: FAIL - Calculator is not defined
+        // Act
+        int result = calc.add(2, 3);
+
+        // Assert
+        assertThat(result).isEqualTo(5);
+    }
+}
+
+// Run: mvn test
+// FAIL - Cannot resolve symbol 'Calculator'
 ```
 
 ### Step 2: Green - Minimal Implementation
 
-```typescript
-class Calculator {
-  add(a: number, b: number): number {
-    return a + b;
-  }
+```java
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
 }
 
-// Run: PASS
+// Run: mvn test
+// PASS ✓
 ```
 
 ### Step 3: Refactor (if needed)
@@ -54,13 +63,38 @@ Code is already clean, move to next test.
 
 ### Step 4: Next Test
 
-```typescript
-test("subtracts two numbers", () => {
-  const calc = new Calculator();
-  expect(calc.subtract(5, 3)).toBe(2);
-});
+```java
+@Test
+void subtract_TwoNumbers_ReturnsDifference() {
+    // Arrange
+    Calculator calc = new Calculator();
 
-// Run: FAIL - subtract is not defined
+    // Act
+    int result = calc.subtract(5, 3);
+
+    // Assert
+    assertThat(result).isEqualTo(2);
+}
+
+// Run: mvn test
+// FAIL - Cannot resolve method 'subtract' in 'Calculator'
+```
+
+### Step 5: Implement Subtract
+
+```java
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+
+    public int subtract(int a, int b) {
+        return a - b;
+    }
+}
+
+// Run: mvn test
+// PASS ✓ (2 tests passing)
 ```
 
 ## TDD Benefits

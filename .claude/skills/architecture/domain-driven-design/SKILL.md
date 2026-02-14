@@ -22,74 +22,157 @@ Shows how bounded contexts relate to each other.
 ### Entity
 Has identity that persists over time. Equality based on ID.
 
-```typescript
-class User {
-  constructor(
-    public readonly id: UserId,
-    public email: Email,
-    public name: string
-  ) {}
+```java
+@Entity
+@Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
+    private Long id;
+
+    @Embedded
+    private Email email;
+
+    private String name;
+
+    @Builder.Default
+    private Instant createdAt = Instant.now();
 }
 ```
 
 ### Value Object
 Immutable, equality based on attributes.
 
-```typescript
-class Email {
-  private constructor(public readonly value: string) {}
+```java
+@Embeddable
+@Value
+public class Email {
+    private String value;
 
-  static create(value: string): Email {
-    if (!value.includes('@')) {
-      throw new Error('Invalid email');
+    private Email(String value) {
+        this.value = value;
     }
-    return new Email(value);
-  }
 
-  equals(other: Email): boolean {
-    return this.value === other.value;
-  }
+    public static Email of(String value) {
+        if (value == null || !value.contains("@")) {
+            throw new IllegalArgumentException("Invalid email");
+        }
+        return new Email(value);
+    }
+
+    // Lombok @Value makes it immutable and generates equals/hashCode
 }
 ```
 
 ### Aggregate
 Cluster of entities and value objects with a root entity.
 
-```typescript
-class Order { // Aggregate Root
-  private items: OrderItem[] = [];
+```java
+@Entity
+@Data
+public class Order { // Aggregate Root
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  addItem(product: ProductId, quantity: number): void {
-    // Business rules enforced here
-    this.items.push(new OrderItem(product, quantity));
-  }
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "order_id")
+    private List<OrderItem> items = new ArrayList<>();
 
-  get total(): Money {
-    return this.items.reduce((sum, item) => sum.add(item.subtotal), Money.zero());
-  }
+    private Long userId;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    // Business logic in domain model
+    public void addItem(Long productId, int quantity) {
+        // Business rules enforced here
+        if (this.status != OrderStatus.DRAFT) {
+            throw new IllegalStateException("Cannot add items to submitted order");
+        }
+        OrderItem item = OrderItem.builder()
+            .productId(productId)
+            .quantity(quantity)
+            .build();
+        this.items.add(item);
+    }
+
+    public Money getTotal() {
+        return items.stream()
+            .map(OrderItem::getSubtotal)
+            .reduce(Money.zero(), Money::add);
+    }
+
+    public void submit() {
+        if (items.isEmpty()) {
+            throw new IllegalStateException("Cannot submit empty order");
+        }
+        this.status = OrderStatus.SUBMITTED;
+    }
 }
 ```
 
 ### Repository
 Abstracts data access for aggregates.
 
-```typescript
-interface OrderRepository {
-  findById(id: OrderId): Promise<Order | null>;
-  save(order: Order): Promise<void>;
+```java
+@Repository
+public interface OrderRepository extends JpaRepository<Order, Long> {
+    Optional<Order> findById(Long id);
+
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.items WHERE o.id = :id")
+    Optional<Order> findByIdWithItems(@Param("id") Long id);
+
+    List<Order> findByUserIdAndStatus(Long userId, OrderStatus status);
 }
 ```
 
 ### Domain Event
 Something that happened in the domain.
 
-```typescript
-class OrderPlaced {
-  constructor(
-    public readonly orderId: OrderId,
-    public readonly userId: UserId,
-    public readonly occurredAt: Date
-  ) {}
+```java
+@Value
+@Builder
+public class OrderPlaced {
+    Long orderId;
+    Long userId;
+    Instant occurredAt;
+}
+
+// Publishing domain events with Spring
+@Service
+@Transactional
+public class OrderService {
+    private final OrderRepository orderRepository;
+    private final ApplicationEventPublisher eventPublisher;
+
+    public void placeOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new OrderNotFoundException(orderId));
+
+        order.submit();
+        orderRepository.save(order);
+
+        // Publish domain event
+        OrderPlaced event = OrderPlaced.builder()
+            .orderId(order.getId())
+            .userId(order.getUserId())
+            .occurredAt(Instant.now())
+            .build();
+        eventPublisher.publishEvent(event);
+    }
+}
+
+// Event listener
+@Component
+public class OrderEventHandler {
+    @EventListener
+    @Async
+    public void handleOrderPlaced(OrderPlaced event) {
+        // Send confirmation email, update inventory, etc.
+    }
 }
 ```
 

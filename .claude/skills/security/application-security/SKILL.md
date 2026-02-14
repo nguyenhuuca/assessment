@@ -30,13 +30,33 @@ allowed-tools: Read, Glob, Grep
 **Risk**: Malicious input executed as code.
 
 **Prevention**:
-```typescript
-// BAD - SQL injection
-const query = `SELECT * FROM users WHERE id = ${userId}`;
+```java
+// ❌ BAD - SQL injection vulnerability
+@GetMapping("/users/{id}")
+public User getUser(@PathVariable String id) {
+    String query = "SELECT * FROM users WHERE id = " + id;
+    return jdbcTemplate.queryForObject(query, User.class);
+}
 
-// GOOD - Parameterized query
-const query = 'SELECT * FROM users WHERE id = $1';
-db.query(query, [userId]);
+// ✅ GOOD - Use JPA/Spring Data (parameterized by default)
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findById(Long id);
+}
+
+// ✅ GOOD - JPQL with named parameters
+@Query("SELECT u FROM User u WHERE u.email = :email AND u.status = :status")
+Optional<User> findByEmailAndStatus(
+    @Param("email") String email,
+    @Param("status") UserStatus status
+);
+
+// ❌ BAD - Command injection
+Runtime.getRuntime().exec("ls " + userInput);
+
+// ✅ GOOD - Use ProcessBuilder with separate arguments
+ProcessBuilder pb = new ProcessBuilder("ls", userInput);
+Process p = pb.start();
 ```
 
 ### 4. Insecure Design

@@ -47,25 +47,86 @@ Payload: {"sub": "123", "exp": 1234567890}
 Signature: RSASHA256(header + payload, privateKey)
 ```
 
-## Role-Based Access Control (RBAC)
+## Role-Based Access Control (RBAC) - Java/Spring Security
 
-```typescript
-interface Role {
-  name: string;
-  permissions: Permission[];
-}
+```java
+// Entity definitions
+@Entity
+@Data
+public class Role {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-interface Permission {
-  resource: string;
-  action: 'read' | 'write' | 'delete';
-}
+    private String name;
 
-function hasPermission(user: User, resource: string, action: string): boolean {
-  return user.roles.some(role =>
-    role.permissions.some(p =>
-      p.resource === resource && p.action === action
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "role_permissions",
+        joinColumns = @JoinColumn(name = "role_id"),
+        inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-  );
+    private Set<Permission> permissions = new HashSet<>();
+}
+
+@Entity
+@Data
+public class Permission {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String resource;
+
+    @Enumerated(EnumType.STRING)
+    private Action action;
+}
+
+public enum Action {
+    READ, WRITE, DELETE
+}
+
+// Spring Security method-level authorization
+@Service
+public class UserService {
+    @PreAuthorize("hasPermission(#userId, 'USER', 'WRITE')")
+    public void updateUser(Long userId, UserDto updates) {
+        // Implementation
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteUser(Long userId) {
+        // Only admins can delete
+    }
+}
+
+// Custom permission evaluator
+@Component
+public class CustomPermissionEvaluator implements PermissionEvaluator {
+    @Override
+    public boolean hasPermission(
+        Authentication auth,
+        Object targetId,
+        Object permission
+    ) {
+        UserDetails user = (UserDetails) auth.getPrincipal();
+        String resource = (String) targetId;
+        String action = (String) permission;
+
+        return user.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals(resource + ":" + action));
+    }
+}
+
+// Controller with role checks
+@RestController
+@RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ADMIN')")
+public class AdminController {
+    @GetMapping("/users")
+    public List<UserDto> getAllUsers() {
+        // Only accessible to ADMIN role
+    }
 }
 ```
 
