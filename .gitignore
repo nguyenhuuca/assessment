@@ -40,3 +40,5 @@ application-prod.properties
 
 deploy-funny-app.sh
 /api/deploy-funny-app.sh
+
+**googlekey.json

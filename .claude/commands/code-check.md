@@ -80,6 +80,7 @@ Use language-appropriate detection tools:
 - Python: vulture, pip-audit
 - Go: go mod tidy, staticcheck
 - Rust: cargo-udeps, cargo-machete
+- Java: SonarQube, Checkstyke
 
 Verify findings before deletion (false positives with dynamic imports).
 
