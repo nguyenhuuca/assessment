@@ -7,12 +7,15 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 public class SlidingWindowRateLimiter {
 
     private final Cache<String, Deque<Long>> requestCache;
+    private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
 
     public SlidingWindowRateLimiter() {
         this.requestCache = CacheBuilder.newBuilder()
@@ -50,7 +53,9 @@ public class SlidingWindowRateLimiter {
             requestCache.put(key, timestamps);
         }
 
-        synchronized (timestamps) {
+        ReentrantLock lock = locks.computeIfAbsent(key, k -> new ReentrantLock());
+        lock.lock();
+        try {
             // remove timestamps outside the window
             while (!timestamps.isEmpty() && now - timestamps.peekFirst() > windowMillis) {
                 timestamps.pollFirst();
@@ -63,6 +68,8 @@ public class SlidingWindowRateLimiter {
             } else {
                 return false;
             }
+        } finally {
+            lock.unlock();
         }
     }
 }
