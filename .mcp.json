@@ -16,11 +16,9 @@
     },
     "github": {
       "command": "npx",
-      "args": [
-        "@anthropic-ai/mcp-server-github"
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
     },
     "context7": {
@@ -31,11 +29,24 @@
       ]
     },
     "fetch": {
-      "command": "npx",
+        "command": "python",
+        "args": ["-m", "mcp_server_fetch"],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+    "trello-python": {
+      "command": "D:\\DO\\assessment\\mcp\\mcp-trello\\venv\\Scripts\\python.exe",
       "args": [
-        "-y",
-        "@modelcontextprotocol/server-fetch"
-      ]
+        "-m",
+        "src.main"
+      ],
+      "cwd": "D:\\DO\\assessment\\mcp\\mcp-trello",
+      "env": {
+        "PYTHONPATH": "D:\\DO\\assessment\\mcp\\mcp-trello",
+        "TRELLO_API_KEY": "${TRELLO_API_KEY}",
+        "TRELLO_TOKEN": "${TRELLO_TOKEN}"
+      }
     }
   }
 }
