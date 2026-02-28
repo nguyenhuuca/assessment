@@ -23,7 +23,7 @@ Three major risk areas were identified:
 
 ---
 
-### H1 — `synchronized` Pins Virtual Threads (Loom Anti-Pattern)
+### H1 — `synchronized` Pins Virtual Threads (Loom Anti-Pattern) ✅ Fixed
 
 | Field | Value |
 |-------|-------|
@@ -83,7 +83,7 @@ Replace with a `ConcurrentHashMap<String, RangeSet>` per `fileId`, protected by 
 
 ---
 
-### H4 — No HTTP Timeout on ChatGPT `RestTemplate`
+### H4 — No HTTP Timeout on ChatGPT `RestTemplate` ✅ Fixed
 
 | Field | Value |
 |-------|-------|
