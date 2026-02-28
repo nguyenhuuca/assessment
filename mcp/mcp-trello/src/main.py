@@ -139,6 +139,46 @@ TOOLS = [
         }
     ),
     Tool(
+        name="trello_create_card",
+        description="Create a new card in a Trello list",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "listId": {"type": "string", "description": "The ID of the list to add the card to"},
+                "name": {"type": "string", "description": "Title of the card"},
+                "desc": {"type": "string", "description": "Description/body of the card (optional)"},
+                "labelIds": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of label IDs to attach (optional)"
+                }
+            },
+            "required": ["listId", "name"]
+        }
+    ),
+    Tool(
+        name="trello_get_board_lists",
+        description="Get all lists on a Trello board",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "boardId": {"type": "string", "description": "The ID of the board"}
+            },
+            "required": ["boardId"]
+        }
+    ),
+    Tool(
+        name="trello_get_board_labels",
+        description="Get all labels defined on a Trello board",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "boardId": {"type": "string", "description": "The ID of the board"}
+            },
+            "required": ["boardId"]
+        }
+    ),
+    Tool(
         name="trello_watch_label",
         description="Poll for cards with a specific label (e.g., 'doing') and return new ones since last check",
         inputSchema={
@@ -201,6 +241,25 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
             comment = trello.add_comment(card_id, text)
             result = f"Comment added successfully:\n{json.dumps(comment, indent=2)}"
             return [TextContent(type="text", text=result)]
+
+        elif name == "trello_create_card":
+            list_id = arguments.get("listId")
+            card_name = arguments.get("name")
+            desc_value = arguments.get("desc")
+            label_ids = arguments.get("labelIds")
+            card = trello.create_card(list_id, card_name, desc=desc_value, label_ids=label_ids)
+            result = f"Card created: {card.get('shortUrl', '')}\n{json.dumps(card, indent=2)}"
+            return [TextContent(type="text", text=result)]
+
+        elif name == "trello_get_board_lists":
+            board_id = arguments.get("boardId")
+            lists = trello.get_board_lists(board_id)
+            return [TextContent(type="text", text=json.dumps(lists, indent=2))]
+
+        elif name == "trello_get_board_labels":
+            board_id = arguments.get("boardId")
+            labels = trello.get_board_labels(board_id)
+            return [TextContent(type="text", text=json.dumps(labels, indent=2))]
 
         elif name == "trello_get_cards_by_label":
             board_id = arguments.get("boardId")

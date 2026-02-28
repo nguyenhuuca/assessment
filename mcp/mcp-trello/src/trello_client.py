@@ -65,6 +65,24 @@ class TrelloClient:
             data={'text': text}
         )
 
+    def create_card(self, list_id: str, name: str, desc: Optional[str] = None,
+                    label_ids: Optional[List[str]] = None) -> Dict[str, Any]:
+        """Create a new card in a list"""
+        data: Dict[str, Any] = {'idList': list_id, 'name': name}
+        if desc:
+            data['desc'] = desc
+        if label_ids:
+            data['idLabels'] = ','.join(label_ids)
+        return self._make_request('/cards', method='POST', data=data)
+
+    def get_board_lists(self, board_id: str) -> List[Dict[str, Any]]:
+        """Get all lists on a board"""
+        return self._make_request(f'/boards/{board_id}/lists')
+
+    def get_board_labels(self, board_id: str) -> List[Dict[str, Any]]:
+        """Get all labels on a board"""
+        return self._make_request(f'/boards/{board_id}/labels')
+
     def get_cards_by_label(self, board_id: str, label_name: str) -> List[Dict[str, Any]]:
         """Get all cards on a board that have a specific label"""
         cards = self.list_cards(board_id)

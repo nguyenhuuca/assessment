@@ -8,13 +8,10 @@
       "Bash(python:*)"
     ]
   },
-  "enableAllProjectMcpServers": true,
+  "enableAllProjectMcpServers": false,
   "enabledMcpjsonServers": [
-    "sequential-thinking",
-    "chrome-devtools",
-    "github",
     "context7",
-    "fetch",
+    "github",
     "trello-python"
   ]
 }
