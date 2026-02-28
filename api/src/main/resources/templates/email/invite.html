@@ -1,113 +1,359 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
     <meta charset="UTF-8" />
-    <title>Activate Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no" />
+    <title>Your Magic Login Link – Canh Labs</title>
+
+    <!-- Preheader (hidden preview text in inbox) -->
+    <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
+        Your secure login link is ready. Click to access Canh Labs. This link expires in 15 minutes.
+        &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    </div>
+
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+
     <style>
-        body {
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * { box-sizing: border-box; }
+
+        body, html {
             margin: 0;
             padding: 0;
-            background: #121212;
-            font-family: 'Segoe UI', sans-serif;
+            width: 100% !important;
+            background-color: #0d0d0d;
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+        }
+
+        table { border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+        a { text-decoration: none; }
+
+        .wrapper {
+            width: 100%;
+            background-color: #0d0d0d;
+            padding: 40px 16px;
+        }
+
+        .email-card {
+            max-width: 560px;
+            margin: 0 auto;
+            background: #161616;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+        }
+
+        /* Top accent bar */
+        .accent-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #ff0000 0%, #ff4d4d 50%, #cc0000 100%);
+        }
+
+        /* Header */
+        .header {
+            padding: 36px 40px 24px;
+            text-align: center;
+            background: linear-gradient(160deg, #1a0000 0%, #161616 60%);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 10px 18px;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+
+        .logo-text {
+            font-size: 17px;
+            font-weight: 700;
             color: #ffffff;
+            letter-spacing: -0.3px;
         }
 
-        .container {
-            max-width: 520px;
-            margin: 40px auto;
-            background: linear-gradient(135deg, #1e1e1e, #2b0000);
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        .logo-text span {
+            color: #ff3333;
         }
 
-        .logo {
-            text-align: center;
-            margin-bottom: 24px;
+        /* Body */
+        .body-content {
+            padding: 36px 40px;
         }
 
-        .logo img {
-            max-width: 100px;
-            border-radius: 12px;
+        .greeting {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.4px;
         }
 
-        h2 {
-            margin-top: 0;
-            color: #FF0000; /* YouTube red */
-            text-align: center;
-        }
-
-        p {
-            font-size: 16px;
+        .subtext {
+            font-size: 15px;
+            color: #888888;
+            margin: 0 0 28px 0;
             line-height: 1.6;
-            color: #dddddd;
+        }
+
+        /* Info box */
+        .info-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+        }
+
+        .info-box p {
+            font-size: 15px;
+            color: #cccccc;
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        /* CTA Button */
+        .btn-wrapper {
+            text-align: center;
+            margin: 0 0 28px 0;
         }
 
         .btn {
             display: inline-block;
-            background-color: #FF0000;
+            background: linear-gradient(135deg, #ff1a1a 0%, #cc0000 100%);
             color: #ffffff !important;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
             text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: bold;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
+            padding: 14px 36px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,100,100,0.3);
+            box-shadow: 0 4px 16px rgba(255, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
-        .btn:hover {
-            background-color: #cc0000;
+        /* Expiry badge */
+        .expiry-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #666666;
+            margin-bottom: 28px;
         }
 
-        .btn-wrapper {
-            text-align: center;
+        .expiry-icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
             margin: 28px 0;
         }
 
-        .footer {
+        /* Fallback link section */
+        .fallback {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+
+        .fallback p {
+            font-size: 13px;
+            color: #666666;
+            margin: 0 0 8px 0;
+            line-height: 1.5;
+        }
+
+        .fallback .link-url {
+            font-size: 12px;
+            color: #ff4d4d;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+
+        /* Security notice */
+        .security-notice {
+            display: flex;
+            gap: 12px;
+            background: rgba(255, 204, 0, 0.04);
+            border: 1px solid rgba(255, 204, 0, 0.1);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 0;
+        }
+
+        .security-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .security-text {
             font-size: 13px;
             color: #999999;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Footer */
+        .footer {
+            background: #111111;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 24px 40px;
             text-align: center;
-            margin-top: 40px;
         }
 
-        .footer a {
-            color: #FF0000;
+        .footer-brand {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555555;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .footer-links {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            font-size: 12px;
+            color: #444444;
             text-decoration: none;
+            margin: 0 8px;
         }
 
-        @media only screen and (max-width: 600px) {
-            .container {
-                margin: 20px;
-                padding: 20px;
-            }
+        .footer-links a:hover {
+            color: #ff4d4d;
+        }
 
-            .btn {
-                width: 150px;
-                text-align: center;
-            }
+        .footer-copy {
+            font-size: 12px;
+            color: #333333;
+            margin: 0;
+        }
+
+        /* Mobile */
+        @media only screen and (max-width: 600px) {
+            .wrapper { padding: 20px 12px; }
+            .header { padding: 28px 24px 20px; }
+            .body-content { padding: 28px 24px; }
+            .footer { padding: 20px 24px; }
+            .greeting { font-size: 20px; }
+            .btn { display: block; padding: 14px 24px; }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="logo">
-        <img src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" alt="Canh Labs Logo" />
-    </div>
+<div class="wrapper">
+    <div class="email-card">
 
-    <h2>Welcome to Canh Labs 👋</h2>
+        <!-- Red accent bar -->
+        <div class="accent-bar"></div>
 
-    <p>Hi {{username}},</p>
-    <p>Your account is almost ready. To complete the login setup, please click the button below to activate your access.</p>
+        <!-- Header / Brand -->
+        <div class="header">
+            <div class="logo-wrapper">
+                <img class="logo-icon"
+                     src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
+                     alt="Canh Labs" />
+                <span class="logo-text">Canh<span>Labs</span></span>
+            </div>
+        </div>
 
-    <div class="btn-wrapper">
-        <a href="{{loginUrl}}" target="_blank" class="btn">Login Now</a>
-    </div>
+        <!-- Body -->
+        <div class="body-content">
 
-    <p>If you didn't request this email, just ignore it.</p>
+            <p class="greeting">Hello, {{username}} 👋</p>
+            <p class="subtext">We received a login request for your Canh Labs account. Use the link below to sign in securely — no password needed.</p>
 
-    <div class="footer">
-        &copy; 2025 Canh Labs · Need help? <a href="mailto:canh@canh-labs.com">Contact Support</a>
+            <!-- Info box -->
+            <div class="info-box">
+                <p>Click the button below to complete your login. This is a <strong style="color:#ffffff;">one-time link</strong> and can only be used once.</p>
+            </div>
+
+            <!-- CTA Button -->
+            <div class="btn-wrapper">
+                <a href="{{loginUrl}}" target="_blank" class="btn">
+                    &#128274;&nbsp; Sign In to Canh Labs
+                </a>
+            </div>
+
+            <!-- Expiry note -->
+            <div class="expiry-note">
+                <span>&#9203;</span>
+                <span>This link expires in <strong>15 minutes</strong></span>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Fallback URL -->
+            <div class="fallback">
+                <p>Button not working? Copy and paste this link into your browser:</p>
+                <span class="link-url">{{loginUrl}}</span>
+            </div>
+
+            <!-- Security notice -->
+            <div class="security-notice">
+                <span class="security-icon">&#x26A0;&#xFE0F;</span>
+                <p class="security-text">
+                    <strong style="color:#cccccc;">Didn't request this?</strong><br />
+                    If you didn't try to sign in, you can safely ignore this email.
+                    Your account remains secure and no action is required.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-brand">Canh Labs</p>
+            <div class="footer-links">
+                <a href="mailto:canh@canh-labs.com">Support</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            <p class="footer-copy">&copy; 2025 Canh Labs. All rights reserved.<br />
+                This email was sent to you because a login was requested.</p>
+        </div>
+
     </div>
 </div>
 </body>
