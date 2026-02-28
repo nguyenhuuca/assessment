@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
+import java.time.Duration;
 import java.util.List;
 
 @Configuration
@@ -42,7 +43,10 @@ public class ConfigBean {
     // initialize bean for rest template
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.build();
+        return builder
+                .connectTimeout(Duration.ofSeconds(5))
+                .readTimeout(Duration.ofSeconds(45))
+                .build();
     }
 
     // To enable AuthenticationManager injection if needed
