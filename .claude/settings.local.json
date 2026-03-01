@@ -12,6 +12,7 @@
   "enabledMcpjsonServers": [
     "context7",
     "github",
-    "trello-python"
+    "trello-python",
+    "sequential-thinking"
   ]
 }
