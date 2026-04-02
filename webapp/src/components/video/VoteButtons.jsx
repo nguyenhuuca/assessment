@@ -1,79 +1,68 @@
 import React, { useEffect, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faThumbsUp, faThumbsDown } from '@fortawesome/free-solid-svg-icons'
-import { faThumbsUp as faThumbsUpReg, faThumbsDown as faThumbsDownReg } from '@fortawesome/free-regular-svg-icons'
 import { videosApi } from '../../api/videos.js'
 
+function fmtCount(n) {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`
+  return String(n)
+}
+
 export default function VoteButtons({ video }) {
-  const [voteState, setVoteState] = useState('none') // 'up' | 'down' | 'none'
-  const [upCount, setUpCount] = useState(video?.upvotes || 0)
+  const [vote,      setVote]      = useState('none') // 'up' | 'down' | 'none'
+  const [upCount,   setUpCount]   = useState(video?.upvotes   || 0)
   const [downCount, setDownCount] = useState(video?.downvotes || 0)
 
   // Reset when video changes
   useEffect(() => {
-    setVoteState('none')
-    setUpCount(video?.upvotes || 0)
+    setVote('none')
+    setUpCount(video?.upvotes   || 0)
     setDownCount(video?.downvotes || 0)
   }, [video?.id])
 
   async function handleUp() {
-    if (voteState === 'down') setDownCount(c => Math.max(0, c - 1))
-
-    if (voteState === 'up') {
+    if (vote === 'down') setDownCount(c => Math.max(0, c - 1))
+    if (vote === 'up') {
       setUpCount(c => Math.max(0, c - 1))
-      setVoteState('none')
+      setVote('none')
     } else {
       setUpCount(c => c + 1)
-      setVoteState('up')
+      setVote('up')
       try { await videosApi.like(video?.id) } catch {}
     }
   }
 
   async function handleDown() {
-    if (voteState === 'up') setUpCount(c => Math.max(0, c - 1))
-
-    if (voteState === 'down') {
+    if (vote === 'up') setUpCount(c => Math.max(0, c - 1))
+    if (vote === 'down') {
       setDownCount(c => Math.max(0, c - 1))
-      setVoteState('none')
+      setVote('none')
     } else {
       setDownCount(c => c + 1)
-      setVoteState('down')
+      setVote('down')
       try { await videosApi.unlike(video?.id) } catch {}
     }
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
-      <div className="vote-action-group" style={{ textAlign: 'center' }}>
-        <button
-          onClick={handleUp}
-          style={voteBtnStyle(voteState === 'up')}
-        >
-          <FontAwesomeIcon icon={voteState === 'up' ? faThumbsUp : faThumbsUpReg} />
-        </button>
-        <div style={{ color: 'white', fontSize: '0.75rem' }}>{upCount}</div>
-      </div>
-      <div className="vote-action-group" style={{ textAlign: 'center' }}>
-        <button
-          onClick={handleDown}
-          style={voteBtnStyle(voteState === 'down')}
-        >
-          <FontAwesomeIcon icon={voteState === 'down' ? faThumbsDown : faThumbsDownReg} />
-        </button>
-        <div style={{ color: 'white', fontSize: '0.75rem' }}>{downCount}</div>
-      </div>
-    </div>
-  )
-}
+    <>
+      {/* Like */}
+      <button
+        className={`action-btn${vote === 'up' ? ' voted' : ''}`}
+        onClick={handleUp}
+        title="Like"
+      >
+        <span className="icon material-symbols-outlined">favorite</span>
+        <span className="label">{fmtCount(upCount)}</span>
+      </button>
 
-function voteBtnStyle(active) {
-  return {
-    background: active ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.5)',
-    border: 'none',
-    borderRadius: 8,
-    color: 'white',
-    padding: '8px 10px',
-    cursor: 'pointer',
-    fontSize: '1.1rem',
-  }
+      {/* Dislike */}
+      <button
+        className={`action-btn${vote === 'down' ? ' voted-down' : ''}`}
+        onClick={handleDown}
+        title="Dislike"
+      >
+        <span className="icon material-symbols-outlined">thumb_down</span>
+        <span className="label">Dislike</span>
+      </button>
+    </>
+  )
 }

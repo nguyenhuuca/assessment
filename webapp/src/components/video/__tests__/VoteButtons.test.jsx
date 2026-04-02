@@ -15,8 +15,9 @@ const mockVideo = { id: 'v1', upvotes: 5, downvotes: 2 }
 describe('VoteButtons', () => {
   it('renders initial vote counts', () => {
     render(<VoteButtons video={mockVideo} />)
+    // upvote count is shown; dislike button shows "Dislike" label (no count)
     expect(screen.getByText('5')).toBeInTheDocument()
-    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(screen.getByTitle('Dislike')).toBeInTheDocument()
   })
 
   it('increments upvote count on click', async () => {

@@ -1,48 +1,48 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faPlay, faPause, faVolumeUp, faVolumeMute
-} from '@fortawesome/free-solid-svg-icons'
 
 export default function VideoPlayer({ video, onEnded, active }) {
-  const videoRef = useRef(null)
-  const [loading, setLoading] = useState(true)
-  const [paused, setPaused] = useState(false)
-  const [muted, setMuted] = useState(false)
-  const [progress, setProgress] = useState(0)
+  const videoRef      = useRef(null)
+  const [loading,      setLoading]      = useState(true)
+  const [paused,       setPaused]       = useState(false)
+  const [muted,        setMuted]        = useState(true)   // start muted so autoplay works
+  const [progress,     setProgress]     = useState(0)
   const [descExpanded, setDescExpanded] = useState(false)
 
-  // Play/pause when active changes
+  // Play / pause driven by `active` prop
   useEffect(() => {
     const v = videoRef.current
     if (!v) return
-    if (active) {
-      v.play().catch(() => {})
-    } else {
-      v.pause()
-    }
+    if (active) { v.play().catch(() => {}) } else { v.pause() }
   }, [active])
 
-  function handleLoadStart() { setLoading(true) }
-  function handleCanPlay() { setLoading(false) }
-  function handleWaiting() { setLoading(true) }
-  function handlePlaying() {
-    setLoading(false)
+  // Reset overlay state when video changes
+  useEffect(() => {
+    setDescExpanded(false)
+    setProgress(0)
     setPaused(false)
-  }
-  function handlePause() { setPaused(true) }
+    setLoading(true)
+  }, [video?.id])
+
+  function handleLoadStart() { setLoading(true) }
+  function handleCanPlay()   { setLoading(false) }
+  function handleWaiting()   { setLoading(true) }
+  function handlePlaying()   { setLoading(false); setPaused(false) }
+  function handlePause()     { setPaused(true) }
   function handleTimeUpdate() {
     const v = videoRef.current
-    if (v && v.duration) setProgress((v.currentTime / v.duration) * 100)
+    if (v?.duration) setProgress((v.currentTime / v.duration) * 100)
   }
 
-  function togglePlayPause() {
+  // Click body of player to toggle play/pause, but skip interactive children
+  function handlePlayerClick(e) {
+    if (e.target.closest('[data-no-toggle]')) return
     const v = videoRef.current
     if (!v) return
     if (v.paused) { v.play() } else { v.pause() }
   }
 
-  function toggleMute() {
+  function toggleMute(e) {
+    e.stopPropagation()
     const v = videoRef.current
     if (!v) return
     v.muted = !v.muted
@@ -51,32 +51,42 @@ export default function VideoPlayer({ video, onEnded, active }) {
 
   function handleProgressClick(e) {
     const v = videoRef.current
-    if (!v || !v.duration) return
+    if (!v?.duration) return
     const rect = e.currentTarget.getBoundingClientRect()
-    const ratio = (e.clientX - rect.left) / rect.width
-    v.currentTime = ratio * v.duration
+    v.currentTime = ((e.clientX - rect.left) / rect.width) * v.duration
   }
 
-  const poster = video?.fileId ? `https://images.canh-labs.com/${video.fileId}.jpg` : undefined
-
-  // HTML5 <video> cannot send custom headers, so append auth tokens as query params
-  // so the streaming endpoint can authenticate the request
   function buildStreamUrl(src) {
     if (!src) return src
     try {
       const url = new URL(src)
       const jwt = localStorage.getItem('jwt')
-      const guestToken = localStorage.getItem('guestToken')
-      if (jwt) url.searchParams.set('token', jwt)
-      if (guestToken) url.searchParams.set('guestToken', guestToken)
+      const guest = localStorage.getItem('guestToken')
+      if (jwt)   url.searchParams.set('token', jwt)
+      if (guest) url.searchParams.set('guestToken', guest)
       return url.toString()
-    } catch {
-      return src
-    }
+    } catch { return src }
   }
 
+  const poster = video?.fileId
+    ? `https://images.canh-labs.com/${video.fileId}.jpg`
+    : undefined
+
+  const handle = video?.userShared?.split('@')[0] || 'anonymous'
+
   return (
-    <div className="video-player" style={{ position: 'relative', width: '100%', height: '100%', background: '#000', overflow: 'hidden' }}>
+    <div
+      onClick={handlePlayerClick}
+      style={{
+        position: 'relative',
+        width: '100%', height: '100%',
+        background: '#000',
+        overflow: 'hidden',
+        borderRadius: 16,
+        cursor: 'pointer',
+      }}
+    >
+      {/* ── Video element ── */}
       <video
         ref={videoRef}
         src={buildStreamUrl(video?.src)}
@@ -84,7 +94,8 @@ export default function VideoPlayer({ video, onEnded, active }) {
         autoPlay={active}
         playsInline
         preload="auto"
-        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        muted={muted}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         onLoadStart={handleLoadStart}
         onCanPlay={handleCanPlay}
         onWaiting={handleWaiting}
@@ -92,76 +103,138 @@ export default function VideoPlayer({ video, onEnded, active }) {
         onPause={handlePause}
         onTimeUpdate={handleTimeUpdate}
         onEnded={onEnded}
-        onClick={togglePlayPause}
       />
 
-      {/* Loading spinner */}
-      {loading && (
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', zIndex: 10 }}>
-          <div className="spinner-border text-light" role="status" />
-        </div>
-      )}
-
-      {/* Center play icon when paused */}
-      {paused && !loading && (
-        <div
-          style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', zIndex: 10, opacity: 0.8, pointerEvents: 'none' }}
-        >
-          <FontAwesomeIcon icon={faPlay} size="3x" color="white" />
-        </div>
-      )}
-
-      {/* Overlay controls */}
-      <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 8, zIndex: 20 }}>
-        <button className="overlay-button" onClick={togglePlayPause} style={btnStyle}>
-          <FontAwesomeIcon icon={paused ? faPlay : faPause} color="white" />
-        </button>
-        <button className="overlay-button" onClick={toggleMute} style={btnStyle}>
-          <FontAwesomeIcon icon={muted ? faVolumeMute : faVolumeUp} color="white" />
-        </button>
-      </div>
-
-      {/* Description overlay */}
-      <div style={{ position: 'absolute', bottom: 40, left: 0, right: 60, padding: '0 12px', zIndex: 10 }}>
-        <h4 style={{ color: 'white', fontSize: '0.95rem', margin: 0, textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
-          {video?.title}
-        </h4>
-        {video?.desc && (
-          <div>
-            <p style={{
-              color: 'rgba(255,255,255,0.9)', fontSize: '0.8rem', margin: '4px 0',
-              display: '-webkit-box', WebkitLineClamp: descExpanded ? 'unset' : 2,
-              WebkitBoxOrient: 'vertical', overflow: descExpanded ? 'visible' : 'hidden'
-            }}>
-              {video.desc}
-            </p>
-            {video.desc.length > 80 && (
-              <button
-                onClick={e => { e.stopPropagation(); setDescExpanded(x => !x) }}
-                style={{ background: 'none', border: 'none', color: 'white', fontSize: '0.75rem', padding: 0, cursor: 'pointer' }}
-              >
-                {descExpanded ? 'See less' : 'See more'}
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Progress bar */}
-      <div
-        onClick={handleProgressClick}
-        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 4, background: 'rgba(255,255,255,0.3)', cursor: 'pointer', zIndex: 20 }}
+      {/* ── Mute / unmute button ── */}
+      <button
+        data-no-toggle
+        onClick={toggleMute}
+        title={muted ? 'Unmute' : 'Mute'}
+        style={{
+          position: 'absolute', top: 12, right: 12, zIndex: 20,
+          background: 'rgba(0,0,0,0.48)',
+          backdropFilter: 'blur(8px)',
+          border: 'none',
+          borderRadius: '50%',
+          width: 40, height: 40,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'white',
+          cursor: 'pointer',
+          transition: 'background 0.15s ease, transform 0.12s ease',
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.72)'}
+        onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.48)'}
       >
-        <div style={{ width: `${progress}%`, height: '100%', background: 'white', transition: 'width 0.1s linear' }} />
+        <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>
+          {muted ? 'volume_off' : 'volume_up'}
+        </span>
+      </button>
+
+      {/* ── Loading spinner ── */}
+      {loading && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 10,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          pointerEvents: 'none',
+        }}>
+          <div className="vid-spinner" />
+        </div>
+      )}
+
+      {/* ── Centre play icon when paused ── */}
+      {paused && !loading && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 10,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          pointerEvents: 'none',
+        }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.52)',
+            backdropFilter: 'blur(10px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            animation: 'fadeIn 0.15s ease',
+          }}>
+            <span className="material-symbols-outlined" style={{
+              fontSize: 40, color: 'white',
+              fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48",
+            }}>
+              play_arrow
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* ── Bottom scrim + metadata ── */}
+      <div className="scrim" style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        padding: '80px 18px 0', zIndex: 10,
+        pointerEvents: 'none',
+      }}>
+        {/* Creator row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, pointerEvents: 'auto' }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: '50%',
+            border: '2px solid var(--primary)',
+            background: 'var(--bg-high)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 15, fontWeight: 700,
+            flexShrink: 0,
+          }}>
+            {handle[0]?.toUpperCase()}
+          </div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.2 }}>@{handle}</div>
+            <div style={{
+              fontSize: 10, color: 'var(--accent-cyan)',
+              fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
+            }}>
+              {video?.category || 'video'}
+            </div>
+          </div>
+        </div>
+
+        {/* Title */}
+        <p style={{
+          fontSize: 15, fontWeight: 600, lineHeight: 1.4,
+          marginBottom: 6, pointerEvents: 'auto',
+        }}>
+          {video?.title}
+        </p>
+
+        {/* Description (tap to expand) */}
+        {video?.desc && (
+          <p
+            data-no-toggle
+            onClick={e => { e.stopPropagation(); setDescExpanded(x => !x) }}
+            style={{
+              fontSize: 12, color: 'rgba(255,255,255,0.72)', lineHeight: 1.5,
+              display: '-webkit-box',
+              WebkitLineClamp: descExpanded ? 'unset' : 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: descExpanded ? 'visible' : 'hidden',
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+              marginBottom: 10,
+            }}
+          >
+            {video.desc}
+            {!descExpanded && video.desc.length > 60 && (
+              <span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}> …more</span>
+            )}
+          </p>
+        )}
+
+        {/* Progress bar */}
+        <div
+          data-no-toggle
+          className="progress-track"
+          style={{ marginBottom: 0 }}
+          onClick={e => { e.stopPropagation(); handleProgressClick(e) }}
+        >
+          <div className="progress-fill" style={{ width: `${progress}%` }} />
+        </div>
       </div>
     </div>
   )
-}
-
-const btnStyle = {
-  background: 'rgba(0,0,0,0.5)',
-  border: 'none',
-  borderRadius: 4,
-  padding: '4px 8px',
-  cursor: 'pointer',
 }
