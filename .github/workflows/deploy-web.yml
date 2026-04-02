@@ -1,4 +1,4 @@
-name: Deploy Frontend (Static Copy)
+name: Deploy Frontend (React Build)
 
 on:
   push:
@@ -6,30 +6,45 @@ on:
     paths:
       - 'webapp/**'
       - '.github/workflows/deploy-web.yml'
+
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: list frontend files
-        run: ls -R webapp/
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: webapp/package-lock.json
 
-      - name: list files
-        run: ls
+      - name: Install dependencies
+        run: npm ci
+        working-directory: webapp
 
-      - name: Deploy static files to server
+      - name: Build React app
+        run: npm run build
+        working-directory: webapp
+        env:
+          VITE_API_BASE_URL: https://canh-labs.com/api/v1/funny-app
+
+      - name: List built files
+        run: ls -R webapp/dist/
+
+      - name: Deploy built files to server
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.PORT }}
           key: ${{ secrets.SSH_DO_SECRET_KEY }}
-          source: webapp/
+          source: webapp/dist/
           target: /var/www/funnyapp.canh-labs.com/
-          strip_components: 1  # loại bỏ thư mục gốc `web/` để copy đúng cấu trúc
+          strip_components: 2  # strips webapp/dist/ prefix, copies contents to target
 
-      - name: Reload web server (optional)
+      - name: Reload web server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
