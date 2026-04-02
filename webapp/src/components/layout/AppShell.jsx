@@ -64,8 +64,8 @@ export default function AppShell() {
         justifyContent: 'space-between',
         padding: '0 24px', gap: 16,
       }}>
-        {/* Brand */}
-        <div style={{
+        {/* Brand (hidden on mobile) */}
+        <div className="topnav-brand" style={{
           fontFamily: 'var(--font-brand)',
           fontSize: 26, letterSpacing: 3,
           color: 'var(--text)',
@@ -75,8 +75,13 @@ export default function AppShell() {
           FUNNY MOVIES
         </div>
 
-        {/* Center — tabs */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        {/* Mobile title — active tab label centered (desktop hidden via CSS) */}
+        <span className="mobile-title">
+          {visibleTabs.find(t => t.key === activeTab)?.label ?? 'For You'}
+        </span>
+
+        {/* Center — tabs (hidden on mobile) */}
+        <nav className="topnav-tabs" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           {visibleTabs.map(tab => (
             <button
               key={tab.key}
@@ -166,7 +171,7 @@ export default function AppShell() {
       )}
 
       {/* ── Main Content ── */}
-      <main style={{
+      <main className="main-content" style={{
         marginLeft: 'var(--sidenav-w)',
         marginTop: 'var(--topnav-h)',
         height: 'calc(100vh - var(--topnav-h))',

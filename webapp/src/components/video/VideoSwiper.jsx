@@ -52,7 +52,8 @@ export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo
   const canDelete = video?.isPrivate && currentUser?.email === video?.userShared
 
   return (
-    <div style={{
+    <div className="video-swiper" style={{
+      position: 'relative',
       display: 'flex',
       alignItems: 'flex-end',
       gap: 20,
@@ -62,6 +63,7 @@ export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo
     }}>
       {/* ── 9:16 Video ── */}
       <div
+        className="video-card"
         {...swipeHandlers}
         style={{
           position: 'relative',
@@ -78,15 +80,10 @@ export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo
       </div>
 
       {/* ── Right-side action column ── */}
-      <div style={{
+      <div className="action-col" style={{
         display: 'flex', flexDirection: 'column',
         gap: 14, paddingBottom: 44, flexShrink: 0,
       }}>
-
-        {/* Navigate up */}
-        <button className="action-btn" onClick={prev} disabled={index === 0} title="Previous">
-          <span className="icon material-symbols-outlined">keyboard_arrow_up</span>
-        </button>
 
         {/* Like / Dislike */}
         <VoteButtons video={video} />
@@ -124,10 +121,15 @@ export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo
           </button>
         )}
 
-        {/* Navigate down */}
-        <button className="action-btn" onClick={next} disabled={index === total - 1} title="Next">
-          <span className="icon material-symbols-outlined">keyboard_arrow_down</span>
-        </button>
+        {/* Navigate up / down — grouped together */}
+        <div className="nav-arrows">
+          <button className="action-btn" onClick={prev} disabled={index === 0} title="Previous">
+            <span className="icon material-symbols-outlined">keyboard_arrow_up</span>
+          </button>
+          <button className="action-btn" onClick={next} disabled={index === total - 1} title="Next">
+            <span className="icon material-symbols-outlined">keyboard_arrow_down</span>
+          </button>
+        </div>
 
         {/* Counter */}
         <div style={{

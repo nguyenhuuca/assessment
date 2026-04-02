@@ -244,15 +244,79 @@ body {
   animation: spin 0.75s linear infinite;
 }
 
+/* ── Nav arrows group (prev/next) ── */
+.nav-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@media (max-width: 768px) {
+  .nav-arrows { gap: 4px; }
+}
+
 /* ── Mobile bottom nav ── */
 .mobile-nav {
   display: none;
 }
 
+/* ── Mobile title (active tab label, centered in header) ── */
+.mobile-title {
+  display: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text);
+  pointer-events: none;
+}
+
 @media (max-width: 768px) {
-  .mobile-nav { display: flex !important; }
+  /* Nav */
+  .mobile-nav    { display: flex !important; }
   .desktop-sidenav { display: none !important; }
-  .fab { bottom: 80px; right: 16px; }
+  .mobile-title  { display: block; }
+  .topnav-brand  { display: none !important; }
+  .topnav-tabs   { display: none !important; }
+
+  /* FAB moves above mobile nav */
+  .fab { bottom: 76px; right: 16px; }
+
+  /* Main content: shrink to leave room for bottom nav */
+  .main-content {
+    margin-left: 0 !important;
+    height: calc(100vh - var(--topnav-h) - 64px) !important;
+  }
+
+  /* VideoSwiper outer wrapper: full-screen column */
+  .video-swiper {
+    padding: 0 !important;
+    gap: 0 !important;
+    align-items: stretch !important;
+    width: 100% !important;
+  }
+
+  /* Video card: fill full width, drop rounded corners + shadow */
+  .video-card {
+    aspect-ratio: unset !important;
+    width: 100% !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Action column: float over video, right edge */
+  .action-col {
+    position: absolute !important;
+    right: 12px !important;
+    bottom: 20px !important;
+    padding-bottom: 0 !important;
+    gap: 10px !important;
+    z-index: 20;
+  }
 }
 
 /* ── Keyframes ── */
