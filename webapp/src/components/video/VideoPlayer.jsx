@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 export default function VideoPlayer({ video, onEnded, active }) {
-  const videoRef      = useRef(null)
+  const videoRef = useRef(null)
+  const trackRef = useRef(null)
   const [loading,      setLoading]      = useState(true)
   const [paused,       setPaused]       = useState(false)
   const [muted,        setMuted]        = useState(true)   // start muted so autoplay works
@@ -49,11 +50,15 @@ export default function VideoPlayer({ video, onEnded, active }) {
     setMuted(v.muted)
   }
 
-  function handleProgressClick(e) {
+  function handleTrackClick(e) {
+    e.stopPropagation()
     const v = videoRef.current
-    if (!v?.duration) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    v.currentTime = ((e.clientX - rect.left) / rect.width) * v.duration
+    const track = trackRef.current
+    if (!v?.duration || !track) return
+    const rect = track.getBoundingClientRect()
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+    v.currentTime = ratio * v.duration
+    setProgress(ratio * 100)
   }
 
   function buildStreamUrl(src) {
@@ -225,14 +230,32 @@ export default function VideoPlayer({ video, onEnded, active }) {
           </p>
         )}
 
-        {/* Progress bar */}
-        <div
-          data-no-toggle
-          className="progress-track"
-          style={{ marginBottom: 0 }}
-          onClick={e => { e.stopPropagation(); handleProgressClick(e) }}
-        >
-          <div className="progress-fill" style={{ width: `${progress}%` }} />
+      </div>
+
+      {/* ── Progress bar — tách riêng, absolute ở đáy, không bị scrim/overflow che ── */}
+      <div
+        ref={trackRef}
+        data-no-toggle
+        onClick={handleTrackClick}
+        style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          height: 20, zIndex: 30,
+          cursor: 'pointer',
+          pointerEvents: 'auto',
+          display: 'flex', alignItems: 'flex-end',
+        }}
+      >
+        {/* track nền */}
+        <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 2, overflow: 'hidden' }}>
+          {/* fill */}
+          <div style={{
+            height: '100%',
+            width: `${progress}%`,
+            background: 'var(--accent-cyan)',
+            boxShadow: '0 0 8px rgba(0,238,252,0.6)',
+            borderRadius: 2,
+            transition: 'width 0.25s linear',
+          }} />
         </div>
       </div>
     </div>

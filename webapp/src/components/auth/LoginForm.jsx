@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Button, Form, Spinner } from 'react-bootstrap'
 import { authApi } from '../../api/auth.js'
 import { useAuth } from '../../hooks/useAuth.js'
 
@@ -10,7 +9,7 @@ const STATUS = {
 
 export default function LoginForm({ onMfaRequired }) {
   const { login } = useAuth()
-  const [email, setEmail] = useState('')
+  const [email,   setEmail]   = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null) // { text, type: 'error'|'success' }
 
@@ -23,7 +22,7 @@ export default function LoginForm({ onMfaRequired }) {
       const res = await authApi.join(email.trim())
       const data = res.data
       if (data.action === STATUS.INVITED_SEND) {
-        setMessage({ text: "We've sent you an email. Please check your inbox", type: 'success' })
+        setMessage({ text: "Check your inbox!", type: 'success' })
       } else if (data.action === STATUS.MFA_REQUIRED) {
         localStorage.setItem('user', JSON.stringify(data.user))
         onMfaRequired?.(data)
@@ -38,24 +37,64 @@ export default function LoginForm({ onMfaRequired }) {
   }
 
   return (
-    <Form onSubmit={handleSubmit} className="d-flex align-items-center gap-2">
-      <Form.Control
-        type="email"
-        placeholder="Enter your email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        required
-        size="sm"
-        style={{ maxWidth: 220 }}
-      />
-      <Button type="submit" variant="primary" size="sm" disabled={loading}>
-        {loading ? <Spinner size="sm" animation="border" /> : 'Login'}
-      </Button>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+          style={{
+            background: 'var(--bg-high)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 8,
+            color: 'var(--text)',
+            fontSize: 13,
+            padding: '6px 12px',
+            width: 200,
+            outline: 'none',
+            transition: 'border-color 0.15s ease',
+          }}
+          onFocus={e => e.target.style.borderColor = 'var(--accent-cyan)'}
+          onBlur={e => e.target.style.borderColor = 'var(--border-subtle)'}
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            background: 'var(--accent-cyan)',
+            color: '#003035',
+            border: 'none',
+            borderRadius: 8,
+            fontSize: 13,
+            fontWeight: 700,
+            padding: '6px 16px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : 1,
+            whiteSpace: 'nowrap',
+            transition: 'opacity 0.15s ease, transform 0.12s ease',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}
+          onMouseEnter={e => { if (!loading) e.currentTarget.style.opacity = '0.85' }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = loading ? '0.7' : '1' }}
+        >
+          {loading
+            ? <><span style={{ width: 12, height: 12, border: '2px solid rgba(0,48,53,0.3)', borderTopColor: '#003035', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />Logging in</>
+            : 'Login'}
+        </button>
+      </form>
+
+      {/* Message shown below the row — does not shift the input */}
       {message && (
-        <span className={message.type === 'error' ? 'text-danger' : 'text-success'} style={{ fontSize: '0.85rem' }}>
-          {message.text}
+        <span style={{
+          fontSize: 11, fontWeight: 600,
+          color: message.type === 'error' ? '#ff6b6b' : 'var(--accent-cyan)',
+          whiteSpace: 'nowrap',
+        }}>
+          {message.type === 'success' ? '✓ ' : '⚠ '}{message.text}
         </span>
       )}
-    </Form>
+    </div>
   )
 }
