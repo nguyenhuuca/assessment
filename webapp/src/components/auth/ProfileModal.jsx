@@ -139,7 +139,7 @@ export default function ProfileModal({ show, onHide }) {
                   fontSize: 18,
                   color: user?.mfaEnabled ? 'var(--accent-cyan)' : 'var(--text-muted)',
                 }}>
-                  {user?.mfaEnabled ? 'shield' : 'shield_with_warning'}
+                  {user?.mfaEnabled ? 'gpp_good' : 'gpp_maybe'}
                 </span>
                 <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
                   MFA Status:{' '}
