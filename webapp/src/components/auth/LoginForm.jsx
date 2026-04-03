@@ -37,7 +37,7 @@ export default function LoginForm({ onMfaRequired }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+    <div style={{ position: 'relative' }}>
       <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <input
           type="email"
@@ -70,6 +70,8 @@ export default function LoginForm({ onMfaRequired }) {
             fontSize: 13,
             fontWeight: 700,
             padding: '6px 16px',
+            width: 70,
+            justifyContent: 'center',
             cursor: loading ? 'not-allowed' : 'pointer',
             opacity: loading ? 0.7 : 1,
             whiteSpace: 'nowrap',
@@ -80,17 +82,20 @@ export default function LoginForm({ onMfaRequired }) {
           onMouseLeave={e => { e.currentTarget.style.opacity = loading ? '0.7' : '1' }}
         >
           {loading
-            ? <><span style={{ width: 12, height: 12, border: '2px solid rgba(0,48,53,0.3)', borderTopColor: '#003035', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />Logging in</>
+            ? <span style={{ width: 14, height: 14, border: '2px solid rgba(0,48,53,0.3)', borderTopColor: '#003035', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
             : 'Login'}
         </button>
       </form>
 
-      {/* Message shown below the row — does not shift the input */}
+      {/* Message floats below without shifting the form */}
       {message && (
         <span style={{
+          position: 'absolute', top: '100%', right: 0,
+          marginTop: 4,
           fontSize: 11, fontWeight: 600,
           color: message.type === 'error' ? '#ff6b6b' : 'var(--accent-cyan)',
           whiteSpace: 'nowrap',
+          pointerEvents: 'none',
         }}>
           {message.type === 'success' ? '✓ ' : '⚠ '}{message.text}
         </span>

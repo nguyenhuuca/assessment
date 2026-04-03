@@ -253,6 +253,7 @@ body {
 
 @media (max-width: 768px) {
   .nav-arrows { gap: 4px; }
+  .action-btn .label { display: none; }
 }
 
 /* ── Mobile bottom nav ── */
@@ -278,7 +279,7 @@ body {
   /* Nav */
   .mobile-nav    { display: flex !important; }
   .desktop-sidenav { display: none !important; }
-  .mobile-title  { display: block; }
+  .mobile-title  { display: none; }
   .topnav-brand  { display: none !important; }
   .topnav-tabs   { display: none !important; }
 
