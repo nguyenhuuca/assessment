@@ -320,6 +320,188 @@ body {
   }
 }
 
+/* ── App Modal ── */
+.app-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.15s ease;
+}
+
+.app-modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  width: 480px;
+  max-width: 92vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popIn 0.18s ease;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+}
+
+.app-modal.lg { width: 560px; }
+
+.app-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.app-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.app-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), color var(--transition);
+  flex-shrink: 0;
+}
+.app-modal-close:hover { background: var(--bg-high); color: var(--text); }
+
+.app-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.app-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* ── App form elements ── */
+.app-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.app-input {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color var(--transition);
+  resize: none;
+}
+.app-input:focus { border-color: var(--accent-cyan); }
+.app-input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+.app-field { margin-bottom: 16px; }
+
+/* ── App checkbox ── */
+.app-checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.app-checkbox-wrap input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: var(--accent-cyan);
+  cursor: pointer;
+}
+.app-checkbox-wrap span {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── App alert ── */
+.app-alert {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+.app-alert.error   { background: rgba(185,41,2,0.2);  color: #ff8a7a; border: 1px solid rgba(185,41,2,0.3); }
+.app-alert.success { background: rgba(0,105,112,0.2); color: var(--accent-cyan); border: 1px solid rgba(0,238,252,0.2); }
+
+/* ── App buttons ── */
+.app-btn {
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity var(--transition), transform var(--transition);
+  white-space: nowrap;
+}
+.app-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.app-btn:not(:disabled):hover { opacity: 0.85; }
+.app-btn:not(:disabled):active { transform: scale(0.96); }
+
+.app-btn.primary  { background: var(--accent-cyan); color: #003035; }
+.app-btn.secondary{ background: var(--bg-high); color: var(--text-muted); }
+.app-btn.danger   { background: #b92902; color: #fff; }
+.app-btn.success  { background: #006940; color: #fff; }
+
+/* ── App tabs ── */
+.app-tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.app-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+.app-tab:hover { color: var(--text); }
+.app-tab.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
+
 /* ── Keyframes ── */
 @keyframes slideInRight {
   from { transform: translateX(100%); opacity: 0; }

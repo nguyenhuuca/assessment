@@ -1,12 +1,23 @@
 import React, { useState } from 'react'
-import { Alert, Button, Form, Modal, Nav, Spinner, Tab } from 'react-bootstrap'
 import { authApi } from '../../api/auth.js'
 import { useAuth } from '../../hooks/useAuth.js'
 
+const Spinner = () => (
+  <span style={{
+    width: 14, height: 14, flexShrink: 0,
+    border: '2px solid rgba(255,255,255,0.2)',
+    borderTopColor: '#fff',
+    borderRadius: '50%',
+    display: 'inline-block',
+    animation: 'spin 0.7s linear infinite',
+  }} />
+)
+
 export default function ProfileModal({ show, onHide }) {
   const { user, updateUser } = useAuth()
+  const [activeTab, setActiveTab] = useState('info')
   const [mfaLoading, setMfaLoading] = useState(false)
-  const [mfaMsg, setMfaMsg] = useState(null) // { text, type }
+  const [mfaMsg, setMfaMsg] = useState(null) // { text, type: 'error'|'success' }
   const [qrCode, setQrCode] = useState(null)
   const [secret, setSecret] = useState(null)
   const [setupCode, setSetupCode] = useState('')
@@ -20,7 +31,7 @@ export default function ProfileModal({ show, onHide }) {
       setQrCode(res.data.qrCode)
       setSecret(res.data.secret)
     } catch (err) {
-      setMfaMsg({ text: err.message, type: 'danger' })
+      setMfaMsg({ text: err.message, type: 'error' })
     } finally {
       setMfaLoading(false)
     }
@@ -28,20 +39,19 @@ export default function ProfileModal({ show, onHide }) {
 
   async function handleEnableMFA() {
     if (!setupCode || setupCode.length !== 6) {
-      setMfaMsg({ text: 'Please enter a valid 6-digit code', type: 'danger' })
+      setMfaMsg({ text: 'Please enter a valid 6-digit code', type: 'error' })
       return
     }
     setMfaLoading(true)
     setMfaMsg(null)
     try {
       await authApi.mfa.enable(setupCode, user?.email, secret)
-      const updated = { ...user, mfaEnabled: true }
-      updateUser(updated)
-      setMfaMsg({ text: 'MFA has been enabled successfully!', type: 'success' })
+      updateUser({ ...user, mfaEnabled: true })
+      setMfaMsg({ text: 'MFA enabled successfully!', type: 'success' })
       setQrCode(null)
       setSetupCode('')
     } catch (err) {
-      setMfaMsg({ text: err.message, type: 'danger' })
+      setMfaMsg({ text: err.message, type: 'error' })
     } finally {
       setMfaLoading(false)
     }
@@ -49,19 +59,18 @@ export default function ProfileModal({ show, onHide }) {
 
   async function handleDisableMFA() {
     if (!disableCode || disableCode.length !== 6) {
-      setMfaMsg({ text: 'Please enter a valid 6-digit code', type: 'danger' })
+      setMfaMsg({ text: 'Please enter a valid 6-digit code', type: 'error' })
       return
     }
     setMfaLoading(true)
     setMfaMsg(null)
     try {
       await authApi.mfa.disable(disableCode, user?.email)
-      const updated = { ...user, mfaEnabled: false }
-      updateUser(updated)
-      setMfaMsg({ text: 'MFA has been disabled successfully!', type: 'success' })
+      updateUser({ ...user, mfaEnabled: false })
+      setMfaMsg({ text: 'MFA disabled successfully!', type: 'success' })
       setDisableCode('')
     } catch (err) {
-      setMfaMsg({ text: err.message, type: 'danger' })
+      setMfaMsg({ text: err.message, type: 'error' })
     } finally {
       setMfaLoading(false)
     }
@@ -76,76 +85,144 @@ export default function ProfileModal({ show, onHide }) {
     onHide()
   }
 
+  if (!show) return null
+
   return (
-    <Modal show={show} onHide={handleClose} size="lg" centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Profile</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Tab.Container defaultActiveKey="info">
-          <Nav variant="tabs" className="mb-3">
-            <Nav.Item><Nav.Link eventKey="info">User Info</Nav.Link></Nav.Item>
-            <Nav.Item><Nav.Link eventKey="mfa">MFA Settings</Nav.Link></Nav.Item>
-          </Nav>
-          <Tab.Content>
-            <Tab.Pane eventKey="info">
-              <p><strong>Email:</strong> {user?.email}</p>
-              <p><strong>Member Since:</strong> {new Date().toLocaleDateString()}</p>
-              <p><strong>Last Login:</strong> {new Date().toLocaleDateString()}</p>
-            </Tab.Pane>
-            <Tab.Pane eventKey="mfa">
-              {mfaMsg && <Alert variant={mfaMsg.type}>{mfaMsg.text}</Alert>}
-              <p>MFA Status: <strong>{user?.mfaEnabled ? 'Enabled' : 'Disabled'}</strong></p>
+    <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) handleClose() }}>
+      <div className="app-modal lg">
+        <div className="app-modal-header">
+          <span className="app-modal-title">Profile</span>
+          <button className="app-modal-close" onClick={handleClose}>
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+          </button>
+        </div>
+
+        <div className="app-modal-body">
+          {/* Tabs */}
+          <div className="app-tabs">
+            <button
+              className={`app-tab${activeTab === 'info' ? ' active' : ''}`}
+              onClick={() => setActiveTab('info')}
+            >
+              User Info
+            </button>
+            <button
+              className={`app-tab${activeTab === 'mfa' ? ' active' : ''}`}
+              onClick={() => setActiveTab('mfa')}
+            >
+              MFA Settings
+            </button>
+          </div>
+
+          {/* User Info tab */}
+          {activeTab === 'info' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <InfoRow label="Email" value={user?.email} />
+              <InfoRow label="Member Since" value={new Date().toLocaleDateString()} />
+              <InfoRow label="Last Login" value={new Date().toLocaleDateString()} />
+            </div>
+          )}
+
+          {/* MFA tab */}
+          {activeTab === 'mfa' && (
+            <div>
+              {mfaMsg && (
+                <div className={`app-alert ${mfaMsg.type}`}>{mfaMsg.text}</div>
+              )}
+
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                marginBottom: 20, padding: '10px 14px',
+                background: 'var(--bg-elevated)', borderRadius: 8,
+              }}>
+                <span className="material-symbols-outlined" style={{
+                  fontSize: 18,
+                  color: user?.mfaEnabled ? 'var(--accent-cyan)' : 'var(--text-muted)',
+                }}>
+                  {user?.mfaEnabled ? 'shield' : 'shield_with_warning'}
+                </span>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                  MFA Status:{' '}
+                  <strong style={{ color: user?.mfaEnabled ? 'var(--accent-cyan)' : 'var(--text)' }}>
+                    {user?.mfaEnabled ? 'Enabled' : 'Disabled'}
+                  </strong>
+                </span>
+              </div>
+
               {!user?.mfaEnabled ? (
-                <div>
-                  {!qrCode ? (
-                    <Button variant="primary" onClick={handleSetupMFA} disabled={mfaLoading}>
-                      {mfaLoading ? <Spinner size="sm" animation="border" /> : 'Setup MFA'}
-                    </Button>
-                  ) : (
-                    <div>
-                      <p>Scan this QR code with your authenticator app:</p>
-                      <img src={`data:image/png;base64,${qrCode}`} alt="MFA QR Code" />
-                      <Form.Group className="mt-3">
-                        <Form.Label>Enter verification code to enable</Form.Label>
-                        <Form.Control
-                          type="text"
-                          maxLength={6}
-                          value={setupCode}
-                          onChange={e => setSetupCode(e.target.value.replace(/\D/g, ''))}
-                          placeholder="000000"
-                        />
-                      </Form.Group>
-                      <Button className="mt-2" variant="success" onClick={handleEnableMFA} disabled={mfaLoading}>
-                        {mfaLoading ? <Spinner size="sm" animation="border" /> : 'Enable MFA'}
-                      </Button>
+                !qrCode ? (
+                  <button className="app-btn primary" onClick={handleSetupMFA} disabled={mfaLoading}>
+                    {mfaLoading ? <><Spinner />Setting up…</> : 'Setup MFA'}
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                      Scan this QR code with your authenticator app:
+                    </p>
+                    <img
+                      src={`data:image/png;base64,${qrCode}`}
+                      alt="MFA QR Code"
+                      style={{ borderRadius: 8, maxWidth: 180 }}
+                    />
+                    <div className="app-field" style={{ marginBottom: 0 }}>
+                      <label className="app-label">Verification code</label>
+                      <input
+                        className="app-input"
+                        type="text"
+                        maxLength={6}
+                        value={setupCode}
+                        onChange={e => setSetupCode(e.target.value.replace(/\D/g, ''))}
+                        placeholder="000000"
+                        style={{ letterSpacing: '0.3em', maxWidth: 160 }}
+                      />
                     </div>
-                  )}
-                </div>
+                    <button className="app-btn success" onClick={handleEnableMFA} disabled={mfaLoading}>
+                      {mfaLoading ? <><Spinner />Enabling…</> : 'Enable MFA'}
+                    </button>
+                  </div>
+                )
               ) : (
-                <div>
-                  <Form.Group>
-                    <Form.Label>Enter code to disable MFA</Form.Label>
-                    <Form.Control
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div className="app-field" style={{ marginBottom: 0 }}>
+                    <label className="app-label">Enter code to disable MFA</label>
+                    <input
+                      className="app-input"
                       type="text"
                       maxLength={6}
                       value={disableCode}
                       onChange={e => setDisableCode(e.target.value.replace(/\D/g, ''))}
                       placeholder="000000"
+                      style={{ letterSpacing: '0.3em', maxWidth: 160 }}
                     />
-                  </Form.Group>
-                  <Button className="mt-2" variant="danger" onClick={handleDisableMFA} disabled={mfaLoading}>
-                    {mfaLoading ? <Spinner size="sm" animation="border" /> : 'Disable MFA'}
-                  </Button>
+                  </div>
+                  <button className="app-btn danger" onClick={handleDisableMFA} disabled={mfaLoading}>
+                    {mfaLoading ? <><Spinner />Disabling…</> : 'Disable MFA'}
+                  </button>
                 </div>
               )}
-            </Tab.Pane>
-          </Tab.Content>
-        </Tab.Container>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Close</Button>
-      </Modal.Footer>
-    </Modal>
+            </div>
+          )}
+        </div>
+
+        <div className="app-modal-footer">
+          <button className="app-btn secondary" onClick={handleClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function InfoRow({ label, value }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12,
+      padding: '10px 14px',
+      background: 'var(--bg-elevated)', borderRadius: 8,
+    }}>
+      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', minWidth: 100, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        {label}
+      </span>
+      <span style={{ fontSize: 13, color: 'var(--text)' }}>{value}</span>
+    </div>
   )
 }

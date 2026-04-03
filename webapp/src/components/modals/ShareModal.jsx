@@ -1,9 +1,19 @@
 import React, { useState } from 'react'
-import { Alert, Button, Form, Modal, Spinner } from 'react-bootstrap'
 import { useQueryClient } from '@tanstack/react-query'
 import { videosApi } from '../../api/videos.js'
 
 const EMPTY_FORM = { url: '', title: '', description: '', isPrivate: false }
+
+const Spinner = () => (
+  <span style={{
+    width: 14, height: 14, flexShrink: 0,
+    border: '2px solid rgba(0,48,53,0.3)',
+    borderTopColor: '#003035',
+    borderRadius: '50%',
+    display: 'inline-block',
+    animation: 'spin 0.7s linear infinite',
+  }} />
+)
 
 export default function ShareModal({ show, onHide }) {
   const queryClient = useQueryClient()
@@ -28,7 +38,6 @@ export default function ShareModal({ show, onHide }) {
         description: form.description.trim(),
         isPrivate: form.isPrivate,
       })
-      // Invalidate all video queries so feeds refresh
       queryClient.invalidateQueries({ queryKey: ['videos'] })
       handleClose()
     } catch (err) {
@@ -44,62 +53,80 @@ export default function ShareModal({ show, onHide }) {
     onHide()
   }
 
+  if (!show) return null
+
   return (
-    <Modal show={show} onHide={handleClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Share a Video</Modal.Title>
-      </Modal.Header>
-      <Form onSubmit={handleSubmit}>
-        <Modal.Body>
-          {error && <Alert variant="danger">{error}</Alert>}
-          <Form.Group className="mb-3">
-            <Form.Label>YouTube URL *</Form.Label>
-            <Form.Control
-              type="url"
-              name="url"
-              value={form.url}
-              onChange={handleChange}
-              placeholder="https://www.youtube.com/watch?v=..."
-              required
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              type="text"
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              placeholder="Video title"
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Description</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              placeholder="Optional description"
-            />
-          </Form.Group>
-          <Form.Check
-            type="checkbox"
-            name="isPrivate"
-            id="isPrivate"
-            label="Private video"
-            checked={form.isPrivate}
-            onChange={handleChange}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose} disabled={loading}>Cancel</Button>
-          <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? <><Spinner size="sm" animation="border" className="me-2" />Sharing...</> : 'Share'}
-          </Button>
-        </Modal.Footer>
-      </Form>
-    </Modal>
+    <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) handleClose() }}>
+      <div className="app-modal">
+        <div className="app-modal-header">
+          <span className="app-modal-title">Share a Video</span>
+          <button className="app-modal-close" onClick={handleClose}>
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: 'contents' }}>
+          <div className="app-modal-body">
+            {error && <div className="app-alert error">{error}</div>}
+
+            <div className="app-field">
+              <label className="app-label">YouTube URL *</label>
+              <input
+                className="app-input"
+                type="url"
+                name="url"
+                value={form.url}
+                onChange={handleChange}
+                placeholder="https://www.youtube.com/watch?v=..."
+                required
+              />
+            </div>
+
+            <div className="app-field">
+              <label className="app-label">Title</label>
+              <input
+                className="app-input"
+                type="text"
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                placeholder="Video title"
+              />
+            </div>
+
+            <div className="app-field">
+              <label className="app-label">Description</label>
+              <textarea
+                className="app-input"
+                rows={3}
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                placeholder="Optional description"
+              />
+            </div>
+
+            <label className="app-checkbox-wrap">
+              <input
+                type="checkbox"
+                name="isPrivate"
+                checked={form.isPrivate}
+                onChange={handleChange}
+              />
+              <span>Private video</span>
+            </label>
+          </div>
+
+          <div className="app-modal-footer">
+            <button type="button" className="app-btn secondary" onClick={handleClose} disabled={loading}>
+              Cancel
+            </button>
+            <button type="submit" className="app-btn primary" disabled={loading}>
+              {loading ? <><Spinner />Sharing…</> : 'Share'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   )
 }
