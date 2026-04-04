@@ -310,12 +310,18 @@ body {
   .topnav-tabs   { display: none !important; }
 
   /* FAB moves above mobile nav */
-  .fab { bottom: 76px; right: 16px; }
+  .fab { bottom: calc(76px + env(safe-area-inset-bottom)); right: 16px; }
 
-  /* Main content: shrink to leave room for bottom nav */
+  /* Safe area for iPhone home bar */
+  .mobile-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(64px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Main content: use dvh so browser chrome doesn't hide progress bar */
   .main-content {
     margin-left: 0 !important;
-    height: calc(100vh - var(--topnav-h) - 64px) !important;
+    height: calc(100dvh - var(--topnav-h) - 64px) !important;
   }
 
   /* VideoSwiper outer wrapper: full-screen column */
