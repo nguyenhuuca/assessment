@@ -55,6 +55,12 @@ This file provides guidance to Claude Code when working with this repository.
 ✅ Batch read multiple files in one request
 ✅ Use grep before opening files
 
+## Task Tracking
+- Track all tasks in TASKS.md
+- Before starting any work, read TASKS.md to check current status
+- After completing each task, update TASKS.md with status and notes
+- Format: [ ] pending, [x] done, [~] in progress
+
 ## Project Overview
 
 **Funny Movies** - Java 24 video streaming app with Spring Boot 3.x, PostgreSQL, Virtual Threads (Loom), YouTube API integration, and passwordless auth.
