@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useSwipeable } from 'react-swipeable'
 import VideoPlayer from './VideoPlayer.jsx'
 import VoteButtons from './VoteButtons.jsx'
+import { buildStreamUrl } from '../../utils/videoModel.js'
 
 export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo, currentUser }) {
   const [index, setIndex] = useState(0)
@@ -140,6 +141,22 @@ export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo
           {index + 1}/{total}
         </div>
       </div>
+
+      {/* ── Preload next 2 videos ── */}
+      {[1, 2].map(offset => {
+        const v = videos[index + offset]
+        const src = v ? buildStreamUrl(v.src) : null
+        return src ? (
+          <video
+            key={v.id}
+            src={src}
+            preload="auto"
+            muted
+            playsInline
+            style={{ display: 'none' }}
+          />
+        ) : null
+      })}
     </div>
   )
 }

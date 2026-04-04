@@ -1,5 +1,17 @@
 export const FUNNY_KEYWORDS = ['funny', 'hài', 'hài hước', 'comedy', 'vui', 'cười']
 
+export function buildStreamUrl(src) {
+  if (!src) return src
+  try {
+    const url = new URL(src)
+    const jwt = localStorage.getItem('jwt')
+    const guest = localStorage.getItem('guestToken')
+    if (jwt)   url.searchParams.set('token', jwt)
+    if (guest) url.searchParams.set('guestToken', guest)
+    return url.toString()
+  } catch { return src }
+}
+
 export function determineCategory(title = '', desc = '') {
   const text = (title + ' ' + desc).toLowerCase()
   return FUNNY_KEYWORDS.some(kw => text.includes(kw)) ? 'funny' : 'regular'

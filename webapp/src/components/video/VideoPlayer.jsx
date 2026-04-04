@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { buildStreamUrl } from '../../utils/videoModel.js'
 
 export default function VideoPlayer({ video, onEnded, active }) {
   const videoRef = useRef(null)
@@ -59,18 +60,6 @@ export default function VideoPlayer({ video, onEnded, active }) {
     const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
     v.currentTime = ratio * v.duration
     setProgress(ratio * 100)
-  }
-
-  function buildStreamUrl(src) {
-    if (!src) return src
-    try {
-      const url = new URL(src)
-      const jwt = localStorage.getItem('jwt')
-      const guest = localStorage.getItem('guestToken')
-      if (jwt)   url.searchParams.set('token', jwt)
-      if (guest) url.searchParams.set('guestToken', guest)
-      return url.toString()
-    } catch { return src }
   }
 
   const poster = video?.fileId
