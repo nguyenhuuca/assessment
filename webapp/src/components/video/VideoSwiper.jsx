@@ -7,6 +7,7 @@ import { buildStreamUrl } from '../../utils/videoModel.js'
 export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo, currentUser }) {
   const [index, setIndex] = useState(0)
   const [direction, setDirection] = useState('next')
+  const [muted, setMuted] = useState(true)
   const total = videos.length
 
   const next = useCallback(() => {
@@ -86,7 +87,7 @@ export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo
           flexShrink: 0,
         }}
       >
-        <VideoPlayer video={video} active onEnded={next} />
+        <VideoPlayer video={video} active onEnded={next} muted={muted} onMutedChange={setMuted} />
       </div>
 
       {/* ── Right-side action column ── */}

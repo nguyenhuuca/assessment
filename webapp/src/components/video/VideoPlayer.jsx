@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { buildStreamUrl } from '../../utils/videoModel.js'
 
-export default function VideoPlayer({ video, onEnded, active }) {
+export default function VideoPlayer({ video, onEnded, active, muted = true, onMutedChange }) {
   const videoRef = useRef(null)
   const trackRef = useRef(null)
   const [loading,      setLoading]      = useState(true)
   const [paused,       setPaused]       = useState(false)
-  const [muted,        setMuted]        = useState(true)   // start muted so autoplay works
   const [progress,     setProgress]     = useState(0)
   const [descExpanded, setDescExpanded] = useState(false)
 
@@ -16,6 +15,12 @@ export default function VideoPlayer({ video, onEnded, active }) {
     if (!v) return
     if (active) { v.play().catch(() => {}) } else { v.pause() }
   }, [active])
+
+  // Sync muted prop → video element
+  useEffect(() => {
+    const v = videoRef.current
+    if (v) v.muted = muted
+  }, [muted])
 
   // Reset overlay state when video changes
   useEffect(() => {
@@ -45,10 +50,7 @@ export default function VideoPlayer({ video, onEnded, active }) {
 
   function toggleMute(e) {
     e.stopPropagation()
-    const v = videoRef.current
-    if (!v) return
-    v.muted = !v.muted
-    setMuted(v.muted)
+    onMutedChange?.(!muted)
   }
 
   function handleTrackClick(e) {
