@@ -244,6 +244,12 @@ body {
   animation: spin 0.75s linear infinite;
 }
 
+/* ── Video card transition (desktop: fade, mobile: slide via media query) ── */
+.video-card.slide-next,
+.video-card.slide-prev {
+  animation: fadeIn 0.2s ease;
+}
+
 /* ── Nav arrows group (prev/next) ── */
 .nav-arrows {
   display: flex;
@@ -318,6 +324,13 @@ body {
     gap: 10px !important;
     z-index: 20;
   }
+
+  /* Clip slide animation within swiper bounds */
+  .video-swiper { overflow: hidden; }
+
+  /* Slide animations on mobile */
+  .video-card.slide-next { animation: slideInUp   0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+  .video-card.slide-prev { animation: slideInDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
 
   /* Smaller action buttons on mobile */
   .action-col .action-btn {
@@ -512,6 +525,16 @@ body {
 .app-tab.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
 
 /* ── Keyframes ── */
+@keyframes slideInUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes slideInDown {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
 @keyframes slideInRight {
   from { transform: translateX(100%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }

@@ -6,10 +6,18 @@ import { buildStreamUrl } from '../../utils/videoModel.js'
 
 export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo, currentUser }) {
   const [index, setIndex] = useState(0)
+  const [direction, setDirection] = useState('next')
   const total = videos.length
 
-  const next = useCallback(() => setIndex(i => Math.min(i + 1, total - 1)), [total])
-  const prev = useCallback(() => setIndex(i => Math.max(i - 1, 0)), [])
+  const next = useCallback(() => {
+    setDirection('next')
+    setIndex(i => Math.min(i + 1, total - 1))
+  }, [total])
+
+  const prev = useCallback(() => {
+    setDirection('prev')
+    setIndex(i => Math.max(i - 1, 0))
+  }, [])
 
   // Keyboard navigation
   useEffect(() => {
@@ -64,7 +72,8 @@ export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo
     }}>
       {/* ── 9:16 Video ── */}
       <div
-        className="video-card"
+        key={index}
+        className={`video-card slide-${direction}`}
         {...swipeHandlers}
         style={{
           position: 'relative',
