@@ -312,10 +312,15 @@ body {
   /* FAB moves above mobile nav */
   .fab { bottom: 76px; right: 16px; }
 
-  /* Main content: shrink to leave room for bottom nav */
+  /* Main content: fixed between topnav and mobile-nav — no 100vh math needed */
   .main-content {
-    margin-left: 0 !important;
-    height: calc(100vh - var(--topnav-h) - 64px) !important;
+    position: fixed !important;
+    top: var(--topnav-h) !important;
+    bottom: 64px !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
   }
 
   /* VideoSwiper outer wrapper: full-screen column */
