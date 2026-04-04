@@ -3,9 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 const ThemeContext = createContext(null)
 
 function getInitialTheme() {
-  const stored = localStorage.getItem('theme')
-  if (stored) return stored
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  return localStorage.getItem('theme') || 'dark'
 }
 
 export function ThemeProvider({ children }) {

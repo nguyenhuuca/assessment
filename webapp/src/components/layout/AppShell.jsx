@@ -9,6 +9,7 @@ import ShareModal from '../modals/ShareModal.jsx'
 import DeleteConfirmModal from '../modals/DeleteConfirmModal.jsx'
 import { CommentPanel } from '../comments/index.js'
 import { PublicFeed, PrivateFeed } from '../video/VideoFeed.jsx'
+import ComingSoon from './ComingSoon.jsx'
 
 const TABS = [
   { key: 'popular', label: 'Popular', icon: 'local_fire_department' },
@@ -17,15 +18,16 @@ const TABS = [
 ]
 
 const SIDE_NAV = [
-  { icon: 'home',          label: 'Home'    },
-  { icon: 'explore',       label: 'Explore' },
-  { icon: 'video_library', label: 'Library' },
-  { icon: 'history',       label: 'History' },
+  { key: 'home',     icon: 'home',          label: 'Home'    },
+  { key: 'explore',  icon: 'explore',       label: 'Explore' },
+  { key: 'library',  icon: 'video_library', label: 'Library' },
+  { key: 'history',  icon: 'history',       label: 'History' },
 ]
 
 export default function AppShell() {
   const { isLoggedIn, user, logout } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
+  const [activeNav,     setActiveNav]     = useState('home')
   const [activeTab,     setActiveTab]     = useState('popular')
   const [privateLoaded, setPrivateLoaded] = useState(false)
   const [message,       setMessage]       = useState(null)
@@ -135,11 +137,15 @@ export default function AppShell() {
         alignItems: 'center',
         paddingTop: 8, paddingBottom: 16,
       }}>
-        {SIDE_NAV.map((item, i) => (
-          <button key={item.icon} className={`sidenav-item${i === 0 ? ' active' : ''}`}>
+        {SIDE_NAV.map(item => (
+          <button
+            key={item.key}
+            className={`sidenav-item${activeNav === item.key ? ' active' : ''}`}
+            onClick={() => setActiveNav(item.key)}
+          >
             <span className="material-symbols-outlined" style={{
               fontSize: 22,
-              fontVariationSettings: i === 0
+              fontVariationSettings: activeNav === item.key
                 ? "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24"
                 : undefined,
             }}>
@@ -148,7 +154,11 @@ export default function AppShell() {
             <span>{item.label}</span>
           </button>
         ))}
-        <button className="sidenav-item" style={{ marginTop: 'auto' }}>
+        <button
+          className={`sidenav-item${activeNav === 'settings' ? ' active' : ''}`}
+          style={{ marginTop: 'auto' }}
+          onClick={() => setActiveNav('settings')}
+        >
           <span className="material-symbols-outlined" style={{ fontSize: 22 }}>settings</span>
           <span>Settings</span>
         </button>
@@ -181,28 +191,34 @@ export default function AppShell() {
         justifyContent: 'center',
         background: 'var(--bg)',
       }}>
-        {activeTab === 'popular' && (
-          <PublicFeed
-            category={null}
-            onShowComments={setCommentVideo}
-            onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
-            currentUser={user}
-          />
-        )}
-        {activeTab === 'funny' && (
-          <PublicFeed
-            category="funny"
-            onShowComments={setCommentVideo}
-            onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
-            currentUser={user}
-          />
-        )}
-        {activeTab === 'private' && privateLoaded && (
-          <PrivateFeed
-            onShowComments={setCommentVideo}
-            onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
-            currentUser={user}
-          />
+        {activeNav !== 'home' ? (
+          <ComingSoon page={activeNav} />
+        ) : (
+          <>
+            {activeTab === 'popular' && (
+              <PublicFeed
+                category={null}
+                onShowComments={setCommentVideo}
+                onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
+                currentUser={user}
+              />
+            )}
+            {activeTab === 'funny' && (
+              <PublicFeed
+                category="funny"
+                onShowComments={setCommentVideo}
+                onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
+                currentUser={user}
+              />
+            )}
+            {activeTab === 'private' && privateLoaded && (
+              <PrivateFeed
+                onShowComments={setCommentVideo}
+                onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
+                currentUser={user}
+              />
+            )}
+          </>
         )}
       </main>
 
