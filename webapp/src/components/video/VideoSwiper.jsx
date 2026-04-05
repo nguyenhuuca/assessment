@@ -30,6 +30,26 @@ export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo
     return () => window.removeEventListener('keydown', onKey)
   }, [next, prev])
 
+
+ // Scroll wheel navigation
+    useEffect(() => {
+        const isScrolling = { current: false }
+
+        function onWheel(e) {
+            e.preventDefault()
+            if (isScrolling.current) return
+            isScrolling.current = true
+
+            if (e.deltaY > 0) next()
+            else prev()
+
+            setTimeout(() => { isScrolling.current = false }, 800)
+        }
+
+        window.addEventListener('wheel', onWheel, { passive: false })
+        return () => window.removeEventListener('wheel', onWheel)
+    }, [next, prev])
+
   // Reset index when video list changes
   useEffect(() => { setIndex(0) }, [videos.length])
 
