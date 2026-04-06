@@ -7,16 +7,57 @@ export default function SearchModal({ show, videos = [], currentIndex = 0, onSel
     if (!show) setSearchTerm('')
   }, [show])
 
+  function normalizeForSearch(value) {
+    return (value || '')
+      .normalize('NFKD')
+      .replace(/\p{M}/gu, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D')
+      .toLocaleLowerCase()
+  }
+
+  // Lightweight fuzzy score: prioritize exact phrase matches, then word hits,
+  // then in-order character subsequence matches for typo-tolerant search.
+  function scoreFuzzy(text, term) {
+    if (!text || !term) return 0
+    const haystack = normalizeForSearch(text)
+    const needle = normalizeForSearch(term)
+    if (haystack.includes(needle)) return needle.length * 4
+
+    const words = needle.split(/\s+/).filter(Boolean)
+    let score = 0
+    for (const w of words) {
+      if (haystack.includes(w)) score += w.length * 2
+    }
+
+    // simple subsequence bonus
+    let hi = 0
+    let matched = 0
+    for (let i = 0; i < needle.length && hi < haystack.length; i++) {
+      const ch = needle[i]
+      const foundIdx = haystack.indexOf(ch, hi)
+      if (foundIdx === -1) break
+      matched++
+      hi = foundIdx + 1
+    }
+    score += matched
+    return score
+  }
+
   const filteredVideos = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase()
+    const term = searchTerm.trim()
     if (!term) return videos
-    return videos.filter(v => {
-      const haystack = [v?.title, v?.desc, v?.userShared, v?.category]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-      return haystack.includes(term)
-    })
+    return videos
+      .map(v => {
+        const base = [v?.title, v?.desc, v?.userShared, v?.category]
+          .filter(Boolean)
+          .join(' ')
+        const s = scoreFuzzy(base, term)
+        return { v, s }
+      })
+      .filter(x => x.s > 0)
+      .sort((a, b) => b.s - a.s)
+      .map(x => x.v)
   }, [videos, searchTerm])
 
   if (!show) return null
@@ -25,20 +66,18 @@ export default function SearchModal({ show, videos = [], currentIndex = 0, onSel
     <div className="mobile-search-modal" onClick={() => onClose?.()}>
       <div className="mobile-search-modal-sheet" onClick={e => e.stopPropagation()}>
         <div className="mobile-search-modal-header">
-          <div className="mobile-search-modal-title">Search Videos</div>
+          <div className="mobile-search-modal-input-wrap mobile-search-modal-input-wrap-header">
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>search</span>
+            <input
+              className="mobile-search-modal-input"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              placeholder="Search in video list"
+            />
+          </div>
           <button className="icon-btn" onClick={() => onClose?.()} title="Close">
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
-        </div>
-        <div className="mobile-search-modal-input-wrap">
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>search</span>
-          <input
-            autoFocus
-            className="mobile-search-modal-input"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Search in video list"
-          />
         </div>
         <div className="mobile-search-modal-list">
           {filteredVideos.map(item => {

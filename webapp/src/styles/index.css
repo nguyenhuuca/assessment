@@ -378,6 +378,7 @@ body {
 
   .mobile-search-modal-sheet {
     width: 100%;
+    height: 78vh;
     max-height: 78vh;
     background: var(--bg-surface);
     border-top: 1px solid var(--border-subtle);
@@ -392,7 +393,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 12px 10px;
+    gap: 8px;
+    padding: 10px 12px;
     border-bottom: 1px solid var(--border);
   }
 
@@ -417,6 +419,11 @@ body {
     color: var(--text-muted);
   }
 
+  .mobile-search-modal-input-wrap-header {
+    margin: 0;
+    flex: 1;
+  }
+
   .mobile-search-modal-input {
     width: 100%;
     border: none;
@@ -428,6 +435,8 @@ body {
   }
 
   .mobile-search-modal-list {
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
     padding: 2px 8px 12px;
   }
