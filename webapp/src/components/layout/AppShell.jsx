@@ -136,12 +136,6 @@ export default function AppShell() {
         >
           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>search</span>
         </button>
-        {mobileSearchOpen && (
-          <div className="mobile-search-popover">
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>search</span>
-            Search coming soon
-          </div>
-        )}
         {!isLoggedIn ? (
           <>
             <button
@@ -242,6 +236,8 @@ export default function AppShell() {
             {activeTab === 'popular' && (
               <PublicFeed
                 category={null}
+                mobileSearchOpen={mobileSearchOpen}
+                onCloseMobileSearch={() => setMobileSearchOpen(false)}
                 onShowComments={setCommentVideo}
                 onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
                 currentUser={user}
@@ -250,6 +246,8 @@ export default function AppShell() {
             {activeTab === 'funny' && (
               <PublicFeed
                 category="funny"
+                mobileSearchOpen={mobileSearchOpen}
+                onCloseMobileSearch={() => setMobileSearchOpen(false)}
                 onShowComments={setCommentVideo}
                 onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
                 currentUser={user}
@@ -257,6 +255,8 @@ export default function AppShell() {
             )}
             {activeTab === 'private' && privateLoaded && (
               <PrivateFeed
+                mobileSearchOpen={mobileSearchOpen}
+                onCloseMobileSearch={() => setMobileSearchOpen(false)}
                 onShowComments={setCommentVideo}
                 onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
                 currentUser={user}

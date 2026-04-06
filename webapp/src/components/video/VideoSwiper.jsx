@@ -3,8 +3,9 @@ import { useSwipeable } from 'react-swipeable'
 import VideoPlayer from './VideoPlayer.jsx'
 import VoteButtons from './VoteButtons.jsx'
 import { buildStreamUrl } from '../../utils/videoModel.js'
+import SearchModal from '../modals/SearchModal.jsx'
 
-export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo, currentUser }) {
+export default function VideoSwiper({ videos = [], mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const [index, setIndex] = useState(0)
   const [direction, setDirection] = useState('next')
   const [muted, setMuted] = useState(true)
@@ -187,6 +188,20 @@ export default function VideoSwiper({ videos = [], onShowComments, onDeleteVideo
           />
         ) : null
       })}
+
+      <SearchModal
+        show={mobileSearchOpen}
+        videos={videos}
+        currentIndex={index}
+        onClose={onCloseMobileSearch}
+        onSelect={itemIndex => {
+          if (itemIndex >= 0) {
+            setDirection(itemIndex >= index ? 'next' : 'prev')
+            setIndex(itemIndex)
+          }
+          onCloseMobileSearch?.()
+        }}
+      />
     </div>
   )
 }
