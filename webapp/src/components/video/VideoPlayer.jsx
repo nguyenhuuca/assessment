@@ -103,6 +103,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
 
       {/* ── Mute / unmute button ── */}
       <button
+        className="video-mute-btn"
         data-no-toggle
         onClick={toggleMute}
         title={muted ? 'Unmute' : 'Mute'}

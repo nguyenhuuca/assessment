@@ -36,6 +36,8 @@ export default function AppShell() {
   const [shareOpen,     setShareOpen]     = useState(false)
   const [deleteModal,   setDeleteModal]   = useState({ show: false, video: null })
   const [commentVideo,  setCommentVideo]  = useState(null)
+  const [mobileLoginOpen, setMobileLoginOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 
   function showMsg(text, type = 'error') {
     setMessage({ text, type })
@@ -126,6 +128,48 @@ export default function AppShell() {
         </div>
       </header>
 
+      <div className="mobile-video-overlay-controls">
+        <button
+          className={`icon-btn mobile-overlay-icon${mobileSearchOpen ? ' active' : ''}`}
+          onClick={() => setMobileSearchOpen(v => !v)}
+          title="Search"
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>search</span>
+        </button>
+        {mobileSearchOpen && (
+          <div className="mobile-search-popover">
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>search</span>
+            Search coming soon
+          </div>
+        )}
+        {!isLoggedIn ? (
+          <>
+            <button
+              className={`icon-btn mobile-overlay-icon${mobileLoginOpen ? ' active' : ''}`}
+              onClick={() => setMobileLoginOpen(v => !v)}
+              title="Login"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person</span>
+            </button>
+            {mobileLoginOpen && (
+              <div className="mobile-login-popover">
+                <LoginForm
+                  onMfaRequired={data => setMfaModal({ show: true, pendingData: data })}
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <button
+            className="icon-btn mobile-overlay-icon"
+            onClick={() => setProfileOpen(true)}
+            title="Profile"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person</span>
+          </button>
+        )}
+      </div>
+
       {/* ── Side Nav (desktop) ── */}
       <aside className="desktop-sidenav" style={{
         position: 'fixed', left: 0,
@@ -166,7 +210,7 @@ export default function AppShell() {
 
       {/* ── Global message banner ── */}
       {message && (
-        <div style={{
+        <div className="global-message-banner" style={{
           position: 'fixed',
           top: 'var(--topnav-h)',
           left: 'var(--sidenav-w)', right: 0,
