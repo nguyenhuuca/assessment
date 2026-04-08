@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { buildStreamUrl } from '../../utils/videoModel.js'
 
-export default function VideoPlayer({ video, onEnded, active, muted = true, onMutedChange }) {
+export default function VideoPlayer({ video, onEnded, active, muted = true, onMutedChange, showMuteButton = true }) {
   const videoRef = useRef(null)
   const trackRef = useRef(null)
   const [loading,      setLoading]      = useState(true)
@@ -101,31 +101,20 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
         onEnded={onEnded}
       />
 
-      {/* ── Mute / unmute button ── */}
-      <button
-        className="video-mute-btn"
-        data-no-toggle
-        onClick={toggleMute}
-        title={muted ? 'Unmute' : 'Mute'}
-        style={{
-          position: 'absolute', top: 12, right: 12, zIndex: 20,
-          background: 'rgba(0,0,0,0.48)',
-          backdropFilter: 'blur(8px)',
-          border: 'none',
-          borderRadius: '50%',
-          width: 40, height: 40,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'white',
-          cursor: 'pointer',
-          transition: 'background 0.15s ease, transform 0.12s ease',
-        }}
-        onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.72)'}
-        onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.48)'}
-      >
-        <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>
-          {muted ? 'volume_off' : 'volume_up'}
-        </span>
-      </button>
+      {/* ── Mute / unmute (optional: parent renders stable control outside slide layer) ── */}
+      {showMuteButton && (
+        <button
+          type="button"
+          className="video-mute-btn"
+          data-no-toggle
+          onClick={toggleMute}
+          title={muted ? 'Unmute' : 'Mute'}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>
+            {muted ? 'volume_off' : 'volume_up'}
+          </span>
+        </button>
+      )}
 
       {/* ── Loading spinner ── */}
       {loading && (

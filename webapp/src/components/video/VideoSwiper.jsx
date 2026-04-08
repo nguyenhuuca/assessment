@@ -92,10 +92,11 @@ export default function VideoSwiper({ videos = [], mobileSearchOpen = false, onC
       padding: '20px 0',
       animation: 'fadeIn 0.25s ease',
     }}>
-      {/* ── 9:16 Video ── */}
+      {/* ── 9:16 Video ──
+          Inner `key={index}` remounts for slide animation. Mute sits outside that layer so the control
+          does not unmount between videos — on mobile (full-bleed reel + overlays) that flicker was very noticeable. */}
       <div
-        key={index}
-        className={`video-card slide-${direction}`}
+        className="video-card"
         {...swipeHandlers}
         style={{
           position: 'relative',
@@ -108,7 +109,36 @@ export default function VideoSwiper({ videos = [], mobileSearchOpen = false, onC
           flexShrink: 0,
         }}
       >
-        <VideoPlayer video={video} active onEnded={next} muted={muted} onMutedChange={setMuted} />
+        <div
+          key={index}
+          className={`video-card-inner slide-${direction}`}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 'inherit',
+            overflow: 'hidden',
+          }}
+        >
+          <VideoPlayer
+            video={video}
+            active
+            onEnded={next}
+            muted={muted}
+            onMutedChange={setMuted}
+            showMuteButton={false}
+          />
+        </div>
+        <button
+          type="button"
+          className="video-mute-btn"
+          data-no-toggle
+          onClick={e => { e.stopPropagation(); setMuted(m => !m) }}
+          title={muted ? 'Unmute' : 'Mute'}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>
+            {muted ? 'volume_off' : 'volume_up'}
+          </span>
+        </button>
       </div>
 
       {/* ── Right-side action column ── */}

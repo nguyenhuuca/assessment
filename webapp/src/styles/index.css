@@ -273,8 +273,31 @@ body {
 /* ── Video card transition ── */
 .video-swiper { overflow: hidden; }
 
-.video-card.slide-next { animation: slideInUp   0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-.video-card.slide-prev { animation: slideInDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+/* Slide animation on inner layer so controls (e.g. mute) outside key remount stay visible */
+.video-card-inner.slide-next { animation: slideInUp   0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+.video-card-inner.slide-prev { animation: slideInDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+
+/* Mute — shared by VideoPlayer and VideoSwiper (stable layer above video / scrim / progress) */
+.video-mute-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 50;
+  background: rgba(0,0,0,0.48);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.video-mute-btn:hover { background: rgba(0,0,0,0.72); }
 
 /* ── Nav arrows group (prev/next) ── */
 .nav-arrows {
@@ -564,8 +587,8 @@ body {
   .video-swiper { overflow: hidden; }
 
   /* Slide animations on mobile */
-  .video-card.slide-next { animation: slideInUp   0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-  .video-card.slide-prev { animation: slideInDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+  .video-card-inner.slide-next { animation: slideInUp   0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+  .video-card-inner.slide-prev { animation: slideInDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
 
   /* Smaller action buttons on mobile */
   .action-col .action-btn {
