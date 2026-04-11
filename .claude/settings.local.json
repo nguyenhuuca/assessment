@@ -5,7 +5,20 @@
       "Bash(dir:*)",
       "mcp__trello-python__trello_get_card",
       "mcp__trello-python__trello_get_cards_by_label",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(mkdir -p /d/DO/assessment/webapp/legacy/js /d/DO/assessment/webapp/legacy/css)",
+      "Bash(cp /d/DO/assessment/webapp/index.html /d/DO/assessment/webapp/legacy/)",
+      "Bash(cp /d/DO/assessment/webapp/js/* /d/DO/assessment/webapp/legacy/js/)",
+      "Bash(cp /d/DO/assessment/webapp/css/* /d/DO/assessment/webapp/legacy/css/)",
+      "Bash(cp /d/DO/assessment/webapp/manifest.json /d/DO/assessment/webapp/legacy/)",
+      "Bash(npm create:*)",
+      "Bash(printf \"y\\\\n\")",
+      "Bash(npm --version)",
+      "Bash(npm install:*)",
+      "mcp__stitch__get_screen",
+      "Read(//tmp/**)",
+      "mcp__atlassian__getAccessibleAtlassianResources",
+      "mcp__atlassian__searchJiraIssuesUsingJql"
     ]
   },
   "enableAllProjectMcpServers": false,
