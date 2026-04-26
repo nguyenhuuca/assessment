@@ -1,0 +1,42 @@
+@startuml
+skinparam monochrome false
+skinparam shadowing true
+skinparam roundcorner 20
+skinparam style strictuml
+
+' Define colors for participants
+skinparam Participant {
+    BackgroundColor<<Controller>> #B0C4DE
+    BackgroundColor<<Service>> #C0F0C0
+    BackgroundColor<<Cache>> #FFFACD
+    BackgroundColor<<Storage>> #E6E6FA
+}
+
+actor Client
+participant "VideoStreamController" as Controller <<Controller>>
+participant "StreamVideoService" as Service <<Service>>
+participant "VideoCacheService" as Cache <<Cache>>
+participant "VideoStorageService" as Storage <<Storage>>
+
+Client -> Controller : GET /video-stream/stream/{fileId}\nRange: bytes=start-end
+note right of Client : <video> tag sends optional Range header
+
+Controller -> Controller : Parse Range header\nDetermine start/end bytes
+Controller -> Service : getPartialFileUsingRAF(fileId, start, end)
+
+Service -> Cache : getChunkStream(fileId, start, end)
+alt ✅ Cache Hit
+    Cache --> Service : InputStream
+else ❌ Cache Miss
+    Service -> Storage : getFileRangeFromDisk(fileId, start, end)
+    Storage --> Service : InputStream
+end
+
+Service -> Service : wrap InputStream & range\nas StreamChunkResult
+Service --> Controller : StreamChunkResult
+
+Controller -> Controller : Prepare StreamingResponseBody\nSet Content-Range headers
+Controller -> Client : HTTP 206 Partial Content\nStream video chunk
+note right of Controller : returns StreamingResponseBody
+
+@enduml

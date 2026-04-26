@@ -1,0 +1,2789 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../prd/PRD-hot-video-priority/">
+      
+      
+        <link rel="next" href="../plan-b-direct-cli-spawn/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Plan A - My Architecture Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#plan-a-trello-webhook-claude-code-file-based-hooks" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="My Architecture Docs" class="md-header__button md-logo" aria-label="My Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            My Architecture Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Plan A
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="My Architecture Docs" class="md-nav__button md-logo" aria-label="My Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    My Architecture Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Video%20Streaming%20System%20Architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Sequence-Diagram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sequence Diagram
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-05/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025-07-05
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025-07-13 VN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025-07-13 EN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0000-template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0001-use-relational-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use RDBMS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0002-backend-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0003-use-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0004-frontend-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/apr_binary_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Binary Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    PRD
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plans
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plans
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan A
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan A
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-this-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Approach?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Why This Approach?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-task-file-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Task File Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-spring-boot-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Spring Boot Service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-claude-code-file-watcher-hook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Claude Code File Watcher Hook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-systemd-service-linux-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Systemd Service (Linux Server)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-task-status-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Task Status Tracking
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deployment Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#development-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#production-setup-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Setup (Server)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#end-to-end-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        End-to-End Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monitoring-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring &amp; Observability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Monitoring &amp; Observability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#log-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#health-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Health Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#failed-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failed Tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stuck-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stuck Tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scalability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scalability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scalability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-server-future" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Server (Future)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost Estimation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alternative-polling-instead-of-file-watching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alternative: Polling Instead of File Watching
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan-b-direct-cli-spawn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan B
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Docs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Docs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../apidocs/api-docs.json" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAPI JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../apidocs/redoc-static.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redoc
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams (PUML)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Diagrams (PUML)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/C4-L1.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C4 L1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/C4-L2.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C4 L2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/C4-L3.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C4 L3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/Deployment.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tasks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tasks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/pending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pending
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-this-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Approach?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Why This Approach?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-task-file-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Task File Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-spring-boot-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Spring Boot Service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-claude-code-file-watcher-hook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Claude Code File Watcher Hook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-systemd-service-linux-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Systemd Service (Linux Server)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-task-status-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Task Status Tracking
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deployment Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#development-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#production-setup-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Setup (Server)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#end-to-end-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        End-to-End Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monitoring-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring &amp; Observability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Monitoring &amp; Observability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#log-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#health-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Health Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#failed-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failed Tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stuck-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stuck Tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scalability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scalability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scalability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-server-future" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Server (Future)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost Estimation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alternative-polling-instead-of-file-watching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alternative: Polling Instead of File Watching
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="plan-a-trello-webhook-claude-code-file-based-hooks">Plan A: Trello Webhook → Claude Code File-Based Hooks</h1>
+<h2 id="overview">Overview</h2>
+<p><strong>Approach:</strong> File-based trigger system where Trello webhooks write task files that Claude Code monitors and auto-processes.</p>
+<p><strong>Philosophy:</strong> "Don't call Claude, let Claude discover the work"</p>
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────┐      ┌──────────────┐      ┌─────────────────┐
+│   Trello    │─────▶│ Spring Boot  │─────▶│ Write Task File │
+│  (webhook)  │      │   Endpoint   │      │ ~/.claude/tasks/│
+└─────────────┘      └──────────────┘      └─────────────────┘
+                                                      │
+                                                      ▼
+                                            ┌─────────────────┐
+                                            │ Claude Code     │
+                                            │ File Watcher    │
+                                            │ Hook (startup)  │
+                                            └─────────────────┘
+                                                      │
+                                                      ▼
+                                            ┌─────────────────┐
+                                            │ Auto spawn:     │
+                                            │ claude-code CLI │
+                                            │ implements task │
+                                            └─────────────────┘
+                                                      │
+                                                      ▼
+                                        ┌───────────────────────────┐
+                                        │ Git branch → Commit → PR  │
+                                        └───────────────────────────┘
+</code></pre>
+<h2 id="why-this-approach">Why This Approach?</h2>
+<h3 id="pros">Pros ✅</h3>
+<ol>
+<li><strong>Decoupled:</strong> Spring Boot doesn't need to know about Claude Code internals</li>
+<li><strong>Reliable:</strong> File system is persistent, survives crashes</li>
+<li><strong>Observable:</strong> Easy to debug - just check task files</li>
+<li><strong>Extensible:</strong> Multiple sources can write tasks (Trello, Jira, Slack, etc.)</li>
+<li><strong>Queueing:</strong> Natural queue system via file system</li>
+<li><strong>Status tracking:</strong> Can mark files as processing/done</li>
+<li><strong>Full context:</strong> Claude Code has complete codebase access</li>
+<li><strong>Auto git operations:</strong> Claude Code handles branch, commit, PR</li>
+</ol>
+<h3 id="cons">Cons ⚠️</h3>
+<ol>
+<li><strong>Server setup:</strong> Requires Claude Code CLI installed on server</li>
+<li><strong>Daemon process:</strong> Need a background watcher process</li>
+<li><strong>File system overhead:</strong> Disk I/O for each task</li>
+<li><strong>Polling latency:</strong> Small delay (1-5 seconds) between write and detection</li>
+</ol>
+<h2 id="implementation-details">Implementation Details</h2>
+<h3 id="1-task-file-format">1. Task File Format</h3>
+<p><strong>Location:</strong> <code>~/.claude/tasks/pending/</code></p>
+<p><strong>File naming:</strong> <code>{timestamp}_{trello_card_id}.json</code></p>
+<p><strong>Schema:</strong></p>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;trello_card_123&quot;,
+  &quot;source&quot;: &quot;trello&quot;,
+  &quot;title&quot;: &quot;Implement user authentication&quot;,
+  &quot;description&quot;: &quot;Add JWT-based authentication to the API endpoints...&quot;,
+  &quot;priority&quot;: &quot;high&quot;,
+  &quot;labels&quot;: [&quot;backend&quot;, &quot;security&quot;],
+  &quot;createdAt&quot;: &quot;2026-02-08T10:30:00Z&quot;,
+  &quot;metadata&quot;: {
+    &quot;trelloCardUrl&quot;: &quot;https://trello.com/c/abc123&quot;,
+    &quot;requestedBy&quot;: &quot;user@example.com&quot;
+  }
+}
+</code></pre>
+<h3 id="2-spring-boot-service">2. Spring Boot Service</h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/TaskFileServiceImpl.java</code></p>
+<pre><code class="language-java">@Service
+@Slf4j
+public class TaskFileServiceImpl implements TaskFileService {
+
+    private final AppProperties appProperties;
+    private final ObjectMapper objectMapper;
+
+    @Override
+    @Async
+    public void createTaskFile(String cardId, String title, String description, Map&lt;String, Object&gt; metadata) {
+        try {
+            // 1. Create task DTO
+            TaskFileDTO task = TaskFileDTO.builder()
+                    .id(cardId)
+                    .source(&quot;trello&quot;)
+                    .title(title)
+                    .description(description)
+                    .priority(&quot;normal&quot;)
+                    .createdAt(Instant.now().toString())
+                    .metadata(metadata)
+                    .build();
+
+            // 2. Generate filename
+            String timestamp = System.currentTimeMillis();
+            String filename = String.format(&quot;%d_%s.json&quot;, timestamp, cardId);
+
+            // 3. Write to pending directory
+            Path taskDir = Paths.get(appProperties.getClaudeTasksDir(), &quot;pending&quot;);
+            Files.createDirectories(taskDir);
+
+            Path taskFile = taskDir.resolve(filename);
+            objectMapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(taskFile.toFile(), task);
+
+            log.info(&quot;Created task file: {}&quot;, taskFile);
+
+        } catch (Exception e) {
+            log.error(&quot;Failed to create task file for card {}: {}&quot;, cardId, e.getMessage(), e);
+            throw new CustomException(&quot;Failed to create task file&quot;);
+        }
+    }
+}
+</code></pre>
+<p><strong>Webhook Integration:</strong></p>
+<pre><code class="language-java">@Service
+public class TrelloWebhookServiceImpl implements TrelloWebhookService {
+
+    private final TaskFileService taskFileService;
+
+    @Override
+    @Async
+    public void processWebhook(TrelloWebhookDTO payload) {
+        // ... validate and parse webhook ...
+
+        if (&quot;doing&quot;.equalsIgnoreCase(labelName)) {
+            Map&lt;String, Object&gt; metadata = Map.of(
+                &quot;trelloCardUrl&quot;, payload.getAction().getData().getCard().getUrl(),
+                &quot;boardId&quot;, payload.getModel().getId()
+            );
+
+            taskFileService.createTaskFile(
+                cardId,
+                cardName,
+                cardDesc,
+                metadata
+            );
+        }
+    }
+}
+</code></pre>
+<h3 id="3-claude-code-file-watcher-hook">3. Claude Code File Watcher Hook</h3>
+<p><strong>Location:</strong> <code>~/.claude/hooks/on-startup.sh</code></p>
+<p><strong>Implementation:</strong></p>
+<pre><code class="language-bash">#!/bin/bash
+# Claude Code startup hook - watches for new task files
+
+TASKS_DIR=&quot;$HOME/.claude/tasks/pending&quot;
+PROCESSING_DIR=&quot;$HOME/.claude/tasks/processing&quot;
+COMPLETED_DIR=&quot;$HOME/.claude/tasks/completed&quot;
+
+mkdir -p &quot;$TASKS_DIR&quot; &quot;$PROCESSING_DIR&quot; &quot;$COMPLETED_DIR&quot;
+
+# Start file watcher in background
+while true; do
+    # Find new task files
+    for task_file in &quot;$TASKS_DIR&quot;/*.json; do
+        [ -e &quot;$task_file&quot; ] || continue  # No files found
+
+        echo &quot;Found new task: $task_file&quot;
+
+        # Move to processing
+        filename=$(basename &quot;$task_file&quot;)
+        mv &quot;$task_file&quot; &quot;$PROCESSING_DIR/$filename&quot;
+
+        # Extract task info
+        task_id=$(jq -r '.id' &quot;$PROCESSING_DIR/$filename&quot;)
+        task_title=$(jq -r '.title' &quot;$PROCESSING_DIR/$filename&quot;)
+        task_desc=$(jq -r '.description' &quot;$PROCESSING_DIR/$filename&quot;)
+
+        # Spawn Claude Code CLI
+        echo &quot;Spawning claude-code for task: $task_title&quot;
+
+        cd &quot;$HOME/projects/assessment&quot; || exit
+
+        claude-code --non-interactive &lt;&lt;EOF
+Implement the following task:
+
+Title: $task_title
+
+Description:
+$task_desc
+
+Follow existing code patterns in the codebase.
+Create a feature branch, implement the code, write tests, commit, and create a PR.
+
+Task ID: $task_id
+EOF
+
+        # Mark as completed
+        mv &quot;$PROCESSING_DIR/$filename&quot; &quot;$COMPLETED_DIR/$filename&quot;
+        echo &quot;Completed task: $task_title&quot;
+    done
+
+    # Wait 5 seconds before next check
+    sleep 5
+done
+</code></pre>
+<p><strong>Alternative: Using inotify (Linux) for instant detection:</strong></p>
+<pre><code class="language-bash">#!/bin/bash
+# More efficient - triggers immediately on file creation
+
+TASKS_DIR=&quot;$HOME/.claude/tasks/pending&quot;
+
+inotifywait -m -e create &quot;$TASKS_DIR&quot; --format '%f' | while read filename; do
+    if [[ $filename == *.json ]]; then
+        echo &quot;New task detected: $filename&quot;
+        # ... process task ...
+    fi
+done
+</code></pre>
+<h3 id="4-systemd-service-linux-server">4. Systemd Service (Linux Server)</h3>
+<p><strong>File:</strong> <code>/etc/systemd/system/claude-task-watcher.service</code></p>
+<pre><code class="language-ini">[Unit]
+Description=Claude Code Task Watcher
+After=network.target
+
+[Service]
+Type=simple
+User=appuser
+WorkingDirectory=/home/appuser
+ExecStart=/home/appuser/.claude/hooks/on-startup.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p><strong>Enable and start:</strong></p>
+<pre><code class="language-bash">sudo systemctl enable claude-task-watcher
+sudo systemctl start claude-task-watcher
+sudo systemctl status claude-task-watcher
+</code></pre>
+<h3 id="5-configuration">5. Configuration</h3>
+<p><strong>AppProperties.java:</strong></p>
+<pre><code class="language-java">@Configuration
+@ConfigurationProperties(&quot;app&quot;)
+public class AppProperties {
+    // ... existing properties ...
+
+    private String claudeTasksDir = System.getProperty(&quot;user.home&quot;) + &quot;/.claude/tasks&quot;;
+
+    // Getters and setters
+}
+</code></pre>
+<p><strong>application.yaml:</strong></p>
+<pre><code class="language-yaml">app:
+  claude-tasks-dir: ${CLAUDE_TASKS_DIR:~/.claude/tasks}
+</code></pre>
+<h3 id="6-task-status-tracking">6. Task Status Tracking</h3>
+<p><strong>Enhanced schema with status:</strong></p>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;trello_card_123&quot;,
+  &quot;status&quot;: &quot;pending&quot;,  // pending | processing | completed | failed
+  &quot;title&quot;: &quot;...&quot;,
+  &quot;description&quot;: &quot;...&quot;,
+  &quot;attempts&quot;: 0,
+  &quot;lastError&quot;: null,
+  &quot;startedAt&quot;: null,
+  &quot;completedAt&quot;: null,
+  &quot;result&quot;: {
+    &quot;branch&quot;: &quot;feature/123-task-name&quot;,
+    &quot;prUrl&quot;: &quot;https://github.com/user/repo/pull/45&quot;,
+    &quot;commitSha&quot;: &quot;abc123&quot;
+  }
+}
+</code></pre>
+<p><strong>Update after completion:</strong></p>
+<pre><code class="language-bash"># In hook script after claude-code completes
+jq '.status = &quot;completed&quot; | .completedAt = now | .result.branch = &quot;'&quot;$branch&quot;'&quot;' \
+    &quot;$PROCESSING_DIR/$filename&quot; &gt; &quot;$COMPLETED_DIR/$filename&quot;
+</code></pre>
+<h2 id="deployment-steps">Deployment Steps</h2>
+<h3 id="development-setup">Development Setup</h3>
+<ol>
+<li>
+<p><strong>Install Claude Code CLI:</strong>
+   <code>bash
+   npm install -g @anthropic/claude-code</code></p>
+</li>
+<li>
+<p><strong>Create directories:</strong>
+   <code>bash
+   mkdir -p ~/.claude/tasks/{pending,processing,completed}
+   mkdir -p ~/.claude/hooks</code></p>
+</li>
+<li>
+<p><strong>Install hook script:</strong>
+   <code>bash
+   cp hooks/on-startup.sh ~/.claude/hooks/
+   chmod +x ~/.claude/hooks/on-startup.sh</code></p>
+</li>
+<li>
+<p><strong>Start watcher:</strong>
+   <code>bash
+   ~/.claude/hooks/on-startup.sh &amp;</code></p>
+</li>
+<li>
+<p><strong>Configure Spring Boot:</strong>
+   <code>bash
+   # In api/.env
+   CLAUDE_TASKS_DIR=$HOME/.claude/tasks</code></p>
+</li>
+</ol>
+<h3 id="production-setup-server">Production Setup (Server)</h3>
+<ol>
+<li>
+<p><strong>Install dependencies:</strong>
+   <code>bash
+   sudo apt-get install -y inotify-tools jq
+   npm install -g @anthropic/claude-code</code></p>
+</li>
+<li>
+<p><strong>Setup systemd service:</strong>
+   <code>bash
+   sudo cp claude-task-watcher.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable claude-task-watcher
+   sudo systemctl start claude-task-watcher</code></p>
+</li>
+<li>
+<p><strong>Configure Trello webhook:</strong>
+   <code>bash
+   curl -X POST "https://api.trello.com/1/webhooks/" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "key": "YOUR_TRELLO_API_KEY",
+       "callbackURL": "https://your-domain.com/api/webhook/trello",
+       "idModel": "BOARD_ID"
+     }'</code></p>
+</li>
+</ol>
+<h2 id="testing">Testing</h2>
+<h3 id="unit-test">Unit Test</h3>
+<pre><code class="language-java">@SpringBootTest
+class TaskFileServiceImplTest {
+
+    @Autowired
+    private TaskFileService taskFileService;
+
+    @TempDir
+    Path tempDir;
+
+    @Test
+    void testCreateTaskFile() throws Exception {
+        // Given
+        String cardId = &quot;test123&quot;;
+        String title = &quot;Test Task&quot;;
+        String description = &quot;Test description&quot;;
+
+        // Configure temp directory
+        ReflectionTestUtils.setField(taskFileService, &quot;tasksDir&quot;, tempDir.toString());
+
+        // When
+        taskFileService.createTaskFile(cardId, title, description, Map.of());
+
+        // Then
+        Path pendingDir = tempDir.resolve(&quot;pending&quot;);
+        assertTrue(Files.exists(pendingDir));
+
+        List&lt;Path&gt; files = Files.list(pendingDir).collect(Collectors.toList());
+        assertEquals(1, files.size());
+
+        String content = Files.readString(files.get(0));
+        assertTrue(content.contains(cardId));
+        assertTrue(content.contains(title));
+    }
+}
+</code></pre>
+<h3 id="integration-test">Integration Test</h3>
+<pre><code class="language-bash"># Test manual task creation
+cat &gt; ~/.claude/tasks/pending/test_manual.json &lt;&lt;EOF
+{
+  &quot;id&quot;: &quot;manual_test&quot;,
+  &quot;source&quot;: &quot;manual&quot;,
+  &quot;title&quot;: &quot;Test task&quot;,
+  &quot;description&quot;: &quot;This is a test&quot;,
+  &quot;createdAt&quot;: &quot;$(date -u +%Y-%m-%dT%H:%M:%SZ)&quot;
+}
+EOF
+
+# Check logs
+tail -f ~/.claude/tasks/watcher.log
+</code></pre>
+<h3 id="end-to-end-test">End-to-End Test</h3>
+<ol>
+<li>Create Trello card</li>
+<li>Add "doing" label</li>
+<li>Check Spring Boot logs: <code>tail -f api/logs/app.log</code></li>
+<li>Check task file created: <code>ls ~/.claude/tasks/pending/</code></li>
+<li>Check watcher processing: <code>tail -f ~/.claude/tasks/watcher.log</code></li>
+<li>Verify branch created: <code>git branch | grep feature/</code></li>
+<li>Verify PR created: <code>gh pr list</code></li>
+</ol>
+<h2 id="monitoring-observability">Monitoring &amp; Observability</h2>
+<h3 id="log-files">Log Files</h3>
+<pre><code class="language-bash"># Spring Boot logs
+tail -f api/logs/app.log | grep TaskFile
+
+# Watcher logs
+tail -f ~/.claude/tasks/watcher.log
+
+# Systemd logs
+journalctl -u claude-task-watcher -f
+</code></pre>
+<h3 id="metrics">Metrics</h3>
+<pre><code class="language-java">@Component
+public class TaskFileMetrics {
+
+    private final MeterRegistry registry;
+
+    public TaskFileMetrics(MeterRegistry registry) {
+        this.registry = registry;
+    }
+
+    public void recordTaskCreated() {
+        registry.counter(&quot;tasks.created&quot;).increment();
+    }
+
+    public void recordTaskCompleted(String status) {
+        registry.counter(&quot;tasks.completed&quot;, &quot;status&quot;, status).increment();
+    }
+}
+</code></pre>
+<h3 id="health-check">Health Check</h3>
+<pre><code class="language-bash"># Check watcher is running
+ps aux | grep on-startup.sh
+
+# Check pending tasks
+ls -la ~/.claude/tasks/pending/
+
+# Check processing tasks (should be empty or short-lived)
+ls -la ~/.claude/tasks/processing/
+
+# Check completed tasks
+ls -la ~/.claude/tasks/completed/ | tail -10
+</code></pre>
+<h2 id="error-handling">Error Handling</h2>
+<h3 id="failed-tasks">Failed Tasks</h3>
+<p><strong>Retry logic in hook:</strong></p>
+<pre><code class="language-bash">max_attempts=3
+current_attempt=$(jq -r '.attempts // 0' &quot;$task_file&quot;)
+
+if [ &quot;$current_attempt&quot; -lt &quot;$max_attempts&quot; ]; then
+    # Increment attempt counter
+    jq '.attempts += 1' &quot;$task_file&quot; &gt; &quot;$task_file.tmp&quot;
+    mv &quot;$task_file.tmp&quot; &quot;$task_file&quot;
+
+    # Move back to pending for retry
+    mv &quot;$task_file&quot; &quot;$TASKS_DIR/&quot;
+else
+    # Max attempts reached, mark as failed
+    jq '.status = &quot;failed&quot; | .lastError = &quot;Max attempts reached&quot;' &quot;$task_file&quot; &gt; &quot;$FAILED_DIR/$filename&quot;
+fi
+</code></pre>
+<h3 id="stuck-tasks">Stuck Tasks</h3>
+<p><strong>Cleanup script:</strong></p>
+<pre><code class="language-bash">#!/bin/bash
+# Remove tasks stuck in processing &gt; 1 hour
+
+find ~/.claude/tasks/processing -name &quot;*.json&quot; -mmin +60 | while read task; do
+    echo &quot;Found stuck task: $task&quot;
+    filename=$(basename &quot;$task&quot;)
+    mv &quot;$task&quot; ~/.claude/tasks/failed/
+done
+</code></pre>
+<p><strong>Cron job:</strong></p>
+<pre><code class="language-cron"># Run cleanup every hour
+0 * * * * /home/appuser/scripts/cleanup-stuck-tasks.sh
+</code></pre>
+<h2 id="security-considerations">Security Considerations</h2>
+<ol>
+<li>
+<p><strong>File permissions:</strong>
+   <code>bash
+   chmod 700 ~/.claude/tasks/
+   chmod 600 ~/.claude/tasks/*/*.json</code></p>
+</li>
+<li>
+<p><strong>Input validation:</strong></p>
+</li>
+<li>Sanitize task descriptions (prevent code injection)</li>
+<li>Validate JSON schema before processing</li>
+<li>
+<p>Limit file size (max 100KB per task)</p>
+</li>
+<li>
+<p><strong>Rate limiting:</strong></p>
+</li>
+<li>Max 10 tasks per minute</li>
+<li>
+<p>Max 100 tasks per hour</p>
+</li>
+<li>
+<p><strong>Isolation:</strong></p>
+</li>
+<li>Run watcher as dedicated user</li>
+<li>Use Docker container for Claude Code execution</li>
+</ol>
+<h2 id="scalability">Scalability</h2>
+<h3 id="single-server">Single Server</h3>
+<ul>
+<li><strong>Throughput:</strong> ~10-20 tasks/hour (depends on task complexity)</li>
+<li><strong>Queue size:</strong> File system limited (~1000s of files)</li>
+<li><strong>Bottleneck:</strong> Claude Code processing time</li>
+</ul>
+<h3 id="multi-server-future">Multi-Server (Future)</h3>
+<p>Use Redis + queue system:</p>
+<pre><code>Trello → Spring Boot → Redis Queue → Multiple Workers → Claude Code
+</code></pre>
+<h2 id="cost-estimation">Cost Estimation</h2>
+<p><strong>Assumptions:</strong>
+- 10 tasks/day
+- Average 2000 tokens input + 4000 tokens output per task
+- Claude Sonnet 4.5 pricing</p>
+<p><strong>Monthly cost:</strong> ~$5-10</p>
+<h2 id="alternative-polling-instead-of-file-watching">Alternative: Polling Instead of File Watching</h2>
+<p>If file watching is complex, use polling from Spring Boot:</p>
+<pre><code class="language-java">@Scheduled(fixedRate = 30000) // Every 30 seconds
+public void processTaskQueue() {
+    Path pendingDir = Paths.get(appProperties.getClaudeTasksDir(), &quot;pending&quot;);
+
+    try (Stream&lt;Path&gt; files = Files.list(pendingDir)) {
+        files.filter(path -&gt; path.toString().endsWith(&quot;.json&quot;))
+             .forEach(this::spawnClaudeCode);
+    }
+}
+</code></pre>
+<h2 id="summary">Summary</h2>
+<p><strong>Best for:</strong>
+- ✅ Production systems with high reliability needs
+- ✅ Multiple task sources (Trello, Jira, Slack, etc.)
+- ✅ Audit trail and status tracking required
+- ✅ Decoupled architecture</p>
+<p><strong>Not ideal for:</strong>
+- ❌ Simple use cases (overkill)
+- ❌ Instant response needed (&lt;1 second)
+- ❌ Serverless environments</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

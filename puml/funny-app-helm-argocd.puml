@@ -1,0 +1,36 @@
+@startuml
+title CI/CD Flow - Helm + ArgoCD Deployment (Funny-App)
+
+actor Developer
+participant "GitHub Actions" as GH
+participant "Docker Hub" as DH
+participant "Helm Repo / GitOps" as Helm
+participant "ArgoCD" as Argo
+participant "Kubernetes Cluster" as K8s
+
+== Code Commit ==
+Developer -> GH: Push code to main branch
+note right of GH
+# Continuous Integration
+- Trigger build on push
+- Run unit tests
+- Package JAR (funny-app-1.0.0.jar)
+- Build Docker image (funny-app:<commit-hash>)
+end note
+
+== Build & Push Docker ==
+GH -> DH: Push image to Docker Hub
+
+== Update Helm ==
+GH -> Helm: Update values.yaml\n(image.tag = <commit-hash>)
+GH -> Helm: Commit and push changes
+
+== ArgoCD Sync ==
+Argo -> Helm: Detect repo change (poll/webhook)
+Argo -> K8s: Apply Helm release update
+
+== Result ==
+K8s -> Developer: App running with new image
+Argo -> Developer: Sync status (Healthy/Degraded)
+
+@enduml

@@ -1,0 +1,2872 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../adr/apr_binary_search/">
+      
+      
+        <link rel="next" href="../../plans/plan-a-file-based-hooks/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Hot Video Priority - My Architecture Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#prd-hot-video-priority-feature" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="My Architecture Docs" class="md-header__button md-logo" aria-label="My Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            My Architecture Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Hot Video Priority
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="My Architecture Docs" class="md-nav__button md-logo" aria-label="My Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    My Architecture Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Video%20Streaming%20System%20Architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Sequence-Diagram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sequence Diagram
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-05/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025-07-05
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025-07-13 VN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025-07-13 EN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0000-template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0001-use-relational-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use RDBMS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0002-backend-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0003-use-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0004-frontend-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/apr_binary_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Binary Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    PRD
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problem-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem Statement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#goal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-background-current-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Background &amp; Current State
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Background &amp; Current State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#existing-infrastructure-reuse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Existing Infrastructure (reuse)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Scope
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Scope">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-scope-v1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In Scope (v1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#out-of-scope-v2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out of Scope (v2+)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fr-1-access-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-1: Access Tracking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-2-hot-score-calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-2: Hot Score Calculation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-3-trending-api-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-3: Trending API Endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-4-extend-existing-video-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-4: Extend Existing Video List
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-5-scheduled-score-recomputation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-5: Scheduled Score Recomputation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-6-pre-warm-cache-for-hot-videos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-6: Pre-warm Cache for Hot Videos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-7-frontend-hot-badge-trending-section" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-7: Frontend — Hot Badge &amp; Trending Section
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-non-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Non-Functional Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-data-model-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Data Model Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Data Model Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-columns-on-video_sources-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Columns on video_sources table
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index-for-trending-query-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Index for trending query performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#activate-videoaccessstats-writes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Activate VideoAccessStats writes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-component-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Component Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Component Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-api-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. API Contract
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. API Contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-apivideostrending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /api/videos/trending
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apivideossorthot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /api/videos?sort=hot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-implementation-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Implementation Plan
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Implementation Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-data-foundation-1-2-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 — Data Foundation (1-2 days)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-scoring-engine-1-2-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2 — Scoring Engine (1-2 days)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-api-scheduler-1-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 — API &amp; Scheduler (1 day)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-frontend-1-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Frontend (1 day)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-5-testing-tuning-1-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5 — Testing &amp; Tuning (1 day)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-risks-mitigations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Risks &amp; Mitigations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-related-documents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Related Documents
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plans
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plans
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-a-file-based-hooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan A
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-b-direct-cli-spawn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan B
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Docs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Docs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../apidocs/api-docs.json" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAPI JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../apidocs/redoc-static.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redoc
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams (PUML)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Diagrams (PUML)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/C4-L1.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C4 L1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/C4-L2.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C4 L2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/C4-L3.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C4 L3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/Deployment.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tasks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tasks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/pending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pending
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problem-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem Statement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#goal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-background-current-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Background &amp; Current State
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Background &amp; Current State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#existing-infrastructure-reuse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Existing Infrastructure (reuse)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Scope
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Scope">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-scope-v1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In Scope (v1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#out-of-scope-v2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out of Scope (v2+)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fr-1-access-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-1: Access Tracking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-2-hot-score-calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-2: Hot Score Calculation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-3-trending-api-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-3: Trending API Endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-4-extend-existing-video-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-4: Extend Existing Video List
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-5-scheduled-score-recomputation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-5: Scheduled Score Recomputation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-6-pre-warm-cache-for-hot-videos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-6: Pre-warm Cache for Hot Videos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-7-frontend-hot-badge-trending-section" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-7: Frontend — Hot Badge &amp; Trending Section
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-non-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Non-Functional Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-data-model-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Data Model Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Data Model Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-columns-on-video_sources-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Columns on video_sources table
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index-for-trending-query-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Index for trending query performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#activate-videoaccessstats-writes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Activate VideoAccessStats writes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-component-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Component Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Component Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-api-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. API Contract
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. API Contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-apivideostrending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /api/videos/trending
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apivideossorthot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /api/videos?sort=hot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-implementation-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Implementation Plan
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Implementation Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-data-foundation-1-2-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 — Data Foundation (1-2 days)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-scoring-engine-1-2-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2 — Scoring Engine (1-2 days)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-api-scheduler-1-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 — API &amp; Scheduler (1 day)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-frontend-1-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Frontend (1 day)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-5-testing-tuning-1-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5 — Testing &amp; Tuning (1 day)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-risks-mitigations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Risks &amp; Mitigations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-related-documents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Related Documents
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="prd-hot-video-priority-feature">PRD: Hot Video Priority Feature</h1>
+<p><strong>Status:</strong> Draft
+<strong>Author:</strong> Team
+<strong>Created:</strong> 2026-02-28
+<strong>Version:</strong> 1.0</p>
+<hr />
+<h2 id="1-overview">1. Overview</h2>
+<h3 id="problem-statement">Problem Statement</h3>
+<p>Currently, all videos are displayed in a flat, unordered list. Users have no signal about which videos are trending or popular — leading to poor content discovery and lower engagement. Users who want to watch something good have to manually browse without any curation.</p>
+<h3 id="goal">Goal</h3>
+<p>Surface "hot" videos (trending, high-engagement content) at the top of the feed and mark them with a visual indicator. Hot videos should also be pre-cached so their streaming starts faster.</p>
+<h3 id="success-metrics">Success Metrics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Baseline</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Average session duration</td>
+<td>TBD</td>
+<td>+15%</td>
+</tr>
+<tr>
+<td>Videos watched per session</td>
+<td>TBD</td>
+<td>+20%</td>
+</tr>
+<tr>
+<td>Time-to-first-frame for hot videos</td>
+<td>~2s</td>
+<td>&lt;500ms (via pre-cache)</td>
+</tr>
+<tr>
+<td>User click-through on hot badges</td>
+<td>N/A</td>
+<td>&gt;30%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-background-current-state">2. Background &amp; Current State</h2>
+<h3 id="existing-infrastructure-reuse">Existing Infrastructure (reuse)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>VideoSource</code> entity</td>
+<td>✅ Active</td>
+<td>Maps to <code>video_sources</code> table — the <strong>active</strong> video table</td>
+</tr>
+<tr>
+<td><code>VideoAccessStats</code> entity</td>
+<td>✅ Exists</td>
+<td>Tracks <code>videoId</code> (= <code>VideoSource.sourceId</code>), <code>hitCount</code>, <code>lastAccessedAt</code></td>
+</tr>
+<tr>
+<td><code>VideoAccessServiceImpl.recordAccess()</code></td>
+<td>⚠️ Commented out</td>
+<td>TODO comment — needs to be activated</td>
+</tr>
+<tr>
+<td><code>ShareLink</code> table</td>
+<td>✅ Exists</td>
+<td>Tracks which videos are shared</td>
+</tr>
+<tr>
+<td><code>VideoCacheImpl</code> (adaptive cache)</td>
+<td>✅ Exists</td>
+<td>Already promotes videos with ≥5 cache hits</td>
+</tr>
+<tr>
+<td><code>StatsCacheImpl</code></td>
+<td>✅ Exists</td>
+<td>In-memory stats cache</td>
+</tr>
+<tr>
+<td><code>AppScheduler</code></td>
+<td>✅ Exists</td>
+<td>Has <code>cleanUpOldVideos()</code> scaffold (currently no-op)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ <strong>Note:</strong> <code>YouTubeVideo</code> / <code>youtube_video</code> table is <strong>no longer the active table</strong>.
+The system now uses <code>VideoSource</code> / <code>video_sources</code> (supports Google Drive, YouTube, S3 sources via <code>sourceType</code> field).
+<code>VideoSource</code> does <strong>not</strong> have <code>upCount</code>/<code>downCount</code> — hot score formula adjusted accordingly.</p>
+</blockquote>
+<h3 id="gap-analysis">Gap Analysis</h3>
+<ol>
+<li><code>recordAccess()</code> is disabled — no access data is being written</li>
+<li>No "hot score" computation logic exists</li>
+<li>No API endpoint returns videos sorted by hotness</li>
+<li>No cache pre-warming for hot videos</li>
+<li>Frontend has no "hot" badge / trending section</li>
+</ol>
+<hr />
+<h2 id="3-scope">3. Scope</h2>
+<h3 id="in-scope-v1">In Scope (v1)</h3>
+<ul>
+<li>[x] Activate <code>recordAccess()</code> in <code>VideoAccessServiceImpl</code></li>
+<li>[x] Implement Hot Score algorithm</li>
+<li>[x] New API: <code>GET /videos/trending</code> — returns top N hot videos</li>
+<li>[x] Extend existing <code>GET /videos</code> to accept <code>sort=hot</code> param</li>
+<li>[x] Scheduled job: recompute hot scores every 30 minutes</li>
+<li>[x] Pre-warm cache for top 10 hot videos</li>
+<li>[x] Frontend: "🔥 Hot" badge on trending videos</li>
+<li>[x] Frontend: "Trending" section at top of home page</li>
+</ul>
+<h3 id="out-of-scope-v2">Out of Scope (v2+)</h3>
+<ul>
+<li>Personalized recommendations (per-user hot scores)</li>
+<li>Real-time score updates (WebSocket push)</li>
+<li>A/B testing framework for ranking algorithms</li>
+<li>Machine learning-based scoring</li>
+</ul>
+<hr />
+<h2 id="4-functional-requirements">4. Functional Requirements</h2>
+<h3 id="fr-1-access-tracking">FR-1: Access Tracking</h3>
+<p><strong>When:</strong> A user streams any video (calls the stream endpoint)
+<strong>Then:</strong> System records the access asynchronously (non-blocking)</p>
+<pre><code>POST /stream/{videoId}
+    → async: VideoAccessService.recordAccess(videoId)
+        → upsert VideoAccessStats (hitCount++, lastAccessedAt = now)
+</code></pre>
+<p><strong>Acceptance Criteria:</strong>
+- <code>recordAccess()</code> must NOT block the streaming response
+- Already uses <code>@Async</code> annotation — keep it
+- Handle upsert: create if not exists, increment if exists
+- DB write failure must not fail the stream request (catch + log)</p>
+<hr />
+<h3 id="fr-2-hot-score-calculation">FR-2: Hot Score Calculation</h3>
+<p><strong>Formula:</strong></p>
+<pre><code>hotScore = (w1 × normalizedHits) + (w2 × normalizedShares) + (w3 × recencyBoost)
+</code></pre>
+<blockquote>
+<p><code>YouTubeVideo.upCount</code> is no longer available — <code>VideoSource</code> table does not have like counts.
+Formula simplified to 3 signals. Weights re-allocated.</p>
+</blockquote>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Source</th>
+<th>Weight (default)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>normalizedHits</code></td>
+<td><code>VideoAccessStats.hitCount</code> where <code>videoId = VideoSource.sourceId</code> (last 24h)</td>
+<td>w1 = 0.60</td>
+</tr>
+<tr>
+<td><code>normalizedShares</code></td>
+<td>COUNT from <code>ShareLink</code> table</td>
+<td>w2 = 0.25</td>
+</tr>
+<tr>
+<td><code>recencyBoost</code></td>
+<td>Decay function based on <code>VideoAccessStats.lastAccessedAt</code></td>
+<td>w3 = 0.15</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recency Decay:</strong></p>
+<pre><code>recencyBoost = e^(-λ × hoursAgo)   where λ = 0.1
+</code></pre>
+<ul>
+<li>Video accessed 1 hour ago → boost ≈ 0.90</li>
+<li>Video accessed 24 hours ago → boost ≈ 0.09</li>
+</ul>
+<p><strong>Normalization:</strong> All inputs normalized to [0, 1] using min-max scaling across all active videos.</p>
+<p><strong>Configuration</strong> (externalizable via <code>AppProperties</code>):</p>
+<pre><code class="language-yaml">app:
+  hot-video:
+    weights:
+      hits: 0.60
+      shares: 0.25
+      recency: 0.15
+    decay-lambda: 0.1
+    window-hours: 24
+    top-n: 20
+    score-ttl-minutes: 30
+</code></pre>
+<hr />
+<h3 id="fr-3-trending-api-endpoint">FR-3: Trending API Endpoint</h3>
+<p><strong>New endpoint:</strong></p>
+<pre><code>GET /api/videos/trending?limit=10
+</code></pre>
+<p><strong>Response:</strong></p>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;SUCCESS&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;videoId&quot;: &quot;abc123&quot;,
+      &quot;title&quot;: &quot;Funny Cat Video&quot;,
+      &quot;upCount&quot;: 12500,
+      &quot;embedLink&quot;: &quot;...&quot;,
+      &quot;hotScore&quot;: 0.87,
+      &quot;isHot&quot;: true,
+      &quot;rank&quot;: 1
+    }
+  ]
+}
+</code></pre>
+<p><strong>Rules:</strong>
+- Returns top <code>limit</code> videos by hotScore (default 10, max 50)
+- Scores served from <code>StatsCacheImpl</code> (TTL: 30 minutes)
+- Falls back to <code>upCount</code> sort if no access stats available</p>
+<hr />
+<h3 id="fr-4-extend-existing-video-list">FR-4: Extend Existing Video List</h3>
+<p>Modify <code>GET /api/videos</code> to accept optional sort param:</p>
+<pre><code>GET /api/videos?sort=hot        → sorted by hotScore DESC
+GET /api/videos?sort=latest     → sorted by createdAt DESC (current default)
+GET /api/videos?sort=likes      → sorted by upCount DESC
+</code></pre>
+<p><strong>Backward compatible:</strong> <code>sort</code> is optional; default behavior unchanged.</p>
+<hr />
+<h3 id="fr-5-scheduled-score-recomputation">FR-5: Scheduled Score Recomputation</h3>
+<p>In <code>AppScheduler</code>, add job:</p>
+<pre><code>@Scheduled(fixedRate = 30 * 60_000)   // every 30 minutes
+public void recomputeHotScores() { ... }
+</code></pre>
+<p><strong>Steps:</strong>
+1. Query all videos with access stats in last 24h
+2. Compute hotScore for each
+3. Store result in <code>StatsCacheImpl</code> (key: <code>hot_scores</code>, TTL: 35min)
+4. Log top 5 scores for observability
+5. Trigger cache pre-warm for top 10 videos (FR-6)</p>
+<hr />
+<h3 id="fr-6-pre-warm-cache-for-hot-videos">FR-6: Pre-warm Cache for Hot Videos</h3>
+<p>After score recomputation, pre-load video metadata for top 10 hot videos into <code>VideoCacheImpl</code>:</p>
+<pre><code>hotVideoService.getTopN(10)
+    .forEach(v -&gt; videoCacheImpl.preWarm(v.getVideoId()))
+</code></pre>
+<p><strong>Goal:</strong> First-frame latency for hot videos drops from ~2s → &lt;500ms</p>
+<hr />
+<h3 id="fr-7-frontend-hot-badge-trending-section">FR-7: Frontend — Hot Badge &amp; Trending Section</h3>
+<p><strong>Home Page changes:</strong>
+1. Add "🔥 Trending Now" section at the top — shows top 5 hot videos
+2. Each video card gets <code>🔥 Hot</code> badge when <code>isHot: true</code></p>
+<p><strong>Badge logic:</strong> Show badge if <code>hotScore &gt;= threshold</code> (default: top 20% of scores)</p>
+<hr />
+<h2 id="5-non-functional-requirements">5. Non-Functional Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>recordAccess()</code> latency overhead</td>
+<td>&lt; 5ms (async, fire-and-forget)</td>
+</tr>
+<tr>
+<td>Trending API response time</td>
+<td>&lt; 100ms (served from cache)</td>
+</tr>
+<tr>
+<td>Score recomputation time</td>
+<td>&lt; 10s for 10,000 videos</td>
+</tr>
+<tr>
+<td>Cache memory overhead</td>
+<td>&lt; 50MB additional</td>
+</tr>
+<tr>
+<td>Backward compatibility</td>
+<td>Existing <code>/api/videos</code> unchanged without <code>sort</code> param</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-data-model-changes">6. Data Model Changes</h2>
+<h3 id="new-columns-on-video_sources-table">New Columns on <code>video_sources</code> table</h3>
+<pre><code class="language-sql">-- Liquibase migration: 202502280001-add-hot-score.sql
+ALTER TABLE video_sources ADD COLUMN hot_score DECIMAL(5,4) DEFAULT 0;
+ALTER TABLE video_sources ADD COLUMN is_hot BOOLEAN DEFAULT FALSE;
+ALTER TABLE video_sources ADD COLUMN hot_rank INT DEFAULT NULL;
+</code></pre>
+<h3 id="index-for-trending-query-performance">Index for trending query performance</h3>
+<pre><code class="language-sql">CREATE INDEX idx_video_sources_hot_score ON video_sources(hot_score DESC)
+WHERE is_hot = TRUE;
+</code></pre>
+<h3 id="activate-videoaccessstats-writes">Activate <code>VideoAccessStats</code> writes</h3>
+<pre><code class="language-sql">-- Ensure index exists for upsert performance
+-- Note: VideoAccessStats.videoId maps to VideoSource.sourceId (String)
+CREATE INDEX IF NOT EXISTS idx_video_access_stats_video_id
+ON video_access_stats(video_id);
+</code></pre>
+<hr />
+<h2 id="7-component-design">7. Component Design</h2>
+<h3 id="new-components">New Components</h3>
+<pre><code>service/
+├── HotVideoService.java              ← Interface
+└── impl/
+    └── HotVideoServiceImpl.java      ← Score computation, ranking
+
+jobs/
+└── AppScheduler.java                 ← Add recomputeHotScores() job
+
+web/
+└── YoutubeController.java            ← Add GET /videos/trending endpoint
+</code></pre>
+<h3 id="modified-components">Modified Components</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>VideoAccessServiceImpl.java</code></td>
+<td>Uncomment <code>recordAccess()</code> body</td>
+</tr>
+<tr>
+<td><code>StreamVideoServiceImpl.java</code></td>
+<td>Add <code>sort=hot</code> support in <code>getVideosToStream()</code></td>
+</tr>
+<tr>
+<td><code>VideoSource.java</code> entity</td>
+<td>Add <code>hotScore</code>, <code>isHot</code>, <code>hotRank</code> fields</td>
+</tr>
+<tr>
+<td><code>VideoDto.java</code></td>
+<td>Add <code>hotScore</code>, <code>isHot</code>, <code>rank</code> to response</td>
+</tr>
+<tr>
+<td><code>AppProperties.java</code></td>
+<td>Add <code>HotVideoProperties</code> inner class</td>
+</tr>
+<tr>
+<td><code>application.yaml</code></td>
+<td>Add <code>app.hot-video.*</code> config block</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-api-contract">8. API Contract</h2>
+<h3 id="get-apivideostrending">GET /api/videos/trending</h3>
+<pre><code>Request:
+  GET /api/videos/trending
+  Query Params:
+    limit  (optional, int, default=10, max=50)
+  Headers:
+    Authorization: Bearer &lt;token&gt;  (optional — public endpoint)
+
+Response 200:
+  ResultListInfo&lt;VideoDto&gt;
+    data[].videoId     String
+    data[].title       String
+    data[].embedLink   String
+    data[].upCount     Long
+    data[].hotScore    Double   ← new
+    data[].isHot       Boolean  ← new
+    data[].rank        Integer  ← new (1 = hottest)
+    data[].userShared  String
+</code></pre>
+<h3 id="get-apivideossorthot">GET /api/videos?sort=hot</h3>
+<pre><code>Request:
+  GET /api/videos?sort=hot&amp;page=0&amp;size=20
+
+Response: same VideoDto structure, ordered by hotScore DESC
+</code></pre>
+<hr />
+<h2 id="9-implementation-plan">9. Implementation Plan</h2>
+<h3 id="phase-1-data-foundation-1-2-days">Phase 1 — Data Foundation (1-2 days)</h3>
+<ul>
+<li>[ ] Activate <code>recordAccess()</code> — uncomment + test</li>
+<li>[ ] Add DB migration: hot_score column + indexes</li>
+<li>[ ] Update <code>YouTubeVideo</code> entity + <code>VideoDto</code></li>
+</ul>
+<h3 id="phase-2-scoring-engine-1-2-days">Phase 2 — Scoring Engine (1-2 days)</h3>
+<ul>
+<li>[ ] Implement <code>HotVideoServiceImpl</code> with score formula</li>
+<li>[ ] Add config properties (<code>AppProperties.HotVideoProperties</code>)</li>
+<li>[ ] Unit tests for score computation (edge cases: no stats, all zeros)</li>
+</ul>
+<h3 id="phase-3-api-scheduler-1-day">Phase 3 — API &amp; Scheduler (1 day)</h3>
+<ul>
+<li>[ ] Add <code>GET /videos/trending</code> endpoint</li>
+<li>[ ] Add <code>sort=hot</code> param to existing endpoint</li>
+<li>[ ] Add <code>recomputeHotScores()</code> scheduler job</li>
+<li>[ ] Pre-warm cache for top 10</li>
+</ul>
+<h3 id="phase-4-frontend-1-day">Phase 4 — Frontend (1 day)</h3>
+<ul>
+<li>[ ] Add "Trending Now" section</li>
+<li>[ ] Add 🔥 badge to hot video cards</li>
+<li>[ ] Update API client to call <code>/trending</code></li>
+</ul>
+<h3 id="phase-5-testing-tuning-1-day">Phase 5 — Testing &amp; Tuning (1 day)</h3>
+<ul>
+<li>[ ] Integration tests for trending endpoint</li>
+<li>[ ] Load test: 100 concurrent users recording access</li>
+<li>[ ] Tune weights based on sample data</li>
+</ul>
+<p><strong>Total estimate: 5-7 days</strong></p>
+<hr />
+<h2 id="10-risks-mitigations">10. Risks &amp; Mitigations</h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Likelihood</th>
+<th>Impact</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>recordAccess()</code> creating DB bottleneck under high load</td>
+<td>Medium</td>
+<td>High</td>
+<td>Keep <code>@Async</code>, add circuit breaker, batch writes with queue if needed</td>
+</tr>
+<tr>
+<td>Hot score bias toward old videos with high hitCount</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Apply 24h rolling window + recency decay factor</td>
+</tr>
+<tr>
+<td>Cache invalidation: scores stale after new video added</td>
+<td>Low</td>
+<td>Low</td>
+<td>TTL-based invalidation (30min) is acceptable for v1</td>
+</tr>
+<tr>
+<td>DB <code>video_access_stats</code> table growth</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Add scheduled cleanup job (already scaffolded in <code>AppScheduler.cleanUpOldVideos()</code>)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11-open-questions">11. Open Questions</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Question</th>
+<th>Owner</th>
+<th>Due</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Should <code>/trending</code> be a public endpoint (no auth)?</td>
+<td>Backend</td>
+<td>Before Phase 3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>What threshold defines "isHot" — top 20% or fixed score?</td>
+<td>Product</td>
+<td>Before Phase 2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Should shares from private share-links count toward score?</td>
+<td>Backend</td>
+<td>Before Phase 2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Do we need a <code>hot_score_history</code> table for analytics?</td>
+<td>Data</td>
+<td>v2</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="12-related-documents">12. Related Documents</h2>
+<ul>
+<li><code>doc/adr/0003-use-cache.md</code> — Cache strategy (Guava → Redis)</li>
+<li><code>doc/adr/0005-use_lru_cache_video_streaming.md</code> — LRU cache trade-offs</li>
+<li><code>VideoAccessStats</code> entity: <code>api/src/main/java/com/canhlabs/funnyapp/entity/VideoAccessStats.java</code></li>
+<li><code>VideoAccessServiceImpl</code>: <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/VideoAccessServiceImpl.java</code></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

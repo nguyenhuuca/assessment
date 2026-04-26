@@ -1,0 +1,3288 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../plan-a-file-based-hooks/">
+      
+      
+        <link rel="next" href="../../apidocs/api-docs.json">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Plan B - My Architecture Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#plan-b-trello-webhook-direct-claude-code-cli-spawn" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="My Architecture Docs" class="md-header__button md-logo" aria-label="My Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            My Architecture Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Plan B
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="My Architecture Docs" class="md-nav__button md-logo" aria-label="My Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    My Architecture Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Video%20Streaming%20System%20Architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Sequence-Diagram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sequence Diagram
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-05/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025-07-05
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025-07-13 VN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025-07-13 EN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0000-template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0001-use-relational-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use RDBMS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0002-backend-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0003-use-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0004-frontend-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/apr_binary_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Binary Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    PRD
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plans
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plans
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan-a-file-based-hooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan A
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan B
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan B
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-this-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Approach?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Why This Approach?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-claude-code-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Claude Code Service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-trello-webhook-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Trello Webhook Service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-webhook-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Webhook Controller
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-dtos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. DTOs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-enhanced-version-background-process-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Enhanced Version: Background Process Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deployment Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-install-claude-code-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Install Claude Code CLI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-configure-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Configure Environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-setup-trello-webhook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Setup Trello Webhook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-expose-endpoint-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Expose Endpoint (Development)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mock-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mock Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monitoring-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring &amp; Observability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Monitoring &amp; Observability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#health-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Health Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#process-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling &amp; Recovery
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling &amp; Recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timeout-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timeout Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retry-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retry Logic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource Cleanup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Optimization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#thread-pool-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thread Pool Tuning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#process-pooling-advanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Pooling (Advanced)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost Estimation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-with-plan-a-file-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison with Plan A (File-Based)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-plan-b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Plan B
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migration-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration Path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Docs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Docs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../apidocs/api-docs.json" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAPI JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../apidocs/redoc-static.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redoc
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams (PUML)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Diagrams (PUML)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/C4-L1.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C4 L1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/C4-L2.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C4 L2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/C4-L3.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C4 L3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../puml/Deployment.puml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tasks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tasks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/pending/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pending
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-this-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Approach?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Why This Approach?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-claude-code-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Claude Code Service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-trello-webhook-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Trello Webhook Service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-webhook-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Webhook Controller
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-dtos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. DTOs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-enhanced-version-background-process-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Enhanced Version: Background Process Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deployment Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-install-claude-code-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Install Claude Code CLI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-configure-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Configure Environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-setup-trello-webhook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Setup Trello Webhook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-expose-endpoint-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Expose Endpoint (Development)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mock-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mock Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual Test
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monitoring-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring &amp; Observability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Monitoring &amp; Observability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#health-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Health Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#process-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling &amp; Recovery
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling &amp; Recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timeout-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timeout Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retry-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retry Logic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource Cleanup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Optimization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#thread-pool-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thread Pool Tuning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#process-pooling-advanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Pooling (Advanced)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost Estimation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-with-plan-a-file-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison with Plan A (File-Based)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-plan-b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Plan B
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migration-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration Path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="plan-b-trello-webhook-direct-claude-code-cli-spawn">Plan B: Trello Webhook → Direct Claude Code CLI Spawn</h1>
+<h2 id="overview">Overview</h2>
+<p><strong>Approach:</strong> Direct process spawning where Spring Boot immediately executes Claude Code CLI when webhook is received.</p>
+<p><strong>Philosophy:</strong> "Immediate execution, simple pipeline"</p>
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────┐      ┌──────────────┐      ┌─────────────────┐
+│   Trello    │─────▶│ Spring Boot  │─────▶│  ProcessBuilder │
+│  (webhook)  │      │   Endpoint   │      │ spawn claude-code│
+└─────────────┘      └──────────────┘      └─────────────────┘
+                                                      │
+                                                      ▼
+                                            ┌─────────────────┐
+                                            │ Claude Code CLI │
+                                            │ runs in process │
+                                            └─────────────────┘
+                                                      │
+                                                      ▼
+                                        ┌───────────────────────────┐
+                                        │ Git branch → Commit → PR  │
+                                        └───────────────────────────┘
+</code></pre>
+<h2 id="why-this-approach">Why This Approach?</h2>
+<h3 id="pros">Pros ✅</h3>
+<ol>
+<li><strong>Simple:</strong> Minimal moving parts, direct execution</li>
+<li><strong>Fast:</strong> No file I/O, no polling delay</li>
+<li><strong>Synchronous option:</strong> Can wait for result if needed</li>
+<li><strong>Less infrastructure:</strong> No daemon/watcher needed</li>
+<li><strong>Easy debugging:</strong> Direct logs from Claude Code</li>
+<li><strong>Full context:</strong> Claude Code has complete codebase access</li>
+<li><strong>Built-in features:</strong> Auto git operations, testing, PR creation</li>
+</ol>
+<h3 id="cons">Cons ⚠️</h3>
+<ol>
+<li><strong>Process management:</strong> Need to handle long-running processes</li>
+<li><strong>Server setup:</strong> Requires Claude Code CLI installed</li>
+<li><strong>Resource intensive:</strong> Each request spawns new process</li>
+<li><strong>Error handling:</strong> Process failures harder to recover</li>
+<li><strong>No queue:</strong> Tasks execute immediately (no backpressure)</li>
+<li><strong>Blocking:</strong> Webhook response delayed if synchronous</li>
+</ol>
+<h2 id="implementation-details">Implementation Details</h2>
+<h3 id="1-claude-code-service">1. Claude Code Service</h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/ClaudeCodeServiceImpl.java</code></p>
+<pre><code class="language-java">@Service
+@Slf4j
+public class ClaudeCodeServiceImpl implements ClaudeCodeService {
+
+    private final AppProperties appProperties;
+    private final ExecutorService executorService;
+
+    public ClaudeCodeServiceImpl(AppProperties appProperties) {
+        this.appProperties = appProperties;
+        // Thread pool for async process execution
+        this.executorService = Executors.newFixedThreadPool(5);
+    }
+
+    @Override
+    @Async
+    public void implementTask(String taskId, String title, String description) {
+        executorService.submit(() -&gt; {
+            try {
+                log.info(&quot;Starting implementation for task: {}&quot;, title);
+
+                // Build task prompt
+                String prompt = buildPrompt(taskId, title, description);
+
+                // Spawn Claude Code CLI
+                ProcessResult result = spawnClaudeCode(prompt);
+
+                if (result.exitCode == 0) {
+                    log.info(&quot;Task {} completed successfully&quot;, taskId);
+                    notifySuccess(taskId, result);
+                } else {
+                    log.error(&quot;Task {} failed with exit code {}&quot;, taskId, result.exitCode);
+                    notifyFailure(taskId, result);
+                }
+
+            } catch (Exception e) {
+                log.error(&quot;Failed to execute task {}: {}&quot;, taskId, e.getMessage(), e);
+                notifyFailure(taskId, e.getMessage());
+            }
+        });
+    }
+
+    private ProcessResult spawnClaudeCode(String prompt) throws Exception {
+        // 1. Create temporary prompt file
+        Path promptFile = Files.createTempFile(&quot;claude-prompt-&quot;, &quot;.txt&quot;);
+        Files.writeString(promptFile, prompt);
+
+        // 2. Build command
+        List&lt;String&gt; command = List.of(
+            &quot;claude-code&quot;,
+            &quot;--non-interactive&quot;,
+            &quot;--input&quot;, promptFile.toString(),
+            &quot;--project&quot;, appProperties.getProjectPath()
+        );
+
+        // 3. Configure process
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.directory(new File(appProperties.getProjectPath()));
+        pb.redirectErrorStream(true);
+
+        // Set environment variables
+        Map&lt;String, String&gt; env = pb.environment();
+        env.put(&quot;ANTHROPIC_API_KEY&quot;, appProperties.getAnthropicApiKey());
+
+        // 4. Start process
+        Process process = pb.start();
+
+        // 5. Capture output
+        StringBuilder output = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append(&quot;\n&quot;);
+                log.debug(&quot;Claude Code: {}&quot;, line);
+            }
+        }
+
+        // 6. Wait for completion (with timeout)
+        boolean finished = process.waitFor(30, TimeUnit.MINUTES);
+
+        if (!finished) {
+            process.destroyForcibly();
+            throw new TimeoutException(&quot;Claude Code execution timeout&quot;);
+        }
+
+        // 7. Cleanup
+        Files.deleteIfExists(promptFile);
+
+        return new ProcessResult(process.exitValue(), output.toString());
+    }
+
+    private String buildPrompt(String taskId, String title, String description) {
+        return String.format(&quot;&quot;&quot;
+            You are a Java Spring Boot expert working on the Funny Movies project.
+
+            Implement the following task:
+
+            Task ID: %s
+            Title: %s
+
+            Description:
+            %s
+
+            Requirements:
+            1. Follow existing code patterns in the codebase (see CLAUDE.md)
+            2. Create a feature branch: feature/%s
+            3. Implement the code following SOLID principles
+            4. Write unit tests with proper coverage
+            5. Commit changes with descriptive message
+            6. Create a pull request
+
+            Use the project structure:
+            - Controllers: api/src/main/java/com/canhlabs/funnyapp/web/
+            - Services: api/src/main/java/com/canhlabs/funnyapp/service/
+            - Repositories: api/src/main/java/com/canhlabs/funnyapp/repo/
+            - DTOs: api/src/main/java/com/canhlabs/funnyapp/dto/
+
+            Follow the tech stack: Java 24, Spring Boot 3.x, PostgreSQL, Virtual Threads
+            &quot;&quot;&quot;,
+            taskId,
+            title,
+            description,
+            taskId.replaceAll(&quot;[^a-zA-Z0-9-]&quot;, &quot;-&quot;).toLowerCase()
+        );
+    }
+
+    private void notifySuccess(String taskId, ProcessResult result) {
+        // Extract PR URL from output
+        String prUrl = extractPrUrl(result.output);
+        log.info(&quot;Task {} completed. PR: {}&quot;, taskId, prUrl);
+
+        // TODO: Post comment back to Trello card with PR link
+        // TODO: Send Slack notification
+    }
+
+    private void notifyFailure(String taskId, ProcessResult result) {
+        log.error(&quot;Task {} failed. Output:\n{}&quot;, taskId, result.output);
+
+        // TODO: Post error comment to Trello card
+        // TODO: Send alert
+    }
+
+    private String extractPrUrl(String output) {
+        // Parse Claude Code output for PR URL
+        Pattern pattern = Pattern.compile(&quot;https://github\\.com/[^/]+/[^/]+/pull/\\d+&quot;);
+        Matcher matcher = pattern.matcher(output);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class ProcessResult {
+        private int exitCode;
+        private String output;
+    }
+}
+</code></pre>
+<h3 id="2-trello-webhook-service">2. Trello Webhook Service</h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/TrelloWebhookServiceImpl.java</code></p>
+<pre><code class="language-java">@Service
+@Slf4j
+public class TrelloWebhookServiceImpl implements TrelloWebhookService {
+
+    private final ClaudeCodeService claudeCodeService;
+    private final AppProperties appProperties;
+
+    @Override
+    @Async
+    public void processWebhook(TrelloWebhookDTO payload, String signature) {
+        // 1. Verify signature
+        if (!verifySignature(payload, signature)) {
+            log.warn(&quot;Invalid Trello webhook signature&quot;);
+            return;
+        }
+
+        // 2. Parse action type
+        String actionType = payload.getAction().getType();
+        if (!&quot;addLabelToCard&quot;.equals(actionType)) {
+            log.debug(&quot;Ignoring action type: {}&quot;, actionType);
+            return;
+        }
+
+        // 3. Check label name
+        String labelName = payload.getAction().getData().getLabel().getName();
+        if (!&quot;doing&quot;.equalsIgnoreCase(labelName)) {
+            log.debug(&quot;Ignoring label: {}&quot;, labelName);
+            return;
+        }
+
+        // 4. Extract card details
+        TrelloWebhookDTO.Card card = payload.getAction().getData().getCard();
+        String cardId = card.getId();
+        String cardName = card.getName();
+        String cardDesc = card.getDesc();
+
+        log.info(&quot;Triggering implementation for Trello card: {} ({})&quot;, cardName, cardId);
+
+        // 5. Trigger Claude Code
+        claudeCodeService.implementTask(cardId, cardName, cardDesc);
+    }
+
+    private boolean verifySignature(TrelloWebhookDTO payload, String signature) {
+        try {
+            String callbackUrl = appProperties.getTrelloCallbackUrl();
+            String secret = appProperties.getTrelloWebhookSecret();
+
+            ObjectMapper mapper = new ObjectMapper();
+            String body = mapper.writeValueAsString(payload);
+            String content = body + callbackUrl;
+
+            Mac mac = Mac.getInstance(&quot;HmacSHA1&quot;);
+            SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), &quot;HmacSHA1&quot;);
+            mac.init(secretKey);
+
+            byte[] hash = mac.doFinal(content.getBytes());
+            String computed = Base64.getEncoder().encodeToString(hash);
+
+            return computed.equals(signature);
+
+        } catch (Exception e) {
+            log.error(&quot;Signature verification failed&quot;, e);
+            return false;
+        }
+    }
+}
+</code></pre>
+<h3 id="3-webhook-controller">3. Webhook Controller</h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/web/TrelloWebhookController.java</code></p>
+<pre><code class="language-java">@RestController
+@RequestMapping(AppConstant.API.BASE_URL + &quot;/webhook&quot;)
+@Slf4j
+public class TrelloWebhookController extends BaseController {
+
+    private final TrelloWebhookService webhookService;
+
+    public TrelloWebhookController(TrelloWebhookService webhookService) {
+        this.webhookService = webhookService;
+    }
+
+    /**
+     * Trello webhook verification endpoint
+     */
+    @RequestMapping(value = &quot;/trello&quot;, method = RequestMethod.HEAD)
+    public ResponseEntity&lt;Void&gt; verifyWebhook() {
+        log.info(&quot;Trello webhook verification request&quot;);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Trello webhook callback endpoint
+     */
+    @PostMapping(&quot;/trello&quot;)
+    public ResponseEntity&lt;ResultObjectInfo&lt;String&gt;&gt; handleWebhook(
+            @RequestBody TrelloWebhookDTO payload,
+            @RequestHeader(value = &quot;X-Trello-Webhook&quot;, required = false) String signature) {
+
+        log.info(&quot;Received Trello webhook: action={}, cardId={}&quot;,
+                payload.getAction().getType(),
+                payload.getAction().getData().getCard().getId());
+
+        // Process asynchronously - don't block webhook response
+        webhookService.processWebhook(payload, signature);
+
+        return ResponseEntity.ok(ResultObjectInfo.&lt;String&gt;builder()
+                .status(ResultStatus.SUCCESS)
+                .message(&quot;Webhook received&quot;)
+                .data(&quot;OK&quot;)
+                .build());
+    }
+
+    /**
+     * Health check endpoint
+     */
+    @GetMapping(&quot;/trello/health&quot;)
+    public ResponseEntity&lt;ResultObjectInfo&lt;Map&lt;String, Object&gt;&gt;&gt; health() {
+        Map&lt;String, Object&gt; status = Map.of(
+            &quot;status&quot;, &quot;up&quot;,
+            &quot;timestamp&quot;, System.currentTimeMillis(),
+            &quot;claudeCode&quot;, checkClaudeCodeInstalled()
+        );
+
+        return ResponseEntity.ok(ResultObjectInfo.&lt;Map&lt;String, Object&gt;&gt;builder()
+                .status(ResultStatus.SUCCESS)
+                .data(status)
+                .build());
+    }
+
+    private boolean checkClaudeCodeInstalled() {
+        try {
+            Process process = new ProcessBuilder(&quot;claude-code&quot;, &quot;--version&quot;).start();
+            return process.waitFor(5, TimeUnit.SECONDS) &amp;&amp; process.exitValue() == 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}
+</code></pre>
+<h3 id="4-dtos">4. DTOs</h3>
+<p><strong>TrelloWebhookDTO.java:</strong></p>
+<pre><code class="language-java">@Data
+public class TrelloWebhookDTO {
+
+    private Action action;
+    private Model model;
+
+    @Data
+    public static class Action {
+        private String id;
+        private String idMemberCreator;
+        private String type;
+        private String date;
+        private ActionData data;
+        private MemberCreator memberCreator;
+    }
+
+    @Data
+    public static class ActionData {
+        private Card card;
+        private Board board;
+        private Label label;
+    }
+
+    @Data
+    public static class Card {
+        private String id;
+        private String name;
+        private String desc;
+        private String shortLink;
+        private String idShort;
+
+        public String getUrl() {
+            return &quot;https://trello.com/c/&quot; + shortLink;
+        }
+    }
+
+    @Data
+    public static class Board {
+        private String id;
+        private String name;
+        private String shortLink;
+    }
+
+    @Data
+    public static class Label {
+        private String id;
+        private String name;
+        private String color;
+    }
+
+    @Data
+    public static class Model {
+        private String id;
+        private String name;
+    }
+
+    @Data
+    public static class MemberCreator {
+        private String id;
+        private String username;
+        private String fullName;
+    }
+}
+</code></pre>
+<h3 id="5-configuration">5. Configuration</h3>
+<p><strong>AppProperties.java:</strong></p>
+<pre><code class="language-java">@Configuration
+@ConfigurationProperties(&quot;app&quot;)
+@Data
+public class AppProperties {
+    // ... existing properties ...
+
+    // Trello configuration
+    private String trelloWebhookSecret;
+    private String trelloCallbackUrl;
+
+    // Claude Code configuration
+    private String anthropicApiKey;
+    private String projectPath = System.getProperty(&quot;user.dir&quot;);
+}
+</code></pre>
+<p><strong>application.yaml:</strong></p>
+<pre><code class="language-yaml">app:
+  trello-webhook-secret: ${TRELLO_WEBHOOK_SECRET}
+  trello-callback-url: ${TRELLO_CALLBACK_URL:https://your-domain.com/api/webhook/trello}
+  anthropic-api-key: ${ANTHROPIC_API_KEY}
+  project-path: ${PROJECT_PATH:/app}
+</code></pre>
+<p><strong>.env.example:</strong></p>
+<pre><code class="language-bash"># Trello Configuration
+TRELLO_WEBHOOK_SECRET=your_random_secret_here
+TRELLO_CALLBACK_URL=https://your-domain.com/api/webhook/trello
+
+# Anthropic API
+ANTHROPIC_API_KEY=sk-ant-api03-...
+
+# Project
+PROJECT_PATH=/home/user/projects/assessment
+</code></pre>
+<h3 id="6-enhanced-version-background-process-management">6. Enhanced Version: Background Process Management</h3>
+<p>For better control over Claude Code processes:</p>
+<pre><code class="language-java">@Service
+@Slf4j
+public class ClaudeCodeProcessManager {
+
+    private final Map&lt;String, Process&gt; runningProcesses = new ConcurrentHashMap&lt;&gt;();
+    private final Map&lt;String, ProcessStatus&gt; processStatuses = new ConcurrentHashMap&lt;&gt;();
+
+    public CompletableFuture&lt;ProcessResult&gt; executeTask(String taskId, String prompt) {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            try {
+                // Mark as running
+                processStatuses.put(taskId, ProcessStatus.RUNNING);
+
+                // Spawn process
+                Process process = startClaudeCode(prompt);
+                runningProcesses.put(taskId, process);
+
+                // Wait for completion
+                ProcessResult result = waitForCompletion(process, taskId);
+
+                // Update status
+                processStatuses.put(taskId,
+                    result.exitCode == 0 ? ProcessStatus.SUCCESS : ProcessStatus.FAILED);
+
+                return result;
+
+            } catch (Exception e) {
+                processStatuses.put(taskId, ProcessStatus.FAILED);
+                throw new RuntimeException(e);
+            } finally {
+                runningProcesses.remove(taskId);
+            }
+        });
+    }
+
+    public void cancelTask(String taskId) {
+        Process process = runningProcesses.get(taskId);
+        if (process != null &amp;&amp; process.isAlive()) {
+            process.destroyForcibly();
+            processStatuses.put(taskId, ProcessStatus.CANCELLED);
+            log.info(&quot;Cancelled task: {}&quot;, taskId);
+        }
+    }
+
+    public ProcessStatus getStatus(String taskId) {
+        return processStatuses.getOrDefault(taskId, ProcessStatus.UNKNOWN);
+    }
+
+    public List&lt;String&gt; getRunningTasks() {
+        return new ArrayList&lt;&gt;(runningProcesses.keySet());
+    }
+
+    public enum ProcessStatus {
+        PENDING, RUNNING, SUCCESS, FAILED, CANCELLED, UNKNOWN
+    }
+}
+</code></pre>
+<h2 id="deployment-steps">Deployment Steps</h2>
+<h3 id="1-install-claude-code-cli">1. Install Claude Code CLI</h3>
+<p><strong>On server:</strong></p>
+<pre><code class="language-bash"># Install Node.js if not present
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install Claude Code globally
+sudo npm install -g @anthropic/claude-code
+
+# Verify installation
+claude-code --version
+</code></pre>
+<p><strong>Or use Docker:</strong></p>
+<pre><code class="language-dockerfile">FROM maven:3.9-eclipse-temurin-24-alpine
+
+# Install Node.js and Claude Code
+RUN apk add --no-cache nodejs npm git
+RUN npm install -g @anthropic/claude-code
+
+# Copy application
+COPY . /app
+WORKDIR /app
+
+CMD [&quot;java&quot;, &quot;-jar&quot;, &quot;target/funny-app.jar&quot;]
+</code></pre>
+<h3 id="2-configure-environment">2. Configure Environment</h3>
+<pre><code class="language-bash"># Set environment variables
+export ANTHROPIC_API_KEY=sk-ant-api03-...
+export TRELLO_WEBHOOK_SECRET=$(openssl rand -hex 32)
+export TRELLO_CALLBACK_URL=https://your-domain.com/api/webhook/trello
+export PROJECT_PATH=/home/user/projects/assessment
+
+# Add to ~/.bashrc or /etc/environment for persistence
+</code></pre>
+<h3 id="3-setup-trello-webhook">3. Setup Trello Webhook</h3>
+<pre><code class="language-bash"># Get your Trello API key and token
+# Visit: https://trello.com/app-key
+
+# Create webhook
+curl -X POST &quot;https://api.trello.com/1/webhooks/?key=YOUR_KEY&amp;token=YOUR_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{
+    &quot;description&quot;: &quot;Claude Code Automation&quot;,
+    &quot;callbackURL&quot;: &quot;https://your-domain.com/api/webhook/trello&quot;,
+    &quot;idModel&quot;: &quot;YOUR_BOARD_ID&quot;
+  }'
+
+# List webhooks
+curl &quot;https://api.trello.com/1/tokens/YOUR_TOKEN/webhooks?key=YOUR_KEY&quot;
+
+# Delete webhook
+curl -X DELETE &quot;https://api.trello.com/1/webhooks/WEBHOOK_ID?key=YOUR_KEY&amp;token=YOUR_TOKEN&quot;
+</code></pre>
+<h3 id="4-expose-endpoint-development">4. Expose Endpoint (Development)</h3>
+<p><strong>Using ngrok:</strong></p>
+<pre><code class="language-bash"># Install ngrok
+brew install ngrok  # macOS
+# or download from https://ngrok.com/
+
+# Start tunnel
+ngrok http 8081
+
+# Use the HTTPS URL for Trello webhook
+# Example: https://abc123.ngrok.io/api/webhook/trello
+</code></pre>
+<p><strong>Using localtunnel:</strong></p>
+<pre><code class="language-bash">npm install -g localtunnel
+lt --port 8081 --subdomain myapp
+</code></pre>
+<h2 id="testing">Testing</h2>
+<h3 id="unit-test">Unit Test</h3>
+<pre><code class="language-java">@SpringBootTest
+class ClaudeCodeServiceImplTest {
+
+    @Autowired
+    private ClaudeCodeService claudeCodeService;
+
+    @Test
+    @Disabled(&quot;Integration test - requires Claude Code CLI&quot;)
+    void testImplementTask() throws Exception {
+        String taskId = &quot;test-123&quot;;
+        String title = &quot;Test Task&quot;;
+        String description = &quot;Create a simple hello world endpoint&quot;;
+
+        // This will actually spawn Claude Code
+        claudeCodeService.implementTask(taskId, title, description);
+
+        // Wait a bit for async execution
+        Thread.sleep(60000);
+
+        // Verify branch was created
+        Process process = new ProcessBuilder(&quot;git&quot;, &quot;branch&quot;, &quot;--list&quot;, &quot;feature/test-123*&quot;)
+                .start();
+        String output = new String(process.getInputStream().readAllBytes());
+
+        assertTrue(output.contains(&quot;feature/test-123&quot;));
+    }
+}
+</code></pre>
+<h3 id="mock-test">Mock Test</h3>
+<pre><code class="language-java">@SpringBootTest
+@MockBean(ClaudeCodeService.class)
+class TrelloWebhookControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private ClaudeCodeService claudeCodeService;
+
+    @Test
+    void testWebhookEndpoint() throws Exception {
+        String payload = &quot;&quot;&quot;
+        {
+          &quot;action&quot;: {
+            &quot;type&quot;: &quot;addLabelToCard&quot;,
+            &quot;data&quot;: {
+              &quot;card&quot;: {
+                &quot;id&quot;: &quot;test123&quot;,
+                &quot;name&quot;: &quot;Test Task&quot;,
+                &quot;desc&quot;: &quot;Test description&quot;,
+                &quot;shortLink&quot;: &quot;abc&quot;
+              },
+              &quot;label&quot;: {
+                &quot;name&quot;: &quot;doing&quot;
+              }
+            }
+          },
+          &quot;model&quot;: {
+            &quot;id&quot;: &quot;board123&quot;
+          }
+        }
+        &quot;&quot;&quot;;
+
+        mockMvc.perform(post(&quot;/api/webhook/trello&quot;)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(&quot;$.status&quot;).value(&quot;SUCCESS&quot;));
+
+        // Verify service was called
+        verify(claudeCodeService, times(1))
+                .implementTask(eq(&quot;test123&quot;), eq(&quot;Test Task&quot;), eq(&quot;Test description&quot;));
+    }
+}
+</code></pre>
+<h3 id="manual-test">Manual Test</h3>
+<pre><code class="language-bash"># Test webhook endpoint locally
+curl -X POST http://localhost:8081/api/webhook/trello \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{
+    &quot;action&quot;: {
+      &quot;type&quot;: &quot;addLabelToCard&quot;,
+      &quot;data&quot;: {
+        &quot;card&quot;: {
+          &quot;id&quot;: &quot;manual-test&quot;,
+          &quot;name&quot;: &quot;Manual Test Task&quot;,
+          &quot;desc&quot;: &quot;Create a simple REST endpoint that returns hello world&quot;,
+          &quot;shortLink&quot;: &quot;test&quot;
+        },
+        &quot;label&quot;: {
+          &quot;name&quot;: &quot;doing&quot;
+        }
+      }
+    },
+    &quot;model&quot;: {
+      &quot;id&quot;: &quot;board123&quot;
+    }
+  }'
+
+# Check logs
+tail -f api/logs/app.log
+
+# Check if Claude Code is running
+ps aux | grep claude-code
+</code></pre>
+<h2 id="monitoring-observability">Monitoring &amp; Observability</h2>
+<h3 id="application-logs">Application Logs</h3>
+<pre><code class="language-java">// Add structured logging
+log.info(&quot;Claude Code started for task: {} at {}&quot;, taskId, Instant.now());
+log.info(&quot;Claude Code completed for task: {} in {} seconds&quot;, taskId, duration);
+</code></pre>
+<h3 id="metrics">Metrics</h3>
+<pre><code class="language-java">@Component
+public class ClaudeCodeMetrics {
+
+    private final Counter tasksStarted;
+    private final Counter tasksCompleted;
+    private final Timer taskDuration;
+
+    public ClaudeCodeMetrics(MeterRegistry registry) {
+        this.tasksStarted = registry.counter(&quot;claude.tasks.started&quot;);
+        this.tasksCompleted = registry.counter(&quot;claude.tasks.completed&quot;, &quot;status&quot;, &quot;success&quot;);
+        this.taskDuration = registry.timer(&quot;claude.tasks.duration&quot;);
+    }
+
+    public void recordTaskStart() {
+        tasksStarted.increment();
+    }
+
+    public void recordTaskComplete(boolean success, long durationMs) {
+        tasksCompleted.increment();
+        taskDuration.record(durationMs, TimeUnit.MILLISECONDS);
+    }
+}
+</code></pre>
+<h3 id="health-check">Health Check</h3>
+<pre><code class="language-bash"># Check Claude Code is installed
+curl http://localhost:8081/api/webhook/trello/health
+
+# Response:
+# {
+#   &quot;status&quot;: &quot;SUCCESS&quot;,
+#   &quot;data&quot;: {
+#     &quot;status&quot;: &quot;up&quot;,
+#     &quot;claudeCode&quot;: true,
+#     &quot;timestamp&quot;: 1707389123456
+#   }
+# }
+</code></pre>
+<h3 id="process-monitoring">Process Monitoring</h3>
+<pre><code class="language-bash"># List running Claude Code processes
+ps aux | grep claude-code
+
+# Monitor resource usage
+top -p $(pgrep -f claude-code)
+
+# Check open files
+lsof -p $(pgrep -f claude-code)
+</code></pre>
+<h2 id="error-handling-recovery">Error Handling &amp; Recovery</h2>
+<h3 id="timeout-handling">Timeout Handling</h3>
+<pre><code class="language-java">// Set timeout for Claude Code execution
+boolean finished = process.waitFor(30, TimeUnit.MINUTES);
+
+if (!finished) {
+    log.error(&quot;Task {} timed out after 30 minutes&quot;, taskId);
+    process.destroyForcibly();
+    throw new TimeoutException(&quot;Claude Code execution timeout&quot;);
+}
+</code></pre>
+<h3 id="retry-logic">Retry Logic</h3>
+<pre><code class="language-java">public void implementTaskWithRetry(String taskId, String title, String description) {
+    int maxRetries = 3;
+    int attempt = 0;
+
+    while (attempt &lt; maxRetries) {
+        try {
+            implementTask(taskId, title, description);
+            return; // Success
+        } catch (Exception e) {
+            attempt++;
+            log.warn(&quot;Task {} failed on attempt {}/{}: {}&quot;,
+                    taskId, attempt, maxRetries, e.getMessage());
+
+            if (attempt &gt;= maxRetries) {
+                throw new RuntimeException(&quot;Task failed after &quot; + maxRetries + &quot; attempts&quot;, e);
+            }
+
+            // Exponential backoff
+            Thread.sleep(1000L * (1 &lt;&lt; attempt));
+        }
+    }
+}
+</code></pre>
+<h3 id="resource-cleanup">Resource Cleanup</h3>
+<pre><code class="language-java">@Scheduled(fixedRate = 300000) // Every 5 minutes
+public void cleanupZombieProcesses() {
+    runningProcesses.forEach((taskId, process) -&gt; {
+        if (!process.isAlive()) {
+            log.warn(&quot;Found zombie process for task: {}&quot;, taskId);
+            runningProcesses.remove(taskId);
+        }
+    });
+}
+</code></pre>
+<h2 id="security-considerations">Security Considerations</h2>
+<ol>
+<li><strong>Signature Verification:</strong> Always verify Trello webhook signatures</li>
+<li><strong>Input Sanitization:</strong> Sanitize task descriptions to prevent injection</li>
+<li><strong>Rate Limiting:</strong> Limit concurrent Claude Code processes (max 5)</li>
+<li><strong>Resource Limits:</strong> Set CPU/memory limits for spawned processes</li>
+<li><strong>API Key Protection:</strong> Store ANTHROPIC_API_KEY securely (env vars, not in code)</li>
+<li><strong>Process Isolation:</strong> Consider running Claude Code in Docker container</li>
+</ol>
+<h2 id="performance-optimization">Performance Optimization</h2>
+<h3 id="thread-pool-tuning">Thread Pool Tuning</h3>
+<pre><code class="language-java">// Configure thread pool size based on server resources
+@Bean
+public ExecutorService claudeCodeExecutor() {
+    return new ThreadPoolExecutor(
+        2,                          // corePoolSize
+        5,                          // maximumPoolSize
+        60L, TimeUnit.SECONDS,      // keepAliveTime
+        new LinkedBlockingQueue&lt;&gt;(10) // workQueue
+    );
+}
+</code></pre>
+<h3 id="process-pooling-advanced">Process Pooling (Advanced)</h3>
+<p>For high-throughput scenarios, consider keeping Claude Code instances warm:</p>
+<pre><code class="language-java">// Keep 2 idle Claude Code processes ready
+private final Queue&lt;Process&gt; processPool = new ConcurrentLinkedQueue&lt;&gt;();
+
+private Process getOrCreateProcess() {
+    Process process = processPool.poll();
+    if (process == null || !process.isAlive()) {
+        return startNewClaudeCode();
+    }
+    return process;
+}
+</code></pre>
+<h2 id="cost-estimation">Cost Estimation</h2>
+<p><strong>Assumptions:</strong>
+- 10 tasks/day
+- Average 2000 tokens input + 4000 tokens output per task
+- Claude Sonnet 4.5 pricing: $3/M input, $15/M output</p>
+<p><strong>Monthly cost:</strong>
+- Input: 10 tasks × 2000 tokens × 30 days = 600k tokens = $1.80
+- Output: 10 tasks × 4000 tokens × 30 days = 1.2M tokens = $18.00
+- <strong>Total: ~$20/month</strong></p>
+<h2 id="comparison-with-plan-a-file-based">Comparison with Plan A (File-Based)</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Plan A (File-Based)</th>
+<th>Plan B (Direct Spawn)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Medium (daemon + files)</td>
+<td>Low (direct execution)</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>1-5 seconds (polling)</td>
+<td>&lt;1 second</td>
+</tr>
+<tr>
+<td><strong>Reliability</strong></td>
+<td>High (persistent queue)</td>
+<td>Medium (in-memory)</td>
+</tr>
+<tr>
+<td><strong>Scalability</strong></td>
+<td>Easy (add workers)</td>
+<td>Limited (thread pool)</td>
+</tr>
+<tr>
+<td><strong>Debugging</strong></td>
+<td>Easy (file audit trail)</td>
+<td>Medium (process logs)</td>
+</tr>
+<tr>
+<td><strong>Infrastructure</strong></td>
+<td>More (daemon + watcher)</td>
+<td>Less (just Spring Boot)</td>
+</tr>
+<tr>
+<td><strong>Recovery</strong></td>
+<td>Easy (reprocess files)</td>
+<td>Hard (lost if crash)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="when-to-use-plan-b">When to Use Plan B</h2>
+<p><strong>Best for:</strong>
+- ✅ Simple use cases with low volume (&lt;20 tasks/day)
+- ✅ Fast prototyping and MVP
+- ✅ Teams comfortable with process management
+- ✅ Single server deployments</p>
+<p><strong>Not ideal for:</strong>
+- ❌ High-volume production systems
+- ❌ Distributed/multi-server setups
+- ❌ Need for audit trail and recovery
+- ❌ Serverless or containerized environments</p>
+<h2 id="migration-path">Migration Path</h2>
+<p>Start with <strong>Plan B</strong> for simplicity, then migrate to <strong>Plan A</strong> when:
+1. Task volume exceeds 50/day
+2. Need better reliability and recovery
+3. Adding multiple task sources
+4. Require detailed audit trails</p>
+<h2 id="summary">Summary</h2>
+<p>Plan B offers the simplest implementation path with direct Claude Code CLI spawning. It's perfect for small-to-medium deployments where immediate execution and low infrastructure overhead are priorities. The trade-off is reduced reliability and scalability compared to the queue-based Plan A approach.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

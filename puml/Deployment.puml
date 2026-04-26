@@ -1,0 +1,35 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+LAYOUT_TOP_DOWN()
+
+Deployment_Node(server, "DigitalOcean Droplet", "Ubuntu 22.04", "2GB RAM, 2vCPU VPS") {
+
+    Deployment_Node(nginx, "Nginx", "Reverse Proxy", "Handles HTTPS and routing") {
+        Container(nginxProxy, "Nginx", "Nginx", "Forwards /api/* and /videos/* to backend")
+    }
+
+    Deployment_Node(app, "App Server", "Spring Boot") {
+        Container(api, "Backend", "Java", "Handles API and video streaming")
+        Container(frontend, "Frontend", "VanillaJS", "Static site (HTML/JS/CSS)")
+    }
+
+    Deployment_Node(db, "PostgreSQL", "Database", "Stores metadata") {
+        ContainerDb(pg, "PostgreSQL", "RDBMS", "Video info and user data")
+    }
+}
+
+Deployment_Node(comp, "Customer's computer", "Microsoft Windows or Apple macOS"){
+    Deployment_Node(browser, "Web Browser", "Google Chrome, Mozilla Firefox, Apple Safari or Microsoft Edge"){
+        Container(spa, "Single Page Application", "JavaScript-VanillaJS", "Provides all the Videos stream functionality to customers via their web browser.")
+    }
+}
+
+Rel(browser, nginxProxy, "Load static html", "HTTP")
+Rel(spa, nginxProxy, "Calls API endpoints", "HTTP")
+Rel_D(nginxProxy, frontend, "Serves static UI")
+Rel_D(nginxProxy, api, "Forwards API/video requests", "HTTP")
+Rel_D(api, pg, "Reads/Writes", "SQL")
+
+SHOW_LEGEND()
+@enduml

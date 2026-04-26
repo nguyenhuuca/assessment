@@ -1,0 +1,32 @@
+@startuml
+actor User as "User\n(Resource Owner)"
+participant Frontend as "Frontend\n(Client)"
+participant GoogleOAuth as "GoogleOAuth\n(Authorization Server)"
+participant Backend as "Backend\n(Resource Server)"
+participant Database
+
+== Login with Google ==
+
+User -> Frontend : Open the application
+Frontend -> GoogleOAuth : Redirect to GoogleOAuth\n(client_id, redirect_uri...)
+GoogleOAuth -> User : Show Google login form
+User -> GoogleOAuth : Login and grant permission
+GoogleOAuth -> Frontend : Redirect back with Authorization Code
+
+== Exchange code with backend ==
+
+Frontend -> Backend : Send Authorization Code
+Backend -> GoogleOAuth : Exchange code for Access Token
+GoogleOAuth -> Backend : Return Access Token (and user info)
+Backend -> Backend : Generate JWT (or session)
+Backend -> Frontend : Return JWT Token
+
+== Access protected API ==
+
+Frontend -> Backend : Send GET /data request\nAuthorization: Bearer <JWT>
+Backend -> Backend : Validate JWT
+Backend -> Database : Query data
+Database --> Backend : Return data
+Backend --> Frontend : Return data (list)
+
+@enduml
