@@ -316,6 +316,53 @@ body {
   display: none;
 }
 
+.mobile-nav-tab {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 8px 16px;
+  flex: 1;
+}
+
+/* Center FAB — inline flex item inside mobile nav (YouTube-style) */
+.mobile-nav-fab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.mobile-nav-fab::before {
+  content: '';
+  display: none; /* placeholder, actual button content below */
+}
+
+.mobile-nav-fab span {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ff8d89 0%, #c10023 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px var(--primary-glow);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.mobile-nav-fab:hover  span { transform: scale(1.08); box-shadow: 0 6px 24px rgba(255,64,64,0.45); }
+.mobile-nav-fab:active span { transform: scale(0.92); }
+
 /* ── Mobile title (active tab label, centered in header) ── */
 .mobile-title {
   display: none;
@@ -421,8 +468,8 @@ body {
     left: 0 !important;
   }
 
-  /* FAB moves above mobile nav */
-  .fab { bottom: 76px; right: 16px; }
+  /* FAB hidden on mobile — replaced by .mobile-nav-fab inside the bottom nav */
+  .fab { display: none !important; }
 
   /* Main content: fixed between topnav and mobile-nav — no 100vh math needed */
   .main-content {

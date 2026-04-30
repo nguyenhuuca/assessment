@@ -297,14 +297,37 @@ export default function AppShell() {
         justifyContent: 'space-around',
         alignItems: 'center', padding: '0 8px',
       }}>
-        {visibleTabs.map(tab => (
-          <button key={tab.key} onClick={() => handleTabSelect(tab.key)} style={{
-            background: 'none', border: 'none',
+        {/* Left tabs */}
+        {(isLoggedIn
+          ? visibleTabs.slice(0, Math.ceil(visibleTabs.length / 2))
+          : visibleTabs
+        ).map(tab => (
+          <button key={tab.key} onClick={() => handleTabSelect(tab.key)} className="mobile-nav-tab" style={{
             color: activeTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-muted)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-            fontSize: 10, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.08em',
-            padding: '8px 16px',
+          }}>
+            <span className="material-symbols-outlined" style={{
+              fontSize: 22,
+              fontVariationSettings: activeTab === tab.key
+                ? "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24"
+                : undefined,
+            }}>
+              {tab.icon}
+            </span>
+            {tab.label}
+          </button>
+        ))}
+
+        {/* Center FAB — inline flex item (YouTube-style) */}
+        {isLoggedIn && (
+          <button className="mobile-nav-fab" onClick={() => setShareOpen(true)} title="Share a video">
+            <span className="material-symbols-outlined" style={{ fontSize: 24 }}>add</span>
+          </button>
+        )}
+
+        {/* Right tabs (only when logged in) */}
+        {isLoggedIn && visibleTabs.slice(Math.ceil(visibleTabs.length / 2)).map(tab => (
+          <button key={tab.key} onClick={() => handleTabSelect(tab.key)} className="mobile-nav-tab" style={{
+            color: activeTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-muted)',
           }}>
             <span className="material-symbols-outlined" style={{
               fontSize: 22,
@@ -319,7 +342,7 @@ export default function AppShell() {
         ))}
       </nav>
 
-      {/* ── FAB ── */}
+      {/* ── FAB (desktop only, hidden on mobile via CSS) ── */}
       {isLoggedIn && (
         <button className="fab" onClick={() => setShareOpen(true)} title="Share a video">
           <span className="material-symbols-outlined" style={{ fontSize: 26 }}>add</span>
