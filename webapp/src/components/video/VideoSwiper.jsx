@@ -154,13 +154,16 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, muted = tru
           <span className="label">Comment</span>
         </button>
 
-        {/* Share (native Web Share API, no-op if unsupported) */}
+        {/* Share — generates ?v={id} deep-link URL */}
         <button
           className="action-btn"
           title="Share"
           onClick={() => {
+            const shareUrl = `${window.location.origin}${window.location.pathname}?v=${video?.id}`
             if (navigator.share) {
-              navigator.share({ title: video?.title, text: video?.desc, url: window.location.href }).catch(() => {})
+              navigator.share({ title: video?.title, text: video?.desc, url: shareUrl }).catch(() => {})
+            } else {
+              navigator.clipboard?.writeText(shareUrl).catch(() => {})
             }
           }}
         >

@@ -1,16 +1,23 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useVideos, usePrivateVideos } from '../../hooks/useVideos.js'
 import VideoSwiper from './VideoSwiper.jsx'
 
-export function PublicFeed({ category, initialIndex, muted, onMutedChange, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
+export function PublicFeed({ category, initialIndex, deepLinkId, onDeepLinkResolved, muted, onMutedChange, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const { data: videos = [], isLoading, error } = useVideos(category)
+
+  const resolvedIndex = useMemo(() => {
+    if (!deepLinkId || !videos.length) return initialIndex ?? 0
+    const idx = videos.findIndex(v => String(v.id) === String(deepLinkId))
+    if (idx >= 0) { onDeepLinkResolved?.(); return idx }
+    return initialIndex ?? 0
+  }, [deepLinkId, videos]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (isLoading) return <LoadingState />
   if (error) return <ErrorState message={error.message} />
   return (
     <VideoSwiper
       videos={videos}
-      initialIndex={initialIndex}
+      initialIndex={resolvedIndex}
       muted={muted}
       onMutedChange={onMutedChange}
       mobileSearchOpen={mobileSearchOpen}

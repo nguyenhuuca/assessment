@@ -41,6 +41,12 @@ export default function AppShell() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [jumpIndex,       setJumpIndex]       = useState(0)
   const [muted,           setMuted]           = useState(true)
+  const [deepLinkId,      setDeepLinkId]      = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    const v = params.get('v')
+    if (v) window.history.replaceState({}, document.title, window.location.pathname)
+    return v || null
+  })
 
   function showMsg(text, type = 'error') {
     setMessage({ text, type })
@@ -258,6 +264,8 @@ export default function AppShell() {
               <PublicFeed
                 category={null}
                 initialIndex={jumpIndex}
+                deepLinkId={deepLinkId}
+                onDeepLinkResolved={() => setDeepLinkId(null)}
                 muted={muted}
                 onMutedChange={setMuted}
                 mobileSearchOpen={mobileSearchOpen}
