@@ -340,6 +340,25 @@ export default function AppShell() {
             {tab.label}
           </button>
         ))}
+
+        {/* Explore — 5th item to center the FAB */}
+        {isLoggedIn && (
+          <button
+            className="mobile-nav-tab"
+            onClick={() => setActiveNav(v => v === 'explore' ? 'home' : 'explore')}
+            style={{ color: activeNav === 'explore' ? 'var(--accent-cyan)' : 'var(--text-muted)' }}
+          >
+            <span className="material-symbols-outlined" style={{
+              fontSize: 22,
+              fontVariationSettings: activeNav === 'explore'
+                ? "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24"
+                : undefined,
+            }}>
+              explore
+            </span>
+            Explore
+          </button>
+        )}
       </nav>
 
       {/* ── FAB (desktop only, hidden on mobile via CSS) ── */}
