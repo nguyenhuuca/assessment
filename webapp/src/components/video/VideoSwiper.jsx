@@ -52,8 +52,6 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, mobileSearc
         return () => window.removeEventListener('wheel', onWheel)
     }, [next, prev])
 
-  // Reset index when video list changes
-  useEffect(() => { setIndex(0) }, [videos.length])
 
   const swipeHandlers = useSwipeable({
     onSwipedUp:    next,
