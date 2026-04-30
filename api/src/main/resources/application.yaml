@@ -118,6 +118,8 @@ app:
   image-url: 'https://image.canh-labs.com'
   main-domain: 'https://canh-labs.com'
   image-storage-path: '/opt/data/images'
+  jobs:
+    regenerate-thumbnails: true
   email-setting:
       enable-preview-mode: false
       percentage: 10

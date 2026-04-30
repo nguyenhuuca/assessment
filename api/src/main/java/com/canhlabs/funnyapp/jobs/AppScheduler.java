@@ -1,16 +1,25 @@
 package com.canhlabs.funnyapp.jobs;
 
 import com.canhlabs.funnyapp.cache.StatsCache;
+import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.CacheStat;
+import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.repo.VideoSourceRepository;
+import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -19,23 +28,40 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class AppScheduler {
+public class AppScheduler implements ApplicationRunner {
 
     private final YouTubeVideoService service;
     private final StreamVideoService streamVideoService;
     private final StatsCache statsCache;
     private final VideoAccessService videoAccessService;
     private final VideoStorageService videoStorageService;
+    private final FfmpegService ffmpegService;
+    private final VideoSourceRepository videoSourceRepository;
+    private final AppProperties appProps;
 
+    @Value("${app.jobs.regenerate-thumbnails:false}")
+    private boolean regenerateThumbnailsEnabled;
 
     public AppScheduler(YouTubeVideoService service, StreamVideoService streamVideoService,
-                        StatsCache statsCache, VideoAccessService videoAccessService, VideoStorageService videoStorageService
+                        StatsCache statsCache, VideoAccessService videoAccessService,
+                        VideoStorageService videoStorageService, FfmpegService ffmpegService,
+                        VideoSourceRepository videoSourceRepository, AppProperties appProps
     ) {
         this.service = service;
         this.streamVideoService = streamVideoService;
         this.statsCache = statsCache;
         this.videoAccessService = videoAccessService;
         this.videoStorageService = videoStorageService;
+        this.ffmpegService = ffmpegService;
+        this.videoSourceRepository = videoSourceRepository;
+        this.appProps = appProps;
+    }
+
+    @Override
+    public void run(ApplicationArguments args) {
+        if (regenerateThumbnailsEnabled) {
+            regenerateThumbnails();
+        }
     }
 
     // Run at 1:00 daily
@@ -93,5 +119,38 @@ public class AppScheduler {
         for (String videoId : candidates) {
             //storageService.deleteIfEligible(videoId);
         }
+    }
+
+    public void regenerateThumbnails() {
+        log.info("▶ Starting one-time thumbnail regeneration job...");
+        List<VideoSource> sources = videoSourceRepository.findAllByOrderByCreatedAtDesc();
+        int processed = 0, skipped = 0, failed = 0;
+
+        for (VideoSource source : sources) {
+            String sourceId = source.getSourceId();
+            File localFile = new File(AppConstant.CACHE_DIR, sourceId + ".full");
+
+            if (!localFile.exists()) {
+                log.debug("Local file missing for sourceId={}, skipping", sourceId);
+                skipped++;
+                continue;
+            }
+
+            try {
+                String imageName = sourceId + ".jpg";
+                String thumbnailPath = Paths.get(
+                        appProps.getImageStoragePath().concat("/thumbnails"), imageName).toString();
+                ffmpegService.generateThumbnail(localFile.getAbsolutePath(), thumbnailPath);
+                source.setThumbnailPath(appProps.getImageUrl() + "/" + imageName);
+                videoSourceRepository.save(source);
+                processed++;
+                log.info("✅ Thumbnail generated for sourceId={}", sourceId);
+            } catch (Exception e) {
+                log.error("❌ Failed to generate thumbnail for sourceId={}: {}", sourceId, e.getMessage());
+                failed++;
+            }
+        }
+
+        log.info("✔ Thumbnail regeneration done — processed={}, skipped={}, failed={}", processed, skipped, failed);
     }
 }
