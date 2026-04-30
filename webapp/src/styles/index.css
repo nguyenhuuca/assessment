@@ -351,7 +351,7 @@ body {
 .mobile-nav-fab span {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 50%;
   background: linear-gradient(135deg, #ff8d89 0%, #c10023 100%);
   display: flex;
   align-items: center;

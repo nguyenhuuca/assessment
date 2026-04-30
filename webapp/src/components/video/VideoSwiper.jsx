@@ -5,10 +5,9 @@ import VoteButtons from './VoteButtons.jsx'
 import { buildStreamUrl } from '../../utils/videoModel.js'
 import SearchModal from '../modals/SearchModal.jsx'
 
-export default function VideoSwiper({ videos = [], initialIndex = 0, mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
+export default function VideoSwiper({ videos = [], initialIndex = 0, muted = true, onMutedChange, mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const [index, setIndex] = useState(() => Math.min(initialIndex, Math.max(0, videos.length - 1)))
   const [direction, setDirection] = useState('next')
-  const [muted, setMuted] = useState(true)
   const total = videos.length
 
   const next = useCallback(() => {
@@ -123,7 +122,7 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, mobileSearc
             active
             onEnded={next}
             muted={muted}
-            onMutedChange={setMuted}
+            onMutedChange={onMutedChange}
             showMuteButton={false}
           />
         </div>
@@ -131,7 +130,7 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, mobileSearc
           type="button"
           className="video-mute-btn"
           data-no-toggle
-          onClick={e => { e.stopPropagation(); setMuted(m => !m) }}
+          onClick={e => { e.stopPropagation(); onMutedChange?.(!muted) }}
           title={muted ? 'Unmute' : 'Mute'}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>

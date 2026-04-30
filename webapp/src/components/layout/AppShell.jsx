@@ -40,6 +40,7 @@ export default function AppShell() {
   const [mobileLoginOpen, setMobileLoginOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [jumpIndex,       setJumpIndex]       = useState(0)
+  const [muted,           setMuted]           = useState(true)
 
   function showMsg(text, type = 'error') {
     setMessage({ text, type })
@@ -257,6 +258,8 @@ export default function AppShell() {
               <PublicFeed
                 category={null}
                 initialIndex={jumpIndex}
+                muted={muted}
+                onMutedChange={setMuted}
                 mobileSearchOpen={mobileSearchOpen}
                 onCloseMobileSearch={() => setMobileSearchOpen(false)}
                 onShowComments={setCommentVideo}
@@ -267,6 +270,8 @@ export default function AppShell() {
             {activeTab === 'funny' && (
               <PublicFeed
                 category="funny"
+                muted={muted}
+                onMutedChange={setMuted}
                 mobileSearchOpen={mobileSearchOpen}
                 onCloseMobileSearch={() => setMobileSearchOpen(false)}
                 onShowComments={setCommentVideo}
@@ -276,6 +281,8 @@ export default function AppShell() {
             )}
             {activeTab === 'private' && privateLoaded && (
               <PrivateFeed
+                muted={muted}
+                onMutedChange={setMuted}
                 mobileSearchOpen={mobileSearchOpen}
                 onCloseMobileSearch={() => setMobileSearchOpen(false)}
                 onShowComments={setCommentVideo}

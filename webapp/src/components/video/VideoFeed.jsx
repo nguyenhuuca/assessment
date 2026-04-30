@@ -2,7 +2,7 @@ import React from 'react'
 import { useVideos, usePrivateVideos } from '../../hooks/useVideos.js'
 import VideoSwiper from './VideoSwiper.jsx'
 
-export function PublicFeed({ category, initialIndex, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
+export function PublicFeed({ category, initialIndex, muted, onMutedChange, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const { data: videos = [], isLoading, error } = useVideos(category)
 
   if (isLoading) return <LoadingState />
@@ -11,6 +11,8 @@ export function PublicFeed({ category, initialIndex, mobileSearchOpen, onCloseMo
     <VideoSwiper
       videos={videos}
       initialIndex={initialIndex}
+      muted={muted}
+      onMutedChange={onMutedChange}
       mobileSearchOpen={mobileSearchOpen}
       onCloseMobileSearch={onCloseMobileSearch}
       onShowComments={onShowComments}
@@ -20,7 +22,7 @@ export function PublicFeed({ category, initialIndex, mobileSearchOpen, onCloseMo
   )
 }
 
-export function PrivateFeed({ mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
+export function PrivateFeed({ muted, onMutedChange, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const { data: videos = [], isLoading, error } = usePrivateVideos()
 
   if (isLoading) return <LoadingState />
@@ -28,6 +30,8 @@ export function PrivateFeed({ mobileSearchOpen, onCloseMobileSearch, onShowComme
   return (
     <VideoSwiper
       videos={videos}
+      muted={muted}
+      onMutedChange={onMutedChange}
       mobileSearchOpen={mobileSearchOpen}
       onCloseMobileSearch={onCloseMobileSearch}
       onShowComments={onShowComments}
