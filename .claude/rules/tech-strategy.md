@@ -37,11 +37,16 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 
 | Component | Choice |
 |-----------|--------|
-| Framework | Vanilla JavaScript (ES6+) |
-| UI Library | Bootstrap 5 |
-| HTTP Client | Fetch API |
+| Framework | React 19 |
+| Build Tool | Vite 6 |
+| Routing | React Router DOM 7 |
+| Server State | TanStack React Query 5 |
+| UI Library | Bootstrap 5 + React-Bootstrap 2 |
+| Icons | FontAwesome (react-fontawesome) |
+| HTTP Client | Fetch API (via React Query) |
+| Testing | Vitest + Testing Library |
 | Location | `webapp/` directory |
-| Architecture | Simple client-side rendering |
+| Architecture | SPA with component-based rendering |
 
 ## Infrastructure
 

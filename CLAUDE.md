@@ -76,6 +76,16 @@ mvn verify                   # Tests + coverage
 mvn test -Dtest=ClassName    # Single test
 ```
 
+**Frontend (webapp):**
+```bash
+cd webapp
+npm install                  # Install dependencies
+npm run dev                  # Dev server (Vite)
+npm run build                # Production build → dist/
+npm run test                 # Run Vitest tests
+npm run lint                 # ESLint check
+```
+
 **Environment setup:**
 ```bash
 cp api/.env.example api/.env
@@ -120,7 +130,7 @@ api/
 │   ├── application.yaml       # Config
 │   └── db/changelog/          # Liquibase migrations
 └── pom.xml
-webapp/         # Frontend (vanilla JS)
+webapp/         # Frontend (React 19 + Vite)
 helm/           # Kubernetes charts
 doc/adr/        # Architecture decisions
 ```

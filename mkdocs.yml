@@ -1,0 +1,46 @@
+site_name: My Architecture Docs
+
+theme:
+  name: material
+
+nav:
+  - Home: README.md
+
+  - Architecture:
+      - Overview: Video Streaming System Architecture.md
+      - Sequence Diagram: Sequence-Diagram.md
+      - Performance Review: performance-review.md
+
+  - Reports:
+      - 2025-07-05: architecture_quality_report_2025-07-05.md
+      - 2025-07-13 VN: architecture_quality_report_2025-07-13._VN.md
+      - 2025-07-13 EN: architecture_quality_report_2025-07-13_EN.md
+
+  - ADR:
+      - Template: adr/0000-template.md
+      - Use RDBMS: adr/0001-use-relational-database.md
+      - Backend Architecture: adr/0002-backend-architecture.md
+      - Cache: adr/0003-use-cache.md
+      - Frontend: adr/0004-frontend-structure.md
+      - Video Cache: adr/0005-use_lru_cache_video_streaming.md
+      - Binary Search: adr/apr_binary_search.md
+
+  - PRD:
+      - Hot Video Priority: prd/PRD-hot-video-priority.md
+
+  - Plans:
+      - Plan A: plans/plan-a-file-based-hooks.md
+      - Plan B: plans/plan-b-direct-cli-spawn.md
+
+  - API Docs:
+      - OpenAPI JSON: apidocs/api-docs.json
+      - Redoc: apidocs/redoc-static.html
+
+  - Diagrams (PUML):
+      - C4 L1: puml/C4-L1.puml
+      - C4 L2: puml/C4-L2.puml
+      - C4 L3: puml/C4-L3.puml
+      - Deployment: puml/Deployment.puml
+
+  - Tasks:
+      - Pending: tasks/pending/
