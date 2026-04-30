@@ -37,7 +37,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     // Whitelisted endpoints
-                    auth.requestMatchers("/admin/**").authenticated();
+                    auth.requestMatchers("/v1/funny-app/admin/**").hasRole("ADMIN");
                     AppConstant.WebIgnoringConfig.WHITE_LIST_PATH.forEach(item -> auth.requestMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()).permitAll());
                     auth.requestMatchers(swaggerWhiteList).permitAll();
                     auth.anyRequest().permitAll();

@@ -1,6 +1,9 @@
 package com.canhlabs.funnyapp.repo;
 
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.enums.VideoStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -19,5 +22,8 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
     List<VideoSource> findAllByDescIsNullOrDesc(String desc);
     List<VideoSource> findAllByIsHideOrderByCreatedAtDesc(boolean hide);
 
+    Page<VideoSource> findAllByStatus(VideoStatus status, Pageable pageable);
+
+    long countByStatus(VideoStatus status);
 
 }

@@ -26,7 +26,13 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!initial.jwt) return
     authApi.me()
-      .then(() => setLoading(false))
+      .then((data) => {
+        const userData = data?.data ?? data
+        if (userData?.role !== undefined) {
+          setUser(prev => prev ? { ...prev, isAdmin: userData.role === 'ADMIN' } : prev)
+        }
+        setLoading(false)
+      })
       .catch((err) => {
         if (err?.status === 401 || err?.status === 403) {
           localStorage.removeItem('jwt')
@@ -39,10 +45,14 @@ export function AuthProvider({ children }) {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const login = useCallback((newJwt, newUser) => {
+    const userWithAdmin = {
+      ...newUser,
+      isAdmin: newUser?.isAdmin ?? (newUser?.role === 'ADMIN'),
+    }
     localStorage.setItem('jwt', newJwt)
-    localStorage.setItem('user', JSON.stringify(newUser))
+    localStorage.setItem('user', JSON.stringify(userWithAdmin))
     setJwt(newJwt)
-    setUser(newUser)
+    setUser(userWithAdmin)
   }, [])
 
   const logout = useCallback(() => {

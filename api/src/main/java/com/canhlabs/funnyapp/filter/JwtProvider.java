@@ -113,6 +113,7 @@ public class JwtProvider {
         Map<String, Object> payload = new HashMap<>();
         payload.put("id", request.getId());
         payload.put("email", request.getEmail());
+        payload.put("role", request.getRole() != null ? request.getRole() : "USER");
         return payload;
     }
 
@@ -120,6 +121,7 @@ public class JwtProvider {
         return UserDetailDto.builder()
                 .id(Long.valueOf(getNonNull(body.get("id"))))
                 .email(getNonNull(body.get("email")))
+                .role(getNonNull(body.get("role")))
                 .build();
     }
 

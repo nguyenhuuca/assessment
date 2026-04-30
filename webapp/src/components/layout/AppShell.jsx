@@ -11,6 +11,7 @@ import { CommentPanel } from '../comments/index.js'
 import { PublicFeed, PrivateFeed } from '../video/VideoFeed.jsx'
 import ExploreView from '../explore/ExploreView.jsx'
 import ComingSoon from './ComingSoon.jsx'
+import AdminView from '../admin/AdminView.jsx'
 
 const TABS = [
   { key: 'popular', label: 'Popular', icon: 'local_fire_department' },
@@ -19,10 +20,11 @@ const TABS = [
 ]
 
 const SIDE_NAV = [
-  { key: 'home',     icon: 'home',          label: 'Home'    },
-  { key: 'explore',  icon: 'explore',       label: 'Explore' },
-  { key: 'library',  icon: 'video_library', label: 'Library' },
-  { key: 'history',  icon: 'history',       label: 'History' },
+  { key: 'home',     icon: 'home',                label: 'Home'    },
+  { key: 'explore',  icon: 'explore',             label: 'Explore' },
+  { key: 'library',  icon: 'video_library',       label: 'Library' },
+  { key: 'history',  icon: 'history',             label: 'History' },
+  { key: 'admin',    icon: 'admin_panel_settings', label: 'Admin',  requiresAdmin: true },
 ]
 
 export default function AppShell() {
@@ -200,7 +202,7 @@ export default function AppShell() {
         alignItems: 'center',
         paddingTop: 8, paddingBottom: 16,
       }}>
-        {SIDE_NAV.map(item => (
+        {SIDE_NAV.filter(item => !item.requiresAdmin || user?.isAdmin).map(item => (
           <button
             key={item.key}
             className={`sidenav-item${activeNav === item.key ? ' active' : ''}`}
@@ -248,14 +250,16 @@ export default function AppShell() {
         marginLeft: 'var(--sidenav-w)',
         marginTop: 'var(--topnav-h)',
         height: 'calc(100vh - var(--topnav-h))',
-        overflow: activeNav === 'explore' ? 'auto' : 'hidden',
-        display: activeNav === 'explore' ? 'block' : 'flex',
+        overflow: (activeNav === 'explore' || activeNav === 'admin') ? 'auto' : 'hidden',
+        display: (activeNav === 'explore' || activeNav === 'admin') ? 'block' : 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--bg)',
       }}>
         {activeNav === 'explore' ? (
           <ExploreView onNavigateToVideo={handleExploreNavigate} />
+        ) : activeNav === 'admin' && user?.isAdmin ? (
+          <AdminView />
         ) : activeNav !== 'home' ? (
           <ComingSoon page={activeNav} />
         ) : (

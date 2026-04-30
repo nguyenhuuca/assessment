@@ -17,8 +17,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.ALLOW_ALL_METHOD;
 import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.WHITE_LIST_PATH;
@@ -47,7 +50,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authentication;
             JwtVerificationResultDto verificationResult = jwtProvider.verifyToken(token);
             UserDetailDto user = verificationResult.getData();
-            authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, Collections.emptyList());
+            String role = user.getRole() != null && !user.getRole().isEmpty() ? user.getRole() : "USER";
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+            authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities);
             authentication.setDetails(user);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 

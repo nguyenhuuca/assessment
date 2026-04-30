@@ -1,7 +1,10 @@
 package com.canhlabs.funnyapp.entity;
 
+import com.canhlabs.funnyapp.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -46,5 +49,9 @@ public class User extends BaseDomain {
 
     @Column(name = "mfa_secret")
     private String mfaSecret;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 20)
+    private UserRole role = UserRole.USER;
 
 }
