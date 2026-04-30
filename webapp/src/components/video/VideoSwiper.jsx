@@ -5,8 +5,8 @@ import VoteButtons from './VoteButtons.jsx'
 import { buildStreamUrl } from '../../utils/videoModel.js'
 import SearchModal from '../modals/SearchModal.jsx'
 
-export default function VideoSwiper({ videos = [], mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
-  const [index, setIndex] = useState(0)
+export default function VideoSwiper({ videos = [], initialIndex = 0, mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
+  const [index, setIndex] = useState(() => Math.min(initialIndex, Math.max(0, videos.length - 1)))
   const [direction, setDirection] = useState('next')
   const [muted, setMuted] = useState(true)
   const total = videos.length
@@ -37,6 +37,7 @@ export default function VideoSwiper({ videos = [], mobileSearchOpen = false, onC
         const isScrolling = { current: false }
 
         function onWheel(e) {
+            if (e.target.closest('.mobile-search-modal')) return
             e.preventDefault()
             if (isScrolling.current) return
             isScrolling.current = true

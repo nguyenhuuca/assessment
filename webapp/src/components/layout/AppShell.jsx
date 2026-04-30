@@ -9,6 +9,7 @@ import ShareModal from '../modals/ShareModal.jsx'
 import DeleteConfirmModal from '../modals/DeleteConfirmModal.jsx'
 import { CommentPanel } from '../comments/index.js'
 import { PublicFeed, PrivateFeed } from '../video/VideoFeed.jsx'
+import ExploreView from '../explore/ExploreView.jsx'
 import ComingSoon from './ComingSoon.jsx'
 
 const TABS = [
@@ -35,9 +36,10 @@ export default function AppShell() {
   const [profileOpen,   setProfileOpen]   = useState(false)
   const [shareOpen,     setShareOpen]     = useState(false)
   const [deleteModal,   setDeleteModal]   = useState({ show: false, video: null })
-  const [commentVideo,  setCommentVideo]  = useState(null)
+  const [commentVideo,    setCommentVideo]    = useState(null)
   const [mobileLoginOpen, setMobileLoginOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const [jumpIndex,       setJumpIndex]       = useState(0)
 
   function showMsg(text, type = 'error') {
     setMessage({ text, type })
@@ -47,6 +49,12 @@ export default function AppShell() {
   function handleTabSelect(key) {
     setActiveTab(key)
     if (key === 'private') setPrivateLoaded(true)
+  }
+
+  function handleExploreNavigate(index) {
+    setJumpIndex(index)
+    setActiveTab('popular')
+    setActiveNav('home')
   }
 
   const visibleTabs = TABS.filter(t => !t.requiresAuth || isLoggedIn)
@@ -99,6 +107,16 @@ export default function AppShell() {
 
         {/* Right — auth controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 180, justifyContent: 'flex-end' }}>
+          {activeNav === 'home' && (
+            <button
+              className={`icon-btn${mobileSearchOpen ? ' active' : ''}`}
+              onClick={() => setMobileSearchOpen(v => !v)}
+              title="Search videos"
+              style={mobileSearchOpen ? { color: 'var(--accent-cyan)', background: 'var(--accent-cyan-dim)' } : undefined}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>search</span>
+            </button>
+          )}
           {!isLoggedIn ? (
             <LoginForm onMfaRequired={data => setMfaModal({ show: true, pendingData: data })} />
           ) : (
@@ -223,19 +241,22 @@ export default function AppShell() {
         marginLeft: 'var(--sidenav-w)',
         marginTop: 'var(--topnav-h)',
         height: 'calc(100vh - var(--topnav-h))',
-        overflow: 'hidden',
-        display: 'flex',
+        overflow: activeNav === 'explore' ? 'auto' : 'hidden',
+        display: activeNav === 'explore' ? 'block' : 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--bg)',
       }}>
-        {activeNav !== 'home' ? (
+        {activeNav === 'explore' ? (
+          <ExploreView onNavigateToVideo={handleExploreNavigate} />
+        ) : activeNav !== 'home' ? (
           <ComingSoon page={activeNav} />
         ) : (
           <>
             {activeTab === 'popular' && (
               <PublicFeed
                 category={null}
+                initialIndex={jumpIndex}
                 mobileSearchOpen={mobileSearchOpen}
                 onCloseMobileSearch={() => setMobileSearchOpen(false)}
                 onShowComments={setCommentVideo}

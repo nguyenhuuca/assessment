@@ -2,7 +2,7 @@ import React from 'react'
 import { useVideos, usePrivateVideos } from '../../hooks/useVideos.js'
 import VideoSwiper from './VideoSwiper.jsx'
 
-export function PublicFeed({ category, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
+export function PublicFeed({ category, initialIndex, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const { data: videos = [], isLoading, error } = useVideos(category)
 
   if (isLoading) return <LoadingState />
@@ -10,6 +10,7 @@ export function PublicFeed({ category, mobileSearchOpen, onCloseMobileSearch, on
   return (
     <VideoSwiper
       videos={videos}
+      initialIndex={initialIndex}
       mobileSearchOpen={mobileSearchOpen}
       onCloseMobileSearch={onCloseMobileSearch}
       onShowComments={onShowComments}
