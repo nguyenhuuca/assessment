@@ -361,7 +361,7 @@ export default function AppShell() {
         ))}
 
         {/* Explore — 5th item to center the FAB */}
-        {isLoggedIn && (
+        {(
           <button
             className="mobile-nav-tab"
             onClick={() => setActiveNav(v => v === 'explore' ? 'home' : 'explore')}
