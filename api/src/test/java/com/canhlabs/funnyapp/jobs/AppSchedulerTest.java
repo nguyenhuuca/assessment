@@ -8,7 +8,6 @@ import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
-import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -35,8 +34,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AppSchedulerTest {
-
-    @Mock YouTubeVideoService youTubeVideoService;
     @Mock StreamVideoService streamVideoService;
     @Mock StatsCache statsCache;
     @Mock VideoAccessService videoAccessService;

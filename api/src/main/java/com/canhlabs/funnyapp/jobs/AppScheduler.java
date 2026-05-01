@@ -30,7 +30,6 @@ import java.util.Map;
 @Service
 public class AppScheduler implements ApplicationRunner {
 
-    private final YouTubeVideoService service;
     private final StreamVideoService streamVideoService;
     private final StatsCache statsCache;
     private final VideoAccessService videoAccessService;
@@ -47,7 +46,6 @@ public class AppScheduler implements ApplicationRunner {
                         VideoStorageService videoStorageService, FfmpegService ffmpegService,
                         VideoSourceRepository videoSourceRepository, AppProperties appProps
     ) {
-        this.service = service;
         this.streamVideoService = streamVideoService;
         this.statsCache = statsCache;
         this.videoAccessService = videoAccessService;
@@ -61,17 +59,6 @@ public class AppScheduler implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         if (regenerateThumbnailsEnabled) {
             regenerateThumbnails();
-        }
-    }
-
-    // Run at 1:00 daily
-    // @Scheduled(cron = "0 15 10 * * *", zone = "Asia/Ho_Chi_Minh")
-    public void scheduleProcessTop10() {
-        log.info("Start running processTop10YouTube at 1AM");
-        try {
-            service.processTop10YouTube();
-        } catch (Exception ex) {
-            log.error("Error running processTop10YouTube job", ex);
         }
     }
 
