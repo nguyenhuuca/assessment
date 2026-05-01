@@ -181,13 +181,19 @@ export default function AppShell() {
             )}
           </>
         ) : (
-          <button
-            className="icon-btn mobile-overlay-icon"
-            onClick={() => setProfileOpen(true)}
-            title="Profile"
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person</span>
-          </button>
+            <>
+                  <button
+                    className="icon-btn mobile-overlay-icon"
+                    onClick={() => setProfileOpen(true)}
+                    title="Profile"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person</span>
+                  </button>
+
+                <button className="icon-btn" onClick={logout} title="Logout" style={{ color: '#ff6b6b' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 20 }}>logout</span>
+                </button>
+            </>
         )}
       </div>
 
