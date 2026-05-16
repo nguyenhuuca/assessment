@@ -54,4 +54,7 @@ public class User extends BaseDomain {
     @Column(name = "role", nullable = false, length = 20)
     private UserRole role = UserRole.USER;
 
+    @Column(name = "permissions", nullable = false)
+    private int permissions = 0;
+
 }

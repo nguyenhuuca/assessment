@@ -16,4 +16,5 @@ public class UserDetailDto extends BaseDto{
     private String email;
     private boolean mfaEnabled = false;
     private String role;
+    private int permissions;
 }

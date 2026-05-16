@@ -1,10 +1,12 @@
 package com.canhlabs.funnyapp.web;
 
+import com.canhlabs.funnyapp.aop.HasPermission;
 import com.canhlabs.funnyapp.dto.AdminAccountDto;
 import com.canhlabs.funnyapp.dto.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.AdminVideoDto;
 import com.canhlabs.funnyapp.dto.UserDetailDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
+import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.enums.VideoStatus;
@@ -115,6 +117,7 @@ public class AdminController {
     }
 
     @GetMapping("/stats")
+    @HasPermission(perms = {Permission.ADMIN})
     public ResponseEntity<ResultObjectInfo<AdminStatsDto>> getStats() {
         AdminStatsDto stats = adminVideoService.getStats();
         return ResponseEntity.ok(ResultObjectInfo.<AdminStatsDto>builder()

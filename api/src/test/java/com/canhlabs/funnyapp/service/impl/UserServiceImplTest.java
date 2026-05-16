@@ -128,8 +128,21 @@ class UserServiceImplTest {
 
         var details = userService.loadUserByUsername("test@abc.com");
 
+        assertThat(details).isInstanceOf(com.canhlabs.funnyapp.config.AppUserDetails.class);
         assertThat(details.getUsername()).isEqualTo("test@abc.com");
         assertThat(details.getPassword()).isEqualTo("pass");
+    }
+
+    @Test
+    void loadUserByUsername_returnsAppUserDetailsWithPermissions() {
+        int perm = com.canhlabs.funnyapp.enums.Permission.READ.getBit()
+                 | com.canhlabs.funnyapp.enums.Permission.ADMIN.getBit();
+        User user = User.builder().userName("admin@abc.com").password("pass").permissions(perm).build();
+        when(userRepo.findAllByUserName("admin@abc.com")).thenReturn(user);
+
+        var details = (com.canhlabs.funnyapp.config.AppUserDetails) userService.loadUserByUsername("admin@abc.com");
+
+        assertThat(details.getPermissions()).isEqualTo(perm);
     }
 
     @Test

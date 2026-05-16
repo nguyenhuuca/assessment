@@ -30,6 +30,13 @@ public class AppConstant {
         public static final String TAG_API = "Funny App API";
     }
 
+    public static class Flags {
+        private Flags() {
+        }
+
+        public static final String PERMISSION_ENFORCEMENT = "permission_enforcement_enabled";
+    }
+
     // inner class hold all the path url that ignore the security when access to system
     public static final class WebIgnoringConfig {
         private WebIgnoringConfig() {

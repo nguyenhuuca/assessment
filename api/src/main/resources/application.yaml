@@ -125,6 +125,10 @@ app:
       percentage: 10
       max-daily-emails: 200
       whitelist: ${EMAIL_PREVIEW_WHITELIST:canh@canh-labs.com,@canh-labs.com}
+harness:
+  ff:
+    api-key: ${FF_API_KEY:}
+
 cache:
   type: guava # or "redis"
   mfa:
