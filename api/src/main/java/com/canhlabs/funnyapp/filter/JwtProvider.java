@@ -113,6 +113,7 @@ public class JwtProvider {
         Map<String, Object> payload = new HashMap<>();
         payload.put("id", request.getId());
         payload.put("email", request.getEmail());
+        payload.put("permissions", request.getPermissions());
         payload.put("role", request.getRole() != null ? request.getRole() : "USER");
         return payload;
     }

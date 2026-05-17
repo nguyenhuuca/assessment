@@ -221,7 +221,12 @@ public class UserServiceImpl implements UserService {
     private String getToken(User user) {
         String role = user.getRole() != null ? user.getRole().name() : "USER";
         return jwtProvider.generateToken(JwtGenerationDto.builder()
-                .payload(UserDetailDto.builder().id(user.getId()).email(user.getUserName()).role(role).build())
+                .payload(UserDetailDto.builder()
+                        .id(user.getId())
+                        .email(user.getUserName())
+                        .role(role)
+                        .permissions(user.getPermissions())
+                        .build())
                 .build()).getToken();
     }
 
