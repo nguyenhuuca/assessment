@@ -117,7 +117,7 @@ public class AdminController {
     }
 
     @GetMapping("/stats")
-    @HasPermission(perms = {Permission.ADMIN})
+    @HasPermission(perm = Permission.ADMIN)
     public ResponseEntity<ResultObjectInfo<AdminStatsDto>> getStats() {
         AdminStatsDto stats = adminVideoService.getStats();
         return ResponseEntity.ok(ResultObjectInfo.<AdminStatsDto>builder()

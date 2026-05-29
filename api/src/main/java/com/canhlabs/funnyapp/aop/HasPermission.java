@@ -10,7 +10,10 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("@permissionServiceImpl.hasAllPermissions(authentication.principal.permissions, #perms)")
+@PreAuthorize("@permissionServiceImpl.hasPermission(authentication.principal.permissions, {perm})")
 public @interface HasPermission {
-    Permission[] perms();
+    // AnnotationTemplateExpressionDefaults expands Permission.ADMIN to the bare identifier ADMIN.
+    // PermissionEnumPropertyAccessor (registered in WebSecurityConfig) makes ADMIN resolvable
+    // in the SpEL context by mapping enum names to their Permission constants.
+    Permission perm();
 }
