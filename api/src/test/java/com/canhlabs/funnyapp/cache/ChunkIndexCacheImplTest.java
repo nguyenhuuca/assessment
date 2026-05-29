@@ -4,7 +4,9 @@ import com.canhlabs.funnyapp.dto.Range;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -84,5 +86,118 @@ public class ChunkIndexCacheImplTest {
         String fileId = "fileY";
         chunkIndexService.addChunk(fileId, 0, 10);
         assertThrows(IllegalArgumentException.class, () -> chunkIndexService.findNearestChunk(fileId, 0, 10, -1));
+    }
+
+    // --- hasChunk tests ---
+
+    @Test
+    void testHasChunk_ReturnsTrue_WhenChunkContainsRange() {
+        String fileId = "hasChunk1";
+        chunkIndexService.addChunk(fileId, 0, 100);
+        assertTrue(chunkIndexService.hasChunk(fileId, 0, 100));
+    }
+
+    @Test
+    void testHasChunk_ReturnsTrue_WhenRangeIsSubset() {
+        String fileId = "hasChunk2";
+        chunkIndexService.addChunk(fileId, 0, 200);
+        assertTrue(chunkIndexService.hasChunk(fileId, 50, 150));
+    }
+
+    @Test
+    void testHasChunk_ReturnsFalse_WhenNoChunksForFile() {
+        assertFalse(chunkIndexService.hasChunk("no_file", 0, 10));
+    }
+
+    @Test
+    void testHasChunk_ReturnsFalse_WhenChunkDoesNotCoverRange() {
+        String fileId = "hasChunk3";
+        chunkIndexService.addChunk(fileId, 0, 50);
+        assertFalse(chunkIndexService.hasChunk(fileId, 60, 100));
+    }
+
+    @Test
+    void testHasChunk_ThrowsNullPointerException_WhenFileIdIsNull() {
+        assertThrows(NullPointerException.class, () -> chunkIndexService.hasChunk(null, 0, 10));
+    }
+
+    @Test
+    void testHasChunk_ReturnsFalse_WhenStartNotCovered() {
+        String fileId = "hasChunk4";
+        // Range [50, 100] — query for [40, 80]: start=40 < r.start=50, so not covered
+        chunkIndexService.addChunk(fileId, 50, 100);
+        assertFalse(chunkIndexService.hasChunk(fileId, 40, 80));
+    }
+
+    @Test
+    void testHasChunk_ReturnsFalse_WhenEndNotCovered() {
+        String fileId = "hasChunk5";
+        // Range [0, 50] — query for [0, 60]: end=60 > r.end=50, so not covered
+        chunkIndexService.addChunk(fileId, 0, 50);
+        assertFalse(chunkIndexService.hasChunk(fileId, 0, 60));
+    }
+
+    // --- addChunk boundary: start == end ---
+
+    @Test
+    void testAddChunk_StartEqualsEnd_IsAccepted() {
+        String fileId = "boundary1";
+        chunkIndexService.addChunk(fileId, 42, 42);
+        assertTrue(chunkIndexService.hasChunk(fileId, 42, 42));
+    }
+
+    // --- clear (invalidate) tests ---
+
+    @Test
+    void testClear_RemovesChunksForFile() {
+        String fileId = "clearFile";
+        chunkIndexService.addChunk(fileId, 0, 100);
+        assertTrue(chunkIndexService.hasChunk(fileId, 0, 100));
+        chunkIndexService.clear(fileId);
+        assertFalse(chunkIndexService.hasChunk(fileId, 0, 100));
+    }
+
+    @Test
+    void testClear_DoesNotAffectOtherFiles() {
+        String fileId1 = "clearOther1";
+        String fileId2 = "clearOther2";
+        chunkIndexService.addChunk(fileId1, 0, 50);
+        chunkIndexService.addChunk(fileId2, 0, 50);
+        chunkIndexService.clear(fileId1);
+        assertFalse(chunkIndexService.findNearestChunk(fileId1, 0, 50, 0).isPresent());
+        assertTrue(chunkIndexService.findNearestChunk(fileId2, 0, 50, 0).isPresent());
+    }
+
+    // --- preload tests ---
+
+    @Test
+    void testPreload_LoadsAllRanges() {
+        String fileId = "preloadFile1";
+        Set<Range> ranges = new HashSet<>();
+        ranges.add(new Range(0, 100));
+        ranges.add(new Range(200, 300));
+        chunkIndexService.preload(fileId, ranges);
+        assertTrue(chunkIndexService.hasChunk(fileId, 0, 100));
+        assertTrue(chunkIndexService.hasChunk(fileId, 200, 300));
+    }
+
+    @Test
+    void testPreload_OverwritesPreviousChunks() {
+        String fileId = "preloadFile2";
+        chunkIndexService.addChunk(fileId, 0, 50);
+        Set<Range> newRanges = new HashSet<>();
+        newRanges.add(new Range(100, 200));
+        chunkIndexService.preload(fileId, newRanges);
+        // After preload the original chunk data is replaced
+        Optional<Range> found = chunkIndexService.findNearestChunk(fileId, 100, 200, 0);
+        assertTrue(found.isPresent());
+        assertEquals(100, found.get().start());
+    }
+
+    @Test
+    void testPreload_EmptySetResultsInNoChunks() {
+        String fileId = "preloadEmpty";
+        chunkIndexService.preload(fileId, new HashSet<>());
+        assertFalse(chunkIndexService.hasChunk(fileId, 0, 10));
     }
 }

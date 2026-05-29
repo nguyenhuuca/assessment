@@ -2,12 +2,14 @@ package com.canhlabs.funnyapp.jobs;
 
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.dto.CacheStat;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
+import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -18,9 +20,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.contains;
@@ -41,6 +46,7 @@ class AppSchedulerTest {
     @Mock FfmpegService ffmpegService;
     @Mock VideoSourceRepository videoSourceRepository;
     @Mock AppProperties appProps;
+    @Mock YouTubeVideoService youTubeVideoService;
 
     @InjectMocks
     AppScheduler scheduler;
@@ -166,6 +172,119 @@ class AppSchedulerTest {
         } finally {
             existingFile.delete();
         }
+    }
+
+    // ── scheduleMakePoem() ────────────────────────────────────────────────────
+
+    @Test
+    void scheduleMakePoem_happyPath_callsUpdateDesc() {
+        doNothing().when(streamVideoService).updateDesc();
+
+        scheduler.scheduleMakePoem();
+
+        verify(streamVideoService).updateDesc();
+    }
+
+    @Test
+    void scheduleMakePoem_whenUpdateDescThrows_exceptionIsCaughtAndNotRethrown() {
+        doThrow(new RuntimeException("service failure")).when(streamVideoService).updateDesc();
+
+        // Must not throw
+        scheduler.scheduleMakePoem();
+
+        verify(streamVideoService).updateDesc();
+    }
+
+    // ── logStats() ────────────────────────────────────────────────────────────
+
+    @Test
+    void logStats_emptyFileStats_logsHitsAndMissesOnly() {
+        when(statsCache.getTotalHits()).thenReturn(10L);
+        when(statsCache.getTotalMisses()).thenReturn(2L);
+        when(statsCache.getFileStats()).thenReturn(Map.of());
+
+        scheduler.logStats();
+
+        verify(statsCache).getTotalHits();
+        verify(statsCache).getTotalMisses();
+        verify(statsCache).getFileStats();
+        verify(statsCache, never()).calculateRatio();
+    }
+
+    @Test
+    void logStats_nonEmptyFileStats_logsEachEntryAndCallsCalculateRatio() {
+        CacheStat stat = CacheStat.builder().hits(5L).misses(1L).build();
+        when(statsCache.getTotalHits()).thenReturn(5L);
+        when(statsCache.getTotalMisses()).thenReturn(1L);
+        when(statsCache.getFileStats()).thenReturn(Map.of("video-1", stat));
+        when(statsCache.calculateRatio()).thenReturn(83L);
+
+        scheduler.logStats();
+
+        verify(statsCache).getTotalHits();
+        verify(statsCache).getTotalMisses();
+        verify(statsCache).getFileStats();
+        verify(statsCache).calculateRatio();
+    }
+
+    @Test
+    void logStats_multipleFileStats_calculateRatioCalledForEachEntry() {
+        CacheStat stat1 = CacheStat.builder().hits(3L).misses(0L).build();
+        CacheStat stat2 = CacheStat.builder().hits(7L).misses(2L).build();
+        when(statsCache.getTotalHits()).thenReturn(10L);
+        when(statsCache.getTotalMisses()).thenReturn(2L);
+        when(statsCache.getFileStats()).thenReturn(Map.of("vid-a", stat1, "vid-b", stat2));
+        when(statsCache.calculateRatio()).thenReturn(80L);
+
+        scheduler.logStats();
+
+        verify(statsCache, times(2)).calculateRatio();
+    }
+
+    // ── syncDriveVideos() ─────────────────────────────────────────────────────
+
+    @Test
+    void syncDriveVideos_happyPath_callsDownloadFileFromFolder() throws Exception {
+        doNothing().when(videoStorageService).downloadFileFromFolder(anyString(), anyString());
+
+        scheduler.syncDriveVideos();
+
+        verify(videoStorageService).downloadFileFromFolder(anyString(), anyString());
+    }
+
+    @Test
+    void syncDriveVideos_whenServiceThrows_exceptionIsCaughtAndNotRethrown() throws Exception {
+        doThrow(new RuntimeException("drive error"))
+                .when(videoStorageService).downloadFileFromFolder(anyString(), anyString());
+
+        // Must not throw
+        scheduler.syncDriveVideos();
+
+        verify(videoStorageService).downloadFileFromFolder(anyString(), anyString());
+    }
+
+    // ── cleanUpOldVideos() ────────────────────────────────────────────────────
+
+    @Test
+    void cleanUpOldVideos_callsGetLeastAccessedVideos() {
+        when(videoAccessService.getLeastAccessedVideos(any(Duration.class), anyInt()))
+                .thenReturn(List.of());
+
+        scheduler.cleanUpOldVideos();
+
+        verify(videoAccessService).getLeastAccessedVideos(any(Duration.class), anyInt());
+    }
+
+    @Test
+    void cleanUpOldVideos_withCandidates_iteratesWithoutDeletingYet() {
+        when(videoAccessService.getLeastAccessedVideos(any(Duration.class), anyInt()))
+                .thenReturn(List.of("video-1", "video-2", "video-3"));
+
+        scheduler.cleanUpOldVideos();
+
+        verify(videoAccessService).getLeastAccessedVideos(any(Duration.class), anyInt());
+        // Storage service must not be touched (deletion is commented out in source)
+        verifyNoInteractions(videoStorageService);
     }
 
     // ── helpers ────────────────────────────────────────────────────────────────

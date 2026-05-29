@@ -57,4 +57,69 @@ class ShareLinkControllerTest {
         assertEquals(videos, response.getBody().getData());
         verify(shareService).getALLShare();
     }
+
+    @Test
+    void getPrivateShareLink_shouldReturnSuccessWithListOfVideos() {
+        VideoDto video1 = VideoDto.builder().id(2L).build();
+        VideoDto video2 = VideoDto.builder().id(3L).build();
+        List<VideoDto> videos = Arrays.asList(video1, video2);
+        when(shareService.getALLShare()).thenReturn(videos);
+
+        ResponseEntity<ResultListInfo<VideoDto>> response = controller.getPrivateShareLink();
+
+        assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
+        assertEquals(videos, response.getBody().getData());
+        verify(shareService).getALLShare();
+    }
+
+    @Test
+    void getPrivateShareLink_emptyList_shouldReturnSuccessWithEmptyList() {
+        when(shareService.getALLShare()).thenReturn(List.of());
+
+        ResponseEntity<ResultListInfo<VideoDto>> response = controller.getPrivateShareLink();
+
+        assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
+        assertTrue(response.getBody().getData().isEmpty());
+    }
+
+    @Test
+    void deleteShareLink_shouldReturnSuccessWithMessage() {
+        when(shareService.deleteShareLink(10L)).thenReturn("Deleted successfully");
+
+        ResponseEntity<ResultObjectInfo<String>> response = controller.deleteShareLink(10L);
+
+        assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
+        assertEquals("Deleted successfully", response.getBody().getMessage());
+        verify(shareService).deleteShareLink(10L);
+    }
+
+    @Test
+    void deleteShareLink_whenServiceReturnsNullMessage_shouldReturnSuccessWithNullMessage() {
+        when(shareService.deleteShareLink(99L)).thenReturn(null);
+
+        ResponseEntity<ResultObjectInfo<String>> response = controller.deleteShareLink(99L);
+
+        assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
+        assertNull(response.getBody().getMessage());
+        verify(shareService).deleteShareLink(99L);
+    }
+
+    @Test
+    void shareLink_whenServiceThrowsException_shouldPropagateException() {
+        ShareRequestDto request = new ShareRequestDto();
+        when(shareService.shareLink(request)).thenThrow(new RuntimeException("Service error"));
+
+        assertThrows(RuntimeException.class, () -> controller.shareLink(request));
+        verify(shareService).shareLink(request);
+    }
+
+    @Test
+    void getShareLink_whenServiceReturnsNull_shouldHandleNullData() {
+        when(shareService.getALLShare()).thenReturn(null);
+
+        ResponseEntity<ResultListInfo<VideoDto>> response = controller.getShareLink();
+
+        assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
+        assertNull(response.getBody().getData());
+    }
 }
