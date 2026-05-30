@@ -84,6 +84,10 @@ nav:
       - Architecture Quality 2025-07-13 VN: architecture_quality_report_2025-07-13._VN.md
       - Architecture Quality 2025-07-05: architecture_quality_report_2025-07-05.md
 
+  - Claude Guide:
+      - English: claude-guide-en.md
+      - Tiếng Việt: claude-guide-vi.md
+
   - Guides:
       - Trello Setup: trello-setup-guide.md
       - Trello Board Status: trello-board-status.md
