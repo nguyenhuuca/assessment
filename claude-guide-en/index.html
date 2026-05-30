@@ -1,0 +1,4236 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Architecture documentation for the Funny Movies video streaming platform">
+      
+      
+        <meta name="author" content="nguyenhuuca">
+      
+      
+      
+        <link rel="prev" href="../architecture_quality_report_2025-07-05/">
+      
+      
+        <link rel="next" href="../claude-guide-vi/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>English - Funny Movies - Architecture Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#claude-code-user-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Funny Movies - Architecture Docs" class="md-header__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Funny Movies - Architecture Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              English
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/nguyenhuuca/assessment" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nguyenhuuca/assessment
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Video%20Streaming%20System%20Architecture/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/0000-template/" class="md-tabs__link">
+          
+  
+  
+  ADR
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../prd/PRD-hot-video-priority/" class="md-tabs__link">
+          
+  
+  
+  PRD
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../plans/plan-hls-migration/" class="md-tabs__link">
+          
+  
+  
+  Plans
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../system_health_report_2026-05-30/" class="md-tabs__link">
+          
+  
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Claude Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../trello-setup-guide/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Funny Movies - Architecture Docs" class="md-nav__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Funny Movies - Architecture Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nguyenhuuca/assessment" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nguyenhuuca/assessment
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Video%20Streaming%20System%20Architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Sequence-Diagram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sequence Diagram
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0000-template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0001-use-relational-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0001 - Use RDBMS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0002-backend-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0002 - Backend Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0003-use-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0003 - Cache Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0004-frontend-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0004 - Frontend Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0005 - LRU Video Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0006-hls-video-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0006 - HLS Video Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0007-admin-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0007 - Admin Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0008-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0008 - React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0009-unified-video-list-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0009 - Unified Video List API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/apr_binary_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Binary Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    PRD
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/PRD-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/PRD-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plans
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plans
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-hls-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-admin-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-permissions-bitwise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions (Bitwise)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-vid2-hot-score-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Score Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-a-file-based-hooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan A (File-based Hooks)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-b-direct-cli-spawn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan B (Direct CLI Spawn)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system_health_report_2026-05-30/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-05-30
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system_health_report_2026-02-06/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-02-06
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-13 EN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-13 VN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_quality_report_2025-07-05/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-05
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Claude Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    English
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    English
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pre-configured-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-configured Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pre-configured Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#folder-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Folder Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#personas-9-specialist-roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Personas — 9 Specialist Roles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Personas — 9 Specialist Roles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-architect-principal-architect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. /architect — Principal Architect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-builder-builder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. /builder — Builder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-qa-engineer-qa-engineer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. /qa-engineer — QA Engineer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-security-auditor-security-auditor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. /security-auditor — Security Auditor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-ui-ux-designer-uiux-designer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. /ui-ux-designer — UI/UX Designer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-code-check-code-quality-reviewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. /code-check — Code Quality Reviewer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-swarm-plan-swarm-planner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. /swarm-plan — Swarm Planner
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-swarm-execute-swarm-executor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. /swarm-execute — Swarm Executor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-swarm-review-swarm-reviewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. /swarm-review — Swarm Reviewer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills-90-automated-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skills — 90+ Automated Workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Skills — 90+ Automated Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auto-triggered-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto-triggered Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-engineering-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Engineering Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#language-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Language Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operations-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operations Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#product-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Product Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#swarm-multi-agent-parallel-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swarm — Multi-Agent Parallel Execution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Swarm — Multi-Agent Parallel Execution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-worker-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 Worker Agents
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swarm-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swarm Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swarm-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swarm Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Swarm Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-parallel-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 1: Parallel Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-security-sweep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 2: Security Sweep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-parallel-exploration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 3: Parallel Exploration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#real-world-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Real-World Workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Real-World Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-1-implement-a-new-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 1: Implement a New Feature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-2-debug-a-production-issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 2: Debug a Production Issue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-3-security-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 3: Security Audit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-4-performance-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 4: Performance Optimization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Templates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Available Templates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#artifact-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artifact Templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claude-mechanism-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claude Mechanism Templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips-tricks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tips &amp; Tricks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tips &amp; Tricks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-always-design-before-coding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Always design before coding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-use-swarm-for-complex-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Use swarm for complex tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-security-first-mindset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Security-first mindset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-keep-test-coverage-above-80" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Keep test coverage above 80%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-document-important-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Document important decisions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shortcuts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shortcuts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shortcuts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auto-triggered-skills-no-manual-call-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto-triggered skills (no manual call needed)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#learning-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning Path
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Learning Path">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#beginner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Beginner
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intermediate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intermediate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-specific-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project-Specific Notes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project-Specific Notes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#funny-movies-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Funny Movies Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-specific-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project-Specific Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../claude-guide-vi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tiếng Việt
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trello-setup-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trello Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trello-board-status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trello Board Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pre-configured-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-configured Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pre-configured Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#folder-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Folder Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#personas-9-specialist-roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Personas — 9 Specialist Roles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Personas — 9 Specialist Roles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-architect-principal-architect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. /architect — Principal Architect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-builder-builder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. /builder — Builder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-qa-engineer-qa-engineer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. /qa-engineer — QA Engineer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-security-auditor-security-auditor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. /security-auditor — Security Auditor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-ui-ux-designer-uiux-designer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. /ui-ux-designer — UI/UX Designer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-code-check-code-quality-reviewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. /code-check — Code Quality Reviewer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-swarm-plan-swarm-planner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. /swarm-plan — Swarm Planner
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-swarm-execute-swarm-executor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. /swarm-execute — Swarm Executor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-swarm-review-swarm-reviewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. /swarm-review — Swarm Reviewer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills-90-automated-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skills — 90+ Automated Workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Skills — 90+ Automated Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auto-triggered-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto-triggered Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-engineering-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Engineering Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#language-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Language Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operations-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operations Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#product-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Product Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#swarm-multi-agent-parallel-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swarm — Multi-Agent Parallel Execution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Swarm — Multi-Agent Parallel Execution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-worker-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 Worker Agents
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swarm-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swarm Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swarm-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swarm Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Swarm Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-parallel-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 1: Parallel Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-security-sweep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 2: Security Sweep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-parallel-exploration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 3: Parallel Exploration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#real-world-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Real-World Workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Real-World Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-1-implement-a-new-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 1: Implement a New Feature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-2-debug-a-production-issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 2: Debug a Production Issue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-3-security-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 3: Security Audit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-4-performance-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 4: Performance Optimization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Templates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Available Templates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#artifact-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artifact Templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claude-mechanism-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claude Mechanism Templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips-tricks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tips &amp; Tricks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tips &amp; Tricks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-always-design-before-coding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Always design before coding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-use-swarm-for-complex-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Use swarm for complex tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-security-first-mindset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Security-first mindset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-keep-test-coverage-above-80" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Keep test coverage above 80%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-document-important-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Document important decisions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shortcuts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shortcuts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shortcuts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auto-triggered-skills-no-manual-call-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto-triggered skills (no manual call needed)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#learning-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning Path
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Learning Path">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#beginner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Beginner
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intermediate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intermediate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Skills
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-specific-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project-Specific Notes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project-Specific Notes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#funny-movies-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Funny Movies Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-specific-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project-Specific Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="claude-code-user-guide">Claude Code — User Guide<a class="headerlink" href="#claude-code-user-guide" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>This guide explains how to use <strong>Claude Code</strong> with the <strong>Funny Movies</strong> project. After cloning the repo, read this to get the most out of the AI assistant.</p>
+</blockquote>
+<hr />
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#pre-configured-setup">Pre-configured Setup</a></li>
+<li><a href="#personas--9-specialist-roles">Personas — 9 Specialist Roles</a></li>
+<li><a href="#skills--90-automated-workflows">Skills — 90+ Automated Workflows</a></li>
+<li><a href="#swarm--multi-agent-parallel-execution">Swarm — Multi-Agent Parallel Execution</a></li>
+<li><a href="#real-world-workflows">Real-World Workflows</a></li>
+<li><a href="#available-templates">Available Templates</a></li>
+<li><a href="#tips--tricks">Tips &amp; Tricks</a></li>
+</ol>
+<hr />
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<p>This project is pre-configured with the <strong>Claude Code Framework</strong> — a powerful AI assistant system that provides:</p>
+<ul>
+<li>✅ <strong>Auto-loaded skills</strong> matching the current context</li>
+<li>✅ <strong>9 specialist personas</strong> (architect, builder, security, QA…)</li>
+<li>✅ <strong>90+ workflows</strong> covering every development task</li>
+<li>✅ <strong>Multi-agent swarm</strong> for parallel task execution</li>
+<li>✅ <strong>Templates</strong> for ADR, PRD, design docs, and more</li>
+</ul>
+<hr />
+<h2 id="pre-configured-setup">Pre-configured Setup<a class="headerlink" href="#pre-configured-setup" title="Permanent link">&para;</a></h2>
+<h3 id="folder-structure">Folder Structure<a class="headerlink" href="#folder-structure" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>.claude/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── commands/          # 9 personas (architect, builder, QA…)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── agents/            # 5 worker agents for swarm execution
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── skills/            # 90+ skill workflows (auto-triggered)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── architecture/  # System design, API design, DDD…
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── core-engineering/  # Coding, testing, debugging…
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── languages/     # TypeScript, Python, Go, Rust, Java…
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   ├── operations/    # Infrastructure, observability, incident…
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   ├── product/       # PRD, roadmap, requirements…
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   ├── security/      # Security audit, threat modeling…
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   └── design/        # UI/UX, accessibility, design systems…
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>├── rules/             # Code quality, security, tech strategy
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>└── settings.json      # Permissions (200+ commands allowed)
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>templates/
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>├── artifacts/         # ADR, PRD, design spec, postmortem…
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>└── claude_mechanisms/ # Agent, command, skill, rule templates
+</code></pre></div>
+<hr />
+<h2 id="personas-9-specialist-roles">Personas — 9 Specialist Roles<a class="headerlink" href="#personas-9-specialist-roles" title="Permanent link">&para;</a></h2>
+<h3 id="1-architect-principal-architect">1. <code>/architect</code> — Principal Architect<a class="headerlink" href="#1-architect-principal-architect" title="Permanent link">&para;</a></h3>
+<p><strong>Use when:</strong> Designing systems, APIs, or writing ADRs</p>
+<p><strong>Capabilities:</strong>
+- System design with trade-off analysis
+- API design with OpenAPI spec
+- Architecture Decision Records (ADR)
+- Sequential Thinking (structured reasoning)
+- Does not write implementation code</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/architect design api to get list video titles
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/architect design microservices architecture for video streaming
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>/architect should we use Redis or Guava cache?
+</code></pre></div></p>
+<p><strong>Output:</strong> ADR document, system design doc, API specification</p>
+<hr />
+<h3 id="2-builder-builder">2. <code>/builder</code> — Builder<a class="headerlink" href="#2-builder-builder" title="Permanent link">&para;</a></h3>
+<p><strong>Use when:</strong> Implementing features, fixing bugs, refactoring</p>
+<p><strong>Capabilities:</strong>
+- Write production code (Java, TypeScript, Python…)
+- Implement features from spec
+- Refactor existing code
+- Fix bugs systematically
+- Write SOLID, DRY, clean code</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/builder implement JWT authentication
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>/builder fix login bug in UserService
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>/builder refactor UserController to use DTO pattern
+</code></pre></div></p>
+<p><strong>Output:</strong> Working code + tests</p>
+<hr />
+<h3 id="3-qa-engineer-qa-engineer">3. <code>/qa-engineer</code> — QA Engineer<a class="headerlink" href="#3-qa-engineer-qa-engineer" title="Permanent link">&para;</a></h3>
+<p><strong>Use when:</strong> Writing tests, test strategy, increasing coverage</p>
+<p><strong>Capabilities:</strong>
+- Write unit tests (JUnit, Mockito, Vitest)
+- Write integration tests (TestContainers)
+- Define test strategy for the project
+- Increase code coverage
+- Performance testing</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/qa-engineer write tests for UserService
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>/qa-engineer create test strategy for authentication module
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>/qa-engineer increase coverage for service layer to 80%
+</code></pre></div></p>
+<p><strong>Output:</strong> Test files, test plan, coverage report</p>
+<hr />
+<h3 id="4-security-auditor-security-auditor">4. <code>/security-auditor</code> — Security Auditor<a class="headerlink" href="#4-security-auditor-security-auditor" title="Permanent link">&para;</a></h3>
+<p><strong>Use when:</strong> Security review, vulnerability scan, compliance</p>
+<p><strong>Capabilities:</strong>
+- OWASP Top 10 audit
+- Security code review
+- Vulnerability detection (SQL injection, XSS…)
+- Threat modeling (STRIDE)
+- Compliance check (GDPR, SOC2…)</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/security-auditor review authentication flow
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/security-auditor scan for SQL injection vulnerabilities
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>/security-auditor check OWASP compliance
+</code></pre></div></p>
+<p><strong>Output:</strong> Security audit report with severity levels (Critical / High / Medium / Low)</p>
+<hr />
+<h3 id="5-ui-ux-designer-uiux-designer">5. <code>/ui-ux-designer</code> — UI/UX Designer<a class="headerlink" href="#5-ui-ux-designer-uiux-designer" title="Permanent link">&para;</a></h3>
+<p><strong>Use when:</strong> Designing UI, improving UX, accessibility</p>
+<p><strong>Capabilities:</strong>
+- UI/UX design
+- Interface design
+- Accessibility (WCAG compliance)
+- Design systems
+- Visual assets</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/ui-ux-designer design video list page
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>/ui-ux-designer improve accessibility for login form
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>/ui-ux-designer create design system for buttons
+</code></pre></div></p>
+<p><strong>Output:</strong> Design mockups, component specs, accessibility report</p>
+<hr />
+<h3 id="6-code-check-code-quality-reviewer">6. <code>/code-check</code> — Code Quality Reviewer<a class="headerlink" href="#6-code-check-code-quality-reviewer" title="Permanent link">&para;</a></h3>
+<p><strong>Use when:</strong> Code review, checking code quality</p>
+<p><strong>Capabilities:</strong>
+- SOLID principles check
+- DRY violations detection
+- Code smell detection
+- Naming consistency
+- Best practices verification</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/code-check review UserService
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>/code-check check SOLID violations in entire codebase
+</code></pre></div></p>
+<p><strong>Output:</strong> Code quality report with recommendations</p>
+<hr />
+<h3 id="7-swarm-plan-swarm-planner">7. <code>/swarm-plan</code> — Swarm Planner<a class="headerlink" href="#7-swarm-plan-swarm-planner" title="Permanent link">&para;</a></h3>
+<p><strong>Use when:</strong> Planning complex tasks with many subtasks</p>
+<p><strong>Capabilities:</strong>
+- Decompose tasks into subtasks
+- Create execution plan
+- Identify dependencies
+- Estimate effort</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/swarm-plan implement user authentication system
+</code></pre></div></p>
+<p><strong>Output:</strong> Task breakdown plan for swarm execution</p>
+<hr />
+<h3 id="8-swarm-execute-swarm-executor">8. <code>/swarm-execute</code> — Swarm Executor<a class="headerlink" href="#8-swarm-execute-swarm-executor" title="Permanent link">&para;</a></h3>
+<p><strong>Use when:</strong> Executing tasks with multiple agents in parallel</p>
+<p><strong>Capabilities:</strong>
+- Launch 4–8 worker agents in parallel
+- Coordinate work via Beads
+- Aggregate results
+- Handle failures</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/swarm-execute implement video recommendation feature
+</code></pre></div></p>
+<p><strong>Output:</strong> Completed feature with multiple agents working together</p>
+<hr />
+<h3 id="9-swarm-review-swarm-reviewer">9. <code>/swarm-review</code> — Swarm Reviewer<a class="headerlink" href="#9-swarm-review-swarm-reviewer" title="Permanent link">&para;</a></h3>
+<p><strong>Use when:</strong> Multi-perspective code review</p>
+<p><strong>Capabilities:</strong>
+- Launch multiple reviewer agents
+- Quality review
+- Security review
+- Performance review
+- Aggregate findings</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/swarm-review security audit entire codebase
+</code></pre></div></p>
+<p><strong>Output:</strong> Comprehensive review report from multiple perspectives</p>
+<hr />
+<h2 id="skills-90-automated-workflows">Skills — 90+ Automated Workflows<a class="headerlink" href="#skills-90-automated-workflows" title="Permanent link">&para;</a></h2>
+<h3 id="auto-triggered-skills">Auto-triggered Skills<a class="headerlink" href="#auto-triggered-skills" title="Permanent link">&para;</a></h3>
+<p>Skills load automatically when:
+1. You use <strong>keywords</strong> in your prompt
+2. You open a <strong>file with a matching extension</strong>
+3. You match an <strong>intent pattern</strong></p>
+<h3 id="core-engineering-skills">Core Engineering Skills<a class="headerlink" href="#core-engineering-skills" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>Auto-trigger</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>implementing-code</strong></td>
+<td>"implement", "code", "feature"</td>
+<td><code>implement user login</code></td>
+</tr>
+<tr>
+<td><strong>debugging</strong></td>
+<td>"debug", "fix", "bug", "error"</td>
+<td><code>fix NPE in UserService</code></td>
+</tr>
+<tr>
+<td><strong>testing</strong></td>
+<td>"test", "unit test", "coverage"</td>
+<td><code>write tests for UserService</code></td>
+</tr>
+<tr>
+<td><strong>refactoring</strong></td>
+<td>"refactor", "cleanup", "improve"</td>
+<td><code>refactor UserController</code></td>
+</tr>
+<tr>
+<td><strong>optimizing</strong></td>
+<td>"optimize", "performance", "slow"</td>
+<td><code>optimize database queries</code></td>
+</tr>
+<tr>
+<td><strong>data-management</strong></td>
+<td>"database", "schema", "migration"</td>
+<td><code>design database schema</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="architecture-skills">Architecture Skills<a class="headerlink" href="#architecture-skills" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>Auto-trigger</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>designing-systems</strong></td>
+<td>"architecture", "design", "diagram"</td>
+<td><code>design video streaming system</code></td>
+</tr>
+<tr>
+<td><strong>designing-apis</strong></td>
+<td>"api", "endpoint", "rest"</td>
+<td><code>design REST API for users</code></td>
+</tr>
+<tr>
+<td><strong>domain-driven-design</strong></td>
+<td>"ddd", "domain", "aggregate"</td>
+<td><code>apply DDD to user module</code></td>
+</tr>
+<tr>
+<td><strong>cloud-native-patterns</strong></td>
+<td>"cloud", "microservice", "k8s"</td>
+<td><code>design microservices architecture</code></td>
+</tr>
+<tr>
+<td><strong>writing-adrs</strong></td>
+<td>"adr", "decision record"</td>
+<td><code>document Redis migration decision</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="security-skills">Security Skills<a class="headerlink" href="#security-skills" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>Auto-trigger</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>application-security</strong></td>
+<td>"security", "vulnerability", "owasp"</td>
+<td><code>security review for login</code></td>
+</tr>
+<tr>
+<td><strong>threat-modeling</strong></td>
+<td>"threat", "attack", "risk"</td>
+<td><code>threat model for payment flow</code></td>
+</tr>
+<tr>
+<td><strong>security-review</strong></td>
+<td>"security review", "audit"</td>
+<td><code>audit authentication code</code></td>
+</tr>
+<tr>
+<td><strong>identity-access</strong></td>
+<td>"auth", "oauth", "jwt"</td>
+<td><code>implement OAuth2 authentication</code></td>
+</tr>
+<tr>
+<td><strong>compliance</strong></td>
+<td>"compliance", "gdpr", "hipaa"</td>
+<td><code>check GDPR compliance</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="language-skills">Language Skills<a class="headerlink" href="#language-skills" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Auto-trigger</th>
+<th>File patterns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>java</strong></td>
+<td>"java", "spring boot", "maven"</td>
+<td><code>*.java</code>, <code>pom.xml</code></td>
+</tr>
+<tr>
+<td><strong>typescript</strong></td>
+<td>"typescript", "ts"</td>
+<td><code>*.ts</code>, <code>*.tsx</code></td>
+</tr>
+<tr>
+<td><strong>python</strong></td>
+<td>"python", "py"</td>
+<td><code>*.py</code>, <code>requirements.txt</code></td>
+</tr>
+<tr>
+<td><strong>go</strong></td>
+<td>"golang", "go"</td>
+<td><code>*.go</code>, <code>go.mod</code></td>
+</tr>
+<tr>
+<td><strong>rust</strong></td>
+<td>"rust", "cargo"</td>
+<td><code>*.rs</code>, <code>Cargo.toml</code></td>
+</tr>
+<tr>
+<td><strong>kotlin</strong></td>
+<td>"kotlin", "android"</td>
+<td><code>*.kt</code>, <code>build.gradle.kts</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="operations-skills">Operations Skills<a class="headerlink" href="#operations-skills" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>Auto-trigger</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>infrastructure</strong></td>
+<td>"infrastructure", "terraform", "iac"</td>
+<td><code>setup AWS infrastructure</code></td>
+</tr>
+<tr>
+<td><strong>observability</strong></td>
+<td>"logging", "metrics", "tracing"</td>
+<td><code>add Prometheus metrics</code></td>
+</tr>
+<tr>
+<td><strong>incident-management</strong></td>
+<td>"incident", "outage", "postmortem"</td>
+<td><code>investigate production outage</code></td>
+</tr>
+<tr>
+<td><strong>chaos-engineering</strong></td>
+<td>"chaos", "resilience"</td>
+<td><code>test system resilience</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="product-skills">Product Skills<a class="headerlink" href="#product-skills" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>Auto-trigger</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>writing-prds</strong></td>
+<td>"prd", "requirements"</td>
+<td><code>write PRD for video search</code></td>
+</tr>
+<tr>
+<td><strong>writing-pr-faqs</strong></td>
+<td>"pr-faq", "vision"</td>
+<td><code>write PR-FAQ for new feature</code></td>
+</tr>
+<tr>
+<td><strong>decomposing-tasks</strong></td>
+<td>"break down", "decompose"</td>
+<td><code>break down authentication task</code></td>
+</tr>
+<tr>
+<td><strong>execution-roadmaps</strong></td>
+<td>"roadmap", "milestone"</td>
+<td><code>create Q1 roadmap</code></td>
+</tr>
+<tr>
+<td><strong>estimating-work</strong></td>
+<td>"estimate", "story points"</td>
+<td><code>estimate video recommendation effort</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="swarm-multi-agent-parallel-execution">Swarm — Multi-Agent Parallel Execution<a class="headerlink" href="#swarm-multi-agent-parallel-execution" title="Permanent link">&para;</a></h2>
+<h3 id="5-worker-agents">5 Worker Agents<a class="headerlink" href="#5-worker-agents" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Worker</th>
+<th>Model</th>
+<th>Tools</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>worker-explorer</strong></td>
+<td>Haiku</td>
+<td>Read, Glob, Grep</td>
+<td>Fast codebase search</td>
+</tr>
+<tr>
+<td><strong>worker-builder</strong></td>
+<td>Sonnet</td>
+<td>All</td>
+<td>Implementation, testing, refactoring</td>
+</tr>
+<tr>
+<td><strong>worker-reviewer</strong></td>
+<td>Sonnet</td>
+<td>Read, Grep</td>
+<td>Code review, security audit</td>
+</tr>
+<tr>
+<td><strong>worker-researcher</strong></td>
+<td>Sonnet</td>
+<td>Read, WebFetch</td>
+<td>External research, docs</td>
+</tr>
+<tr>
+<td><strong>worker-architect</strong></td>
+<td>Opus</td>
+<td>All</td>
+<td>Complex design decisions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="swarm-workflow">Swarm Workflow<a class="headerlink" href="#swarm-workflow" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>1. /swarm-plan &quot;implement user authentication&quot;
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>   → Decompose into subtasks
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>   → Create execution plan
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>2. /swarm-execute
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>   → Launch 4–8 workers in parallel
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>   → Each worker handles 1 subtask
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>   → Workers coordinate via Beads
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>3. /swarm-review
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>   → Multi-perspective review
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>   → Aggregate findings
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>   → Report completion
+</code></pre></div>
+<h3 id="swarm-patterns">Swarm Patterns<a class="headerlink" href="#swarm-patterns" title="Permanent link">&para;</a></h3>
+<h4 id="pattern-1-parallel-implementation">Pattern 1: Parallel Implementation<a class="headerlink" href="#pattern-1-parallel-implementation" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Task: Implement video recommendation feature
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Swarm breakdown:
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>├── Worker 1: YouTubeApiClient (fetch metadata)
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>├── Worker 2: ChatGptService (get recommendations)
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>├── Worker 3: RecommendationController (REST API)
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>├── Worker 4: RecommendationService (business logic)
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>└── Worker 5: Tests (unit + integration)
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>All workers execute in parallel → 5x faster
+</code></pre></div>
+<h4 id="pattern-2-security-sweep">Pattern 2: Security Sweep<a class="headerlink" href="#pattern-2-security-sweep" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Task: Security audit entire codebase
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>Swarm breakdown:
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>├── Worker 1: Scan authentication module
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>├── Worker 2: Scan API endpoints
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>├── Worker 3: Scan database layer
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>├── Worker 4: Scan file operations
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>├── Worker 5: Scan external integrations
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>├── Worker 6: Check OWASP Top 10
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>├── Worker 7: Dependency vulnerability scan
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>└── Worker 8: Configuration security check
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>Aggregate findings → Comprehensive security report
+</code></pre></div>
+<h4 id="pattern-3-parallel-exploration">Pattern 3: Parallel Exploration<a class="headerlink" href="#pattern-3-parallel-exploration" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Task: Find all usages of deprecated API
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>Swarm breakdown:
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>├── Worker 1: Search controllers/
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>├── Worker 2: Search services/
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>├── Worker 3: Search repositories/
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>├── Worker 4: Search utils/
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>└── Worker 5: Search tests/
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>Fast parallel search → Complete results
+</code></pre></div>
+<hr />
+<h2 id="real-world-workflows">Real-World Workflows<a class="headerlink" href="#real-world-workflows" title="Permanent link">&para;</a></h2>
+<h3 id="workflow-1-implement-a-new-feature">Workflow 1: Implement a New Feature<a class="headerlink" href="#workflow-1-implement-a-new-feature" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Step 1: Design (Architect)</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>/architect<span class="w"> </span>design<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>API
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># Step 2: Plan (Swarm)</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>/swarm-plan<span class="w"> </span>implement<span class="w"> </span>video<span class="w"> </span>recommendation
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c1"># Step 3: Execute (Swarm)</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>/swarm-execute<span class="w"> </span>implement<span class="w"> </span>video<span class="w"> </span>recommendation
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="c1"># Step 4: Test (QA)</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>tests<span class="w"> </span><span class="k">for</span><span class="w"> </span>RecommendationService
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="c1"># Step 5: Security (Security Auditor)</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>/security-auditor<span class="w"> </span>review<span class="w"> </span>recommendation<span class="w"> </span>feature
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="c1"># Step 6: Review (Code Check)</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>/code-check<span class="w"> </span>review<span class="w"> </span>recommendation<span class="w"> </span>module
+</code></pre></div>
+<hr />
+<h3 id="workflow-2-debug-a-production-issue">Workflow 2: Debug a Production Issue<a class="headerlink" href="#workflow-2-debug-a-production-issue" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Step 1: Investigate</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="s2">&quot;debug login timeout issue&quot;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>→<span class="w"> </span>Auto-load:<span class="w"> </span>debugging<span class="w"> </span>skill
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="c1"># Step 2: Analyze</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>/architect<span class="w"> </span>analyze<span class="w"> </span>authentication<span class="w"> </span>flow
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="c1"># Step 3: Fix</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>/builder<span class="w"> </span>fix<span class="w"> </span>timeout<span class="w"> </span><span class="k">in</span><span class="w"> </span>UserService
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="c1"># Step 4: Test</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>regression<span class="w"> </span>tests
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="c1"># Step 5: Postmortem</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="s2">&quot;write postmortem for login timeout&quot;</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>→<span class="w"> </span>Auto-load:<span class="w"> </span>incident-management<span class="w"> </span>skill
+</code></pre></div>
+<hr />
+<h3 id="workflow-3-security-audit">Workflow 3: Security Audit<a class="headerlink" href="#workflow-3-security-audit" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Step 1: Full audit</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>/swarm-review<span class="w"> </span>security<span class="w"> </span>audit<span class="w"> </span>entire<span class="w"> </span>codebase
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># Step 2: Fix critical issues</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>/builder<span class="w"> </span>fix<span class="w"> </span>SQL<span class="w"> </span>injection<span class="w"> </span><span class="k">in</span><span class="w"> </span>UserRepo
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>/builder<span class="w"> </span>fix<span class="w"> </span>hardcoded<span class="w"> </span>credentials<span class="w"> </span><span class="k">in</span><span class="w"> </span>Helm<span class="w"> </span>values
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="c1"># Step 3: Verify</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>/security-auditor<span class="w"> </span>verify<span class="w"> </span>security<span class="w"> </span>fixes
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="c1"># Step 4: Document</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="s2">&quot;document security improvements&quot;</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>→<span class="w"> </span>Save<span class="w"> </span>to<span class="w"> </span>security_audit_YYYY-MM-DD.md
+</code></pre></div>
+<hr />
+<h3 id="workflow-4-performance-optimization">Workflow 4: Performance Optimization<a class="headerlink" href="#workflow-4-performance-optimization" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Step 1: Profile</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="s2">&quot;analyze slow API endpoints&quot;</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>→<span class="w"> </span>Auto-load:<span class="w"> </span>optimizing-code<span class="w"> </span>skill
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c1"># Step 2: Design solution</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>/architect<span class="w"> </span>design<span class="w"> </span>Redis<span class="w"> </span>caching<span class="w"> </span>strategy
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="c1"># Step 3: Implement</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>/swarm-execute<span class="w"> </span>implement<span class="w"> </span>Redis<span class="w"> </span>cache
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="c1"># Step 4: Test performance</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>performance<span class="w"> </span>tests
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="c1"># Step 5: Verify</span>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="s2">&quot;benchmark before/after caching&quot;</span>
+</code></pre></div>
+<hr />
+<h2 id="available-templates">Available Templates<a class="headerlink" href="#available-templates" title="Permanent link">&para;</a></h2>
+<h3 id="artifact-templates">Artifact Templates<a class="headerlink" href="#artifact-templates" title="Permanent link">&para;</a></h3>
+<p>Located in <code>templates/artifacts/</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Template</th>
+<th>Use case</th>
+<th>Triggered by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>adr.template.md</strong></td>
+<td>Architecture Decision Record</td>
+<td><code>/architect design …</code></td>
+</tr>
+<tr>
+<td><strong>design_spec.template.md</strong></td>
+<td>Design specification</td>
+<td><code>/architect design …</code></td>
+</tr>
+<tr>
+<td><strong>prd.template.md</strong></td>
+<td>Product Requirements</td>
+<td><code>Write PRD for …</code></td>
+</tr>
+<tr>
+<td><strong>pr_faq.template.md</strong></td>
+<td>Press Release FAQ</td>
+<td><code>Write PR-FAQ for …</code></td>
+</tr>
+<tr>
+<td><strong>roadmap.template.md</strong></td>
+<td>Execution roadmap</td>
+<td><code>Create roadmap for …</code></td>
+</tr>
+<tr>
+<td><strong>postmortem.template.md</strong></td>
+<td>Incident postmortem</td>
+<td><code>Write postmortem for …</code></td>
+</tr>
+<tr>
+<td><strong>security_audit.template.md</strong></td>
+<td>Security audit report</td>
+<td><code>/security-auditor review …</code></td>
+</tr>
+<tr>
+<td><strong>system_design.template.md</strong></td>
+<td>System design doc</td>
+<td><code>/architect design system …</code></td>
+</tr>
+<tr>
+<td><strong>plan.template.md</strong></td>
+<td>Implementation plan</td>
+<td><code>/swarm-plan …</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="claude-mechanism-templates">Claude Mechanism Templates<a class="headerlink" href="#claude-mechanism-templates" title="Permanent link">&para;</a></h3>
+<p>Located in <code>templates/claude_mechanisms/</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Template</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>agent.template.md</strong></td>
+<td>Create a custom worker agent</td>
+</tr>
+<tr>
+<td><strong>command.template.md</strong></td>
+<td>Create a custom persona command</td>
+</tr>
+<tr>
+<td><strong>skill.template.md</strong></td>
+<td>Create a custom skill workflow</td>
+</tr>
+<tr>
+<td><strong>rule.template.md</strong></td>
+<td>Create a custom rule</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tips-tricks">Tips &amp; Tricks<a class="headerlink" href="#tips-tricks" title="Permanent link">&para;</a></h2>
+<h3 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h3>
+<h4 id="1-always-design-before-coding">1. Always design before coding<a class="headerlink" href="#1-always-design-before-coding" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Bad</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="s2">&quot;implement video recommendation&quot;</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># Good</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>API
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="c1"># Review design → Approve</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>/swarm-execute<span class="w"> </span>implement<span class="w"> </span>video<span class="w"> </span>recommendation
+</code></pre></div>
+<h4 id="2-use-swarm-for-complex-tasks">2. Use swarm for complex tasks<a class="headerlink" href="#2-use-swarm-for-complex-tasks" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Bad: Single agent for a large task</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>/builder<span class="w"> </span>implement<span class="w"> </span>entire<span class="w"> </span>authentication<span class="w"> </span>system
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Good: Swarm for parallel execution</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>/swarm-plan<span class="w"> </span>implement<span class="w"> </span>authentication<span class="w"> </span>system
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>/swarm-execute
+</code></pre></div>
+<h4 id="3-security-first-mindset">3. Security-first mindset<a class="headerlink" href="#3-security-first-mindset" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># After implementing any feature:</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>/security-auditor<span class="w"> </span>review<span class="w"> </span><span class="o">[</span>feature-name<span class="o">]</span>
+</code></pre></div>
+<h4 id="4-keep-test-coverage-above-80">4. Keep test coverage above 80%<a class="headerlink" href="#4-keep-test-coverage-above-80" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># After implementing:</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>tests<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="o">[</span>service-name<span class="o">]</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="c1"># Check coverage:</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>mvn<span class="w"> </span>verify
+</code></pre></div>
+<h4 id="5-document-important-decisions">5. Document important decisions<a class="headerlink" href="#5-document-important-decisions" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Any major decision → Write ADR</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>/architect<span class="w"> </span>document<span class="w"> </span>decision<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>Redis<span class="w"> </span>cache
+</code></pre></div>
+<hr />
+<h3 id="shortcuts">Shortcuts<a class="headerlink" href="#shortcuts" title="Permanent link">&para;</a></h3>
+<h4 id="auto-triggered-skills-no-manual-call-needed">Auto-triggered skills (no manual call needed)<a class="headerlink" href="#auto-triggered-skills-no-manual-call-needed" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="s2">&quot;implement user login&quot;</span><span class="w">   </span>→<span class="w"> </span>auto-load:<span class="w"> </span>implementing-code
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="s2">&quot;fix bug in UserService&quot;</span><span class="w"> </span>→<span class="w"> </span>auto-load:<span class="w"> </span>debugging
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="s2">&quot;write tests&quot;</span><span class="w">            </span>→<span class="w"> </span>auto-load:<span class="w"> </span>testing
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="s2">&quot;design API&quot;</span><span class="w">             </span>→<span class="w"> </span>auto-load:<span class="w"> </span>designing-apis
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="s2">&quot;security review&quot;</span><span class="w">        </span>→<span class="w"> </span>auto-load:<span class="w"> </span>application-security
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="s2">&quot;optimize queries&quot;</span><span class="w">       </span>→<span class="w"> </span>auto-load:<span class="w"> </span>optimizing-code
+</code></pre></div>
+<h4 id="quick-commands">Quick commands<a class="headerlink" href="#quick-commands" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># Git</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="s2">&quot;create commit&quot;</span><span class="w">       </span>→<span class="w"> </span>Auto<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>+<span class="w"> </span>commit<span class="w"> </span>with<span class="w"> </span>message
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="s2">&quot;create pull request&quot;</span><span class="w"> </span>→<span class="w"> </span>Auto<span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>+<span class="w"> </span>gh<span class="w"> </span>pr<span class="w"> </span>create
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="c1"># Code quality</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="s2">&quot;check code quality&quot;</span><span class="w">  </span>→<span class="w"> </span>SOLID,<span class="w"> </span>DRY<span class="w"> </span>analysis
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="s2">&quot;increase coverage&quot;</span><span class="w">   </span>→<span class="w"> </span>Generate<span class="w"> </span>missing<span class="w"> </span>tests
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="c1"># Documentation</span>
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="s2">&quot;explain this code&quot;</span><span class="w">   </span>→<span class="w"> </span>Code<span class="w"> </span>explanation
+<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="s2">&quot;document this API&quot;</span><span class="w">   </span>→<span class="w"> </span>OpenAPI/Swagger<span class="w"> </span>docs
+</code></pre></div>
+<hr />
+<h3 id="learning-path">Learning Path<a class="headerlink" href="#learning-path" title="Permanent link">&para;</a></h3>
+<h4 id="beginner">Beginner<a class="headerlink" href="#beginner" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Use personas: <code>/architect</code>, <code>/builder</code>, <code>/qa-engineer</code></li>
+<li>Try auto-triggered skills: implement, test, debug</li>
+<li>Create commits and PRs with Claude</li>
+</ol>
+<h4 id="intermediate">Intermediate<a class="headerlink" href="#intermediate" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Use <code>/swarm-plan</code> and <code>/swarm-execute</code></li>
+<li>Security audit with <code>/security-auditor</code></li>
+<li>System design with <code>/architect</code></li>
+</ol>
+<h4 id="advanced">Advanced<a class="headerlink" href="#advanced" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Create custom skills in <code>.claude/skills/</code></li>
+<li>Configure permissions in <code>.claude/settings.json</code></li>
+<li>Build multi-agent workflows with swarm</li>
+</ol>
+<hr />
+<h2 id="quick-reference">Quick Reference<a class="headerlink" href="#quick-reference" title="Permanent link">&para;</a></h2>
+<h3 id="common-commands">Common Commands<a class="headerlink" href="#common-commands" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/architect design …</code></td>
+<td>System/API design</td>
+<td>ADR, design doc</td>
+</tr>
+<tr>
+<td><code>/builder implement …</code></td>
+<td>Code implementation</td>
+<td>Working code</td>
+</tr>
+<tr>
+<td><code>/qa-engineer test …</code></td>
+<td>Write tests</td>
+<td>Test files</td>
+</tr>
+<tr>
+<td><code>/security-auditor review …</code></td>
+<td>Security audit</td>
+<td>Audit report</td>
+</tr>
+<tr>
+<td><code>/code-check review …</code></td>
+<td>Code quality</td>
+<td>Quality report</td>
+</tr>
+<tr>
+<td><code>/swarm-execute …</code></td>
+<td>Parallel execution</td>
+<td>Feature complete</td>
+</tr>
+</tbody>
+</table>
+<h3 id="common-skills">Common Skills<a class="headerlink" href="#common-skills" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Keywords</th>
+<th>Skill loaded</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>implement, code</td>
+<td>implementing-code</td>
+<td>Write feature</td>
+</tr>
+<tr>
+<td>debug, fix, bug</td>
+<td>debugging</td>
+<td>Fix issues</td>
+</tr>
+<tr>
+<td>test, coverage</td>
+<td>testing</td>
+<td>Write tests</td>
+</tr>
+<tr>
+<td>design, api</td>
+<td>designing-apis</td>
+<td>API design</td>
+</tr>
+<tr>
+<td>security, audit</td>
+<td>application-security</td>
+<td>Security check</td>
+</tr>
+<tr>
+<td>optimize, performance</td>
+<td>optimizing-code</td>
+<td>Speed up code</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="project-specific-notes">Project-Specific Notes<a class="headerlink" href="#project-specific-notes" title="Permanent link">&para;</a></h2>
+<h3 id="funny-movies-architecture">Funny Movies Architecture<a class="headerlink" href="#funny-movies-architecture" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Language</strong>: Java 24 with Virtual Threads</li>
+<li><strong>Framework</strong>: Spring Boot 3.x</li>
+<li><strong>Database</strong>: PostgreSQL + Liquibase</li>
+<li><strong>Cache</strong>: Guava LRU (Redis migration planned)</li>
+<li><strong>CI/CD</strong>: GitHub Actions</li>
+<li><strong>Deployment</strong>: Docker + Kubernetes (Helm)</li>
+</ul>
+<h3 id="project-specific-commands">Project-Specific Commands<a class="headerlink" href="#project-specific-commands" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Build &amp; Run</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./startLocal.sh
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Run tests</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./unittest.sh
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="c1"># Tests + coverage report</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="c1"># Docker build</span>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>funny-app<span class="w"> </span>.
+</code></pre></div>
+<hr />
+<h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>CLAUDE.md</strong> — Project config and development guide</li>
+<li><strong>README.md</strong> — Project setup and installation</li>
+<li><strong>docs/adr/</strong> — Architecture Decision Records</li>
+<li><strong>.claude/rules/</strong> — Code quality, security, tech strategy rules</li>
+</ul>
+<hr />
+<p><strong>Happy coding with Claude!</strong></p>
+<p><em>Last updated: 2026-05-30</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
