@@ -18,7 +18,8 @@
       "mcp__stitch__get_screen",
       "Read(//tmp/**)",
       "mcp__atlassian__getAccessibleAtlassianResources",
-      "mcp__atlassian__searchJiraIssuesUsingJql"
+      "mcp__atlassian__searchJiraIssuesUsingJql",
+      "Bash(mvn test *)"
     ]
   },
   "enableAllProjectMcpServers": false,
