@@ -24,7 +24,7 @@
         <lombok.version>1.18.38</lombok.version>
         <common-lang.version>3.18.0</common-lang.version>
         <json-lib.version>20231013</json-lib.version>
-        <commons-validator.version>1.7</commons-validator.version>
+        <commons-validator.version>1.9.0</commons-validator.version>
         <guava.version>33.3.1-jre</guava.version>
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>

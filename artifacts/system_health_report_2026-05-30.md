@@ -132,7 +132,7 @@ Zero breaking changes — only `CacheBuilder` and `Cache` APIs used; both stable
 | Dependency | Current | Latest | Notes |
 |------------|---------|--------|-------|
 | ~~Guava~~ | ~~32.1.2-jre~~ | ~~33.3.1-jre~~ | ✅ Done |
-| Commons Validator | 1.7 | 1.9 | Minor risk — backlog |
+| ~~Commons Validator~~ | ~~1.7~~ | ~~1.9~~ | ✅ Done |
 
 ---
 
