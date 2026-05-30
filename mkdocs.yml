@@ -57,6 +57,7 @@ nav:
       - Overview: Video Streaming System Architecture.md
       - Sequence Diagram: Sequence-Diagram.md
       - Performance Review: performance-review.md
+      - CI/CD Pipeline: diagrams/ci-pipeline.md
 
   - ADR:
       - Template: adr/0000-template.md
