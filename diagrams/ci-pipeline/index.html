@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../0001-use-relational-database/">
+        <link rel="prev" href="../../performance-review/">
       
       
-        <link rel="next" href="../0003-use-cache/">
+        <link rel="next" href="../../adr/0000-template/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>0002 - Backend Architecture - Funny Movies - Architecture Docs</title>
+        <title>CI/CD Pipeline - Funny Movies - Architecture Docs</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#use-layered-spring-boot-architecture-with-virtual-threads-support" class="md-skip">
+        <a href="#cicd-pipeline-diagram" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              0002 - Backend Architecture
+              CI/CD Pipeline
             
           </span>
         </div>
@@ -242,10 +242,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../../Video%20Streaming%20System%20Architecture/" class="md-tabs__link">
           
   
@@ -262,13 +264,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../0000-template/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../adr/0000-template/" class="md-tabs__link">
           
   
   
@@ -436,28 +436,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -475,7 +478,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -574,10 +577,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../diagrams/ci-pipeline/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -593,6 +605,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -609,31 +622,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -651,7 +661,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -669,7 +679,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0000-template/" class="md-nav__link">
+      <a href="../../adr/0000-template/" class="md-nav__link">
         
   
   
@@ -697,7 +707,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0001-use-relational-database/" class="md-nav__link">
+      <a href="../../adr/0001-use-relational-database/" class="md-nav__link">
         
   
   
@@ -722,37 +732,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0002 - Backend Architecture
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../adr/0002-backend-architecture/" class="md-nav__link">
         
   
   
@@ -768,92 +751,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Context
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Consequences
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -866,7 +763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0003-use-cache/" class="md-nav__link">
+      <a href="../../adr/0003-use-cache/" class="md-nav__link">
         
   
   
@@ -894,7 +791,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0004-frontend-structure/" class="md-nav__link">
+      <a href="../../adr/0004-frontend-structure/" class="md-nav__link">
         
   
   
@@ -922,7 +819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0005-use_lru_cache_video_streaming/" class="md-nav__link">
+      <a href="../../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
         
   
   
@@ -950,7 +847,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0006-hls-video-streaming/" class="md-nav__link">
+      <a href="../../adr/0006-hls-video-streaming/" class="md-nav__link">
         
   
   
@@ -978,7 +875,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0007-admin-dashboard/" class="md-nav__link">
+      <a href="../../adr/0007-admin-dashboard/" class="md-nav__link">
         
   
   
@@ -1006,7 +903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0008-react-migration/" class="md-nav__link">
+      <a href="../../adr/0008-react-migration/" class="md-nav__link">
         
   
   
@@ -1034,7 +931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0009-unified-video-list-api/" class="md-nav__link">
+      <a href="../../adr/0009-unified-video-list-api/" class="md-nav__link">
         
   
   
@@ -1062,7 +959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0010-trivy-container-scanning/" class="md-nav__link">
+      <a href="../../adr/0010-trivy-container-scanning/" class="md-nav__link">
         
   
   
@@ -1830,80 +1727,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Context
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Consequences
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -1922,38 +1745,31 @@
   
 
 
-<h1 id="use-layered-spring-boot-architecture-with-virtual-threads-support">Use Layered Spring Boot Architecture with Virtual Threads Support<a class="headerlink" href="#use-layered-spring-boot-architecture-with-virtual-threads-support" title="Permanent link">&para;</a></h1>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Accepted</p>
-<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2025-07-03</p>
-<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The backend handles multiple concerns:
-- REST APIs (video, comment, like, view)
-- Background jobs (cron: download from Google Drive, generate thumbnail, cleanup)
-- Caching (Redis)
-- File I/O (video streaming, stats logging)</p>
-<p>We expect high concurrency, especially when serving video streams or updating view stats, which requires efficient threading without consuming too many OS threads.</p>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>We use:
-- <strong>Spring Boot 3.x</strong> with <strong>virtual thread support</strong> (Project Loom, JEP 444)
-- Layered architecture: <code>Controller → Service → Repository</code>
-- Enable virtual threads by:
-    - Configuring Tomcat to use <code>Executors.newVirtualThreadPerTaskExecutor()</code>
-    - Ensuring all blocking operations (DB, file, network) are thread-friendly</p>
-<p>Virtual threads allow handling many concurrent requests with minimal memory/CPU cost compared to platform threads.</p>
-<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Backend can handle more concurrent I/O-bound requests (video, file I/O) with fewer resources.</li>
-<li>Reduces the need for complex async/reactive code in most scenarios.</li>
-<li>Some libraries that use native threads may still block (must monitor).</li>
-</ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Task: Stream video using <code>RadomAccessFile</code> with virtual threads</li>
-<li>Task: Schedule background jobs using <code>@Scheduled</code></li>
-<li>JEP 444: https://openjdk.org/jeps/444</li>
-</ul>
+<h1 id="cicd-pipeline-diagram">CI/CD Pipeline Diagram<a class="headerlink" href="#cicd-pipeline-diagram" title="Permanent link">&para;</a></h1>
+<pre class="mermaid"><code>flowchart TD
+    push(["`**Push to main**`"]) --&gt; build
+
+    build["🧱 Build\nMaven package"]
+
+    build --&gt; test
+    build --&gt; scan
+    build --&gt; docker
+
+    test["🧪 Test\nJUnit + Jacoco\nSonarCloud + Codecov"]
+    scan["🔍 Trivy Scan\nCRITICAL gate"]
+    docker["🐳 Docker\nBuild &amp; push\nnguyenhuuca/funny-app"]
+
+    test --&gt; deploy
+    scan --&gt; deploy
+
+    deploy["🚀 Deploy\nSCP JAR → SSH\nVM server"]
+
+    style push fill:#6366f1,color:#fff
+    style build fill:#3b82f6,color:#fff
+    style test fill:#10b981,color:#fff
+    style scan fill:#f59e0b,color:#fff
+    style docker fill:#06b6d4,color:#fff
+    style deploy fill:#8b5cf6,color:#fff</code></pre>
 
 
 
