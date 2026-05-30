@@ -30,7 +30,7 @@ The JWT library has been upgraded to 0.12.6 (resolved this session). The remaini
 | MFA (TOTP) | Partial | ✅ Complete | ✅ Improved |
 | JWT 0.11.5 | 🔴 | ✅ 0.12.6 | ✅ Fixed |
 | HPA maxReplicas=1 | ⚠️ | ⚠️ | ❌ Not fixed |
-| Guava 32.1.2 | ⚠️ | ⚠️ | ❌ Not fixed |
+| Guava 32.1.2 | ⚠️ | ✅ 33.3.1 | ✅ Fixed |
 
 ---
 
@@ -124,15 +124,15 @@ autoscaling:
 
 ---
 
-### ⚠️ Issue 3: Outdated Dependencies
-**Severity:** LOW–MEDIUM
+### ✅ Issue 3: Guava — RESOLVED (2026-05-30)
+**Was:** 32.1.2-jre — **Now:** 33.3.1-jre (commit `HEAD`)
+
+Zero breaking changes — only `CacheBuilder` and `Cache` APIs used; both stable across 32→33.
 
 | Dependency | Current | Latest | Notes |
 |------------|---------|--------|-------|
-| Guava | 32.1.2-jre | 33.3.1-jre | Potential CVEs |
-| Commons Validator | 1.7 | 1.9 | Minor risk |
-
-Run `mvn versions:display-dependency-updates` to audit the full list.
+| ~~Guava~~ | ~~32.1.2-jre~~ | ~~33.3.1-jre~~ | ✅ Done |
+| Commons Validator | 1.7 | 1.9 | Minor risk — backlog |
 
 ---
 
@@ -288,8 +288,9 @@ api/src/main/java/com/canhlabs/funnyapp/
 ### ✅ Completed This Session
 1. ~~**Upgrade JWT 0.11.5 → 0.12.6**~~ — done, commit `bfac68e`
 
-### ⚠️ This Sprint
-2. **Upgrade Guava 32.1.2 → 33.3.1** (~1 hour)
+### ✅ Completed This Session
+1. ~~**Upgrade JWT 0.11.5 → 0.12.6**~~ — done, commit `bfac68e`
+2. ~~**Upgrade Guava 32.1.2 → 33.3.1**~~ — done
 
 ### ⚠️ Next Sprint
 3. **Switch `Thread.ofPlatform()` → `Thread.ofVirtual()`** in `VideoStorageServiceImpl` (30 min)
