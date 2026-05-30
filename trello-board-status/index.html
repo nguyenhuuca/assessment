@@ -6,8 +6,14 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="Architecture documentation for the Funny Movies video streaming platform">
       
       
+        <meta name="author" content="nguyenhuuca">
+      
+      
+      
+        <link rel="prev" href="../trello-setup-guide/">
       
       
       
@@ -19,11 +25,14 @@
     
     
       
-        <title>STREAM-VIDEO Board - Card Status Report - My Architecture Docs</title>
+        <title>Trello Board Status - Funny Movies - Architecture Docs</title>
       
     
     
       <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -51,7 +60,14 @@
   </head>
   
   
-    <body dir="ltr">
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -72,11 +88,9 @@
     
       
 
-  
-
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="My Architecture Docs" class="md-header__button md-logo" aria-label="My Architecture Docs" data-md-component="logo">
+    <a href=".." title="Funny Movies - Architecture Docs" class="md-header__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -90,18 +104,44 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            My Architecture Docs
+            Funny Movies - Architecture Docs
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              STREAM-VIDEO Board - Card Status Report
+              Trello Board Status
             
           </span>
         </div>
       </div>
     </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
     
     
       <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
@@ -133,6 +173,8 @@
         </button>
       </nav>
       
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
@@ -149,6 +191,18 @@
       
     
     
+      <div class="md-header__source">
+        <a href="https://github.com/nguyenhuuca/assessment" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nguyenhuuca/assessment
+  </div>
+</a>
+      </div>
+    
   </nav>
   
 </header>
@@ -157,6 +211,156 @@
       
       
         
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Video%20Streaming%20System%20Architecture/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/0000-template/" class="md-tabs__link">
+          
+  
+  
+  ADR
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../prd/PRD-hot-video-priority/" class="md-tabs__link">
+          
+  
+  
+  PRD
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../plans/plan-hls-migration/" class="md-tabs__link">
+          
+  
+  
+  Plans
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../system_health_report_2026-05-30/" class="md-tabs__link">
+          
+  
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../trello-setup-guide/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
           
         
       
@@ -171,17 +375,31 @@
                     
 
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="My Architecture Docs" class="md-nav__button md-logo" aria-label="My Architecture Docs" data-md-component="logo">
+    <a href=".." title="Funny Movies - Architecture Docs" class="md-nav__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    My Architecture Docs
+    Funny Movies - Architecture Docs
   </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nguyenhuuca/assessment" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nguyenhuuca/assessment
+  </div>
+</a>
+    </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
     
@@ -222,12 +440,19 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -360,153 +585,22 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reports
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Reports
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture_quality_report_2025-07-05/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    2025-07-05
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    2025-07-13 VN
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    2025-07-13 EN
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -524,8 +618,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -577,7 +671,7 @@
   <span class="md-ellipsis">
     
   
-    Use RDBMS
+    0001 - Use RDBMS
   
 
     
@@ -605,7 +699,7 @@
   <span class="md-ellipsis">
     
   
-    Backend Architecture
+    0002 - Backend Architecture
   
 
     
@@ -633,7 +727,7 @@
   <span class="md-ellipsis">
     
   
-    Cache
+    0003 - Cache Strategy
   
 
     
@@ -661,7 +755,7 @@
   <span class="md-ellipsis">
     
   
-    Frontend
+    0004 - Frontend Structure
   
 
     
@@ -689,7 +783,119 @@
   <span class="md-ellipsis">
     
   
-    Video Cache
+    0005 - LRU Video Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0006-hls-video-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0006 - HLS Video Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0007-admin-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0007 - Admin Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0008-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0008 - React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0009-unified-video-list-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0009 - Unified Video List API
   
 
     
@@ -748,15 +954,22 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -774,8 +987,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -813,6 +1026,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/PRD-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -830,15 +1071,22 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -856,8 +1104,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -874,6 +1122,146 @@
   
   
     <li class="md-nav__item">
+      <a href="../plans/plan-hls-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-admin-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-permissions-bitwise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions (Bitwise)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-vid2-hot-score-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Score Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../plans/plan-a-file-based-hooks/" class="md-nav__link">
         
   
@@ -881,7 +1269,7 @@
   <span class="md-ellipsis">
     
   
-    Plan A
+    Plan A (File-based Hooks)
   
 
     
@@ -909,7 +1297,7 @@
   <span class="md-ellipsis">
     
   
-    Plan B
+    Plan B (Direct CLI Spawn)
   
 
     
@@ -940,22 +1328,29 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    API Docs
+    Reports
   
 
     
@@ -966,12 +1361,216 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system_health_report_2026-05-30/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-05-30
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system_health_report_2026-02-06/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-02-06
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-13 EN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-13 VN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_quality_report_2025-07-05/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-05
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
   
-    API Docs
+    Guides
   
 
           </label>
@@ -984,14 +1583,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../apidocs/api-docs.json" class="md-nav__link">
+      <a href="../trello-setup-guide/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    OpenAPI JSON
+    Trello Setup
   
 
     
@@ -1009,63 +1608,26 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../apidocs/redoc-static.html" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
     
   
-    Redoc
-  
-
-    
-  </span>
   
   
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
+    <li class="md-nav__item md-nav__item--active">
       
-    </li>
-  
-
-    
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-  
-  
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
+        
       
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
-        
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
           
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
-            
   
   
   <span class="md-ellipsis">
     
   
-    Diagrams (PUML)
+    Trello Board Status
   
 
     
@@ -1073,209 +1635,399 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Diagrams (PUML)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../puml/C4-L1.puml" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    C4 L1
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../puml/C4-L2.puml" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    C4 L2
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../puml/C4-L3.puml" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    C4 L3
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../puml/Deployment.puml" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Deployment
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
-    </li>
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trello Board Status
   
 
     
-      
-      
+  </span>
   
   
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
+
+      </a>
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
-        
-          
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
-            
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
-  <span class="md-ellipsis">
+  
     
   
-    Tasks
   
-
-    
-  </span>
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary-by-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary by Status
+      
+    </span>
+  </a>
   
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In Progress
+      
+    </span>
+  </a>
   
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+    <nav class="md-nav" aria-label="In Progress">
+      <ul class="md-nav__list">
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_9">
-            <span class="md-nav__icon md-icon"></span>
-            
+          <li class="md-nav__item">
+  <a href="#2-create-cron-job-to-clean-up-old-unviewed-files-and-log-deleted-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] Create Cron Job to Clean Up Old Unviewed Files and Log Deleted Files
+      
+    </span>
+  </a>
   
-    Tasks
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../tasks/pending/" class="md-nav__link">
+</li>
         
+          <li class="md-nav__item">
+  <a href="#25-be-add-video_type-column-to-video_source-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [25] [BE] Add video_type column to video_source table
+      
+    </span>
+  </a>
   
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-be-video-type-filtering-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [23] [BE] Video Type Filtering API
+      
+    </span>
+  </a>
   
-  <span class="md-ellipsis">
-    
+</li>
+        
+      </ul>
+    </nav>
   
-    Pending
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backlogto-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backlog/To Do
+      
+    </span>
+  </a>
   
-
-    
-  </span>
+    <nav class="md-nav" aria-label="Backlog/To Do">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-onboarding-setup-explore-funny-app-assigned-to-new_joiner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] [ONBOARDING] Setup &amp; Explore funny-app – Assigned to: @new_joiner
+      
+    </span>
+  </a>
   
+</li>
+        
+      </ul>
+    </nav>
   
-
-      </a>
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backlogto-do_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backlog/To Do
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Backlog/To Do">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#9-backend-implement-likeunlike-and-view-count-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [9] Backend – Implement Like/Unlike and View Count APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-frontend-implement-likeunlike-button-and-view-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [10] Frontend – Implement Like/Unlike Button and View Tracking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#17-automate-nginx-deployment-reload-via-github-actions-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [17] Automate Nginx Deployment &amp; Reload via GitHub Actions (CI/CD)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#19-evaluate-using-temporal-to-replace-scheduled-jobs-in-spring-boot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [19] Evaluate using Temporal to replace scheduled jobs in Spring Boot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#20-tech-move-java-package-classification-lists-to-spring-config-with-enable-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [20] [TECH] Move Java Package Classification Lists to Spring Config with Enable Flags
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-fe-video-type-filtering-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [24] [FE] Video Type Filtering UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-create-trello-mcp-server-in-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [26] Create Trello MCP Server in Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deployed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-persist-video-hit-stats-to-database-for-cleanup-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] Persist Video Hit Stats to Database for Cleanup Support
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#21-email-handle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [21] Email handle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-fe-build-frontend-ui-for-anonymous-commenting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [8] [FE] Build Frontend UI for Anonymous Commenting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-beimplement-comment-api-in-spring-boot-no-login-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [7] [BE]Implement Comment API in Spring Boot (No Login Required
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-design-database-schema-for-comment-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [6] Design Database Schema for Comment Feature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#18-integrate-sonarcloud-code-analysis-into-github-actions-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [18] Integrate SonarCloud Code Analysis into GitHub Actions CI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-generate-video-thumbnail-using-ffmpeg-at-1-second-mark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] Generate Video Thumbnail Using FFmpeg at 1 Second Mark
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-insert-thumbnail_path-during-google-drive-download-cron-job" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [11] Insert thumbnail_path During Google Drive Download Cron Job
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-add-taskutils-helper-for-structured-parallel-task-execution-using-virtual-threads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [22] Add TaskUtils helper for structured parallel task execution using Virtual Threads
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-add-is_hide-and-thumbnail_path-columns-to-video_source-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] Add is_hide and thumbnail_path Columns to video_source Table
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-add-virtual-thread-metrics-to-monitor-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [14] Add Virtual Thread Metrics to Monitor Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#16-configure-nginx-to-serve-images-on-imagescanh-labscom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [16] Configure Nginx to Serve Images on images.canh-labs.com
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-create-c4-architecture-diagrams-levels-1-2-and-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [15] Create C4 Architecture Diagrams – Levels 1, 2, and 3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-create-adr-documentation-for-system-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [12] Create ADR Documentation for System Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1684,12 +2436,15 @@
                   
 
 
+  
+  
 
-<h1 id="stream-video-board-card-status-report">STREAM-VIDEO Board - Card Status Report</h1>
+
+<h1 id="stream-video-board-card-status-report">STREAM-VIDEO Board - Card Status Report<a class="headerlink" href="#stream-video-board-card-status-report" title="Permanent link">&para;</a></h1>
 <p><strong>Generated</strong>: 2026-02-13 10:47:21
 <strong>Board</strong>: STREAM-VIDEO
 <strong>Total Cards</strong>: 25</p>
-<h2 id="summary-by-status">Summary by Status</h2>
+<h2 id="summary-by-status">Summary by Status<a class="headerlink" href="#summary-by-status" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1717,10 +2472,10 @@
 </tbody>
 </table>
 <hr />
-<h2 id="in-progress">In Progress</h2>
+<h2 id="in-progress">In Progress<a class="headerlink" href="#in-progress" title="Permanent link">&para;</a></h2>
 <p><strong>List ID</strong>: 6865e49fe5b307299e1eb1dc
 <strong>Card Count</strong>: 3</p>
-<h3 id="2-create-cron-job-to-clean-up-old-unviewed-files-and-log-deleted-files">[2] Create Cron Job to Clean Up Old Unviewed Files and Log Deleted Files</h3>
+<h3 id="2-create-cron-job-to-clean-up-old-unviewed-files-and-log-deleted-files">[2] Create Cron Job to Clean Up Old Unviewed Files and Log Deleted Files<a class="headerlink" href="#2-create-cron-job-to-clean-up-old-unviewed-files-and-log-deleted-files" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/IqFTuacQ</p>
 <table>
 <thead>
@@ -1765,7 +2520,7 @@ Additionally, I want to log the details of each deleted file into a database tab
 
 </details>
 
-<h3 id="25-be-add-video_type-column-to-video_source-table">[25] [BE] Add video_type column to video_source table</h3>
+<h3 id="25-be-add-video_type-column-to-video_source-table">[25] [BE] Add video_type column to video_source table<a class="headerlink" href="#25-be-add-video_type-column-to-video_source-table" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/s4ghHM16</p>
 <table>
 <thead>
@@ -1824,7 +2579,7 @@ As a backend developer, I want to add a new column `video_type` to the `video_so
 
 </details>
 
-<h3 id="23-be-video-type-filtering-api">[23] [BE] Video Type Filtering API</h3>
+<h3 id="23-be-video-type-filtering-api">[23] [BE] Video Type Filtering API<a class="headerlink" href="#23-be-video-type-filtering-api" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/jIP0Urmy</p>
 <table>
 <thead>
@@ -1883,10 +2638,10 @@ As a backend developer, I want to provide an API endpoint that filters and retur
 </details>
 
 <hr />
-<h2 id="backlogto-do">Backlog/To Do</h2>
+<h2 id="backlogto-do">Backlog/To Do<a class="headerlink" href="#backlogto-do" title="Permanent link">&para;</a></h2>
 <p><strong>List ID</strong>: 686775822d1e1fdb24e5a152
 <strong>Card Count</strong>: 1</p>
-<h3 id="5-onboarding-setup-explore-funny-app-assigned-to-new_joiner">[5] [ONBOARDING] Setup &amp; Explore funny-app – Assigned to: @new_joiner</h3>
+<h3 id="5-onboarding-setup-explore-funny-app-assigned-to-new_joiner">[5] [ONBOARDING] Setup &amp; Explore funny-app – Assigned to: @new_joiner<a class="headerlink" href="#5-onboarding-setup-explore-funny-app-assigned-to-new_joiner" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/ycx3Jlj4</p>
 <table>
 <thead>
@@ -1938,10 +2693,10 @@ Use this task as a checklist and feel free to ask your mentor/buddy if you get s
 </details>
 
 <hr />
-<h2 id="backlogto-do_1">Backlog/To Do</h2>
+<h2 id="backlogto-do_1">Backlog/To Do<a class="headerlink" href="#backlogto-do_1" title="Permanent link">&para;</a></h2>
 <p><strong>List ID</strong>: 6865e44bdaadfa536119c5c8
 <strong>Card Count</strong>: 7</p>
-<h3 id="9-backend-implement-likeunlike-and-view-count-apis">[9] Backend – Implement Like/Unlike and View Count APIs</h3>
+<h3 id="9-backend-implement-likeunlike-and-view-count-apis">[9] Backend – Implement Like/Unlike and View Count APIs<a class="headerlink" href="#9-backend-implement-likeunlike-and-view-count-apis" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/32PhAcaS</p>
 <table>
 <thead>
@@ -1980,7 +2735,7 @@ As a backend developer, I want to implement REST APIs to support liking/unliking
 
 </details>
 
-<h3 id="10-frontend-implement-likeunlike-button-and-view-tracking">[10] Frontend – Implement Like/Unlike Button and View Tracking</h3>
+<h3 id="10-frontend-implement-likeunlike-button-and-view-tracking">[10] Frontend – Implement Like/Unlike Button and View Tracking<a class="headerlink" href="#10-frontend-implement-likeunlike-button-and-view-tracking" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/aj2ud85R</p>
 <table>
 <thead>
@@ -2018,7 +2773,7 @@ As a user, I want to like/unlike a video and see how many views and likes it has
 
 </details>
 
-<h3 id="17-automate-nginx-deployment-reload-via-github-actions-cicd">[17] Automate Nginx Deployment &amp; Reload via GitHub Actions (CI/CD)</h3>
+<h3 id="17-automate-nginx-deployment-reload-via-github-actions-cicd">[17] Automate Nginx Deployment &amp; Reload via GitHub Actions (CI/CD)<a class="headerlink" href="#17-automate-nginx-deployment-reload-via-github-actions-cicd" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/tT9HPz6p</p>
 <table>
 <thead>
@@ -2072,7 +2827,7 @@ As a DevOps engineer, I want to automate the deployment and reloading of Nginx c
 
 </details>
 
-<h3 id="19-evaluate-using-temporal-to-replace-scheduled-jobs-in-spring-boot">[19] Evaluate using Temporal to replace scheduled jobs in Spring Boot</h3>
+<h3 id="19-evaluate-using-temporal-to-replace-scheduled-jobs-in-spring-boot">[19] Evaluate using Temporal to replace scheduled jobs in Spring Boot<a class="headerlink" href="#19-evaluate-using-temporal-to-replace-scheduled-jobs-in-spring-boot" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/VqITzd6y</p>
 <table>
 <thead>
@@ -2112,7 +2867,7 @@ Assess the feasibility of using [http://Temporal.io](http://Temporal.io "smartCa
 
 </details>
 
-<h3 id="20-tech-move-java-package-classification-lists-to-spring-config-with-enable-flags">[20] [TECH] Move Java Package Classification Lists to Spring Config with Enable Flags</h3>
+<h3 id="20-tech-move-java-package-classification-lists-to-spring-config-with-enable-flags">[20] [TECH] Move Java Package Classification Lists to Spring Config with Enable Flags<a class="headerlink" href="#20-tech-move-java-package-classification-lists-to-spring-config-with-enable-flags" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/vUgyGXoB</p>
 <table>
 <thead>
@@ -2167,72 +2922,70 @@ There’s no way to disable the use of one or more of these lists at runtime.
 
 ✅ The following keys are added to `application.yml`:
 
-
-<pre><code>instability-calculator:
-  native-packages:
-    enabled: true
-    values:
-      - java.
-      - javax.
-      - jakarta.
-      - sun.
-      - com.sun.
-      - org.w3c.
-      - org.xml.
-      - org.omg.
-      - org.ietf.
-      - jdk.
-      - org.apache.xerces.
-      - org.relaxng.
-
-  external-packages:
-    enabled: true
-    values:
-      - org.springframework.
-      - org.apache.
-      - com.google.common.
-      - org.junit.
-      - org.mockito.
-      - org.slf4j.
-      - org.logback.
-      - org.hibernate.
-      - com.fasterxml.jackson.
-      - com.google.api
-      - org.assertj.
-      - org.aspectj.
-      - io.micrometer.
-      - io.swagger.
-      - io.jsonwebtoken.
-      - org.json.
-      - com.google.zxing.
-      - com.google.auth.
-
-  basic-types:
-    enabled: true
-    values:
-      - boolean
-      - byte
-      - char
-      - short
-      - int
-      - long
-      - float
-      - double
-      - void
-      - java.lang.Boolean
-      - java.lang.Byte
-      - java.lang.Character
-      - java.lang.Short
-      - java.lang.Integer
-      - java.lang.Long
-      - java.lang.Float
-      - java.lang.Double
-      - java.lang.Void
-      - java.lang.String
-      - java.lang.Object
-      - java.lang.Class
-</code></pre>
-
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>instability-calculator:
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  native-packages:
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    enabled: true
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    values:
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>      - java.
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>      - javax.
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>      - jakarta.
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>      - sun.
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>      - com.sun.
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>      - org.w3c.
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>      - org.xml.
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>      - org.omg.
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>      - org.ietf.
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>      - jdk.
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>      - org.apache.xerces.
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>      - org.relaxng.
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>  external-packages:
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    enabled: true
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    values:
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>      - org.springframework.
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>      - org.apache.
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>      - com.google.common.
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>      - org.junit.
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>      - org.mockito.
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>      - org.slf4j.
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>      - org.logback.
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>      - org.hibernate.
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>      - com.fasterxml.jackson.
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>      - com.google.api
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>      - org.assertj.
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>      - org.aspectj.
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>      - io.micrometer.
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>      - io.swagger.
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>      - io.jsonwebtoken.
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>      - org.json.
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>      - com.google.zxing.
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>      - com.google.auth.
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>  basic-types:
+<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>    enabled: true
+<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>    values:
+<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>      - boolean
+<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>      - byte
+<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>      - char
+<a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>      - short
+<a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>      - int
+<a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>      - long
+<a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>      - float
+<a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>      - double
+<a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>      - void
+<a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>      - java.lang.Boolean
+<a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>      - java.lang.Byte
+<a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>      - java.lang.Character
+<a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>      - java.lang.Short
+<a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>      - java.lang.Integer
+<a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a>      - java.lang.Long
+<a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a>      - java.lang.Float
+<a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a>      - java.lang.Double
+<a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a>      - java.lang.Void
+<a id="__codelineno-0-61" name="__codelineno-0-61" href="#__codelineno-0-61"></a>      - java.lang.String
+<a id="__codelineno-0-62" name="__codelineno-0-62" href="#__codelineno-0-62"></a>      - java.lang.Object
+<a id="__codelineno-0-63" name="__codelineno-0-63" href="#__codelineno-0-63"></a>      - java.lang.Class
+</code></pre></div>
 
 ✅ A Spring `@ConfigurationProperties(prefix = "instability-calculator")` class is created and mapped properly.
 
@@ -2244,7 +2997,7 @@ There’s no way to disable the use of one or more of these lists at runtime.
 
 </details>
 
-<h3 id="24-fe-video-type-filtering-ui">[24] [FE] Video Type Filtering UI</h3>
+<h3 id="24-fe-video-type-filtering-ui">[24] [FE] Video Type Filtering UI<a class="headerlink" href="#24-fe-video-type-filtering-ui" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/Ty56seMW</p>
 <table>
 <thead>
@@ -2294,7 +3047,7 @@ As a frontend developer, I want to allow users to filter and view videos by type
 
 </details>
 
-<h3 id="26-create-trello-mcp-server-in-python">[26] Create Trello MCP Server in Python</h3>
+<h3 id="26-create-trello-mcp-server-in-python">[26] Create Trello MCP Server in Python<a class="headerlink" href="#26-create-trello-mcp-server-in-python" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/LLZek6TM</p>
 <table>
 <thead>
@@ -2356,10 +3109,10 @@ Definition of Done:
 </details>
 
 <hr />
-<h2 id="deployed">Deployed</h2>
+<h2 id="deployed">Deployed<a class="headerlink" href="#deployed" title="Permanent link">&para;</a></h2>
 <p><strong>List ID</strong>: 6865e4a267ea372ce23cbecc
 <strong>Card Count</strong>: 14</p>
-<h3 id="3-persist-video-hit-stats-to-database-for-cleanup-support">[3] Persist Video Hit Stats to Database for Cleanup Support</h3>
+<h3 id="3-persist-video-hit-stats-to-database-for-cleanup-support">[3] Persist Video Hit Stats to Database for Cleanup Support<a class="headerlink" href="#3-persist-video-hit-stats-to-database-for-cleanup-support" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/7FSHzLox</p>
 <table>
 <thead>
@@ -2420,7 +3173,7 @@ As a system owner, I want to persist video hit statistics (both from cache and d
 
 </details>
 
-<h3 id="21-email-handle">[21] Email handle</h3>
+<h3 id="21-email-handle">[21] Email handle<a class="headerlink" href="#21-email-handle" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/s9qpgCHP</p>
 <table>
 <thead>
@@ -2472,15 +3225,13 @@ As a system owner, I want to persist video hit statistics (both from cache and d
 
 ✅ In `application.yml`:
 
-
-<pre><code>email:
-  preview-mode:
-    enabled: true
-    max-daily-emails: 1000
-    percentage: 10
-    whitelist: ${EMAIL_PREVIEW_WHITELIST:abc.com}
-</code></pre>
-
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>email:
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  preview-mode:
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    enabled: true
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    max-daily-emails: 1000
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    percentage: 10
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    whitelist: ${EMAIL_PREVIEW_WHITELIST:abc.com}
+</code></pre></div>
 
 ✅ Behavior:
 
@@ -2496,7 +3247,7 @@ As a system owner, I want to persist video hit statistics (both from cache and d
 
 </details>
 
-<h3 id="8-fe-build-frontend-ui-for-anonymous-commenting">[8] [FE] Build Frontend UI for Anonymous Commenting</h3>
+<h3 id="8-fe-build-frontend-ui-for-anonymous-commenting">[8] [FE] Build Frontend UI for Anonymous Commenting<a class="headerlink" href="#8-fe-build-frontend-ui-for-anonymous-commenting" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/UD1ezAJn</p>
 <table>
 <thead>
@@ -2537,7 +3288,7 @@ As a user (guest or logged-in), I want to post and reply to comments on a video 
 
 </details>
 
-<h3 id="7-beimplement-comment-api-in-spring-boot-no-login-required">[7] [BE]Implement Comment API in Spring Boot (No Login Required</h3>
+<h3 id="7-beimplement-comment-api-in-spring-boot-no-login-required">[7] [BE]Implement Comment API in Spring Boot (No Login Required<a class="headerlink" href="#7-beimplement-comment-api-in-spring-boot-no-login-required" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/szyzNFJq</p>
 <table>
 <thead>
@@ -2578,7 +3329,7 @@ As a backend developer, I want to build public comment APIs that allow both logg
 
 </details>
 
-<h3 id="6-design-database-schema-for-comment-feature">[6] Design Database Schema for Comment Feature</h3>
+<h3 id="6-design-database-schema-for-comment-feature">[6] Design Database Schema for Comment Feature<a class="headerlink" href="#6-design-database-schema-for-comment-feature" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/HVx6ahoE</p>
 <table>
 <thead>
@@ -2621,7 +3372,7 @@ As a developer, I want to design and create a database table to store user comme
 
 </details>
 
-<h3 id="18-integrate-sonarcloud-code-analysis-into-github-actions-ci">[18] Integrate SonarCloud Code Analysis into GitHub Actions CI</h3>
+<h3 id="18-integrate-sonarcloud-code-analysis-into-github-actions-ci">[18] Integrate SonarCloud Code Analysis into GitHub Actions CI<a class="headerlink" href="#18-integrate-sonarcloud-code-analysis-into-github-actions-ci" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/e6mxAork</p>
 <table>
 <thead>
@@ -2670,7 +3421,7 @@ As a developer, I want to integrate SonarCloud static code analysis into the Git
 
 </details>
 
-<h3 id="4-generate-video-thumbnail-using-ffmpeg-at-1-second-mark">[4] Generate Video Thumbnail Using FFmpeg at 1 Second Mark</h3>
+<h3 id="4-generate-video-thumbnail-using-ffmpeg-at-1-second-mark">[4] Generate Video Thumbnail Using FFmpeg at 1 Second Mark<a class="headerlink" href="#4-generate-video-thumbnail-using-ffmpeg-at-1-second-mark" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/pztvy830</p>
 <table>
 <thead>
@@ -2735,7 +3486,7 @@ As a system, I want to automatically generate a video thumbnail image at the 1-s
 
 </details>
 
-<h3 id="11-insert-thumbnail_path-during-google-drive-download-cron-job">[11] Insert thumbnail_path During Google Drive Download Cron Job</h3>
+<h3 id="11-insert-thumbnail_path-during-google-drive-download-cron-job">[11] Insert thumbnail_path During Google Drive Download Cron Job<a class="headerlink" href="#11-insert-thumbnail_path-during-google-drive-download-cron-job" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/kv5mKgz7</p>
 <table>
 <thead>
@@ -2795,7 +3546,7 @@ As a system, I want the cron job that downloads videos from Google Drive to also
 
 </details>
 
-<h3 id="22-add-taskutils-helper-for-structured-parallel-task-execution-using-virtual-threads">[22] Add TaskUtils helper for structured parallel task execution using Virtual Threads</h3>
+<h3 id="22-add-taskutils-helper-for-structured-parallel-task-execution-using-virtual-threads">[22] Add TaskUtils helper for structured parallel task execution using Virtual Threads<a class="headerlink" href="#22-add-taskutils-helper-for-structured-parallel-task-execution-using-virtual-threads" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/cBBLdayX</p>
 <table>
 <thead>
@@ -2885,7 +3636,7 @@ A result wrapper class `Result<T>` is introduced to encapsulate either a success
 
 </details>
 
-<h3 id="1-add-is_hide-and-thumbnail_path-columns-to-video_source-table">[1] Add is_hide and thumbnail_path Columns to video_source Table</h3>
+<h3 id="1-add-is_hide-and-thumbnail_path-columns-to-video_source-table">[1] Add is_hide and thumbnail_path Columns to video_source Table<a class="headerlink" href="#1-add-is_hide-and-thumbnail_path-columns-to-video_source-table" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/vUkSZhsw</p>
 <table>
 <thead>
@@ -2932,7 +3683,7 @@ As a developer, I want to add `is_hide` and `thumbnail_path` columns to the `vid
 
 </details>
 
-<h3 id="14-add-virtual-thread-metrics-to-monitor-performance">[14] Add Virtual Thread Metrics to Monitor Performance</h3>
+<h3 id="14-add-virtual-thread-metrics-to-monitor-performance">[14] Add Virtual Thread Metrics to Monitor Performance<a class="headerlink" href="#14-add-virtual-thread-metrics-to-monitor-performance" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/gaudma5I</p>
 <table>
 <thead>
@@ -2978,7 +3729,7 @@ As a developer, I want to add `is_hide` and `thumbnail_path` columns to the `vid
 
 </details>
 
-<h3 id="16-configure-nginx-to-serve-images-on-imagescanh-labscom">[16] Configure Nginx to Serve Images on images.canh-labs.com</h3>
+<h3 id="16-configure-nginx-to-serve-images-on-imagescanh-labscom">[16] Configure Nginx to Serve Images on images.canh-labs.com<a class="headerlink" href="#16-configure-nginx-to-serve-images-on-imagescanh-labscom" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/NgV0xAOL</p>
 <table>
 <thead>
@@ -3026,9 +3777,8 @@ As a DevOps/developer, I want to enhance the current Nginx configuration to serv
 - Proper content types are returned (`image/jpeg`, `image/png`)
 - Directory listing is disabled
 - System can access thumbnails like:
-  ```
-  https://images.canh-labs.com/thumbnails/abc123.jpg
-  ```
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>https://images.canh-labs.com/thumbnails/abc123.jpg
+</code></pre></div>
   ‌
 - CORS and caching headers are optionally configured to support frontend usage
 
@@ -3045,7 +3795,7 @@ As a DevOps/developer, I want to enhance the current Nginx configuration to serv
 
 </details>
 
-<h3 id="15-create-c4-architecture-diagrams-levels-1-2-and-3">[15] Create C4 Architecture Diagrams – Levels 1, 2, and 3</h3>
+<h3 id="15-create-c4-architecture-diagrams-levels-1-2-and-3">[15] Create C4 Architecture Diagrams – Levels 1, 2, and 3<a class="headerlink" href="#15-create-c4-architecture-diagrams-levels-1-2-and-3" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/lA0rpJbP</p>
 <table>
 <thead>
@@ -3095,7 +3845,7 @@ As a team, we want to create a full set of C4 Model diagrams (L1–L3) to docume
 
 </details>
 
-<h3 id="12-create-adr-documentation-for-system-architecture">[12] Create ADR Documentation for System Architecture</h3>
+<h3 id="12-create-adr-documentation-for-system-architecture">[12] Create ADR Documentation for System Architecture<a class="headerlink" href="#12-create-adr-documentation-for-system-architecture" title="Permanent link">&para;</a></h3>
 <p><strong>Link</strong>: https://trello.com/c/LozrV954</p>
 <table>
 <thead>
@@ -3169,6 +3919,12 @@ As a team, we want to document key architecture decisions in ADR (Architecture D
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
       </main>
       
         <footer class="md-footer">
@@ -3198,7 +3954,7 @@ As a team, we want to document key architecture decisions in ADR (Architecture D
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

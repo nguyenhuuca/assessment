@@ -1,0 +1,3172 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Architecture documentation for the Funny Movies video streaming platform">
+      
+      
+        <meta name="author" content="nguyenhuuca">
+      
+      
+      
+        <link rel="prev" href="../plans/plan-b-direct-cli-spawn/">
+      
+      
+        <link rel="next" href="../system_health_report_2026-02-06/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>System Health 2026-05-30 - Funny Movies - Architecture Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#system-health-report-funny-movies-application" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Funny Movies - Architecture Docs" class="md-header__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Funny Movies - Architecture Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              System Health 2026-05-30
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/nguyenhuuca/assessment" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nguyenhuuca/assessment
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Video%20Streaming%20System%20Architecture/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/0000-template/" class="md-tabs__link">
+          
+  
+  
+  ADR
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../prd/PRD-hot-video-priority/" class="md-tabs__link">
+          
+  
+  
+  PRD
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../plans/plan-hls-migration/" class="md-tabs__link">
+          
+  
+  
+  Plans
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../trello-setup-guide/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Funny Movies - Architecture Docs" class="md-nav__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Funny Movies - Architecture Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nguyenhuuca/assessment" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nguyenhuuca/assessment
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Video%20Streaming%20System%20Architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Sequence-Diagram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sequence Diagram
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0000-template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0001-use-relational-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0001 - Use RDBMS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0002-backend-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0002 - Backend Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0003-use-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0003 - Cache Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0004-frontend-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0004 - Frontend Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0005 - LRU Video Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0006-hls-video-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0006 - HLS Video Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0007-admin-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0007 - Admin Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0008-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0008 - React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0009-unified-video-list-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0009 - Unified Video List API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/apr_binary_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Binary Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    PRD
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/PRD-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/PRD-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plans
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plans
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-hls-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-admin-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-permissions-bitwise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions (Bitwise)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-vid2-hot-score-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Score Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-a-file-based-hooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan A (File-based Hooks)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-b-direct-cli-spawn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan B (Direct CLI Spawn)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-05-30
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-05-30
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delta-since-report-2026-02-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delta Since Report 2026-02-06
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-assessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Assessment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Assessment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#strengths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Strengths
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="✅ Strengths">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-outstanding-test-coverage-growth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Outstanding Test Coverage Growth
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-bitwise-permission-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Bitwise Permission System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-new-features-since-feb-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. New Features Since Feb 2026
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-concurrency-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Concurrency Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-robust-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Robust CI/CD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Open Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#issue-1-jwt-library-resolved-2026-05-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Issue 1: JWT Library — RESOLVED (2026-05-30)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-2-hpa-maxreplicas1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Issue 2: HPA maxReplicas=1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-3-guava-resolved-2026-05-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Issue 3: Guava — RESOLVED (2026-05-30)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-4-platform-threads-in-structuredtaskscope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Issue 4: Platform Threads in StructuredTaskScope
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-5-spring_profiles_activedev-in-helm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Issue 5: SPRING_PROFILES_ACTIVE=dev in Helm
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Coverage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Coverage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state-95-instruction-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Current State: 95%+ Instruction Coverage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubernetes-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kubernetes Deployment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cicd-pipeline-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CI/CD Pipeline Health
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-posture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Posture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Posture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#strengths_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Strengths
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open-gaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Gaps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Considerations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Current Optimizations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-bottlenecks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Bottlenecks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#action-items-prioritized" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action Items (Prioritized)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Action Items (Prioritized)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#completed-this-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Completed This Session
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#completed-this-session_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Completed This Session
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-sprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Next Sprint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backlog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔵 Backlog
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system_health_report_2026-02-06/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-02-06
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-13 EN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-13 VN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_quality_report_2025-07-05/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-05
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trello-setup-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trello Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trello-board-status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trello Board Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delta-since-report-2026-02-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delta Since Report 2026-02-06
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-assessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Assessment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Assessment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#strengths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Strengths
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="✅ Strengths">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-outstanding-test-coverage-growth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Outstanding Test Coverage Growth
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-bitwise-permission-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Bitwise Permission System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-new-features-since-feb-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. New Features Since Feb 2026
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-concurrency-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Concurrency Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-robust-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Robust CI/CD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Open Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#issue-1-jwt-library-resolved-2026-05-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Issue 1: JWT Library — RESOLVED (2026-05-30)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-2-hpa-maxreplicas1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Issue 2: HPA maxReplicas=1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-3-guava-resolved-2026-05-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Issue 3: Guava — RESOLVED (2026-05-30)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-4-platform-threads-in-structuredtaskscope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Issue 4: Platform Threads in StructuredTaskScope
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-5-spring_profiles_activedev-in-helm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Issue 5: SPRING_PROFILES_ACTIVE=dev in Helm
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Coverage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Coverage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state-95-instruction-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Current State: 95%+ Instruction Coverage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubernetes-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kubernetes Deployment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cicd-pipeline-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CI/CD Pipeline Health
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-posture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Posture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Posture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#strengths_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Strengths
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open-gaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Gaps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Considerations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Current Optimizations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-bottlenecks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Bottlenecks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#action-items-prioritized" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action Items (Prioritized)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Action Items (Prioritized)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#completed-this-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Completed This Session
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#completed-this-session_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Completed This Session
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-sprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Next Sprint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backlog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔵 Backlog
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="system-health-report-funny-movies-application">System Health Report: Funny Movies Application<a class="headerlink" href="#system-health-report-funny-movies-application" title="Permanent link">&para;</a></h1>
+<p><strong>Date:</strong> 2026-05-30
+<strong>Architect:</strong> Principal Architect (Claude Sonnet 4.6)
+<strong>Status:</strong> ✅ OPERATIONAL
+<strong>Previous Report:</strong> 2026-02-06</p>
+<hr />
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<p>Since the February 2026 report, the <strong>Funny Movies</strong> application has made significant quality improvements: test coverage jumped from <strong>58% to 95%+</strong> (exceeding industry standard), and several new features have been added — bitwise permission system, comments, video access stats, and a complete MFA flow. The system is in strong shape with 19 successful releases since the last review.</p>
+<p>The JWT library has been upgraded to 0.12.6 (resolved this session). The remaining open item is the HPA config, which is blocked on Redis cache.</p>
+<p><strong>Overall Health Score: 8.5/10</strong> <em>(up from 8.0 — driven by coverage gains and new features)</em></p>
+<hr />
+<h2 id="delta-since-report-2026-02-06">Delta Since Report 2026-02-06<a class="headerlink" href="#delta-since-report-2026-02-06" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Feb 2026</th>
+<th>May 2026</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Test Coverage</td>
+<td>58%</td>
+<td><strong>95%+</strong></td>
+<td>✅ +37%</td>
+</tr>
+<tr>
+<td>App Version</td>
+<td>prod-12</td>
+<td>prod-31</td>
+<td>✅ 19 releases</td>
+</tr>
+<tr>
+<td>Test Files</td>
+<td>30</td>
+<td>52</td>
+<td>✅ +22 files</td>
+</tr>
+<tr>
+<td>Source Files</td>
+<td>100+</td>
+<td>147</td>
+<td>✅ +47 files</td>
+</tr>
+<tr>
+<td>Permission System</td>
+<td>❌</td>
+<td>✅ Bitwise</td>
+<td>✅ New</td>
+</tr>
+<tr>
+<td>Comment Feature</td>
+<td>❌</td>
+<td>✅</td>
+<td>✅ New</td>
+</tr>
+<tr>
+<td>Video Access Stats</td>
+<td>❌</td>
+<td>✅</td>
+<td>✅ New</td>
+</tr>
+<tr>
+<td>MFA (TOTP)</td>
+<td>Partial</td>
+<td>✅ Complete</td>
+<td>✅ Improved</td>
+</tr>
+<tr>
+<td>JWT 0.11.5</td>
+<td>🔴</td>
+<td>✅ 0.12.6</td>
+<td>✅ Fixed</td>
+</tr>
+<tr>
+<td>HPA maxReplicas=1</td>
+<td>⚠️</td>
+<td>⚠️</td>
+<td>❌ Not fixed</td>
+</tr>
+<tr>
+<td>Guava 32.1.2</td>
+<td>⚠️</td>
+<td>✅ 33.3.1</td>
+<td>✅ Fixed</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="system-overview">System Overview<a class="headerlink" href="#system-overview" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+<th>Version</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Java Runtime</td>
+<td>✅</td>
+<td>24 (preview)</td>
+<td>Virtual Threads enabled</td>
+</tr>
+<tr>
+<td>Spring Boot</td>
+<td>✅</td>
+<td>3.5.0</td>
+<td>Latest stable</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>✅</td>
+<td>Latest</td>
+<td>Schema via Liquibase</td>
+</tr>
+<tr>
+<td>Maven</td>
+<td>✅</td>
+<td>3.x</td>
+<td>Build automation</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>✅</td>
+<td>Latest</td>
+<td>prod-31</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>✅</td>
+<td>Helm 0.1.0</td>
+<td>Deployed</td>
+</tr>
+<tr>
+<td>CI/CD</td>
+<td>✅</td>
+<td>GitHub Actions</td>
+<td>Fully automated</td>
+</tr>
+<tr>
+<td>Test Coverage</td>
+<td>✅</td>
+<td><strong>95%+</strong></td>
+<td>Exceeds industry standard</td>
+</tr>
+<tr>
+<td>Version</td>
+<td>✅</td>
+<td>prod-31</td>
+<td>Auto-incremented</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="architecture-assessment">Architecture Assessment<a class="headerlink" href="#architecture-assessment" title="Permanent link">&para;</a></h2>
+<h3 id="strengths">✅ Strengths<a class="headerlink" href="#strengths" title="Permanent link">&para;</a></h3>
+<h4 id="1-outstanding-test-coverage-growth">1. Outstanding Test Coverage Growth<a class="headerlink" href="#1-outstanding-test-coverage-growth" title="Permanent link">&para;</a></h4>
+<p>Coverage grew from 58% to <strong>95%+</strong> across four consecutive sprints:</p>
+<table>
+<thead>
+<tr>
+<th>Sprint</th>
+<th>Before</th>
+<th>After</th>
+<th>Tests Added</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>62.7%</td>
+<td>79.5%</td>
+<td>+96</td>
+</tr>
+<tr>
+<td>2</td>
+<td>79.5%</td>
+<td>86.7%</td>
+<td>+97</td>
+</tr>
+<tr>
+<td>3</td>
+<td>86.7%</td>
+<td>95%+</td>
+<td>+51</td>
+</tr>
+<tr>
+<td>4</td>
+<td>95%+</td>
+<td>95%+</td>
+<td>+32 (gap-fill)</td>
+</tr>
+</tbody>
+</table>
+<p>The CI coverage gate (+1%/commit) ensures coverage never regresses.</p>
+<h4 id="2-bitwise-permission-system">2. Bitwise Permission System<a class="headerlink" href="#2-bitwise-permission-system" title="Permanent link">&para;</a></h4>
+<p>A fully functional, fine-grained permission model was introduced:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Permission</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">READ</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">WRITE</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">EXEC</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">DELETE</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">ADMIN</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><code>@HasPermission(perm = Permission.ADMIN)</code> annotation on endpoints</li>
+<li>Backed by <code>@PreAuthorize</code> + Spring Security</li>
+<li>DB bootstrapped via <code>202605010001-init_permissions.sql</code></li>
+</ul>
+<h4 id="3-new-features-since-feb-2026">3. New Features Since Feb 2026<a class="headerlink" href="#3-new-features-since-feb-2026" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Comment system</strong> — <code>CommentController</code> + <code>create-comment-table</code> migration</li>
+<li><strong>Video Access Stats</strong> — view tracking (<code>video_access_stats</code> table)</li>
+<li><strong>Google Drive streaming</strong> — <code>VideoStorageServiceImpl</code> downloads and streams from Drive</li>
+<li><strong>Logout endpoint</strong> — added to <code>UserController</code></li>
+<li><strong>Complete MFA flow</strong> — magic link + TOTP end-to-end</li>
+</ul>
+<h4 id="4-concurrency-model">4. Concurrency Model<a class="headerlink" href="#4-concurrency-model" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>StructuredTaskScope</code> used in <code>VideoStorageServiceImpl.downloadFileFromFolder()</code> for parallel file downloads</li>
+<li>All I/O operations benefit from Virtual Threads via Spring Boot configuration</li>
+</ul>
+<h4 id="5-robust-cicd">5. Robust CI/CD<a class="headerlink" href="#5-robust-cicd" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Build → Test + Coverage → SonarCloud + Codecov
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>     → Docker Build → Push Registry → Update Helm → Deploy VM
+</code></pre></div>
+19 releases shipped without any recorded rollback.</p>
+<hr />
+<h2 id="open-issues">Open Issues<a class="headerlink" href="#open-issues" title="Permanent link">&para;</a></h2>
+<h3 id="issue-1-jwt-library-resolved-2026-05-30">✅ Issue 1: JWT Library — RESOLVED (2026-05-30)<a class="headerlink" href="#issue-1-jwt-library-resolved-2026-05-30" title="Permanent link">&para;</a></h3>
+<p><strong>Was:</strong> 0.11.5 (2022) — HIGH severity
+<strong>Now:</strong> 0.12.6 — security patches for signature validation and algorithm hardening applied.</p>
+<p>API migration completed in <code>JwtProvider.java</code> and <code>JwtProviderTest.java</code> (commit <code>bfac68e</code>). All tests pass.</p>
+<hr />
+<h3 id="issue-2-hpa-maxreplicas1">⚠️ Issue 2: HPA maxReplicas=1<a class="headerlink" href="#issue-2-hpa-maxreplicas1" title="Permanent link">&para;</a></h3>
+<p><strong>Severity:</strong> MEDIUM — <strong>Open since 2026-02-06</strong>
+<strong>File:</strong> <code>helm/funny-app/values.yaml:19</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">autoscaling</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">minReplicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">maxReplicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">    </span><span class="c1"># HPA defined but will never scale</span>
+</code></pre></div>
+<p><strong>Note:</strong> Scaling beyond 1 pod requires a distributed cache first (Redis per ADR-0003), since Guava is in-memory only.</p>
+<hr />
+<h3 id="issue-3-guava-resolved-2026-05-30">✅ Issue 3: Guava — RESOLVED (2026-05-30)<a class="headerlink" href="#issue-3-guava-resolved-2026-05-30" title="Permanent link">&para;</a></h3>
+<p><strong>Was:</strong> 32.1.2-jre — <strong>Now:</strong> 33.3.1-jre (commit <code>HEAD</code>)</p>
+<p>Zero breaking changes — only <code>CacheBuilder</code> and <code>Cache</code> APIs used; both stable across 32→33.</p>
+<table>
+<thead>
+<tr>
+<th>Dependency</th>
+<th>Current</th>
+<th>Latest</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>~~Guava~~</td>
+<td>~~32.1.2-jre~~</td>
+<td>~~33.3.1-jre~~</td>
+<td>✅ Done</td>
+</tr>
+<tr>
+<td>~~Commons Validator~~</td>
+<td>~~1.7~~</td>
+<td>~~1.9~~</td>
+<td>✅ Done</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="issue-4-platform-threads-in-structuredtaskscope">⚠️ Issue 4: Platform Threads in StructuredTaskScope<a class="headerlink" href="#issue-4-platform-threads-in-structuredtaskscope" title="Permanent link">&para;</a></h3>
+<p><strong>Severity:</strong> LOW
+<strong>File:</strong> <code>VideoStorageServiceImpl.java:123</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StructuredTaskScope</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="s">&quot;download&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Thread</span><span class="p">.</span><span class="na">ofPlatform</span><span class="p">().</span><span class="na">factory</span><span class="p">());</span>
+</code></pre></div>
+<p>Using a platform thread factory undermines the Virtual Threads model. Switch to virtual threads for consistency and efficiency:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StructuredTaskScope</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="s">&quot;download&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Thread</span><span class="p">.</span><span class="na">ofVirtual</span><span class="p">().</span><span class="na">factory</span><span class="p">());</span>
+</code></pre></div>
+<hr />
+<h3 id="issue-5-spring_profiles_activedev-in-helm">⚠️ Issue 5: <code>SPRING_PROFILES_ACTIVE=dev</code> in Helm<a class="headerlink" href="#issue-5-spring_profiles_activedev-in-helm" title="Permanent link">&para;</a></h3>
+<p><strong>Severity:</strong> LOW
+<strong>File:</strong> <code>helm/funny-app/values.yaml:35</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SPRING_PROFILES_ACTIVE</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dev&quot;</span><span class="w">   </span><span class="c1"># Swagger UI enabled</span>
+</code></pre></div>
+<p>If this chart is used for a production deployment, Swagger should not be exposed. Consider a separate <code>values-prod.yaml</code> with <code>"prod"</code>.</p>
+<hr />
+<h2 id="test-coverage">Test Coverage<a class="headerlink" href="#test-coverage" title="Permanent link">&para;</a></h2>
+<h3 id="current-state-95-instruction-coverage">✅ Current State: 95%+ Instruction Coverage<a class="headerlink" href="#current-state-95-instruction-coverage" title="Permanent link">&para;</a></h3>
+<p><strong>Test approach:</strong>
+- Plain Mockito (<code>@ExtendWith(MockitoExtension.class)</code>) — avoids <code>@WebMvcTest</code> CME issues with <code>StreamingResponseBody</code>
+- <code>MockedStatic</code> for <code>AppUtils</code> and <code>Converter</code> static methods
+- <code>@TempDir</code> for file system tests
+- Reflection for private method testing (<code>getQueryParam</code>, <code>toEntity</code>)</p>
+<p><strong>52 test files</strong> covering all layers: controllers, services, repositories, AOP, cache, utils.</p>
+<hr />
+<h2 id="project-structure">Project Structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>api/src/main/java/com/canhlabs/funnyapp/
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>├── aop/      ✅ AuditLog, RateLimited, HasPermission (NEW), Sensitive
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>├── cache/    ✅ VideoCacheImpl, ChunkIndexCacheImpl, StatsCacheImpl
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>├── client/   ✅ YouTubeApiClient
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>├── config/   ✅ Spring Security, AppProperties
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>├── dto/      ✅ Full DTO coverage
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>├── entity/   ✅ User, ShareLink, VideoSource (NEW), VideoAccessStats (NEW)
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>├── enums/    ✅ Permission (NEW — bitwise)
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>├── exception/✅ CustomException, ControllerAdvice
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>├── filter/   ✅ JWT filter
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>├── jobs/     ✅ AppScheduler
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>├── repo/     ✅ JPA repositories
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>├── service/  ✅ Interfaces + implementations
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>├── utils/    ✅ Contract, ContractDSL, AppUtils
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>└── web/      ✅ 7 controllers (AdminController, CommentController NEW, ...)
+</code></pre></div>
+<p><strong>Liquibase Migrations:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>202504300001  add-user-role
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>202504300002  add-video-status
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>20250601001   add-mfa
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>202506040001  create-email-request
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>202506220101  create-source-stream
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>202507210001  create_video_access_stats_table  (NEW)
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>202508240001  create-comment-table             (NEW)
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>202605010001  init_permissions                 (NEW)
+</code></pre></div></p>
+<hr />
+<h2 id="kubernetes-deployment">Kubernetes Deployment<a class="headerlink" href="#kubernetes-deployment" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Configuration</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Namespace</td>
+<td><code>funny-app</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Image</td>
+<td><code>nguyenhuuca/funny-app:prod-31</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Replicas</td>
+<td>1 (HPA: 1–1)</td>
+<td>⚠️ Not autoscaling</td>
+</tr>
+<tr>
+<td>Service</td>
+<td>NodePort 30080</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Resources</td>
+<td>400m–500m CPU, 600Mi RAM</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Probes</td>
+<td>Liveness + Readiness (exec curl)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Email Secrets</td>
+<td>Kubernetes Secret</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>GCP Credentials</td>
+<td>Secret mount <code>/secrets/googlekey.json</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Active Profile</td>
+<td><code>dev</code> (Swagger on)</td>
+<td>⚠️</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cicd-pipeline-health">CI/CD Pipeline Health<a class="headerlink" href="#cicd-pipeline-health" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> ✅ Fully Operational — 19 successful releases</p>
+<table>
+<thead>
+<tr>
+<th>Job</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build (JDK 24)</td>
+<td>✅</td>
+<td>Maven + preview flags</td>
+</tr>
+<tr>
+<td>Test + Coverage</td>
+<td>✅</td>
+<td>95%+ enforced</td>
+</tr>
+<tr>
+<td>SonarCloud</td>
+<td>✅</td>
+<td>Code quality gate</td>
+</tr>
+<tr>
+<td>Codecov</td>
+<td>✅</td>
+<td>Coverage tracking</td>
+</tr>
+<tr>
+<td>Docker Build/Push</td>
+<td>✅</td>
+<td>prod-31</td>
+</tr>
+<tr>
+<td>Helm Auto-update</td>
+<td>✅</td>
+<td>values.yaml patched per release</td>
+</tr>
+<tr>
+<td>VM Deploy</td>
+<td>✅</td>
+<td>SSH + SCP</td>
+</tr>
+<tr>
+<td>Git Tag</td>
+<td>✅</td>
+<td>Per release</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="security-posture">Security Posture<a class="headerlink" href="#security-posture" title="Permanent link">&para;</a></h2>
+<h3 id="strengths_1">✅ Strengths<a class="headerlink" href="#strengths_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Passwordless magic link authentication</li>
+<li>JWT authorization (upgrade pending)</li>
+<li>Complete MFA (TOTP)</li>
+<li>Bitwise permission system with <code>@HasPermission</code></li>
+<li>AOP audit logging with <code>@Sensitive</code> field masking</li>
+<li>Sliding-window rate limiting (<code>SlidingWindowRateLimiter</code>)</li>
+<li>CORS and Spring Security configured</li>
+</ul>
+<h3 id="open-gaps">Open Gaps<a class="headerlink" href="#open-gaps" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Issue</th>
+<th>Severity</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>JWT 0.11.5 — outdated security library</td>
+<td>HIGH</td>
+<td>✅ Fixed 2026-05-30</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Swagger exposed via <code>dev</code> profile in Helm</td>
+<td>LOW</td>
+<td>❌ Backlog</td>
+</tr>
+<tr>
+<td>3</td>
+<td>No secrets scanning in CI</td>
+<td>MEDIUM</td>
+<td>❌ Backlog</td>
+</tr>
+<tr>
+<td>4</td>
+<td>No container image scanning (Trivy)</td>
+<td>MEDIUM</td>
+<td>❌ Backlog</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="performance-considerations">Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permanent link">&para;</a></h2>
+<h3 id="current-optimizations">✅ Current Optimizations<a class="headerlink" href="#current-optimizations" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Virtual Threads for all I/O via Spring Boot</li>
+<li>Guava LRU cache for video chunks and metadata</li>
+<li>HTTP Range request support for streaming</li>
+<li><code>RandomAccessFile</code> for efficient video byte-range serving</li>
+<li><code>StructuredTaskScope</code> for parallel Drive file downloads</li>
+</ul>
+<h3 id="known-bottlenecks">Known Bottlenecks<a class="headerlink" href="#known-bottlenecks" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>In-memory cache</strong> — cannot share state across pods; blocks horizontal scaling (ADR-0003 tracks Redis migration)</li>
+<li><strong>Single replica</strong> — HPA defined but nonfunctional until maxReplicas &gt; 1</li>
+<li><strong>Platform threads in StructuredTaskScope</strong> — see Issue 4</li>
+</ol>
+<hr />
+<h2 id="action-items-prioritized">Action Items (Prioritized)<a class="headerlink" href="#action-items-prioritized" title="Permanent link">&para;</a></h2>
+<h3 id="completed-this-session">✅ Completed This Session<a class="headerlink" href="#completed-this-session" title="Permanent link">&para;</a></h3>
+<ol>
+<li>~~<strong>Upgrade JWT 0.11.5 → 0.12.6</strong>~~ — done, commit <code>bfac68e</code></li>
+</ol>
+<h3 id="completed-this-session_1">✅ Completed This Session<a class="headerlink" href="#completed-this-session_1" title="Permanent link">&para;</a></h3>
+<ol>
+<li>~~<strong>Upgrade JWT 0.11.5 → 0.12.6</strong>~~ — done, commit <code>bfac68e</code></li>
+<li>~~<strong>Upgrade Guava 32.1.2 → 33.3.1</strong>~~ — done</li>
+</ol>
+<h3 id="next-sprint">⚠️ Next Sprint<a class="headerlink" href="#next-sprint" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Switch <code>Thread.ofPlatform()</code> → <code>Thread.ofVirtual()</code></strong> in <code>VideoStorageServiceImpl</code> (30 min)</li>
+<li><strong>Fix HPA <code>maxReplicas: 1</code> → <code>5</code></strong> after Redis cache is in place</li>
+<li><strong>Add Trivy scan</strong> to CI pipeline (~2 hours)</li>
+</ol>
+<h3 id="backlog">🔵 Backlog<a class="headerlink" href="#backlog" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Redis cache implementation</strong> per ADR-0003 — prerequisite for horizontal scaling</li>
+<li><strong>Switch Helm probes</strong> from <code>exec: curl</code> to <code>httpGet</code> for efficiency</li>
+<li><strong>Enable Dependabot</strong> for automated dependency PRs</li>
+<li><strong>Set <code>SPRING_PROFILES_ACTIVE=prod</code></strong> in a dedicated <code>values-prod.yaml</code></li>
+</ol>
+<hr />
+<h2 id="conclusion">Conclusion<a class="headerlink" href="#conclusion" title="Permanent link">&para;</a></h2>
+<p>The <strong>Funny Movies</strong> application is in good health. The 95%+ test coverage milestone is a standout achievement — well above the 80% industry benchmark — and the 19 clean releases demonstrate a reliable CI/CD pipeline. The new permission system, comment feature, and video access stats meaningfully expand the product surface.</p>
+<p>The main outstanding item is the <strong>JWT library upgrade</strong>, which has been deferred since February. This should be the top priority for the current sprint before any further feature work.</p>
+<hr />
+<h2 id="appendix">Appendix<a class="headerlink" href="#appendix" title="Permanent link">&para;</a></h2>
+<p><strong>References:</strong>
+- Previous report: <code>artifacts/system_health_report_2026-02-06.md</code>
+- ADR-0003: Guava → Redis cache migration plan
+- OWASP Top 10 2021</p>
+<p><strong>Report Generated By:</strong> Principal Architect (Claude Sonnet 4.6)
+<strong>Timestamp:</strong> 2026-05-30
+<strong>Next Review:</strong> 2026-08-30</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2976 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Architecture documentation for the Funny Movies video streaming platform">
+      
+      
+        <meta name="author" content="nguyenhuuca">
+      
+      
+      
+        <link rel="prev" href="../plan-hls-migration/">
+      
+      
+        <link rel="next" href="../plan-admin-dashboard/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>React Migration - Funny Movies - Architecture Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#implementation-plan-migrate-frontend-to-react" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Funny Movies - Architecture Docs" class="md-header__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Funny Movies - Architecture Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              React Migration
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/nguyenhuuca/assessment" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nguyenhuuca/assessment
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Video%20Streaming%20System%20Architecture/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../adr/0000-template/" class="md-tabs__link">
+          
+  
+  
+  ADR
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../prd/PRD-hot-video-priority/" class="md-tabs__link">
+          
+  
+  
+  PRD
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../plan-hls-migration/" class="md-tabs__link">
+          
+  
+  
+  Plans
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../system_health_report_2026-05-30/" class="md-tabs__link">
+          
+  
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../trello-setup-guide/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Funny Movies - Architecture Docs" class="md-nav__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Funny Movies - Architecture Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nguyenhuuca/assessment" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nguyenhuuca/assessment
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Video%20Streaming%20System%20Architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Sequence-Diagram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sequence Diagram
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0000-template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0001-use-relational-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0001 - Use RDBMS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0002-backend-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0002 - Backend Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0003-use-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0003 - Cache Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0004-frontend-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0004 - Frontend Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0005 - LRU Video Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0006-hls-video-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0006 - HLS Video Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0007-admin-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0007 - Admin Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0008-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0008 - React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0009-unified-video-list-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0009 - Unified Video List API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/apr_binary_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Binary Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    PRD
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plans
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plans
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan-hls-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-foundation-3-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Foundation (3 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1: Foundation (3 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-1-initialize-vite-react-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1: Initialize Vite + React project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-2-api-client-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2: API client layer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-3-environment-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 3: Environment config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-auth-module-3-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Auth Module (3 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 2: Auth Module (3 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-4-authcontext-useauth-hook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4: AuthContext + useAuth hook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-5-loginform-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 5: LoginForm component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-6-magiclink-handler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 6: MagicLink handler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-7-mfa-modal-profile-modal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 7: MFA modal + Profile modal
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-video-core-4-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Video Core (4 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3: Video Core (4 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-8-video-model-category-classifier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 8: Video model + category classifier
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-9-videoplayer-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 9: VideoPlayer component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-10-videoswiper-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 10: VideoSwiper component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-11-votebuttons-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 11: VoteButtons component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-12-videotabs-videofeed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 12: VideoTabs + VideoFeed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-social-features-2-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Social Features (2 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 4: Social Features (2 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-13-commentpanel-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 13: CommentPanel component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-14-sharemodal-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 14: ShareModal component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-15-deleteconfirmmodal-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 15: DeleteConfirmModal component
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-layout-theme-15-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5: Layout &amp; Theme (1.5 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 5: Layout &amp; Theme (1.5 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-16-themecontext-usetheme-hook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 16: ThemeContext + useTheme hook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-17-appshell-header-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 17: AppShell (Header + Layout)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-6-cicd-update-1-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6: CI/CD Update (1 day)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6: CI/CD Update (1 day)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-18-update-deploy-webyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 18: Update deploy-web.yml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-19-nginx-spa-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 19: Nginx SPA routing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-7-testing-qa-2-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 7: Testing &amp; QA (2 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 7: Testing &amp; QA (2 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-20-unit-tests-for-auth-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 20: Unit tests for auth flows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-21-unit-tests-for-video-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 21: Unit tests for video components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-22-integration-smoke-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 22: Integration smoke tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#task-dependency-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task Dependency Graph
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files-changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Changed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files-not-changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files NOT Changed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#definition-of-done" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition of Done
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan-admin-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan-permissions-bitwise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions (Bitwise)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan-vid2-hot-score-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Score Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan-a-file-based-hooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan A (File-based Hooks)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan-b-direct-cli-spawn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan B (Direct CLI Spawn)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../system_health_report_2026-05-30/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-05-30
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../system_health_report_2026-02-06/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-02-06
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-13 EN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-13 VN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture_quality_report_2025-07-05/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-05
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../trello-setup-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trello Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../trello-board-status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trello Board Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-foundation-3-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Foundation (3 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1: Foundation (3 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-1-initialize-vite-react-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1: Initialize Vite + React project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-2-api-client-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2: API client layer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-3-environment-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 3: Environment config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-auth-module-3-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Auth Module (3 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 2: Auth Module (3 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-4-authcontext-useauth-hook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4: AuthContext + useAuth hook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-5-loginform-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 5: LoginForm component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-6-magiclink-handler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 6: MagicLink handler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-7-mfa-modal-profile-modal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 7: MFA modal + Profile modal
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-video-core-4-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Video Core (4 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3: Video Core (4 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-8-video-model-category-classifier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 8: Video model + category classifier
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-9-videoplayer-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 9: VideoPlayer component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-10-videoswiper-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 10: VideoSwiper component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-11-votebuttons-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 11: VoteButtons component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-12-videotabs-videofeed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 12: VideoTabs + VideoFeed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-social-features-2-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Social Features (2 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 4: Social Features (2 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-13-commentpanel-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 13: CommentPanel component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-14-sharemodal-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 14: ShareModal component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-15-deleteconfirmmodal-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 15: DeleteConfirmModal component
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-layout-theme-15-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5: Layout &amp; Theme (1.5 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 5: Layout &amp; Theme (1.5 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-16-themecontext-usetheme-hook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 16: ThemeContext + useTheme hook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-17-appshell-header-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 17: AppShell (Header + Layout)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-6-cicd-update-1-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6: CI/CD Update (1 day)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6: CI/CD Update (1 day)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-18-update-deploy-webyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 18: Update deploy-web.yml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-19-nginx-spa-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 19: Nginx SPA routing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-7-testing-qa-2-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 7: Testing &amp; QA (2 days)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 7: Testing &amp; QA (2 days)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-20-unit-tests-for-auth-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 20: Unit tests for auth flows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-21-unit-tests-for-video-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 21: Unit tests for video components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-22-integration-smoke-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 22: Integration smoke tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#task-dependency-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task Dependency Graph
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files-changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Changed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files-not-changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files NOT Changed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#definition-of-done" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition of Done
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="implementation-plan-migrate-frontend-to-react">Implementation Plan: Migrate Frontend to React<a class="headerlink" href="#implementation-plan-migrate-frontend-to-react" title="Permanent link">&para;</a></h1>
+<p><strong>Status:</strong> Ready for execution
+<strong>Estimated effort:</strong> 14–17 days
+<strong>Dependencies:</strong> ADR-0006 accepted, PRD-react-migration approved
+<strong>Handoff:</strong> Use <code>/swarm-execute</code> with this plan</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>Migrate <code>webapp/</code> from ~4,400 lines of vanilla JS + jQuery to React 19 + Vite.
+<strong>No backend changes.</strong> Feature parity only — no new features.
+Migration follows a bottom-up approach: infrastructure → auth → video core → social → layout → CI/CD → QA.</p>
+<hr />
+<h2 id="phase-1-foundation-3-days">Phase 1: Foundation (3 days)<a class="headerlink" href="#phase-1-foundation-3-days" title="Permanent link">&para;</a></h2>
+<h3 id="task-1-initialize-vite-react-project">Task 1: Initialize Vite + React project<a class="headerlink" href="#task-1-initialize-vite-react-project" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- <code>webapp/</code> contains a working Vite + React 19 project
+- <code>npm run dev</code> starts local dev server
+- <code>npm run build</code> produces <code>webapp/dist/</code>
+- Old files (<code>js/</code>, <code>index.html</code>, <code>css/</code>) moved to <code>webapp/legacy/</code> (kept for reference, not deployed)</p>
+<p><strong>Steps:</strong>
+1. Run <code>npm create vite@latest . -- --template react</code> inside <code>webapp/</code>
+2. Install dependencies: <code>npm install react-router-dom @tanstack/react-query react-bootstrap bootstrap react-swipeable @fortawesome/react-fontawesome @fortawesome/free-solid-svg-icons @fortawesome/free-brands-svg-icons</code>
+3. Install dev deps: <code>npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom</code>
+4. Create project structure (see below)
+5. Move legacy files: <code>mkdir legacy &amp;&amp; mv index.html js/ css/ manifest.json legacy/</code>
+6. Copy <code>manifest.json</code> to <code>public/manifest.json</code>
+7. Copy icons to <code>public/icons/</code></p>
+<p><strong>Project structure:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>webapp/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── public/
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── manifest.json
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   └── icons/
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>├── src/
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── api/          # API client + endpoint functions
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── components/   # Reusable UI components
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   │   ├── auth/     # Login, MFA, Profile, MagicLink
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   │   ├── video/    # VideoPlayer, VideoSwiper, VoteButtons
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   │   ├── comments/ # CommentPanel, CommentList, CommentInput
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   │   ├── modals/   # ShareModal, DeleteModal
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   │   └── layout/   # Header, Tabs, AppShell
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   ├── contexts/     # AuthContext, ThemeContext
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│   ├── hooks/        # useVideos, useComments, useVote, useSwipe
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│   ├── utils/        # Video model, category classifier, formatting
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│   ├── styles/       # assessment.css (migrated), theme vars
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│   ├── App.jsx
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│   └── main.jsx
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>├── legacy/           # Old vanilla JS files (reference only)
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>├── package.json
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>├── vite.config.js
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>└── vitest.config.js
+</code></pre></div></p>
+<hr />
+<h3 id="task-2-api-client-layer">Task 2: API client layer<a class="headerlink" href="#task-2-api-client-layer" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- All 14 API endpoints implemented as async functions
+- JWT + guestToken headers injected automatically
+- Error shape normalized: <code>{ message, status }</code> on failure
+- <code>REACT_APP_API_BASE_URL</code> (or <code>VITE_API_BASE_URL</code>) used for base URL</p>
+<p><strong>Steps:</strong>
+1. Create <code>src/api/client.js</code> — base Fetch wrapper with auth headers
+2. Create <code>src/api/auth.js</code> — join, me, verifyMagic, mfa/setup/verify/enable/disable
+3. Create <code>src/api/videos.js</code> — list, privateList, share, delete
+4. Create <code>src/api/comments.js</code> — list, post, delete
+5. Create <code>src/api/guestToken.js</code> — guest token management</p>
+<p><strong>Key implementation note:</strong> Replace <code>$.ajaxSetup()</code> global headers with a <code>createHeaders()</code> util that reads from <code>localStorage</code> each call (mirrors current behavior).</p>
+<hr />
+<h3 id="task-3-environment-config">Task 3: Environment config<a class="headerlink" href="#task-3-environment-config" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- <code>VITE_API_BASE_URL</code> sets API base URL
+- <code>.env.local</code> for local dev (points to <code>http://localhost:8081/v1/funny-app</code>)
+- Production uses <code>https://canh-labs.com/api/v1/funny-app</code></p>
+<p><strong>Steps:</strong>
+1. Create <code>webapp/.env.example</code> with <code>VITE_API_BASE_URL=...</code>
+2. Create <code>webapp/.env.local</code> for local dev (gitignored)
+3. Update <code>vite.config.js</code> — no proxy needed (CORS handled by Spring Boot)</p>
+<hr />
+<h2 id="phase-2-auth-module-3-days">Phase 2: Auth Module (3 days)<a class="headerlink" href="#phase-2-auth-module-3-days" title="Permanent link">&para;</a></h2>
+<h3 id="task-4-authcontext-useauth-hook">Task 4: AuthContext + useAuth hook<a class="headerlink" href="#task-4-authcontext-useauth-hook" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- JWT, user, guestToken stored in/read from localStorage
+- <code>useAuth()</code> provides: <code>{ user, isLoggedIn, login, logout, setGuestToken }</code>
+- Session validation on app mount (calls <code>GET /user/me</code>)
+- All components read auth via <code>useAuth()</code> — no direct localStorage reads</p>
+<p><strong>Steps:</strong>
+1. Create <code>src/contexts/AuthContext.jsx</code>
+2. <code>AuthProvider</code> wraps app, initializes state from localStorage
+3. <code>useEffect</code> on mount: validate JWT via <code>GET /user/me</code>; clear if invalid
+4. Expose: <code>login(jwt, user)</code>, <code>logout()</code>, <code>setGuestToken(token)</code>, <code>user</code>, <code>isLoggedIn</code>
+5. Create <code>src/hooks/useAuth.js</code> consuming context</p>
+<hr />
+<h3 id="task-5-loginform-component">Task 5: LoginForm component<a class="headerlink" href="#task-5-loginform-component" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- Email input → POST /user/join
+- Handles <code>INVITED_SEND</code> status (shows "check email" message)
+- Handles <code>MFA_REQUIRED</code> status (opens MFA modal)
+- Loading spinner during request
+- Error message display</p>
+<p><strong>Component:</strong> <code>src/components/auth/LoginForm.jsx</code></p>
+<hr />
+<h3 id="task-6-magiclink-handler">Task 6: MagicLink handler<a class="headerlink" href="#task-6-magiclink-handler" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- On app load, check <code>?token=</code> URL param
+- If present, call <code>GET /user/verify-magic?token=&lt;token&gt;</code>
+- On success: store JWT + user, redirect to <code>/</code>
+- On failure: show error message</p>
+<p><strong>Component:</strong> <code>src/components/auth/MagicLinkHandler.jsx</code> (rendered at route <code>/</code>)</p>
+<hr />
+<h3 id="task-7-mfa-modal-profile-modal">Task 7: MFA modal + Profile modal<a class="headerlink" href="#task-7-mfa-modal-profile-modal" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- <strong>MFA Login Modal</strong>: OTP input → POST /user/mfa/verify → login on success
+- <strong>Profile Modal</strong> tabs:
+  - User Info tab: email, member since, last login (read-only)
+  - MFA Setup tab: show QR code, verify code to enable, or disable with code
+- All existing form validation behavior preserved</p>
+<p><strong>Components:</strong>
+- <code>src/components/auth/MFALoginModal.jsx</code>
+- <code>src/components/auth/ProfileModal.jsx</code></p>
+<hr />
+<h2 id="phase-3-video-core-4-days">Phase 3: Video Core (4 days)<a class="headerlink" href="#phase-3-video-core-4-days" title="Permanent link">&para;</a></h2>
+<h3 id="task-8-video-model-category-classifier">Task 8: Video model + category classifier<a class="headerlink" href="#task-8-video-model-category-classifier" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- <code>Video</code> class with same <code>determineCategory()</code> logic (keyword matching: funny/regular)
+- <code>useVideos(category)</code> hook: React Query query for <code>GET /video-stream/list</code>
+- <code>usePrivateVideos()</code> hook: React Query query for <code>GET /private-videos</code> (auth required)
+- Videos sorted by upvotes (matching current <code>sort</code> logic)</p>
+<p><strong>Files:</strong>
+- <code>src/utils/videoModel.js</code> — Video class + category logic
+- <code>src/hooks/useVideos.js</code> — React Query wrappers</p>
+<hr />
+<h3 id="task-9-videoplayer-component">Task 9: VideoPlayer component<a class="headerlink" href="#task-9-videoplayer-component" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- HTML5 <code>&lt;video&gt;</code> with <code>autoPlay</code>, <code>playsInline</code>, <code>preload="auto"</code>
+- Controls: play/pause toggle, mute toggle, progress bar (seekable)
+- Loading spinner shown on <code>loadstart</code>/<code>waiting</code> events, hidden on <code>canplay</code>
+- Center play icon shown when paused
+- Expandable description overlay with "See more" toggle
+- Video ends → callback to advance to next</p>
+<p><strong>Component:</strong> <code>src/components/video/VideoPlayer.jsx</code>
+<strong>Key:</strong> Use <code>useRef</code> for video element — do NOT use React state for video playback controls (causes rerenders/flicker)</p>
+<hr />
+<h3 id="task-10-videoswiper-component">Task 10: VideoSwiper component<a class="headerlink" href="#task-10-videoswiper-component" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- Displays current video (index-based)
+- Left/right swipe navigation via <code>react-swipeable</code>
+- Keyboard left/right arrow navigation
+- Navigation feedback animation (flash left/right)
+- Touch events don't conflict with video controls
+- Auto-advance on video end</p>
+<p><strong>Component:</strong> <code>src/components/video/VideoSwiper.jsx</code>
+<strong>Key:</strong> Maintain <code>currentIndex</code> in React state; video array from <code>useVideos()</code> hook</p>
+<hr />
+<h3 id="task-11-votebuttons-component">Task 11: VoteButtons component<a class="headerlink" href="#task-11-votebuttons-component" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- Up vote / down vote buttons
+- Visual state: active/inactive icon toggle (matching current <code>fa-thumbs-up</code> logic)
+- Vote state persisted per video in component state (resets on unmount)
+- <code>POST /video/like</code> and <code>POST /video/unlike</code> on click</p>
+<p><strong>Component:</strong> <code>src/components/video/VoteButtons.jsx</code></p>
+<hr />
+<h3 id="task-12-videotabs-videofeed">Task 12: VideoTabs + VideoFeed<a class="headerlink" href="#task-12-videotabs-videofeed" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- Three tabs: Popular, Funny, Private
+- Private tab hidden unless <code>isLoggedIn</code>
+- Clicking Private tab loads private videos (lazy load on tab click)
+- Each tab has its own <code>VideoSwiper</code> with independent index state</p>
+<p><strong>Components:</strong>
+- <code>src/components/layout/VideoTabs.jsx</code>
+- <code>src/components/video/VideoFeed.jsx</code></p>
+<hr />
+<h2 id="phase-4-social-features-2-days">Phase 4: Social Features (2 days)<a class="headerlink" href="#phase-4-social-features-2-days" title="Permanent link">&para;</a></h2>
+<h3 id="task-13-commentpanel-component">Task 13: CommentPanel component<a class="headerlink" href="#task-13-commentpanel-component" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- Slides in from right (CSS animation matching current <code>slideInRight</code>)
+- Loads comments via <code>GET /videos/{id}/comments</code>
+- Displays avatar (initials + hashCode color, same logic as current)
+- Comment time formatting (relative, matching current <code>formatCommentTime</code>)
+- Post comment via <code>POST /videos/{id}/comments</code>
+- Delete own comment (DELETE with confirmation)
+- Enter key sends comment
+- Mobile keyboard avoidance (panel repositions when virtual keyboard appears)
+- Comment badge count on video action button</p>
+<p><strong>Component:</strong> <code>src/components/comments/CommentPanel.jsx</code></p>
+<hr />
+<h3 id="task-14-sharemodal-component">Task 14: ShareModal component<a class="headerlink" href="#task-14-sharemodal-component" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- YouTube URL input, title, description, private checkbox
+- POST /share-links on submit
+- Loading spinner during submit
+- Clears form on modal close
+- Success: closes modal, new video appears in feed (React Query invalidation)</p>
+<p><strong>Component:</strong> <code>src/components/modals/ShareModal.jsx</code></p>
+<hr />
+<h3 id="task-15-deleteconfirmmodal-component">Task 15: DeleteConfirmModal component<a class="headerlink" href="#task-15-deleteconfirmmodal-component" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- "Are you sure?" confirmation
+- DELETE /share-links/{id} on confirm
+- On success: remove video from UI (React Query mutation)</p>
+<p><strong>Component:</strong> <code>src/components/modals/DeleteConfirmModal.jsx</code></p>
+<hr />
+<h2 id="phase-5-layout-theme-15-days">Phase 5: Layout &amp; Theme (1.5 days)<a class="headerlink" href="#phase-5-layout-theme-15-days" title="Permanent link">&para;</a></h2>
+<h3 id="task-16-themecontext-usetheme-hook">Task 16: ThemeContext + useTheme hook<a class="headerlink" href="#task-16-themecontext-usetheme-hook" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- Dark/light theme toggle
+- Persists to localStorage
+- Reads OS preference (<code>prefers-color-scheme</code>) as fallback
+- Sets <code>data-theme</code> attribute on <code>&lt;html&gt;</code> (same as current)
+- Moon/sun icon toggle</p>
+<p><strong>Files:</strong>
+- <code>src/contexts/ThemeContext.jsx</code>
+- <code>src/hooks/useTheme.js</code></p>
+<hr />
+<h3 id="task-17-appshell-header-layout">Task 17: AppShell (Header + Layout)<a class="headerlink" href="#task-17-appshell-header-layout" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- App title + icon
+- Global message banner (<code>showMessage</code> equivalent)
+- Email input + Login button (shown when not logged in)
+- Share button, Profile button, Logout button (shown when logged in)
+- Welcome message with email
+- Theme toggle button (top-right)
+- VideoTabs below header</p>
+<p><strong>Component:</strong> <code>src/components/layout/AppShell.jsx</code></p>
+<hr />
+<h2 id="phase-6-cicd-update-1-day">Phase 6: CI/CD Update (1 day)<a class="headerlink" href="#phase-6-cicd-update-1-day" title="Permanent link">&para;</a></h2>
+<h3 id="task-18-update-deploy-webyml">Task 18: Update deploy-web.yml<a class="headerlink" href="#task-18-update-deploy-webyml" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- Workflow installs Node.js 20
+- Runs <code>npm ci</code> in <code>webapp/</code>
+- Runs <code>npm run build</code> in <code>webapp/</code>
+- SCPs <code>webapp/dist/</code> to server (not <code>webapp/</code>)
+- Server receives deployable static files in Nginx document root</p>
+<p><strong>Changes to <code>.github/workflows/deploy-web.yml</code>:</strong>
+1. Add step: <code>actions/setup-node@v4</code> with Node.js 20
+2. Add step: <code>npm ci</code> in <code>webapp/</code>
+3. Add step: <code>npm run build</code> in <code>webapp/</code>
+4. Update SCP source from <code>webapp/</code> to <code>webapp/dist/</code></p>
+<hr />
+<h3 id="task-19-nginx-spa-routing">Task 19: Nginx SPA routing<a class="headerlink" href="#task-19-nginx-spa-routing" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- <code>try_files $uri $uri/ /index.html</code> configured for React Router
+- No 404 on page refresh with client-side routes</p>
+<p><strong>Note:</strong> Verify with ops team if Nginx config needs updating on server; may be out of scope for this PR.</p>
+<hr />
+<h2 id="phase-7-testing-qa-2-days">Phase 7: Testing &amp; QA (2 days)<a class="headerlink" href="#phase-7-testing-qa-2-days" title="Permanent link">&para;</a></h2>
+<h3 id="task-20-unit-tests-for-auth-flows">Task 20: Unit tests for auth flows<a class="headerlink" href="#task-20-unit-tests-for-auth-flows" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- AuthContext: login, logout, session restoration
+- MagicLink handler: token extraction + API call
+- API client: header injection, error normalization</p>
+<hr />
+<h3 id="task-21-unit-tests-for-video-components">Task 21: Unit tests for video components<a class="headerlink" href="#task-21-unit-tests-for-video-components" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- VideoPlayer: play/pause/mute controls
+- VideoSwiper: left/right navigation, auto-advance
+- VoteButtons: toggle state, API calls</p>
+<hr />
+<h3 id="task-22-integration-smoke-tests">Task 22: Integration smoke tests<a class="headerlink" href="#task-22-integration-smoke-tests" title="Permanent link">&para;</a></h3>
+<p><strong>Acceptance criteria:</strong>
+- App renders without errors
+- Tab switching shows correct content
+- Share modal opens/closes/clears</p>
+<hr />
+<h2 id="task-dependency-graph">Task Dependency Graph<a class="headerlink" href="#task-dependency-graph" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>T1 (Vite setup)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  ├── T2 (API client)
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  │     └── T4 (AuthContext) ──── T5, T6, T7
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  │           └── T8 (Video model) ──── T9, T10, T11, T12
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  │                                          └── T13, T14, T15
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  ├── T3 (Env config)
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  └── T16 (ThemeContext)
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>          └── T17 (AppShell) ──── all components integrated
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>T12 + T13 + T14 + T15 + T16 + T17 → T18 (CI/CD)
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>T17 → T19 (Nginx)
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>T18 → T20, T21, T22 (Tests)
+</code></pre></div>
+<hr />
+<h2 id="files-changed">Files Changed<a class="headerlink" href="#files-changed" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>webapp/package.json</code></td>
+<td>New — Vite + React project</td>
+</tr>
+<tr>
+<td><code>webapp/vite.config.js</code></td>
+<td>New — Vite configuration</td>
+</tr>
+<tr>
+<td><code>webapp/src/</code></td>
+<td>New — all React source files</td>
+</tr>
+<tr>
+<td><code>webapp/public/</code></td>
+<td>New — static assets</td>
+</tr>
+<tr>
+<td><code>webapp/legacy/</code></td>
+<td>New — moved vanilla JS files (reference)</td>
+</tr>
+<tr>
+<td><code>.github/workflows/deploy-web.yml</code></td>
+<td>Update — add Node build step</td>
+</tr>
+</tbody>
+</table>
+<h2 id="files-not-changed">Files NOT Changed<a class="headerlink" href="#files-not-changed" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api/</code> (all backend)</td>
+<td>No backend changes required</td>
+</tr>
+<tr>
+<td><code>helm/</code></td>
+<td>No Helm chart changes</td>
+</tr>
+<tr>
+<td><code>doc/adr/0004-frontend-structure.md</code></td>
+<td>ADR-0006 supersedes, do not delete</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="definition-of-done">Definition of Done<a class="headerlink" href="#definition-of-done" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] <code>npm run build</code> succeeds with no errors or warnings</li>
+<li>[ ] All 14 API calls function correctly against production API</li>
+<li>[ ] Feature parity verified: auth, video, comments, theme, modals</li>
+<li>[ ] <code>npm test</code> passes all unit tests</li>
+<li>[ ] CI pipeline deploys built React app via SCP</li>
+<li>[ ] Mobile swipe navigation tested on real device</li>
+<li>[ ] ADR-0006 updated to "Accepted"</li>
+<li>[ ] Tech strategy updated: JavaScript section updated to React + Vite</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
