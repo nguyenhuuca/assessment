@@ -3101,13 +3101,12 @@
 <li>Health checks at <code>/actuator/health</code></li>
 </ul>
 <h4 id="4-robust-cicd-pipeline">4. Robust CI/CD Pipeline<a class="headerlink" href="#4-robust-cicd-pipeline" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>graph LR
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    A[Build] --&gt; B[Test + Coverage]
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    B --&gt; C[Docker Build]
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    B --&gt; D[Deploy VM]
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    C --&gt; E[Push to Registry]
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    E --&gt; F[Update Helm]
-</code></pre></div>
+<pre class="mermaid"><code>graph LR
+    A[Build] --&gt; B[Test + Coverage]
+    B --&gt; C[Docker Build]
+    B --&gt; D[Deploy VM]
+    C --&gt; E[Push to Registry]
+    E --&gt; F[Update Helm]</code></pre>
 <p><strong>Pipeline Features:</strong>
 - Auto-increment version management
 - Progressive coverage enforcement (+1% per commit)
@@ -3137,28 +3136,28 @@
 <h3 id="issue-1-hardcoded-credentials-in-version-control">🔴 Issue 1: Hardcoded Credentials in Version Control<a class="headerlink" href="#issue-1-hardcoded-credentials-in-version-control" title="Permanent link">&para;</a></h3>
 <p><strong>Severity:</strong> HIGH (CWE-798)
 <strong>File:</strong> <code>helm/funny-app/values.yaml:47</code></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">env</span><span class="p">:</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DB_PASS</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;123456&quot;</span><span class="w">  </span><span class="c1"># ❌ HARDCODED PASSWORD</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DB_PASS</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;123456&quot;</span><span class="w">  </span><span class="c1"># ❌ HARDCODED PASSWORD</span>
 </code></pre></div>
 <p><strong>Impact:</strong>
 - Database password exposed in Git history
 - Violates OWASP A07:2021 - Identification and Authentication Failures
 - Compliance violation (PCI-DSS, SOC2)</p>
 <p><strong>Remediation:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">env</span><span class="p">:</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DB_PASS</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">valueFrom</span><span class="p">:</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">      </span><span class="nt">secretKeyRef</span><span class="p">:</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">database-credentials</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">        </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DB_PASS</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DB_PASS</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">valueFrom</span><span class="p">:</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">      </span><span class="nt">secretKeyRef</span><span class="p">:</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">database-credentials</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DB_PASS</span>
 </code></pre></div></p>
 <p><strong>Action:</strong> Move to Kubernetes Secrets immediately.</p>
 <hr />
 <h3 id="issue-2-outdated-jwt-library-security-vulnerability">🔴 Issue 2: Outdated JWT Library (Security Vulnerability)<a class="headerlink" href="#issue-2-outdated-jwt-library-security-vulnerability" title="Permanent link">&para;</a></h3>
 <p><strong>Severity:</strong> HIGH (CVE Risk)
 <strong>File:</strong> <code>api/pom.xml:112</code></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">&lt;jsonwebtoken.version&gt;</span>0.11.5<span class="nt">&lt;/jsonwebtoken.version&gt;</span><span class="w">  </span><span class="cm">&lt;!-- ❌ OLD --&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">&lt;jsonwebtoken.version&gt;</span>0.11.5<span class="nt">&lt;/jsonwebtoken.version&gt;</span><span class="w">  </span><span class="cm">&lt;!-- ❌ OLD --&gt;</span>
 </code></pre></div>
 <p><strong>Current Version:</strong> 0.11.5 (released 2022)
 <strong>Latest Version:</strong> 0.12.6 (2024) with security patches</p>
@@ -3167,15 +3166,15 @@
 - Algorithm confusion vulnerabilities
 - Missing hardening features</p>
 <p><strong>Remediation:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">&lt;jsonwebtoken.version&gt;</span>0.12.6<span class="nt">&lt;/jsonwebtoken.version&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">&lt;jsonwebtoken.version&gt;</span>0.12.6<span class="nt">&lt;/jsonwebtoken.version&gt;</span>
 </code></pre></div></p>
 <p><strong>Action:</strong> Upgrade to 0.12.6 and verify JWT signature validation logic.</p>
 <hr />
 <h3 id="issue-3-in-memory-cache-prevents-horizontal-scaling">🔴 Issue 3: In-Memory Cache Prevents Horizontal Scaling<a class="headerlink" href="#issue-3-in-memory-cache-prevents-horizontal-scaling" title="Permanent link">&para;</a></h3>
 <p><strong>Severity:</strong> HIGH (Architecture)
 <strong>File:</strong> <code>api/src/main/resources/application.yaml:126</code></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">cache</span><span class="p">:</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guava</span><span class="w">  </span><span class="c1"># ❌ IN-MEMORY ONLY</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">cache</span><span class="p">:</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guava</span><span class="w">  </span><span class="c1"># ❌ IN-MEMORY ONLY</span>
 </code></pre></div>
 <p><strong>Impact:</strong>
 - <strong>No horizontal scaling</strong>: Cache inconsistency across pods
@@ -3183,8 +3182,8 @@
 - <strong>Single point of failure</strong>: No cache redundancy
 - <strong>Rate limiter broken</strong>: Won't work across multiple pods</p>
 <p><strong>Current State:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Pod 1 [Guava Cache] ← User A requests
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>Pod 2 [Guava Cache] ← User A requests (CACHE MISS!)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Pod 1 [Guava Cache] ← User A requests
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>Pod 2 [Guava Cache] ← User A requests (CACHE MISS!)
 </code></pre></div></p>
 <p><strong>Documented Issue:</strong> ADR-0003 already acknowledges this and plans Redis migration.</p>
 <p><strong>Remediation:</strong>
@@ -3234,18 +3233,18 @@
 <hr />
 <h3 id="issue-5-hpa-misconfiguration">⚠️ Issue 5: HPA Misconfiguration<a class="headerlink" href="#issue-5-hpa-misconfiguration" title="Permanent link">&para;</a></h3>
 <p><strong>File:</strong> <code>helm/funny-app/values.yaml:18</code></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">autoscaling</span><span class="p">:</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">minReplicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">maxReplicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">  </span><span class="c1"># ❌ NOT ACTUALLY AUTOSCALING</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">autoscaling</span><span class="p">:</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">minReplicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">maxReplicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">  </span><span class="c1"># ❌ NOT ACTUALLY AUTOSCALING</span>
 </code></pre></div>
 <p><strong>Impact:</strong> HPA is enabled but won't scale (min=max).</p>
 <p><strong>Remediation:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">autoscaling</span><span class="p">:</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">minReplicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nt">maxReplicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w">  </span><span class="c1"># Allow scaling to 5 pods</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nt">targetCPUUtilizationPercentage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">autoscaling</span><span class="p">:</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">minReplicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">maxReplicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w">  </span><span class="c1"># Allow scaling to 5 pods</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">targetCPUUtilizationPercentage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
 </code></pre></div></p>
 <p><strong>Note:</strong> This requires fixing Issue 3 (Redis cache) first!</p>
 <hr />
@@ -3263,27 +3262,27 @@
 <hr />
 <h2 id="project-structure-validation">Project Structure Validation<a class="headerlink" href="#project-structure-validation" title="Permanent link">&para;</a></h2>
 <h3 id="directory-structure">✅ Directory Structure<a class="headerlink" href="#directory-structure" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>api/
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>├── src/main/java/com/canhlabs/funnyapp/
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>│   ├── aop/              ✅ AOP aspects
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>│   ├── cache/            ✅ Caching implementations
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>│   ├── client/           ✅ External API clients
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>│   ├── config/           ✅ Spring configuration
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>│   ├── dto/              ✅ Data Transfer Objects
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>│   ├── entity/           ✅ JPA entities
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>│   ├── enums/            ✅ Enumerations
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>│   ├── exception/        ✅ Error handling
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>│   ├── filter/           ✅ HTTP filters
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>│   ├── jobs/             ✅ Background jobs
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>│   ├── repo/             ✅ JPA repositories
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>│   ├── service/          ✅ Business logic
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>│   ├── utils/            ✅ Utilities
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>│   ├── web/              ✅ REST controllers
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>│   └── FunnyApp.java     ✅ Main application
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>├── src/main/resources/
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>│   ├── application.yaml  ✅ Configuration
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>│   └── db/changelog/     ✅ Liquibase migrations
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>└── src/test/java/        ✅ 30 test files
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>api/
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>├── src/main/java/com/canhlabs/funnyapp/
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>│   ├── aop/              ✅ AOP aspects
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>│   ├── cache/            ✅ Caching implementations
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>│   ├── client/           ✅ External API clients
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>│   ├── config/           ✅ Spring configuration
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>│   ├── dto/              ✅ Data Transfer Objects
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>│   ├── entity/           ✅ JPA entities
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>│   ├── enums/            ✅ Enumerations
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>│   ├── exception/        ✅ Error handling
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>│   ├── filter/           ✅ HTTP filters
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>│   ├── jobs/             ✅ Background jobs
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>│   ├── repo/             ✅ JPA repositories
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>│   ├── service/          ✅ Business logic
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>│   ├── utils/            ✅ Utilities
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>│   ├── web/              ✅ REST controllers
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>│   └── FunnyApp.java     ✅ Main application
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>├── src/main/resources/
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>│   ├── application.yaml  ✅ Configuration
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>│   └── db/changelog/     ✅ Liquibase migrations
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>└── src/test/java/        ✅ 30 test files
 </code></pre></div>
 <p><strong>Files Count:</strong>
 - Source files: 100+
@@ -3293,14 +3292,14 @@
 <h2 id="configuration-completeness">Configuration Completeness<a class="headerlink" href="#configuration-completeness" title="Permanent link">&para;</a></h2>
 <h3 id="environment-variables">✅ Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
 <p><strong>Required variables documented in <code>.env.example</code>:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>JWT_SECRET<span class="w">          </span>✅<span class="w"> </span><span class="m">32</span>+<span class="w"> </span>character<span class="w"> </span>secret
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>DB_PASS<span class="w">             </span>✅<span class="w"> </span>PostgreSQL<span class="w"> </span>password
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>DB_HOST<span class="w">             </span>✅<span class="w"> </span>Database<span class="w"> </span>host
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>GOOGLE_KEY<span class="w">          </span>✅<span class="w"> </span>YouTube<span class="w"> </span>Data<span class="w"> </span>API<span class="w"> </span>key
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>GPT_KEY<span class="w">             </span>✅<span class="w"> </span>OpenAI<span class="w"> </span>API<span class="w"> </span>key
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>EMAIL_SENDER<span class="w">        </span>✅<span class="w"> </span>Gmail<span class="w"> </span>SMTP<span class="w"> </span>username
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>EMAIL_PASS<span class="w">          </span>✅<span class="w"> </span>Gmail<span class="w"> </span>SMTP<span class="w"> </span>password
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>OTEL_*<span class="w">              </span>✅<span class="w"> </span>OpenTelemetry<span class="w"> </span>config
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>JWT_SECRET<span class="w">          </span>✅<span class="w"> </span><span class="m">32</span>+<span class="w"> </span>character<span class="w"> </span>secret
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>DB_PASS<span class="w">             </span>✅<span class="w"> </span>PostgreSQL<span class="w"> </span>password
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>DB_HOST<span class="w">             </span>✅<span class="w"> </span>Database<span class="w"> </span>host
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>GOOGLE_KEY<span class="w">          </span>✅<span class="w"> </span>YouTube<span class="w"> </span>Data<span class="w"> </span>API<span class="w"> </span>key
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>GPT_KEY<span class="w">             </span>✅<span class="w"> </span>OpenAI<span class="w"> </span>API<span class="w"> </span>key
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>EMAIL_SENDER<span class="w">        </span>✅<span class="w"> </span>Gmail<span class="w"> </span>SMTP<span class="w"> </span>username
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>EMAIL_PASS<span class="w">          </span>✅<span class="w"> </span>Gmail<span class="w"> </span>SMTP<span class="w"> </span>password
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>OTEL_*<span class="w">              </span>✅<span class="w"> </span>OpenTelemetry<span class="w"> </span>config
 </code></pre></div></p>
 <p><strong>Status:</strong> All critical variables documented. Actual <code>.env</code> file exists locally.</p>
 <h3 id="database-setup">✅ Database Setup<a class="headerlink" href="#database-setup" title="Permanent link">&para;</a></h3>
@@ -3412,20 +3411,20 @@
 <li>[ ] <strong>Gmail SMTP credentials</strong> for magic links</li>
 </ul>
 <h3 id="setup-steps">Setup Steps<a class="headerlink" href="#setup-steps" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># 1. Create database</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>createdb<span class="w"> </span>funnyapp
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>psql<span class="w"> </span>-d<span class="w"> </span>funnyapp<span class="w"> </span>-f<span class="w"> </span>db/dump.sql
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1"># 2. Configure environment</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>cp<span class="w"> </span>api/.env.example<span class="w"> </span>api/.env
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1"># Edit .env with actual credentials</span>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="c1"># 3. Build and run</span>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="nb">cd</span><span class="w"> </span>api
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>./startLocal.sh
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="c1"># 4. Verify</span>
-<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>curl<span class="w"> </span>http://localhost:8081/actuator/health
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># 1. Create database</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>createdb<span class="w"> </span>funnyapp
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>psql<span class="w"> </span>-d<span class="w"> </span>funnyapp<span class="w"> </span>-f<span class="w"> </span>db/dump.sql
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="c1"># 2. Configure environment</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>cp<span class="w"> </span>api/.env.example<span class="w"> </span>api/.env
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1"># Edit .env with actual credentials</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="c1"># 3. Build and run</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="nb">cd</span><span class="w"> </span>api
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>./startLocal.sh
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="c1"># 4. Verify</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>curl<span class="w"> </span>http://localhost:8081/actuator/health
 </code></pre></div>
 <h3 id="access-points">Access Points<a class="headerlink" href="#access-points" title="Permanent link">&para;</a></h3>
 <ul>
@@ -3664,6 +3663,8 @@
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
     
   </body>
