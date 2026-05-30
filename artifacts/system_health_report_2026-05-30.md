@@ -42,11 +42,11 @@ The JWT library has been upgraded to 0.12.6 (resolved this session). The remaini
 | Spring Boot | ✅ | 3.5.0 | Latest stable |
 | PostgreSQL | ✅ | Latest | Schema via Liquibase |
 | Maven | ✅ | 3.x | Build automation |
-| Docker | ✅ | Latest | prod-28 |
+| Docker | ✅ | Latest | prod-29 |
 | Kubernetes | ✅ | Helm 0.1.0 | Deployed |
 | CI/CD | ✅ | GitHub Actions | Fully automated |
 | Test Coverage | ✅ | **95%+** | Exceeds industry standard |
-| Version | ✅ | prod-28 | Auto-incremented |
+| Version | ✅ | prod-29 | Auto-incremented |
 
 ---
 
@@ -218,7 +218,7 @@ api/src/main/java/com/canhlabs/funnyapp/
 | Resource | Configuration | Status |
 |----------|--------------|--------|
 | Namespace | `funny-app` | ✅ |
-| Image | `nguyenhuuca/funny-app:prod-28` | ✅ |
+| Image | `nguyenhuuca/funny-app:prod-29` | ✅ |
 | Replicas | 1 (HPA: 1–1) | ⚠️ Not autoscaling |
 | Service | NodePort 30080 | ✅ |
 | Resources | 400m–500m CPU, 600Mi RAM | ✅ |
