@@ -25,7 +25,7 @@ Full architecture docs, ADRs, plans, and reports:
 
 ## Overview
 
-**Funny Movies** is a video streaming web application built with **Java 24** and **Spring Boot 3.5.0**, backed by a **React 19** SPA frontend. It lets users share, watch, and comment on funny videos sourced from YouTube, with AI-powered recommendations via ChatGPT.
+**Funny Movies** is a video streaming web application built with **Java 24** and **Spring Boot 3.5.0**, backed by a **React 19** SPA frontend. It lets users upload, share, watch, and comment on funny videos.
 
 ### Key Features
 
@@ -34,9 +34,8 @@ Full architecture docs, ADRs, plans, and reports:
 - **MFA** — optional TOTP-based two-factor authentication
 - **Video sharing** — share private video links with other users
 - **Comments** — per-video comment threads
+- **Google Drive sync** — auto-sync videos from Google Drive to server every 15 minutes
 - **Admin dashboard** — manage videos, accounts, and view stats
-- **AI recommendations** — ChatGPT suggests trending YouTube content
-- **YouTube integration** — fetch and display top videos via YouTube Data API v3
 
 ---
 
@@ -94,7 +93,7 @@ api/src/main/java/com/canhlabs/funnyapp/
 ├── repo/         # JPA repositories
 ├── entity/       # JPA entities
 ├── dto/          # Data Transfer Objects
-├── client/       # YouTube API client
+├── client/       # External API clients
 ├── config/       # Spring configuration
 ├── cache/        # Guava LRU caches
 ├── aop/          # @AuditLog, @RateLimited aspects
@@ -102,7 +101,7 @@ api/src/main/java/com/canhlabs/funnyapp/
 └── utils/        # Validation, helpers
 ```
 
-**Virtual Threads** enabled globally via `spring.threads.virtual.enabled=true`, with `StructuredTaskScope` used for coordinated concurrent calls (YouTube API + ChatGPT + email).
+**Virtual Threads** enabled globally via `spring.threads.virtual.enabled=true`, with `StructuredTaskScope` used for coordinated concurrent calls (external APIs + email).
 
 **Caching** — four Guava LRU caches:
 - `VideoCacheImpl` — video metadata
@@ -124,8 +123,6 @@ api/src/main/java/com/canhlabs/funnyapp/
 - Maven 3.6+
 - PostgreSQL
 - Node.js 18+
-- Google API Key (YouTube Data API v3)
-- OpenAI API Key
 
 ### Database
 
@@ -148,9 +145,8 @@ DB_NAME=funnyapp
 DB_PASS=your_password
 DB_HOST=localhost
 
-GOOGLE_KEY=your_youtube_api_key
-GPT_KEY=your_openai_key
 JWT_SECRET=your_jwt_secret
+GOOGLE_KEY=your_google_api_key
 
 EMAIL_SENDER=you@example.com
 EMAIL_PASS=your_email_password
