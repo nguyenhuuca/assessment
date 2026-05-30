@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -87,6 +88,11 @@ class VideoStreamControllerTest {
         assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_RANGE)).isNotNull();
         assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE)).isEqualTo("video/mp4");
         assertThat(response.getHeaders().getFirst(HttpHeaders.ACCEPT_RANGES)).isEqualTo("bytes");
+
+        // Execute the streaming body to cover the lambda branch
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        response.getBody().writeTo(out);
+        assertThat(out.toByteArray()).isEqualTo("videodata".getBytes());
     }
 
     @Test

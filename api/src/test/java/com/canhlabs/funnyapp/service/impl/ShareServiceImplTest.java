@@ -179,6 +179,64 @@ class ShareServiceImplTest {
     }
 
     @Test
+    void shareLink_googleDriveUrl_buildsVideoDtoFromRequest() {
+        try (MockedStatic<AppUtils> appUtilsMockedStatic = Mockito.mockStatic(AppUtils.class)) {
+            UserDetailDto userDetail = UserDetailDto.builder().id(1L).email("test@abc.com").build();
+            appUtilsMockedStatic.when(AppUtils::getCurrentUser).thenReturn(userDetail);
+
+            ShareRequestDto req = ShareRequestDto.builder()
+                    .url("https://drive.google.com/file/d/abc123/view")
+                    .title("My Drive Video")
+                    .description("A description")
+                    .build();
+            User user = User.builder().id(1L).userName("test@abc.com").build();
+            when(userRepo.findAllById(1L)).thenReturn(user);
+            ShareLink shareLink = ShareLink.builder().id(5L).user(user).build();
+            when(shareLinkRepo.save(any())).thenReturn(shareLink);
+
+            VideoDto result = shareService.shareLink(req);
+
+            assertThat(result.getTitle()).isEqualTo("My Drive Video");
+            assertThat(result.getId()).isEqualTo(5L);
+            assertThat(result.getUserShared()).isEqualTo("test@abc.com");
+        }
+    }
+
+    @Test
+    void getShareByUser_returnsListForUser() {
+        User user = User.builder().id(3L).userName("user3@abc.com").build();
+        when(userRepo.findAllByUserName("user3@abc.com")).thenReturn(user);
+        ShareLink link = ShareLink.builder().title("t").user(user).build();
+        when(shareLinkRepo.findAllByUser(user)).thenReturn(List.of(link));
+
+        try (MockedStatic<Converter> converterMockedStatic = Mockito.mockStatic(Converter.class)) {
+            VideoDto dto = VideoDto.builder().title("t").build();
+            converterMockedStatic.when(() -> Converter.videoDtoList(anyList())).thenReturn(List.of(dto));
+
+            List<VideoDto> result = shareService.getShareByUser("user3@abc.com");
+            assertThat(result).hasSize(1);
+        }
+    }
+
+    @Test
+    void deleteShareLink_callsRepoDeleteById() {
+        shareService.deleteShareLink(99L);
+        Mockito.verify(shareLinkRepo).deleteById(99L);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void getQueryParam_malformedParam_skipsEntry() throws Exception {
+        // "v=abc123&malformed" — "malformed" has no "=" so split gives 1 element, index 1 throws
+        java.lang.reflect.Method method = ShareServiceImpl.class.getDeclaredMethod("getQueryParam", String.class);
+        method.setAccessible(true);
+        Map<String, String> result = (Map<String, String>) method.invoke(shareService, "v=abc123&malformed");
+        // "v" is parsed fine; "malformed" is skipped (exception caught internally)
+        assertThat(result.get("v")).isEqualTo("abc123");
+        assertThat(result).doesNotContainKey("malformed");
+    }
+
+    @Test
     void requestYouTube_returnsVideoDtoForValidResponse() throws Exception {
         // Arrange
         String videoId = "abc123";
