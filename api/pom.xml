@@ -30,6 +30,7 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <jsonwebtoken.version>0.12.6</jsonwebtoken.version>
         <springdoc-openapi.version>2.7.0</springdoc-openapi.version>
+        <spring-security.version>6.5.9</spring-security.version>
         <skipTests>false</skipTests>
         <skipCoverage>false</skipCoverage>
         <jacoco.minimum.coverage>0.07</jacoco.minimum.coverage>
