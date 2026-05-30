@@ -10,7 +10,7 @@
 
 Since the February 2026 report, the **Funny Movies** application has made significant quality improvements: test coverage jumped from **58% to 95%+** (exceeding industry standard), and several new features have been added — bitwise permission system, comments, video access stats, and a complete MFA flow. The system is in strong shape with 16 successful releases since the last review.
 
-Two legacy issues from the previous report (JWT library, HPA config) remain unresolved and should be addressed this sprint.
+The JWT library has been upgraded to 0.12.6 (resolved this session). The remaining open item is the HPA config, which is blocked on Redis cache.
 
 **Overall Health Score: 8.5/10** _(up from 8.0 — driven by coverage gains and new features)_
 
@@ -28,7 +28,7 @@ Two legacy issues from the previous report (JWT library, HPA config) remain unre
 | Comment Feature | ❌ | ✅ | ✅ New |
 | Video Access Stats | ❌ | ✅ | ✅ New |
 | MFA (TOTP) | Partial | ✅ Complete | ✅ Improved |
-| JWT 0.11.5 | 🔴 | 🔴 | ❌ Not fixed |
+| JWT 0.11.5 | 🔴 | ✅ 0.12.6 | ✅ Fixed |
 | HPA maxReplicas=1 | ⚠️ | ⚠️ | ❌ Not fixed |
 | Guava 32.1.2 | ⚠️ | ⚠️ | ❌ Not fixed |
 
@@ -102,22 +102,11 @@ Build → Test + Coverage → SonarCloud + Codecov
 
 ## Open Issues
 
-### 🔴 Issue 1: Outdated JWT Library (Security Risk)
-**Severity:** HIGH (CVE Risk) — **Open since 2026-02-06**
-**File:** `api/pom.xml`
+### ✅ Issue 1: JWT Library — RESOLVED (2026-05-30)
+**Was:** 0.11.5 (2022) — HIGH severity
+**Now:** 0.12.6 — security patches for signature validation and algorithm hardening applied.
 
-```xml
-<jsonwebtoken.version>0.11.5</jsonwebtoken.version>  <!-- Released 2022 -->
-```
-
-**Latest stable:** 0.12.6 — includes security patches for signature validation and algorithm hardening.
-
-**Note:** 0.12.x has breaking API changes (`Jwts.parserBuilder()` → `Jwts.parser()`). Review `JwtTokenProvider` after upgrading.
-
-**Remediation:**
-```xml
-<jsonwebtoken.version>0.12.6</jsonwebtoken.version>
-```
+API migration completed in `JwtProvider.java` and `JwtProviderTest.java` (commit `bfac68e`). All tests pass.
 
 ---
 
@@ -271,8 +260,8 @@ api/src/main/java/com/canhlabs/funnyapp/
 ### Open Gaps
 | # | Issue | Severity | Status |
 |---|-------|----------|--------|
-| 1 | JWT 0.11.5 — outdated security library | HIGH | ❌ Open since Feb |
-| 2 | Swagger exposed via `dev` profile in Helm | LOW | ❌ New |
+| 1 | JWT 0.11.5 — outdated security library | HIGH | ✅ Fixed 2026-05-30 |
+| 2 | Swagger exposed via `dev` profile in Helm | LOW | ❌ Backlog |
 | 3 | No secrets scanning in CI | MEDIUM | ❌ Backlog |
 | 4 | No container image scanning (Trivy) | MEDIUM | ❌ Backlog |
 
@@ -296,8 +285,10 @@ api/src/main/java/com/canhlabs/funnyapp/
 
 ## Action Items (Prioritized)
 
-### 🔴 This Sprint
-1. **Upgrade JWT 0.11.5 → 0.12.6** — review `JwtTokenProvider` API changes (~3 hours)
+### ✅ Completed This Session
+1. ~~**Upgrade JWT 0.11.5 → 0.12.6**~~ — done, commit `bfac68e`
+
+### ⚠️ This Sprint
 2. **Upgrade Guava 32.1.2 → 33.3.1** (~1 hour)
 
 ### ⚠️ Next Sprint
