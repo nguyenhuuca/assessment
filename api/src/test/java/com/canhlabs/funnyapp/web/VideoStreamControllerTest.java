@@ -27,9 +27,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -64,12 +62,15 @@ class VideoStreamControllerTest {
             return null;
         }).when(jwtFilter).doFilter(any(), any(), any());
 
-        StreamChunkResult chunkResult = mock(StreamChunkResult.class);
-        when(chunkResult.getStream()).thenAnswer(inv -> new ByteArrayInputStream("videodata".getBytes()));
-        when(chunkResult.getActualStart()).thenReturn(0L);
-        when(chunkResult.getActualEnd()).thenReturn(8L);
+        // Use real builder instance (not mock) to avoid Mockito CME on thenAnswer chains.
+        // thenAnswer creates a fresh stream per call so concurrent-looking tests stay isolated.
         when(videoService.getFileSize(any())).thenReturn(FILE_SIZE);
-        when(videoService.getPartialFileUsingRAF(any(), anyLong(), anyLong())).thenReturn(chunkResult);
+        when(videoService.getPartialFileUsingRAF(any(), anyLong(), anyLong())).thenAnswer(inv ->
+                StreamChunkResult.builder()
+                        .stream(new ByteArrayInputStream("videodata".getBytes()))
+                        .actualStart(0L)
+                        .actualEnd(8L)
+                        .build());
     }
 
     @Test
