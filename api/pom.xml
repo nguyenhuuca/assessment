@@ -28,7 +28,7 @@
         <guava.version>32.1.2-jre</guava.version>
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
-        <jsonwebtoken.version>0.11.5</jsonwebtoken.version>
+        <jsonwebtoken.version>0.12.6</jsonwebtoken.version>
         <springdoc-openapi.version>2.7.0</springdoc-openapi.version>
         <skipTests>false</skipTests>
         <skipCoverage>false</skipCoverage>

@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,10 +42,10 @@ public class JwtProvider {
      * @return token string
      */
     public TokenDto generateToken(JwtGenerationDto request) {
-        JwtBuilder jwtBuilder = Jwts.builder().setClaims(generatePayload(request.getPayload()));
+        JwtBuilder jwtBuilder = Jwts.builder().claims(generatePayload(request.getPayload()));
         Date expireDate = getExpiredDate(request);
-        jwtBuilder.setExpiration(expireDate);
-        jwtBuilder.setIssuedAt(new Date());
+        jwtBuilder.expiration(expireDate);
+        jwtBuilder.issuedAt(new Date());
         String token = jwtBuilder.signWith(getKey()).compact();
         return TokenDto.builder()
                 .token(token)
@@ -62,11 +62,11 @@ public class JwtProvider {
     public JwtVerificationResultDto verifyToken(String token) throws UnauthorizedException {
         JwtVerificationResultDto rs = JwtVerificationResultDto.builder().build();
         try {
-            var claims = Jwts.parserBuilder()
-                    .setSigningKey(getKey())
+            var claims = Jwts.parser()
+                    .verifyWith(getKey())
                     .build()
-                    .parseClaimsJws(token.replace("Bearer", ""));
-            rs.setData(convertValue(claims.getBody()));
+                    .parseSignedClaims(token.replace("Bearer", ""));
+            rs.setData(convertValue(claims.getPayload()));
             rs.setSuccessful(true);
 
 
@@ -99,7 +99,7 @@ public class JwtProvider {
      *
      * @return Key  that use to sign when generate token
      */
-    private Key getKey() {
+    private SecretKey getKey() {
         return Keys.hmacShaKeyFor(props.getJwtSecretKey().getBytes());
     }
 

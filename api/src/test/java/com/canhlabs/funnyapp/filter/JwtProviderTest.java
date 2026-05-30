@@ -58,8 +58,8 @@ class JwtProviderTest {
     @Test
     void verifyToken_returnsSuccessfulResultForValidToken() {
         String token = Jwts.builder()
-                .setClaims(Map.of("id", 7L, "email", "test@abc.com"))
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000L))
+                .claims(Map.of("id", 7L, "email", "test@abc.com"))
+                .expiration(new Date(System.currentTimeMillis() + 3600000L))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
 
@@ -73,8 +73,8 @@ class JwtProviderTest {
     @Test
     void verifyToken_throwsUnauthorizedExceptionForExpiredToken() {
         String token = Jwts.builder()
-                .setClaims(Map.of("id", 2L, "email", "expired@abc.com"))
-                .setExpiration(new Date(System.currentTimeMillis() - 1000L))
+                .claims(Map.of("id", 2L, "email", "expired@abc.com"))
+                .expiration(new Date(System.currentTimeMillis() - 1000L))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
 
