@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Glob, Grep
 - [ ] **Identify Stakeholders**: List all relevant stakeholders
 - [ ] **Draft User Stories**: Capture user needs
 - [ ] **Detail Requirements**: List functional and non-functional requirements
-- [ ] **Save Artifact**: Save to `./artifacts/prd_[feature].md`
+- [ ] **Save Artifact**: Save to `./docs/prd/prd_[feature].md`
 - [ ] **Review**: Conduct stakeholder review
 
 ## PRD Structure

@@ -80,14 +80,14 @@ bd dep add <task2-id> <task1-id>
 - NO creating tasks without clear acceptance criteria
 - NO assuming context — explore codebase first
 - ALWAYS use parallel workers for research phase
-- ALWAYS store artifacts in `./artifacts/`
+- ALWAYS store artifacts in `./docs/` (adr → `docs/adr/`, plans → `docs/plans/`, prd → `docs/prd/`)
 - ALWAYS create Beads before declaring planning complete
 - ALWAYS validate arguments before using in commands
 
 ## Output
 
 Every planning session MUST produce:
-1. Artifact(s) in `./artifacts/` following naming conventions
+1. Artifact(s) in `./docs/` following naming conventions (adr → `docs/adr/`, plans → `docs/plans/`, prd → `docs/prd/`)
 2. Beads for all implementation tasks
 3. Dependency graph showing task order
 4. Handoff summary for /execute command

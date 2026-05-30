@@ -45,7 +45,7 @@ Use STRIDE analysis systematically:
 - NO custom crypto implementations
 - NO skipping threat analysis — use Sequential Thinking
 - ALWAYS trace data flow with Grep for injection risks
-- ALWAYS document findings in `./artifacts/security_audit_[date].md`
+- ALWAYS document findings in `./docs/security_audit_[date].md`
 - ALWAYS create GitHub issues for critical/high findings
 
 ## Related Skills

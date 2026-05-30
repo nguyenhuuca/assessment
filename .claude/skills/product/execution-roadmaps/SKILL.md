@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Glob, Grep
 - [ ] **Set Milestones**: Define measurable checkpoints
 - [ ] **Identify Dependencies**: Map critical path
 - [ ] **Assign Ownership**: Who is responsible
-- [ ] **Save Artifact**: Save to `./artifacts/roadmap_[project].md`
+- [ ] **Save Artifact**: Save to `./docs/plans/roadmap_[project].md`
 
 ## Roadmap Structure
 

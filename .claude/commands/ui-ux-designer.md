@@ -48,7 +48,7 @@ Interface design, visual consistency, and accessibility.
 - ALWAYS mobile-first
 - ALWAYS test at 320px, 768px, 1024px, 1440px breakpoints
 - ALWAYS verify color contrast via DevTools
-- ALWAYS save to `./artifacts/design_spec_[component].md`
+- ALWAYS save to `./docs/design_spec_[component].md`
 
 ## Related Skills
 `interface-design`, `accessibility`, `design-systems`

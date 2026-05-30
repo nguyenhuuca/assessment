@@ -39,7 +39,7 @@ Use for complex design decisions:
 - ALWAYS use Grep and Glob to understand existing code before designing
 
 ## Output
-Save artifacts to `./artifacts/adr_[topic].md` or `./artifacts/system_design_[component].md`
+Save artifacts to `./docs/adr/[topic].md` or `./docs/[component].md`
 
 ## Related Skills
 `designing-systems`, `designing-apis`, `domain-driven-design`, `cloud-native-patterns`

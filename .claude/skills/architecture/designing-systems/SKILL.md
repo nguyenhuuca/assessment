@@ -13,7 +13,7 @@ allowed-tools: Read, Write, Glob, Grep
 - [ ] **Data**: Define data model and storage strategy
 - [ ] **API**: Define interfaces and contracts
 - [ ] **Risks**: Identify single points of failure
-- [ ] **Document**: Save to `./artifacts/adr_[topic].md`
+- [ ] **Document**: Save to `./docs/adr/[topic].md`
 
 ## Feedback Loops
 
