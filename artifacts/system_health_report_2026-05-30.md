@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-Since the February 2026 report, the **Funny Movies** application has made significant quality improvements: test coverage jumped from **58% to 95%+** (exceeding industry standard), and several new features have been added — bitwise permission system, comments, video access stats, and a complete MFA flow. The system is in strong shape with 16 successful releases since the last review.
+Since the February 2026 report, the **Funny Movies** application has made significant quality improvements: test coverage jumped from **58% to 95%+** (exceeding industry standard), and several new features have been added — bitwise permission system, comments, video access stats, and a complete MFA flow. The system is in strong shape with 19 successful releases since the last review.
 
 The JWT library has been upgraded to 0.12.6 (resolved this session). The remaining open item is the HPA config, which is blocked on Redis cache.
 
@@ -21,7 +21,7 @@ The JWT library has been upgraded to 0.12.6 (resolved this session). The remaini
 | Area | Feb 2026 | May 2026 | Change |
 |------|----------|----------|--------|
 | Test Coverage | 58% | **95%+** | ✅ +37% |
-| App Version | prod-12 | prod-28 | ✅ 16 releases |
+| App Version | prod-12 | prod-31 | ✅ 19 releases |
 | Test Files | 30 | 52 | ✅ +22 files |
 | Source Files | 100+ | 147 | ✅ +47 files |
 | Permission System | ❌ | ✅ Bitwise | ✅ New |
@@ -42,11 +42,11 @@ The JWT library has been upgraded to 0.12.6 (resolved this session). The remaini
 | Spring Boot | ✅ | 3.5.0 | Latest stable |
 | PostgreSQL | ✅ | Latest | Schema via Liquibase |
 | Maven | ✅ | 3.x | Build automation |
-| Docker | ✅ | Latest | prod-29 |
+| Docker | ✅ | Latest | prod-31 |
 | Kubernetes | ✅ | Helm 0.1.0 | Deployed |
 | CI/CD | ✅ | GitHub Actions | Fully automated |
 | Test Coverage | ✅ | **95%+** | Exceeds industry standard |
-| Version | ✅ | prod-29 | Auto-incremented |
+| Version | ✅ | prod-31 | Auto-incremented |
 
 ---
 
@@ -96,7 +96,7 @@ public enum Permission {
 Build → Test + Coverage → SonarCloud + Codecov
      → Docker Build → Push Registry → Update Helm → Deploy VM
 ```
-16 releases shipped without any recorded rollback.
+19 releases shipped without any recorded rollback.
 
 ---
 
@@ -218,7 +218,7 @@ api/src/main/java/com/canhlabs/funnyapp/
 | Resource | Configuration | Status |
 |----------|--------------|--------|
 | Namespace | `funny-app` | ✅ |
-| Image | `nguyenhuuca/funny-app:prod-29` | ✅ |
+| Image | `nguyenhuuca/funny-app:prod-31` | ✅ |
 | Replicas | 1 (HPA: 1–1) | ⚠️ Not autoscaling |
 | Service | NodePort 30080 | ✅ |
 | Resources | 400m–500m CPU, 600Mi RAM | ✅ |
@@ -231,7 +231,7 @@ api/src/main/java/com/canhlabs/funnyapp/
 
 ## CI/CD Pipeline Health
 
-**Status:** ✅ Fully Operational — 16 successful releases
+**Status:** ✅ Fully Operational — 19 successful releases
 
 | Job | Status | Notes |
 |-----|--------|-------|
@@ -239,7 +239,7 @@ api/src/main/java/com/canhlabs/funnyapp/
 | Test + Coverage | ✅ | 95%+ enforced |
 | SonarCloud | ✅ | Code quality gate |
 | Codecov | ✅ | Coverage tracking |
-| Docker Build/Push | ✅ | prod-28 |
+| Docker Build/Push | ✅ | prod-31 |
 | Helm Auto-update | ✅ | values.yaml patched per release |
 | VM Deploy | ✅ | SSH + SCP |
 | Git Tag | ✅ | Per release |
@@ -307,7 +307,7 @@ api/src/main/java/com/canhlabs/funnyapp/
 
 ## Conclusion
 
-The **Funny Movies** application is in good health. The 95%+ test coverage milestone is a standout achievement — well above the 80% industry benchmark — and the 16 clean releases demonstrate a reliable CI/CD pipeline. The new permission system, comment feature, and video access stats meaningfully expand the product surface.
+The **Funny Movies** application is in good health. The 95%+ test coverage milestone is a standout achievement — well above the 80% industry benchmark — and the 19 clean releases demonstrate a reliable CI/CD pipeline. The new permission system, comment feature, and video access stats meaningfully expand the product surface.
 
 The main outstanding item is the **JWT library upgrade**, which has been deferred since February. This should be the top priority for the current sprint before any further feature work.
 
