@@ -16,6 +16,14 @@
 
 ---
 
+## 📚 Documentation
+
+Full architecture docs, ADRs, plans, and reports are available at:
+
+**[https://nguyenhuuca.github.io/assessment/](https://nguyenhuuca.github.io/assessment/)**
+
+---
+
 ##  Overview
 
 **Funny Movies** is a modern web application built with **Java 24** and **Spring Boot 3.x**, designed to deliver **high-performance video experiences**.
