@@ -62,7 +62,6 @@ nav:
       - 0007 - Admin Dashboard: adr/0007-admin-dashboard.md
       - 0008 - React Migration: adr/0008-react-migration.md
       - 0009 - Unified Video List API: adr/0009-unified-video-list-api.md
-      - Binary Search: adr/apr_binary_search.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -89,5 +88,3 @@ nav:
       - Tiếng Việt: claude-guide-vi.md
 
   - Guides:
-      - Trello Setup: trello-setup-guide.md
-      - Trello Board Status: trello-board-status.md
