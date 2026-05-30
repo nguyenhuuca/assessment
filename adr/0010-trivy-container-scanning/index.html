@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../0002-backend-architecture/">
+        <link rel="prev" href="../0009-unified-video-list-api/">
       
       
-        <link rel="next" href="../0004-frontend-structure/">
+        <link rel="next" href="../../prd/PRD-hot-video-priority/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>0003 - Cache Strategy - Funny Movies - Architecture Docs</title>
+        <title>0010 - Trivy Dependency Scanning - Funny Movies - Architecture Docs</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#use-guava-cache-initially-with-planned-migration-to-redis" class="md-skip">
+        <a href="#adr-0010-add-trivy-dependency-filesystem-scanning-to-ci" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              0003 - Cache Strategy
+              0010 - Trivy Dependency Scanning
             
           </span>
         </div>
@@ -722,37 +722,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0003 - Cache Strategy
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../0003-use-cache/" class="md-nav__link">
         
   
   
@@ -768,92 +741,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Context
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Consequences
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1031,10 +918,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../0010-trivy-container-scanning/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0010 - Trivy Dependency Scanning
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1050,6 +964,131 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#date" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Date
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consequences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consequences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consequences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#positive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Positive
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Negative
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trade-offs-accepted" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trade-offs accepted
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1861,6 +1900,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Consequences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#positive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Positive
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Negative
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trade-offs-accepted" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trade-offs accepted
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1894,51 +1972,97 @@
   
 
 
-<h1 id="use-guava-cache-initially-with-planned-migration-to-redis">Use Guava Cache Initially, with Planned Migration to Redis<a class="headerlink" href="#use-guava-cache-initially-with-planned-migration-to-redis" title="Permanent link">&para;</a></h1>
+<h1 id="adr-0010-add-trivy-dependency-filesystem-scanning-to-ci">ADR-0010: Add Trivy Dependency &amp; Filesystem Scanning to CI<a class="headerlink" href="#adr-0010-add-trivy-dependency-filesystem-scanning-to-ci" title="Permanent link">&para;</a></h1>
 <h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
 <p>Accepted</p>
 <h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2025-07-03</p>
+<p>2026-05-30</p>
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The system needs caching for:
-- Video metadata (title, duration, availability)
-- Chunk data in memory for video streaming
-- Hit stats (view count, like count) used for cleanup logic</p>
-<p>During early stages, an in-memory cache is sufficient and avoids external dependencies. However, for horizontal scaling and persistence across app restarts, Redis will be required.</p>
+<p>The Funny Movies CI pipeline currently covers build, test (coverage gate + SonarCloud), Docker build, and deploy. There is <strong>no automated vulnerability scanning</strong> of the container image or runtime dependencies before pushing to Docker Hub and deploying to production.</p>
+<p><strong>Current gaps identified in the 2026-05-30 system health report:</strong>
+- No container image scanning in CI (MEDIUM severity)
+- No secrets scanning in CI (MEDIUM severity)
+- The JWT library <code>0.11.5</code> went undetected in CI for months — only caught by manual review</p>
+<p><strong>Risk:</strong>
+- A vulnerable OS package or transitive dependency can be shipped to production without any warning
+- Docker Hub and Kubernetes do not scan images automatically in this setup
+- The <code>nguyenhuuca/funny-app</code> image is based on <code>eclipse-temurin:24-jre-alpine</code> — Alpine is minimal but still ships packages that receive CVEs</p>
+<p><strong>Alternatives considered:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Trivy</strong> (Aqua Security)</td>
+<td>Free, fast, OSS, GitHub Action available, scans image + filesystem + secrets</td>
+<td>Requires Docker image to be built first</td>
+</tr>
+<tr>
+<td>Snyk</td>
+<td>Deep language-level scanning, fix suggestions</td>
+<td>Paid for full features, external service</td>
+</tr>
+<tr>
+<td>OWASP Dependency-Check</td>
+<td>Maven plugin, Java-focused</td>
+<td>Slow (~5 min), no image scanning, XML report only</td>
+</tr>
+<tr>
+<td>Dependabot</td>
+<td>Auto-PRs for outdated deps</td>
+<td>Reactive only, no image scanning, no gate</td>
+</tr>
+<tr>
+<td>Grype (Anchore)</td>
+<td>Similar to Trivy, good SBOM support</td>
+<td>Less ecosystem adoption</td>
+</tr>
+</tbody>
+</table>
 <h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Currently</strong>, we use <strong>Guava Cache</strong> for in-memory caching within the application.</li>
-<li>
-<p>Guava is suitable for:</p>
-<ul>
-<li>Fast local memory access</li>
-<li>Lightweight TTL support</li>
-<li>No need for network layer or external services</li>
-</ul>
-</li>
-<li>
-<p><strong>Future Plan</strong>:</p>
-<ul>
-<li>Migrate to <strong>Redis</strong> when:<ul>
-<li>We deploy multiple instances of the backend</li>
-<li>Cache needs to persist across restarts</li>
-<li>We centralize metrics or chunk-level cache</li>
-</ul>
-</li>
-<li>Redis will be deployed using Docker Compose locally and via managed services (e.g., Redis Cloud, AWS ElastiCache)</li>
-</ul>
-</li>
-</ul>
+<p>Add <strong>Trivy</strong> as a new <code>scan</code> job in the GitHub Actions CI pipeline, running <strong>after the Docker image is built and pushed</strong>.</p>
+<p><strong>Scan target:</strong><br />
+<strong>Filesystem</strong> (<code>api/</code> directory) — catches CVEs in Maven dependencies declared in <code>pom.xml</code> and compiled JARs in <code>target/</code>. Docker image scanning is deferred until Docker is used in production.</p>
+<p><strong>Gate policy:</strong>
+- Fail the pipeline on any <strong>CRITICAL</strong> severity finding
+- <strong>HIGH</strong> severity findings: reported but non-blocking (backlog for now, tighten after baseline is established)
+- Upload SARIF report to GitHub Security tab for visibility</p>
+<p><strong>Rationale for Trivy over alternatives:</strong>
+- Zero cost, maintained by Aqua Security, wide adoption
+- <code>aquasecurity/trivy-action</code> integrates natively with GitHub Actions and Security tab (SARIF)
+- Scans both image and filesystem in one tool — no need for a separate Maven plugin
+- Fast enough (~30–60s) to not slow the pipeline meaningfully</p>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
+<h3 id="positive">Positive<a class="headerlink" href="#positive" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Current setup is fast, zero-config, ideal for local testing</li>
-<li>Redis will introduce infra/ops overhead but bring cross-instance and persistent caching</li>
-<li>Code should be abstracted to allow switching from Guava to Redis with minimal impact (e.g., via <code>AppCache</code> interface)</li>
+<li>Automated CVE detection before every production deploy</li>
+<li>SARIF upload surfaces findings in GitHub Security → Code Scanning tab</li>
+<li>Catches both OS-level (Alpine) and Java library vulnerabilities</li>
+<li>Sets foundation for secrets scanning (Trivy supports <code>--scanners secret</code>)</li>
+</ul>
+<h3 id="negative">Negative<a class="headerlink" href="#negative" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Pipeline gains one more job (~60s on a warm runner)</li>
+<li>CRITICAL gate may cause false-positive blocks on first run if existing image has unresolved CVEs — need a one-time triage before enabling the gate</li>
+<li>Trivy DB must be downloaded each run (~200MB); mitigated by caching</li>
+</ul>
+<h3 id="trade-offs-accepted">Trade-offs accepted<a class="headerlink" href="#trade-offs-accepted" title="Permanent link">&para;</a></h3>
+<ul>
+<li>HIGH severity is non-blocking initially to avoid disrupting the release cadence; the threshold will be tightened after the first clean baseline is established</li>
+<li>Image scan requires the Docker job to complete first, so <code>scan</code> runs sequentially after <code>docker</code> (no parallelism gain here)</li>
 </ul>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Task: Setup Redis with user/pass and Spring Boot integration</li>
-<li>Task: Cache video chunks and hit stats</li>
+<li>System Health Report 2026-05-30 — identified this as MEDIUM priority open gap</li>
+<li>ADR-0002 — CI/CD pipeline architecture</li>
+<li><code>.github/workflows/funnyapp-ci.yml</code> — target file for implementation</li>
+<li><code>docs/plans/plan-trivy-scan.md</code> — implementation plan</li>
+<li>Note: Docker image scanning to be added when Docker is used in production deployment</li>
 </ul>
 
 

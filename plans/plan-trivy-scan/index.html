@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../0002-backend-architecture/">
+        <link rel="prev" href="../plan-vid2-hot-score-migration/">
       
       
-        <link rel="next" href="../0004-frontend-structure/">
+        <link rel="next" href="../plan-a-file-based-hooks/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>0003 - Cache Strategy - Funny Movies - Architecture Docs</title>
+        <title>Trivy Scan - Funny Movies - Architecture Docs</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#use-guava-cache-initially-with-planned-migration-to-redis" class="md-skip">
+        <a href="#plan-trivy-vulnerability-scan-on-jar-dependencies" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              0003 - Cache Strategy
+              Trivy Scan
             
           </span>
         </div>
@@ -262,13 +262,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../0000-template/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../adr/0000-template/" class="md-tabs__link">
           
   
   
@@ -304,11 +302,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../plans/plan-hls-migration/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../plan-hls-migration/" class="md-tabs__link">
           
   
   
@@ -581,31 +581,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -623,7 +620,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -641,7 +638,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0000-template/" class="md-nav__link">
+      <a href="../../adr/0000-template/" class="md-nav__link">
         
   
   
@@ -669,7 +666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0001-use-relational-database/" class="md-nav__link">
+      <a href="../../adr/0001-use-relational-database/" class="md-nav__link">
         
   
   
@@ -697,7 +694,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0002-backend-architecture/" class="md-nav__link">
+      <a href="../../adr/0002-backend-architecture/" class="md-nav__link">
         
   
   
@@ -722,37 +719,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0003 - Cache Strategy
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../adr/0003-use-cache/" class="md-nav__link">
         
   
   
@@ -768,92 +738,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Context
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Consequences
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -866,7 +750,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0004-frontend-structure/" class="md-nav__link">
+      <a href="../../adr/0004-frontend-structure/" class="md-nav__link">
         
   
   
@@ -894,7 +778,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0005-use_lru_cache_video_streaming/" class="md-nav__link">
+      <a href="../../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
         
   
   
@@ -922,7 +806,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0006-hls-video-streaming/" class="md-nav__link">
+      <a href="../../adr/0006-hls-video-streaming/" class="md-nav__link">
         
   
   
@@ -950,7 +834,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0007-admin-dashboard/" class="md-nav__link">
+      <a href="../../adr/0007-admin-dashboard/" class="md-nav__link">
         
   
   
@@ -978,7 +862,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0008-react-migration/" class="md-nav__link">
+      <a href="../../adr/0008-react-migration/" class="md-nav__link">
         
   
   
@@ -1006,7 +890,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0009-unified-video-list-api/" class="md-nav__link">
+      <a href="../../adr/0009-unified-video-list-api/" class="md-nav__link">
         
   
   
@@ -1034,7 +918,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0010-trivy-container-scanning/" class="md-nav__link">
+      <a href="../../adr/0010-trivy-container-scanning/" class="md-nav__link">
         
   
   
@@ -1183,28 +1067,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -1222,7 +1109,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1240,7 +1127,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-hls-migration/" class="md-nav__link">
+      <a href="../plan-hls-migration/" class="md-nav__link">
         
   
   
@@ -1268,7 +1155,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-react-migration/" class="md-nav__link">
+      <a href="../plan-react-migration/" class="md-nav__link">
         
   
   
@@ -1296,7 +1183,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-admin-dashboard/" class="md-nav__link">
+      <a href="../plan-admin-dashboard/" class="md-nav__link">
         
   
   
@@ -1324,7 +1211,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-permissions-bitwise/" class="md-nav__link">
+      <a href="../plan-permissions-bitwise/" class="md-nav__link">
         
   
   
@@ -1352,7 +1239,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-vid2-hot-score-migration/" class="md-nav__link">
+      <a href="../plan-vid2-hot-score-migration/" class="md-nav__link">
         
   
   
@@ -1377,10 +1264,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../plans/plan-trivy-scan/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trivy Scan
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1396,6 +1310,114 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#target-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Target Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-add-scan-job-to-funnyapp-ciyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change: Add scan job to funnyapp-ci.yml
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behaviour" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Behaviour
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#first-run-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        First-Run Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trivyignore-if-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .trivyignore (if needed)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rollback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollback
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1408,7 +1430,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-a-file-based-hooks/" class="md-nav__link">
+      <a href="../plan-a-file-based-hooks/" class="md-nav__link">
         
   
   
@@ -1436,7 +1458,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-b-direct-cli-spawn/" class="md-nav__link">
+      <a href="../plan-b-direct-cli-spawn/" class="md-nav__link">
         
   
   
@@ -1809,28 +1831,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1842,10 +1842,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#current-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Current Pipeline
       
     </span>
   </a>
@@ -1853,10 +1853,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
+  <a href="#target-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Consequences
+        Target Pipeline
       
     </span>
   </a>
@@ -1864,10 +1864,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#change-add-scan-job-to-funnyapp-ciyml" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Change: Add scan job to funnyapp-ci.yml
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behaviour" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Behaviour
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#first-run-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        First-Run Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trivyignore-if-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .trivyignore (if needed)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rollback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollback
       
     </span>
   </a>
@@ -1894,52 +1938,126 @@
   
 
 
-<h1 id="use-guava-cache-initially-with-planned-migration-to-redis">Use Guava Cache Initially, with Planned Migration to Redis<a class="headerlink" href="#use-guava-cache-initially-with-planned-migration-to-redis" title="Permanent link">&para;</a></h1>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Accepted</p>
-<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2025-07-03</p>
+<h1 id="plan-trivy-vulnerability-scan-on-jar-dependencies">Plan: Trivy Vulnerability Scan on JAR &amp; Dependencies<a class="headerlink" href="#plan-trivy-vulnerability-scan-on-jar-dependencies" title="Permanent link">&para;</a></h1>
+<p><strong>ADR:</strong> ADR-0010<br />
+<strong>Date:</strong> 2026-05-30<br />
+<strong>Status:</strong> Ready to implement<br />
+<strong>Effort:</strong> ~30 minutes  </p>
+<hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The system needs caching for:
-- Video metadata (title, duration, availability)
-- Chunk data in memory for video streaming
-- Hit stats (view count, like count) used for cleanup logic</p>
-<p>During early stages, an in-memory cache is sufficient and avoids external dependencies. However, for horizontal scaling and persistence across app restarts, Redis will be required.</p>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
+<p>Production deployment uses <strong>JAR over SSH</strong> — Docker image is built but not yet used in production. The scan target is therefore the <strong>filesystem</strong> (<code>api/</code> directory): Maven dependencies declared in <code>pom.xml</code> and resolved JARs in <code>target/</code>.</p>
+<p>Trivy <code>fs</code> mode detects CVEs in Java libraries by scanning <code>pom.xml</code> and the compiled JAR — no Docker required.</p>
+<hr />
+<h2 id="current-pipeline">Current Pipeline<a class="headerlink" href="#current-pipeline" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>build ──→ test ──┬──→ deploy (SSH)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                 └──→ docker (not in prod)
+</code></pre></div>
+<h2 id="target-pipeline">Target Pipeline<a class="headerlink" href="#target-pipeline" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>build ──→ test ──┬──→ scan (fs) ──→ deploy (SSH)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                 └──→ docker
+</code></pre></div>
+<p><code>scan</code> runs <strong>after <code>test</code></strong> (needs the compiled JAR from <code>build</code>) and <strong>blocks <code>deploy</code></strong> on CRITICAL findings.</p>
+<hr />
+<h2 id="change-add-scan-job-to-funnyapp-ciyml">Change: Add <code>scan</code> job to <code>funnyapp-ci.yml</code><a class="headerlink" href="#change-add-scan-job-to-funnyapp-ciyml" title="Permanent link">&para;</a></h2>
+<p>Add this job and update <code>deploy</code> to depend on it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">  </span><span class="nt">scan</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">🔍 Trivy Vulnerability Scan</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">build</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Checkout code</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Download built JAR</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/download-artifact@v4</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">built-jar</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">          </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">api/target/</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cache Trivy DB</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/cache@v4</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">          </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">~/.cache/trivy</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">          </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ runner.os }}-trivy-db</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">          </span><span class="nt">restore-keys</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ runner.os }}-trivy-db</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Scan filesystem for CVEs (CRITICAL gate)</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aquasecurity/trivy-action@master</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">          </span><span class="nt">scan-type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fs</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">          </span><span class="nt">scan-ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">api/</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">          </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="w">          </span><span class="nt">exit-code</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">          </span><span class="nt">severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CRITICAL</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="w">          </span><span class="nt">ignore-unfixed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Scan filesystem for CVEs (SARIF upload)</span>
+<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aquasecurity/trivy-action@master</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="w">        </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always()</span>
+<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="w">          </span><span class="nt">scan-type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fs</span>
+<a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a><span class="w">          </span><span class="nt">scan-ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">api/</span>
+<a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a><span class="w">          </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sarif</span>
+<a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a><span class="w">          </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trivy-results.sarif</span>
+<a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a><span class="w">          </span><span class="nt">severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CRITICAL,HIGH</span>
+<a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a><span class="w">          </span><span class="nt">ignore-unfixed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-2-43" name="__codelineno-2-43" href="#__codelineno-2-43"></a>
+<a id="__codelineno-2-44" name="__codelineno-2-44" href="#__codelineno-2-44"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Upload results to GitHub Security tab</span>
+<a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github/codeql-action/upload-sarif@v3</span>
+<a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a><span class="w">        </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always()</span>
+<a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a><span class="w">          </span><span class="nt">sarif_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trivy-results.sarif</span>
+<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="w">          </span><span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trivy-fs</span>
+</code></pre></div>
+<p>Update <code>deploy</code> job to wait on <code>scan</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="w">  </span><span class="nt">deploy</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">🚀 Deploy to Server</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">test</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">scan</span><span class="w"> </span><span class="p p-Indicator">]</span><span class="w">   </span><span class="c1"># &lt;-- add scan here</span>
+</code></pre></div>
+<hr />
+<h2 id="behaviour">Behaviour<a class="headerlink" href="#behaviour" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No CRITICAL CVEs</td>
+<td>✅ scan passes → deploy proceeds</td>
+</tr>
+<tr>
+<td>CRITICAL CVE with fix available</td>
+<td>❌ scan fails → deploy blocked</td>
+</tr>
+<tr>
+<td>CRITICAL CVE with no fix</td>
+<td>✅ ignored (<code>ignore-unfixed</code>) → deploy proceeds</td>
+</tr>
+<tr>
+<td>HIGH CVE</td>
+<td>✅ visible in GitHub Security tab, does not block deploy</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="first-run-checklist">First-Run Checklist<a class="headerlink" href="#first-run-checklist" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Currently</strong>, we use <strong>Guava Cache</strong> for in-memory caching within the application.</li>
-<li>
-<p>Guava is suitable for:</p>
-<ul>
-<li>Fast local memory access</li>
-<li>Lightweight TTL support</li>
-<li>No need for network layer or external services</li>
+<li>[ ] Add <code>scan</code> job to <code>funnyapp-ci.yml</code></li>
+<li>[ ] Add <code>scan</code> to <code>deploy.needs</code></li>
+<li>[ ] Push → check GitHub Actions for scan results</li>
+<li>[ ] Open GitHub → Security → Code Scanning to review findings</li>
+<li>[ ] If false positives: create <code>api/.trivyignore</code> with CVE IDs to suppress</li>
 </ul>
-</li>
-<li>
-<p><strong>Future Plan</strong>:</p>
-<ul>
-<li>Migrate to <strong>Redis</strong> when:<ul>
-<li>We deploy multiple instances of the backend</li>
-<li>Cache needs to persist across restarts</li>
-<li>We centralize metrics or chunk-level cache</li>
-</ul>
-</li>
-<li>Redis will be deployed using Docker Compose locally and via managed services (e.g., Redis Cloud, AWS ElastiCache)</li>
-</ul>
-</li>
-</ul>
-<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Current setup is fast, zero-config, ideal for local testing</li>
-<li>Redis will introduce infra/ops overhead but bring cross-instance and persistent caching</li>
-<li>Code should be abstracted to allow switching from Guava to Redis with minimal impact (e.g., via <code>AppCache</code> interface)</li>
-</ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Task: Setup Redis with user/pass and Spring Boot integration</li>
-<li>Task: Cache video chunks and hit stats</li>
-</ul>
+<h2 id="trivyignore-if-needed"><code>.trivyignore</code> (if needed)<a class="headerlink" href="#trivyignore-if-needed" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a># CVE-YYYY-XXXXX  reason: not exploitable in this context
+</code></pre></div>
+<h2 id="rollback">Rollback<a class="headerlink" href="#rollback" title="Permanent link">&para;</a></h2>
+<p>Remove the <code>scan</code> job and revert <code>deploy.needs</code> to <code>[ test ]</code>. No application code touched.</p>
 
 
 
