@@ -2,148 +2,145 @@
 
 ---
 
-### Build status
+### Build Status
 
 ![Java 24](https://img.shields.io/badge/Java-24-blue)
-![Spring Boot](https://img.shields.io/badge/Spring--Boot-3.x-brightgreen)
-![ChatGPT Powered](https://img.shields.io/badge/AI-ChatGPT--Powered-purple)
+![Spring Boot](https://img.shields.io/badge/Spring--Boot-3.5.0-brightgreen)
+![React](https://img.shields.io/badge/React-19-61DAFB)
 ![Virtual Threads](https://img.shields.io/badge/Threads-Virtual--Threads-orange)
 ![StructuredTaskScope](https://img.shields.io/badge/Concurrency-StructuredTaskScope-informational)
 
 ![Build Status](https://github.com/nguyenhuuca/assessment/actions/workflows/funnyapp-ci.yml/badge.svg)
-
 [![codecov](https://codecov.io/gh/nguyenhuuca/assessment/branch/main/graph/badge.svg?token=NC1XVNHCJW)](https://codecov.io/gh/nguyenhuuca/assessment)
 
 ---
 
 ## 📚 Documentation
 
-Full architecture docs, ADRs, plans, and reports are available at:
+Full architecture docs, ADRs, plans, and reports:
 
 **[https://nguyenhuuca.github.io/assessment/](https://nguyenhuuca.github.io/assessment/)**
 
 ---
 
-##  Overview
+## Overview
 
-**Funny Movies** is a modern web application built with **Java 24** and **Spring Boot 3.x**, designed to deliver **high-performance video experiences**.
+**Funny Movies** is a video streaming web application built with **Java 24** and **Spring Boot 3.5.0**, backed by a **React 19** SPA frontend. It lets users share, watch, and comment on funny videos sourced from YouTube, with AI-powered recommendations via ChatGPT.
 
-###  Key Highlights
+### Key Features
 
--  Uses **Java 24 Virtual Threads** and `StructuredTaskScope` for lightweight concurrency
--  Users can share and view funny videos
--  Uses **ChatGPT AI** to suggest trending YouTube content
--  Integrates with the **YouTube API** to fetch and analyze video metadata
+- **Video streaming** — chunked range-request streaming with LRU cache
+- **Passwordless auth** — magic link login (no passwords)
+- **MFA** — optional TOTP-based two-factor authentication
+- **Video sharing** — share private video links with other users
+- **Comments** — per-video comment threads
+- **Admin dashboard** — manage videos, accounts, and view stats
+- **AI recommendations** — ChatGPT suggests trending YouTube content
+- **YouTube integration** — fetch and display top videos via YouTube Data API v3
 
 ---
 
 ## Tech Stack
 
-| Technology            | Description                                                 |
-|-----------------------|-------------------------------------------------------------|
-| **Java 24**           | Latest features, including Virtual Threads (Project Loom)   |
-| **Spring Boot 3**     | Lightweight and efficient backend framework                 |
-| **StructuredTaskScope** | High-concurrency coordination with clean error handling   |
-| **ChatGPT API**       | AI-based suggestions for trending or funny videos           |
-| **YouTube API**       | Video search and metadata analysis                          |
-| **PostgreSQL**        | Persistent storage for users and videos                     |
-| **JUnit + Jacoco**    | Unit testing and code coverage reporting                    |
-| **GitHub Actions**    | CI/CD automation                                            |
+### Backend
+
+| Component | Choice |
+|-----------|--------|
+| Language | Java 24 (preview features enabled) |
+| Framework | Spring Boot 3.5.0 |
+| Concurrency | Virtual Threads + `StructuredTaskScope` |
+| ORM | JPA / Hibernate |
+| Migrations | Liquibase |
+| Security | Spring Security + JWT (JJWT 0.12.6) |
+| Caching | Guava LRU 33.3.1 |
+| API Docs | Springdoc OpenAPI 2.7.0 (Swagger) |
+| Testing | JUnit 5 + Jacoco |
+| Database | PostgreSQL + HikariCP |
+
+### Frontend
+
+| Component | Choice |
+|-----------|--------|
+| Framework | React 19 |
+| Build Tool | Vite 6.2 |
+| Routing | React Router DOM 7 |
+| Server State | TanStack React Query 5 |
+| UI | Bootstrap 5.3 + React-Bootstrap 2 |
+| Icons | FontAwesome |
+| HTTP Client | Axios |
+| Testing | Vitest 3 + Testing Library |
+
+### Infrastructure
+
+| Component | Choice |
+|-----------|--------|
+| Containerization | Docker |
+| Orchestration | Kubernetes + Helm |
+| CI/CD | GitHub Actions |
+| Registry | Docker Hub (`nguyenhuuca/funny-app`) |
+| Deployment | VM (SSH/SCP) + Kubernetes (Helm) |
+| Monitoring | Spring Actuator + Prometheus + OpenTelemetry |
 
 ---
 
-##  Why Virtual Threads & StructuredTaskScope?
+## Architecture
 
-Thanks to **Project Loom**, Funny Movies uses **Virtual Threads** and `StructuredTaskScope` to handle thousands of concurrent tasks efficiently, especially for I/O-heavy operations like:
+Layered Spring Boot architecture: **Controller → Service → Repository**
 
-- Fetching YouTube metadata  
-- Calling OpenAI GPT  
-- Sending emails  
-- Writing logs & analytics  
-
-###  Benefits:
-
-- Minimal memory usage  
-- Fast context switching  
-- Safe concurrent task coordination  
-- Easier error handling (`shutdownOnFailure`, etc.)
-
-```java
-try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-    var metadataTask = scope.fork(() -> youtubeService.fetchVideoMetadata(id));
-    var thumbnailTask = scope.fork(() -> ffmpegService.generateThumbnail(id));
-
-    scope.join();
-    scope.throwIfFailed();
-
-    VideoMeta meta = metadataTask.get();
-    String thumbnail = thumbnailTask.get();
-}
+```
+api/src/main/java/com/canhlabs/funnyapp/
+├── web/          # REST controllers (8 controllers)
+├── service/      # Business logic (interfaces + impls)
+├── repo/         # JPA repositories
+├── entity/       # JPA entities
+├── dto/          # Data Transfer Objects
+├── client/       # YouTube API client
+├── config/       # Spring configuration
+├── cache/        # Guava LRU caches
+├── aop/          # @AuditLog, @RateLimited aspects
+├── jobs/         # Scheduled background tasks
+└── utils/        # Validation, helpers
 ```
 
----
+**Virtual Threads** enabled globally via `spring.threads.virtual.enabled=true`, with `StructuredTaskScope` used for coordinated concurrent calls (YouTube API + ChatGPT + email).
 
-## How ChatGPT Works
+**Caching** — four Guava LRU caches:
+- `VideoCacheImpl` — video metadata
+- `ChunkIndexCacheImpl` — chunk position index
+- `StatsCacheImpl` — view/hit statistics
+- `MFASessionStoreImpl` — temporary MFA session storage
 
-We integrate OpenAI's ChatGPT API to:
-
-- Prompt trending video suggestions  
-  > _e.g._ "Suggest 10 funny trending videos on YouTube this week"  
-- Filter and analyze titles/descriptions  
-- Display high-quality recommendations to users
-
----
-
-##  Passwordless Login via Magic Link
-
-**Funny Movies** uses a modern, secure, and frictionless login system:
-
-> **No passwords. No reset flows. Just a click.**
-
-### How it works:
-
-1. User enters their email  
-2. A **magic link** is sent  
-3. Clicking it signs them in instantly
-
-### Benefits:
-
--  No password reuse or phishing risks  
--  Email-based identity = simple  
--  Secure, expirable tokens with device binding
-
-> Powered by JWT & one-time secure tokens.
+**Cross-cutting concerns** via AOP:
+- `@AuditLog` — audit trail with automatic sensitive-field masking
+- `@RateLimited` — per-endpoint rate limiting
 
 ---
 
-##  Setup & Installation
+## Setup & Installation
 
-###  Requirements
+### Requirements
 
-- **JDK 24** (with preview features enabled)  
-- **Maven 3.6+**  
-- **PostgreSQL**  
-- **Google API Key** (YouTube Data API)  
-  👉 https://console.cloud.google.com/apis/api/youtube.googleapis.com/credentials
+- JDK 24 (with preview features)
+- Maven 3.6+
+- PostgreSQL
+- Node.js 18+
+- Google API Key (YouTube Data API v3)
+- OpenAI API Key
 
----
+### Database
 
-###  Database Setup
+```bash
+createdb funnyapp
+psql -d funnyapp -f db/dump.sql
+```
 
-1. Create a PostgreSQL database named `funnyapp`
-2. Run `db/dump.sql` to create the schema & tables
-
----
-
-###  Running App Locally
-
-#### 1. Configure environment variables
-
-Copy and edit:
+### Environment
 
 ```bash
 cp api/.env.example api/.env
 ```
+
+Required variables:
 
 ```env
 DB_USER=postgres
@@ -151,64 +148,103 @@ DB_NAME=funnyapp
 DB_PASS=your_password
 DB_HOST=localhost
 
-GOOGLE_KEY=your_google_api_key
-JWT_SECRET=your_jwt_secret
+GOOGLE_KEY=your_youtube_api_key
 GPT_KEY=your_openai_key
+JWT_SECRET=your_jwt_secret
 
 EMAIL_SENDER=you@example.com
 EMAIL_PASS=your_email_password
 ```
 
-#### 2. Start the app
+### Run Locally
 
 ```bash
-cd api
-./startLocal
+# Backend
+cd api && ./startLocal.sh
+
+# Frontend
+cd webapp && npm install && npm run dev
 ```
 
-#### 3. Access endpoints
+### Access
 
--  Swagger UI: [http://localhost:8081/swagger-ui/](http://localhost:8081/swagger-ui/)  
--  Health Check: [http://localhost:8081/actuator/health](http://localhost:8081/actuator/health)
-
-#### 4. Web UI
-
-- Open `webapp/js/assessment.js`
-- Update:
-
-```js
-const baseURL = "http://localhost:8081/v1/funny-app";
-```
-
-- Open `webapp/index.html` in your browser
+| URL | Purpose |
+|-----|---------|
+| `http://localhost:8081/swagger-ui/` | API docs (dev profile) |
+| `http://localhost:8081/actuator/health` | Health check |
+| `http://localhost:5173` | Frontend dev server |
 
 ---
 
-###  Run Unit Tests
+## Testing
 
 ```bash
 cd api
-./unittest
+
+# Run unit tests
+./unittest.sh
+
+# Tests + coverage report
+mvn verify
 ```
 
-> Jacoco report will be generated under `/target/jacoco-report`
+Coverage is enforced by Jacoco — currently at **55%**, with a **+1% gate per commit** (build fails if coverage drops).
 
 ---
 
-## Docker options
+## Docker
 
-Build your JAR:
-```
+```bash
+cd api
 mvn clean package
-```
-Build the Docker image:
-```
 docker build -t funny-app .
-```
-Run the container:
-```
 docker run -p 8081:8081 --env-file env.local funny-app
 ```
-##  Online Demo
 
-🔗 [https://funnyapp.canh-labs.com/](https://funnyapp.canh-labs.com/)
+---
+
+## CI/CD Pipeline
+
+GitHub Actions workflow (`.github/workflows/funnyapp-ci.yml`):
+
+```
+Build → Test + Coverage → Docker Build → Push to Hub → Deploy to VM
+```
+
+1. **Build** — Maven clean package (JDK 24, skip tests)
+2. **Test** — JUnit 5, Jacoco coverage gate (+1%), SonarCloud, Codecov
+3. **Docker** — build image, auto-increment version, push `prod-{version}` + `latest`
+4. **Deploy** — SCP JAR to VM, trigger deployment script via SSH
+
+Current version: **32** (tracked in `api/.funny-app.version`)
+
+---
+
+## Deployment
+
+### VM (current)
+
+SSH + SCP deploy to `/opt/CICD/`, triggered automatically by CI on merge to `main`.
+
+### Kubernetes (Helm)
+
+```bash
+helm upgrade --install funny-app helm/funny-app/ \
+  --set image.tag=prod-32
+```
+
+Helm config: NodePort 30080, 1 replica, HPA at 80% CPU, 500m CPU / 600Mi memory limits.
+
+---
+
+## Online Demo
+
+[https://funnyapp.canh-labs.com/](https://funnyapp.canh-labs.com/)
+
+---
+
+## Using Claude Code
+
+This project is configured with the **Claude Code Framework** — 9 specialist personas, 90+ auto-triggered skills, and multi-agent swarm execution.
+
+See the guide: [English](https://nguyenhuuca.github.io/assessment/claude-guide-en/) · [Tiếng Việt](https://nguyenhuuca.github.io/assessment/claude-guide-vi/)
