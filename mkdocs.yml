@@ -1,7 +1,47 @@
-site_name: My Architecture Docs
+site_name: Funny Movies - Architecture Docs
+site_description: Architecture documentation for the Funny Movies video streaming platform
+site_author: nguyenhuuca
+repo_url: https://github.com/nguyenhuuca/assessment
+repo_name: nguyenhuuca/assessment
 
 theme:
   name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
 
 nav:
   - Home: README.md
@@ -11,36 +51,39 @@ nav:
       - Sequence Diagram: Sequence-Diagram.md
       - Performance Review: performance-review.md
 
-  - Reports:
-      - 2025-07-05: architecture_quality_report_2025-07-05.md
-      - 2025-07-13 VN: architecture_quality_report_2025-07-13._VN.md
-      - 2025-07-13 EN: architecture_quality_report_2025-07-13_EN.md
-
   - ADR:
       - Template: adr/0000-template.md
-      - Use RDBMS: adr/0001-use-relational-database.md
-      - Backend Architecture: adr/0002-backend-architecture.md
-      - Cache: adr/0003-use-cache.md
-      - Frontend: adr/0004-frontend-structure.md
-      - Video Cache: adr/0005-use_lru_cache_video_streaming.md
+      - 0001 - Use RDBMS: adr/0001-use-relational-database.md
+      - 0002 - Backend Architecture: adr/0002-backend-architecture.md
+      - 0003 - Cache Strategy: adr/0003-use-cache.md
+      - 0004 - Frontend Structure: adr/0004-frontend-structure.md
+      - 0005 - LRU Video Cache: adr/0005-use_lru_cache_video_streaming.md
+      - 0006 - HLS Video Streaming: adr/0006-hls-video-streaming.md
+      - 0007 - Admin Dashboard: adr/0007-admin-dashboard.md
+      - 0008 - React Migration: adr/0008-react-migration.md
+      - 0009 - Unified Video List API: adr/0009-unified-video-list-api.md
       - Binary Search: adr/apr_binary_search.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
+      - React Migration: prd/PRD-react-migration.md
 
   - Plans:
-      - Plan A: plans/plan-a-file-based-hooks.md
-      - Plan B: plans/plan-b-direct-cli-spawn.md
+      - HLS Migration: plans/plan-hls-migration.md
+      - React Migration: plans/plan-react-migration.md
+      - Admin Dashboard: plans/plan-admin-dashboard.md
+      - Permissions (Bitwise): plans/plan-permissions-bitwise.md
+      - Hot Score Migration: plans/plan-vid2-hot-score-migration.md
+      - Plan A (File-based Hooks): plans/plan-a-file-based-hooks.md
+      - Plan B (Direct CLI Spawn): plans/plan-b-direct-cli-spawn.md
 
-  - API Docs:
-      - OpenAPI JSON: apidocs/api-docs.json
-      - Redoc: apidocs/redoc-static.html
+  - Reports:
+      - System Health 2026-05-30: system_health_report_2026-05-30.md
+      - System Health 2026-02-06: system_health_report_2026-02-06.md
+      - Architecture Quality 2025-07-13 EN: architecture_quality_report_2025-07-13_EN.md
+      - Architecture Quality 2025-07-13 VN: architecture_quality_report_2025-07-13._VN.md
+      - Architecture Quality 2025-07-05: architecture_quality_report_2025-07-05.md
 
-  - Diagrams (PUML):
-      - C4 L1: puml/C4-L1.puml
-      - C4 L2: puml/C4-L2.puml
-      - C4 L3: puml/C4-L3.puml
-      - Deployment: puml/Deployment.puml
-
-  - Tasks:
-      - Pending: tasks/pending/
+  - Guides:
+      - Trello Setup: trello-setup-guide.md
+      - Trello Board Status: trello-board-status.md
