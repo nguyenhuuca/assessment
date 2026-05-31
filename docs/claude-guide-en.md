@@ -645,19 +645,20 @@ mvn verify
 ### Learning Path
 
 #### Beginner
-1. Use personas: `/architect`, `/builder`, `/qa-engineer`
-2. Try auto-triggered skills: implement, test, debug
+1. Scope a feature idea: `/scope add a feature`
+2. Use core personas: `/builder`, `/qa-engineer`
 3. Create commits and PRs with Claude
 
 #### Intermediate
-4. Use `/swarm-plan` and `/swarm-execute`
-5. Security audit with `/security-auditor`
-6. System design with `/architect`
+4. Full planning flow: `/scope` → `/architect` → `/spec` → `/swarm-plan`
+5. Execute with swarm: `/swarm-execute`
+6. Security audit with `/security-auditor`
+7. System design and ADRs with `/architect`
 
 #### Advanced
-7. Create custom skills in `.claude/skills/`
-8. Configure permissions in `.claude/settings.json`
-9. Build multi-agent workflows with swarm
+8. Create custom skills in `.claude/skills/`
+9. Configure permissions in `.claude/settings.json`
+10. Build multi-agent workflows with swarm
 
 ---
 
