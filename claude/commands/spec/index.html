@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Test strategy, automation, and quality verification">
+        <meta name="description" content="Generate a Feature Specification from a PRD and ADR — asks clarifying questions one at a time, then writes docs/specs/spec-{slug}.md">
       
       
         <meta name="author" content="nguyenhuuca">
       
       
       
-        <link rel="prev" href="../architect/">
+        <link rel="prev" href="../scope/">
       
       
-        <link rel="next" href="../code-check/">
+        <link rel="next" href="../builder/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>QA Engineer - Funny Movies - Architecture Docs</title>
+        <title>Spec (Specification) - Funny Movies - Architecture Docs</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#qa-engineer" class="md-skip">
+        <a href="#spec-feature-specification" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              QA Engineer
+              Spec (Specification)
             
           </span>
         </div>
@@ -2444,10 +2444,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../spec/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spec (Specification)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -2463,6 +2490,120 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to use
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-read-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Read inputs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-identify-gaps-and-ask-questions-one-at-a-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Identify gaps and ask questions one at a time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-read-codebase-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Read codebase context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-write-the-spec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Write the Spec
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-update-tracking-and-offer-next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Update tracking and offer next steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2528,37 +2669,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    QA Engineer
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../qa-engineer/" class="md-nav__link">
         
   
   
@@ -2574,92 +2688,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#mcp-tools" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        MCP Tools
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing Workflow
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#test-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test Types
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Constraints
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related-skills" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related Skills
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#handoff" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handoff
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -5690,10 +5718,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mcp-tools" class="md-nav__link">
+  <a href="#how-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP Tools
+        How to use
       
     </span>
   </a>
@@ -5701,54 +5729,82 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#testing-workflow" class="md-nav__link">
+  <a href="#workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Workflow
+        Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-read-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Read inputs
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#test-types" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#step-2-identify-gaps-and-ask-questions-one-at-a-time" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Test Types
+        Step 2 — Identify gaps and ask questions one at a time
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#constraints" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#step-3-read-codebase-context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Constraints
+        Step 3 — Read codebase context
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#related-skills" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#step-4-write-the-spec" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related Skills
+        Step 4 — Write the Spec
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#handoff" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#step-5-update-tracking-and-offer-next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Handoff
+        Step 5 — Update tracking and offer next steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rules
       
     </span>
   </a>
@@ -5772,7 +5828,7 @@
 
 
   
-    <a href="https://github.com/nguyenhuuca/assessment/edit/main/docs/claude/commands/qa-engineer.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/nguyenhuuca/assessment/edit/main/docs/claude/commands/spec.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -5780,81 +5836,148 @@
   
 
 
-<h1 id="qa-engineer">QA Engineer<a class="headerlink" href="#qa-engineer" title="Permanent link">&para;</a></h1>
-<p>Test strategy, automation, and verification.</p>
-<h2 id="mcp-tools">MCP Tools<a class="headerlink" href="#mcp-tools" title="Permanent link">&para;</a></h2>
-<p><strong>Chrome DevTools</strong> (E2E and browser testing):
-- Automate user flows in real browser
-- Capture screenshots for visual regression
-- Run Lighthouse accessibility audits
-- Profile performance during tests
-- Inspect network requests and console errors</p>
-<h2 id="testing-workflow">Testing Workflow<a class="headerlink" href="#testing-workflow" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>Analyze</strong> — Use Glob to find source files without corresponding tests</li>
-<li><strong>Plan</strong> — Design test strategy covering all layers</li>
-<li><strong>Unit/Integration</strong> — Write tests with standard runners</li>
-<li><strong>E2E</strong> — Use Chrome DevTools for browser automation</li>
-<li><strong>Accessibility</strong> — Run Lighthouse audits via DevTools</li>
-<li><strong>Performance</strong> — Capture traces for performance baselines</li>
-</ol>
-<h2 id="test-types">Test Types<a class="headerlink" href="#test-types" title="Permanent link">&para;</a></h2>
+<h1 id="spec-feature-specification">Spec → Feature Specification<a class="headerlink" href="#spec-feature-specification" title="Permanent link">&para;</a></h1>
+<p>Turn an approved PRD + ADR into a precise, implementable Feature Specification.
+Ask clarifying questions before writing — the spec must be unambiguous.</p>
+<h2 id="how-to-use">How to use<a class="headerlink" href="#how-to-use" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/spec docs/prd/PRD-{slug}.md docs/adr/NNNN-{slug}.md
+</code></pre></div>
+<p>Example: <code>/spec docs/prd/PRD-bookmark-feature.md docs/adr/0012-bookmark-feature-design.md</code></p>
+<hr />
+<h2 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Permanent link">&para;</a></h2>
+<h3 id="step-1-read-inputs">Step 1 — Read inputs<a class="headerlink" href="#step-1-read-inputs" title="Permanent link">&para;</a></h3>
+<p>Read both files from <code>$ARGUMENTS</code>:
+- <strong>PRD</strong> — extract: feature name, functional requirements, user stories, scope, NFRs
+- <strong>ADR</strong> — extract: chosen approach, schema sketch, API sketch, constraints, consequences</p>
+<p>Derive the kebab slug from the PRD filename (e.g. <code>PRD-bookmark-feature.md</code> → <code>bookmark-feature</code>).</p>
+<h3 id="step-2-identify-gaps-and-ask-questions-one-at-a-time">Step 2 — Identify gaps and ask questions one at a time<a class="headerlink" href="#step-2-identify-gaps-and-ask-questions-one-at-a-time" title="Permanent link">&para;</a></h3>
+<p>The PRD and ADR answer the "why" and "how". The Spec must answer the "exactly what".
+Ask ONLY for what is genuinely unclear or not stated in the inputs.</p>
+<p><strong>Required information:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Type</th>
-<th>Purpose</th>
-<th>Tools</th>
+<th>#</th>
+<th>Question</th>
+<th>Why it matters</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Unit</td>
-<td>Logic isolation</td>
-<td>Project test runner</td>
+<td>Q1</td>
+<td>What are the exact business rules that must be enforced? (numbered, precise)</td>
+<td>Business Rules section</td>
 </tr>
 <tr>
-<td>Integration</td>
-<td>Component interaction</td>
-<td>Real deps</td>
+<td>Q2</td>
+<td>What are all the error cases? Include HTTP status, error code, and the exact condition.</td>
+<td>API error table</td>
 </tr>
 <tr>
-<td>E2E</td>
-<td>User flows</td>
-<td>Chrome DevTools</td>
+<td>Q3</td>
+<td>Are there any rate limits, caps, or quotas? (per user / per day / global)</td>
+<td>FR + Security sections</td>
 </tr>
 <tr>
-<td>Visual</td>
-<td>UI regression</td>
-<td>DevTools screenshots</td>
+<td>Q4</td>
+<td>What are the edge cases that must be explicitly handled? (boundary values, concurrency, nulls)</td>
+<td>Edge Cases section</td>
 </tr>
 <tr>
-<td>A11y</td>
-<td>Accessibility</td>
-<td>Lighthouse via DevTools</td>
+<td>Q5</td>
+<td>What are the performance targets per operation?</td>
+<td>NFR section</td>
 </tr>
 <tr>
-<td>Perf</td>
-<td>Performance</td>
-<td>DevTools traces</td>
+<td>Q6</td>
+<td>Any security requirements beyond JWT auth? (role restrictions, data masking, audit logging)</td>
+<td>Security section</td>
 </tr>
 </tbody>
 </table>
-<h2 id="constraints">Constraints<a class="headerlink" href="#constraints" title="Permanent link">&para;</a></h2>
+<p><strong>Rules:</strong>
+- Ask questions <strong>one at a time</strong> — use <code>AskUserQuestion</code> for each, wait for the answer, then ask the next
+- Work through Q1 → Q6 in order, skipping any already answered in the PRD/ADR
+- For each question, provide <strong>3–4 contextually relevant options</strong> derived from the feature. Mark best guess <code>(Recommended)</code>.
+- After each answer, acknowledge it in one sentence before asking the next
+- If the user says "just write it" or "use your best judgment", proceed with clearly labeled assumptions</p>
+<p><strong>Example — asking Q1 for a bookmark feature:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>AskUserQuestion({
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  questions: [{
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    question: &quot;What are the core business rules for bookmarks?&quot;,
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    header: &quot;Business Rules&quot;,
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    multiSelect: true,
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    options: [
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>      { label: &quot;Max 500 bookmarks per user (Recommended)&quot;, description: &quot;Cap enforced at API layer — 409 if exceeded&quot; },
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>      { label: &quot;A video can only be bookmarked once per user&quot;, description: &quot;Idempotent add — no duplicates&quot; },
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>      { label: &quot;Bookmarks survive video deletion&quot;, description: &quot;video_id becomes null, bookmark entry persists&quot; },
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>      { label: &quot;Max 50 collections per user&quot;, description: &quot;Cap on named folders to prevent abuse&quot; }
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    ]
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>  }]
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>})
+</code></pre></div></p>
+<p><strong>Example — asking Q4 for edge cases:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>AskUserQuestion({
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  questions: [{
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    question: &quot;Which edge cases must be explicitly handled?&quot;,
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    header: &quot;Edge Cases&quot;,
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    multiSelect: true,
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    options: [
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>      { label: &quot;Bookmark exactly at the cap (Recommended)&quot;, description: &quot;500th bookmark → success; 501st → 409&quot; },
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>      { label: &quot;Concurrent bookmark requests from same user&quot;, description: &quot;Two simultaneous POSTs for same video → at most one created&quot; },
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>      { label: &quot;Bookmark a deleted video&quot;, description: &quot;video_id becomes null → UI shows placeholder&quot; },
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>      { label: &quot;Delete collection with items&quot;, description: &quot;Bookmarks remain in &#39;All Bookmarks&#39;; only collection link removed&quot; }
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    ]
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>  }]
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>})
+</code></pre></div></p>
+<h3 id="step-3-read-codebase-context">Step 3 — Read codebase context<a class="headerlink" href="#step-3-read-codebase-context" title="Permanent link">&para;</a></h3>
+<p>Use Glob/Grep to verify:
+- Existing entities related to the feature (field names, types)
+- Existing error handling patterns (<code>ResultErrorInfo</code>, exception classes)
+- Migration naming convention (latest file in <code>db/changelog/sql/</code>)
+- Frontend API module pattern (<code>webapp/src/api/</code>)</p>
+<p>This ensures the spec reflects the actual codebase, not assumptions.</p>
+<h3 id="step-4-write-the-spec">Step 4 — Write the Spec<a class="headerlink" href="#step-4-write-the-spec" title="Permanent link">&para;</a></h3>
+<p>Create <code>docs/specs/spec-{kebab-slug}.md</code> using <code>templates/artifacts/spec.template.md</code>.</p>
+<p>Fill every section. Where information comes from assumption rather than user input, mark with <code>&gt; **Assumption:** ...</code>.</p>
+<p><strong>Project-specific conventions:</strong>
+- API base path: <code>/v1/funny-app</code> (from <code>AppConstant.API.BASE_URL</code>)
+- Response wrappers: <code>ResultObjectInfo&lt;T&gt;</code> for single objects, <code>ResultListInfo&lt;T&gt;</code> for lists
+- Error response format: <code>{ status: "ERROR", code: "...", message: "..." }</code> via <code>ResultErrorInfo</code>
+- Auth: JWT Bearer — extracted from <code>SecurityContextHolder</code> in service layer
+- DB migrations: <code>api/src/main/resources/db/changelog/sql/YYYYMMDDHHMM-description.sql</code>
+- UUID primary keys for new entities (matches recent VideoComment pattern)
+- Frontend queries: <code>['resource', 'filter']</code> key convention with React Query</p>
+<p><strong>Sections to fill (never leave placeholder text):</strong>
+- Overview — 1–3 sentences, system-level outcome
+- Business Rules — numbered, each independently testable
+- Functional Requirements — FR-1, FR-2... with "must"/"must not"
+- API Changes — exact request/response/error table per endpoint
+- Database Changes — final SQL with indexes
+- Security Requirements — auth, roles, masking
+- Caching Impact — which Guava caches are affected
+- Frontend Changes — new routes, components, React Query keys
+- Non-Functional Requirements — latency targets per operation
+- Edge Cases — EC-1, EC-2... with exact expected behavior
+- Acceptance Criteria — testable checklist QA can use directly</p>
+<h3 id="step-5-update-tracking-and-offer-next-steps">Step 5 — Update tracking and offer next steps<a class="headerlink" href="#step-5-update-tracking-and-offer-next-steps" title="Permanent link">&para;</a></h3>
+<p>After writing the Spec:
+1. Update <code>docs/tracking.md</code> — set Spec column for this feature to link + 📋
+2. Offer to create <strong>Implementation Plan</strong> (<code>docs/plans/plan-{slug}.md</code>) via <code>/swarm-plan</code>
+3. Offer to add entry to <strong><code>mkdocs.yml</code></strong> nav under Specs</p>
+<p>Do not auto-create these — wait for the user to confirm.</p>
+<hr />
+<h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>
 <ul>
-<li>NO flaky tests — fix or remove</li>
-<li>NO shared state between tests</li>
-<li>NO order-dependent tests</li>
-<li>ALWAYS deterministic and isolated</li>
-<li>ALWAYS run Lighthouse for UI components</li>
-<li>ALWAYS capture screenshots for visual changes</li>
-</ul>
-<h2 id="related-skills">Related Skills<a class="headerlink" href="#related-skills" title="Permanent link">&para;</a></h2>
-<p><code>testing</code>, <code>test-driven-development</code></p>
-<h2 id="handoff">Handoff<a class="headerlink" href="#handoff" title="Permanent link">&para;</a></h2>
-<ul>
-<li>To Builder: For bug fixes</li>
-<li>To Swarm Review: After test pass</li>
+<li><strong>Read PRD and ADR first</strong> — never ask questions already answered there</li>
+<li><strong>One question at a time</strong> — use <code>AskUserQuestion</code>; wait for answer before next</li>
+<li><strong>Always provide options</strong> — 3–4 relevant choices, mark best guess <code>(Recommended)</code></li>
+<li><strong>Acknowledge each answer</strong> before moving to the next question</li>
+<li><strong>No ambiguity allowed</strong> — every edge case must be resolved, not left as TBD</li>
+<li><strong>Assumptions must be labelled</strong> — mark with <code>&gt; **Assumption:**</code> inline</li>
+<li><strong>Fill every section</strong> — use <code>N/A</code> only when genuinely not applicable, never as shortcut</li>
+<li><strong>Match codebase patterns</strong> — verify entity/API names against actual code</li>
 </ul>
 <p>$ARGUMENTS</p>
 
