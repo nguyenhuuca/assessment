@@ -3,6 +3,7 @@ site_description: Architecture documentation for the Funny Movies video streamin
 site_author: nguyenhuuca
 repo_url: https://github.com/nguyenhuuca/assessment
 repo_name: nguyenhuuca/assessment
+edit_uri: edit/main/docs/
 
 theme:
   name: material
@@ -49,6 +50,7 @@ markdown_extensions:
 
 extra_javascript:
   - https://unpkg.com/mermaid@11/dist/mermaid.min.js
+  - javascripts/copy-markdown.js
 
 nav:
   - Home: README.md
