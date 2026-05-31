@@ -15,6 +15,7 @@ theme:
     - search.highlight
     - search.suggest
     - content.code.copy
+    - content.action.edit
   palette:
     - scheme: default
       primary: indigo
