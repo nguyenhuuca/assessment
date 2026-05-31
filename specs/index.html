@@ -1582,6 +1582,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-to-create-a-spec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to create a Spec
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#template" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5652,6 +5663,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-to-create-a-spec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to create a Spec
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#template" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5699,17 +5721,36 @@
 
 
 <h1 id="feature-specifications">Feature Specifications<a class="headerlink" href="#feature-specifications" title="Permanent link">&para;</a></h1>
-<p>Feature Specs định nghĩa exact behavior, API contract, và acceptance criteria cho từng feature.</p>
+<p>Feature Specs define the exact behavior, API contract, and acceptance criteria for each feature.</p>
 <h2 id="what-is-a-spec">What is a Spec?<a class="headerlink" href="#what-is-a-spec" title="Permanent link">&para;</a></h2>
-<p>Spec là bridge giữa ADR (quyết định kiến trúc) và Plan (task breakdown).
-Dev đọc Spec là implement được ngay — không cần suy diễn.</p>
+<p>A Spec is the bridge between an ADR (architectural decision) and a Plan (task breakdown).
+A developer can read a Spec and implement immediately — no ambiguity, no guesswork.</p>
 <h2 id="flow">Flow<a class="headerlink" href="#flow" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>PRD → ADR → Spec → Plan → Implementation
 </code></pre></div>
+<h2 id="how-to-create-a-spec">How to create a Spec<a class="headerlink" href="#how-to-create-a-spec" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/spec docs/prd/PRD-{slug}.md docs/adr/NNNN-{slug}.md
+</code></pre></div>
+<p>Claude reads the PRD and ADR, asks clarifying questions one at a time (business rules, error cases, edge cases, performance targets), then writes the Spec.</p>
 <h2 id="template">Template<a class="headerlink" href="#template" title="Permanent link">&para;</a></h2>
-<p>Xem template tại: <a href="../claude/templates/artifacts/spec.template/">Spec Template</a></p>
+<p>See: <a href="../claude/templates/artifacts/spec.template/">Spec Template</a></p>
 <h2 id="specs">Specs<a class="headerlink" href="#specs" title="Permanent link">&para;</a></h2>
-<p><em>Chưa có spec nào. Tạo spec đầu tiên với template trên.</em></p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>File</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Watch History</td>
+<td><a href="spec-watch-history/">spec-watch-history.md</a></td>
+<td>📋 Draft</td>
+</tr>
+</tbody>
+</table>
 
 
 
