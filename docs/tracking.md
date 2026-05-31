@@ -39,19 +39,29 @@ Status tracker for all PRDs, ADRs, and Plans in the project.
 
 ## Status Summary
 
-### ✅ Done
-- Use RDBMS, Backend Architecture, Cache Strategy, Frontend Structure, LRU Video Cache
-- Trivy Container Scanning, Bitwise Permissions, React Migration
+### ✅ Done (8)
+- [Use RDBMS](adr/0001-use-relational-database.md)
+- [Backend Architecture](adr/0002-backend-architecture.md)
+- [Cache Strategy](adr/0003-use-cache.md)
+- [Frontend Structure](adr/0004-frontend-structure.md)
+- [LRU Video Cache](adr/0005-use_lru_cache_video_streaming.md)
+- [Trivy Container Scanning](adr/0010-trivy-container-scanning.md)
+- [Bitwise Permissions](plans/plan-permissions-bitwise.md)
+- [React Migration](prd/PRD-react-migration.md)
 
-### 🔄 In Progress
-- Admin Dashboard
+### 🔄 In Progress (1)
+- [Admin Dashboard](plans/plan-admin-dashboard.md)
 
-### 🔍 In Review
-- HLS Video Streaming, Unified Video List API, Hot Video Priority
-- Hot Score Migration, File-based Hooks, Bookmark Feature
+### 🔍 In Review (6)
+- [HLS Video Streaming](plans/plan-hls-migration.md)
+- [Unified Video List API](adr/0009-unified-video-list-api.md)
+- [Hot Video Priority](plans/plan-hot-video-priority.md)
+- [Hot Score Migration](plans/plan-vid2-hot-score-migration.md)
+- [File-based Hooks](plans/plan-a-file-based-hooks.md)
+- [Bookmark Feature](plans/plan-bookmark-feature.md)
 
-### 📝 Draft / Proposed
-- Unified Video List API
+### 💡 Proposed / No Plan Yet (0)
+- —
 
 ---
 
