@@ -1,6 +1,6 @@
 ---
 description: Scope a feature idea into a full PRD — asks clarifying questions when the description is unclear, then writes docs/prd/PRD-{slug}.md using the project's official template
-allowed-tools: Read, Write, Glob, Grep
+allowed-tools: Read, Write, Glob, Grep, AskUserQuestion
 argument-hint: [feature description]
 ---
 
@@ -45,11 +45,30 @@ Before writing anything, check which of the following are **missing or ambiguous
 | Q6 | Any known technical constraints, dependencies, or risks? | Dependencies + Risks sections |
 
 **Rules:**
-- Ask questions **one at a time** — pose a single question, wait for the user's answer, then ask the next
+- Ask questions **one at a time** — use `AskUserQuestion` for each, wait for the answer, then ask the next
 - Work through Q1 → Q6 in order, skipping any already answered in the input
+- For each question, provide **3–4 contextually relevant options** derived from the feature description. Mark your best guess with `(Recommended)` at the end of its label. The tool automatically appends an "Other" option so the user can type a free-form answer.
 - After each answer, briefly acknowledge it (one sentence) before asking the next question
 - Once all gaps are filled, summarize what you understood and confirm before writing
 - If the user says "just write it" or "use your best judgment", proceed with clearly labeled assumptions
+
+**Example — asking Q1 for a "trending videos" feature:**
+```
+AskUserQuestion({
+  questions: [{
+    question: "What problem does this feature solve, and who has it?",
+    header: "Problem",
+    multiSelect: false,
+    options: [
+      { label: "Users can't find popular content (Recommended)", description: "Homepage lacks social proof; users churn after not discovering trending videos" },
+      { label: "Returning users have no reason to come back", description: "No fresh or dynamic content to pull users back" },
+      { label: "New creators can't get visibility", description: "Without trending, small creators never surface to new audiences" }
+    ]
+  }]
+})
+```
+
+Adapt the options to the actual feature — do not reuse these verbatim.
 
 ### Step 3 — Read existing codebase context
 
@@ -88,7 +107,8 @@ Do not auto-create these — wait for the user to confirm.
 ## Rules
 
 - **Never skip the clarification step** if any of Q1–Q4 are unanswered
-- **One question at a time** — ask Q1, wait for answer, then Q2, and so on
+- **One question at a time** — use `AskUserQuestion` for each; wait for answer before asking Q2, etc.
+- **Always provide options** — 3–4 contextually relevant choices, mark best guess `(Recommended)`, "Other" is auto-added for free text
 - **Acknowledge each answer** before moving to the next question
 - **Assumptions must be labelled** — mark with `> **Assumption:**` inline
 - **Use the official template** from `templates/artifacts/prd.template.md` — do not invent a different structure
