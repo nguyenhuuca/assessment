@@ -157,18 +157,29 @@ Expected: Tối đa một request thành công; limit vẫn được đảm bả
 
 ## Bước 4 — Kế hoạch triển khai
 
-Sau khi PRD + ADR được duyệt, dùng `/swarm-plan` để phân rã tính năng thành kế hoạch theo giai đoạn và Beads.
+Sau khi có Spec (hoặc PRD + ADR), dùng `/swarm-plan` để phân rã tính năng thành kế hoạch theo giai đoạn và Beads.
 
-```
+`/swarm-plan` nhận bất kỳ artifact nào — truyền vào những gì bạn đang có:
+
+```bash
+# Với Spec (recommended — input chi tiết nhất)
+/swarm-plan docs/specs/spec-comment-section.md
+
+# Với Spec + PRD + ADR (đầy đủ nhất)
+/swarm-plan docs/specs/spec-comment-section.md docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
+
+# Không có Spec (chỉ PRD + ADR)
 /swarm-plan docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
 ```
+
+> **Tip:** Spec là input phong phú nhất — đã có FR-1/FR-2, API contract, edge cases, và acceptance criteria. `/swarm-plan` có thể derive tasks trực tiếp từ Spec mà không cần PRD hay ADR.
 
 `/swarm-plan` khác `/architect` ở chỗ:
 
 | | `/architect` | `/swarm-plan` |
 |---|---|---|
 | **Output chính** | ADR (ghi lại quyết định) | Plan + Beads (chia nhỏ task) |
-| **Hỏi người dùng** | Không — tự explore codebase | Không — đọc PRD/ADR |
+| **Hỏi người dùng** | Không — tự explore codebase | Không — đọc artifacts đầu vào |
 | **Tạo ADR** | Luôn luôn | Chỉ khi gặp quyết định One-Way Door (High) |
 | **Tạo Beads** | Không | Có — sẵn sàng cho `/swarm-execute` |
 

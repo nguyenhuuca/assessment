@@ -156,18 +156,29 @@ Expected: At most one succeeds; limit remains enforced
 
 ## Step 4 — Implementation plan
 
-With PRD + ADR approved, use `/swarm-plan` to decompose the feature into a phased plan and Beads.
+With Spec (or PRD + ADR) ready, use `/swarm-plan` to decompose the feature into a phased plan and Beads.
 
-```
+`/swarm-plan` accepts any combination of artifacts — pass whichever you have:
+
+```bash
+# With Spec (recommended — most detailed input)
+/swarm-plan docs/specs/spec-comment-section.md
+
+# With Spec + PRD + ADR (maximum context)
+/swarm-plan docs/specs/spec-comment-section.md docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
+
+# Without Spec (PRD + ADR only)
 /swarm-plan docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
 ```
+
+> **Tip:** The Spec is the richest input — it already contains FR-1/FR-2, API contract, edge cases, and acceptance criteria. `/swarm-plan` can derive tasks directly from it without needing PRD or ADR.
 
 `/swarm-plan` differs from `/architect`:
 
 | | `/architect` | `/swarm-plan` |
 |---|---|---|
 | **Primary output** | ADR (decision record) | Plan + Beads (task breakdown) |
-| **Asks questions** | No — explores codebase | No — reads PRD/ADR |
+| **Asks questions** | No — explores codebase | No — reads input artifacts |
 | **Creates ADR** | Always | Only for One-Way Door (High) decisions found during planning |
 | **Creates Beads** | No | Yes — ready for `/swarm-execute` |
 
