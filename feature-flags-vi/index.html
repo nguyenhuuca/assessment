@@ -13,28 +13,28 @@
       
       
       
-        <link rel="prev" href="../0003-use-cache/">
+        <link rel="prev" href="../feature-flags/">
       
       
-        <link rel="next" href="../0005-use_lru_cache_video_streaming/">
+        <link rel="next" href="../plans/plan-hls-migration/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>0004 - Frontend Structure - Funny Movies - Architecture Docs</title>
+        <title>Tiếng Việt - Funny Movies - Architecture Docs</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,7 +53,7 @@
       
     
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#use-vanilla-js-bootstrap-for-current-frontend-with-planned-migration-to-react" class="md-skip">
+        <a href="#harness-feature-flags" class="md-skip">
           Skip to content
         </a>
       
@@ -92,7 +92,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Funny Movies - Architecture Docs" class="md-header__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+    <a href=".." title="Funny Movies - Architecture Docs" class="md-header__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              0004 - Frontend Structure
+              Tiếng Việt
             
           </span>
         </div>
@@ -225,7 +225,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href=".." class="md-tabs__link">
         
   
   
@@ -246,7 +246,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../Video%20Streaming%20System%20Architecture/" class="md-tabs__link">
+        <a href="../Video%20Streaming%20System%20Architecture/" class="md-tabs__link">
           
   
   
@@ -262,13 +262,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../0000-template/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../adr/0000-template/" class="md-tabs__link">
           
   
   
@@ -288,7 +286,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../prd/PRD-hot-video-priority/" class="md-tabs__link">
+        <a href="../prd/PRD-hot-video-priority/" class="md-tabs__link">
           
   
   
@@ -304,11 +302,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../feature-flags/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../feature-flags/" class="md-tabs__link">
           
   
   
@@ -328,7 +328,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../plans/plan-hls-migration/" class="md-tabs__link">
+        <a href="../plans/plan-hls-migration/" class="md-tabs__link">
           
   
   
@@ -348,7 +348,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../system_health_report_2026-05-30/" class="md-tabs__link">
+        <a href="../system_health_report_2026-05-30/" class="md-tabs__link">
           
   
   
@@ -368,7 +368,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../claude-guide-en/" class="md-tabs__link">
+        <a href="../claude-guide-en/" class="md-tabs__link">
           
   
   
@@ -402,7 +402,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Funny Movies - Architecture Docs" class="md-nav__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+    <a href=".." title="Funny Movies - Architecture Docs" class="md-nav__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -432,7 +432,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -513,7 +513,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Video%20Streaming%20System%20Architecture/" class="md-nav__link">
+      <a href="../Video%20Streaming%20System%20Architecture/" class="md-nav__link">
         
   
   
@@ -541,7 +541,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Sequence-Diagram/" class="md-nav__link">
+      <a href="../Sequence-Diagram/" class="md-nav__link">
         
   
   
@@ -569,7 +569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../performance-review/" class="md-nav__link">
+      <a href="../performance-review/" class="md-nav__link">
         
   
   
@@ -597,7 +597,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../diagrams/ci-pipeline/" class="md-nav__link">
+      <a href="../diagrams/ci-pipeline/" class="md-nav__link">
         
   
   
@@ -629,31 +629,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -671,7 +668,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -689,7 +686,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0000-template/" class="md-nav__link">
+      <a href="../adr/0000-template/" class="md-nav__link">
         
   
   
@@ -717,7 +714,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0001-use-relational-database/" class="md-nav__link">
+      <a href="../adr/0001-use-relational-database/" class="md-nav__link">
         
   
   
@@ -745,7 +742,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0002-backend-architecture/" class="md-nav__link">
+      <a href="../adr/0002-backend-architecture/" class="md-nav__link">
         
   
   
@@ -773,7 +770,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0003-use-cache/" class="md-nav__link">
+      <a href="../adr/0003-use-cache/" class="md-nav__link">
         
   
   
@@ -798,37 +795,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0004 - Frontend Structure
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../adr/0004-frontend-structure/" class="md-nav__link">
         
   
   
@@ -844,92 +814,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Context
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Consequences
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -942,7 +826,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0005-use_lru_cache_video_streaming/" class="md-nav__link">
+      <a href="../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
         
   
   
@@ -970,7 +854,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0006-hls-video-streaming/" class="md-nav__link">
+      <a href="../adr/0006-hls-video-streaming/" class="md-nav__link">
         
   
   
@@ -998,7 +882,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0007-admin-dashboard/" class="md-nav__link">
+      <a href="../adr/0007-admin-dashboard/" class="md-nav__link">
         
   
   
@@ -1026,7 +910,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0008-react-migration/" class="md-nav__link">
+      <a href="../adr/0008-react-migration/" class="md-nav__link">
         
   
   
@@ -1054,7 +938,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0009-unified-video-list-api/" class="md-nav__link">
+      <a href="../adr/0009-unified-video-list-api/" class="md-nav__link">
         
   
   
@@ -1082,7 +966,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0010-trivy-container-scanning/" class="md-nav__link">
+      <a href="../adr/0010-trivy-container-scanning/" class="md-nav__link">
         
   
   
@@ -1171,7 +1055,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../prd/PRD-hot-video-priority/" class="md-nav__link">
+      <a href="../prd/PRD-hot-video-priority/" class="md-nav__link">
         
   
   
@@ -1199,7 +1083,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../prd/PRD-react-migration/" class="md-nav__link">
+      <a href="../prd/PRD-react-migration/" class="md-nav__link">
         
   
   
@@ -1231,28 +1115,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -1270,7 +1157,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1288,7 +1175,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../feature-flags/" class="md-nav__link">
+      <a href="../feature-flags/" class="md-nav__link">
         
   
   
@@ -1313,10 +1200,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../feature-flags-vi/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tiếng Việt
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1332,6 +1246,136 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kien-truc-tong-quan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kiến trúc tổng quan
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cau-hinh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cấu hình
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Interface
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#danh-sach-flags-hien-tai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Danh sách Flags hiện tại
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#user-targeting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User Targeting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vi-du-thuc-te-permission-enforcement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ví dụ thực tế: Permission Enforcement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graceful-degradation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graceful Degradation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#them-mot-flag-moi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thêm một Flag mới
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Coverage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cac-file-lien-quan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Các file liên quan
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1405,7 +1449,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-hls-migration/" class="md-nav__link">
+      <a href="../plans/plan-hls-migration/" class="md-nav__link">
         
   
   
@@ -1433,7 +1477,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-react-migration/" class="md-nav__link">
+      <a href="../plans/plan-react-migration/" class="md-nav__link">
         
   
   
@@ -1461,7 +1505,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-admin-dashboard/" class="md-nav__link">
+      <a href="../plans/plan-admin-dashboard/" class="md-nav__link">
         
   
   
@@ -1489,7 +1533,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-permissions-bitwise/" class="md-nav__link">
+      <a href="../plans/plan-permissions-bitwise/" class="md-nav__link">
         
   
   
@@ -1517,7 +1561,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-vid2-hot-score-migration/" class="md-nav__link">
+      <a href="../plans/plan-vid2-hot-score-migration/" class="md-nav__link">
         
   
   
@@ -1545,7 +1589,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-trivy-scan/" class="md-nav__link">
+      <a href="../plans/plan-trivy-scan/" class="md-nav__link">
         
   
   
@@ -1573,7 +1617,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-a-file-based-hooks/" class="md-nav__link">
+      <a href="../plans/plan-a-file-based-hooks/" class="md-nav__link">
         
   
   
@@ -1601,7 +1645,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-b-direct-cli-spawn/" class="md-nav__link">
+      <a href="../plans/plan-b-direct-cli-spawn/" class="md-nav__link">
         
   
   
@@ -1690,7 +1734,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../system_health_report_2026-05-30/" class="md-nav__link">
+      <a href="../system_health_report_2026-05-30/" class="md-nav__link">
         
   
   
@@ -1718,7 +1762,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../system_health_report_2026-02-06/" class="md-nav__link">
+      <a href="../system_health_report_2026-02-06/" class="md-nav__link">
         
   
   
@@ -1746,7 +1790,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
+      <a href="../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
         
   
   
@@ -1774,7 +1818,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
+      <a href="../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
         
   
   
@@ -1802,7 +1846,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture_quality_report_2025-07-05/" class="md-nav__link">
+      <a href="../architecture_quality_report_2025-07-05/" class="md-nav__link">
         
   
   
@@ -1891,7 +1935,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../claude-guide-en/" class="md-nav__link">
+      <a href="../claude-guide-en/" class="md-nav__link">
         
   
   
@@ -1919,7 +1963,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../claude-guide-vi/" class="md-nav__link">
+      <a href="../claude-guide-vi/" class="md-nav__link">
         
   
   
@@ -1974,10 +2018,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#kien-truc-tong-quan" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
+        Kiến trúc tổng quan
       
     </span>
   </a>
@@ -1985,10 +2029,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
+  <a href="#cau-hinh" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Date
+        Cấu hình
       
     </span>
   </a>
@@ -1996,10 +2040,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
+  <a href="#service-interface" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Context
+        Service Interface
       
     </span>
   </a>
@@ -2007,10 +2051,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#danh-sach-flags-hien-tai" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Danh sách Flags hiện tại
       
     </span>
   </a>
@@ -2018,10 +2062,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
+  <a href="#user-targeting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Consequences
+        User Targeting
       
     </span>
   </a>
@@ -2029,10 +2073,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#vi-du-thuc-te-permission-enforcement" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Ví dụ thực tế: Permission Enforcement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graceful-degradation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graceful Degradation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#them-mot-flag-moi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thêm một Flag mới
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Coverage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cac-file-lien-quan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Các file liên quan
       
     </span>
   </a>
@@ -2059,38 +2147,282 @@
   
 
 
-<h1 id="use-vanilla-js-bootstrap-for-current-frontend-with-planned-migration-to-react">Use Vanilla JS + Bootstrap for Current Frontend with Planned Migration to React<a class="headerlink" href="#use-vanilla-js-bootstrap-for-current-frontend-with-planned-migration-to-react" title="Permanent link">&para;</a></h1>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Accepted</p>
-<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2025-07-03</p>
-<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The frontend is responsible for:
-- Displaying video content, stats (views, likes)
-- Allowing users to comment, like, and interact anonymously
-- Providing responsive UI on mobile/desktop</p>
-<p>We needed a lightweight setup for early-stage development, while keeping flexibility for future migration.</p>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>We use:
-- <strong>Vanilla JavaScript</strong> for DOM manipulation and logic
-- <strong>Bootstrap</strong> for CSS and responsive design
-- A basic modular structure (HTML + JS files per feature)</p>
-<p>In the future, we plan to migrate to <strong>React</strong> for:
-- Better component reuse and state management
-- Richer interaction (e.g. comment threads, optimistic UI)
-- Easier integration with design systems and CI tooling</p>
-<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
+<h1 id="harness-feature-flags">Harness Feature Flags<a class="headerlink" href="#harness-feature-flags" title="Permanent link">&para;</a></h1>
+<p>Funny Movies tích hợp feature flags thông qua <strong>Harness Feature Flag (FF) SDK</strong> (<code>ff-java-server-sdk 1.9.3</code>). Feature flags cho phép bật/tắt tính năng mà không cần deploy lại, đồng thời hỗ trợ rollout từng phần theo từng user.</p>
+<hr />
+<h2 id="kien-truc-tong-quan">Kiến trúc tổng quan<a class="headerlink" href="#kien-truc-tong-quan" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TD
+    A[Controller / AOP] --&gt; B[FeatureFlagService]
+    B --&gt;|API key có giá trị| C[Harness CfClient]
+    B --&gt;|API key trống / Harness không khả dụng| D[defaultValue]
+    C --&gt;|boolVariation| E[Flag ON / OFF]
+    E --&gt; F[Business Logic]
+    D --&gt; F
+
+    subgraph "Harness Cloud"
+        C
+    end</code></pre>
+<p><strong>Luồng hoạt động:</strong></p>
+<ol>
+<li>Khi Spring Boot khởi động, <code>FeatureFlagServiceImpl.init()</code> khởi tạo <code>CfClient</code> nếu <code>FF_API_KEY</code> được cấu hình.</li>
+<li>Khi cần kiểm tra flag, <code>isEnabled(flagName, defaultValue)</code> được gọi.</li>
+<li><code>CfClient.boolVariation()</code> liên hệ Harness Cloud với user hiện tại làm <code>Target</code>.</li>
+<li>Nếu Harness không khả dụng, <code>defaultValue</code> được trả về — không ném exception.</li>
+</ol>
+<hr />
+<h2 id="cau-hinh">Cấu hình<a class="headerlink" href="#cau-hinh" title="Permanent link">&para;</a></h2>
+<p><strong>Biến môi trường</strong> (bắt buộc để kích hoạt):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">FF_API_KEY</span><span class="o">=</span>&lt;your-harness-sdk-key&gt;
+</code></pre></div>
+<p><strong><code>application.yaml</code>:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">harness</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">ff</span><span class="p">:</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">api-key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${FF_API_KEY:}</span><span class="w">   </span><span class="c1"># Để trống = tắt hoàn toàn, tất cả flags dùng defaultValue</span>
+</code></pre></div>
+<p>Nếu <code>FF_API_KEY</code> trống, toàn bộ flag sẽ fallback về <code>defaultValue</code> và ứng dụng tiếp tục hoạt động bình thường.</p>
+<hr />
+<h2 id="service-interface">Service Interface<a class="headerlink" href="#service-interface" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// FeatureFlagService.java</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">FeatureFlagService</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isEnabled</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">defaultValue</span><span class="p">);</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Cách dùng:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">boolean</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">featureFlagService</span><span class="p">.</span><span class="na">isEnabled</span><span class="p">(</span><span class="n">AppConstant</span><span class="p">.</span><span class="na">Flags</span><span class="p">.</span><span class="na">MY_FLAG</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
+</code></pre></div>
+<hr />
+<h2 id="danh-sach-flags-hien-tai">Danh sách Flags hiện tại<a class="headerlink" href="#danh-sach-flags-hien-tai" title="Permanent link">&para;</a></h2>
+<p>Tên các flag được khai báo tập trung tại <code>AppConstant.Flags</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Tên flag (Harness)</th>
+<th>Default</th>
+<th>Mô tả</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AppConstant.Flags.PERMISSION_ENFORCEMENT</code></td>
+<td><code>permission_enforcement_enabled</code></td>
+<td><code>false</code></td>
+<td>Bật kiểm tra bitwise permission. Khi OFF, tất cả permission check đều pass vô điều kiện.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Thêm flag mới:</strong> Khai báo constant trong <code>AppConstant.Flags</code>, sau đó tạo flag tương ứng trên Harness console với đúng tên string đó.</p>
+</blockquote>
+<hr />
+<h2 id="user-targeting">User Targeting<a class="headerlink" href="#user-targeting" title="Permanent link">&para;</a></h2>
+<p>Mỗi lần evaluate flag, <code>FeatureFlagServiceImpl</code> tự động lấy user hiện tại từ Spring Security context:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">currentUserId</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">Authentication</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SecurityContextHolder</span><span class="p">.</span><span class="na">getContext</span><span class="p">().</span><span class="na">getAuthentication</span><span class="p">();</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">auth</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="na">isAuthenticated</span><span class="p">())</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;system&quot;</span><span class="p">;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">}</span>
+</code></pre></div>
 <ul>
-<li>Current stack is lightweight, fast to prototype</li>
-<li>No build step or SPA framework needed now</li>
-<li>Later migration to React will require code rewrite</li>
-<li>No advanced state management (limited by plain JS)</li>
+<li><strong>User đã đăng nhập:</strong> <code>target.identifier</code> = username / email.</li>
+<li><strong>Không có session</strong> (batch job, startup task): fallback về <code>"system"</code>.</li>
 </ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Task: Implement like/comment/view UI in Vanilla JS</li>
-<li>Planned: Migrate to React with component architecture (Q4 2025)</li>
-</ul>
+<p>Điều này cho phép cấu hình rollout per-user trên Harness console — ví dụ bật flag cho <code>admin@example.com</code> trước khi rollout đại trà.</p>
+<hr />
+<h2 id="vi-du-thuc-te-permission-enforcement">Ví dụ thực tế: Permission Enforcement<a class="headerlink" href="#vi-du-thuc-te-permission-enforcement" title="Permanent link">&para;</a></h2>
+<p>Flag <code>permission_enforcement_enabled</code> kiểm soát toàn bộ hệ thống bitwise permission.</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant C as Controller
+    participant AOP as @HasPermission AOP
+    participant PS as PermissionServiceImpl
+    participant FF as FeatureFlagService
+    participant H as Harness Cloud
+
+    C-&gt;&gt;AOP: Request đến endpoint
+    AOP-&gt;&gt;PS: hasAllPermissions(userBits, [ADMIN])
+    PS-&gt;&gt;FF: isEnabled("permission_enforcement_enabled", false)
+    FF-&gt;&gt;H: boolVariation(flagName, target)
+    H--&gt;&gt;FF: true / false
+    alt Flag = OFF (mặc định)
+        FF--&gt;&gt;PS: false
+        PS--&gt;&gt;AOP: true (bypass — tất cả check đều pass)
+    else Flag = ON
+        FF--&gt;&gt;PS: true
+        PS-&gt;&gt;PS: (userBits &amp; ADMIN.bit) != 0
+        PS--&gt;&gt;AOP: granted / denied
+    end
+    AOP--&gt;&gt;C: 200 OK / 403 Forbidden</code></pre>
+<p><strong>Permission bits (enum <code>Permission</code>):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Permission</th>
+<th>Bit</th>
+<th>Giá trị</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>READ</code></td>
+<td><code>1 &lt;&lt; 0</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>WRITE</code></td>
+<td><code>1 &lt;&lt; 1</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>EXEC</code></td>
+<td><code>1 &lt;&lt; 2</code></td>
+<td>4</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>1 &lt;&lt; 3</code></td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>ADMIN</code></td>
+<td><code>1 &lt;&lt; 4</code></td>
+<td>16</td>
+</tr>
+</tbody>
+</table>
+<p>User với <code>permissions = 17</code> (binary <code>10001</code>) có <code>READ</code> + <code>ADMIN</code>.</p>
+<hr />
+<h2 id="graceful-degradation">Graceful Degradation<a class="headerlink" href="#graceful-degradation" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Tình huống</th>
+<th>Kết quả</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FF_API_KEY</code> trống</td>
+<td>Log info, bỏ qua init, trả <code>defaultValue</code> cho tất cả flags</td>
+</tr>
+<tr>
+<td>Harness không khả dụng khi startup</td>
+<td>Log warning, <code>cfClient</code> vẫn được tạo, tiếp tục retry</td>
+</tr>
+<tr>
+<td><code>cfClient == null</code></td>
+<td><code>isEnabled()</code> trả về <code>defaultValue</code> ngay lập tức</td>
+</tr>
+<tr>
+<td>Flag chưa được tạo trên Harness</td>
+<td><code>boolVariation()</code> trả về <code>defaultValue</code></td>
+</tr>
+</tbody>
+</table>
+<p>Ứng dụng <strong>không bao giờ crash</strong> vì Harness không khả dụng. Mọi lỗi đều fallback về giá trị mặc định.</p>
+<hr />
+<h2 id="them-mot-flag-moi">Thêm một Flag mới<a class="headerlink" href="#them-mot-flag-moi" title="Permanent link">&para;</a></h2>
+<p><strong>Bước 1 — Khai báo constant:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// AppConstant.java</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Flags</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">PERMISSION_ENFORCEMENT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;permission_enforcement_enabled&quot;</span><span class="p">;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">MY_NEW_FEATURE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;my_new_feature_enabled&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// thêm ở đây</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Bước 2 — Sử dụng trong service:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@Autowired</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">private</span><span class="w"> </span><span class="n">FeatureFlagService</span><span class="w"> </span><span class="n">featureFlagService</span><span class="p">;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">doSomething</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">featureFlagService</span><span class="p">.</span><span class="na">isEnabled</span><span class="p">(</span><span class="n">AppConstant</span><span class="p">.</span><span class="na">Flags</span><span class="p">.</span><span class="na">MY_NEW_FEATURE</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">        </span><span class="c1">// logic mới</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">        </span><span class="c1">// logic cũ / fallback</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Bước 3 — Tạo flag trên Harness console:</strong></p>
+<ol>
+<li>Vào <strong>Harness → Feature Flags → New Flag</strong>.</li>
+<li>Tên flag phải khớp chính xác với constant string: <code>my_new_feature_enabled</code>.</li>
+<li>Chọn type: <strong>Boolean</strong>.</li>
+<li>Cấu hình default rules và rollout targeting.</li>
+</ol>
+<hr />
+<h2 id="test-coverage">Test Coverage<a class="headerlink" href="#test-coverage" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Test Class</th>
+<th>Số test</th>
+<th>Phạm vi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FeatureFlagServiceImplTest</code></td>
+<td>11</td>
+<td>Init, degradation, security context resolution</td>
+</tr>
+<tr>
+<td><code>PermissionServiceImplTest</code></td>
+<td>20</td>
+<td>Flag ON/OFF, bitwise operations</td>
+</tr>
+<tr>
+<td><code>HasPermissionAnnotationTest</code></td>
+<td>24</td>
+<td>AOP chain, SpEL, integration</td>
+</tr>
+<tr>
+<td><code>AdminControllerPermissionTest</code></td>
+<td>9</td>
+<td>HTTP 200/403, flag bypass</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cac-file-lien-quan">Các file liên quan<a class="headerlink" href="#cac-file-lien-quan" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Vai trò</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>service/FeatureFlagService.java</code></td>
+<td>Service interface</td>
+</tr>
+<tr>
+<td><code>service/impl/FeatureFlagServiceImpl.java</code></td>
+<td>Tích hợp Harness CfClient</td>
+</tr>
+<tr>
+<td><code>service/impl/PermissionServiceImpl.java</code></td>
+<td>Consumer: permission enforcement gate</td>
+</tr>
+<tr>
+<td><code>utils/AppConstant.java</code> → inner class <code>Flags</code></td>
+<td>Tập trung khai báo tên flag</td>
+</tr>
+<tr>
+<td><code>aop/HasPermission.java</code></td>
+<td>Annotation <code>@HasPermission</code> cho endpoints</td>
+</tr>
+<tr>
+<td><code>filter/WebSecurityConfig.java</code></td>
+<td>Spring Security + SpEL expression handler</td>
+</tr>
+<tr>
+<td><code>application.yaml</code> (<code>harness.ff.api-key</code>)</td>
+<td>Cấu hình API key</td>
+</tr>
+<tr>
+<td><code>pom.xml</code> (<code>ff-java-server-sdk 1.9.3</code>)</td>
+<td>Maven dependency</td>
+</tr>
+</tbody>
+</table>
 
 
 
@@ -2146,10 +2478,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
