@@ -7,17 +7,26 @@ This document describes the end-to-end flow for taking a rough feature idea all 
 ## Overview
 
 ```mermaid
-graph LR
-    A["💡 Idea"] --> B["/scope"]
-    B --> C["📄 PRD"]
-    C --> D["/architect"]
-    D --> E["📐 ADR"]
-    E --> F["/swarm-plan"]
-    F --> G["📋 Plan + Beads"]
-    G --> H["/swarm-execute"]
-    H --> I["🧪 /qa-engineer"]
-    I --> J["/code-review"]
-    J --> K["✅ Merge"]
+%%{init: {'theme': 'default', 'themeVariables': {'fontSize': '18px'}}}%%
+flowchart LR
+    subgraph plan ["🗺️ Planning"]
+        direction LR
+        A["💡 Idea"] --> B["/scope"]
+        B --> C["📄 PRD"]
+        C --> D["/architect"]
+        D --> E["📐 ADR"]
+        E --> F["/swarm-plan"]
+        F --> G["📋 Plan + Beads"]
+    end
+
+    subgraph exec ["⚙️ Execution"]
+        direction LR
+        H["/swarm-execute"] --> I["🧪 /qa-engineer"]
+        I --> J["/code-review"]
+        J --> K["✅ Merge"]
+    end
+
+    G --> H
 ```
 
 | Step | Command | Output | Template |

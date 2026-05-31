@@ -7,17 +7,26 @@ Tài liệu này mô tả quy trình đầu-cuối để đưa một ý tưởng
 ## Tổng Quan
 
 ```mermaid
-graph LR
-    A["💡 Ý tưởng"] --> B["/scope"]
-    B --> C["📄 PRD"]
-    C --> D["/architect"]
-    D --> E["📐 ADR"]
-    E --> F["/swarm-plan"]
-    F --> G["📋 Plan + Beads"]
-    G --> H["/swarm-execute"]
-    H --> I["🧪 /qa-engineer"]
-    I --> J["/code-review"]
-    J --> K["✅ Merge"]
+%%{init: {'theme': 'default', 'themeVariables': {'fontSize': '18px'}}}%%
+flowchart LR
+    subgraph plan ["🗺️ Lập Kế Hoạch"]
+        direction LR
+        A["💡 Ý tưởng"] --> B["/scope"]
+        B --> C["📄 PRD"]
+        C --> D["/architect"]
+        D --> E["📐 ADR"]
+        E --> F["/swarm-plan"]
+        F --> G["📋 Plan + Beads"]
+    end
+
+    subgraph exec ["⚙️ Triển Khai"]
+        direction LR
+        H["/swarm-execute"] --> I["🧪 /qa-engineer"]
+        I --> J["/code-review"]
+        J --> K["✅ Merge"]
+    end
+
+    G --> H
 ```
 
 | Bước | Lệnh | Output | Template |
