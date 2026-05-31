@@ -12,9 +12,16 @@ Monitoring via OpenTelemetry and Grafana Cloud.
 
 ## 📝 Design Decisions
 
-- [0001-use-relational-database.md](adr/0001-use-relational-database.md)
-- [0002-backend-architecture.md](adr/0002-backend-architecture.md)
-- [0003-use-cache.md](adr/0003-use-cache.md)
-- [0004-frontend-structure.md](adr/0004-frontend-structure.md)
-- [0005-use_lru_cache_video_streaming.md](adr/0005-use_lru_cache_video_streaming.md)
+| ADR | Title | Status |
+|-----|-------|--------|
+| [ADR-0001](adr/0001-use-relational-database.md) | Use Relational Database (PostgreSQL) for Core Data | Accepted |
+| [ADR-0002](adr/0002-backend-architecture.md) | Use Layered Spring Boot Architecture with Virtual Threads | Accepted |
+| [ADR-0003](adr/0003-use-cache.md) | Use Guava Cache Initially, with Planned Migration to Redis | Accepted |
+| [ADR-0004](adr/0004-frontend-structure.md) | Use Vanilla JS + Bootstrap with Planned Migration to React | Accepted |
+| [ADR-0005](adr/0005-use_lru_cache_video_streaming.md) | Use LRU Cache for Video Streaming | Accepted |
+| [ADR-0006](adr/0006-hls-video-streaming.md) | Switch to HLS for Local Video Streaming | Proposed |
+| [ADR-0007](adr/0007-admin-dashboard.md) | Admin Dashboard — Content & Account Management | Accepted |
+| [ADR-0008](adr/0008-react-migration.md) | Migrate Frontend to React with Vite | Proposed |
+| [ADR-0009](adr/0009-unified-video-list-api.md) | Unified Video List API for UI Display | Proposed |
+| [ADR-0010](adr/0010-trivy-container-scanning.md) | Add Trivy Dependency & Filesystem Scanning to CI | Accepted |
 
