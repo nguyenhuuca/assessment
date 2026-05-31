@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#video-streaming-system" class="md-skip">
+        <a href="#funny-movies-personal-project" class="md-skip">
           Skip to content
         </a>
       
@@ -520,10 +520,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#architecture-documents" class="md-nav__link">
+  <a href="#why-this-project-exists" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📄 Architecture Documents
+        Why This Project Exists
       
     </span>
   </a>
@@ -531,10 +531,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#design-decisions" class="md-nav__link">
+  <a href="#tech-stack" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📝 Design Decisions
+        Tech Stack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-features-are-built" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Features Are Built
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-documents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Documents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-decisions-adrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Decisions (ADRs)
       
     </span>
   </a>
@@ -5168,10 +5201,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#architecture-documents" class="md-nav__link">
+  <a href="#why-this-project-exists" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📄 Architecture Documents
+        Why This Project Exists
       
     </span>
   </a>
@@ -5179,10 +5212,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#design-decisions" class="md-nav__link">
+  <a href="#tech-stack" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📝 Design Decisions
+        Tech Stack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-features-are-built" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Features Are Built
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-documents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Documents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-decisions-adrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Decisions (ADRs)
       
     </span>
   </a>
@@ -5214,16 +5280,65 @@
   
 
 
-<h1 id="video-streaming-system">Video Streaming System<a class="headerlink" href="#video-streaming-system" title="Permanent link">&para;</a></h1>
-<p>This project delivers on-demand video streaming using Spring Boot, Guava cache, and Virtual Threads.<br />
-Monitoring via OpenTelemetry and Grafana Cloud.</p>
-<h2 id="architecture-documents">📄 Architecture Documents<a class="headerlink" href="#architecture-documents" title="Permanent link">&para;</a></h2>
+<h1 id="funny-movies-personal-project">Funny Movies — Personal Project<a class="headerlink" href="#funny-movies-personal-project" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Built for fun. Learning by doing.</p>
+</blockquote>
+<p>A personal side project for streaming funny videos — built to explore modern backend architecture, AI-assisted development, and real-world engineering practices. No business pressure, just curiosity and a love for building things.</p>
+<hr />
+<h2 id="why-this-project-exists">Why This Project Exists<a class="headerlink" href="#why-this-project-exists" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>What I'm exploring</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build something real</td>
+<td>End-to-end video streaming system — not just a tutorial</td>
+</tr>
+<tr>
+<td>Learn modern tech</td>
+<td>Java 24 Virtual Threads, Spring Boot 3.x, React 19, HLS streaming, Kubernetes</td>
+</tr>
+<tr>
+<td>Learn AI-assisted dev</td>
+<td>Using Claude Code to scope features, write ADRs, generate plans, and implement code</td>
+</tr>
+<tr>
+<td>Practice good engineering</td>
+<td>ADRs, PRDs, architecture diagrams, coverage gates, CI/CD pipelines</td>
+</tr>
+<tr>
+<td>Take security seriously</td>
+<td>Bitwise permissions, feature flags, Trivy scanning, magic link auth</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tech-stack">Tech Stack<a class="headerlink" href="#tech-stack" title="Permanent link">&para;</a></h2>
+<p><strong>Backend:</strong> Java 24 · Spring Boot 3.x · Virtual Threads (Project Loom) · PostgreSQL · Liquibase · Guava Cache · JWT · OpenTelemetry</p>
+<p><strong>Frontend:</strong> React 19 · Vite · TanStack Query · React Router · Bootstrap 5</p>
+<p><strong>Infrastructure:</strong> Docker · Kubernetes · Helm · GitHub Actions · Docker Hub</p>
+<p><strong>AI Tooling:</strong> Claude Code — for scoping, architecture decisions, implementation, and documentation</p>
+<hr />
+<h2 id="how-features-are-built">How Features Are Built<a class="headerlink" href="#how-features-are-built" title="Permanent link">&para;</a></h2>
+<p>Every feature follows a structured flow powered by Claude:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/scope → PRD → ADR → Plan → /builder → /qa-engineer → /code-review → merge
+</code></pre></div>
+<p>See the full guide: <a href="flow-scope-to-implement/">From Scope to Implementation</a></p>
+<hr />
+<h2 id="architecture-documents">Architecture Documents<a class="headerlink" href="#architecture-documents" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="Video%20Streaming%20System%20Architecture/">Video Streaming System Architecture.md</a></li>
-<li><a href="architecture_quality_report_2025-07-05/">architecture_quality_report.md</a></li>
-<li><a href="Sequence-Diagram/">Sequence-Diagram.puml</a></li>
+<li><a href="Video%20Streaming%20System%20Architecture/">System Architecture Overview</a></li>
+<li><a href="Sequence-Diagram/">Sequence Diagram</a></li>
+<li><a href="performance-review/">Performance Review</a></li>
+<li><a href="diagrams/ci-pipeline/">CI/CD Pipeline</a></li>
 </ul>
-<h2 id="design-decisions">📝 Design Decisions<a class="headerlink" href="#design-decisions" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="architecture-decisions-adrs">Architecture Decisions (ADRs)<a class="headerlink" href="#architecture-decisions-adrs" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
