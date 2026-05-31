@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // Only show on Claude Workspace pages
+  if (!window.location.pathname.includes('/claude/')) return;
+
   var rawUrl = getRawUrl();
   if (!rawUrl) return;
 
