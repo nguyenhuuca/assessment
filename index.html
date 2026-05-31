@@ -1976,13 +1976,67 @@ Monitoring via OpenTelemetry and Grafana Cloud.</p>
 <li><a href="Sequence-Diagram/">Sequence-Diagram.puml</a></li>
 </ul>
 <h2 id="design-decisions">📝 Design Decisions<a class="headerlink" href="#design-decisions" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="adr/0001-use-relational-database/">0001-use-relational-database.md</a></li>
-<li><a href="adr/0002-backend-architecture/">0002-backend-architecture.md</a></li>
-<li><a href="adr/0003-use-cache/">0003-use-cache.md</a></li>
-<li><a href="adr/0004-frontend-structure/">0004-frontend-structure.md</a></li>
-<li><a href="adr/0005-use_lru_cache_video_streaming/">0005-use_lru_cache_video_streaming.md</a></li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>ADR</th>
+<th>Title</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="adr/0001-use-relational-database/">ADR-0001</a></td>
+<td>Use Relational Database (PostgreSQL) for Core Data</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="adr/0002-backend-architecture/">ADR-0002</a></td>
+<td>Use Layered Spring Boot Architecture with Virtual Threads</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="adr/0003-use-cache/">ADR-0003</a></td>
+<td>Use Guava Cache Initially, with Planned Migration to Redis</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="adr/0004-frontend-structure/">ADR-0004</a></td>
+<td>Use Vanilla JS + Bootstrap with Planned Migration to React</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="adr/0005-use_lru_cache_video_streaming/">ADR-0005</a></td>
+<td>Use LRU Cache for Video Streaming</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="adr/0006-hls-video-streaming/">ADR-0006</a></td>
+<td>Switch to HLS for Local Video Streaming</td>
+<td>Proposed</td>
+</tr>
+<tr>
+<td><a href="adr/0007-admin-dashboard/">ADR-0007</a></td>
+<td>Admin Dashboard — Content &amp; Account Management</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="adr/0008-react-migration/">ADR-0008</a></td>
+<td>Migrate Frontend to React with Vite</td>
+<td>Proposed</td>
+</tr>
+<tr>
+<td><a href="adr/0009-unified-video-list-api/">ADR-0009</a></td>
+<td>Unified Video List API for UI Display</td>
+<td>Proposed</td>
+</tr>
+<tr>
+<td><a href="adr/0010-trivy-container-scanning/">ADR-0010</a></td>
+<td>Add Trivy Dependency &amp; Filesystem Scanning to CI</td>
+<td>Accepted</td>
+</tr>
+</tbody>
+</table>
 
 
 
