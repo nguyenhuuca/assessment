@@ -60,7 +60,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Hot Score Migration](plans/plan-vid2-hot-score-migration.md)
 - [File-based Hooks](plans/plan-a-file-based-hooks.md)
 - [Bookmark Feature](plans/plan-bookmark-feature.md)
-- [Watch History](specs/spec-watch-history.md)
+- [Watch History](plans/plan-watch-history.md)
 
 ### 💡 Proposed / No Plan Yet (0)
 - —
@@ -83,7 +83,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0010 | Trivy Container Scanning | ✅ Accepted |
 | 0011 | Hot Video Priority | ✅ Accepted |
 | 0012 | Bookmark Feature Design | 💡 Proposed |
+| 0013 | Watch History Design | 💡 Proposed |
 
 ---
 
-*Last updated: 2026-05-31*
+*Last updated: 2026-05-31 — Watch History added*
