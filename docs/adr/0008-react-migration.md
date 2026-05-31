@@ -1,90 +1,124 @@
-# ADR-0006: Migrate Frontend to React with Vite
+# ADR-0008: Migrate Frontend to React with Vite
 
-## Status
-Proposed
+## Metadata
+**Status:** Proposed
+**Date:** 2026-03-01
+**Deciders:** nguyenhuuca
+**Related PRD:** docs/prd/PRD-react-migration.md
+**Tech Strategy Alignment:**
+- [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
 
-## Date
-2026-03-01
+**Domain Tags:** frontend
+**Supersedes:** ADR-0004
+**Superseded By:** N/A
+
+---
 
 ## Context
 
-ADR-0004 (Use Vanilla JS + Bootstrap for Current Frontend) explicitly planned migration to React for:
-- Better component reuse and state management
-- Richer interaction (comment threads, optimistic UI)
-- Easier integration with design systems and CI tooling
+ADR-0004 explicitly planned a migration to React once the prototype phase was complete. That phase is now done (version 14, production deployed). The frontend codebase has grown to approximately 4,400 lines across 6 files. Complexity has increased significantly around auth flows (passwordless, MFA, magic link), YouTube Shorts-style video navigation (touch, keyboard, swipe), comment panel state, per-video vote state, and five Bootstrap modals.
 
-The prototype phase is complete (version 14, production deployed). The codebase has grown to ~4,400 lines across 6 files with increasing complexity around:
-- Auth flows (passwordless + MFA + magic link)
-- YouTube Shorts-style video navigation (touch, keyboard, swipe)
-- Comment panel with real-time state updates
-- Vote state management per video
-- Multi-modal UI (5 Bootstrap modals)
+jQuery-based DOM manipulation has become difficult to reason about as interaction complexity grows. The conditions described in ADR-0004 for triggering the migration have been met.
 
-jQuery-based DOM manipulation has become hard to reason about as interactions grow. It's the right time to execute the planned migration.
+---
 
-## Decision
+## Decision Drivers
 
-Migrate the frontend (`webapp/`) from Vanilla JS + jQuery + Bootstrap CDN to:
+- jQuery DOM manipulation does not scale well with the current interaction complexity
+- Component isolation is needed to enable reliable unit testing of UI logic
+- Server state management (loading, caching, error handling) requires a dedicated solution
+- The build pipeline should produce a verifiable artifact before deployment
+- Migration scope must be bounded to avoid introducing type migration risk alongside behavior migration
 
-| Component | Decision |
-|-----------|----------|
-| Build tool | **Vite** (replaces no-build-step) |
-| Framework | **React 19** |
-| Language | **JavaScript ES6+** (no TypeScript in this phase) |
-| HTTP | **Fetch API** (replace jQuery AJAX) |
-| Server state | **TanStack Query v5** (React Query) |
-| Client state | **React Context** (auth + theme) |
-| Routing | **React Router v6** |
-| UI library | **react-bootstrap** (Bootstrap 5 wrappers) |
-| Gestures | **react-swipeable** |
-| Testing | **Vitest + React Testing Library** |
+---
 
-### Why Vite over Create React App (CRA)?
-- CRA is deprecated as of 2023
-- Vite has native ESM, faster HMR, smaller output
-- No ejecting required for config customization
+## Considered Options
 
-### Why React Context over Redux/Zustand?
-- Only 2 client-state concerns: auth (JWT/user) and theme
-- React Query handles all server state (loading, caching, errors)
-- Adding Redux for 2 global values would be over-engineering
+### Option 1: Keep Vanilla JS + jQuery
+Continue extending the existing jQuery-based codebase.
 
-### Why react-bootstrap over importing Bootstrap CSS directly?
-- Avoids Bootstrap JS (conflicts with React's synthetic events)
-- Native React component API (no `data-bs-toggle` attributes)
-- Modal lifecycle managed by React, not jQuery
+| Pros | Cons |
+|------|------|
+| No migration cost | DOM manipulation complexity continues to grow |
+| No pipeline changes required | Isolated unit testing of UI logic remains impractical |
+| | Server state boilerplate must be maintained manually |
 
-### Why JavaScript instead of TypeScript?
-- Reduces migration scope (pure behavior migration, not type migration)
-- Team can adopt TypeScript in a follow-up ADR once React patterns are established
-- Vite supports TypeScript migration incrementally later
+### Option 2: React 19 + Vite (chosen)
+Migrate `webapp/` to React 19 with Vite as the build tool, replacing jQuery and the no-build-step approach.
+
+| Pros | Cons |
+|------|------|
+| Component-based architecture enables isolated testing | Breaking change to deployment pipeline |
+| React Query eliminates loading/error state boilerplate | `webapp/` directory structure completely changes |
+| Vite native ESM provides faster HMR than CRA | Nginx requires `try_files` reconfiguration for SPA routing |
+| Removes jQuery (-87KB gzipped) | Bundle size increases by ~40KB for React core (gzipped) |
+| CI build step produces verifiable artifact | Node.js required in CI environment |
+
+### Option 3: Vue.js + Vite
+Adopt Vue.js instead of React as the component framework.
+
+| Pros | Cons |
+|------|------|
+| Gentler learning curve, single-file components | Not aligned with team's existing React knowledge trajectory |
+| Vite native support | Smaller ecosystem for the specific libraries already chosen (React Query, react-bootstrap) |
+
+### Option 4: Next.js
+Adopt Next.js for server-side rendering capability.
+
+| Pros | Cons |
+|------|------|
+| SSR and SSG support for improved initial load | Over-engineered for a SPA with an existing Spring Boot API |
+| File-based routing | Adds server infrastructure complexity without clear benefit |
+
+---
+
+## Decision Outcome
+**Chosen Option:** Option 2 — React 19 + Vite
+**Rationale:** React with Vite is the most direct path to solving the core problems: testable component isolation, managed server state via TanStack Query, and a reproducible build artifact. CRA was excluded because it was deprecated in 2023; Vite's native ESM and faster HMR make it the correct replacement. Vue.js and Next.js were excluded because they do not align with the team's existing direction and add migration or infrastructure complexity without proportional benefit. React Context covers the only two client-state concerns (auth and theme); Redux would be over-engineering at this scope. JavaScript ES6+ is retained over TypeScript to keep the migration bounded to behavior only; TypeScript can be adopted incrementally in a follow-up ADR.
+
+### Quantified Impact *(where applicable)*
+| Metric | Before | After | Notes |
+|--------|--------|-------|-------|
+| jQuery bundle | ~87KB gzipped | 0KB | Dependency removed entirely |
+| React core bundle | 0KB | ~40KB gzipped | Net reduction of ~47KB |
+| CI pipeline | No build step | `npm run build` added | Verifiable artifact before SCP |
+
+---
 
 ## Consequences
+**Positive:**
+- Component-based architecture enables isolated unit testing of UI logic
+- TanStack Query v5 eliminates manual loading, caching, and error state boilerplate
+- Vite HMR accelerates local development
+- jQuery dependency removed entirely
+- CI/CD pipeline now includes a build step with artifact verification
 
-### Positive
-- Component-based architecture enables isolated testing
-- React Query eliminates manual loading/error state boilerplate
-- Vite HMR speeds up local development
-- Removes jQuery dependency (saves ~87KB gzipped)
-- CI/CD now includes a build step with artifact verification
+**Negative:**
+- Deployment pipeline requires a breaking change: `npm run build` must run before SCP
+- `webapp/` directory structure changes completely with no coexistence path for old code
+- Nginx must be reconfigured with `try_files $uri /index.html` for SPA routing
+- Node.js must be available in the CI environment
 
-### Negative
-- **Breaking change** to deployment pipeline (must add `npm run build` before SCP)
-- `webapp/` directory structure completely changes (no coexistence with old code)
-- Nginx needs `try_files $uri /index.html` for SPA routing
-- Initial bundle size slightly larger than zero-JS-framework approach (~40KB React core gzipped)
-- Node.js required in CI environment for build step
+**Risks:**
+- PWA manifest, CSS theme system, and all 14 backend API endpoints are intentionally unchanged; any drift from this scope increases migration risk
+- TypeScript adoption deferred; if React patterns are not established before a follow-up TypeScript ADR, incremental migration may be inconsistent
 
-### Neutral
-- PWA manifest (`manifest.json`) carries forward unchanged
-- CSS custom property theme system (`assessment.css`) carries forward with minor adaptation
-- All 14 backend API endpoints remain unchanged
-- Authentication flows (passwordless, MFA, magic link) behavior unchanged
+---
 
-## Supersedes
-- ADR-0004 (frontend-structure) — this ADR executes the planned migration referenced in that decision
+## Validation
+- [x] Tech Strategy alignment confirmed
+- [ ] Related plan document created: docs/prd/PRD-react-migration.md
 
-## Related
-- PRD: `artifacts/prd_react-migration.md`
-- Plan: `artifacts/plan_react-migration.md`
-- Tech Strategy: `doc/tech-strategy.md` — update JavaScript section after this ADR is accepted
+---
+
+## Links
+- ADR-0004: frontend-structure (superseded by this decision)
+- PRD: `docs/prd/PRD-react-migration.md`
+
+---
+
+## Changelog
+| Date | Author | Change |
+|------|--------|--------|
+| 2026-03-01 | nguyenhuuca | Initial draft |
+| 2026-05-31 | nguyenhuuca | Restructured to new ADR template |

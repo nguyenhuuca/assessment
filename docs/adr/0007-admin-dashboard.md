@@ -1,320 +1,150 @@
-# ADR: Admin Dashboard — Content & Account Management
+# ADR-0007: Admin Dashboard — Content and Account Management
 
-**Status:** Accepted  
-**Date:** 2026-04-30  
-**Scope:** Full-stack (Spring Boot 3.x backend + React 19 frontend)
+## Metadata
+**Status:** Accepted
+**Date:** 2026-04-30
+**Deciders:** nguyenhuuca
+**Related PRD:** N/A
+**Tech Strategy Alignment:**
+- [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
+**Domain Tags:** security, api, frontend
+**Supersedes:** N/A
+**Superseded By:** N/A
 
 ---
 
 ## Context
 
-The application needs an admin-only dashboard to manage video content and user accounts. Requirements:
-- CRUD on `VideoSource` records (list, change status, delete)
-- CRUD on `User` accounts (list, change role, delete)
-- Status model: PUBLISHED / PENDING / FLAGGED per video
-- Only users with ADMIN role may access any `/admin/**` endpoint or UI
-- Design follows the "KINETIC NOIR" Stitch screen (`stitch_admin.png`)
+The application needs an admin-only dashboard for video moderation and user account management. At the time of this decision:
 
-Current state gaps:
-- `User` entity has no `role` field
-- JWT contains only `id` + `email`; `GrantedAuthority` list is always empty
-- `/admin/**` rule requires `authenticated()` but no role check
-- `VideoSource` has `isHide` (boolean) but no moderation status
-- No admin controller or service exists
+- The `User` entity has no role field — all users are treated equally
+- The JWT payload contains only `id` and `email`; the `GrantedAuthority` list is always empty
+- The `/admin/**` route rule requires only `authenticated()` — no role check exists
+- `VideoSource` has an `isHide` boolean (user privacy) but no moderation state
+- No admin controller, service, or frontend view exists
+
+Six sub-decisions were required to implement this feature correctly.
 
 ---
 
-## Decisions
+## Decision Drivers
 
-### D-1 · Role model on User
-
-**Decision:** Add `role VARCHAR(20) NOT NULL DEFAULT 'USER'` column to `users` table.  
-Map to a Java enum `UserRole { USER, ADMIN }` stored as `@Enumerated(EnumType.STRING)`.
-
-**Rejected alternatives:**
-| Option | Why rejected |
-|--------|-------------|
-| Boolean `isAdmin` column | Cannot extend to future roles (MODERATOR) without schema change |
-| Separate `user_roles` join table | Over-engineered for a two-role system |
+- Admin routes must be inaccessible to non-admin users at both the HTTP filter layer and the controller layer
+- The role model must be extensible beyond a two-value boolean
+- Video moderation state must be orthogonal to user-controlled privacy (`isHide`)
+- The frontend must not rely on stale data to determine admin status
 
 ---
 
-### D-2 · Authorization — defense in depth
+## Considered Options
 
-**Decision:** Enforce `ROLE_ADMIN` at **two layers**:
+### Option A: Single-layer authorization (URL-level only)
+Enforce `ROLE_ADMIN` only in `WebSecurityConfig` via `.requestMatchers("/admin/**").hasRole("ADMIN")`.
 
-1. **URL-level** (`WebSecurityConfig`):
-   ```
-   .requestMatchers("/admin/**").hasRole("ADMIN")
-   ```
-2. **Method-level** (`AdminController`):
-   ```java
-   @PreAuthorize("hasRole('ADMIN')")   // class-level annotation
-   ```
+| Pros | Cons |
+|------|------|
+| Simple, one place to maintain | Authorization intent invisible in controller code |
+| | Breaks silently if URL pattern changes or is refactored |
+| | Controller code must be reached before intent is visible |
 
-`@EnableMethodSecurity` is already active. URL-level rejects non-admins before the controller is reached. Method-level makes intent explicit and survives URL refactors.
+### Option B: Dual-layer defense-in-depth (chosen)
+Enforce `ROLE_ADMIN` at both URL-level (`WebSecurityConfig`) AND method-level (`@PreAuthorize` on `AdminController`).
 
-**Rejected alternatives:**
-| Option | Why rejected |
-|--------|-------------|
-| URL-level only | Intent invisible in controller; breaks if URL changes |
-| Method-level only | No fast-fail at filter chain; controller code must be reached first |
-
----
-
-### D-3 · Video moderation status
-
-**Decision:** Add `status VARCHAR(20) NOT NULL DEFAULT 'PUBLISHED'` to `video_sources`.  
-Map to enum `VideoStatus { PUBLISHED, PENDING, FLAGGED }`.
-
-**Keep `isHide` as-is** — it controls user-facing privacy (private videos), which is orthogonal to admin moderation state.
-
-| Field | Owner | Purpose |
-|-------|-------|---------|
-| `isHide` | User | Hides video from public feed (private upload) |
-| `status` | Admin | Moderation state: published / pending review / flagged |
-
-**Rejected alternative:** Multiple boolean columns (`isPending`, `isFlagged`) create invalid combinations and are not extensible.
+| Pros | Cons |
+|------|------|
+| Non-admins rejected before controller is reached | Slightly more boilerplate |
+| Authorization intent explicit in controller | |
+| Survives URL refactors — method annotation travels with class | |
 
 ---
 
-### D-4 · JWT role claim
+### Option A: Boolean `isAdmin` column on User
+Add a single boolean column to the `users` table.
 
-**Decision:** Include `role` claim in JWT payload. Update `JwtProvider.generatePayload()` and `convertValue()`. Update `JWTAuthenticationFilter` to build `GrantedAuthority` list from the claim.
+| Pros | Cons |
+|------|------|
+| Minimal schema change | Cannot extend to future roles (MODERATOR) without schema change |
+| | Boolean semantics inappropriate for a multi-value concept |
 
-```
-JWT payload (after change):
-{ "id": 42, "email": "user@x.com", "role": "ADMIN" }
-```
+### Option B: `role VARCHAR(20)` with Java enum (chosen)
+Add `role VARCHAR(20) NOT NULL DEFAULT 'USER'` mapped to `UserRole { USER, ADMIN }`.
 
-Filter change — replace `Collections.emptyList()`:
-```java
-List<GrantedAuthority> authorities = List.of(
-    new SimpleGrantedAuthority("ROLE_" + user.getRole())
-);
-new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities)
-```
+| Pros | Cons |
+|------|------|
+| Extensible to future roles without schema change | Enum changes require migration |
+| Type-safe in Java layer | |
+| Consistent with existing string-enum pattern in codebase | |
 
-`UserDetailDto` gains a `role` field (String). `JwtGenerationDto.payload` carries it.
-
----
-
-### D-5 · Frontend: how to know if current user is admin
-
-**Decision:** Expose `isAdmin` in `UserDetailDto` returned by `GET /user/me`.  
-`AuthContext` reads `user.isAdmin` from the `/user/me` response (already called on mount).
-
-**Rejected alternative:** Parse JWT in the browser (base64-decode middle segment).  
-Risk: stale role if admin rights change while user is logged in. `/user/me` is always fresh.
+A separate `user_roles` join table was also considered and rejected as over-engineered for a two-role system.
 
 ---
 
-### D-6 · Pagination strategy
+### Option A: Parse JWT in browser to detect admin status
+Decode the JWT's middle segment in JavaScript to read the `role` claim.
 
-**Decision:** Use Spring `Pageable` (offset pagination) via `@PageableDefault`.  
-Returns Spring `Page<T>` which includes `content`, `totalElements`, `totalPages` — feeds the "Reviewing 1,482 total assets" header and pagination controls directly.
+| Pros | Cons |
+|------|------|
+| No extra HTTP call | Role claim is stale if admin rights change while user is logged in |
+| | Requires client-side JWT parsing logic |
 
-Cursor-based pagination is not needed — admin data is not high-velocity, and admins need random page access.
+### Option B: Expose `isAdmin` via `GET /user/me` (chosen)
+Return `isAdmin: true/false` in the `UserDetailDto` from the existing `/user/me` endpoint already called on app mount.
 
----
-
-## API Contract
-
-All endpoints under `/admin/**` require `Authorization: Bearer <admin-jwt>`.
-
-### Videos
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/admin/videos?page=0&size=20&status=` | Paginated video list, optional status filter |
-| PATCH | `/admin/videos/{id}/status` | Change moderation status |
-| DELETE | `/admin/videos/{id}` | Delete video and source record |
-
-**AdminVideoDto:**
-```json
-{
-  "id": 1,
-  "title": "NEON_DREAMSCAPE_V2",
-  "thumbnailPath": "https://...",
-  "creatorEmail": "niko@example.com",
-  "status": "PUBLISHED",
-  "viewCount": 138400,
-  "createdAt": "2025-06-01T00:00:00Z"
-}
-```
-
-**PATCH body:**
-```json
-{ "status": "FLAGGED" }
-```
-
-### Accounts
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/admin/accounts?page=0&size=20` | Paginated user list |
-| PATCH | `/admin/accounts/{id}/role` | Promote / demote user |
-| DELETE | `/admin/accounts/{id}` | Delete user account |
-
-**AdminAccountDto:**
-```json
-{
-  "id": 42,
-  "email": "user@example.com",
-  "role": "USER",
-  "mfaEnabled": true,
-  "createdAt": "2025-01-01T00:00:00Z"
-}
-```
-
-**Safety constraint:** An admin cannot change their own role or delete their own account.  
-Service layer validates: `if (targetId.equals(currentUserId)) throw ForbiddenException`.
-
-### Stats
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/admin/stats` | Dashboard summary counts |
-
-**AdminStatsDto:**
-```json
-{
-  "totalVideos": 1482,
-  "totalUsers": 320,
-  "pendingCount": 12,
-  "flaggedCount": 24
-}
-```
+| Pros | Cons |
+|------|------|
+| Always reflects current server-side role | Requires one extra field in the DTO |
+| No extra HTTP call (endpoint already used) | |
+| Role changes take effect on next page load | |
 
 ---
 
-## Database Migrations
+## Decision Outcome
+**Chosen Option:** Option B across all three contested sub-decisions, plus three uncontested sub-decisions.
 
-Two new SQL files following the existing naming convention (`YYYYMMDDnnnn-description.sql`):
+**Rationale:**
+- **Dual-layer authorization** (D-2): Defense-in-depth ensures no path to admin functionality exists without an explicit role check. URL-level rejects at the filter chain; method-level makes intent self-documenting.
+- **`role` VARCHAR enum** (D-1): A `UserRole` enum is extensible and consistent with other string-enum fields in the schema. A boolean cannot grow to support future roles without a migration.
+- **`/user/me` for admin detection** (D-5): Avoids stale role data in the browser. The endpoint is already called on mount, so no additional request is needed.
 
-**`202504300001-add-user-role.sql`**
-```sql
-ALTER TABLE users
-ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'USER';
-```
-
-**`202504300002-add-video-status.sql`**
-```sql
-ALTER TABLE video_sources
-ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'PUBLISHED';
-```
+Uncontested sub-decisions rationale:
+- **Video moderation status** (D-3): A `status` column (`PUBLISHED`/`PENDING`/`FLAGGED`) is orthogonal to `isHide`. The `isHide` field is user-controlled privacy; `status` is admin-controlled moderation. Multiple boolean columns (`isPending`, `isFlagged`) were rejected because they permit invalid combinations and are not extensible.
+- **JWT role claim** (D-4): Including `role` in the JWT payload allows Spring Security's `GrantedAuthority` mechanism to work correctly. Without it, `@PreAuthorize("hasRole('ADMIN')")` always fails because the authority list is empty.
+- **Offset pagination** (D-6): Spring `Pageable` (offset-based) is sufficient — admin data is not high-velocity and admins need random page access. Cursor-based pagination would prevent jumping to arbitrary pages.
 
 ---
 
-## Backend Component Map
+## Consequences
+**Positive:**
+- Defense-in-depth authorization — two independent enforcement points for admin access
+- Extensible role model supports future roles (e.g., MODERATOR) without schema redesign
+- Clean separation between user privacy state (`isHide`) and admin moderation state (`status`)
+- JWT now carries a real `GrantedAuthority`, enabling method-level security annotations throughout the codebase
 
-```
-filter/
-  JwtProvider.java              ← add role to generatePayload() + convertValue()
-  JWTAuthenticationFilter.java  ← build GrantedAuthority list from role claim
-  WebSecurityConfig.java        ← change /admin/** to hasRole("ADMIN")
+**Negative:**
+- JWT role claim is stale until the user re-authenticates after a role change
+- Admin-facing pagination uses offset — performance degrades at very high page numbers (not a current concern)
 
-entity/
-  User.java                     ← add UserRole enum field
-  VideoSource.java              ← add VideoStatus enum field
-
-enums/
-  UserRole.java                 ← NEW: USER, ADMIN
-  VideoStatus.java              ← NEW: PUBLISHED, PENDING, FLAGGED
-
-dto/
-  UserDetailDto.java            ← add role String field
-  AdminVideoDto.java            ← NEW
-  AdminAccountDto.java          ← NEW
-  AdminStatsDto.java            ← NEW
-
-service/
-  AdminVideoService.java        ← NEW interface
-  AdminAccountService.java      ← NEW interface
-  impl/
-    AdminVideoServiceImpl.java  ← NEW
-    AdminAccountServiceImpl.java← NEW
-
-web/
-  AdminController.java          ← NEW (@PreAuthorize("hasRole('ADMIN')"))
-```
+**Risks:**
+- **Stale JWT after role change:** Mitigate with short JWT TTL or forced re-login after role promotion/demotion
+- **Admin deletes own account:** Service layer must guard against this with a check comparing `targetId` vs authenticated `userId`
+- **Mass delete:** Current implementation is hard-delete; consider soft-delete (`status = DELETED`) in a future iteration
 
 ---
 
-## Frontend Component Map
-
-```
-src/
-  contexts/
-    AuthContext.jsx             ← expose user.isAdmin from /user/me response
-  api/
-    admin.js                    ← NEW: getVideos, updateVideoStatus, deleteVideo,
-                                        getAccounts, updateAccountRole, deleteAccount,
-                                        getStats
-  hooks/
-    useAdmin.js                 ← NEW: React Query hooks wrapping admin.js
-  components/
-    layout/
-      AppShell.jsx              ← add Admin to SIDE_NAV with requiresAdmin guard
-    admin/
-      AdminView.jsx             ← NEW: tabs container + stats cards
-      AdminVideoTable.jsx       ← NEW: table with StatusBadge + actions
-      AdminAccountTable.jsx     ← NEW: table with RoleBadge + actions
-  styles/
-    index.css                   ← add .admin-* classes (dark surface, badges)
-```
+## Validation
+- [ ] Tech Strategy alignment confirmed
+- [ ] Related plan document created: [docs/plans/plan-admin-dashboard.md](../plans/plan-admin-dashboard.md)
 
 ---
 
-## Admin Nav Guard (Frontend)
-
-Two layers — same defense-in-depth as backend:
-
-```js
-// 1. Nav item hidden unless admin
-const visibleNav = SIDE_NAV.filter(
-  item => !item.requiresAdmin || user?.isAdmin
-)
-
-// 2. Content render guard
-{activeNav === 'admin' && user?.isAdmin && <AdminView />}
-```
+## Links
+- Plan document: `docs/plans/plan-admin-dashboard.md`
+- Spring Security `@PreAuthorize`: https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html
 
 ---
 
-## Status Badge Colors (from design)
-
-| Status | Color | Hex |
-|--------|-------|-----|
-| PUBLISHED | Green | `#00c853` |
-| PENDING | Yellow | `#ffd600` |
-| FLAGGED | Red | `#ff1744` |
-| ADMIN role badge | Cyan | `var(--accent-cyan)` |
-
----
-
-## Risks & Mitigations
-
-| Risk | Mitigation |
-|------|-----------|
-| JWT role claim stale after role change | Short JWT TTL (30 days → consider shorter for admin sessions); force re-login after role change |
-| Admin deletes own account | Service-layer guard: compare targetId vs authenticated userId |
-| Mass delete wipes data | DELETE is hard-delete; consider soft-delete (status = DELETED) in future |
-| CORS allows admin endpoints from other origins | Existing CORS config already restricts to `canh-labs.com` + localhost |
-
----
-
-## Implementation Order
-
-```
-1. Migrations (DB schema)
-2. Enums + Entity changes (User.role, VideoSource.status)
-3. JWT role claim (JwtProvider + JWTAuthenticationFilter + UserDetailDto)
-4. WebSecurityConfig hasRole gate
-5. AdminVideoService + AdminAccountService + AdminController
-6. Frontend: AuthContext isAdmin
-7. Frontend: AppShell admin nav item
-8. Frontend: api/admin.js + useAdmin.js hooks
-9. Frontend: AdminView + AdminVideoTable + AdminAccountTable
-10. CSS for admin components
-```
+## Changelog
+| Date | Author | Change |
+|------|--------|--------|
+| 2026-04-30 | nguyenhuuca | Initial draft |
+| 2026-05-31 | nguyenhuuca | Restructured to new ADR template; technical details moved to plan doc |

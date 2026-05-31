@@ -1,285 +1,133 @@
-# ADR: Switch to HLS for Local Video Streaming
+# ADR-0006: HLS Video Streaming for Local Videos
 
-**Status:** Proposed  
-**Date:** 2026-05-30  
-**Author:** nguyenhuuca  
+## Metadata
+**Status:** Proposed
+**Date:** 2026-05-30
+**Deciders:** nguyenhuuca
+**Related PRD:** N/A
+**Tech Strategy Alignment:**
+- [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
+**Domain Tags:** infrastructure, api, frontend
+**Supersedes:** N/A
+**Superseded By:** N/A
 
 ---
 
 ## Context
 
-The current streaming implementation (`VideoStreamController`) serves locally-stored MP4 files (`.full` extension, downloaded from Google Drive) via HTTP Range requests (RFC 7233). Clients receive 256 KB on the first request and 512 KB on subsequent requests.
+Local videos (sourceType = `google_drive`) are currently served via HTTP Range requests on raw MP4 files. This approach has several pain points:
 
-**Pain points with the current approach:**
-- Range-based MP4 streaming is not CDN-cacheable (every byte range is a unique request)
-- Requires custom seek math and a Guava byte[] chunk cache in application memory
-- No standard adaptive bitrate (ABR) path — quality is fixed
-- Player compatibility depends on the browser correctly implementing Range requests
-- Seeking is at byte granularity but the application imposes its own chunk boundaries, causing mismatches
+- Range-based MP4 responses are not CDN-cacheable — every byte-range combination is a unique cache key
+- The application maintains a Guava `byte[]` chunk cache in heap memory to avoid repeated disk reads
+- Seeking requires custom chunk-boundary math in the application layer, causing byte-range mismatches
+- No path to adaptive bitrate (ABR) streaming without a full rewrite
+- Player compatibility depends on browsers correctly implementing Range request handling
 
-**YouTube videos are out of scope** — they are embedded via `embedLink` and served by YouTube's own infrastructure. HLS migration applies only to locally-stored videos (`VideoSource` entities with `sourceType = "google_drive"`).
-
----
-
-## Decision
-
-Switch local video streaming from HTTP Range + MP4 to **HLS (HTTP Live Streaming)** using FFmpeg to segment videos into `.ts` chunks and `.m3u8` playlists during the existing Google Drive sync pipeline.
-
-- **Segmentation:** FFmpeg stream-copy (no re-encode), 6-second segments
-- **Timing:** Offline — run during `VideoStorageServiceImpl.downloadFileFromFolder()`
-- **Serving:** Direct `FileSystemResource` from disk (no application-level byte cache)
-- **Frontend:** `hls.js` for Chrome/Firefox; native HLS for Safari
-- **Rollout:** Feature-flagged, backward-compatible — old Range endpoint kept until all videos are transcoded
+YouTube videos are out of scope — they are embedded via `embedLink` and served entirely by YouTube's infrastructure.
 
 ---
 
-## Architecture
+## Decision Drivers
 
-### Storage Layout
-
-```
-video-cache/
-├── {fileId}.full              ← original MP4 (kept until HLS verified, then deleted)
-└── {fileId}/
-    ├── playlist.m3u8          ← media playlist
-    ├── seg_000.ts
-    ├── seg_001.ts
-    └── ...
-```
-
-### New Backend Components
-
-#### 1. `HlsTranscodeService` (interface + impl)
-
-```java
-// service/HlsTranscodeService.java
-public interface HlsTranscodeService {
-    void transcode(String fileId);             // async, updates VideoSource status
-    HlsStatus getStatus(String fileId);
-    Path getPlaylistPath(String fileId);
-    Path getSegmentPath(String fileId, String segmentName);
-}
-```
-
-**Implementation notes:**
-- Runs `ProcessBuilder` with FFmpeg command below
-- Wraps execution in a Virtual Thread (`Thread.ofVirtual().start(...)`)
-- On start: set `VideoSource.hlsStatus = PROCESSING`
-- On success: set `hlsStatus = READY`, populate `hlsPath`
-- On failure: set `hlsStatus = ERROR`, log stderr
-
-**FFmpeg command:**
-```bash
-ffmpeg -i video-cache/{fileId}.full \
-  -c:v copy -c:a copy \
-  -f hls \
-  -hls_time 6 \
-  -hls_list_size 0 \
-  -hls_flags independent_segments \
-  -hls_segment_filename "video-cache/{fileId}/seg_%03d.ts" \
-  video-cache/{fileId}/playlist.m3u8
-```
-
-`-c copy` remuxes without re-encoding — near-instant processing, no quality loss.
-
-#### 2. `HlsStreamController` (new controller)
-
-```
-GET /api/v1/hls/{fileId}/playlist.m3u8
-  → 200 + Content-Type: application/vnd.apple.mpegurl  (if READY)
-  → 202 Accepted + Retry-After: 5                       (if PROCESSING)
-  → 404 Not Found                                        (if PENDING/ERROR/unknown)
-
-GET /api/v1/hls/{fileId}/{segment}.ts
-  → 200 + Content-Type: video/mp2t
-  → Cache-Control: public, max-age=31536000 (segments are immutable)
-  → Served via FileSystemResource (no Guava cache)
-
-GET /api/v1/hls/{fileId}/status
-  → 200 + { "status": "READY" | "PROCESSING" | "PENDING" | "ERROR" }
-```
-
-Segment files are served via Spring's `FileSystemResource` — the OS page cache handles hot-segment caching transparently, eliminating the application-level Guava byte[] cache for this flow.
-
-#### 3. `VideoSource` entity changes
-
-```java
-@Enumerated(EnumType.STRING)
-@Column(name = "hls_status")
-private HlsStatus hlsStatus = HlsStatus.PENDING;
-
-@Column(name = "hls_path")
-private String hlsPath;  // relative path, e.g., "{fileId}/playlist.m3u8"
-
-public enum HlsStatus { PENDING, PROCESSING, READY, ERROR }
-```
-
-#### 4. Liquibase migration
-
-```sql
--- db/changelog/V{n}__add_hls_status_to_video_sources.sql
-ALTER TABLE video_sources
-  ADD COLUMN hls_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
-  ADD COLUMN hls_path   VARCHAR(500);
-```
-
-#### 5. `VideoDto` changes
-
-```java
-private boolean hlsReady;
-private String  hlsUrl;    // "/api/v1/hls/{fileId}/playlist.m3u8" when ready
-```
-
-#### 6. `VideoStorageServiceImpl` changes
-
-After a file is downloaded, fork transcoding as an async subtask inside the existing `StructuredTaskScope`:
-
-```java
-// After file download in downloadFileFromFolder()
-scope.fork(() -> {
-    hlsTranscodeService.transcode(fileId);
-    return null;
-});
-```
-
-#### 7. `AppScheduler` — retry job
-
-```java
-@Scheduled(cron = "0 0 2 * * *")     // 2 AM daily
-void retryFailedHlsTranscoding() {
-    // Find all VideoSource with hlsStatus IN (PENDING, ERROR)
-    // Re-submit to hlsTranscodeService.transcode()
-}
-```
-
-### Frontend Changes
-
-**Dependency:**
-```bash
-npm i hls.js
-```
-
-**New component: `HlsVideoPlayer.jsx`**
-
-```jsx
-import Hls from 'hls.js';
-
-export function HlsVideoPlayer({ video }) {
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    if (!video.hlsReady) return;
-    const src = video.hlsUrl;
-
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(src);
-      hls.attachMedia(videoRef.current);
-      return () => hls.destroy();
-    } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-      // Safari: native HLS
-      videoRef.current.src = src;
-    }
-  }, [video.hlsReady, video.hlsUrl]);
-
-  return <video ref={videoRef} controls />;
-}
-```
-
-**Fallback logic in parent component:**
-
-```jsx
-// If hlsReady: use HlsVideoPlayer
-// If !hlsReady && video.fileId: use legacy Range player (existing <video> with range URL)
-// Poll /hls/{fileId}/status every 5s until READY
-```
+- Eliminate application-level byte[] cache to reduce heap pressure
+- Enable CDN caching of video segments (immutable, fixed-size)
+- Use a standard protocol supported natively by all target browsers
+- Keep ingest overhead low — re-encoding is unacceptable for a sync pipeline
+- Maintain backward compatibility during rollout
 
 ---
 
-## Trade-off Matrix
+## Considered Options
 
-| Criterion               | Range/MP4 (current)              | HLS (proposed)                         |
-|-------------------------|----------------------------------|----------------------------------------|
-| Browser compatibility   | Range requests widely supported  | hls.js universal; Safari native        |
-| Seek performance        | Byte-precise but custom chunking | Segment-level (±3 s), standard         |
-| CDN cacheability        | Poor — varied byte ranges        | Excellent — immutable segments         |
-| Server memory           | Guava byte[] cache needed        | OS page cache sufficient               |
-| Server CPU on request   | None                             | None (FFmpeg runs at ingest time)      |
-| Ingest CPU overhead     | None                             | FFmpeg `-c copy` < 1s per GB           |
-| Storage overhead        | 1×                               | ~1.01× (segments ≈ source size)        |
-| ABR readiness           | Not possible                     | Add renditions in future               |
-| DRM readiness           | Not built-in                     | AES-128 segment encryption available   |
-| Code complexity         | Custom Range parser + cache      | Standard Spring Resource serving       |
+### Option 1: Keep Range/MP4 (status quo)
+Continue serving raw MP4 bytes with HTTP Range headers and the existing Guava chunk cache.
+
+| Pros | Cons |
+|------|------|
+| No migration effort | Not CDN-cacheable (varied byte ranges) |
+| Byte-precise seeking | Guava byte[] cache consumes heap |
+| Wide browser support | Custom chunk-boundary logic is brittle |
+| | No ABR path without full rewrite |
+
+### Option 2: HLS with FFmpeg stream-copy (chosen)
+Segment videos into `.ts` chunks and `.m3u8` playlists at ingest time using FFmpeg `-c copy` (no re-encode). Serve segments directly via `FileSystemResource`. Use `hls.js` on Chrome/Firefox; native HLS on Safari.
+
+| Pros | Cons |
+|------|------|
+| Segments are immutable — trivially CDN-cacheable | FFmpeg invocation per video at ingest time |
+| Eliminates application-level byte[] cache | More complex storage layout (directory per video) |
+| Standard protocol — no custom player code | Adds `hls.js` dependency (~300 KB) to frontend |
+| Foundation for ABR and AES-128 DRM | |
+| FFmpeg stream-copy is fast (< 1s per GB) | |
+
+### Option 3: MPEG-DASH
+Segment using DASH standard instead of HLS.
+
+| Pros | Cons |
+|------|------|
+| Similar CDN and ABR benefits to HLS | Less native browser support than HLS |
+| | `dash.js` is more complex than `hls.js` |
+| | No meaningful advantage over HLS for this use case |
+
+### Option 4: On-demand segmentation (first request)
+Generate HLS segments lazily when first requested.
+
+| Pros | Cons |
+|------|------|
+| No ingest overhead | Unacceptable first-play latency |
+| | Concurrent first-plays cause resource contention |
 
 ---
 
-## Migration Plan (Zero Downtime)
+## Decision Outcome
+**Chosen Option:** Option 2 — HLS with FFmpeg stream-copy
 
-### Phase 1 — Backend (no visible frontend change)
-1. Liquibase migration: add `hls_status`, `hls_path` to `video_sources`
-2. Implement `HlsTranscodeService` + wire into download pipeline
-3. Implement `HlsStreamController`
-4. Add nightly retry job
-5. Update `VideoDto` with `hlsReady`, `hlsUrl`
-6. One-shot migration endpoint (admin-only) or scheduled job to transcode existing `.full` files
+**Rationale:** Stream-copy segmentation at ingest time imposes negligible overhead (no re-encode, < 1s per GB) while delivering immutable segments that are CDN-cacheable. Eliminating the Guava `byte[]` chunk cache reduces heap pressure with no loss of functionality — the OS page cache handles hot segments transparently. HLS has broader native browser support than DASH, and `hls.js` is a simpler integration than `dash.js`. The rollout is feature-flagged and backward-compatible: the old Range endpoint remains until all videos are transcoded.
 
-### Phase 2 — Frontend
-1. Add `hls.js`
-2. Implement `HlsVideoPlayer` component
-3. Switch video player to HLS when `hlsReady = true`
-4. Poll status endpoint for in-progress transcoding
+### Quantified Impact
 
-### Phase 3 — Cleanup
-1. After all videos report `hlsReady = true`, delete `.full` files via `deleteIfEligible()`
-2. Remove Guava `VideoCacheImpl` from request path (keep for backward compat period)
-3. Deprecate `VideoStreamController` (sunset in a future release)
-
-### Feature Flag
-
-```yaml
-# application.yaml
-hls:
-  enabled: true
-  segment-duration: 6       # seconds per .ts segment
-  output-dir: video-cache   # base directory
-```
+| Metric | Before | After | Notes |
+|--------|--------|-------|-------|
+| Storage overhead | 1× | ~1.01× | Stream-copy ≈ source size |
+| Ingest CPU | None | < 1s per GB | FFmpeg `-c copy` |
+| Server heap (chunk cache) | Guava byte[] allocated | Eliminated | OS page cache sufficient |
 
 ---
 
 ## Consequences
-
 **Positive:**
-- Standard HLS playback across all browsers (no custom player code)
-- Eliminates application-level byte[] chunk cache — reduces heap pressure
-- Segments are immutable → trivially CDN-cacheable in future
-- Foundation for ABR and AES-128 DRM
+- Standard HLS playback across all browsers with no custom player code
+- Application-level byte[] chunk cache eliminated — lower heap pressure
+- Immutable segments enable trivial CDN caching in future
+- Foundation for ABR renditions and AES-128 DRM
 
-**Negative / Accepted:**
-- Additional FFmpeg invocation per video at ingest time (mitigated: stream-copy is fast)
-- Slightly more complex storage layout (directory per video vs single file)
-- Frontend gains `hls.js` dependency (~300 KB gzipped, lazy-loaded)
+**Negative:**
+- FFmpeg must be available in all deployment environments
+- Storage layout is more complex (directory per video vs single file)
+- Frontend gains `hls.js` dependency
 
-**Neutral:**
-- `StatsCache` and `VideoAccessService` remain useful for analytics regardless of streaming protocol
-- YouTube videos unaffected
-
----
-
-## Alternatives Rejected
-
-| Alternative | Reason Rejected |
-|---|---|
-| On-demand segmentation (first request) | Unacceptable first-play latency |
-| Multi-bitrate ABR ladder (v1) | Extra FFmpeg passes add ingest time; can be added as Phase 2 |
-| MPEG-DASH instead of HLS | HLS has broader native support; hls.js is simpler than dash.js |
-| Keep Range/MP4 with chunked transfer | Does not address CDN cacheability or cache memory pressure |
+**Risks:**
+- FFmpeg process failure leaves video in `PROCESSING` state — mitigated by nightly retry scheduler
+- Feature-flag rollout requires managing two serving paths concurrently during transition
 
 ---
 
-## References
+## Validation
+- [ ] Tech Strategy alignment confirmed
+- [ ] Related plan document created: [docs/plans/plan-hls-migration.md](../plans/plan-hls-migration.md)
 
+---
+
+## Links
 - [RFC 8216 — HTTP Live Streaming](https://datatracker.ietf.org/doc/html/rfc8216)
 - [hls.js documentation](https://github.com/video-dev/hls.js)
 - [FFmpeg HLS muxer](https://ffmpeg.org/ffmpeg-formats.html#hls-1)
-- Current implementation: `web/VideoStreamController.java`, `service/impl/StreamVideoServiceImpl.java`
-- Related ADR: `doc/adr/` (existing architecture decisions)
+- Plan document: `docs/plans/plan-hls-migration.md`
+
+---
+
+## Changelog
+| Date | Author | Change |
+|------|--------|--------|
+| 2026-05-30 | nguyenhuuca | Initial draft |
+| 2026-05-31 | nguyenhuuca | Restructured to new ADR template; technical details moved to plan doc |

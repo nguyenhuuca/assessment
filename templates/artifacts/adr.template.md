@@ -1,8 +1,8 @@
-# ADR: [Decision Title]
+# ADR-NNNN: [Decision Title]
 
 <!--
 Architecture Decision Record
-Filename: artifacts/adr_NNNN_[topic].md (e.g., adr_0001_database_choice.md)
+Filename: docs/adr/NNNN-[kebab-title].md
 Owner: Architect (/architect)
 Handoff to: Builder (/builder), Security Auditor (/security-auditor)
 Related Skills: designing-systems, designing-apis, domain-driven-design, cloud-native-patterns, writing-adrs
@@ -10,41 +10,46 @@ Related Skills: designing-systems, designing-apis, domain-driven-design, cloud-n
 Format: Based on MADR (Markdown Any Decision Records) - https://adr.github.io/madr/
 Best Practices:
 - Write ADRs BEFORE committing to implementation
-- Keep them short, specific, and comparable across the codebase
 - One decision per ADR (not groups of decisions)
-- Quantify when possible (SLOs, latency budgets, cost envelopes)
+- Quantify consequences where possible (latency, cost, throughput)
+- Keep Technical Details and Implementation Steps in plan.template.md — not here
 -->
 
 ## Metadata
 
 **Status:** Proposed | Accepted | Deprecated | Superseded
-**Date:** [YYYY-MM-DD]
+**Date:** YYYY-MM-DD
 **Deciders:** [List of people involved]
-**Beads Issue:** [bd://issue-id or N/A]
-**Related PRD:** [Link to PRD]
+**Related PRD:** [Link or N/A]
 **Tech Strategy Alignment:**
 - [ ] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-- [ ] OR deviation is explicitly justified in Rationale section
+- [ ] OR deviation is explicitly justified in the Rationale below
 **Domain Tags:** [security | data | integration | infrastructure | api | frontend | devops]
-**Supersedes:** [adr_NNNN if applicable]
-**Superseded By:** [adr_NNNN if applicable]
+**Supersedes:** [ADR-NNNN or N/A]
+**Superseded By:** [ADR-NNNN or N/A]
+
+---
 
 ## Context
 
-[What is the issue that we're seeing that motivates this decision or change?]
+[What is the problem or situation that motivates this decision? Include technical constraints, business goals, and current gaps. Be specific — link to entities, services, or files where relevant.]
+
+---
 
 ## Decision Drivers
 
-- [Driver 1: e.g., scalability requirements]
-- [Driver 2: e.g., team expertise]
-- [Driver 3: e.g., time constraints]
-- [Driver 4: e.g., cost considerations]
+- [Driver 1: e.g., must not block streaming response]
+- [Driver 2: e.g., backward compatible with existing API]
+- [Driver 3: e.g., configurable without redeploy]
+- [Driver 4: e.g., team has limited Redis ops experience]
+
+---
 
 ## Considered Options
 
 ### Option 1: [Name]
 
-**Description:** [Brief description]
+[Brief description]
 
 | Pros | Cons |
 |------|------|
@@ -53,38 +58,40 @@ Best Practices:
 
 ### Option 2: [Name]
 
-**Description:** [Brief description]
+[Brief description]
 
 | Pros | Cons |
 |------|------|
 | [Pro 1] | [Con 1] |
 | [Pro 2] | [Con 2] |
 
-### Option 3: [Name]
+### Option 3: [Name] *(if applicable)*
 
-**Description:** [Brief description]
+[Brief description]
 
 | Pros | Cons |
 |------|------|
 | [Pro 1] | [Con 1] |
-| [Pro 2] | [Con 2] |
+
+---
 
 ## Decision Outcome
 
-**Chosen Option:** [Option N]
+**Chosen Option:** Option N — [Name]
 
-**Rationale:** [Why this option was selected over others]
+**Rationale:** [Why this option over the others. Reference the Decision Drivers. Be explicit about trade-offs accepted.]
 
-### Quantified Impact (where applicable)
+### Quantified Impact *(where applicable)*
 
 | Metric | Before | After | Notes |
 |--------|--------|-------|-------|
-| Latency (p99) | [X]ms | [Y]ms | [Context] |
-| Cost | $[X]/mo | $[Y]/mo | [Context] |
-| Throughput | [X] req/s | [Y] req/s | [Context] |
-| SLO Impact | [X]% | [Y]% | [Context] |
+| Latency (p99) | [X] ms | [Y] ms | |
+| Cost | $[X]/mo | $[Y]/mo | |
+| Throughput | [X] req/s | [Y] req/s | |
 
-### Consequences
+---
+
+## Consequences
 
 **Positive:**
 - [Consequence 1]
@@ -97,43 +104,22 @@ Best Practices:
 **Risks:**
 - [Risk 1 and mitigation]
 
-## Technical Details
-
-### Architecture
-
-```
-[ASCII diagram or description of architecture]
-```
-
-### API Contract
-
-```
-[Key interfaces, endpoints, or contracts]
-```
-
-### Data Model
-
-```
-[Key entities and relationships]
-```
-
-## Implementation Plan
-
-1. [ ] [Step 1]
-2. [ ] [Step 2]
-3. [ ] [Step 3]
+---
 
 ## Validation
 
-- [ ] Performance benchmarks meet requirements
-- [ ] Security review completed
-- [ ] Cost analysis approved
+- [ ] Performance benchmarks meet requirements (if applicable)
+- [ ] Security review completed (if applicable)
+- [ ] Tech Strategy alignment confirmed
+- [ ] Related plan document created: `docs/plans/plan-[topic].md`
+
+---
 
 ## Links
 
-- [Related ADR 1](./adr_related.md)
-- [PRD](./prd_feature.md)
-- [External documentation]
+- [Related PRD](../prd/PRD-[feature].md)
+- [Implementation Plan](../plans/plan-[topic].md)
+- [Related ADR](./NNNN-[topic].md)
 
 ---
 
@@ -141,4 +127,4 @@ Best Practices:
 
 | Date | Author | Change |
 |------|--------|--------|
-| [Date] | [Name] | Initial draft |
+| YYYY-MM-DD | [Name] | Initial draft |
