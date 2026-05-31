@@ -1,16 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // Derive raw GitHub URL from the edit button injected by MkDocs Material
-  const editLink = document.querySelector('a[title="Edit this page"]');
-  if (!editLink) return;
+  var rawUrl = getRawUrl();
+  if (!rawUrl) return;
 
-  // https://github.com/user/repo/edit/main/docs/path.md
-  // → https://raw.githubusercontent.com/user/repo/main/docs/path.md
-  const rawUrl = editLink.href
-    .replace('github.com', 'raw.githubusercontent.com')
-    .replace('/edit/', '/');
-
-  // Build button
-  const btn = document.createElement('button');
+  var btn = document.createElement('button');
   btn.textContent = '📋 Copy Markdown';
   btn.title = 'Copy the raw Markdown source of this page';
   btn.style.cssText = [
@@ -29,25 +21,52 @@ document.addEventListener('DOMContentLoaded', function () {
     'transition:opacity .15s',
   ].join(';');
 
-  btn.addEventListener('mouseenter', () => btn.style.opacity = '0.85');
-  btn.addEventListener('mouseleave', () => btn.style.opacity = '1');
+  btn.addEventListener('mouseenter', function () { btn.style.opacity = '0.85'; });
+  btn.addEventListener('mouseleave', function () { btn.style.opacity = '1'; });
 
   btn.addEventListener('click', async function () {
     try {
-      const res = await fetch(rawUrl);
+      var res = await fetch(rawUrl);
       if (!res.ok) throw new Error(res.status);
-      const text = await res.text();
+      var text = await res.text();
       await navigator.clipboard.writeText(text);
       btn.textContent = '✅ Copied!';
     } catch (_) {
-      btn.textContent = '❌ Failed — check CORS or network';
+      // Fallback: open raw URL in new tab so user can copy manually
+      window.open(rawUrl, '_blank');
+      btn.textContent = '↗ Opened raw file';
     }
-    setTimeout(() => { btn.textContent = '📋 Copy Markdown'; }, 2500);
+    setTimeout(function () { btn.textContent = '📋 Copy Markdown'; }, 2500);
   });
 
-  // Insert right after the <h1>
-  const h1 = document.querySelector('article h1, .md-content h1');
-  if (h1) {
-    h1.insertAdjacentElement('afterend', btn);
-  }
+  var h1 = document.querySelector('article h1, .md-content h1');
+  if (h1) h1.insertAdjacentElement('afterend', btn);
 });
+
+function getRawUrl() {
+  var REPO_RAW = 'https://raw.githubusercontent.com/nguyenhuuca/assessment/main/docs';
+
+  // Primary: derive from the edit button rendered by MkDocs Material
+  // (requires content.action.edit feature + edit_uri in mkdocs.yml)
+  var editLink = document.querySelector('a[title="Edit this page"]');
+  if (editLink && editLink.href) {
+    // https://github.com/user/repo/edit/main/docs/path.md
+    // → https://raw.githubusercontent.com/user/repo/main/docs/path.md
+    return editLink.href
+      .replace('github.com', 'raw.githubusercontent.com')
+      .replace('/edit/', '/');
+  }
+
+  // Fallback: construct from window.location.pathname
+  // Works when the site is served at root (local dev or GitHub Pages with repo name stripped)
+  var path = window.location.pathname
+    .replace(/^\/assessment/, '')   // strip GitHub Pages repo prefix
+    .replace(/\/$/, '')             // strip trailing slash
+    .replace(/^\//, '');            // strip leading slash
+
+  if (!path) return REPO_RAW + '/README.md';
+
+  // MkDocs turns "foo/bar/" into "foo/bar/index.html" — map back to foo/bar.md
+  // If path ends with a known directory-style segment, try .md directly
+  return REPO_RAW + '/' + path + '.md';
+}
