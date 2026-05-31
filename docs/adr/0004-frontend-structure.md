@@ -1,16 +1,19 @@
 # ADR-0004: Use Vanilla JS + Bootstrap for Initial Frontend with Planned Migration to React
 
 ## Metadata
-**Status:** Accepted
-**Date:** 2025-07-03
-**Deciders:** nguyenhuuca
-**Related PRD:** N/A
+
+| Field | Value |
+|-------|-------|
+| **Status** | Accepted |
+| **Date** | 2025-07-03 |
+| **Deciders** | nguyenhuuca |
+| **Related PRD** | N/A |
+| **Domain Tags** | frontend |
+| **Supersedes** | N/A |
+| **Superseded By** | ADR-0008 (React migration executes the planned migration) |
+
 **Tech Strategy Alignment:**
 - [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-
-**Domain Tags:** frontend
-**Supersedes:** N/A
-**Superseded By:** ADR-0008 (React migration executes the planned migration)
 
 ---
 

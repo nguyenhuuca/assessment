@@ -1,15 +1,19 @@
 # ADR-0006: HLS Video Streaming for Local Videos
 
 ## Metadata
-**Status:** Proposed
-**Date:** 2026-05-30
-**Deciders:** nguyenhuuca
-**Related PRD:** N/A
+
+| Field | Value |
+|-------|-------|
+| **Status** | Proposed |
+| **Date** | 2026-05-30 |
+| **Deciders** | nguyenhuuca |
+| **Related PRD** | N/A |
+| **Domain Tags** | infrastructure, api, frontend |
+| **Supersedes** | N/A |
+| **Superseded By** | N/A |
+
 **Tech Strategy Alignment:**
 - [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-**Domain Tags:** infrastructure, api, frontend
-**Supersedes:** N/A
-**Superseded By:** N/A
 
 ---
 

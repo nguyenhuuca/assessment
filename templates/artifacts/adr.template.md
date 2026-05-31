@@ -17,16 +17,19 @@ Best Practices:
 
 ## Metadata
 
-**Status:** Proposed | Accepted | Deprecated | Superseded
-**Date:** YYYY-MM-DD
-**Deciders:** [List of people involved]
-**Related PRD:** [Link or N/A]
+| Field | Value |
+|-------|-------|
+| **Status** | Proposed \| Accepted \| Deprecated \| Superseded |
+| **Date** | YYYY-MM-DD |
+| **Deciders** | [names] |
+| **Related PRD** | [Link or N/A] |
+| **Domain Tags** | [tags] |
+| **Supersedes** | [ADR-NNNN or N/A] |
+| **Superseded By** | [ADR-NNNN or N/A] |
+
 **Tech Strategy Alignment:**
 - [ ] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
 - [ ] OR deviation is explicitly justified in the Rationale below
-**Domain Tags:** [security | data | integration | infrastructure | api | frontend | devops]
-**Supersedes:** [ADR-NNNN or N/A]
-**Superseded By:** [ADR-NNNN or N/A]
 
 ---
 

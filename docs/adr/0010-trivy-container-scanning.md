@@ -1,16 +1,19 @@
 # ADR-0010: Add Trivy Dependency and Filesystem Scanning to CI
 
 ## Metadata
-**Status:** Accepted
-**Date:** 2026-05-30
-**Deciders:** nguyenhuuca
-**Related PRD:** N/A
+
+| Field | Value |
+|-------|-------|
+| **Status** | Accepted |
+| **Date** | 2026-05-30 |
+| **Deciders** | nguyenhuuca |
+| **Related PRD** | N/A |
+| **Domain Tags** | security, devops |
+| **Supersedes** | N/A |
+| **Superseded By** | N/A |
+
 **Tech Strategy Alignment:**
 - [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-
-**Domain Tags:** security, devops
-**Supersedes:** N/A
-**Superseded By:** N/A
 
 ---
 

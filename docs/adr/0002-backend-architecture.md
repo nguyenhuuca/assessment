@@ -1,16 +1,19 @@
 # ADR-0002: Use Layered Spring Boot Architecture with Virtual Threads Support
 
 ## Metadata
-**Status:** Accepted
-**Date:** 2025-07-03
-**Deciders:** nguyenhuuca
-**Related PRD:** N/A
+
+| Field | Value |
+|-------|-------|
+| **Status** | Accepted |
+| **Date** | 2025-07-03 |
+| **Deciders** | nguyenhuuca |
+| **Related PRD** | N/A |
+| **Domain Tags** | infrastructure, api |
+| **Supersedes** | N/A |
+| **Superseded By** | N/A |
+
 **Tech Strategy Alignment:**
 - [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-
-**Domain Tags:** infrastructure, api
-**Supersedes:** N/A
-**Superseded By:** N/A
 
 ---
 

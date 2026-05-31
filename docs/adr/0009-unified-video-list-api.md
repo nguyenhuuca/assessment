@@ -1,15 +1,19 @@
 # ADR-0009: Unified Video List API
 
 ## Metadata
-**Status:** Proposed
-**Date:** 2026-02-06
-**Deciders:** nguyenhuuca
-**Related PRD:** N/A
+
+| Field | Value |
+|-------|-------|
+| **Status** | Proposed |
+| **Date** | 2026-02-06 |
+| **Deciders** | nguyenhuuca |
+| **Related PRD** | N/A |
+| **Domain Tags** | api, data |
+| **Supersedes** | N/A |
+| **Superseded By** | N/A |
+
 **Tech Strategy Alignment:**
 - [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-**Domain Tags:** api, data
-**Supersedes:** N/A
-**Superseded By:** N/A
 
 ---
 

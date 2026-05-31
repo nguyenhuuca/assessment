@@ -1,16 +1,19 @@
 # ADR-0003: Use Guava Cache Initially, with Planned Migration to Redis
 
 ## Metadata
-**Status:** Accepted
-**Date:** 2025-07-03
-**Deciders:** nguyenhuuca
-**Related PRD:** N/A
+
+| Field | Value |
+|-------|-------|
+| **Status** | Accepted |
+| **Date** | 2025-07-03 |
+| **Deciders** | nguyenhuuca |
+| **Related PRD** | N/A |
+| **Domain Tags** | data, infrastructure |
+| **Supersedes** | N/A |
+| **Superseded By** | N/A |
+
 **Tech Strategy Alignment:**
 - [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-
-**Domain Tags:** data, infrastructure
-**Supersedes:** N/A
-**Superseded By:** N/A
 
 ---
 

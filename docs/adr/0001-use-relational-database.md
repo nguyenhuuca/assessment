@@ -1,16 +1,19 @@
 # ADR-0001: Use Relational Database (PostgreSQL) for Core Data
 
 ## Metadata
-**Status:** Accepted
-**Date:** 2025-07-03
-**Deciders:** nguyenhuuca
-**Related PRD:** N/A
+
+| Field | Value |
+|-------|-------|
+| **Status** | Accepted |
+| **Date** | 2025-07-03 |
+| **Deciders** | nguyenhuuca |
+| **Related PRD** | N/A |
+| **Domain Tags** | data, infrastructure |
+| **Supersedes** | N/A |
+| **Superseded By** | N/A |
+
 **Tech Strategy Alignment:**
 - [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-
-**Domain Tags:** data, infrastructure
-**Supersedes:** N/A
-**Superseded By:** N/A
 
 ---
 

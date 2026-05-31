@@ -1,15 +1,19 @@
 # ADR-0007: Admin Dashboard — Content and Account Management
 
 ## Metadata
-**Status:** Accepted
-**Date:** 2026-04-30
-**Deciders:** nguyenhuuca
-**Related PRD:** N/A
+
+| Field | Value |
+|-------|-------|
+| **Status** | Accepted |
+| **Date** | 2026-04-30 |
+| **Deciders** | nguyenhuuca |
+| **Related PRD** | N/A |
+| **Domain Tags** | security, api, frontend |
+| **Supersedes** | N/A |
+| **Superseded By** | N/A |
+
 **Tech Strategy Alignment:**
 - [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-**Domain Tags:** security, api, frontend
-**Supersedes:** N/A
-**Superseded By:** N/A
 
 ---
 
