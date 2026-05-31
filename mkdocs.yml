@@ -105,6 +105,7 @@ nav:
   - Claude Guide:
       - English: claude-guide-en.md
       - Tiếng Việt: claude-guide-vi.md
+      - Scope to Implement Flow: flow-scope-to-implement.md
 
   - Claude Workspace:
       - Commands:
