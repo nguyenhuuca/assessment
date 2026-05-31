@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#use-layered-spring-boot-architecture-with-virtual-threads-support" class="md-skip">
+        <a href="#adr-0002-use-layered-spring-boot-architecture-with-virtual-threads-support" class="md-skip">
           Skip to content
         </a>
       
@@ -835,21 +835,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -868,13 +857,91 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-spring-boot-virtual-threads-project-loom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: Spring Boot + Virtual Threads (Project Loom)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-spring-webflux-reactive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: Spring WebFlux (Reactive)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-nodejs-express" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: Node.js / Express
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -890,10 +957,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4729,21 +4818,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -4762,13 +4840,91 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-spring-boot-virtual-threads-project-loom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: Spring Boot + Virtual Threads (Project Loom)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-spring-webflux-reactive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: Spring WebFlux (Reactive)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-nodejs-express" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: Node.js / Express
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -4784,10 +4940,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4819,38 +4997,196 @@
   
 
 
-<h1 id="use-layered-spring-boot-architecture-with-virtual-threads-support">Use Layered Spring Boot Architecture with Virtual Threads Support<a class="headerlink" href="#use-layered-spring-boot-architecture-with-virtual-threads-support" title="Permanent link">&para;</a></h1>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Accepted</p>
-<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2025-07-03</p>
+<h1 id="adr-0002-use-layered-spring-boot-architecture-with-virtual-threads-support">ADR-0002: Use Layered Spring Boot Architecture with Virtual Threads Support<a class="headerlink" href="#adr-0002-use-layered-spring-boot-architecture-with-virtual-threads-support" title="Permanent link">&para;</a></h1>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> Accepted
+<strong>Date:</strong> 2025-07-03
+<strong>Deciders:</strong> nguyenhuuca
+<strong>Related PRD:</strong> N/A
+<strong>Tech Strategy Alignment:</strong>
+- [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code></p>
+<p><strong>Domain Tags:</strong> infrastructure, api
+<strong>Supersedes:</strong> N/A
+<strong>Superseded By:</strong> N/A</p>
+<hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The backend handles multiple concerns:
-- REST APIs (video, comment, like, view)
-- Background jobs (cron: download from Google Drive, generate thumbnail, cleanup)
-- Caching (Redis)
-- File I/O (video streaming, stats logging)</p>
-<p>We expect high concurrency, especially when serving video streams or updating view stats, which requires efficient threading without consuming too many OS threads.</p>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>We use:
-- <strong>Spring Boot 3.x</strong> with <strong>virtual thread support</strong> (Project Loom, JEP 444)
-- Layered architecture: <code>Controller → Service → Repository</code>
-- Enable virtual threads by:
-    - Configuring Tomcat to use <code>Executors.newVirtualThreadPerTaskExecutor()</code>
-    - Ensuring all blocking operations (DB, file, network) are thread-friendly</p>
-<p>Virtual threads allow handling many concurrent requests with minimal memory/CPU cost compared to platform threads.</p>
+<p>The backend handles REST APIs, background jobs, file I/O for video streaming, and view stat updates. High concurrency is expected, particularly when serving video streams to multiple simultaneous users. The architecture must handle many parallel I/O-bound requests efficiently without consuming excessive OS thread resources or requiring complex asynchronous programming models.</p>
+<hr />
+<h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
+<ul>
+<li>High concurrency requirement for video streaming and stat updates</li>
+<li>I/O-bound workloads dominate (database, file, network calls)</li>
+<li>Team familiarity with imperative, synchronous code is preferred over reactive programming</li>
+<li>Reducing infrastructure cost by maximizing throughput per instance</li>
+<li>Maintainability and onboarding simplicity must be preserved</li>
+</ul>
+<hr />
+<h2 id="considered-options">Considered Options<a class="headerlink" href="#considered-options" title="Permanent link">&para;</a></h2>
+<h3 id="option-1-spring-boot-virtual-threads-project-loom">Option 1: Spring Boot + Virtual Threads (Project Loom)<a class="headerlink" href="#option-1-spring-boot-virtual-threads-project-loom" title="Permanent link">&para;</a></h3>
+<p>Spring Boot 3.x with Java 24 virtual threads enabled via Project Loom (JEP 444). Layered architecture: Controller → Service → Repository.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Handles high concurrency with minimal memory per thread</td>
+<td>Some third-party libraries may pin platform threads (must monitor)</td>
+</tr>
+<tr>
+<td>Synchronous, imperative code style — easy to read and debug</td>
+<td>Virtual threads are relatively new; edge cases may surface</td>
+</tr>
+<tr>
+<td>No reactive programming model required</td>
+<td>Requires JDK 21+ (Java 24 used here)</td>
+</tr>
+<tr>
+<td>Natural fit with Spring Boot's existing servlet model</td>
+<td></td>
+</tr>
+<tr>
+<td>Layered architecture is well-understood and easy to onboard</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-2-spring-webflux-reactive">Option 2: Spring WebFlux (Reactive)<a class="headerlink" href="#option-2-spring-webflux-reactive" title="Permanent link">&para;</a></h3>
+<p>Spring's reactive stack using Project Reactor and non-blocking I/O throughout the stack.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Excellent scalability for high-concurrency I/O workloads</td>
+<td>Steep learning curve; reactive programming is complex</td>
+</tr>
+<tr>
+<td>Non-blocking end-to-end eliminates thread starvation</td>
+<td>All layers must be reactive — difficult to adopt incrementally</td>
+</tr>
+<tr>
+<td>Battle-tested in production at scale</td>
+<td>Debugging and stack traces are harder to follow</td>
+</tr>
+<tr>
+<td></td>
+<td>Requires reactive-compatible libraries throughout</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-3-nodejs-express">Option 3: Node.js / Express<a class="headerlink" href="#option-3-nodejs-express" title="Permanent link">&para;</a></h3>
+<p>JavaScript runtime with event-loop-based non-blocking I/O, commonly used for API backends.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single-threaded event loop handles concurrency naturally</td>
+<td>Not idiomatic for a Java team</td>
+</tr>
+<tr>
+<td>Lightweight and fast to prototype</td>
+<td>Limited type safety without TypeScript overhead</td>
+</tr>
+<tr>
+<td>Large ecosystem of packages</td>
+<td>CPU-bound tasks block the event loop</td>
+</tr>
+<tr>
+<td></td>
+<td>Weaker ecosystem for enterprise patterns (JPA, Spring Security)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
+<p><strong>Chosen Option:</strong> Option 1 — Spring Boot + Virtual Threads (Project Loom)
+<strong>Rationale:</strong> Virtual threads deliver reactive-level concurrency with synchronous, imperative code. This keeps the codebase simple and maintainable while meeting the high-concurrency requirement for video streaming. Spring WebFlux would require a full reactive rewrite across all layers and significantly increase complexity. Node.js is not suitable for a Java-first team with JPA and Spring Security requirements.</p>
+<h3 id="quantified-impact-where-applicable">Quantified Impact <em>(where applicable)</em><a class="headerlink" href="#quantified-impact-where-applicable" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Max concurrent requests (per instance)</td>
+<td>Limited by OS thread count</td>
+<td>Scales to thousands</td>
+<td>Virtual threads are lightweight</td>
+</tr>
+<tr>
+<td>Code complexity</td>
+<td>N/A</td>
+<td>Low (synchronous style)</td>
+<td>No reactive operators or callbacks</td>
+</tr>
+</tbody>
+</table>
+<hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
+<p><strong>Positive:</strong>
+- Backend handles many concurrent I/O-bound requests with far fewer OS resources
+- Synchronous code style reduces cognitive load for developers
+- Background jobs and REST handlers share the same simple threading model
+- Straightforward layered architecture is easy to extend and test</p>
+<p><strong>Negative:</strong>
+- Libraries that pin platform threads (e.g., certain JDBC drivers, synchronized blocks) may reduce virtual thread benefits
+- Requires JDK 21 or later; Java 24 with preview features adds compiler configuration overhead</p>
+<p><strong>Risks:</strong>
+- Undetected thread pinning by third-party libraries could silently degrade throughput
+- Preview features in Java 24 may introduce breaking changes in future JDK releases</p>
+<hr />
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Backend can handle more concurrent I/O-bound requests (video, file I/O) with fewer resources.</li>
-<li>Reduces the need for complex async/reactive code in most scenarios.</li>
-<li>Some libraries that use native threads may still block (must monitor).</li>
+<li>[ ] Tech Strategy alignment confirmed</li>
+<li>[ ] Related plan document created: N/A</li>
 </ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Task: Stream video using <code>RadomAccessFile</code> with virtual threads</li>
-<li>Task: Schedule background jobs using <code>@Scheduled</code></li>
-<li>JEP 444: https://openjdk.org/jeps/444</li>
+<li><a href="https://openjdk.org/jeps/444">JEP 444: Virtual Threads</a></li>
+<li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.thread-virtual">Spring Boot Virtual Threads docs</a></li>
 </ul>
+<hr />
+<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Author</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025-07-03</td>
+<td>nguyenhuuca</td>
+<td>Initial draft</td>
+</tr>
+<tr>
+<td>2026-05-31</td>
+<td>nguyenhuuca</td>
+<td>Restructured to new ADR template</td>
+</tr>
+</tbody>
+</table>
 
 
 

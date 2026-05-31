@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#use-relational-database-postgresql-for-core-data" class="md-skip">
+        <a href="#adr-0001-use-relational-database-postgresql-for-core-data" class="md-skip">
           Skip to content
         </a>
       
@@ -807,21 +807,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -840,13 +829,91 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-mongodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: MongoDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-sqlite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -862,10 +929,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4729,21 +4818,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -4762,13 +4840,91 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-mongodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: MongoDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-sqlite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -4784,10 +4940,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4819,31 +4997,196 @@
   
 
 
-<h1 id="use-relational-database-postgresql-for-core-data">Use Relational Database (PostgreSQL) for Core Data<a class="headerlink" href="#use-relational-database-postgresql-for-core-data" title="Permanent link">&para;</a></h1>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Accepted</p>
-<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2025-07-03</p>
+<h1 id="adr-0001-use-relational-database-postgresql-for-core-data">ADR-0001: Use Relational Database (PostgreSQL) for Core Data<a class="headerlink" href="#adr-0001-use-relational-database-postgresql-for-core-data" title="Permanent link">&para;</a></h1>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> Accepted
+<strong>Date:</strong> 2025-07-03
+<strong>Deciders:</strong> nguyenhuuca
+<strong>Related PRD:</strong> N/A
+<strong>Tech Strategy Alignment:</strong>
+- [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code></p>
+<p><strong>Domain Tags:</strong> data, infrastructure
+<strong>Supersedes:</strong> N/A
+<strong>Superseded By:</strong> N/A</p>
+<hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The system needs to store structured data including videos, comments, view stats, and user interactions. This data has clear relationships (e.g., one-to-many, parent-child), which makes relational modeling suitable.</p>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>We use PostgreSQL as the relational database due to:
-- ACID compliance
-- Rich SQL support
-- Native JSON support (for flexibility in some columns)
-- Strong community and cloud-managed options</p>
+<p>The system needs to persist structured data including videos, comments, view statistics, and user interactions. This data has clear relationships (one-to-many, parent-child hierarchies) and requires consistent, transactional writes. A storage solution that enforces relational integrity and supports safe schema evolution over time is needed.</p>
+<hr />
+<h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Data has well-defined relationships between entities (videos, comments, users, stats)</li>
+<li>Transactional consistency is required for writes</li>
+<li>Schema must evolve safely over time without data loss</li>
+<li>Reporting and filtering queries benefit from rich SQL support</li>
+<li>Cloud-managed hosting options are preferred to reduce operational overhead</li>
+</ul>
+<hr />
+<h2 id="considered-options">Considered Options<a class="headerlink" href="#considered-options" title="Permanent link">&para;</a></h2>
+<h3 id="option-1-postgresql">Option 1: PostgreSQL<a class="headerlink" href="#option-1-postgresql" title="Permanent link">&para;</a></h3>
+<p>A mature, open-source relational database with full ACID compliance, rich SQL, and native JSON support.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ACID compliance ensures data integrity</td>
+<td>Requires upfront schema design</td>
+</tr>
+<tr>
+<td>Rich SQL for complex queries and joins</td>
+<td>Schema migrations must be managed carefully</td>
+</tr>
+<tr>
+<td>Native JSON columns for flexible fields</td>
+<td>Vertical scaling limits (mitigated by cloud options)</td>
+</tr>
+<tr>
+<td>Strong community and cloud-managed options available</td>
+<td></td>
+</tr>
+<tr>
+<td>Compatible with Liquibase for migration management</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-2-mongodb">Option 2: MongoDB<a class="headerlink" href="#option-2-mongodb" title="Permanent link">&para;</a></h3>
+<p>A document-oriented NoSQL database suited to schema-flexible, unstructured data.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Schema-flexible, easy to start</td>
+<td>Weak relational integrity across documents</td>
+</tr>
+<tr>
+<td>Horizontal scaling built-in</td>
+<td>Joins are complex and less performant</td>
+</tr>
+<tr>
+<td>Good for unstructured or variable data</td>
+<td>Transactions less mature than PostgreSQL</td>
+</tr>
+<tr>
+<td></td>
+<td>Overkill for well-structured relational data</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-3-sqlite">Option 3: SQLite<a class="headerlink" href="#option-3-sqlite" title="Permanent link">&para;</a></h3>
+<p>An embedded, file-based relational database requiring no server process.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zero operational overhead</td>
+<td>Not suitable for multi-user concurrent writes</td>
+</tr>
+<tr>
+<td>Simple local development setup</td>
+<td>Cannot run as a separate networked service</td>
+</tr>
+<tr>
+<td></td>
+<td>Poor fit for production cloud deployments</td>
+</tr>
+<tr>
+<td></td>
+<td>Limited concurrency and scalability</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
+<p><strong>Chosen Option:</strong> Option 1 — PostgreSQL
+<strong>Rationale:</strong> The data model is inherently relational and benefits from enforced foreign keys, transactional consistency, and rich SQL. PostgreSQL provides all of these along with native JSON support for flexibility, and integrates cleanly with Spring Boot via JPA and Liquibase. MongoDB adds complexity without benefit for a well-structured domain. SQLite is unsuitable for multi-user production workloads.</p>
+<h3 id="quantified-impact-where-applicable">Quantified Impact <em>(where applicable)</em><a class="headerlink" href="#quantified-impact-where-applicable" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Schema evolution safety</td>
+<td>Manual/ad hoc</td>
+<td>Managed via Liquibase</td>
+<td>Automated, versioned migrations</td>
+</tr>
+<tr>
+<td>Query complexity support</td>
+<td>N/A</td>
+<td>Full SQL joins and aggregations</td>
+<td>Enables reporting and filtering</td>
+</tr>
+</tbody>
+</table>
+<hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
+<p><strong>Positive:</strong>
+- Schema evolution is managed safely through Liquibase versioned migrations
+- Relational data (video to comments to replies) is modeled naturally with foreign keys
+- Complex reporting queries and aggregations are efficient with SQL
+- ACID guarantees prevent partial writes and data corruption</p>
+<p><strong>Negative:</strong>
+- Schema must be designed upfront; structural changes require migration files
+- Horizontal scaling requires additional configuration such as read replicas and connection pooling</p>
+<p><strong>Risks:</strong>
+- Poorly written migrations could cause downtime during schema changes on production
+- Unbounded JOIN complexity could degrade query performance at scale without indexing discipline</p>
+<hr />
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Well-supported schema evolution via migration tools</li>
-<li>Easy to model relations like <code>video -&gt; comments -&gt; replies</code></li>
-<li>Complex reporting and joins are efficient</li>
-<li>Requires designing migrations carefully as schema evolves</li>
+<li>[ ] Tech Strategy alignment confirmed</li>
+<li>[ ] Related plan document created: N/A</li>
 </ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Task: Design video_source and video_comments table</li>
-<li>Migration tool: Liquibase for schema management</li>
+<li><a href="https://docs.liquibase.com/">Liquibase migration docs</a></li>
+<li><a href="https://www.postgresql.org/docs/">PostgreSQL official docs</a></li>
 </ul>
+<hr />
+<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Author</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025-07-03</td>
+<td>nguyenhuuca</td>
+<td>Initial draft</td>
+</tr>
+<tr>
+<td>2026-05-31</td>
+<td>nguyenhuuca</td>
+<td>Restructured to new ADR template</td>
+</tr>
+</tbody>
+</table>
 
 
 

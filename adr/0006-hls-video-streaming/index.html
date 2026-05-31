@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-switch-to-hls-for-local-video-streaming" class="md-skip">
+        <a href="#adr-0006-hls-video-streaming-for-local-videos" class="md-skip">
           Skip to content
         </a>
       
@@ -947,6 +947,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -958,10 +969,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
@@ -969,22 +980,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#architecture" class="md-nav__link">
+  <a href="#considered-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Architecture
+        Considered Options
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Architecture">
+    <nav class="md-nav" aria-label="Considered Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#storage-layout" class="md-nav__link">
+  <a href="#option-1-keep-rangemp4-status-quo" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Storage Layout
+        Option 1: Keep Range/MP4 (status quo)
       
     </span>
   </a>
@@ -992,22 +1003,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#new-backend-components" class="md-nav__link">
+  <a href="#option-2-hls-with-ffmpeg-stream-copy-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        New Backend Components
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="New Backend Components">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-hlstranscodeservice-interface-impl" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. HlsTranscodeService (interface + impl)
+        Option 2: HLS with FFmpeg stream-copy (chosen)
       
     </span>
   </a>
@@ -1015,10 +1014,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-hlsstreamcontroller-new-controller" class="md-nav__link">
+  <a href="#option-3-mpeg-dash" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. HlsStreamController (new controller)
+        Option 3: MPEG-DASH
       
     </span>
   </a>
@@ -1026,70 +1025,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-videosource-entity-changes" class="md-nav__link">
+  <a href="#option-4-on-demand-segmentation-first-request" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. VideoSource entity changes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-liquibase-migration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Liquibase migration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-videodto-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. VideoDto changes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6-videostorageserviceimpl-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. VideoStorageServiceImpl changes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#7-appscheduler-retry-job" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7. AppScheduler — retry job
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#frontend-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Frontend Changes
+        Option 4: On-demand segmentation (first request)
       
     </span>
   </a>
@@ -1102,66 +1041,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#trade-off-matrix" class="md-nav__link">
+  <a href="#decision-outcome" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Trade-off Matrix
+        Decision Outcome
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#migration-plan-zero-downtime" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migration Plan (Zero Downtime)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Migration Plan (Zero Downtime)">
+    <nav class="md-nav" aria-label="Decision Outcome">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#phase-1-backend-no-visible-frontend-change" class="md-nav__link">
+  <a href="#quantified-impact" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 1 — Backend (no visible frontend change)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#phase-2-frontend" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 2 — Frontend
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#phase-3-cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 3 — Cleanup
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#feature-flag" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Feature Flag
+        Quantified Impact
       
     </span>
   </a>
@@ -1185,10 +1080,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#alternatives-rejected" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Alternatives Rejected
+        Validation
       
     </span>
   </a>
@@ -1196,10 +1091,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
+  <a href="#links" class="md-nav__link">
     <span class="md-ellipsis">
       
-        References
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4923,6 +4829,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4934,10 +4851,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
@@ -4945,22 +4862,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#architecture" class="md-nav__link">
+  <a href="#considered-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Architecture
+        Considered Options
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Architecture">
+    <nav class="md-nav" aria-label="Considered Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#storage-layout" class="md-nav__link">
+  <a href="#option-1-keep-rangemp4-status-quo" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Storage Layout
+        Option 1: Keep Range/MP4 (status quo)
       
     </span>
   </a>
@@ -4968,22 +4885,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#new-backend-components" class="md-nav__link">
+  <a href="#option-2-hls-with-ffmpeg-stream-copy-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        New Backend Components
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="New Backend Components">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-hlstranscodeservice-interface-impl" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. HlsTranscodeService (interface + impl)
+        Option 2: HLS with FFmpeg stream-copy (chosen)
       
     </span>
   </a>
@@ -4991,10 +4896,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-hlsstreamcontroller-new-controller" class="md-nav__link">
+  <a href="#option-3-mpeg-dash" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. HlsStreamController (new controller)
+        Option 3: MPEG-DASH
       
     </span>
   </a>
@@ -5002,70 +4907,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-videosource-entity-changes" class="md-nav__link">
+  <a href="#option-4-on-demand-segmentation-first-request" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. VideoSource entity changes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-liquibase-migration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Liquibase migration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-videodto-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. VideoDto changes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6-videostorageserviceimpl-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. VideoStorageServiceImpl changes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#7-appscheduler-retry-job" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7. AppScheduler — retry job
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#frontend-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Frontend Changes
+        Option 4: On-demand segmentation (first request)
       
     </span>
   </a>
@@ -5078,66 +4923,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#trade-off-matrix" class="md-nav__link">
+  <a href="#decision-outcome" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Trade-off Matrix
+        Decision Outcome
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#migration-plan-zero-downtime" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migration Plan (Zero Downtime)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Migration Plan (Zero Downtime)">
+    <nav class="md-nav" aria-label="Decision Outcome">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#phase-1-backend-no-visible-frontend-change" class="md-nav__link">
+  <a href="#quantified-impact" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 1 — Backend (no visible frontend change)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#phase-2-frontend" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 2 — Frontend
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#phase-3-cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 3 — Cleanup
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#feature-flag" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Feature Flag
+        Quantified Impact
       
     </span>
   </a>
@@ -5161,10 +4962,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#alternatives-rejected" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Alternatives Rejected
+        Validation
       
     </span>
   </a>
@@ -5172,10 +4973,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
+  <a href="#links" class="md-nav__link">
     <span class="md-ellipsis">
       
-        References
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -5207,296 +5019,229 @@
   
 
 
-<h1 id="adr-switch-to-hls-for-local-video-streaming">ADR: Switch to HLS for Local Video Streaming<a class="headerlink" href="#adr-switch-to-hls-for-local-video-streaming" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Proposed<br />
-<strong>Date:</strong> 2026-05-30<br />
-<strong>Author:</strong> nguyenhuuca  </p>
+<h1 id="adr-0006-hls-video-streaming-for-local-videos">ADR-0006: HLS Video Streaming for Local Videos<a class="headerlink" href="#adr-0006-hls-video-streaming-for-local-videos" title="Permanent link">&para;</a></h1>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> Proposed
+<strong>Date:</strong> 2026-05-30
+<strong>Deciders:</strong> nguyenhuuca
+<strong>Related PRD:</strong> N/A
+<strong>Tech Strategy Alignment:</strong>
+- [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code>
+<strong>Domain Tags:</strong> infrastructure, api, frontend
+<strong>Supersedes:</strong> N/A
+<strong>Superseded By:</strong> N/A</p>
 <hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The current streaming implementation (<code>VideoStreamController</code>) serves locally-stored MP4 files (<code>.full</code> extension, downloaded from Google Drive) via HTTP Range requests (RFC 7233). Clients receive 256 KB on the first request and 512 KB on subsequent requests.</p>
-<p><strong>Pain points with the current approach:</strong>
-- Range-based MP4 streaming is not CDN-cacheable (every byte range is a unique request)
-- Requires custom seek math and a Guava byte[] chunk cache in application memory
-- No standard adaptive bitrate (ABR) path — quality is fixed
-- Player compatibility depends on the browser correctly implementing Range requests
-- Seeking is at byte granularity but the application imposes its own chunk boundaries, causing mismatches</p>
-<p><strong>YouTube videos are out of scope</strong> — they are embedded via <code>embedLink</code> and served by YouTube's own infrastructure. HLS migration applies only to locally-stored videos (<code>VideoSource</code> entities with <code>sourceType = "google_drive"</code>).</p>
-<hr />
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>Switch local video streaming from HTTP Range + MP4 to <strong>HLS (HTTP Live Streaming)</strong> using FFmpeg to segment videos into <code>.ts</code> chunks and <code>.m3u8</code> playlists during the existing Google Drive sync pipeline.</p>
+<p>Local videos (sourceType = <code>google_drive</code>) are currently served via HTTP Range requests on raw MP4 files. This approach has several pain points:</p>
 <ul>
-<li><strong>Segmentation:</strong> FFmpeg stream-copy (no re-encode), 6-second segments</li>
-<li><strong>Timing:</strong> Offline — run during <code>VideoStorageServiceImpl.downloadFileFromFolder()</code></li>
-<li><strong>Serving:</strong> Direct <code>FileSystemResource</code> from disk (no application-level byte cache)</li>
-<li><strong>Frontend:</strong> <code>hls.js</code> for Chrome/Firefox; native HLS for Safari</li>
-<li><strong>Rollout:</strong> Feature-flagged, backward-compatible — old Range endpoint kept until all videos are transcoded</li>
+<li>Range-based MP4 responses are not CDN-cacheable — every byte-range combination is a unique cache key</li>
+<li>The application maintains a Guava <code>byte[]</code> chunk cache in heap memory to avoid repeated disk reads</li>
+<li>Seeking requires custom chunk-boundary math in the application layer, causing byte-range mismatches</li>
+<li>No path to adaptive bitrate (ABR) streaming without a full rewrite</li>
+<li>Player compatibility depends on browsers correctly implementing Range request handling</li>
+</ul>
+<p>YouTube videos are out of scope — they are embedded via <code>embedLink</code> and served entirely by YouTube's infrastructure.</p>
+<hr />
+<h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Eliminate application-level byte[] cache to reduce heap pressure</li>
+<li>Enable CDN caching of video segments (immutable, fixed-size)</li>
+<li>Use a standard protocol supported natively by all target browsers</li>
+<li>Keep ingest overhead low — re-encoding is unacceptable for a sync pipeline</li>
+<li>Maintain backward compatibility during rollout</li>
 </ul>
 <hr />
-<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
-<h3 id="storage-layout">Storage Layout<a class="headerlink" href="#storage-layout" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>video-cache/
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── {fileId}.full              ← original MP4 (kept until HLS verified, then deleted)
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>└── {fileId}/
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ├── playlist.m3u8          ← media playlist
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    ├── seg_000.ts
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ├── seg_001.ts
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    └── ...
-</code></pre></div>
-<h3 id="new-backend-components">New Backend Components<a class="headerlink" href="#new-backend-components" title="Permanent link">&para;</a></h3>
-<h4 id="1-hlstranscodeservice-interface-impl">1. <code>HlsTranscodeService</code> (interface + impl)<a class="headerlink" href="#1-hlstranscodeservice-interface-impl" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// service/HlsTranscodeService.java</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">HlsTranscodeService</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">transcode</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">fileId</span><span class="p">);</span><span class="w">             </span><span class="c1">// async, updates VideoSource status</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="n">HlsStatus</span><span class="w"> </span><span class="nf">getStatus</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">fileId</span><span class="p">);</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="n">Path</span><span class="w"> </span><span class="nf">getPlaylistPath</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">fileId</span><span class="p">);</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="n">Path</span><span class="w"> </span><span class="nf">getSegmentPath</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">fileId</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">segmentName</span><span class="p">);</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
-</code></pre></div>
-<p><strong>Implementation notes:</strong>
-- Runs <code>ProcessBuilder</code> with FFmpeg command below
-- Wraps execution in a Virtual Thread (<code>Thread.ofVirtual().start(...)</code>)
-- On start: set <code>VideoSource.hlsStatus = PROCESSING</code>
-- On success: set <code>hlsStatus = READY</code>, populate <code>hlsPath</code>
-- On failure: set <code>hlsStatus = ERROR</code>, log stderr</p>
-<p><strong>FFmpeg command:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ffmpeg<span class="w"> </span>-i<span class="w"> </span>video-cache/<span class="o">{</span>fileId<span class="o">}</span>.full<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>-c:v<span class="w"> </span>copy<span class="w"> </span>-c:a<span class="w"> </span>copy<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>-f<span class="w"> </span>hls<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span>-hls_time<span class="w"> </span><span class="m">6</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span>-hls_list_size<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span>-hls_flags<span class="w"> </span>independent_segments<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span>-hls_segment_filename<span class="w"> </span><span class="s2">&quot;video-cache/{fileId}/seg_%03d.ts&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span>video-cache/<span class="o">{</span>fileId<span class="o">}</span>/playlist.m3u8
-</code></pre></div></p>
-<p><code>-c copy</code> remuxes without re-encoding — near-instant processing, no quality loss.</p>
-<h4 id="2-hlsstreamcontroller-new-controller">2. <code>HlsStreamController</code> (new controller)<a class="headerlink" href="#2-hlsstreamcontroller-new-controller" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>GET /api/v1/hls/{fileId}/playlist.m3u8
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  → 200 + Content-Type: application/vnd.apple.mpegurl  (if READY)
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  → 202 Accepted + Retry-After: 5                       (if PROCESSING)
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  → 404 Not Found                                        (if PENDING/ERROR/unknown)
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>GET /api/v1/hls/{fileId}/{segment}.ts
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  → 200 + Content-Type: video/mp2t
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>  → Cache-Control: public, max-age=31536000 (segments are immutable)
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  → Served via FileSystemResource (no Guava cache)
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>GET /api/v1/hls/{fileId}/status
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>  → 200 + { &quot;status&quot;: &quot;READY&quot; | &quot;PROCESSING&quot; | &quot;PENDING&quot; | &quot;ERROR&quot; }
-</code></pre></div>
-<p>Segment files are served via Spring's <code>FileSystemResource</code> — the OS page cache handles hot-segment caching transparently, eliminating the application-level Guava byte[] cache for this flow.</p>
-<h4 id="3-videosource-entity-changes">3. <code>VideoSource</code> entity changes<a class="headerlink" href="#3-videosource-entity-changes" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Enumerated</span><span class="p">(</span><span class="n">EnumType</span><span class="p">.</span><span class="na">STRING</span><span class="p">)</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;hls_status&quot;</span><span class="p">)</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kd">private</span><span class="w"> </span><span class="n">HlsStatus</span><span class="w"> </span><span class="n">hlsStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HlsStatus</span><span class="p">.</span><span class="na">PENDING</span><span class="p">;</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;hls_path&quot;</span><span class="p">)</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">hlsPath</span><span class="p">;</span><span class="w">  </span><span class="c1">// relative path, e.g., &quot;{fileId}/playlist.m3u8&quot;</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">HlsStatus</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">PENDING</span><span class="p">,</span><span class="w"> </span><span class="n">PROCESSING</span><span class="p">,</span><span class="w"> </span><span class="n">READY</span><span class="p">,</span><span class="w"> </span><span class="n">ERROR</span><span class="w"> </span><span class="p">}</span>
-</code></pre></div>
-<h4 id="4-liquibase-migration">4. Liquibase migration<a class="headerlink" href="#4-liquibase-migration" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">-- db/changelog/V{n}__add_hls_status_to_video_sources.sql</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">video_sources</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">hls_status</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;PENDING&#39;</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">hls_path</span><span class="w">   </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span>
-</code></pre></div>
-<h4 id="5-videodto-changes">5. <code>VideoDto</code> changes<a class="headerlink" href="#5-videodto-changes" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">private</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">hlsReady</span><span class="p">;</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w">  </span><span class="n">hlsUrl</span><span class="p">;</span><span class="w">    </span><span class="c1">// &quot;/api/v1/hls/{fileId}/playlist.m3u8&quot; when ready</span>
-</code></pre></div>
-<h4 id="6-videostorageserviceimpl-changes">6. <code>VideoStorageServiceImpl</code> changes<a class="headerlink" href="#6-videostorageserviceimpl-changes" title="Permanent link">&para;</a></h4>
-<p>After a file is downloaded, fork transcoding as an async subtask inside the existing <code>StructuredTaskScope</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// After file download in downloadFileFromFolder()</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">scope</span><span class="p">.</span><span class="na">fork</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="n">hlsTranscodeService</span><span class="p">.</span><span class="na">transcode</span><span class="p">(</span><span class="n">fileId</span><span class="p">);</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">});</span>
-</code></pre></div>
-<h4 id="7-appscheduler-retry-job">7. <code>AppScheduler</code> — retry job<a class="headerlink" href="#7-appscheduler-retry-job" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@Scheduled</span><span class="p">(</span><span class="n">cron</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;0 0 2 * * *&quot;</span><span class="p">)</span><span class="w">     </span><span class="c1">// 2 AM daily</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kt">void</span><span class="w"> </span><span class="nf">retryFailedHlsTranscoding</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="c1">// Find all VideoSource with hlsStatus IN (PENDING, ERROR)</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="c1">// Re-submit to hlsTranscodeService.transcode()</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">}</span>
-</code></pre></div>
-<h3 id="frontend-changes">Frontend Changes<a class="headerlink" href="#frontend-changes" title="Permanent link">&para;</a></h3>
-<p><strong>Dependency:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>npm<span class="w"> </span>i<span class="w"> </span>hls.js
-</code></pre></div></p>
-<p><strong>New component: <code>HlsVideoPlayer.jsx</code></strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">import</span><span class="w"> </span><span class="nx">Hls</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;hls.js&#39;</span><span class="p">;</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">HlsVideoPlayer</span><span class="p">({</span><span class="w"> </span><span class="nx">video</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">videoRef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useRef</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nx">useEffect</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">video</span><span class="p">.</span><span class="nx">hlsReady</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">video</span><span class="p">.</span><span class="nx">hlsUrl</span><span class="p">;</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">Hls</span><span class="p">.</span><span class="nx">isSupported</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">hls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Hls</span><span class="p">();</span>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">      </span><span class="nx">hls</span><span class="p">.</span><span class="nx">loadSource</span><span class="p">(</span><span class="nx">src</span><span class="p">);</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">      </span><span class="nx">hls</span><span class="p">.</span><span class="nx">attachMedia</span><span class="p">(</span><span class="nx">videoRef</span><span class="p">.</span><span class="nx">current</span><span class="p">);</span>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">hls</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">videoRef</span><span class="p">.</span><span class="nx">current</span><span class="p">.</span><span class="nx">canPlayType</span><span class="p">(</span><span class="s1">&#39;application/vnd.apple.mpegurl&#39;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">      </span><span class="c1">// Safari: native HLS</span>
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="w">      </span><span class="nx">videoRef</span><span class="p">.</span><span class="nx">current</span><span class="p">.</span><span class="nx">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">src</span><span class="p">;</span>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">  </span><span class="p">},</span><span class="w"> </span><span class="p">[</span><span class="nx">video</span><span class="p">.</span><span class="nx">hlsReady</span><span class="p">,</span><span class="w"> </span><span class="nx">video</span><span class="p">.</span><span class="nx">hlsUrl</span><span class="p">]);</span>
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">video</span><span class="w"> </span><span class="na">ref</span><span class="o">=</span><span class="p">{</span><span class="nx">videoRef</span><span class="p">}</span><span class="w"> </span><span class="na">controls</span><span class="w"> </span><span class="p">/&gt;;</span>
-<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="p">}</span>
-</code></pre></div>
-<p><strong>Fallback logic in parent component:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// If hlsReady: use HlsVideoPlayer</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="c1">// If !hlsReady &amp;&amp; video.fileId: use legacy Range player (existing &lt;video&gt; with range URL)</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="c1">// Poll /hls/{fileId}/status every 5s until READY</span>
-</code></pre></div>
-<hr />
-<h2 id="trade-off-matrix">Trade-off Matrix<a class="headerlink" href="#trade-off-matrix" title="Permanent link">&para;</a></h2>
+<h2 id="considered-options">Considered Options<a class="headerlink" href="#considered-options" title="Permanent link">&para;</a></h2>
+<h3 id="option-1-keep-rangemp4-status-quo">Option 1: Keep Range/MP4 (status quo)<a class="headerlink" href="#option-1-keep-rangemp4-status-quo" title="Permanent link">&para;</a></h3>
+<p>Continue serving raw MP4 bytes with HTTP Range headers and the existing Guava chunk cache.</p>
 <table>
 <thead>
 <tr>
-<th>Criterion</th>
-<th>Range/MP4 (current)</th>
-<th>HLS (proposed)</th>
+<th>Pros</th>
+<th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Browser compatibility</td>
-<td>Range requests widely supported</td>
-<td>hls.js universal; Safari native</td>
+<td>No migration effort</td>
+<td>Not CDN-cacheable (varied byte ranges)</td>
 </tr>
 <tr>
-<td>Seek performance</td>
-<td>Byte-precise but custom chunking</td>
-<td>Segment-level (±3 s), standard</td>
+<td>Byte-precise seeking</td>
+<td>Guava byte[] cache consumes heap</td>
 </tr>
 <tr>
-<td>CDN cacheability</td>
-<td>Poor — varied byte ranges</td>
-<td>Excellent — immutable segments</td>
+<td>Wide browser support</td>
+<td>Custom chunk-boundary logic is brittle</td>
 </tr>
 <tr>
-<td>Server memory</td>
-<td>Guava byte[] cache needed</td>
-<td>OS page cache sufficient</td>
-</tr>
-<tr>
-<td>Server CPU on request</td>
-<td>None</td>
-<td>None (FFmpeg runs at ingest time)</td>
-</tr>
-<tr>
-<td>Ingest CPU overhead</td>
-<td>None</td>
-<td>FFmpeg <code>-c copy</code> &lt; 1s per GB</td>
-</tr>
-<tr>
-<td>Storage overhead</td>
-<td>1×</td>
-<td>~1.01× (segments ≈ source size)</td>
-</tr>
-<tr>
-<td>ABR readiness</td>
-<td>Not possible</td>
-<td>Add renditions in future</td>
-</tr>
-<tr>
-<td>DRM readiness</td>
-<td>Not built-in</td>
-<td>AES-128 segment encryption available</td>
-</tr>
-<tr>
-<td>Code complexity</td>
-<td>Custom Range parser + cache</td>
-<td>Standard Spring Resource serving</td>
+<td></td>
+<td>No ABR path without full rewrite</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="migration-plan-zero-downtime">Migration Plan (Zero Downtime)<a class="headerlink" href="#migration-plan-zero-downtime" title="Permanent link">&para;</a></h2>
-<h3 id="phase-1-backend-no-visible-frontend-change">Phase 1 — Backend (no visible frontend change)<a class="headerlink" href="#phase-1-backend-no-visible-frontend-change" title="Permanent link">&para;</a></h3>
-<ol>
-<li>Liquibase migration: add <code>hls_status</code>, <code>hls_path</code> to <code>video_sources</code></li>
-<li>Implement <code>HlsTranscodeService</code> + wire into download pipeline</li>
-<li>Implement <code>HlsStreamController</code></li>
-<li>Add nightly retry job</li>
-<li>Update <code>VideoDto</code> with <code>hlsReady</code>, <code>hlsUrl</code></li>
-<li>One-shot migration endpoint (admin-only) or scheduled job to transcode existing <code>.full</code> files</li>
-</ol>
-<h3 id="phase-2-frontend">Phase 2 — Frontend<a class="headerlink" href="#phase-2-frontend" title="Permanent link">&para;</a></h3>
-<ol>
-<li>Add <code>hls.js</code></li>
-<li>Implement <code>HlsVideoPlayer</code> component</li>
-<li>Switch video player to HLS when <code>hlsReady = true</code></li>
-<li>Poll status endpoint for in-progress transcoding</li>
-</ol>
-<h3 id="phase-3-cleanup">Phase 3 — Cleanup<a class="headerlink" href="#phase-3-cleanup" title="Permanent link">&para;</a></h3>
-<ol>
-<li>After all videos report <code>hlsReady = true</code>, delete <code>.full</code> files via <code>deleteIfEligible()</code></li>
-<li>Remove Guava <code>VideoCacheImpl</code> from request path (keep for backward compat period)</li>
-<li>Deprecate <code>VideoStreamController</code> (sunset in a future release)</li>
-</ol>
-<h3 id="feature-flag">Feature Flag<a class="headerlink" href="#feature-flag" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># application.yaml</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nt">hls</span><span class="p">:</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">segment-duration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6</span><span class="w">       </span><span class="c1"># seconds per .ts segment</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">output-dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">video-cache</span><span class="w">   </span><span class="c1"># base directory</span>
-</code></pre></div>
-<hr />
-<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Standard HLS playback across all browsers (no custom player code)
-- Eliminates application-level byte[] chunk cache — reduces heap pressure
-- Segments are immutable → trivially CDN-cacheable in future
-- Foundation for ABR and AES-128 DRM</p>
-<p><strong>Negative / Accepted:</strong>
-- Additional FFmpeg invocation per video at ingest time (mitigated: stream-copy is fast)
-- Slightly more complex storage layout (directory per video vs single file)
-- Frontend gains <code>hls.js</code> dependency (~300 KB gzipped, lazy-loaded)</p>
-<p><strong>Neutral:</strong>
-- <code>StatsCache</code> and <code>VideoAccessService</code> remain useful for analytics regardless of streaming protocol
-- YouTube videos unaffected</p>
-<hr />
-<h2 id="alternatives-rejected">Alternatives Rejected<a class="headerlink" href="#alternatives-rejected" title="Permanent link">&para;</a></h2>
+<h3 id="option-2-hls-with-ffmpeg-stream-copy-chosen">Option 2: HLS with FFmpeg stream-copy (chosen)<a class="headerlink" href="#option-2-hls-with-ffmpeg-stream-copy-chosen" title="Permanent link">&para;</a></h3>
+<p>Segment videos into <code>.ts</code> chunks and <code>.m3u8</code> playlists at ingest time using FFmpeg <code>-c copy</code> (no re-encode). Serve segments directly via <code>FileSystemResource</code>. Use <code>hls.js</code> on Chrome/Firefox; native HLS on Safari.</p>
 <table>
 <thead>
 <tr>
-<th>Alternative</th>
-<th>Reason Rejected</th>
+<th>Pros</th>
+<th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>On-demand segmentation (first request)</td>
+<td>Segments are immutable — trivially CDN-cacheable</td>
+<td>FFmpeg invocation per video at ingest time</td>
+</tr>
+<tr>
+<td>Eliminates application-level byte[] cache</td>
+<td>More complex storage layout (directory per video)</td>
+</tr>
+<tr>
+<td>Standard protocol — no custom player code</td>
+<td>Adds <code>hls.js</code> dependency (~300 KB) to frontend</td>
+</tr>
+<tr>
+<td>Foundation for ABR and AES-128 DRM</td>
+<td></td>
+</tr>
+<tr>
+<td>FFmpeg stream-copy is fast (&lt; 1s per GB)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-3-mpeg-dash">Option 3: MPEG-DASH<a class="headerlink" href="#option-3-mpeg-dash" title="Permanent link">&para;</a></h3>
+<p>Segment using DASH standard instead of HLS.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Similar CDN and ABR benefits to HLS</td>
+<td>Less native browser support than HLS</td>
+</tr>
+<tr>
+<td></td>
+<td><code>dash.js</code> is more complex than <code>hls.js</code></td>
+</tr>
+<tr>
+<td></td>
+<td>No meaningful advantage over HLS for this use case</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-4-on-demand-segmentation-first-request">Option 4: On-demand segmentation (first request)<a class="headerlink" href="#option-4-on-demand-segmentation-first-request" title="Permanent link">&para;</a></h3>
+<p>Generate HLS segments lazily when first requested.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No ingest overhead</td>
 <td>Unacceptable first-play latency</td>
 </tr>
 <tr>
-<td>Multi-bitrate ABR ladder (v1)</td>
-<td>Extra FFmpeg passes add ingest time; can be added as Phase 2</td>
-</tr>
-<tr>
-<td>MPEG-DASH instead of HLS</td>
-<td>HLS has broader native support; hls.js is simpler than dash.js</td>
-</tr>
-<tr>
-<td>Keep Range/MP4 with chunked transfer</td>
-<td>Does not address CDN cacheability or cache memory pressure</td>
+<td></td>
+<td>Concurrent first-plays cause resource contention</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
+<p><strong>Chosen Option:</strong> Option 2 — HLS with FFmpeg stream-copy</p>
+<p><strong>Rationale:</strong> Stream-copy segmentation at ingest time imposes negligible overhead (no re-encode, &lt; 1s per GB) while delivering immutable segments that are CDN-cacheable. Eliminating the Guava <code>byte[]</code> chunk cache reduces heap pressure with no loss of functionality — the OS page cache handles hot segments transparently. HLS has broader native browser support than DASH, and <code>hls.js</code> is a simpler integration than <code>dash.js</code>. The rollout is feature-flagged and backward-compatible: the old Range endpoint remains until all videos are transcoded.</p>
+<h3 id="quantified-impact">Quantified Impact<a class="headerlink" href="#quantified-impact" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Storage overhead</td>
+<td>1×</td>
+<td>~1.01×</td>
+<td>Stream-copy ≈ source size</td>
+</tr>
+<tr>
+<td>Ingest CPU</td>
+<td>None</td>
+<td>&lt; 1s per GB</td>
+<td>FFmpeg <code>-c copy</code></td>
+</tr>
+<tr>
+<td>Server heap (chunk cache)</td>
+<td>Guava byte[] allocated</td>
+<td>Eliminated</td>
+<td>OS page cache sufficient</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
+<p><strong>Positive:</strong>
+- Standard HLS playback across all browsers with no custom player code
+- Application-level byte[] chunk cache eliminated — lower heap pressure
+- Immutable segments enable trivial CDN caching in future
+- Foundation for ABR renditions and AES-128 DRM</p>
+<p><strong>Negative:</strong>
+- FFmpeg must be available in all deployment environments
+- Storage layout is more complex (directory per video vs single file)
+- Frontend gains <code>hls.js</code> dependency</p>
+<p><strong>Risks:</strong>
+- FFmpeg process failure leaves video in <code>PROCESSING</code> state — mitigated by nightly retry scheduler
+- Feature-flag rollout requires managing two serving paths concurrently during transition</p>
+<hr />
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] Tech Strategy alignment confirmed</li>
+<li>[ ] Related plan document created: <a href="../../plans/plan-hls-migration/">docs/plans/plan-hls-migration.md</a></li>
+</ul>
+<hr />
+<h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="https://datatracker.ietf.org/doc/html/rfc8216">RFC 8216 — HTTP Live Streaming</a></li>
 <li><a href="https://github.com/video-dev/hls.js">hls.js documentation</a></li>
 <li><a href="https://ffmpeg.org/ffmpeg-formats.html#hls-1">FFmpeg HLS muxer</a></li>
-<li>Current implementation: <code>web/VideoStreamController.java</code>, <code>service/impl/StreamVideoServiceImpl.java</code></li>
-<li>Related ADR: <code>doc/adr/</code> (existing architecture decisions)</li>
+<li>Plan document: <code>docs/plans/plan-hls-migration.md</code></li>
 </ul>
+<hr />
+<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Author</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-05-30</td>
+<td>nguyenhuuca</td>
+<td>Initial draft</td>
+</tr>
+<tr>
+<td>2026-05-31</td>
+<td>nguyenhuuca</td>
+<td>Restructured to new ADR template; technical details moved to plan doc</td>
+</tr>
+</tbody>
+</table>
 
 
 

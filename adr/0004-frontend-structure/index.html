@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#use-vanilla-js-bootstrap-for-current-frontend-with-planned-migration-to-react" class="md-skip">
+        <a href="#adr-0004-use-vanilla-js-bootstrap-for-initial-frontend-with-planned-migration-to-react" class="md-skip">
           Skip to content
         </a>
       
@@ -891,21 +891,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -924,13 +913,102 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-vanilla-js-bootstrap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: Vanilla JS + Bootstrap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-react-immediate-adoption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: React (immediate adoption)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-vuejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: Vue.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-4-angular" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 4: Angular
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -946,10 +1024,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4729,21 +4829,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -4762,13 +4851,102 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-vanilla-js-bootstrap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: Vanilla JS + Bootstrap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-react-immediate-adoption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: React (immediate adoption)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-vuejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: Vue.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-4-angular" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 4: Angular
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -4784,10 +4962,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4819,38 +5019,216 @@
   
 
 
-<h1 id="use-vanilla-js-bootstrap-for-current-frontend-with-planned-migration-to-react">Use Vanilla JS + Bootstrap for Current Frontend with Planned Migration to React<a class="headerlink" href="#use-vanilla-js-bootstrap-for-current-frontend-with-planned-migration-to-react" title="Permanent link">&para;</a></h1>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Accepted</p>
-<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2025-07-03</p>
+<h1 id="adr-0004-use-vanilla-js-bootstrap-for-initial-frontend-with-planned-migration-to-react">ADR-0004: Use Vanilla JS + Bootstrap for Initial Frontend with Planned Migration to React<a class="headerlink" href="#adr-0004-use-vanilla-js-bootstrap-for-initial-frontend-with-planned-migration-to-react" title="Permanent link">&para;</a></h1>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> Accepted
+<strong>Date:</strong> 2025-07-03
+<strong>Deciders:</strong> nguyenhuuca
+<strong>Related PRD:</strong> N/A
+<strong>Tech Strategy Alignment:</strong>
+- [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code></p>
+<p><strong>Domain Tags:</strong> frontend
+<strong>Supersedes:</strong> N/A
+<strong>Superseded By:</strong> ADR-0008 (React migration executes the planned migration)</p>
+<hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The frontend is responsible for:
-- Displaying video content, stats (views, likes)
-- Allowing users to comment, like, and interact anonymously
-- Providing responsive UI on mobile/desktop</p>
-<p>We needed a lightweight setup for early-stage development, while keeping flexibility for future migration.</p>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>We use:
-- <strong>Vanilla JavaScript</strong> for DOM manipulation and logic
-- <strong>Bootstrap</strong> for CSS and responsive design
-- A basic modular structure (HTML + JS files per feature)</p>
-<p>In the future, we plan to migrate to <strong>React</strong> for:
-- Better component reuse and state management
-- Richer interaction (e.g. comment threads, optimistic UI)
-- Easier integration with design systems and CI tooling</p>
+<p>The frontend must display video content, expose interactions such as comments and likes, and provide a responsive UI across mobile and desktop. At the early stage of the project, the priority was to ship a working UI quickly with minimal toolchain overhead, while deliberately deferring the adoption of a component framework until the product's interaction model stabilized.</p>
+<hr />
+<h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Fastest path to a working UI with no build toolchain required</li>
+<li>Team can prototype and iterate quickly without framework overhead</li>
+<li>Product interaction requirements were not yet stable enough to justify a full SPA framework</li>
+<li>Future migration path to a richer framework must remain open</li>
+<li>Responsive design is required from day one</li>
+</ul>
+<hr />
+<h2 id="considered-options">Considered Options<a class="headerlink" href="#considered-options" title="Permanent link">&para;</a></h2>
+<h3 id="option-1-vanilla-js-bootstrap">Option 1: Vanilla JS + Bootstrap<a class="headerlink" href="#option-1-vanilla-js-bootstrap" title="Permanent link">&para;</a></h3>
+<p>Plain JavaScript for DOM manipulation and logic, Bootstrap for responsive CSS. No build step required.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No build toolchain needed — open in browser directly</td>
+<td>No component reuse; logic duplicates across pages</td>
+</tr>
+<tr>
+<td>Fast to prototype new UI features</td>
+<td>State management becomes complex as interactions grow</td>
+</tr>
+<tr>
+<td>Bootstrap provides responsive grid and components out of the box</td>
+<td>Migration to a framework later requires a full rewrite</td>
+</tr>
+<tr>
+<td>Zero framework learning curve</td>
+<td>No module bundling or tree-shaking</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-2-react-immediate-adoption">Option 2: React (immediate adoption)<a class="headerlink" href="#option-2-react-immediate-adoption" title="Permanent link">&para;</a></h3>
+<p>A component-based SPA framework with a full build pipeline (Vite), state management, and rich ecosystem.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Component reuse and composability from day one</td>
+<td>Build toolchain setup required upfront</td>
+</tr>
+<tr>
+<td>Ecosystem for state management, routing, and testing</td>
+<td>Higher initial complexity and onboarding cost</td>
+</tr>
+<tr>
+<td>Easier to integrate design systems</td>
+<td>More overhead than needed for a simple early-stage UI</td>
+</tr>
+<tr>
+<td>Long-term maintainability advantage</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-3-vuejs">Option 3: Vue.js<a class="headerlink" href="#option-3-vuejs" title="Permanent link">&para;</a></h3>
+<p>A progressive JavaScript framework with a gentler learning curve than React.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Easier to learn than React for teams new to SPA frameworks</td>
+<td>Smaller ecosystem than React</td>
+</tr>
+<tr>
+<td>Progressive adoption possible (script tag or SPA)</td>
+<td>Less alignment with team's existing JavaScript knowledge</td>
+</tr>
+<tr>
+<td>Good documentation and CLI tooling</td>
+<td>Not the team's intended long-term direction</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-4-angular">Option 4: Angular<a class="headerlink" href="#option-4-angular" title="Permanent link">&para;</a></h3>
+<p>A full-featured opinionated SPA framework from Google.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Complete solution: routing, forms, HTTP client built-in</td>
+<td>Highest learning curve of all options</td>
+</tr>
+<tr>
+<td>Strong typing via TypeScript by default</td>
+<td>Heavyweight for a video streaming side project</td>
+</tr>
+<tr>
+<td>Enterprise-grade architecture</td>
+<td>Slow to prototype new features</td>
+</tr>
+<tr>
+<td></td>
+<td>Over-engineered for current scale</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
+<p><strong>Chosen Option:</strong> Option 1 — Vanilla JS + Bootstrap (interim)
+<strong>Rationale:</strong> The early-stage priority was speed of delivery. Vanilla JS with Bootstrap required no toolchain and enabled immediate prototyping. The decision explicitly deferred React adoption until product requirements stabilized, with the migration planned for Q4 2025 and formalized in ADR-0008. Vue and Angular were excluded due to ecosystem fit and team direction.</p>
+<h3 id="quantified-impact-where-applicable">Quantified Impact <em>(where applicable)</em><a class="headerlink" href="#quantified-impact-where-applicable" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time to first working UI</td>
+<td>Days (with framework setup)</td>
+<td>Hours (no build step)</td>
+<td>Prototype speed was the primary driver</td>
+</tr>
+<tr>
+<td>Build toolchain complexity</td>
+<td>N/A</td>
+<td>None</td>
+<td>No bundler, transpiler, or package manager needed</td>
+</tr>
+</tbody>
+</table>
+<hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
+<p><strong>Positive:</strong>
+- Working UI delivered quickly with no toolchain overhead
+- Bootstrap provides responsive design without custom CSS effort
+- No framework lock-in during the unstable early product phase</p>
+<p><strong>Negative:</strong>
+- Code reuse across pages is limited; logic must be duplicated manually
+- State management complexity increases as interactions grow
+- Full rewrite required when migrating to React (see ADR-0008)</p>
+<p><strong>Risks:</strong>
+- Delaying the migration too long increases the cost of the eventual rewrite
+- Without a module system, dependency management between JS files is fragile at scale</p>
+<hr />
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Current stack is lightweight, fast to prototype</li>
-<li>No build step or SPA framework needed now</li>
-<li>Later migration to React will require code rewrite</li>
-<li>No advanced state management (limited by plain JS)</li>
+<li>[ ] Tech Strategy alignment confirmed</li>
+<li>[ ] Related plan document created: N/A</li>
 </ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Task: Implement like/comment/view UI in Vanilla JS</li>
-<li>Planned: Migrate to React with component architecture (Q4 2025)</li>
+<li><a href="../0008-react-migration/">ADR-0008: React Migration</a></li>
+<li><a href="https://getbootstrap.com/docs/5.0/">Bootstrap 5 docs</a></li>
 </ul>
+<hr />
+<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Author</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025-07-03</td>
+<td>nguyenhuuca</td>
+<td>Initial draft</td>
+</tr>
+<tr>
+<td>2026-05-31</td>
+<td>nguyenhuuca</td>
+<td>Restructured to new ADR template</td>
+</tr>
+</tbody>
+</table>
 
 
 

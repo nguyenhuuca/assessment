@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-admin-dashboard-content-account-management" class="md-skip">
+        <a href="#adr-0007-admin-dashboard-content-and-account-management" class="md-skip">
           Skip to content
         </a>
       
@@ -975,6 +975,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -986,22 +997,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decisions" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decisions
+        Decision Drivers
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decisions">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#d-1-role-model-on-user" class="md-nav__link">
+  <a href="#option-a-single-layer-authorization-url-level-only" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-1 · Role model on User
+        Option A: Single-layer authorization (URL-level only)
       
     </span>
   </a>
@@ -1009,10 +1031,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#d-2-authorization-defense-in-depth" class="md-nav__link">
+  <a href="#option-b-dual-layer-defense-in-depth-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-2 · Authorization — defense in depth
+        Option B: Dual-layer defense-in-depth (chosen)
       
     </span>
   </a>
@@ -1020,10 +1042,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#d-3-video-moderation-status" class="md-nav__link">
+  <a href="#option-a-boolean-isadmin-column-on-user" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-3 · Video moderation status
+        Option A: Boolean isAdmin column on User
       
     </span>
   </a>
@@ -1031,10 +1053,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#d-4-jwt-role-claim" class="md-nav__link">
+  <a href="#option-b-role-varchar20-with-java-enum-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-4 · JWT role claim
+        Option B: role VARCHAR(20) with Java enum (chosen)
       
     </span>
   </a>
@@ -1042,10 +1064,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#d-5-frontend-how-to-know-if-current-user-is-admin" class="md-nav__link">
+  <a href="#option-a-parse-jwt-in-browser-to-detect-admin-status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-5 · Frontend: how to know if current user is admin
+        Option A: Parse JWT in browser to detect admin status
       
     </span>
   </a>
@@ -1053,10 +1075,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#d-6-pagination-strategy" class="md-nav__link">
+  <a href="#option-b-expose-isadmin-via-get-userme-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-6 · Pagination strategy
+        Option B: Expose isAdmin via GET /user/me (chosen)
       
     </span>
   </a>
@@ -1069,60 +1091,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api-contract" class="md-nav__link">
+  <a href="#decision-outcome" class="md-nav__link">
     <span class="md-ellipsis">
       
-        API Contract
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="API Contract">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#videos" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Videos
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#accounts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Accounts
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stats" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stats
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#database-migrations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Database Migrations
+        Decision Outcome
       
     </span>
   </a>
@@ -1130,10 +1102,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#backend-component-map" class="md-nav__link">
+  <a href="#consequences" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Backend Component Map
+        Consequences
       
     </span>
   </a>
@@ -1141,10 +1113,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#frontend-component-map" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Frontend Component Map
+        Validation
       
     </span>
   </a>
@@ -1152,10 +1124,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#admin-nav-guard-frontend" class="md-nav__link">
+  <a href="#links" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Admin Nav Guard (Frontend)
+        Links
       
     </span>
   </a>
@@ -1163,32 +1135,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#status-badge-colors-from-design" class="md-nav__link">
+  <a href="#changelog" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status Badge Colors (from design)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#risks-mitigations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Risks &amp; Mitigations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#implementation-order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Implementation Order
+        Changelog
       
     </span>
   </a>
@@ -4884,6 +4834,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4895,22 +4856,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decisions" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decisions
+        Decision Drivers
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decisions">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#d-1-role-model-on-user" class="md-nav__link">
+  <a href="#option-a-single-layer-authorization-url-level-only" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-1 · Role model on User
+        Option A: Single-layer authorization (URL-level only)
       
     </span>
   </a>
@@ -4918,10 +4890,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#d-2-authorization-defense-in-depth" class="md-nav__link">
+  <a href="#option-b-dual-layer-defense-in-depth-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-2 · Authorization — defense in depth
+        Option B: Dual-layer defense-in-depth (chosen)
       
     </span>
   </a>
@@ -4929,10 +4901,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#d-3-video-moderation-status" class="md-nav__link">
+  <a href="#option-a-boolean-isadmin-column-on-user" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-3 · Video moderation status
+        Option A: Boolean isAdmin column on User
       
     </span>
   </a>
@@ -4940,10 +4912,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#d-4-jwt-role-claim" class="md-nav__link">
+  <a href="#option-b-role-varchar20-with-java-enum-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-4 · JWT role claim
+        Option B: role VARCHAR(20) with Java enum (chosen)
       
     </span>
   </a>
@@ -4951,10 +4923,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#d-5-frontend-how-to-know-if-current-user-is-admin" class="md-nav__link">
+  <a href="#option-a-parse-jwt-in-browser-to-detect-admin-status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-5 · Frontend: how to know if current user is admin
+        Option A: Parse JWT in browser to detect admin status
       
     </span>
   </a>
@@ -4962,10 +4934,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#d-6-pagination-strategy" class="md-nav__link">
+  <a href="#option-b-expose-isadmin-via-get-userme-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D-6 · Pagination strategy
+        Option B: Expose isAdmin via GET /user/me (chosen)
       
     </span>
   </a>
@@ -4978,60 +4950,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api-contract" class="md-nav__link">
+  <a href="#decision-outcome" class="md-nav__link">
     <span class="md-ellipsis">
       
-        API Contract
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="API Contract">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#videos" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Videos
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#accounts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Accounts
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stats" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stats
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#database-migrations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Database Migrations
+        Decision Outcome
       
     </span>
   </a>
@@ -5039,10 +4961,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#backend-component-map" class="md-nav__link">
+  <a href="#consequences" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Backend Component Map
+        Consequences
       
     </span>
   </a>
@@ -5050,10 +4972,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#frontend-component-map" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Frontend Component Map
+        Validation
       
     </span>
   </a>
@@ -5061,10 +4983,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#admin-nav-guard-frontend" class="md-nav__link">
+  <a href="#links" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Admin Nav Guard (Frontend)
+        Links
       
     </span>
   </a>
@@ -5072,32 +4994,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#status-badge-colors-from-design" class="md-nav__link">
+  <a href="#changelog" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status Badge Colors (from design)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#risks-mitigations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Risks &amp; Mitigations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#implementation-order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Implementation Order
+        Changelog
       
     </span>
   </a>
@@ -5129,357 +5029,237 @@
   
 
 
-<h1 id="adr-admin-dashboard-content-account-management">ADR: Admin Dashboard — Content &amp; Account Management<a class="headerlink" href="#adr-admin-dashboard-content-account-management" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Accepted<br />
-<strong>Date:</strong> 2026-04-30<br />
-<strong>Scope:</strong> Full-stack (Spring Boot 3.x backend + React 19 frontend)</p>
+<h1 id="adr-0007-admin-dashboard-content-and-account-management">ADR-0007: Admin Dashboard — Content and Account Management<a class="headerlink" href="#adr-0007-admin-dashboard-content-and-account-management" title="Permanent link">&para;</a></h1>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> Accepted
+<strong>Date:</strong> 2026-04-30
+<strong>Deciders:</strong> nguyenhuuca
+<strong>Related PRD:</strong> N/A
+<strong>Tech Strategy Alignment:</strong>
+- [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code>
+<strong>Domain Tags:</strong> security, api, frontend
+<strong>Supersedes:</strong> N/A
+<strong>Superseded By:</strong> N/A</p>
 <hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The application needs an admin-only dashboard to manage video content and user accounts. Requirements:
-- CRUD on <code>VideoSource</code> records (list, change status, delete)
-- CRUD on <code>User</code> accounts (list, change role, delete)
-- Status model: PUBLISHED / PENDING / FLAGGED per video
-- Only users with ADMIN role may access any <code>/admin/**</code> endpoint or UI
-- Design follows the "KINETIC NOIR" Stitch screen (<code>stitch_admin.png</code>)</p>
-<p>Current state gaps:
-- <code>User</code> entity has no <code>role</code> field
-- JWT contains only <code>id</code> + <code>email</code>; <code>GrantedAuthority</code> list is always empty
-- <code>/admin/**</code> rule requires <code>authenticated()</code> but no role check
-- <code>VideoSource</code> has <code>isHide</code> (boolean) but no moderation status
-- No admin controller or service exists</p>
+<p>The application needs an admin-only dashboard for video moderation and user account management. At the time of this decision:</p>
+<ul>
+<li>The <code>User</code> entity has no role field — all users are treated equally</li>
+<li>The JWT payload contains only <code>id</code> and <code>email</code>; the <code>GrantedAuthority</code> list is always empty</li>
+<li>The <code>/admin/**</code> route rule requires only <code>authenticated()</code> — no role check exists</li>
+<li><code>VideoSource</code> has an <code>isHide</code> boolean (user privacy) but no moderation state</li>
+<li>No admin controller, service, or frontend view exists</li>
+</ul>
+<p>Six sub-decisions were required to implement this feature correctly.</p>
 <hr />
-<h2 id="decisions">Decisions<a class="headerlink" href="#decisions" title="Permanent link">&para;</a></h2>
-<h3 id="d-1-role-model-on-user">D-1 · Role model on User<a class="headerlink" href="#d-1-role-model-on-user" title="Permanent link">&para;</a></h3>
-<p><strong>Decision:</strong> Add <code>role VARCHAR(20) NOT NULL DEFAULT 'USER'</code> column to <code>users</code> table.<br />
-Map to a Java enum <code>UserRole { USER, ADMIN }</code> stored as <code>@Enumerated(EnumType.STRING)</code>.</p>
-<p><strong>Rejected alternatives:</strong>
-| Option | Why rejected |
-|--------|-------------|
-| Boolean <code>isAdmin</code> column | Cannot extend to future roles (MODERATOR) without schema change |
-| Separate <code>user_roles</code> join table | Over-engineered for a two-role system |</p>
+<h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Admin routes must be inaccessible to non-admin users at both the HTTP filter layer and the controller layer</li>
+<li>The role model must be extensible beyond a two-value boolean</li>
+<li>Video moderation state must be orthogonal to user-controlled privacy (<code>isHide</code>)</li>
+<li>The frontend must not rely on stale data to determine admin status</li>
+</ul>
 <hr />
-<h3 id="d-2-authorization-defense-in-depth">D-2 · Authorization — defense in depth<a class="headerlink" href="#d-2-authorization-defense-in-depth" title="Permanent link">&para;</a></h3>
-<p><strong>Decision:</strong> Enforce <code>ROLE_ADMIN</code> at <strong>two layers</strong>:</p>
-<ol>
-<li><strong>URL-level</strong> (<code>WebSecurityConfig</code>):
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>.requestMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;)
-</code></pre></div></li>
-<li><strong>Method-level</strong> (<code>AdminController</code>):
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@PreAuthorize</span><span class="p">(</span><span class="s">&quot;hasRole(&#39;ADMIN&#39;)&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// class-level annotation</span>
-</code></pre></div></li>
-</ol>
-<p><code>@EnableMethodSecurity</code> is already active. URL-level rejects non-admins before the controller is reached. Method-level makes intent explicit and survives URL refactors.</p>
-<p><strong>Rejected alternatives:</strong>
-| Option | Why rejected |
-|--------|-------------|
-| URL-level only | Intent invisible in controller; breaks if URL changes |
-| Method-level only | No fast-fail at filter chain; controller code must be reached first |</p>
-<hr />
-<h3 id="d-3-video-moderation-status">D-3 · Video moderation status<a class="headerlink" href="#d-3-video-moderation-status" title="Permanent link">&para;</a></h3>
-<p><strong>Decision:</strong> Add <code>status VARCHAR(20) NOT NULL DEFAULT 'PUBLISHED'</code> to <code>video_sources</code>.<br />
-Map to enum <code>VideoStatus { PUBLISHED, PENDING, FLAGGED }</code>.</p>
-<p><strong>Keep <code>isHide</code> as-is</strong> — it controls user-facing privacy (private videos), which is orthogonal to admin moderation state.</p>
+<h2 id="considered-options">Considered Options<a class="headerlink" href="#considered-options" title="Permanent link">&para;</a></h2>
+<h3 id="option-a-single-layer-authorization-url-level-only">Option A: Single-layer authorization (URL-level only)<a class="headerlink" href="#option-a-single-layer-authorization-url-level-only" title="Permanent link">&para;</a></h3>
+<p>Enforce <code>ROLE_ADMIN</code> only in <code>WebSecurityConfig</code> via <code>.requestMatchers("/admin/**").hasRole("ADMIN")</code>.</p>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Owner</th>
-<th>Purpose</th>
+<th>Pros</th>
+<th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>isHide</code></td>
-<td>User</td>
-<td>Hides video from public feed (private upload)</td>
+<td>Simple, one place to maintain</td>
+<td>Authorization intent invisible in controller code</td>
 </tr>
 <tr>
-<td><code>status</code></td>
-<td>Admin</td>
-<td>Moderation state: published / pending review / flagged</td>
+<td></td>
+<td>Breaks silently if URL pattern changes or is refactored</td>
+</tr>
+<tr>
+<td></td>
+<td>Controller code must be reached before intent is visible</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Rejected alternative:</strong> Multiple boolean columns (<code>isPending</code>, <code>isFlagged</code>) create invalid combinations and are not extensible.</p>
-<hr />
-<h3 id="d-4-jwt-role-claim">D-4 · JWT role claim<a class="headerlink" href="#d-4-jwt-role-claim" title="Permanent link">&para;</a></h3>
-<p><strong>Decision:</strong> Include <code>role</code> claim in JWT payload. Update <code>JwtProvider.generatePayload()</code> and <code>convertValue()</code>. Update <code>JWTAuthenticationFilter</code> to build <code>GrantedAuthority</code> list from the claim.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>JWT payload (after change):
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>{ &quot;id&quot;: 42, &quot;email&quot;: &quot;user@x.com&quot;, &quot;role&quot;: &quot;ADMIN&quot; }
-</code></pre></div>
-<p>Filter change — replace <code>Collections.emptyList()</code>:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;</span><span class="w"> </span><span class="n">authorities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleGrantedAuthority</span><span class="p">(</span><span class="s">&quot;ROLE_&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="na">getRole</span><span class="p">())</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">);</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">new</span><span class="w"> </span><span class="n">UsernamePasswordAuthenticationToken</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="na">getEmail</span><span class="p">(),</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">authorities</span><span class="p">)</span>
-</code></pre></div></p>
-<p><code>UserDetailDto</code> gains a <code>role</code> field (String). <code>JwtGenerationDto.payload</code> carries it.</p>
-<hr />
-<h3 id="d-5-frontend-how-to-know-if-current-user-is-admin">D-5 · Frontend: how to know if current user is admin<a class="headerlink" href="#d-5-frontend-how-to-know-if-current-user-is-admin" title="Permanent link">&para;</a></h3>
-<p><strong>Decision:</strong> Expose <code>isAdmin</code> in <code>UserDetailDto</code> returned by <code>GET /user/me</code>.<br />
-<code>AuthContext</code> reads <code>user.isAdmin</code> from the <code>/user/me</code> response (already called on mount).</p>
-<p><strong>Rejected alternative:</strong> Parse JWT in the browser (base64-decode middle segment).<br />
-Risk: stale role if admin rights change while user is logged in. <code>/user/me</code> is always fresh.</p>
-<hr />
-<h3 id="d-6-pagination-strategy">D-6 · Pagination strategy<a class="headerlink" href="#d-6-pagination-strategy" title="Permanent link">&para;</a></h3>
-<p><strong>Decision:</strong> Use Spring <code>Pageable</code> (offset pagination) via <code>@PageableDefault</code>.<br />
-Returns Spring <code>Page&lt;T&gt;</code> which includes <code>content</code>, <code>totalElements</code>, <code>totalPages</code> — feeds the "Reviewing 1,482 total assets" header and pagination controls directly.</p>
-<p>Cursor-based pagination is not needed — admin data is not high-velocity, and admins need random page access.</p>
-<hr />
-<h2 id="api-contract">API Contract<a class="headerlink" href="#api-contract" title="Permanent link">&para;</a></h2>
-<p>All endpoints under <code>/admin/**</code> require <code>Authorization: Bearer &lt;admin-jwt&gt;</code>.</p>
-<h3 id="videos">Videos<a class="headerlink" href="#videos" title="Permanent link">&para;</a></h3>
+<h3 id="option-b-dual-layer-defense-in-depth-chosen">Option B: Dual-layer defense-in-depth (chosen)<a class="headerlink" href="#option-b-dual-layer-defense-in-depth-chosen" title="Permanent link">&para;</a></h3>
+<p>Enforce <code>ROLE_ADMIN</code> at both URL-level (<code>WebSecurityConfig</code>) AND method-level (<code>@PreAuthorize</code> on <code>AdminController</code>).</p>
 <table>
 <thead>
 <tr>
-<th>Method</th>
-<th>Path</th>
-<th>Description</th>
+<th>Pros</th>
+<th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>GET</td>
-<td><code>/admin/videos?page=0&amp;size=20&amp;status=</code></td>
-<td>Paginated video list, optional status filter</td>
+<td>Non-admins rejected before controller is reached</td>
+<td>Slightly more boilerplate</td>
 </tr>
 <tr>
-<td>PATCH</td>
-<td><code>/admin/videos/{id}/status</code></td>
-<td>Change moderation status</td>
+<td>Authorization intent explicit in controller</td>
+<td></td>
 </tr>
 <tr>
-<td>DELETE</td>
-<td><code>/admin/videos/{id}</code></td>
-<td>Delete video and source record</td>
+<td>Survives URL refactors — method annotation travels with class</td>
+<td></td>
 </tr>
 </tbody>
 </table>
-<p><strong>AdminVideoDto:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NEON_DREAMSCAPE_V2&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">&quot;thumbnailPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://...&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">&quot;creatorEmail&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;niko@example.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PUBLISHED&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="nt">&quot;viewCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">138400</span><span class="p">,</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="nt">&quot;createdAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-06-01T00:00:00Z&quot;</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">}</span>
-</code></pre></div></p>
-<p><strong>PATCH body:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;FLAGGED&quot;</span><span class="w"> </span><span class="p">}</span>
-</code></pre></div></p>
-<h3 id="accounts">Accounts<a class="headerlink" href="#accounts" title="Permanent link">&para;</a></h3>
+<hr />
+<h3 id="option-a-boolean-isadmin-column-on-user">Option A: Boolean <code>isAdmin</code> column on User<a class="headerlink" href="#option-a-boolean-isadmin-column-on-user" title="Permanent link">&para;</a></h3>
+<p>Add a single boolean column to the <code>users</code> table.</p>
 <table>
 <thead>
 <tr>
-<th>Method</th>
-<th>Path</th>
-<th>Description</th>
+<th>Pros</th>
+<th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>GET</td>
-<td><code>/admin/accounts?page=0&amp;size=20</code></td>
-<td>Paginated user list</td>
+<td>Minimal schema change</td>
+<td>Cannot extend to future roles (MODERATOR) without schema change</td>
 </tr>
 <tr>
-<td>PATCH</td>
-<td><code>/admin/accounts/{id}/role</code></td>
-<td>Promote / demote user</td>
-</tr>
-<tr>
-<td>DELETE</td>
-<td><code>/admin/accounts/{id}</code></td>
-<td>Delete user account</td>
+<td></td>
+<td>Boolean semantics inappropriate for a multi-value concept</td>
 </tr>
 </tbody>
 </table>
-<p><strong>AdminAccountDto:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">&quot;email&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user@example.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;USER&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nt">&quot;mfaEnabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nt">&quot;createdAt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">}</span>
-</code></pre></div></p>
-<p><strong>Safety constraint:</strong> An admin cannot change their own role or delete their own account.<br />
-Service layer validates: <code>if (targetId.equals(currentUserId)) throw ForbiddenException</code>.</p>
-<h3 id="stats">Stats<a class="headerlink" href="#stats" title="Permanent link">&para;</a></h3>
+<h3 id="option-b-role-varchar20-with-java-enum-chosen">Option B: <code>role VARCHAR(20)</code> with Java enum (chosen)<a class="headerlink" href="#option-b-role-varchar20-with-java-enum-chosen" title="Permanent link">&para;</a></h3>
+<p>Add <code>role VARCHAR(20) NOT NULL DEFAULT 'USER'</code> mapped to <code>UserRole { USER, ADMIN }</code>.</p>
 <table>
 <thead>
 <tr>
-<th>Method</th>
-<th>Path</th>
-<th>Description</th>
+<th>Pros</th>
+<th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>GET</td>
-<td><code>/admin/stats</code></td>
-<td>Dashboard summary counts</td>
+<td>Extensible to future roles without schema change</td>
+<td>Enum changes require migration</td>
+</tr>
+<tr>
+<td>Type-safe in Java layer</td>
+<td></td>
+</tr>
+<tr>
+<td>Consistent with existing string-enum pattern in codebase</td>
+<td></td>
 </tr>
 </tbody>
 </table>
-<p><strong>AdminStatsDto:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;totalVideos&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1482</span><span class="p">,</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">&quot;totalUsers&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">320</span><span class="p">,</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">&quot;pendingCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nt">&quot;flaggedCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">24</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">}</span>
-</code></pre></div></p>
+<p>A separate <code>user_roles</code> join table was also considered and rejected as over-engineered for a two-role system.</p>
 <hr />
-<h2 id="database-migrations">Database Migrations<a class="headerlink" href="#database-migrations" title="Permanent link">&para;</a></h2>
-<p>Two new SQL files following the existing naming convention (<code>YYYYMMDDnnnn-description.sql</code>):</p>
-<p><strong><code>202504300001-add-user-role.sql</code></strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="k">role</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;USER&#39;</span><span class="p">;</span>
-</code></pre></div></p>
-<p><strong><code>202504300002-add-video-status.sql</code></strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">video_sources</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;PUBLISHED&#39;</span><span class="p">;</span>
-</code></pre></div></p>
-<hr />
-<h2 id="backend-component-map">Backend Component Map<a class="headerlink" href="#backend-component-map" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>filter/
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>  JwtProvider.java              ← add role to generatePayload() + convertValue()
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>  JWTAuthenticationFilter.java  ← build GrantedAuthority list from role claim
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>  WebSecurityConfig.java        ← change /admin/** to hasRole(&quot;ADMIN&quot;)
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>entity/
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>  User.java                     ← add UserRole enum field
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>  VideoSource.java              ← add VideoStatus enum field
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>enums/
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>  UserRole.java                 ← NEW: USER, ADMIN
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>  VideoStatus.java              ← NEW: PUBLISHED, PENDING, FLAGGED
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>dto/
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>  UserDetailDto.java            ← add role String field
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>  AdminVideoDto.java            ← NEW
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>  AdminAccountDto.java          ← NEW
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>  AdminStatsDto.java            ← NEW
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>service/
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>  AdminVideoService.java        ← NEW interface
-<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>  AdminAccountService.java      ← NEW interface
-<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>  impl/
-<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>    AdminVideoServiceImpl.java  ← NEW
-<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>    AdminAccountServiceImpl.java← NEW
-<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a>
-<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>web/
-<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a>  AdminController.java          ← NEW (@PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;))
-</code></pre></div>
-<hr />
-<h2 id="frontend-component-map">Frontend Component Map<a class="headerlink" href="#frontend-component-map" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>src/
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>  contexts/
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    AuthContext.jsx             ← expose user.isAdmin from /user/me response
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>  api/
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    admin.js                    ← NEW: getVideos, updateVideoStatus, deleteVideo,
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>                                        getAccounts, updateAccountRole, deleteAccount,
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>                                        getStats
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>  hooks/
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    useAdmin.js                 ← NEW: React Query hooks wrapping admin.js
-<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>  components/
-<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>    layout/
-<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>      AppShell.jsx              ← add Admin to SIDE_NAV with requiresAdmin guard
-<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    admin/
-<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>      AdminView.jsx             ← NEW: tabs container + stats cards
-<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>      AdminVideoTable.jsx       ← NEW: table with StatusBadge + actions
-<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>      AdminAccountTable.jsx     ← NEW: table with RoleBadge + actions
-<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>  styles/
-<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>    index.css                   ← add .admin-* classes (dark surface, badges)
-</code></pre></div>
-<hr />
-<h2 id="admin-nav-guard-frontend">Admin Nav Guard (Frontend)<a class="headerlink" href="#admin-nav-guard-frontend" title="Permanent link">&para;</a></h2>
-<p>Two layers — same defense-in-depth as backend:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">// 1. Nav item hidden unless admin</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">visibleNav</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">SIDE_NAV</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nx">item</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="o">!</span><span class="nx">item</span><span class="p">.</span><span class="nx">requiresAdmin</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">user</span><span class="o">?</span><span class="p">.</span><span class="nx">isAdmin</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">)</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1">// 2. Content render guard</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="p">{</span><span class="nx">activeNav</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;admin&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">user</span><span class="o">?</span><span class="p">.</span><span class="nx">isAdmin</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">&lt;</span><span class="nx">AdminView</span><span class="w"> </span><span class="o">/&gt;</span><span class="p">}</span>
-</code></pre></div>
-<hr />
-<h2 id="status-badge-colors-from-design">Status Badge Colors (from design)<a class="headerlink" href="#status-badge-colors-from-design" title="Permanent link">&para;</a></h2>
+<h3 id="option-a-parse-jwt-in-browser-to-detect-admin-status">Option A: Parse JWT in browser to detect admin status<a class="headerlink" href="#option-a-parse-jwt-in-browser-to-detect-admin-status" title="Permanent link">&para;</a></h3>
+<p>Decode the JWT's middle segment in JavaScript to read the <code>role</code> claim.</p>
 <table>
 <thead>
 <tr>
-<th>Status</th>
-<th>Color</th>
-<th>Hex</th>
+<th>Pros</th>
+<th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>PUBLISHED</td>
-<td>Green</td>
-<td><code>#00c853</code></td>
+<td>No extra HTTP call</td>
+<td>Role claim is stale if admin rights change while user is logged in</td>
 </tr>
 <tr>
-<td>PENDING</td>
-<td>Yellow</td>
-<td><code>#ffd600</code></td>
-</tr>
-<tr>
-<td>FLAGGED</td>
-<td>Red</td>
-<td><code>#ff1744</code></td>
-</tr>
-<tr>
-<td>ADMIN role badge</td>
-<td>Cyan</td>
-<td><code>var(--accent-cyan)</code></td>
+<td></td>
+<td>Requires client-side JWT parsing logic</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="risks-mitigations">Risks &amp; Mitigations<a class="headerlink" href="#risks-mitigations" title="Permanent link">&para;</a></h2>
+<h3 id="option-b-expose-isadmin-via-get-userme-chosen">Option B: Expose <code>isAdmin</code> via <code>GET /user/me</code> (chosen)<a class="headerlink" href="#option-b-expose-isadmin-via-get-userme-chosen" title="Permanent link">&para;</a></h3>
+<p>Return <code>isAdmin: true/false</code> in the <code>UserDetailDto</code> from the existing <code>/user/me</code> endpoint already called on app mount.</p>
 <table>
 <thead>
 <tr>
-<th>Risk</th>
-<th>Mitigation</th>
+<th>Pros</th>
+<th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>JWT role claim stale after role change</td>
-<td>Short JWT TTL (30 days → consider shorter for admin sessions); force re-login after role change</td>
+<td>Always reflects current server-side role</td>
+<td>Requires one extra field in the DTO</td>
 </tr>
 <tr>
-<td>Admin deletes own account</td>
-<td>Service-layer guard: compare targetId vs authenticated userId</td>
+<td>No extra HTTP call (endpoint already used)</td>
+<td></td>
 </tr>
 <tr>
-<td>Mass delete wipes data</td>
-<td>DELETE is hard-delete; consider soft-delete (status = DELETED) in future</td>
-</tr>
-<tr>
-<td>CORS allows admin endpoints from other origins</td>
-<td>Existing CORS config already restricts to <code>canh-labs.com</code> + localhost</td>
+<td>Role changes take effect on next page load</td>
+<td></td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="implementation-order">Implementation Order<a class="headerlink" href="#implementation-order" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>1. Migrations (DB schema)
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>2. Enums + Entity changes (User.role, VideoSource.status)
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>3. JWT role claim (JwtProvider + JWTAuthenticationFilter + UserDetailDto)
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>4. WebSecurityConfig hasRole gate
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>5. AdminVideoService + AdminAccountService + AdminController
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>6. Frontend: AuthContext isAdmin
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>7. Frontend: AppShell admin nav item
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>8. Frontend: api/admin.js + useAdmin.js hooks
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>9. Frontend: AdminView + AdminVideoTable + AdminAccountTable
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>10. CSS for admin components
-</code></pre></div>
+<h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
+<p><strong>Chosen Option:</strong> Option B across all three contested sub-decisions, plus three uncontested sub-decisions.</p>
+<p><strong>Rationale:</strong>
+- <strong>Dual-layer authorization</strong> (D-2): Defense-in-depth ensures no path to admin functionality exists without an explicit role check. URL-level rejects at the filter chain; method-level makes intent self-documenting.
+- <strong><code>role</code> VARCHAR enum</strong> (D-1): A <code>UserRole</code> enum is extensible and consistent with other string-enum fields in the schema. A boolean cannot grow to support future roles without a migration.
+- <strong><code>/user/me</code> for admin detection</strong> (D-5): Avoids stale role data in the browser. The endpoint is already called on mount, so no additional request is needed.</p>
+<p>Uncontested sub-decisions rationale:
+- <strong>Video moderation status</strong> (D-3): A <code>status</code> column (<code>PUBLISHED</code>/<code>PENDING</code>/<code>FLAGGED</code>) is orthogonal to <code>isHide</code>. The <code>isHide</code> field is user-controlled privacy; <code>status</code> is admin-controlled moderation. Multiple boolean columns (<code>isPending</code>, <code>isFlagged</code>) were rejected because they permit invalid combinations and are not extensible.
+- <strong>JWT role claim</strong> (D-4): Including <code>role</code> in the JWT payload allows Spring Security's <code>GrantedAuthority</code> mechanism to work correctly. Without it, <code>@PreAuthorize("hasRole('ADMIN')")</code> always fails because the authority list is empty.
+- <strong>Offset pagination</strong> (D-6): Spring <code>Pageable</code> (offset-based) is sufficient — admin data is not high-velocity and admins need random page access. Cursor-based pagination would prevent jumping to arbitrary pages.</p>
+<hr />
+<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
+<p><strong>Positive:</strong>
+- Defense-in-depth authorization — two independent enforcement points for admin access
+- Extensible role model supports future roles (e.g., MODERATOR) without schema redesign
+- Clean separation between user privacy state (<code>isHide</code>) and admin moderation state (<code>status</code>)
+- JWT now carries a real <code>GrantedAuthority</code>, enabling method-level security annotations throughout the codebase</p>
+<p><strong>Negative:</strong>
+- JWT role claim is stale until the user re-authenticates after a role change
+- Admin-facing pagination uses offset — performance degrades at very high page numbers (not a current concern)</p>
+<p><strong>Risks:</strong>
+- <strong>Stale JWT after role change:</strong> Mitigate with short JWT TTL or forced re-login after role promotion/demotion
+- <strong>Admin deletes own account:</strong> Service layer must guard against this with a check comparing <code>targetId</code> vs authenticated <code>userId</code>
+- <strong>Mass delete:</strong> Current implementation is hard-delete; consider soft-delete (<code>status = DELETED</code>) in a future iteration</p>
+<hr />
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] Tech Strategy alignment confirmed</li>
+<li>[ ] Related plan document created: <a href="../../plans/plan-admin-dashboard/">docs/plans/plan-admin-dashboard.md</a></li>
+</ul>
+<hr />
+<h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Plan document: <code>docs/plans/plan-admin-dashboard.md</code></li>
+<li>Spring Security <code>@PreAuthorize</code>: https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html</li>
+</ul>
+<hr />
+<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Author</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-04-30</td>
+<td>nguyenhuuca</td>
+<td>Initial draft</td>
+</tr>
+<tr>
+<td>2026-05-31</td>
+<td>nguyenhuuca</td>
+<td>Restructured to new ADR template; technical details moved to plan doc</td>
+</tr>
+</tbody>
+</table>
 
 
 

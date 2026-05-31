@@ -4985,8 +4985,10 @@
 - Place new DB migrations in <code>api/src/main/resources/db/changelog/sql/</code></p>
 <h3 id="step-5-offer-next-steps">Step 5 — Offer next steps<a class="headerlink" href="#step-5-offer-next-steps" title="Permanent link">&para;</a></h3>
 <p>After writing the PRD, offer:
-1. Create <strong>ADR</strong> (<code>docs/adr/00NN-{slug}.md</code>) — architecture decisions behind the feature
-2. Create <strong>Implementation Plan</strong> (<code>docs/plans/plan-{slug}.md</code>) — phased task breakdown
+1. Create <strong>ADR</strong> (<code>docs/adr/00NN-{slug}.md</code>) using <code>templates/artifacts/adr.template.md</code>
+   - Key sections to fill: Metadata, Context, Decision Drivers, Considered Options (pros/cons per option), Decision Outcome, Consequences, Validation, Links, Changelog
+   - Do NOT include Technical Details or Implementation Steps in the ADR — those go in the Plan
+2. Create <strong>Implementation Plan</strong> (<code>docs/plans/plan-{slug}.md</code>) using <code>templates/artifacts/plan.template.md</code>
 3. Add entries to <strong><code>mkdocs.yml</code></strong> nav</p>
 <p>Do not auto-create these — wait for the user to confirm.</p>
 <hr />

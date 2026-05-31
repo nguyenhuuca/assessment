@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-0006-migrate-frontend-to-react-with-vite" class="md-skip">
+        <a href="#adr-0008-migrate-frontend-to-react-with-vite" class="md-skip">
           Skip to content
         </a>
       
@@ -1003,21 +1003,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -1036,22 +1025,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#why-vite-over-create-react-app-cra" class="md-nav__link">
+  <a href="#option-1-keep-vanilla-js-jquery" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why Vite over Create React App (CRA)?
+        Option 1: Keep Vanilla JS + jQuery
       
     </span>
   </a>
@@ -1059,10 +1059,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-react-context-over-reduxzustand" class="md-nav__link">
+  <a href="#option-2-react-19-vite-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why React Context over Redux/Zustand?
+        Option 2: React 19 + Vite (chosen)
       
     </span>
   </a>
@@ -1070,10 +1070,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-react-bootstrap-over-importing-bootstrap-css-directly" class="md-nav__link">
+  <a href="#option-3-vuejs-vite" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why react-bootstrap over importing Bootstrap CSS directly?
+        Option 3: Vue.js + Vite
       
     </span>
   </a>
@@ -1081,10 +1081,38 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-javascript-instead-of-typescript" class="md-nav__link">
+  <a href="#option-4-nextjs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why JavaScript instead of TypeScript?
+        Option 4: Next.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
       
     </span>
   </a>
@@ -1105,52 +1133,13 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Consequences">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#positive" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Positive
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#negative" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Negative
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#neutral" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Neutral
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
-  <a href="#supersedes" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Supersedes
+        Validation
       
     </span>
   </a>
@@ -1158,10 +1147,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#links" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4829,21 +4829,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -4862,22 +4851,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#why-vite-over-create-react-app-cra" class="md-nav__link">
+  <a href="#option-1-keep-vanilla-js-jquery" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why Vite over Create React App (CRA)?
+        Option 1: Keep Vanilla JS + jQuery
       
     </span>
   </a>
@@ -4885,10 +4885,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-react-context-over-reduxzustand" class="md-nav__link">
+  <a href="#option-2-react-19-vite-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why React Context over Redux/Zustand?
+        Option 2: React 19 + Vite (chosen)
       
     </span>
   </a>
@@ -4896,10 +4896,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-react-bootstrap-over-importing-bootstrap-css-directly" class="md-nav__link">
+  <a href="#option-3-vuejs-vite" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why react-bootstrap over importing Bootstrap CSS directly?
+        Option 3: Vue.js + Vite
       
     </span>
   </a>
@@ -4907,10 +4907,38 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-javascript-instead-of-typescript" class="md-nav__link">
+  <a href="#option-4-nextjs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why JavaScript instead of TypeScript?
+        Option 4: Next.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
       
     </span>
   </a>
@@ -4931,52 +4959,13 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Consequences">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#positive" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Positive
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#negative" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Negative
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#neutral" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Neutral
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
-  <a href="#supersedes" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Supersedes
+        Validation
       
     </span>
   </a>
@@ -4984,10 +4973,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#links" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -5019,133 +5019,214 @@
   
 
 
-<h1 id="adr-0006-migrate-frontend-to-react-with-vite">ADR-0006: Migrate Frontend to React with Vite<a class="headerlink" href="#adr-0006-migrate-frontend-to-react-with-vite" title="Permanent link">&para;</a></h1>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Proposed</p>
-<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2026-03-01</p>
+<h1 id="adr-0008-migrate-frontend-to-react-with-vite">ADR-0008: Migrate Frontend to React with Vite<a class="headerlink" href="#adr-0008-migrate-frontend-to-react-with-vite" title="Permanent link">&para;</a></h1>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> Proposed
+<strong>Date:</strong> 2026-03-01
+<strong>Deciders:</strong> nguyenhuuca
+<strong>Related PRD:</strong> docs/prd/PRD-react-migration.md
+<strong>Tech Strategy Alignment:</strong>
+- [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code></p>
+<p><strong>Domain Tags:</strong> frontend
+<strong>Supersedes:</strong> ADR-0004
+<strong>Superseded By:</strong> N/A</p>
+<hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>ADR-0004 (Use Vanilla JS + Bootstrap for Current Frontend) explicitly planned migration to React for:
-- Better component reuse and state management
-- Richer interaction (comment threads, optimistic UI)
-- Easier integration with design systems and CI tooling</p>
-<p>The prototype phase is complete (version 14, production deployed). The codebase has grown to ~4,400 lines across 6 files with increasing complexity around:
-- Auth flows (passwordless + MFA + magic link)
-- YouTube Shorts-style video navigation (touch, keyboard, swipe)
-- Comment panel with real-time state updates
-- Vote state management per video
-- Multi-modal UI (5 Bootstrap modals)</p>
-<p>jQuery-based DOM manipulation has become hard to reason about as interactions grow. It's the right time to execute the planned migration.</p>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>Migrate the frontend (<code>webapp/</code>) from Vanilla JS + jQuery + Bootstrap CDN to:</p>
+<p>ADR-0004 explicitly planned a migration to React once the prototype phase was complete. That phase is now done (version 14, production deployed). The frontend codebase has grown to approximately 4,400 lines across 6 files. Complexity has increased significantly around auth flows (passwordless, MFA, magic link), YouTube Shorts-style video navigation (touch, keyboard, swipe), comment panel state, per-video vote state, and five Bootstrap modals.</p>
+<p>jQuery-based DOM manipulation has become difficult to reason about as interaction complexity grows. The conditions described in ADR-0004 for triggering the migration have been met.</p>
+<hr />
+<h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
+<ul>
+<li>jQuery DOM manipulation does not scale well with the current interaction complexity</li>
+<li>Component isolation is needed to enable reliable unit testing of UI logic</li>
+<li>Server state management (loading, caching, error handling) requires a dedicated solution</li>
+<li>The build pipeline should produce a verifiable artifact before deployment</li>
+<li>Migration scope must be bounded to avoid introducing type migration risk alongside behavior migration</li>
+</ul>
+<hr />
+<h2 id="considered-options">Considered Options<a class="headerlink" href="#considered-options" title="Permanent link">&para;</a></h2>
+<h3 id="option-1-keep-vanilla-js-jquery">Option 1: Keep Vanilla JS + jQuery<a class="headerlink" href="#option-1-keep-vanilla-js-jquery" title="Permanent link">&para;</a></h3>
+<p>Continue extending the existing jQuery-based codebase.</p>
 <table>
 <thead>
 <tr>
-<th>Component</th>
-<th>Decision</th>
+<th>Pros</th>
+<th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Build tool</td>
-<td><strong>Vite</strong> (replaces no-build-step)</td>
+<td>No migration cost</td>
+<td>DOM manipulation complexity continues to grow</td>
 </tr>
 <tr>
-<td>Framework</td>
-<td><strong>React 19</strong></td>
+<td>No pipeline changes required</td>
+<td>Isolated unit testing of UI logic remains impractical</td>
 </tr>
 <tr>
-<td>Language</td>
-<td><strong>JavaScript ES6+</strong> (no TypeScript in this phase)</td>
-</tr>
-<tr>
-<td>HTTP</td>
-<td><strong>Fetch API</strong> (replace jQuery AJAX)</td>
-</tr>
-<tr>
-<td>Server state</td>
-<td><strong>TanStack Query v5</strong> (React Query)</td>
-</tr>
-<tr>
-<td>Client state</td>
-<td><strong>React Context</strong> (auth + theme)</td>
-</tr>
-<tr>
-<td>Routing</td>
-<td><strong>React Router v6</strong></td>
-</tr>
-<tr>
-<td>UI library</td>
-<td><strong>react-bootstrap</strong> (Bootstrap 5 wrappers)</td>
-</tr>
-<tr>
-<td>Gestures</td>
-<td><strong>react-swipeable</strong></td>
-</tr>
-<tr>
-<td>Testing</td>
-<td><strong>Vitest + React Testing Library</strong></td>
+<td></td>
+<td>Server state boilerplate must be maintained manually</td>
 </tr>
 </tbody>
 </table>
-<h3 id="why-vite-over-create-react-app-cra">Why Vite over Create React App (CRA)?<a class="headerlink" href="#why-vite-over-create-react-app-cra" title="Permanent link">&para;</a></h3>
-<ul>
-<li>CRA is deprecated as of 2023</li>
-<li>Vite has native ESM, faster HMR, smaller output</li>
-<li>No ejecting required for config customization</li>
-</ul>
-<h3 id="why-react-context-over-reduxzustand">Why React Context over Redux/Zustand?<a class="headerlink" href="#why-react-context-over-reduxzustand" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Only 2 client-state concerns: auth (JWT/user) and theme</li>
-<li>React Query handles all server state (loading, caching, errors)</li>
-<li>Adding Redux for 2 global values would be over-engineering</li>
-</ul>
-<h3 id="why-react-bootstrap-over-importing-bootstrap-css-directly">Why react-bootstrap over importing Bootstrap CSS directly?<a class="headerlink" href="#why-react-bootstrap-over-importing-bootstrap-css-directly" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Avoids Bootstrap JS (conflicts with React's synthetic events)</li>
-<li>Native React component API (no <code>data-bs-toggle</code> attributes)</li>
-<li>Modal lifecycle managed by React, not jQuery</li>
-</ul>
-<h3 id="why-javascript-instead-of-typescript">Why JavaScript instead of TypeScript?<a class="headerlink" href="#why-javascript-instead-of-typescript" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Reduces migration scope (pure behavior migration, not type migration)</li>
-<li>Team can adopt TypeScript in a follow-up ADR once React patterns are established</li>
-<li>Vite supports TypeScript migration incrementally later</li>
-</ul>
+<h3 id="option-2-react-19-vite-chosen">Option 2: React 19 + Vite (chosen)<a class="headerlink" href="#option-2-react-19-vite-chosen" title="Permanent link">&para;</a></h3>
+<p>Migrate <code>webapp/</code> to React 19 with Vite as the build tool, replacing jQuery and the no-build-step approach.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Component-based architecture enables isolated testing</td>
+<td>Breaking change to deployment pipeline</td>
+</tr>
+<tr>
+<td>React Query eliminates loading/error state boilerplate</td>
+<td><code>webapp/</code> directory structure completely changes</td>
+</tr>
+<tr>
+<td>Vite native ESM provides faster HMR than CRA</td>
+<td>Nginx requires <code>try_files</code> reconfiguration for SPA routing</td>
+</tr>
+<tr>
+<td>Removes jQuery (-87KB gzipped)</td>
+<td>Bundle size increases by ~40KB for React core (gzipped)</td>
+</tr>
+<tr>
+<td>CI build step produces verifiable artifact</td>
+<td>Node.js required in CI environment</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-3-vuejs-vite">Option 3: Vue.js + Vite<a class="headerlink" href="#option-3-vuejs-vite" title="Permanent link">&para;</a></h3>
+<p>Adopt Vue.js instead of React as the component framework.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gentler learning curve, single-file components</td>
+<td>Not aligned with team's existing React knowledge trajectory</td>
+</tr>
+<tr>
+<td>Vite native support</td>
+<td>Smaller ecosystem for the specific libraries already chosen (React Query, react-bootstrap)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-4-nextjs">Option 4: Next.js<a class="headerlink" href="#option-4-nextjs" title="Permanent link">&para;</a></h3>
+<p>Adopt Next.js for server-side rendering capability.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SSR and SSG support for improved initial load</td>
+<td>Over-engineered for a SPA with an existing Spring Boot API</td>
+</tr>
+<tr>
+<td>File-based routing</td>
+<td>Adds server infrastructure complexity without clear benefit</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
+<p><strong>Chosen Option:</strong> Option 2 — React 19 + Vite
+<strong>Rationale:</strong> React with Vite is the most direct path to solving the core problems: testable component isolation, managed server state via TanStack Query, and a reproducible build artifact. CRA was excluded because it was deprecated in 2023; Vite's native ESM and faster HMR make it the correct replacement. Vue.js and Next.js were excluded because they do not align with the team's existing direction and add migration or infrastructure complexity without proportional benefit. React Context covers the only two client-state concerns (auth and theme); Redux would be over-engineering at this scope. JavaScript ES6+ is retained over TypeScript to keep the migration bounded to behavior only; TypeScript can be adopted incrementally in a follow-up ADR.</p>
+<h3 id="quantified-impact-where-applicable">Quantified Impact <em>(where applicable)</em><a class="headerlink" href="#quantified-impact-where-applicable" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jQuery bundle</td>
+<td>~87KB gzipped</td>
+<td>0KB</td>
+<td>Dependency removed entirely</td>
+</tr>
+<tr>
+<td>React core bundle</td>
+<td>0KB</td>
+<td>~40KB gzipped</td>
+<td>Net reduction of ~47KB</td>
+</tr>
+<tr>
+<td>CI pipeline</td>
+<td>No build step</td>
+<td><code>npm run build</code> added</td>
+<td>Verifiable artifact before SCP</td>
+</tr>
+</tbody>
+</table>
+<hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<h3 id="positive">Positive<a class="headerlink" href="#positive" title="Permanent link">&para;</a></h3>
+<p><strong>Positive:</strong>
+- Component-based architecture enables isolated unit testing of UI logic
+- TanStack Query v5 eliminates manual loading, caching, and error state boilerplate
+- Vite HMR accelerates local development
+- jQuery dependency removed entirely
+- CI/CD pipeline now includes a build step with artifact verification</p>
+<p><strong>Negative:</strong>
+- Deployment pipeline requires a breaking change: <code>npm run build</code> must run before SCP
+- <code>webapp/</code> directory structure changes completely with no coexistence path for old code
+- Nginx must be reconfigured with <code>try_files $uri /index.html</code> for SPA routing
+- Node.js must be available in the CI environment</p>
+<p><strong>Risks:</strong>
+- PWA manifest, CSS theme system, and all 14 backend API endpoints are intentionally unchanged; any drift from this scope increases migration risk
+- TypeScript adoption deferred; if React patterns are not established before a follow-up TypeScript ADR, incremental migration may be inconsistent</p>
+<hr />
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Component-based architecture enables isolated testing</li>
-<li>React Query eliminates manual loading/error state boilerplate</li>
-<li>Vite HMR speeds up local development</li>
-<li>Removes jQuery dependency (saves ~87KB gzipped)</li>
-<li>CI/CD now includes a build step with artifact verification</li>
+<li>[x] Tech Strategy alignment confirmed</li>
+<li>[ ] Related plan document created: docs/prd/PRD-react-migration.md</li>
 </ul>
-<h3 id="negative">Negative<a class="headerlink" href="#negative" title="Permanent link">&para;</a></h3>
+<hr />
+<h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Breaking change</strong> to deployment pipeline (must add <code>npm run build</code> before SCP)</li>
-<li><code>webapp/</code> directory structure completely changes (no coexistence with old code)</li>
-<li>Nginx needs <code>try_files $uri /index.html</code> for SPA routing</li>
-<li>Initial bundle size slightly larger than zero-JS-framework approach (~40KB React core gzipped)</li>
-<li>Node.js required in CI environment for build step</li>
+<li>ADR-0004: frontend-structure (superseded by this decision)</li>
+<li>PRD: <code>docs/prd/PRD-react-migration.md</code></li>
 </ul>
-<h3 id="neutral">Neutral<a class="headerlink" href="#neutral" title="Permanent link">&para;</a></h3>
-<ul>
-<li>PWA manifest (<code>manifest.json</code>) carries forward unchanged</li>
-<li>CSS custom property theme system (<code>assessment.css</code>) carries forward with minor adaptation</li>
-<li>All 14 backend API endpoints remain unchanged</li>
-<li>Authentication flows (passwordless, MFA, magic link) behavior unchanged</li>
-</ul>
-<h2 id="supersedes">Supersedes<a class="headerlink" href="#supersedes" title="Permanent link">&para;</a></h2>
-<ul>
-<li>ADR-0004 (frontend-structure) — this ADR executes the planned migration referenced in that decision</li>
-</ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
-<ul>
-<li>PRD: <code>artifacts/prd_react-migration.md</code></li>
-<li>Plan: <code>artifacts/plan_react-migration.md</code></li>
-<li>Tech Strategy: <code>doc/tech-strategy.md</code> — update JavaScript section after this ADR is accepted</li>
-</ul>
+<hr />
+<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Author</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-03-01</td>
+<td>nguyenhuuca</td>
+<td>Initial draft</td>
+</tr>
+<tr>
+<td>2026-05-31</td>
+<td>nguyenhuuca</td>
+<td>Restructured to new ADR template</td>
+</tr>
+</tbody>
+</table>
 
 
 

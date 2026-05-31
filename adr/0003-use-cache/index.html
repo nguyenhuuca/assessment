@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#use-guava-cache-initially-with-planned-migration-to-redis" class="md-skip">
+        <a href="#adr-0003-use-guava-cache-initially-with-planned-migration-to-redis" class="md-skip">
           Skip to content
         </a>
       
@@ -863,21 +863,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -896,13 +885,102 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-guava-cache-current-choice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: Guava Cache (current choice)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-redis-immediate-adoption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: Redis (immediate adoption)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-caffeine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: Caffeine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-4-no-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 4: No Cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -918,10 +996,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4729,21 +4829,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -4762,13 +4851,102 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-guava-cache-current-choice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: Guava Cache (current choice)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-redis-immediate-adoption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: Redis (immediate adoption)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-caffeine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: Caffeine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-4-no-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 4: No Cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -4784,10 +4962,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4819,52 +5019,210 @@
   
 
 
-<h1 id="use-guava-cache-initially-with-planned-migration-to-redis">Use Guava Cache Initially, with Planned Migration to Redis<a class="headerlink" href="#use-guava-cache-initially-with-planned-migration-to-redis" title="Permanent link">&para;</a></h1>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Accepted</p>
-<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2025-07-03</p>
+<h1 id="adr-0003-use-guava-cache-initially-with-planned-migration-to-redis">ADR-0003: Use Guava Cache Initially, with Planned Migration to Redis<a class="headerlink" href="#adr-0003-use-guava-cache-initially-with-planned-migration-to-redis" title="Permanent link">&para;</a></h1>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> Accepted
+<strong>Date:</strong> 2025-07-03
+<strong>Deciders:</strong> nguyenhuuca
+<strong>Related PRD:</strong> N/A
+<strong>Tech Strategy Alignment:</strong>
+- [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code></p>
+<p><strong>Domain Tags:</strong> data, infrastructure
+<strong>Supersedes:</strong> N/A
+<strong>Superseded By:</strong> N/A</p>
+<hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The system needs caching for:
-- Video metadata (title, duration, availability)
-- Chunk data in memory for video streaming
-- Hit stats (view count, like count) used for cleanup logic</p>
-<p>During early stages, an in-memory cache is sufficient and avoids external dependencies. However, for horizontal scaling and persistence across app restarts, Redis will be required.</p>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
+<p>The system requires caching to reduce database load and improve response times for frequently accessed data including video metadata, video chunk data for streaming, and hit statistics. In the early single-instance deployment phase, an external cache service introduces unnecessary operational complexity. As the system scales to multiple instances, a shared cache becomes necessary for correctness.</p>
+<hr />
+<h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Currently</strong>, we use <strong>Guava Cache</strong> for in-memory caching within the application.</li>
-<li>
-<p>Guava is suitable for:</p>
-<ul>
-<li>Fast local memory access</li>
-<li>Lightweight TTL support</li>
-<li>No need for network layer or external services</li>
+<li>Avoid external service dependencies during early development and single-instance deployment</li>
+<li>Video metadata and chunk data must be served with low latency</li>
+<li>Cache implementation must be swappable without changing business logic</li>
+<li>Horizontal scaling in the future will require a shared, cross-instance cache</li>
 </ul>
-</li>
-<li>
-<p><strong>Future Plan</strong>:</p>
-<ul>
-<li>Migrate to <strong>Redis</strong> when:<ul>
-<li>We deploy multiple instances of the backend</li>
-<li>Cache needs to persist across restarts</li>
-<li>We centralize metrics or chunk-level cache</li>
-</ul>
-</li>
-<li>Redis will be deployed using Docker Compose locally and via managed services (e.g., Redis Cloud, AWS ElastiCache)</li>
-</ul>
-</li>
-</ul>
+<hr />
+<h2 id="considered-options">Considered Options<a class="headerlink" href="#considered-options" title="Permanent link">&para;</a></h2>
+<h3 id="option-1-guava-cache-current-choice">Option 1: Guava Cache (current choice)<a class="headerlink" href="#option-1-guava-cache-current-choice" title="Permanent link">&para;</a></h3>
+<p>Google Guava's in-process LRU cache with TTL support, running inside the JVM.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zero external dependencies or infrastructure</td>
+<td>Cache is not shared across multiple instances</td>
+</tr>
+<tr>
+<td>Fast local memory access with no network overhead</td>
+<td>Data lost on application restart</td>
+</tr>
+<tr>
+<td>Lightweight TTL and size-based eviction built-in</td>
+<td>Memory-bound; large caches compete with JVM heap</td>
+</tr>
+<tr>
+<td>Easy to configure and test locally</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-2-redis-immediate-adoption">Option 2: Redis (immediate adoption)<a class="headerlink" href="#option-2-redis-immediate-adoption" title="Permanent link">&para;</a></h3>
+<p>An external in-memory data store supporting distributed caching, persistence, and pub/sub.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shared across all instances — correct for horizontal scale</td>
+<td>Adds infrastructure dependency from day one</td>
+</tr>
+<tr>
+<td>Supports persistence across restarts</td>
+<td>Network latency adds overhead vs. in-process cache</td>
+</tr>
+<tr>
+<td>Rich data structures (sorted sets, streams)</td>
+<td>Requires ops setup: deployment, auth, monitoring</td>
+</tr>
+<tr>
+<td>Industry standard for distributed caching</td>
+<td>Overkill for a single-instance early-stage deployment</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-3-caffeine">Option 3: Caffeine<a class="headerlink" href="#option-3-caffeine" title="Permanent link">&para;</a></h3>
+<p>A high-performance in-process cache for Java, successor to Guava Cache.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Higher throughput than Guava in benchmarks</td>
+<td>Same single-instance limitation as Guava</td>
+</tr>
+<tr>
+<td>Spring Boot's preferred local cache implementation</td>
+<td>Adds a dependency with minimal benefit over Guava at this scale</td>
+</tr>
+<tr>
+<td>Compatible with Spring Cache abstraction</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-4-no-cache">Option 4: No Cache<a class="headerlink" href="#option-4-no-cache" title="Permanent link">&para;</a></h3>
+<p>Serve all requests directly from the database and filesystem without caching.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Simplest implementation</td>
+<td>High database load under concurrent video streaming</td>
+</tr>
+<tr>
+<td>No cache invalidation complexity</td>
+<td>Unacceptable latency for repeated video metadata reads</td>
+</tr>
+<tr>
+<td></td>
+<td>View stat queries would hit the DB on every request</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
+<p><strong>Chosen Option:</strong> Option 1 — Guava Cache (with planned migration to Redis)
+<strong>Rationale:</strong> Guava Cache satisfies the current caching requirements with no operational overhead, which is appropriate for a single-instance deployment. The cache logic is abstracted behind an <code>AppCache</code> interface so the implementation can be swapped to Redis when horizontal scaling is required. Adopting Redis immediately would add infrastructure complexity before it is needed.</p>
+<h3 id="quantified-impact-where-applicable">Quantified Impact <em>(where applicable)</em><a class="headerlink" href="#quantified-impact-where-applicable" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Video metadata DB calls</td>
+<td>Per request</td>
+<td>Near-zero for cached entries</td>
+<td>TTL-based eviction controls staleness</td>
+</tr>
+<tr>
+<td>Operational dependencies</td>
+<td>None</td>
+<td>None (Guava phase)</td>
+<td>Redis deferred until multi-instance</td>
+</tr>
+</tbody>
+</table>
+<hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
+<p><strong>Positive:</strong>
+- Fast, zero-configuration caching in the early development and single-instance phase
+- No external service to provision, monitor, or secure during initial deployment
+- Abstracted cache interface allows future migration to Redis with minimal code changes</p>
+<p><strong>Negative:</strong>
+- Cache is not shared across instances; horizontal scaling before migration will cause cache misses and inconsistencies
+- Cached data is lost on application restart, causing a cold-start period</p>
+<p><strong>Risks:</strong>
+- Deferring Redis adoption could require urgent migration under time pressure when scaling is needed
+- Cache abstraction must be maintained carefully to avoid leaking Guava-specific behavior into callers</p>
+<hr />
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Current setup is fast, zero-config, ideal for local testing</li>
-<li>Redis will introduce infra/ops overhead but bring cross-instance and persistent caching</li>
-<li>Code should be abstracted to allow switching from Guava to Redis with minimal impact (e.g., via <code>AppCache</code> interface)</li>
+<li>[ ] Tech Strategy alignment confirmed</li>
+<li>[ ] Related plan document created: N/A</li>
 </ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Task: Setup Redis with user/pass and Spring Boot integration</li>
-<li>Task: Cache video chunks and hit stats</li>
+<li><a href="https://github.com/google/guava/wiki/CachesExplained">Guava Cache docs</a></li>
+<li><a href="https://redis.io/docs/">Redis official docs</a></li>
 </ul>
+<hr />
+<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Author</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025-07-03</td>
+<td>nguyenhuuca</td>
+<td>Initial draft</td>
+</tr>
+<tr>
+<td>2026-05-31</td>
+<td>nguyenhuuca</td>
+<td>Restructured to new ADR template</td>
+</tr>
+</tbody>
+</table>
 
 
 

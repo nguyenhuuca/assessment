@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-0010-add-trivy-dependency-filesystem-scanning-to-ci" class="md-skip">
+        <a href="#adr-0010-add-trivy-dependency-and-filesystem-scanning-to-ci" class="md-skip">
           Skip to content
         </a>
       
@@ -1059,21 +1059,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -1092,10 +1081,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
@@ -1103,22 +1092,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
+  <a href="#considered-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Consequences
+        Considered Options
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Consequences">
+    <nav class="md-nav" aria-label="Considered Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#positive" class="md-nav__link">
+  <a href="#option-1-trivy-aqua-security-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Positive
+        Option 1: Trivy (Aqua Security) — chosen
       
     </span>
   </a>
@@ -1126,10 +1115,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#negative" class="md-nav__link">
+  <a href="#option-2-snyk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Negative
+        Option 2: Snyk
       
     </span>
   </a>
@@ -1137,10 +1126,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#trade-offs-accepted" class="md-nav__link">
+  <a href="#option-3-owasp-dependency-check" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Trade-offs accepted
+        Option 3: OWASP Dependency-Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-4-dependabot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 4: Dependabot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-5-grype-anchore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 5: Grype (Anchore)
       
     </span>
   </a>
@@ -1153,10 +1164,71 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#decision-outcome" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consequences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consequences
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4768,21 +4840,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#metadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
+        Metadata
       
     </span>
   </a>
@@ -4801,10 +4862,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
@@ -4812,22 +4873,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
+  <a href="#considered-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Consequences
+        Considered Options
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Consequences">
+    <nav class="md-nav" aria-label="Considered Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#positive" class="md-nav__link">
+  <a href="#option-1-trivy-aqua-security-chosen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Positive
+        Option 1: Trivy (Aqua Security) — chosen
       
     </span>
   </a>
@@ -4835,10 +4896,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#negative" class="md-nav__link">
+  <a href="#option-2-snyk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Negative
+        Option 2: Snyk
       
     </span>
   </a>
@@ -4846,10 +4907,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#trade-offs-accepted" class="md-nav__link">
+  <a href="#option-3-owasp-dependency-check" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Trade-offs accepted
+        Option 3: OWASP Dependency-Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-4-dependabot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 4: Dependabot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-5-grype-anchore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 5: Grype (Anchore)
       
     </span>
   </a>
@@ -4862,10 +4945,71 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#decision-outcome" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consequences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consequences
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4897,98 +5041,236 @@
   
 
 
-<h1 id="adr-0010-add-trivy-dependency-filesystem-scanning-to-ci">ADR-0010: Add Trivy Dependency &amp; Filesystem Scanning to CI<a class="headerlink" href="#adr-0010-add-trivy-dependency-filesystem-scanning-to-ci" title="Permanent link">&para;</a></h1>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Accepted</p>
-<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2026-05-30</p>
+<h1 id="adr-0010-add-trivy-dependency-and-filesystem-scanning-to-ci">ADR-0010: Add Trivy Dependency and Filesystem Scanning to CI<a class="headerlink" href="#adr-0010-add-trivy-dependency-and-filesystem-scanning-to-ci" title="Permanent link">&para;</a></h1>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> Accepted
+<strong>Date:</strong> 2026-05-30
+<strong>Deciders:</strong> nguyenhuuca
+<strong>Related PRD:</strong> N/A
+<strong>Tech Strategy Alignment:</strong>
+- [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code></p>
+<p><strong>Domain Tags:</strong> security, devops
+<strong>Supersedes:</strong> N/A
+<strong>Superseded By:</strong> N/A</p>
+<hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The Funny Movies CI pipeline currently covers build, test (coverage gate + SonarCloud), Docker build, and deploy. There is <strong>no automated vulnerability scanning</strong> of the container image or runtime dependencies before pushing to Docker Hub and deploying to production.</p>
-<p><strong>Current gaps identified in the 2026-05-30 system health report:</strong>
-- No container image scanning in CI (MEDIUM severity)
-- No secrets scanning in CI (MEDIUM severity)
-- The JWT library <code>0.11.5</code> went undetected in CI for months — only caught by manual review</p>
-<p><strong>Risk:</strong>
-- A vulnerable OS package or transitive dependency can be shipped to production without any warning
-- Docker Hub and Kubernetes do not scan images automatically in this setup
-- The <code>nguyenhuuca/funny-app</code> image is based on <code>eclipse-temurin:24-jre-alpine</code> — Alpine is minimal but still ships packages that receive CVEs</p>
-<p><strong>Alternatives considered:</strong></p>
+<p>The CI pipeline covers build, test (coverage gate and SonarCloud), Docker build, and deploy. There is no automated vulnerability scanning of the container image or runtime dependencies before pushing to Docker Hub and deploying to production.</p>
+<p>Two gaps were identified in the 2026-05-30 system health report: no container image scanning (MEDIUM severity) and no secrets scanning (MEDIUM severity). The JWT library at version 0.11.5 went undetected in CI for months and was only caught by manual review. Docker Hub and Kubernetes do not scan images automatically in this setup. The production image is based on <code>eclipse-temurin:24-jre-alpine</code>, which is minimal but still receives OS-level CVEs.</p>
+<hr />
+<h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Vulnerable OS packages or transitive Java dependencies must be caught before reaching production</li>
+<li>Scanning must integrate with GitHub Actions without requiring an external paid service</li>
+<li>Pipeline overhead must remain acceptable (target: under 90 seconds per run)</li>
+<li>Findings must be surfaced in a developer-visible interface (GitHub Security tab)</li>
+<li>The gate policy must not block the release cadence on the first run before a baseline is established</li>
+</ul>
+<hr />
+<h2 id="considered-options">Considered Options<a class="headerlink" href="#considered-options" title="Permanent link">&para;</a></h2>
+<h3 id="option-1-trivy-aqua-security-chosen">Option 1: Trivy (Aqua Security) — chosen<a class="headerlink" href="#option-1-trivy-aqua-security-chosen" title="Permanent link">&para;</a></h3>
+<p>Free, open-source scanner with a native GitHub Action; scans filesystem, container images, and secrets in one tool.</p>
 <table>
 <thead>
 <tr>
-<th>Tool</th>
 <th>Pros</th>
 <th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Trivy</strong> (Aqua Security)</td>
-<td>Free, fast, OSS, GitHub Action available, scans image + filesystem + secrets</td>
-<td>Requires Docker image to be built first</td>
+<td>Zero cost, OSS, maintained by Aqua Security</td>
+<td>Requires the Docker image to be built before image scanning can run</td>
 </tr>
 <tr>
-<td>Snyk</td>
-<td>Deep language-level scanning, fix suggestions</td>
-<td>Paid for full features, external service</td>
+<td>Native <code>aquasecurity/trivy-action</code> with SARIF output to GitHub Security tab</td>
+<td>Trivy DB is ~200MB per download (mitigated by caching)</td>
 </tr>
 <tr>
-<td>OWASP Dependency-Check</td>
-<td>Maven plugin, Java-focused</td>
-<td>Slow (~5 min), no image scanning, XML report only</td>
+<td>Scans both filesystem and container image in one tool</td>
+<td>CRITICAL gate may cause false-positive blocks on first run</td>
 </tr>
 <tr>
-<td>Dependabot</td>
-<td>Auto-PRs for outdated deps</td>
-<td>Reactive only, no image scanning, no gate</td>
-</tr>
-<tr>
-<td>Grype (Anchore)</td>
-<td>Similar to Trivy, good SBOM support</td>
-<td>Less ecosystem adoption</td>
+<td>Fast (~30–60s on a warm runner)</td>
+<td></td>
 </tr>
 </tbody>
 </table>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>Add <strong>Trivy</strong> as a new <code>scan</code> job in the GitHub Actions CI pipeline, running <strong>after the Docker image is built and pushed</strong>.</p>
-<p><strong>Scan target:</strong><br />
-<strong>Filesystem</strong> (<code>api/</code> directory) — catches CVEs in Maven dependencies declared in <code>pom.xml</code> and compiled JARs in <code>target/</code>. Docker image scanning is deferred until Docker is used in production.</p>
-<p><strong>Gate policy:</strong>
-- Fail the pipeline on any <strong>CRITICAL</strong> severity finding
-- <strong>HIGH</strong> severity findings: reported but non-blocking (backlog for now, tighten after baseline is established)
-- Upload SARIF report to GitHub Security tab for visibility</p>
-<p><strong>Rationale for Trivy over alternatives:</strong>
-- Zero cost, maintained by Aqua Security, wide adoption
-- <code>aquasecurity/trivy-action</code> integrates natively with GitHub Actions and Security tab (SARIF)
-- Scans both image and filesystem in one tool — no need for a separate Maven plugin
-- Fast enough (~30–60s) to not slow the pipeline meaningfully</p>
+<h3 id="option-2-snyk">Option 2: Snyk<a class="headerlink" href="#option-2-snyk" title="Permanent link">&para;</a></h3>
+<p>Deep language-level scanning with fix suggestions.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Detailed fix suggestions per vulnerability</td>
+<td>Full feature set requires a paid plan</td>
+</tr>
+<tr>
+<td>Strong Java and Maven support</td>
+<td>External SaaS dependency; not self-contained in CI</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-3-owasp-dependency-check">Option 3: OWASP Dependency-Check<a class="headerlink" href="#option-3-owasp-dependency-check" title="Permanent link">&para;</a></h3>
+<p>Maven plugin for Java dependency scanning.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Java-focused, integrates as a Maven plugin</td>
+<td>Slow (~5 minutes per run)</td>
+</tr>
+<tr>
+<td>No external service required</td>
+<td>Cannot scan container images</td>
+</tr>
+<tr>
+<td></td>
+<td>XML-only report; no native GitHub Security tab integration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-4-dependabot">Option 4: Dependabot<a class="headerlink" href="#option-4-dependabot" title="Permanent link">&para;</a></h3>
+<p>Automated pull requests for outdated dependencies.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No pipeline overhead; runs asynchronously</td>
+<td>Reactive only; does not block deploys on vulnerabilities</td>
+</tr>
+<tr>
+<td>Native GitHub integration</td>
+<td>Cannot scan container images</td>
+</tr>
+<tr>
+<td></td>
+<td>No active gate on severity</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-5-grype-anchore">Option 5: Grype (Anchore)<a class="headerlink" href="#option-5-grype-anchore" title="Permanent link">&para;</a></h3>
+<p>Open-source scanner similar to Trivy with strong SBOM support.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Good SBOM generation capability</td>
+<td>Less GitHub Actions ecosystem adoption than Trivy</td>
+</tr>
+<tr>
+<td>Similar feature set to Trivy</td>
+<td>SARIF integration less mature</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
+<p><strong>Chosen Option:</strong> Option 1 — Trivy
+<strong>Rationale:</strong> Trivy is zero-cost, actively maintained by Aqua Security, and has the widest adoption in GitHub Actions environments. It scans both filesystem and container image in one tool, eliminating the need for a separate Maven plugin. Its SARIF output integrates natively with the GitHub Security tab. At 30–60 seconds on a warm runner it does not meaningfully slow the pipeline. Snyk was excluded due to cost. OWASP Dependency-Check was excluded for speed and lack of image scanning. Dependabot was excluded for being reactive with no gate. Grype was excluded due to lower ecosystem adoption.</p>
+<p>The scan target is the filesystem (<code>api/</code> directory), catching CVEs in Maven dependencies declared in <code>pom.xml</code> and compiled JARs. Docker image scanning is deferred until Docker is used in the production deployment path.</p>
+<p>Gate policy: fail on CRITICAL severity; HIGH severity is reported but non-blocking initially, to be tightened after a clean baseline is established. SARIF reports are uploaded to the GitHub Security tab on every run.</p>
+<h3 id="quantified-impact-where-applicable">Quantified Impact <em>(where applicable)</em><a class="headerlink" href="#quantified-impact-where-applicable" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pipeline duration</td>
+<td>Baseline</td>
+<td>+~60s</td>
+<td>On a warm runner with Trivy DB cached</td>
+</tr>
+<tr>
+<td>Trivy DB download</td>
+<td>N/A</td>
+<td>~200MB</td>
+<td>Mitigated by GitHub Actions cache</td>
+</tr>
+<tr>
+<td>CVE visibility</td>
+<td>Manual review only</td>
+<td>Automated on every push</td>
+<td>SARIF surfaced in GitHub Security tab</td>
+</tr>
+</tbody>
+</table>
+<hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<h3 id="positive">Positive<a class="headerlink" href="#positive" title="Permanent link">&para;</a></h3>
+<p><strong>Positive:</strong>
+- Automated CVE detection runs before every production deploy
+- SARIF upload surfaces findings in GitHub Security Code Scanning tab
+- Catches both OS-level (Alpine) and Java library vulnerabilities in one job
+- Establishes the foundation for secrets scanning (<code>--scanners secret</code> can be added later)</p>
+<p><strong>Negative:</strong>
+- Pipeline gains one additional job (~60s on a warm runner)
+- Trivy DB must be downloaded each run if the cache is cold (~200MB)</p>
+<p><strong>Risks:</strong>
+- The CRITICAL gate may block the pipeline on the first run if existing dependencies carry unresolved critical CVEs; a one-time triage pass is required before the gate is activated
+- HIGH severity findings are non-blocking initially; if the threshold is not tightened after the baseline is established, medium-term risk accumulates
+- Image scanning is deferred; OS-level CVEs in the deployed container will not be caught until Docker is used in production</p>
+<hr />
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Automated CVE detection before every production deploy</li>
-<li>SARIF upload surfaces findings in GitHub Security → Code Scanning tab</li>
-<li>Catches both OS-level (Alpine) and Java library vulnerabilities</li>
-<li>Sets foundation for secrets scanning (Trivy supports <code>--scanners secret</code>)</li>
+<li>[x] Tech Strategy alignment confirmed</li>
+<li>[ ] Related plan document created: docs/plans/plan-trivy-scan.md</li>
 </ul>
-<h3 id="negative">Negative<a class="headerlink" href="#negative" title="Permanent link">&para;</a></h3>
+<hr />
+<h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Pipeline gains one more job (~60s on a warm runner)</li>
-<li>CRITICAL gate may cause false-positive blocks on first run if existing image has unresolved CVEs — need a one-time triage before enabling the gate</li>
-<li>Trivy DB must be downloaded each run (~200MB); mitigated by caching</li>
-</ul>
-<h3 id="trade-offs-accepted">Trade-offs accepted<a class="headerlink" href="#trade-offs-accepted" title="Permanent link">&para;</a></h3>
-<ul>
-<li>HIGH severity is non-blocking initially to avoid disrupting the release cadence; the threshold will be tightened after the first clean baseline is established</li>
-<li>Image scan requires the Docker job to complete first, so <code>scan</code> runs sequentially after <code>docker</code> (no parallelism gain here)</li>
-</ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
-<ul>
-<li>System Health Report 2026-05-30 — identified this as MEDIUM priority open gap</li>
+<li>System Health Report 2026-05-30 — source of MEDIUM priority gaps that triggered this ADR</li>
 <li>ADR-0002 — CI/CD pipeline architecture</li>
-<li><code>.github/workflows/funnyapp-ci.yml</code> — target file for implementation</li>
 <li><code>docs/plans/plan-trivy-scan.md</code> — implementation plan</li>
-<li>Note: Docker image scanning to be added when Docker is used in production deployment</li>
+<li><code>.github/workflows/funnyapp-ci.yml</code> — target file for implementation</li>
 </ul>
+<hr />
+<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Author</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-05-30</td>
+<td>nguyenhuuca</td>
+<td>Initial draft</td>
+</tr>
+<tr>
+<td>2026-05-31</td>
+<td>nguyenhuuca</td>
+<td>Restructured to new ADR template</td>
+</tr>
+</tbody>
+</table>
 
 
 

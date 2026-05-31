@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#use-lru-cache-for-video-streaming" class="md-skip">
+        <a href="#adr-0005-use-lru-cache-for-video-streaming" class="md-skip">
           Skip to content
         </a>
       
@@ -919,6 +919,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -930,22 +941,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rationale" class="md-nav__link">
+  <a href="#option-1-lru-least-recently-used" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rationale:
+        Option 1: LRU (Least Recently Used)
       
     </span>
   </a>
@@ -953,10 +975,60 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#trade-offs" class="md-nav__link">
+  <a href="#option-2-lfu-least-frequently-used" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Trade-offs:
+        Option 2: LFU (Least Frequently Used)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-fifo-first-in-first-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: FIFO (First In, First Out)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-4-hybrid-eg-w-tinylfu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 4: Hybrid (e.g., W-TinyLFU)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
       
     </span>
   </a>
@@ -980,10 +1052,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#alternatives-considered" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Alternatives Considered
+        Validation
       
     </span>
   </a>
@@ -991,10 +1063,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#future-considerations" class="md-nav__link">
+  <a href="#links" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Future Considerations
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4746,6 +4829,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4757,22 +4851,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision Drivers
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considered-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considered Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considered Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rationale" class="md-nav__link">
+  <a href="#option-1-lru-least-recently-used" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rationale:
+        Option 1: LRU (Least Recently Used)
       
     </span>
   </a>
@@ -4780,10 +4885,60 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#trade-offs" class="md-nav__link">
+  <a href="#option-2-lfu-least-frequently-used" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Trade-offs:
+        Option 2: LFU (Least Frequently Used)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-fifo-first-in-first-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: FIFO (First In, First Out)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-4-hybrid-eg-w-tinylfu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 4: Hybrid (e.g., W-TinyLFU)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Outcome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Outcome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quantified-impact-where-applicable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantified Impact (where applicable)
       
     </span>
   </a>
@@ -4807,10 +4962,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#alternatives-considered" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Alternatives Considered
+        Validation
       
     </span>
   </a>
@@ -4818,10 +4973,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#future-considerations" class="md-nav__link">
+  <a href="#links" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Future Considerations
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
       
     </span>
   </a>
@@ -4853,82 +5019,158 @@
   
 
 
-<h1 id="use-lru-cache-for-video-streaming">Use LRU Cache for Video Streaming<a class="headerlink" href="#use-lru-cache-for-video-streaming" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Accepted<br />
-<strong>Date:</strong> 2025-07-14<br />
-<strong>Decision Makers:</strong> [canh]<br />
-<strong>Context:</strong> [Cache Layer in Video Streaming System]</p>
+<h1 id="adr-0005-use-lru-cache-for-video-streaming">ADR-0005: Use LRU Cache for Video Streaming<a class="headerlink" href="#adr-0005-use-lru-cache-for-video-streaming" title="Permanent link">&para;</a></h1>
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> Accepted
+<strong>Date:</strong> 2025-07-14
+<strong>Deciders:</strong> nguyenhuuca
+<strong>Related PRD:</strong> N/A
+<strong>Tech Strategy Alignment:</strong>
+- [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code></p>
+<p><strong>Domain Tags:</strong> data, infrastructure
+<strong>Supersedes:</strong> N/A
+<strong>Superseded By:</strong> N/A</p>
+<hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The video streaming service handles large files by serving them in small chunks. To reduce disk and network latency and improve performance, we implement an in-memory caching layer. This layer needs to:</p>
+<p>The video streaming service handles large files by serving them in small chunks. An in-memory caching layer is required to reduce disk and network latency. The cache must evict unused items efficiently under memory pressure, prioritize chunks likely to be re-accessed soon, and support concurrent access safely.</p>
+<p>The primary design decision is which eviction policy to apply. The two most common strategies considered are LRU (Least Recently Used) and LFU (Least Frequently Used).</p>
+<hr />
+<h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Evict unused items efficiently under memory pressure  </li>
-<li>Prioritize chunks that are likely to be re-accessed soon  </li>
-<li>Support concurrent access safely</li>
+<li>Eviction policy must suit temporal locality patterns typical in video streaming</li>
+<li>Implementation complexity must remain low for the current team size</li>
+<li>Library support must exist in the existing Java ecosystem (Guava)</li>
+<li>Memory and computational overhead must be minimal</li>
 </ul>
-<p>Currently, we must choose an eviction policy for the cache. The two most common strategies are:</p>
-<ul>
-<li><strong>Least Recently Used (LRU):</strong> Evicts the least recently accessed item.</li>
-<li><strong>Least Frequently Used (LFU):</strong> Evicts the item accessed least frequently over time.</li>
-</ul>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>We decided to <strong>use an LRU (Least Recently Used) cache</strong> as the eviction strategy for video chunk caching.</p>
-<h3 id="rationale">Rationale:<a class="headerlink" href="#rationale" title="Permanent link">&para;</a></h3>
-<ul>
-<li>LRU is simple to implement and widely supported by caching libraries (e.g., Guava, Caffeine).</li>
-<li>LRU aligns well with temporal locality patterns seen in streaming, where recently accessed chunks are more likely to be accessed again soon.</li>
-<li>LRU requires less memory and computational overhead compared to LFU.</li>
-<li>Benchmarking shows that LRU performs adequately under current access patterns.</li>
-</ul>
-<h3 id="trade-offs">Trade-offs:<a class="headerlink" href="#trade-offs" title="Permanent link">&para;</a></h3>
-<ul>
-<li>LRU may evict "hot" chunks that are accessed frequently but not recently (unlike LFU).</li>
-<li>LFU may perform better in long-lived streams or workloads with heavy re-access of older content.</li>
-</ul>
-<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<ul>
-<li>The cache will automatically evict least recently accessed chunks when it exceeds its memory limit.</li>
-<li>Performance will likely remain stable under typical streaming usage.</li>
-<li>We gain fast implementation and low operational complexity.</li>
-</ul>
-<h2 id="alternatives-considered">Alternatives Considered<a class="headerlink" href="#alternatives-considered" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="considered-options">Considered Options<a class="headerlink" href="#considered-options" title="Permanent link">&para;</a></h2>
+<h3 id="option-1-lru-least-recently-used">Option 1: LRU (Least Recently Used)<a class="headerlink" href="#option-1-lru-least-recently-used" title="Permanent link">&para;</a></h3>
+<p>Evicts the item that was accessed least recently.</p>
 <table>
 <thead>
 <tr>
-<th>Option</th>
 <th>Pros</th>
 <th>Cons</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>LRU (chosen)</td>
-<td>Simple, low overhead, temporal locality</td>
-<td>Not frequency-aware</td>
+<td>Simple to implement; supported by Guava out of the box</td>
+<td>Not frequency-aware; may evict chunks that are hot but not recent</td>
 </tr>
 <tr>
-<td>LFU</td>
-<td>Captures frequency-based locality</td>
-<td>More memory and complexity</td>
+<td>Aligns with temporal locality patterns in streaming</td>
+<td>Suboptimal for long-lived streams with repeated access to older content</td>
 </tr>
 <tr>
-<td>FIFO</td>
-<td>Easy to implement</td>
-<td>Poor cache hit rate for streaming workloads</td>
-</tr>
-<tr>
-<td>Hybrid</td>
-<td>Potentially optimal hit ratio</td>
-<td>Requires tuning and added complexity</td>
+<td>Low memory and computational overhead</td>
+<td></td>
 </tr>
 </tbody>
 </table>
-<h2 id="future-considerations">Future Considerations<a class="headerlink" href="#future-considerations" title="Permanent link">&para;</a></h2>
-<p>We will monitor the system under production workloads. If we detect cache churn or degradation in hit rate due to frequent eviction of hot chunks, we may:</p>
+<h3 id="option-2-lfu-least-frequently-used">Option 2: LFU (Least Frequently Used)<a class="headerlink" href="#option-2-lfu-least-frequently-used" title="Permanent link">&para;</a></h3>
+<p>Evicts the item accessed least frequently over its lifetime.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Captures frequency-based locality; better for repeated access to the same content</td>
+<td>Higher memory and implementation complexity</td>
+</tr>
+<tr>
+<td>Better cache hit rate under stable, long-lived access patterns</td>
+<td>Requires frequency counters; more tuning needed</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-3-fifo-first-in-first-out">Option 3: FIFO (First In, First Out)<a class="headerlink" href="#option-3-fifo-first-in-first-out" title="Permanent link">&para;</a></h3>
+<p>Evicts the oldest item regardless of access pattern.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Trivial to implement</td>
+<td>Poor cache hit rate for streaming workloads; ignores access recency and frequency</td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-4-hybrid-eg-w-tinylfu">Option 4: Hybrid (e.g., W-TinyLFU)<a class="headerlink" href="#option-4-hybrid-eg-w-tinylfu" title="Permanent link">&para;</a></h3>
+<p>Combines frequency and recency signals for near-optimal eviction.</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Potentially optimal hit ratio across diverse workloads</td>
+<td>Requires significant tuning and added implementation complexity</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
+<p><strong>Chosen Option:</strong> Option 1 — LRU (Least Recently Used)
+<strong>Rationale:</strong> LRU is directly supported by Guava, requires no additional tuning, and aligns well with the temporal locality patterns observed in video streaming where recently accessed chunks are most likely to be re-requested. LFU offers frequency-based advantages but adds complexity that is not justified at the current scale. FIFO and Hybrid options were ruled out for poor hit rate and high tuning cost respectively.</p>
+<h3 id="quantified-impact-where-applicable">Quantified Impact <em>(where applicable)</em><a class="headerlink" href="#quantified-impact-where-applicable" title="Permanent link">&para;</a></h3>
+<p>N/A — no concrete before/after metrics available at decision time.</p>
+<hr />
+<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
+<p><strong>Positive:</strong>
+- Cache automatically evicts least recently accessed chunks when the memory limit is reached
+- Performance remains stable under typical streaming usage patterns
+- Fast implementation path using Guava with low operational complexity</p>
+<p><strong>Negative:</strong>
+- Frequently accessed but not recently accessed chunks may be evicted, reducing hit rate under certain access patterns</p>
+<p><strong>Risks:</strong>
+- If production workloads exhibit cache churn or degraded hit rates due to frequent eviction of hot chunks, a switch to LFU (Caffeine) or a hybrid strategy such as W-TinyLFU may be required; this should be driven by chunk access telemetry</p>
+<hr />
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Switch to <strong>LFU</strong> (e.g., Caffeine's LFU mode)</li>
-<li>Implement a hybrid strategy such as <strong>W-TinyLFU</strong></li>
-<li>Analyze chunk access telemetry to guide caching strategy</li>
+<li>[x] Tech Strategy alignment confirmed</li>
+<li>[ ] Related plan document created: N/A</li>
 </ul>
+<hr />
+<h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Guava Cache documentation: https://github.com/google/guava/wiki/CachesExplained</li>
+<li>Caffeine (LFU alternative): https://github.com/ben-manes/caffeine</li>
+</ul>
+<hr />
+<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Author</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025-07-14</td>
+<td>nguyenhuuca</td>
+<td>Initial draft</td>
+</tr>
+<tr>
+<td>2026-05-31</td>
+<td>nguyenhuuca</td>
+<td>Restructured to new ADR template</td>
+</tr>
+</tbody>
+</table>
 
 
 
