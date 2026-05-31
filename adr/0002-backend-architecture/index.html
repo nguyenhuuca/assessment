@@ -268,7 +268,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../0000-template/" class="md-tabs__link">
+        <a href="../0001-use-relational-database/" class="md-tabs__link">
           
   
   
@@ -711,34 +711,6 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../0000-template/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Template
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
             
               
                 
@@ -5515,46 +5487,9 @@
 
 <h1 id="adr-0002-use-layered-spring-boot-architecture-with-virtual-threads-support">ADR-0002: Use Layered Spring Boot Architecture with Virtual Threads Support<a class="headerlink" href="#adr-0002-use-layered-spring-boot-architecture-with-virtual-threads-support" title="Permanent link">&para;</a></h1>
 <h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Status</strong></td>
-<td>Accepted</td>
-</tr>
-<tr>
-<td><strong>Date</strong></td>
-<td>2025-07-03</td>
-</tr>
-<tr>
-<td><strong>Deciders</strong></td>
-<td>nguyenhuuca</td>
-</tr>
-<tr>
-<td><strong>Related PRD</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Domain Tags</strong></td>
-<td>infrastructure, api</td>
-</tr>
-<tr>
-<td><strong>Supersedes</strong></td>
-<td>N/A</td>
-</tr>
-<tr>
-<td><strong>Superseded By</strong></td>
-<td>N/A</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Tech Strategy Alignment:</strong>
-- [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code></p>
+<p><strong>Status:</strong> Accepted · <strong>Date:</strong> 2025-07-03 · <strong>Deciders:</strong> nguyenhuuca · <strong>Tags:</strong> infrastructure, api<br />
+<strong>Related PRD:</strong> N/A · <strong>Supersedes:</strong> N/A · <strong>Superseded By:</strong> N/A</p>
+<p><strong>Tech Strategy:</strong> ✅ Follows Golden Path</p>
 <hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
 <p>The backend handles REST APIs, background jobs, file I/O for video streaming, and view stat updates. High concurrency is expected, particularly when serving video streams to multiple simultaneous users. The architecture must handle many parallel I/O-bound requests efficiently without consuming excessive OS thread resources or requiring complex asynchronous programming models.</p>
