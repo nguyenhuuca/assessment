@@ -6225,9 +6225,20 @@ flowchart LR
 <p><strong>Output:</strong> <code>docs/specs/spec-{slug}.md</code></p>
 <hr />
 <h2 id="buoc-4-ke-hoach-trien-khai">Bước 4 — Kế hoạch triển khai<a class="headerlink" href="#buoc-4-ke-hoach-trien-khai" title="Permanent link">&para;</a></h2>
-<p>Sau khi PRD + ADR được duyệt, dùng <code>/swarm-plan</code> để phân rã tính năng thành kế hoạch theo giai đoạn và Beads.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/swarm-plan docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
+<p>Sau khi có Spec (hoặc PRD + ADR), dùng <code>/swarm-plan</code> để phân rã tính năng thành kế hoạch theo giai đoạn và Beads.</p>
+<p><code>/swarm-plan</code> nhận bất kỳ artifact nào — truyền vào những gì bạn đang có:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Với Spec (recommended — input chi tiết nhất)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-comment-section.md
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Với Spec + PRD + ADR (đầy đủ nhất)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-comment-section.md<span class="w"> </span>docs/prd/PRD-comment-section.md<span class="w"> </span>docs/adr/NNNN-comment-section.md
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Không có Spec (chỉ PRD + ADR)</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>/swarm-plan<span class="w"> </span>docs/prd/PRD-comment-section.md<span class="w"> </span>docs/adr/NNNN-comment-section.md
 </code></pre></div>
+<blockquote>
+<p><strong>Tip:</strong> Spec là input phong phú nhất — đã có FR-1/FR-2, API contract, edge cases, và acceptance criteria. <code>/swarm-plan</code> có thể derive tasks trực tiếp từ Spec mà không cần PRD hay ADR.</p>
+</blockquote>
 <p><code>/swarm-plan</code> khác <code>/architect</code> ở chỗ:</p>
 <table>
 <thead>
@@ -6246,7 +6257,7 @@ flowchart LR
 <tr>
 <td><strong>Hỏi người dùng</strong></td>
 <td>Không — tự explore codebase</td>
-<td>Không — đọc PRD/ADR</td>
+<td>Không — đọc artifacts đầu vào</td>
 </tr>
 <tr>
 <td><strong>Tạo ADR</strong></td>

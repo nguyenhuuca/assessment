@@ -6224,9 +6224,20 @@ flowchart LR
 <p><strong>Output:</strong> <code>docs/specs/spec-{slug}.md</code></p>
 <hr />
 <h2 id="step-4-implementation-plan">Step 4 — Implementation plan<a class="headerlink" href="#step-4-implementation-plan" title="Permanent link">&para;</a></h2>
-<p>With PRD + ADR approved, use <code>/swarm-plan</code> to decompose the feature into a phased plan and Beads.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/swarm-plan docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
+<p>With Spec (or PRD + ADR) ready, use <code>/swarm-plan</code> to decompose the feature into a phased plan and Beads.</p>
+<p><code>/swarm-plan</code> accepts any combination of artifacts — pass whichever you have:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># With Spec (recommended — most detailed input)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-comment-section.md
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># With Spec + PRD + ADR (maximum context)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-comment-section.md<span class="w"> </span>docs/prd/PRD-comment-section.md<span class="w"> </span>docs/adr/NNNN-comment-section.md
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Without Spec (PRD + ADR only)</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>/swarm-plan<span class="w"> </span>docs/prd/PRD-comment-section.md<span class="w"> </span>docs/adr/NNNN-comment-section.md
 </code></pre></div>
+<blockquote>
+<p><strong>Tip:</strong> The Spec is the richest input — it already contains FR-1/FR-2, API contract, edge cases, and acceptance criteria. <code>/swarm-plan</code> can derive tasks directly from it without needing PRD or ADR.</p>
+</blockquote>
 <p><code>/swarm-plan</code> differs from <code>/architect</code>:</p>
 <table>
 <thead>
@@ -6245,7 +6256,7 @@ flowchart LR
 <tr>
 <td><strong>Asks questions</strong></td>
 <td>No — explores codebase</td>
-<td>No — reads PRD/ADR</td>
+<td>No — reads input artifacts</td>
 </tr>
 <tr>
 <td><strong>Creates ADR</strong></td>
