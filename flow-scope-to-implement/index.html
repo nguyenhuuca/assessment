@@ -5482,11 +5482,12 @@
     B --&gt; C["📄 PRD"]
     C --&gt; D["/architect"]
     D --&gt; E["📐 ADR"]
-    E --&gt; F["📋 Plan"]
-    F --&gt; G["/builder"]
-    G --&gt; H["🧪 /qa-engineer"]
-    H --&gt; I["/code-review"]
-    I --&gt; J["✅ Merge"]</code></pre>
+    E --&gt; F["/swarm-plan"]
+    F --&gt; G["📋 Plan + Beads"]
+    G --&gt; H["/swarm-execute"]
+    H --&gt; I["🧪 /qa-engineer"]
+    I --&gt; J["/code-review"]
+    J --&gt; K["✅ Merge"]</code></pre>
 <table>
 <thead>
 <tr>
@@ -5511,13 +5512,13 @@
 </tr>
 <tr>
 <td>3. Plan</td>
-<td><code>/architect</code> or <code>/builder</code></td>
-<td><code>docs/plans/plan-{slug}.md</code></td>
+<td><code>/swarm-plan</code></td>
+<td><code>docs/plans/plan-{slug}.md</code> + Beads</td>
 <td><code>templates/artifacts/plan.template.md</code></td>
 </tr>
 <tr>
 <td>4. Implement</td>
-<td><code>/builder</code> or <code>/swarm-execute</code></td>
+<td><code>/swarm-execute</code> or <code>/builder</code></td>
 <td>Code changes</td>
 <td>—</td>
 </tr>
@@ -5575,22 +5576,57 @@
 <p><strong>Output:</strong> <code>docs/adr/NNNN-{slug}.md</code></p>
 <hr />
 <h2 id="step-3-implementation-plan">Step 3 — Implementation plan<a class="headerlink" href="#step-3-implementation-plan" title="Permanent link">&para;</a></h2>
-<p>With PRD + ADR approved, create a phased implementation plan.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/architect create an implementation plan for docs/prd/PRD-comment-section.md
+<p>With PRD + ADR approved, use <code>/swarm-plan</code> to decompose the feature into a phased plan and Beads.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/swarm-plan docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
 </code></pre></div>
-<p>Or if the task is straightforward:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/builder create a plan for the comment section feature
-</code></pre></div>
-<p>The plan (<code>templates/artifacts/plan.template.md</code>) contains:
-- Phased steps with exact file paths
+<p><code>/swarm-plan</code> differs from <code>/architect</code>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>/architect</code></th>
+<th><code>/swarm-plan</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Primary output</strong></td>
+<td>ADR (decision record)</td>
+<td>Plan + Beads (task breakdown)</td>
+</tr>
+<tr>
+<td><strong>Asks questions</strong></td>
+<td>No — explores codebase</td>
+<td>No — reads PRD/ADR</td>
+</tr>
+<tr>
+<td><strong>Creates ADR</strong></td>
+<td>Always</td>
+<td>Only for One-Way Door (High) decisions found during planning</td>
+</tr>
+<tr>
+<td><strong>Creates Beads</strong></td>
+<td>No</td>
+<td>Yes — ready for <code>/swarm-execute</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>/swarm-plan</code> will:
+1. Launch 3–6 <code>worker-explorer</code> agents in parallel to research existing patterns
+2. Classify decision reversibility (Two-Way Door vs One-Way Door)
+3. Write <code>docs/plans/plan-{slug}.md</code> using <code>templates/artifacts/plan.template.md</code>
+4. Output Beads commands for all implementation tasks with dependencies</p>
+<p>The plan contains:
+- Phased steps with exact file paths and acceptance criteria
 - Testing strategy (unit + integration + manual)
 - Rollback plan
+- Dependency graph showing task order
 - Before/During/After PR checklist</p>
-<p><strong>Output:</strong> <code>docs/plans/plan-{slug}.md</code></p>
+<p><strong>Output:</strong> <code>docs/plans/plan-{slug}.md</code> + Beads</p>
 <hr />
 <h2 id="step-4-implement">Step 4 — Implement<a class="headerlink" href="#step-4-implement" title="Permanent link">&para;</a></h2>
 <h3 id="option-a-single-builder-smallmedium-tasks">Option A — Single builder (small/medium tasks)<a class="headerlink" href="#option-a-single-builder-smallmedium-tasks" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/builder implement docs/plans/plan-comment-section.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/builder implement docs/plans/plan-comment-section.md
 </code></pre></div>
 <p>The builder:
 1. Reads the plan, PRD, and ADR
@@ -5599,7 +5635,7 @@
 4. Writes tests alongside code (TDD)
 5. Runs <code>mvn verify</code> or <code>npm run test</code> to confirm passing</p>
 <h3 id="option-b-swarm-largeparallel-tasks">Option B — Swarm (large/parallel tasks)<a class="headerlink" href="#option-b-swarm-largeparallel-tasks" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/swarm-execute implement docs/plans/plan-comment-section.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/swarm-execute implement docs/plans/plan-comment-section.md
 </code></pre></div>
 <p>The swarm:
 1. Decomposes the plan into parallel tracks (e.g., backend + frontend + tests)
@@ -5610,7 +5646,7 @@
 <p><strong>Output:</strong> Code commits on a feature branch</p>
 <hr />
 <h2 id="step-5-test">Step 5 — Test<a class="headerlink" href="#step-5-test" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/qa-engineer test the comment section feature
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/qa-engineer test the comment section feature
 </code></pre></div>
 <p>QA engineer:
 1. Reviews the implementation against PRD acceptance criteria
@@ -5618,16 +5654,16 @@
 3. Writes integration tests for the happy path and edge cases
 4. Checks test isolation (no shared state, no order-dependent tests)</p>
 <p>Run tests manually to confirm:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify<span class="w">          </span><span class="c1"># backend</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">cd</span><span class="w"> </span>webapp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span><span class="nb">test</span><span class="w">     </span><span class="c1"># frontend</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify<span class="w">          </span><span class="c1"># backend</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">cd</span><span class="w"> </span>webapp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span><span class="nb">test</span><span class="w">     </span><span class="c1"># frontend</span>
 </code></pre></div></p>
 <p><strong>Output:</strong> Test files, coverage report</p>
 <hr />
 <h2 id="step-6-review">Step 6 — Review<a class="headerlink" href="#step-6-review" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/code-review
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/code-review
 </code></pre></div>
 <p>Or for a deeper multi-perspective review:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/swarm-review
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/swarm-review
 </code></pre></div>
 <p>The reviewer checks:
 - Correctness — logic errors, edge cases missed
@@ -5637,37 +5673,40 @@
 <p>Fix findings, then commit and open a PR.</p>
 <hr />
 <h2 id="full-example-end-to-end">Full example — end to end<a class="headerlink" href="#full-example-end-to-end" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># 1. Scope</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>/scope<span class="w"> </span>add<span class="w"> </span>real-time<span class="w"> </span>view<span class="w"> </span>count<span class="w"> </span>to<span class="w"> </span>video<span class="w"> </span>cards
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Claude asks questions → you answer → PRD created</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="c1"># → docs/prd/PRD-realtime-view-count.md</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># 2. Architecture</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>/architect<span class="w"> </span>review<span class="w"> </span>PRD<span class="w"> </span>and<span class="w"> </span>create<span class="w"> </span>ADR<span class="w"> </span><span class="k">for</span><span class="w"> </span>view<span class="w"> </span>count<span class="w"> </span>approach
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="c1"># → docs/adr/0012-realtime-view-count.md</span>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="c1"># 3. Plan</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>/builder<span class="w"> </span>create<span class="w"> </span>implementation<span class="w"> </span>plan
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="c1"># → docs/plans/plan-realtime-view-count.md</span>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="c1"># 4. Implement</span>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feat/realtime-view-count
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>/builder<span class="w"> </span>implement<span class="w"> </span>the<span class="w"> </span>plan
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="c1"># 5. Test</span>
-<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>/qa-engineer<span class="w"> </span><span class="nb">test</span><span class="w"> </span>view<span class="w"> </span>count<span class="w"> </span>feature
-<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify
-<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>
-<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="c1"># 6. Review</span>
-<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a>/code-review
-<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>
-<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="c1"># 7. Commit and push</span>
-<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a>git<span class="w"> </span>add<span class="w"> </span>.
-<a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: add real-time view count to video cards&quot;</span>
-<a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a>git<span class="w"> </span>push
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># 1. Scope</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/scope<span class="w"> </span>add<span class="w"> </span>real-time<span class="w"> </span>view<span class="w"> </span>count<span class="w"> </span>to<span class="w"> </span>video<span class="w"> </span>cards
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Claude asks questions one at a time → you answer → PRD created</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="c1"># → docs/prd/PRD-realtime-view-count.md</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># 2. Architecture</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>/architect<span class="w"> </span>docs/prd/PRD-realtime-view-count.md
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="c1"># Uses Sequential Thinking for trade-off analysis</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="c1"># → docs/adr/0013-realtime-view-count.md</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="c1"># 3. Plan</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>/swarm-plan<span class="w"> </span>docs/prd/PRD-realtime-view-count.md<span class="w"> </span>docs/adr/0013-realtime-view-count.md
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="c1"># Launches parallel explorer agents → researches codebase</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="c1"># → docs/plans/plan-realtime-view-count.md + Beads</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="c1"># 4. Implement</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feat/realtime-view-count
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-realtime-view-count.md
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="c1"># 5. Test</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>/qa-engineer<span class="w"> </span><span class="nb">test</span><span class="w"> </span>view<span class="w"> </span>count<span class="w"> </span>feature
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="nb">cd</span><span class="w"> </span>webapp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span><span class="nb">test</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="c1"># 6. Review</span>
+<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a>/code-review
+<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a>
+<a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="c1"># 7. Commit and push</span>
+<a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: add real-time view count to video cards&quot;</span>
+<a id="__codelineno-9-34" name="__codelineno-9-34" href="#__codelineno-9-34"></a>git<span class="w"> </span>push
 </code></pre></div>
 <hr />
 <h2 id="when-to-skip-steps">When to skip steps<a class="headerlink" href="#when-to-skip-steps" title="Permanent link">&para;</a></h2>
@@ -5703,15 +5742,15 @@
 </table>
 <hr />
 <h2 id="artifacts-location-reference">Artifacts location reference<a class="headerlink" href="#artifacts-location-reference" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>docs/
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>├── prd/          → PRD-{feature}.md
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>├── adr/          → NNNN-{decision}.md
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>└── plans/        → plan-{feature}.md
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>templates/artifacts/
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>├── prd.template.md
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>├── adr.template.md
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>└── plan.template.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>docs/
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>├── prd/          → PRD-{feature}.md
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>├── adr/          → NNNN-{decision}.md
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>└── plans/        → plan-{feature}.md
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>templates/artifacts/
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>├── prd.template.md
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>├── adr.template.md
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>└── plan.template.md
 </code></pre></div>
 <hr />
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
