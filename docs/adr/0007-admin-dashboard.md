@@ -2,18 +2,10 @@
 
 ## Metadata
 
-| Field | Value |
-|-------|-------|
-| **Status** | Accepted |
-| **Date** | 2026-04-30 |
-| **Deciders** | nguyenhuuca |
-| **Related PRD** | N/A |
-| **Domain Tags** | security, api, frontend |
-| **Supersedes** | N/A |
-| **Superseded By** | N/A |
+**Status:** Accepted · **Date:** 2026-04-30 · **Deciders:** nguyenhuuca · **Tags:** security, api, frontend  
+**Related PRD:** N/A · **Supersedes:** N/A · **Superseded By:** N/A
 
-**Tech Strategy Alignment:**
-- [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
+**Tech Strategy:** ✅ Follows Golden Path
 
 ---
 

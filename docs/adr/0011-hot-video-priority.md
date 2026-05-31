@@ -2,18 +2,10 @@
 
 ## Metadata
 
-| Field | Value |
-|-------|-------|
-| **Status** | Accepted |
-| **Date** | 2026-02-28 |
-| **Deciders** | nguyenhuuca |
-| **Related PRD** | [PRD-hot-video-priority](../prd/PRD-hot-video-priority.md) |
-| **Domain Tags** | data, api, infrastructure |
-| **Supersedes** | N/A |
-| **Superseded By** | N/A |
+**Status:** Accepted · **Date:** 2026-02-28 · **Deciders:** nguyenhuuca · **Tags:** data, api, infrastructure  
+**Related PRD:** [PRD-hot-video-priority](../prd/PRD-hot-video-priority.md) · **Supersedes:** N/A · **Superseded By:** N/A
 
-**Tech Strategy Alignment:**
-- [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
+**Tech Strategy:** ✅ Follows Golden Path
 
 ---
 

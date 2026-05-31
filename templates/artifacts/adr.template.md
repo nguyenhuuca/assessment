@@ -17,19 +17,10 @@ Best Practices:
 
 ## Metadata
 
-| Field | Value |
-|-------|-------|
-| **Status** | Proposed \| Accepted \| Deprecated \| Superseded |
-| **Date** | YYYY-MM-DD |
-| **Deciders** | [names] |
-| **Related PRD** | [Link or N/A] |
-| **Domain Tags** | [tags] |
-| **Supersedes** | [ADR-NNNN or N/A] |
-| **Superseded By** | [ADR-NNNN or N/A] |
+**Status:** Proposed \| Accepted \| Deprecated \| Superseded · **Date:** YYYY-MM-DD · **Deciders:** [names] · **Tags:** [tags]  
+**Related PRD:** [Link or N/A] · **Supersedes:** [ADR-NNNN or N/A] · **Superseded By:** [ADR-NNNN or N/A]
 
-**Tech Strategy Alignment:**
-- [ ] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-- [ ] OR deviation is explicitly justified in the Rationale below
+**Tech Strategy:** ✅ Follows Golden Path OR ⚠️ Deviation — see Rationale
 
 ---
 

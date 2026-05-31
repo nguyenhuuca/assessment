@@ -2,18 +2,10 @@
 
 ## Metadata
 
-| Field | Value |
-|-------|-------|
-| **Status** | Accepted |
-| **Date** | 2026-05-30 |
-| **Deciders** | nguyenhuuca |
-| **Related PRD** | N/A |
-| **Domain Tags** | security, devops |
-| **Supersedes** | N/A |
-| **Superseded By** | N/A |
+**Status:** Accepted · **Date:** 2026-05-30 · **Deciders:** nguyenhuuca · **Tags:** security, devops  
+**Related PRD:** N/A · **Supersedes:** N/A · **Superseded By:** N/A
 
-**Tech Strategy Alignment:**
-- [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
+**Tech Strategy:** ✅ Follows Golden Path
 
 ---
 

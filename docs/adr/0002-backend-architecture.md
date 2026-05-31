@@ -2,18 +2,10 @@
 
 ## Metadata
 
-| Field | Value |
-|-------|-------|
-| **Status** | Accepted |
-| **Date** | 2025-07-03 |
-| **Deciders** | nguyenhuuca |
-| **Related PRD** | N/A |
-| **Domain Tags** | infrastructure, api |
-| **Supersedes** | N/A |
-| **Superseded By** | N/A |
+**Status:** Accepted · **Date:** 2025-07-03 · **Deciders:** nguyenhuuca · **Tags:** infrastructure, api  
+**Related PRD:** N/A · **Supersedes:** N/A · **Superseded By:** N/A
 
-**Tech Strategy Alignment:**
-- [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
+**Tech Strategy:** ✅ Follows Golden Path
 
 ---
 

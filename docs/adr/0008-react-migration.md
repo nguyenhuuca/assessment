@@ -2,18 +2,10 @@
 
 ## Metadata
 
-| Field | Value |
-|-------|-------|
-| **Status** | Proposed |
-| **Date** | 2026-03-01 |
-| **Deciders** | nguyenhuuca |
-| **Related PRD** | docs/prd/PRD-react-migration.md |
-| **Domain Tags** | frontend |
-| **Supersedes** | ADR-0004 |
-| **Superseded By** | N/A |
+**Status:** Proposed · **Date:** 2026-03-01 · **Deciders:** nguyenhuuca · **Tags:** frontend  
+**Related PRD:** [PRD-react-migration](../prd/PRD-react-migration.md) · **Supersedes:** ADR-0004 · **Superseded By:** N/A
 
-**Tech Strategy Alignment:**
-- [x] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
+**Tech Strategy:** ✅ Follows Golden Path
 
 ---
 

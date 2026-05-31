@@ -63,7 +63,6 @@ nav:
       - CI/CD Pipeline: diagrams/ci-pipeline.md
 
   - ADR:
-      - Template: adr/0000-template.md
       - 0001 - Use RDBMS: adr/0001-use-relational-database.md
       - 0002 - Backend Architecture: adr/0002-backend-architecture.md
       - 0003 - Cache Strategy: adr/0003-use-cache.md
