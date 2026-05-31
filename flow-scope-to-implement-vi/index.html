@@ -5635,17 +5635,26 @@
 <p>Tài liệu này mô tả quy trình đầu-cuối để đưa một ý tưởng tính năng thô thành code đã được merge và kiểm thử, sử dụng các lệnh và template của Claude.</p>
 <hr />
 <h2 id="tong-quan">Tổng Quan<a class="headerlink" href="#tong-quan" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>graph LR
-    A["💡 Ý tưởng"] --&gt; B["/scope"]
-    B --&gt; C["📄 PRD"]
-    C --&gt; D["/architect"]
-    D --&gt; E["📐 ADR"]
-    E --&gt; F["/swarm-plan"]
-    F --&gt; G["📋 Plan + Beads"]
-    G --&gt; H["/swarm-execute"]
-    H --&gt; I["🧪 /qa-engineer"]
-    I --&gt; J["/code-review"]
-    J --&gt; K["✅ Merge"]</code></pre>
+<pre class="mermaid"><code>%%{init: {'theme': 'default', 'themeVariables': {'fontSize': '18px'}}}%%
+flowchart LR
+    subgraph plan ["🗺️ Lập Kế Hoạch"]
+        direction LR
+        A["💡 Ý tưởng"] --&gt; B["/scope"]
+        B --&gt; C["📄 PRD"]
+        C --&gt; D["/architect"]
+        D --&gt; E["📐 ADR"]
+        E --&gt; F["/swarm-plan"]
+        F --&gt; G["📋 Plan + Beads"]
+    end
+
+    subgraph exec ["⚙️ Triển Khai"]
+        direction LR
+        H["/swarm-execute"] --&gt; I["🧪 /qa-engineer"]
+        I --&gt; J["/code-review"]
+        J --&gt; K["✅ Merge"]
+    end
+
+    G --&gt; H</code></pre>
 <table>
 <thead>
 <tr>

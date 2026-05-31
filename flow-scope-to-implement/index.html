@@ -5635,17 +5635,26 @@
 <p>This document describes the end-to-end flow for taking a rough feature idea all the way to merged, tested code using Claude commands and templates.</p>
 <hr />
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>graph LR
-    A["💡 Idea"] --&gt; B["/scope"]
-    B --&gt; C["📄 PRD"]
-    C --&gt; D["/architect"]
-    D --&gt; E["📐 ADR"]
-    E --&gt; F["/swarm-plan"]
-    F --&gt; G["📋 Plan + Beads"]
-    G --&gt; H["/swarm-execute"]
-    H --&gt; I["🧪 /qa-engineer"]
-    I --&gt; J["/code-review"]
-    J --&gt; K["✅ Merge"]</code></pre>
+<pre class="mermaid"><code>%%{init: {'theme': 'default', 'themeVariables': {'fontSize': '18px'}}}%%
+flowchart LR
+    subgraph plan ["🗺️ Planning"]
+        direction LR
+        A["💡 Idea"] --&gt; B["/scope"]
+        B --&gt; C["📄 PRD"]
+        C --&gt; D["/architect"]
+        D --&gt; E["📐 ADR"]
+        E --&gt; F["/swarm-plan"]
+        F --&gt; G["📋 Plan + Beads"]
+    end
+
+    subgraph exec ["⚙️ Execution"]
+        direction LR
+        H["/swarm-execute"] --&gt; I["🧪 /qa-engineer"]
+        I --&gt; J["/code-review"]
+        J --&gt; K["✅ Merge"]
+    end
+
+    G --&gt; H</code></pre>
 <table>
 <thead>
 <tr>
