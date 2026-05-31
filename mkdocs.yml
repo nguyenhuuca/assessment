@@ -198,3 +198,20 @@ nav:
           - Threat Modeling: claude/skills/security/threat-modeling.md
           - Identity & Access: claude/skills/security/identity-access.md
           - Compliance: claude/skills/security/compliance.md
+
+      - Templates — Artifacts:
+          - PRD: claude/templates/artifacts/prd.template.md
+          - ADR: claude/templates/artifacts/adr.template.md
+          - Plan: claude/templates/artifacts/plan.template.md
+          - System Design: claude/templates/artifacts/system_design.template.md
+          - Design Spec: claude/templates/artifacts/design_spec.template.md
+          - PR-FAQ: claude/templates/artifacts/pr_faq.template.md
+          - Roadmap: claude/templates/artifacts/roadmap.template.md
+          - Security Audit: claude/templates/artifacts/security_audit.template.md
+          - Post-Mortem: claude/templates/artifacts/postmortem.template.md
+
+      - Templates — Claude Mechanisms:
+          - Command: claude/templates/claude_mechanisms/command.template.md
+          - Skill: claude/templates/claude_mechanisms/skill.template.md
+          - Agent: claude/templates/claude_mechanisms/agent.template.md
+          - Rule: claude/templates/claude_mechanisms/rule.template.md
