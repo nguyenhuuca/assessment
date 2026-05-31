@@ -5483,7 +5483,7 @@
     C --&gt; D["/architect"]
     D --&gt; E["📐 ADR"]
     E --&gt; F["/swarm-plan"]
-    F --&gt; G["📋 Plan"]
+    F --&gt; G["📋 Plan + Beads"]
     G --&gt; H["/swarm-execute"]
     H --&gt; I["🧪 /qa-engineer"]
     I --&gt; J["/code-review"]
@@ -5513,7 +5513,7 @@
 <tr>
 <td>3. Plan</td>
 <td><code>/swarm-plan</code></td>
-<td><code>docs/plans/plan-{slug}.md</code></td>
+<td><code>docs/plans/plan-{slug}.md</code> + Beads</td>
 <td><code>templates/artifacts/plan.template.md</code></td>
 </tr>
 <tr>
@@ -5576,7 +5576,7 @@
 <p><strong>Output:</strong> <code>docs/adr/NNNN-{slug}.md</code></p>
 <hr />
 <h2 id="step-3-implementation-plan">Step 3 — Implementation plan<a class="headerlink" href="#step-3-implementation-plan" title="Permanent link">&para;</a></h2>
-<p>With PRD + ADR approved, use <code>/swarm-plan</code> to decompose the feature into a phased implementation plan.</p>
+<p>With PRD + ADR approved, use <code>/swarm-plan</code> to decompose the feature into a phased plan and Beads.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/swarm-plan docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
 </code></pre></div>
 <p><code>/swarm-plan</code> differs from <code>/architect</code>:</p>
@@ -5592,7 +5592,7 @@
 <tr>
 <td><strong>Primary output</strong></td>
 <td>ADR (decision record)</td>
-<td>Plan (task breakdown)</td>
+<td>Plan + Beads (task breakdown)</td>
 </tr>
 <tr>
 <td><strong>Asks questions</strong></td>
@@ -5604,19 +5604,25 @@
 <td>Always</td>
 <td>Only for One-Way Door (High) decisions found during planning</td>
 </tr>
+<tr>
+<td><strong>Creates Beads</strong></td>
+<td>No</td>
+<td>Yes — ready for <code>/swarm-execute</code></td>
+</tr>
 </tbody>
 </table>
 <p><code>/swarm-plan</code> will:
 1. Launch 3–6 <code>worker-explorer</code> agents in parallel to research existing patterns
 2. Classify decision reversibility (Two-Way Door vs One-Way Door)
-3. Write <code>docs/plans/plan-{slug}.md</code> using <code>templates/artifacts/plan.template.md</code></p>
+3. Write <code>docs/plans/plan-{slug}.md</code> using <code>templates/artifacts/plan.template.md</code>
+4. Output Beads commands for all implementation tasks with dependencies</p>
 <p>The plan contains:
 - Phased steps with exact file paths and acceptance criteria
 - Testing strategy (unit + integration + manual)
 - Rollback plan
 - Dependency graph showing task order
 - Before/During/After PR checklist</p>
-<p><strong>Output:</strong> <code>docs/plans/plan-{slug}.md</code></p>
+<p><strong>Output:</strong> <code>docs/plans/plan-{slug}.md</code> + Beads</p>
 <hr />
 <h2 id="step-4-implement">Step 4 — Implement<a class="headerlink" href="#step-4-implement" title="Permanent link">&para;</a></h2>
 <h3 id="option-a-single-builder-smallmedium-tasks">Option A — Single builder (small/medium tasks)<a class="headerlink" href="#option-a-single-builder-smallmedium-tasks" title="Permanent link">&para;</a></h3>
@@ -5683,7 +5689,7 @@
 <a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>/swarm-plan<span class="w"> </span>docs/prd/PRD-realtime-view-count.md<span class="w"> </span>docs/adr/0013-realtime-view-count.md
 <a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>
 <a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="c1"># Launches parallel explorer agents → researches codebase</span>
-<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="c1"># → docs/plans/plan-realtime-view-count.md</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="c1"># → docs/plans/plan-realtime-view-count.md + Beads</span>
 <a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>
 <a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="c1"># 4. Implement</span>
 <a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feat/realtime-view-count
