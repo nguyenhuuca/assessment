@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../../adr/0010-trivy-container-scanning/">
+        <link rel="prev" href="../../adr/0011-hot-video-priority/">
       
       
         <link rel="next" href="../PRD-react-migration/">
@@ -1017,6 +1017,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0011-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0011 - Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1983,6 +2011,34 @@
     
   
     Trivy Scan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
   
 
     
@@ -5536,10 +5592,12 @@
 
 
 <h1 id="prd-hot-video-priority-feature">PRD: Hot Video Priority Feature<a class="headerlink" href="#prd-hot-video-priority-feature" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Draft
-<strong>Author:</strong> Team
-<strong>Created:</strong> 2026-02-28
-<strong>Version:</strong> 1.0</p>
+<p><strong>Status:</strong> Accepted
+<strong>Author:</strong> nguyenhuuca
+<strong>Date:</strong> 2026-02-28
+<strong>Version:</strong> 1.0
+<strong>ADR:</strong> <a href="../../adr/0011-hot-video-priority/">ADR-0011</a>
+<strong>Plan:</strong> <a href="../../plans/plan-hot-video-priority/">plan-hot-video-priority</a></p>
 <hr />
 <h2 id="1-overview">1. Overview<a class="headerlink" href="#1-overview" title="Permanent link">&para;</a></h2>
 <h3 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h3>
@@ -5740,19 +5798,18 @@ Formula simplified to 3 signals. Weights re-allocated.</p>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="p">{</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">      </span><span class="nt">&quot;videoId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;abc123&quot;</span><span class="p">,</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Funny Cat Video&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">      </span><span class="nt">&quot;upCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12500</span><span class="p">,</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">      </span><span class="nt">&quot;embedLink&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">      </span><span class="nt">&quot;hotScore&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.87</span><span class="p">,</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">      </span><span class="nt">&quot;isHot&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">      </span><span class="nt">&quot;rank&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="p">]</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">}</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">      </span><span class="nt">&quot;embedLink&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">      </span><span class="nt">&quot;hotScore&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.87</span><span class="p">,</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">      </span><span class="nt">&quot;isHot&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">      </span><span class="nt">&quot;rank&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">  </span><span class="p">]</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Rules:</strong>
 - Returns top <code>limit</code> videos by hotScore (default 10, max 50)
 - Scores served from <code>StatsCacheImpl</code> (TTL: 30 minutes)
-- Falls back to <code>upCount</code> sort if no access stats available</p>
+- Falls back to <code>createdAt DESC</code> sort if no access stats available</p>
 <hr />
 <h3 id="fr-4-extend-existing-video-list">FR-4: Extend Existing Video List<a class="headerlink" href="#fr-4-extend-existing-video-list" title="Permanent link">&para;</a></h3>
 <p>Modify <code>GET /api/videos</code> to accept optional sort param:</p>
@@ -5900,11 +5957,10 @@ Formula simplified to 3 signals. Weights re-allocated.</p>
 <a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    data[].videoId     String
 <a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    data[].title       String
 <a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>    data[].embedLink   String
-<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>    data[].upCount     Long
-<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>    data[].hotScore    Double   ← new
-<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>    data[].isHot       Boolean  ← new
-<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>    data[].rank        Integer  ← new (1 = hottest)
-<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>    data[].userShared  String
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>    data[].hotScore    Double   ← new
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>    data[].isHot       Boolean  ← new
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>    data[].rank        Integer  ← new (1 = hottest)
+<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>    data[].userShared  String
 </code></pre></div>
 <h3 id="get-apivideossorthot">GET /api/videos?sort=hot<a class="headerlink" href="#get-apivideossorthot" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Request:
@@ -5918,7 +5974,7 @@ Formula simplified to 3 signals. Weights re-allocated.</p>
 <ul>
 <li>[ ] Activate <code>recordAccess()</code> — uncomment + test</li>
 <li>[ ] Add DB migration: hot_score column + indexes</li>
-<li>[ ] Update <code>YouTubeVideo</code> entity + <code>VideoDto</code></li>
+<li>[ ] Update <code>VideoSource</code> entity + <code>VideoDto</code></li>
 </ul>
 <h3 id="phase-2-scoring-engine-1-2-days">Phase 2 — Scoring Engine (1-2 days)<a class="headerlink" href="#phase-2-scoring-engine-1-2-days" title="Permanent link">&para;</a></h3>
 <ul>
@@ -6025,10 +6081,13 @@ Formula simplified to 3 signals. Weights re-allocated.</p>
 <hr />
 <h2 id="12-related-documents">12. Related Documents<a class="headerlink" href="#12-related-documents" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>doc/adr/0003-use-cache.md</code> — Cache strategy (Guava → Redis)</li>
-<li><code>doc/adr/0005-use_lru_cache_video_streaming.md</code> — LRU cache trade-offs</li>
+<li><a href="../../adr/0011-hot-video-priority/">ADR-0011</a> — Architecture decision for hot video scoring</li>
+<li><a href="../../plans/plan-hot-video-priority/">plan-hot-video-priority</a> — Step-by-step implementation plan</li>
+<li><a href="../../adr/0003-use-cache/">ADR-0003</a> — Cache strategy (Guava → Redis)</li>
+<li><a href="../../adr/0005-use_lru_cache_video_streaming/">ADR-0005</a> — LRU cache trade-offs</li>
 <li><code>VideoAccessStats</code> entity: <code>api/src/main/java/com/canhlabs/funnyapp/entity/VideoAccessStats.java</code></li>
 <li><code>VideoAccessServiceImpl</code>: <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/VideoAccessServiceImpl.java</code></li>
+<li><code>VideoSource</code> entity: <code>api/src/main/java/com/canhlabs/funnyapp/entity/VideoSource.java</code></li>
 </ul>
 
 

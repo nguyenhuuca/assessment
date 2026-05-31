@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../0007-admin-dashboard/">
+        <link rel="prev" href="../0010-trivy-container-scanning/">
       
       
-        <link rel="next" href="../0009-unified-video-list-api/">
+        <link rel="next" href="../../prd/PRD-hot-video-priority/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>0008 - React Migration - Funny Movies - Architecture Docs</title>
+        <title>0011 - Hot Video Priority - Funny Movies - Architecture Docs</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-0006-migrate-frontend-to-react-with-vite" class="md-skip">
+        <a href="#adr-0011-hot-video-priority-scoring" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              0008 - React Migration
+              0011 - Hot Video Priority
             
           </span>
         </div>
@@ -940,6 +940,90 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../0008-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0008 - React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0009-unified-video-list-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0009 - Unified Video List API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0010-trivy-container-scanning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0010 - Trivy Dependency Scanning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -959,7 +1043,7 @@
   <span class="md-ellipsis">
     
   
-    0008 - React Migration
+    0011 - Hot Video Priority
   
 
     
@@ -977,7 +1061,7 @@
   <span class="md-ellipsis">
     
   
-    0008 - React Migration
+    0011 - Hot Video Priority
   
 
     
@@ -1044,56 +1128,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#why-vite-over-create-react-app-cra" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Vite over Create React App (CRA)?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-react-context-over-reduxzustand" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why React Context over Redux/Zustand?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-react-bootstrap-over-importing-bootstrap-css-directly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why react-bootstrap over importing Bootstrap CSS directly?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-javascript-instead-of-typescript" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why JavaScript instead of TypeScript?
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1131,10 +1165,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#neutral" class="md-nav__link">
+  <a href="#trade-offs-accepted" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Neutral
+        Trade-offs accepted
       
     </span>
   </a>
@@ -1143,17 +1177,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#supersedes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supersedes
-      
-    </span>
-  </a>
   
 </li>
       
@@ -1172,90 +1195,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../0009-unified-video-list-api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0009 - Unified Video List API
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../0010-trivy-container-scanning/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0010 - Trivy Dependency Scanning
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../0011-hot-video-priority/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0011 - Hot Video Priority
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -4842,56 +4781,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#why-vite-over-create-react-app-cra" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Vite over Create React App (CRA)?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-react-context-over-reduxzustand" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why React Context over Redux/Zustand?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-react-bootstrap-over-importing-bootstrap-css-directly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why react-bootstrap over importing Bootstrap CSS directly?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-javascript-instead-of-typescript" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why JavaScript instead of TypeScript?
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -4929,10 +4818,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#neutral" class="md-nav__link">
+  <a href="#trade-offs-accepted" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Neutral
+        Trade-offs accepted
       
     </span>
   </a>
@@ -4941,17 +4830,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#supersedes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supersedes
-      
-    </span>
-  </a>
   
 </li>
       
@@ -4983,7 +4861,7 @@
 
 
   
-    <a href="https://github.com/nguyenhuuca/assessment/edit/main/docs/adr/0008-react-migration.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/nguyenhuuca/assessment/edit/main/docs/adr/0011-hot-video-priority.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4991,132 +4869,133 @@
   
 
 
-<h1 id="adr-0006-migrate-frontend-to-react-with-vite">ADR-0006: Migrate Frontend to React with Vite<a class="headerlink" href="#adr-0006-migrate-frontend-to-react-with-vite" title="Permanent link">&para;</a></h1>
+<h1 id="adr-0011-hot-video-priority-scoring">ADR-0011: Hot Video Priority Scoring<a class="headerlink" href="#adr-0011-hot-video-priority-scoring" title="Permanent link">&para;</a></h1>
 <h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Proposed</p>
+<p>Accepted</p>
 <h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2026-03-01</p>
+<p>2026-02-28</p>
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>ADR-0004 (Use Vanilla JS + Bootstrap for Current Frontend) explicitly planned migration to React for:
-- Better component reuse and state management
-- Richer interaction (comment threads, optimistic UI)
-- Easier integration with design systems and CI tooling</p>
-<p>The prototype phase is complete (version 14, production deployed). The codebase has grown to ~4,400 lines across 6 files with increasing complexity around:
-- Auth flows (passwordless + MFA + magic link)
-- YouTube Shorts-style video navigation (touch, keyboard, swipe)
-- Comment panel with real-time state updates
-- Vote state management per video
-- Multi-modal UI (5 Bootstrap modals)</p>
-<p>jQuery-based DOM manipulation has become hard to reason about as interactions grow. It's the right time to execute the planned migration.</p>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>Migrate the frontend (<code>webapp/</code>) from Vanilla JS + jQuery + Bootstrap CDN to:</p>
+<p>All videos are displayed in a flat, unordered list with no signal of trending or popularity. Users must manually browse without any curation, leading to poor content discovery and lower engagement.</p>
+<p><strong>Existing infrastructure available for reuse:</strong></p>
 <table>
 <thead>
 <tr>
 <th>Component</th>
-<th>Decision</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Build tool</td>
-<td><strong>Vite</strong> (replaces no-build-step)</td>
+<td><code>VideoSource</code> entity</td>
+<td>Active video table (<code>video_sources</code>) — supports YouTube, Google Drive, S3 via <code>sourceType</code></td>
 </tr>
 <tr>
-<td>Framework</td>
-<td><strong>React 19</strong></td>
+<td><code>VideoAccessStats</code> entity</td>
+<td>Tracks <code>videoId</code> (= <code>VideoSource.sourceId</code>), <code>hitCount</code>, <code>lastAccessedAt</code></td>
 </tr>
 <tr>
-<td>Language</td>
-<td><strong>JavaScript ES6+</strong> (no TypeScript in this phase)</td>
+<td><code>VideoAccessServiceImpl.recordAccess()</code></td>
+<td>Exists but commented out — needs activation</td>
 </tr>
 <tr>
-<td>HTTP</td>
-<td><strong>Fetch API</strong> (replace jQuery AJAX)</td>
+<td><code>ShareLink</code> table</td>
+<td>Tracks share events per video</td>
 </tr>
 <tr>
-<td>Server state</td>
-<td><strong>TanStack Query v5</strong> (React Query)</td>
+<td><code>VideoCacheImpl</code></td>
+<td>Already promotes videos with ≥5 cache hits</td>
 </tr>
 <tr>
-<td>Client state</td>
-<td><strong>React Context</strong> (auth + theme)</td>
-</tr>
-<tr>
-<td>Routing</td>
-<td><strong>React Router v6</strong></td>
-</tr>
-<tr>
-<td>UI library</td>
-<td><strong>react-bootstrap</strong> (Bootstrap 5 wrappers)</td>
-</tr>
-<tr>
-<td>Gestures</td>
-<td><strong>react-swipeable</strong></td>
-</tr>
-<tr>
-<td>Testing</td>
-<td><strong>Vitest + React Testing Library</strong></td>
+<td><code>AppScheduler</code></td>
+<td>Has <code>cleanUpOldVideos()</code> scaffold — can host new scheduled jobs</td>
 </tr>
 </tbody>
 </table>
-<h3 id="why-vite-over-create-react-app-cra">Why Vite over Create React App (CRA)?<a class="headerlink" href="#why-vite-over-create-react-app-cra" title="Permanent link">&para;</a></h3>
-<ul>
-<li>CRA is deprecated as of 2023</li>
-<li>Vite has native ESM, faster HMR, smaller output</li>
-<li>No ejecting required for config customization</li>
-</ul>
-<h3 id="why-react-context-over-reduxzustand">Why React Context over Redux/Zustand?<a class="headerlink" href="#why-react-context-over-reduxzustand" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Only 2 client-state concerns: auth (JWT/user) and theme</li>
-<li>React Query handles all server state (loading, caching, errors)</li>
-<li>Adding Redux for 2 global values would be over-engineering</li>
-</ul>
-<h3 id="why-react-bootstrap-over-importing-bootstrap-css-directly">Why react-bootstrap over importing Bootstrap CSS directly?<a class="headerlink" href="#why-react-bootstrap-over-importing-bootstrap-css-directly" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Avoids Bootstrap JS (conflicts with React's synthetic events)</li>
-<li>Native React component API (no <code>data-bs-toggle</code> attributes)</li>
-<li>Modal lifecycle managed by React, not jQuery</li>
-</ul>
-<h3 id="why-javascript-instead-of-typescript">Why JavaScript instead of TypeScript?<a class="headerlink" href="#why-javascript-instead-of-typescript" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Reduces migration scope (pure behavior migration, not type migration)</li>
-<li>Team can adopt TypeScript in a follow-up ADR once React patterns are established</li>
-<li>Vite supports TypeScript migration incrementally later</li>
-</ul>
+<p><strong>Key constraint:</strong> <code>VideoSource</code> has <strong>no</strong> <code>upCount</code>/<code>downCount</code> fields. The hot score formula must rely only on access hits, shares, and recency.</p>
+<p><strong>Alternatives considered:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Simple hit-count sort</td>
+<td>Trivial to implement</td>
+<td>Biased to old videos, ignores recency</td>
+</tr>
+<tr>
+<td>YouTube-style engagement score</td>
+<td>Rich signals (likes, comments)</td>
+<td>Signals don't exist in <code>VideoSource</code></td>
+</tr>
+<tr>
+<td><strong>Weighted multi-signal score with decay</strong> ✅</td>
+<td>Balances hits, shares, recency; configurable weights</td>
+<td>Slightly more complex; requires scheduler</td>
+</tr>
+<tr>
+<td>External recommendation engine</td>
+<td>High quality</td>
+<td>Overkill for current scale</td>
+</tr>
+<tr>
+<td>Collaborative filtering (ML)</td>
+<td>Personalized</td>
+<td>Out of scope for v1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
+<p>Implement a <strong>weighted multi-signal hot score</strong> computed on a 30-minute schedule and stored on the <code>video_sources</code> table.</p>
+<p><strong>Formula:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>hotScore = (0.60 × normalizedHits) + (0.25 × normalizedShares) + (0.15 × recencyBoost)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>recencyBoost = e^(-0.1 × hoursAgo)
+</code></pre></div></p>
+<p>All inputs are min-max normalized to <code>[0, 1]</code> across active videos. Weights are externalised in <code>application.yaml</code> under <code>app.hot-video.*</code> for tuning without redeploy.</p>
+<p><strong>Storage:</strong> Three new columns added to <code>video_sources</code> via Liquibase migration:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">hot_score</span><span class="w">  </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">is_hot</span><span class="w">     </span><span class="nb">BOOLEAN</span><span class="w">      </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">hot_rank</span><span class="w">   </span><span class="nb">INT</span><span class="w">          </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">NULL</span>
+</code></pre></div></p>
+<p><strong>API surface:</strong>
+- New: <code>GET /api/videos/trending?limit=N</code> — returns top N hot videos from cache
+- Extended: <code>GET /api/videos?sort=hot</code> — existing endpoint with opt-in sort param (backward compatible)</p>
+<p><strong>Scheduler:</strong> <code>AppScheduler.recomputeHotScores()</code> runs every 30 minutes, updates scores in DB, refreshes <code>StatsCacheImpl</code>, and pre-warms <code>VideoCacheImpl</code> for top 10 videos.</p>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <h3 id="positive">Positive<a class="headerlink" href="#positive" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Component-based architecture enables isolated testing</li>
-<li>React Query eliminates manual loading/error state boilerplate</li>
-<li>Vite HMR speeds up local development</li>
-<li>Removes jQuery dependency (saves ~87KB gzipped)</li>
-<li>CI/CD now includes a build step with artifact verification</li>
+<li>Content discovery improves — trending videos surface automatically</li>
+<li>Pre-warming cache for hot videos reduces first-frame latency from ~2s to &lt;500ms</li>
+<li>Configurable weights allow tuning without code changes</li>
+<li>Backward compatible — no breaking change to existing <code>/api/videos</code></li>
+<li>Formula is transparent and auditable (no black-box ML)</li>
 </ul>
 <h3 id="negative">Negative<a class="headerlink" href="#negative" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Breaking change</strong> to deployment pipeline (must add <code>npm run build</code> before SCP)</li>
-<li><code>webapp/</code> directory structure completely changes (no coexistence with old code)</li>
-<li>Nginx needs <code>try_files $uri /index.html</code> for SPA routing</li>
-<li>Initial bundle size slightly larger than zero-JS-framework approach (~40KB React core gzipped)</li>
-<li>Node.js required in CI environment for build step</li>
+<li>Scores are stale up to 30 minutes (acceptable for v1)</li>
+<li>Additional DB columns and index on <code>video_sources</code></li>
+<li><code>video_access_stats</code> table will grow over time — requires periodic cleanup job</li>
+<li><code>recordAccess()</code> adds a small async DB write on every stream (fire-and-forget, non-blocking)</li>
 </ul>
-<h3 id="neutral">Neutral<a class="headerlink" href="#neutral" title="Permanent link">&para;</a></h3>
+<h3 id="trade-offs-accepted">Trade-offs accepted<a class="headerlink" href="#trade-offs-accepted" title="Permanent link">&para;</a></h3>
 <ul>
-<li>PWA manifest (<code>manifest.json</code>) carries forward unchanged</li>
-<li>CSS custom property theme system (<code>assessment.css</code>) carries forward with minor adaptation</li>
-<li>All 14 backend API endpoints remain unchanged</li>
-<li>Authentication flows (passwordless, MFA, magic link) behavior unchanged</li>
-</ul>
-<h2 id="supersedes">Supersedes<a class="headerlink" href="#supersedes" title="Permanent link">&para;</a></h2>
-<ul>
-<li>ADR-0004 (frontend-structure) — this ADR executes the planned migration referenced in that decision</li>
+<li>30-minute TTL is acceptable for v1; real-time scoring deferred to v2</li>
+<li>No personalization — same trending list for all users (v2 can add per-user signals)</li>
+<li><code>is_hot</code> threshold (top 20% by score) is a configurable approximation</li>
 </ul>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
-<li>PRD: <code>artifacts/prd_react-migration.md</code></li>
-<li>Plan: <code>artifacts/plan_react-migration.md</code></li>
-<li>Tech Strategy: <code>doc/tech-strategy.md</code> — update JavaScript section after this ADR is accepted</li>
+<li><a href="../../prd/PRD-hot-video-priority/">PRD-hot-video-priority</a> — Full product requirements</li>
+<li><a href="../../plans/plan-hot-video-priority/">plan-hot-video-priority</a> — Implementation plan</li>
+<li><a href="../0003-use-cache/">ADR-0003</a> — Guava cache strategy (StatsCacheImpl, VideoCacheImpl)</li>
+<li><a href="../0005-use_lru_cache_video_streaming/">ADR-0005</a> — LRU cache for video streaming</li>
+<li><code>VideoAccessStats</code> entity: <code>api/src/main/java/com/canhlabs/funnyapp/entity/VideoAccessStats.java</code></li>
+<li><code>VideoSource</code> entity: <code>api/src/main/java/com/canhlabs/funnyapp/entity/VideoSource.java</code></li>
 </ul>
 
 

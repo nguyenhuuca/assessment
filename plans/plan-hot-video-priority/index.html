@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../0007-admin-dashboard/">
+        <link rel="prev" href="../plan-trivy-scan/">
       
       
-        <link rel="next" href="../0009-unified-video-list-api/">
+        <link rel="next" href="../plan-a-file-based-hooks/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>0008 - React Migration - Funny Movies - Architecture Docs</title>
+        <title>Hot Video Priority - Funny Movies - Architecture Docs</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-0006-migrate-frontend-to-react-with-vite" class="md-skip">
+        <a href="#plan-hot-video-priority-scoring" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              0008 - React Migration
+              Hot Video Priority
             
           </span>
         </div>
@@ -262,13 +262,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../0000-template/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../adr/0000-template/" class="md-tabs__link">
           
   
   
@@ -324,11 +322,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../plans/plan-hls-migration/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../plan-hls-migration/" class="md-tabs__link">
           
   
   
@@ -659,31 +659,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -701,7 +698,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -719,7 +716,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0000-template/" class="md-nav__link">
+      <a href="../../adr/0000-template/" class="md-nav__link">
         
   
   
@@ -747,7 +744,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0001-use-relational-database/" class="md-nav__link">
+      <a href="../../adr/0001-use-relational-database/" class="md-nav__link">
         
   
   
@@ -775,7 +772,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0002-backend-architecture/" class="md-nav__link">
+      <a href="../../adr/0002-backend-architecture/" class="md-nav__link">
         
   
   
@@ -803,7 +800,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0003-use-cache/" class="md-nav__link">
+      <a href="../../adr/0003-use-cache/" class="md-nav__link">
         
   
   
@@ -831,7 +828,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0004-frontend-structure/" class="md-nav__link">
+      <a href="../../adr/0004-frontend-structure/" class="md-nav__link">
         
   
   
@@ -859,7 +856,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0005-use_lru_cache_video_streaming/" class="md-nav__link">
+      <a href="../../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
         
   
   
@@ -887,7 +884,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0006-hls-video-streaming/" class="md-nav__link">
+      <a href="../../adr/0006-hls-video-streaming/" class="md-nav__link">
         
   
   
@@ -915,7 +912,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0007-admin-dashboard/" class="md-nav__link">
+      <a href="../../adr/0007-admin-dashboard/" class="md-nav__link">
         
   
   
@@ -940,37 +937,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0008 - React Migration
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../adr/0008-react-migration/" class="md-nav__link">
         
   
   
@@ -986,192 +956,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Context
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Decision">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#why-vite-over-create-react-app-cra" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Vite over Create React App (CRA)?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-react-context-over-reduxzustand" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why React Context over Redux/Zustand?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-react-bootstrap-over-importing-bootstrap-css-directly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why react-bootstrap over importing Bootstrap CSS directly?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-javascript-instead-of-typescript" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why JavaScript instead of TypeScript?
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Consequences
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Consequences">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#positive" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Positive
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#negative" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Negative
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#neutral" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Neutral
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#supersedes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supersedes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1184,7 +968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0009-unified-video-list-api/" class="md-nav__link">
+      <a href="../../adr/0009-unified-video-list-api/" class="md-nav__link">
         
   
   
@@ -1212,7 +996,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0010-trivy-container-scanning/" class="md-nav__link">
+      <a href="../../adr/0010-trivy-container-scanning/" class="md-nav__link">
         
   
   
@@ -1240,7 +1024,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../0011-hot-video-priority/" class="md-nav__link">
+      <a href="../../adr/0011-hot-video-priority/" class="md-nav__link">
         
   
   
@@ -1506,28 +1290,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   
@@ -1545,7 +1332,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1563,7 +1350,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-hls-migration/" class="md-nav__link">
+      <a href="../plan-hls-migration/" class="md-nav__link">
         
   
   
@@ -1591,7 +1378,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-react-migration/" class="md-nav__link">
+      <a href="../plan-react-migration/" class="md-nav__link">
         
   
   
@@ -1619,7 +1406,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-admin-dashboard/" class="md-nav__link">
+      <a href="../plan-admin-dashboard/" class="md-nav__link">
         
   
   
@@ -1647,7 +1434,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-permissions-bitwise/" class="md-nav__link">
+      <a href="../plan-permissions-bitwise/" class="md-nav__link">
         
   
   
@@ -1675,7 +1462,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-vid2-hot-score-migration/" class="md-nav__link">
+      <a href="../plan-vid2-hot-score-migration/" class="md-nav__link">
         
   
   
@@ -1703,7 +1490,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-trivy-scan/" class="md-nav__link">
+      <a href="../plan-trivy-scan/" class="md-nav__link">
         
   
   
@@ -1728,10 +1515,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../plans/plan-hot-video-priority/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1747,6 +1561,242 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#problem-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-data-foundation-day-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 — Data Foundation (Day 1–2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1 — Data Foundation (Day 1–2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-activate-recordaccess" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Activate recordAccess()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-db-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — DB migration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-update-videosource-entity-videodto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Update VideoSource entity + VideoDto
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-scoring-engine-day-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2 — Scoring Engine (Day 2–3)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 2 — Scoring Engine (Day 2–3)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-4-add-hotvideoproperties-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Add HotVideoProperties config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-implement-hotvideoservice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Implement HotVideoService
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-api-scheduler-day-34" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 — API &amp; Scheduler (Day 3–4)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3 — API &amp; Scheduler (Day 3–4)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-6-add-trending-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Add Trending endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-extend-get-apivideos-with-sorthot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Extend GET /api/videos with sort=hot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-8-scheduler-job" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8 — Scheduler job
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-frontend-day-45" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Frontend (Day 4–5)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-testing-day-57" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5 — Testing (Day 5–7)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acceptance-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Acceptance Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risks-mitigations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risks &amp; Mitigations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1759,7 +1809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-a-file-based-hooks/" class="md-nav__link">
+      <a href="../plan-a-file-based-hooks/" class="md-nav__link">
         
   
   
@@ -1787,7 +1837,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plans/plan-b-direct-cli-spawn/" class="md-nav__link">
+      <a href="../plan-b-direct-cli-spawn/" class="md-nav__link">
         
   
   
@@ -4801,10 +4851,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#problem-summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status
+        Problem Summary
       
     </span>
   </a>
@@ -4812,10 +4862,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#date" class="md-nav__link">
+  <a href="#architecture-summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Date
+        Architecture Summary
       
     </span>
   </a>
@@ -4823,33 +4873,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
+  <a href="#phase-1-data-foundation-day-12" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Context
+        Phase 1 — Data Foundation (Day 1–2)
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Decision">
+    <nav class="md-nav" aria-label="Phase 1 — Data Foundation (Day 1–2)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#why-vite-over-create-react-app-cra" class="md-nav__link">
+  <a href="#step-1-activate-recordaccess" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why Vite over Create React App (CRA)?
+        Step 1 — Activate recordAccess()
       
     </span>
   </a>
@@ -4857,10 +4896,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-react-context-over-reduxzustand" class="md-nav__link">
+  <a href="#step-2-db-migration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why React Context over Redux/Zustand?
+        Step 2 — DB migration
       
     </span>
   </a>
@@ -4868,21 +4907,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-react-bootstrap-over-importing-bootstrap-css-directly" class="md-nav__link">
+  <a href="#step-3-update-videosource-entity-videodto" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why react-bootstrap over importing Bootstrap CSS directly?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-javascript-instead-of-typescript" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why JavaScript instead of TypeScript?
+        Step 3 — Update VideoSource entity + VideoDto
       
     </span>
   </a>
@@ -4895,22 +4923,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
+  <a href="#phase-2-scoring-engine-day-23" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Consequences
+        Phase 2 — Scoring Engine (Day 2–3)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Consequences">
+    <nav class="md-nav" aria-label="Phase 2 — Scoring Engine (Day 2–3)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#positive" class="md-nav__link">
+  <a href="#step-4-add-hotvideoproperties-config" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Positive
+        Step 4 — Add HotVideoProperties config
       
     </span>
   </a>
@@ -4918,21 +4946,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#negative" class="md-nav__link">
+  <a href="#step-5-implement-hotvideoservice" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Negative
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#neutral" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Neutral
+        Step 5 — Implement HotVideoService
       
     </span>
   </a>
@@ -4945,10 +4962,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#supersedes" class="md-nav__link">
+  <a href="#phase-3-api-scheduler-day-34" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Supersedes
+        Phase 3 — API &amp; Scheduler (Day 3–4)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3 — API &amp; Scheduler (Day 3–4)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-6-add-trending-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Add Trending endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-extend-get-apivideos-with-sorthot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Extend GET /api/videos with sort=hot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-8-scheduler-job" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8 — Scheduler job
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-frontend-day-45" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Frontend (Day 4–5)
       
     </span>
   </a>
@@ -4956,10 +5023,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+  <a href="#phase-5-testing-day-57" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Phase 5 — Testing (Day 5–7)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acceptance-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Acceptance Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risks-mitigations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risks &amp; Mitigations
       
     </span>
   </a>
@@ -4983,7 +5083,7 @@
 
 
   
-    <a href="https://github.com/nguyenhuuca/assessment/edit/main/docs/adr/0008-react-migration.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/nguyenhuuca/assessment/edit/main/docs/plans/plan-hot-video-priority.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4991,133 +5091,397 @@
   
 
 
-<h1 id="adr-0006-migrate-frontend-to-react-with-vite">ADR-0006: Migrate Frontend to React with Vite<a class="headerlink" href="#adr-0006-migrate-frontend-to-react-with-vite" title="Permanent link">&para;</a></h1>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Proposed</p>
-<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
-<p>2026-03-01</p>
-<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>ADR-0004 (Use Vanilla JS + Bootstrap for Current Frontend) explicitly planned migration to React for:
-- Better component reuse and state management
-- Richer interaction (comment threads, optimistic UI)
-- Easier integration with design systems and CI tooling</p>
-<p>The prototype phase is complete (version 14, production deployed). The codebase has grown to ~4,400 lines across 6 files with increasing complexity around:
-- Auth flows (passwordless + MFA + magic link)
-- YouTube Shorts-style video navigation (touch, keyboard, swipe)
-- Comment panel with real-time state updates
-- Vote state management per video
-- Multi-modal UI (5 Bootstrap modals)</p>
-<p>jQuery-based DOM manipulation has become hard to reason about as interactions grow. It's the right time to execute the planned migration.</p>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>Migrate the frontend (<code>webapp/</code>) from Vanilla JS + jQuery + Bootstrap CDN to:</p>
+<h1 id="plan-hot-video-priority-scoring">Plan: Hot Video Priority Scoring<a class="headerlink" href="#plan-hot-video-priority-scoring" title="Permanent link">&para;</a></h1>
+<p><strong>Relates to:</strong> <a href="../../prd/PRD-hot-video-priority/">PRD-hot-video-priority</a>, <a href="../../adr/0011-hot-video-priority/">ADR-0011</a>
+<strong>Size:</strong> Medium (5–7 days)
+<strong>Decision type:</strong> Two-Way Door (additive columns, opt-in sort param, backward compatible)
+<strong>Blocks nothing</strong> — existing <code>/api/videos</code> endpoint unchanged without <code>sort=hot</code> param</p>
+<hr />
+<h2 id="problem-summary">Problem Summary<a class="headerlink" href="#problem-summary" title="Permanent link">&para;</a></h2>
+<p>Videos are shown in a flat list with no trending signal. Five gaps must be closed:</p>
 <table>
 <thead>
 <tr>
-<th>Component</th>
-<th>Decision</th>
+<th>#</th>
+<th>Gap</th>
+<th>Severity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Build tool</td>
-<td><strong>Vite</strong> (replaces no-build-step)</td>
+<td>1</td>
+<td><code>recordAccess()</code> is commented out — no access data is written</td>
+<td>High</td>
 </tr>
 <tr>
-<td>Framework</td>
-<td><strong>React 19</strong></td>
+<td>2</td>
+<td>No hot score computation logic</td>
+<td>High</td>
 </tr>
 <tr>
-<td>Language</td>
-<td><strong>JavaScript ES6+</strong> (no TypeScript in this phase)</td>
+<td>3</td>
+<td>No API endpoint for trending videos</td>
+<td>High</td>
 </tr>
 <tr>
-<td>HTTP</td>
-<td><strong>Fetch API</strong> (replace jQuery AJAX)</td>
+<td>4</td>
+<td>No cache pre-warming for hot videos</td>
+<td>Medium</td>
 </tr>
 <tr>
-<td>Server state</td>
-<td><strong>TanStack Query v5</strong> (React Query)</td>
-</tr>
-<tr>
-<td>Client state</td>
-<td><strong>React Context</strong> (auth + theme)</td>
-</tr>
-<tr>
-<td>Routing</td>
-<td><strong>React Router v6</strong></td>
-</tr>
-<tr>
-<td>UI library</td>
-<td><strong>react-bootstrap</strong> (Bootstrap 5 wrappers)</td>
-</tr>
-<tr>
-<td>Gestures</td>
-<td><strong>react-swipeable</strong></td>
-</tr>
-<tr>
-<td>Testing</td>
-<td><strong>Vitest + React Testing Library</strong></td>
+<td>5</td>
+<td>Frontend has no hot badge or trending section</td>
+<td>Medium</td>
 </tr>
 </tbody>
 </table>
-<h3 id="why-vite-over-create-react-app-cra">Why Vite over Create React App (CRA)?<a class="headerlink" href="#why-vite-over-create-react-app-cra" title="Permanent link">&para;</a></h3>
+<hr />
+<h2 id="architecture-summary">Architecture Summary<a class="headerlink" href="#architecture-summary" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Stream request
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    → VideoAccessServiceImpl.recordAccess()  [async, fire-and-forget]
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        → upsert VideoAccessStats
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>AppScheduler.recomputeHotScores()  [every 30 min]
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    → HotVideoServiceImpl.computeScores()
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        → query VideoAccessStats + ShareLink (last 24h)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        → normalize + apply weighted formula
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        → update video_sources (hot_score, is_hot, hot_rank)
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        → refresh StatsCacheImpl
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        → pre-warm VideoCacheImpl for top 10
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>GET /api/videos/trending
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    → VideoController.getTrending()
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        → HotVideoService.getTopN()
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>            → StatsCacheImpl (TTL 30 min)
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>GET /api/videos?sort=hot
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    → VideoController.getVideos()
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        → VideoService.getVideosToStream(sort=hot)
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>            → query ORDER BY hot_score DESC
+</code></pre></div>
+<hr />
+<h2 id="phase-1-data-foundation-day-12">Phase 1 — Data Foundation (Day 1–2)<a class="headerlink" href="#phase-1-data-foundation-day-12" title="Permanent link">&para;</a></h2>
+<h3 id="step-1-activate-recordaccess">Step 1 — Activate <code>recordAccess()</code><a class="headerlink" href="#step-1-activate-recordaccess" title="Permanent link">&para;</a></h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/VideoAccessServiceImpl.java</code></p>
+<p>Uncomment the body of <code>recordAccess()</code>. It should perform an upsert:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// Upsert: increment hitCount, update lastAccessedAt</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">videoAccessStatsRepo</span><span class="p">.</span><span class="na">upsertAccess</span><span class="p">(</span><span class="n">videoId</span><span class="p">,</span><span class="w"> </span><span class="n">Instant</span><span class="p">.</span><span class="na">now</span><span class="p">());</span>
+</code></pre></div></p>
 <ul>
-<li>CRA is deprecated as of 2023</li>
-<li>Vite has native ESM, faster HMR, smaller output</li>
-<li>No ejecting required for config customization</li>
+<li>Must remain <code>@Async</code> — non-blocking</li>
+<li>DB failure must be caught + logged, never propagated to caller</li>
 </ul>
-<h3 id="why-react-context-over-reduxzustand">Why React Context over Redux/Zustand?<a class="headerlink" href="#why-react-context-over-reduxzustand" title="Permanent link">&para;</a></h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/StreamVideoServiceImpl.java</code></p>
+<p>Verify that the stream endpoint calls <code>recordAccess()</code>. If not, add the call:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">videoAccessService</span><span class="p">.</span><span class="na">recordAccess</span><span class="p">(</span><span class="n">videoId</span><span class="p">);</span><span class="w">  </span><span class="c1">// fire-and-forget</span>
+</code></pre></div></p>
+<hr />
+<h3 id="step-2-db-migration">Step 2 — DB migration<a class="headerlink" href="#step-2-db-migration" title="Permanent link">&para;</a></h3>
+<p><strong>New file:</strong> <code>api/src/main/resources/db/changelog/sql/202602280001-add-hot-score.sql</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- Add hot score columns to video_sources</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">video_sources</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">hot_score</span><span class="w">  </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">video_sources</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">is_hot</span><span class="w">     </span><span class="nb">BOOLEAN</span><span class="w">      </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">video_sources</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">hot_rank</span><span class="w">   </span><span class="nb">INT</span><span class="w">          </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1">-- Index for trending query performance</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_video_sources_hot_score</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="n">video_sources</span><span class="p">(</span><span class="n">hot_score</span><span class="w"> </span><span class="k">DESC</span><span class="p">)</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="k">WHERE</span><span class="w"> </span><span class="n">is_hot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">TRUE</span><span class="p">;</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1">-- Index for upsert performance on VideoAccessStats</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">idx_video_access_stats_video_id</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="k">ON</span><span class="w"> </span><span class="n">video_access_stats</span><span class="p">(</span><span class="n">video_id</span><span class="p">);</span>
+</code></pre></div>
+<p>Register in <code>api/src/main/resources/db/changelog/db.changelog-master.yaml</code>.</p>
+<hr />
+<h3 id="step-3-update-videosource-entity-videodto">Step 3 — Update <code>VideoSource</code> entity + <code>VideoDto</code><a class="headerlink" href="#step-3-update-videosource-entity-videodto" title="Permanent link">&para;</a></h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/entity/VideoSource.java</code></p>
+<p>Add fields:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;hot_score&quot;</span><span class="p">)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">private</span><span class="w"> </span><span class="n">Double</span><span class="w"> </span><span class="n">hotScore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;is_hot&quot;</span><span class="p">)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kd">private</span><span class="w"> </span><span class="n">Boolean</span><span class="w"> </span><span class="n">isHot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;hot_rank&quot;</span><span class="p">)</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="kd">private</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">hotRank</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/dto/VideoDto.java</code></p>
+<p>Add response fields:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">private</span><span class="w"> </span><span class="n">Double</span><span class="w"> </span><span class="n">hotScore</span><span class="p">;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">private</span><span class="w"> </span><span class="n">Boolean</span><span class="w"> </span><span class="n">isHot</span><span class="p">;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kd">private</span><span class="w"> </span><span class="n">Integer</span><span class="w"> </span><span class="n">rank</span><span class="p">;</span>
+</code></pre></div></p>
+<hr />
+<h2 id="phase-2-scoring-engine-day-23">Phase 2 — Scoring Engine (Day 2–3)<a class="headerlink" href="#phase-2-scoring-engine-day-23" title="Permanent link">&para;</a></h2>
+<h3 id="step-4-add-hotvideoproperties-config">Step 4 — Add <code>HotVideoProperties</code> config<a class="headerlink" href="#step-4-add-hotvideoproperties-config" title="Permanent link">&para;</a></h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/config/AppProperties.java</code></p>
+<p>Add inner class:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@Data</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">HotVideoProperties</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">weightHits</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="mf">0.60</span><span class="p">;</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">weightShares</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mf">0.25</span><span class="p">;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">weightRecency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.15</span><span class="p">;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">decayLambda</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span><span class="p">;</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w">    </span><span class="n">windowHours</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">24</span><span class="p">;</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w">    </span><span class="n">topN</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w">    </span><span class="n">scoreTtlMinutes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="p">;</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>File:</strong> <code>api/src/main/resources/application.yaml</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">app</span><span class="p">:</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">hot-video</span><span class="p">:</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="nt">weight-hits</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.60</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">weight-shares</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.25</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="nt">weight-recency</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.15</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="nt">decay-lambda</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="nt">window-hours</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">24</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="nt">top-n</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="nt">score-ttl-minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+</code></pre></div>
+<hr />
+<h3 id="step-5-implement-hotvideoservice">Step 5 — Implement <code>HotVideoService</code><a class="headerlink" href="#step-5-implement-hotvideoservice" title="Permanent link">&para;</a></h3>
+<p><strong>New file:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/service/HotVideoService.java</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">HotVideoService</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">recomputeScores</span><span class="p">();</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="n">List</span><span class="o">&lt;</span><span class="n">VideoDto</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getTopN</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>New file:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/HotVideoServiceImpl.java</code></p>
+<p>Core scoring logic:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">double</span><span class="w"> </span><span class="nf">hotScore</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">hits</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">shares</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">hoursAgo</span><span class="p">,</span><span class="w"> </span><span class="n">HotVideoProperties</span><span class="w"> </span><span class="n">cfg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">recency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Math</span><span class="p">.</span><span class="na">exp</span><span class="p">(</span><span class="o">-</span><span class="n">cfg</span><span class="p">.</span><span class="na">getDecayLambda</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hoursAgo</span><span class="p">);</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="na">getWeightHits</span><span class="p">()</span><span class="w">    </span><span class="o">*</span><span class="w"> </span><span class="n">hits</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">         </span><span class="o">+</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="na">getWeightShares</span><span class="p">()</span><span class="w">  </span><span class="o">*</span><span class="w"> </span><span class="n">shares</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">         </span><span class="o">+</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="na">getWeightRecency</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">recency</span><span class="p">;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">}</span>
+</code></pre></div></p>
+<p>Min-max normalization applied to all videos before computing weighted sum.</p>
+<p>After computation:
+- Persist <code>hot_score</code>, <code>hot_rank</code>, <code>is_hot</code> (top 20%) back to <code>video_sources</code> via repository
+- Push top N results into <code>StatsCacheImpl</code></p>
+<hr />
+<h2 id="phase-3-api-scheduler-day-34">Phase 3 — API &amp; Scheduler (Day 3–4)<a class="headerlink" href="#phase-3-api-scheduler-day-34" title="Permanent link">&para;</a></h2>
+<h3 id="step-6-add-trending-endpoint">Step 6 — Add Trending endpoint<a class="headerlink" href="#step-6-add-trending-endpoint" title="Permanent link">&para;</a></h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/web/VideoController.java</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nd">@GetMapping</span><span class="p">(</span><span class="s">&quot;/trending&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">ResultListInfo</span><span class="o">&lt;</span><span class="n">VideoDto</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nf">getTrending</span><span class="p">(</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">        </span><span class="nd">@RequestParam</span><span class="p">(</span><span class="n">defaultValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;10&quot;</span><span class="p">)</span><span class="w"> </span><span class="nd">@Max</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">limit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ok</span><span class="p">(</span><span class="n">hotVideoService</span><span class="p">.</span><span class="na">getTopN</span><span class="p">(</span><span class="n">limit</span><span class="p">));</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="step-7-extend-get-apivideos-with-sorthot">Step 7 — Extend <code>GET /api/videos</code> with <code>sort=hot</code><a class="headerlink" href="#step-7-extend-get-apivideos-with-sorthot" title="Permanent link">&para;</a></h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/VideoServiceImpl.java</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;hot&quot;</span><span class="p">.</span><span class="na">equalsIgnoreCase</span><span class="p">(</span><span class="n">sort</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">videoSourceRepo</span><span class="p">.</span><span class="na">findAllOrderByHotScoreDesc</span><span class="p">(</span><span class="n">pageable</span><span class="p">);</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>Add corresponding repository method using <code>@Query</code> with <code>ORDER BY hot_score DESC</code>.</p>
+<h3 id="step-8-scheduler-job">Step 8 — Scheduler job<a class="headerlink" href="#step-8-scheduler-job" title="Permanent link">&para;</a></h3>
+<p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/jobs/AppScheduler.java</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nd">@Scheduled</span><span class="p">(</span><span class="n">fixedRate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">60_000</span><span class="p">)</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">recomputeHotScores</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="n">hotVideoService</span><span class="p">.</span><span class="na">recomputeScores</span><span class="p">();</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="phase-4-frontend-day-45">Phase 4 — Frontend (Day 4–5)<a class="headerlink" href="#phase-4-frontend-day-45" title="Permanent link">&para;</a></h2>
+<p><strong>File:</strong> <code>webapp/src/components/VideoCard.jsx</code> (or equivalent)</p>
 <ul>
-<li>Only 2 client-state concerns: auth (JWT/user) and theme</li>
-<li>React Query handles all server state (loading, caching, errors)</li>
-<li>Adding Redux for 2 global values would be over-engineering</li>
+<li>Add <code>🔥 Hot</code> badge when <code>isHot === true</code></li>
 </ul>
-<h3 id="why-react-bootstrap-over-importing-bootstrap-css-directly">Why react-bootstrap over importing Bootstrap CSS directly?<a class="headerlink" href="#why-react-bootstrap-over-importing-bootstrap-css-directly" title="Permanent link">&para;</a></h3>
+<p><strong>File:</strong> <code>webapp/src/pages/Home.jsx</code></p>
 <ul>
-<li>Avoids Bootstrap JS (conflicts with React's synthetic events)</li>
-<li>Native React component API (no <code>data-bs-toggle</code> attributes)</li>
-<li>Modal lifecycle managed by React, not jQuery</li>
+<li>Add "🔥 Trending Now" section at page top</li>
+<li>Call <code>GET /api/videos/trending?limit=5</code></li>
+<li>Reuse existing <code>VideoCard</code> component</li>
 </ul>
-<h3 id="why-javascript-instead-of-typescript">Why JavaScript instead of TypeScript?<a class="headerlink" href="#why-javascript-instead-of-typescript" title="Permanent link">&para;</a></h3>
+<hr />
+<h2 id="phase-5-testing-day-57">Phase 5 — Testing (Day 5–7)<a class="headerlink" href="#phase-5-testing-day-57" title="Permanent link">&para;</a></h2>
+<p><strong>Unit tests (Sonnet):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Test class</th>
+<th>Scenarios</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HotVideoServiceImplTest</code></td>
+<td>Score formula, normalization, no-data edge case, all-zero edge case</td>
+</tr>
+<tr>
+<td><code>AppSchedulerTest</code></td>
+<td><code>recomputeHotScores()</code> is called, delegates to service</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Integration tests:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Test class</th>
+<th>Scenarios</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>VideoControllerTrendingTest</code></td>
+<td><code>GET /trending</code> returns 200 with sorted list, limit enforced, cache hit</td>
+</tr>
+<tr>
+<td><code>VideoAccessServiceImplTest</code></td>
+<td><code>recordAccess()</code> upserts correctly, DB failure does not throw</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="acceptance-criteria">Acceptance Criteria<a class="headerlink" href="#acceptance-criteria" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Reduces migration scope (pure behavior migration, not type migration)</li>
-<li>Team can adopt TypeScript in a follow-up ADR once React patterns are established</li>
-<li>Vite supports TypeScript migration incrementally later</li>
+<li>[ ] Streaming a video increments <code>VideoAccessStats.hitCount</code> asynchronously</li>
+<li>[ ] <code>recomputeHotScores()</code> scheduler runs every 30 minutes</li>
+<li>[ ] <code>hot_score</code>, <code>is_hot</code>, <code>hot_rank</code> are persisted to <code>video_sources</code> after each run</li>
+<li>[ ] <code>GET /api/videos/trending</code> returns videos ordered by <code>hotScore DESC</code></li>
+<li>[ ] <code>GET /api/videos?sort=hot</code> returns all videos ordered by <code>hotScore DESC</code></li>
+<li>[ ] <code>GET /api/videos</code> (no sort param) behavior is unchanged</li>
+<li>[ ] Top 10 hot videos are pre-warmed in <code>VideoCacheImpl</code></li>
+<li>[ ] Frontend shows 🔥 badge on <code>isHot = true</code> video cards</li>
+<li>[ ] Frontend shows "Trending Now" section with top 5 hot videos</li>
+<li>[ ] Unit tests pass for scoring formula with edge cases</li>
+<li>[ ] <code>mvn verify</code> passes (coverage gate +1%)</li>
 </ul>
-<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<h3 id="positive">Positive<a class="headerlink" href="#positive" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Component-based architecture enables isolated testing</li>
-<li>React Query eliminates manual loading/error state boilerplate</li>
-<li>Vite HMR speeds up local development</li>
-<li>Removes jQuery dependency (saves ~87KB gzipped)</li>
-<li>CI/CD now includes a build step with artifact verification</li>
-</ul>
-<h3 id="negative">Negative<a class="headerlink" href="#negative" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Breaking change</strong> to deployment pipeline (must add <code>npm run build</code> before SCP)</li>
-<li><code>webapp/</code> directory structure completely changes (no coexistence with old code)</li>
-<li>Nginx needs <code>try_files $uri /index.html</code> for SPA routing</li>
-<li>Initial bundle size slightly larger than zero-JS-framework approach (~40KB React core gzipped)</li>
-<li>Node.js required in CI environment for build step</li>
-</ul>
-<h3 id="neutral">Neutral<a class="headerlink" href="#neutral" title="Permanent link">&para;</a></h3>
-<ul>
-<li>PWA manifest (<code>manifest.json</code>) carries forward unchanged</li>
-<li>CSS custom property theme system (<code>assessment.css</code>) carries forward with minor adaptation</li>
-<li>All 14 backend API endpoints remain unchanged</li>
-<li>Authentication flows (passwordless, MFA, magic link) behavior unchanged</li>
-</ul>
-<h2 id="supersedes">Supersedes<a class="headerlink" href="#supersedes" title="Permanent link">&para;</a></h2>
-<ul>
-<li>ADR-0004 (frontend-structure) — this ADR executes the planned migration referenced in that decision</li>
-</ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
-<ul>
-<li>PRD: <code>artifacts/prd_react-migration.md</code></li>
-<li>Plan: <code>artifacts/plan_react-migration.md</code></li>
-<li>Tech Strategy: <code>doc/tech-strategy.md</code> — update JavaScript section after this ADR is accepted</li>
-</ul>
+<hr />
+<h2 id="file-checklist">File Checklist<a class="headerlink" href="#file-checklist" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>File</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>db/changelog/sql/202602280001-add-hot-score.sql</code></td>
+<td>New — add hot_score, is_hot, hot_rank columns + indexes</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>db/changelog/db.changelog-master.yaml</code></td>
+<td>Register new migration</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>entity/VideoSource.java</code></td>
+<td>Add hotScore, isHot, hotRank fields</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>dto/VideoDto.java</code></td>
+<td>Add hotScore, isHot, rank fields</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>config/AppProperties.java</code></td>
+<td>Add HotVideoProperties inner class</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>application.yaml</code></td>
+<td>Add app.hot-video.* config block</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>service/impl/VideoAccessServiceImpl.java</code></td>
+<td>Uncomment recordAccess() body</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>service/impl/StreamVideoServiceImpl.java</code></td>
+<td>Call recordAccess() on stream</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>service/HotVideoService.java</code></td>
+<td>New interface</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>service/impl/HotVideoServiceImpl.java</code></td>
+<td>New — scoring engine, getTopN()</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>repo/VideoSourceRepo.java</code></td>
+<td>Add findAllOrderByHotScoreDesc()</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>repo/VideoAccessStatsRepo.java</code></td>
+<td>Add upsertAccess()</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>web/VideoController.java</code></td>
+<td>Add GET /trending endpoint + sort=hot param</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>service/impl/VideoServiceImpl.java</code></td>
+<td>Add sort=hot branch</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>jobs/AppScheduler.java</code></td>
+<td>Add recomputeHotScores() job</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>webapp/src/components/VideoCard.jsx</code></td>
+<td>Add 🔥 Hot badge</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>webapp/src/pages/Home.jsx</code></td>
+<td>Add Trending Now section</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="risks-mitigations">Risks &amp; Mitigations<a class="headerlink" href="#risks-mitigations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Likelihood</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>recordAccess()</code> DB bottleneck under load</td>
+<td>Medium</td>
+<td><code>@Async</code> + catch all exceptions; add write queue if needed in v2</td>
+</tr>
+<tr>
+<td><code>video_access_stats</code> table unbounded growth</td>
+<td>Medium</td>
+<td>Activate <code>cleanUpOldVideos()</code> in <code>AppScheduler</code> to purge rows older than window</td>
+</tr>
+<tr>
+<td>Hot score biased to old high-hit videos</td>
+<td>Medium</td>
+<td>24h rolling window + exponential recency decay mitigates this</td>
+</tr>
+<tr>
+<td>Score stale up to 30 minutes</td>
+<td>Low</td>
+<td>Acceptable for v1; TTL is configurable</td>
+</tr>
+</tbody>
+</table>
 
 
 
