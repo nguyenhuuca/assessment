@@ -8,7 +8,7 @@
 
 1. [Introduction](#introduction)
 2. [Pre-configured Setup](#pre-configured-setup)
-3. [Personas — 9 Specialist Roles](#personas--9-specialist-roles)
+3. [Personas — 11 Commands](#personas--11-commands)
 4. [Skills — 90+ Automated Workflows](#skills--90-automated-workflows)
 5. [Swarm — Multi-Agent Parallel Execution](#swarm--multi-agent-parallel-execution)
 6. [Real-World Workflows](#real-world-workflows)
@@ -22,7 +22,7 @@
 This project is pre-configured with the **Claude Code Framework** — a powerful AI assistant system that provides:
 
 - ✅ **Auto-loaded skills** matching the current context
-- ✅ **9 specialist personas** (architect, builder, security, QA…)
+- ✅ **11 specialist commands** (scope, spec, architect, builder, security, QA…)
 - ✅ **90+ workflows** covering every development task
 - ✅ **Multi-agent swarm** for parallel task execution
 - ✅ **Templates** for ADR, PRD, design docs, and more
@@ -55,9 +55,47 @@ templates/
 
 ---
 
-## Personas — 9 Specialist Roles
+## Personas — 11 Commands
 
-### 1. `/architect` — Principal Architect
+### 1. `/scope` — PRD Generator
+
+**Use when:** Turning a rough feature idea into a structured PRD
+
+**Capabilities:**
+- Asks clarifying questions one at a time (problem, users, success metrics, scope)
+- Reads existing codebase context before writing
+- Produces a complete PRD using the official template
+
+**Example:**
+```
+/scope add watch history feature
+/scope add a comment section to video pages
+```
+
+**Output:** `docs/prd/PRD-{slug}.md`
+
+---
+
+### 2. `/spec` — Feature Specification Generator
+
+**Use when:** Translating an approved PRD + ADR into a precise, implementable specification
+
+**Capabilities:**
+- Reads PRD and ADR to extract what's already known
+- Asks clarifying questions one at a time (business rules, error cases, edge cases, performance targets)
+- Verifies entity/API names against actual codebase
+- Produces a Spec with exact API contract, DB schema, edge cases, and acceptance criteria
+
+**Example:**
+```
+/spec docs/prd/PRD-watch-history.md docs/adr/0013-watch-history-design.md
+```
+
+**Output:** `docs/specs/spec-{slug}.md`
+
+---
+
+### 3. `/architect` — Principal Architect
 
 **Use when:** Designing systems, APIs, or writing ADRs
 
@@ -79,7 +117,7 @@ templates/
 
 ---
 
-### 2. `/builder` — Builder
+### 4. `/builder` — Builder
 
 **Use when:** Implementing features, fixing bugs, refactoring
 
@@ -101,7 +139,7 @@ templates/
 
 ---
 
-### 3. `/qa-engineer` — QA Engineer
+### 5. `/qa-engineer` — QA Engineer
 
 **Use when:** Writing tests, test strategy, increasing coverage
 
@@ -123,7 +161,7 @@ templates/
 
 ---
 
-### 4. `/security-auditor` — Security Auditor
+### 6. `/security-auditor` — Security Auditor
 
 **Use when:** Security review, vulnerability scan, compliance
 
@@ -145,7 +183,7 @@ templates/
 
 ---
 
-### 5. `/ui-ux-designer` — UI/UX Designer
+### 7. `/ui-ux-designer` — UI/UX Designer
 
 **Use when:** Designing UI, improving UX, accessibility
 
@@ -167,7 +205,7 @@ templates/
 
 ---
 
-### 6. `/code-check` — Code Quality Reviewer
+### 8. `/code-check` — Code Quality Reviewer
 
 **Use when:** Code review, checking code quality
 
@@ -188,7 +226,7 @@ templates/
 
 ---
 
-### 7. `/swarm-plan` — Swarm Planner
+### 9. `/swarm-plan` — Swarm Planner
 
 **Use when:** Planning complex tasks with many subtasks
 
@@ -207,7 +245,7 @@ templates/
 
 ---
 
-### 8. `/swarm-execute` — Swarm Executor
+### 10. `/swarm-execute` — Swarm Executor
 
 **Use when:** Executing tasks with multiple agents in parallel
 
@@ -226,7 +264,7 @@ templates/
 
 ---
 
-### 9. `/swarm-review` — Swarm Reviewer
+### 11. `/swarm-review` — Swarm Reviewer
 
 **Use when:** Multi-perspective code review
 
@@ -399,25 +437,31 @@ Fast parallel search → Complete results
 
 ## Real-World Workflows
 
-### Workflow 1: Implement a New Feature
+### Workflow 1: Implement a New Feature (Spec-Driven)
 
 ```bash
-# Step 1: Design (Architect)
-/architect design video recommendation API
+# Step 1: Scope — clarify requirements, produce PRD
+/scope add video recommendation feature
 
-# Step 2: Plan (Swarm)
-/swarm-plan implement video recommendation
+# Step 2: Architect — key technical decisions, produce ADR
+/architect docs/prd/PRD-video-recommendation.md
 
-# Step 3: Execute (Swarm)
-/swarm-execute implement video recommendation
+# Step 3: Spec — exact behavior contract, produce Spec
+/spec docs/prd/PRD-video-recommendation.md docs/adr/NNNN-video-recommendation.md
 
-# Step 4: Test (QA)
+# Step 4: Plan — task breakdown from Spec
+/swarm-plan docs/specs/spec-video-recommendation.md
+
+# Step 5: Execute (Swarm)
+/swarm-execute docs/plans/plan-video-recommendation.md
+
+# Step 6: Test (QA)
 /qa-engineer write tests for RecommendationService
 
-# Step 5: Security (Security Auditor)
+# Step 7: Security (Security Auditor)
 /security-auditor review recommendation feature
 
-# Step 6: Review (Code Check)
+# Step 8: Review (Code Check)
 /code-check review recommendation module
 ```
 
@@ -496,15 +540,16 @@ Located in `templates/artifacts/`:
 
 | Template | Use case | Triggered by |
 |----------|----------|--------------|
-| **adr.template.md** | Architecture Decision Record | `/architect design …` |
+| **prd.template.md** | Product Requirements Document | `/scope …` |
+| **adr.template.md** | Architecture Decision Record | `/architect …` |
+| **spec.template.md** | Feature Specification | `/spec …` |
+| **plan.template.md** | Implementation plan | `/swarm-plan …` |
 | **design_spec.template.md** | Design specification | `/architect design …` |
-| **prd.template.md** | Product Requirements | `Write PRD for …` |
 | **pr_faq.template.md** | Press Release FAQ | `Write PR-FAQ for …` |
 | **roadmap.template.md** | Execution roadmap | `Create roadmap for …` |
 | **postmortem.template.md** | Incident postmortem | `Write postmortem for …` |
 | **security_audit.template.md** | Security audit report | `/security-auditor review …` |
 | **system_design.template.md** | System design doc | `/architect design system …` |
-| **plan.template.md** | Implementation plan | `/swarm-plan …` |
 
 ### Claude Mechanism Templates
 
@@ -622,7 +667,10 @@ mvn verify
 
 | Command | Purpose | Output |
 |---------|---------|--------|
-| `/architect design …` | System/API design | ADR, design doc |
+| `/scope …` | Scope idea into PRD | `docs/prd/PRD-{slug}.md` |
+| `/architect …` | Architecture decisions | `docs/adr/NNNN-{slug}.md` |
+| `/spec …` | Feature specification | `docs/specs/spec-{slug}.md` |
+| `/swarm-plan …` | Task breakdown | `docs/plans/plan-{slug}.md` |
 | `/builder implement …` | Code implementation | Working code |
 | `/qa-engineer test …` | Write tests | Test files |
 | `/security-auditor review …` | Security audit | Audit report |
@@ -682,4 +730,4 @@ cd api && docker build -t funny-app .
 
 **Happy coding with Claude!**
 
-*Last updated: 2026-05-30*
+*Last updated: 2026-05-31*
