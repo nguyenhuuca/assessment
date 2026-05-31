@@ -29,7 +29,7 @@ Read `$ARGUMENTS`. Extract what is already clear:
 - Success signal (if stated)
 - Known constraints (if stated)
 
-### Step 2 — Identify gaps and ask questions
+### Step 2 — Identify gaps and ask questions one at a time
 
 Before writing anything, check which of the following are **missing or ambiguous**. Ask ONLY for what is genuinely unclear — do not re-ask information already in the input.
 
@@ -45,8 +45,10 @@ Before writing anything, check which of the following are **missing or ambiguous
 | Q6 | Any known technical constraints, dependencies, or risks? | Dependencies + Risks sections |
 
 **Rules:**
-- Ask all unclear questions in **a single message** — never one at a time
-- If the input is detailed enough to make reasonable assumptions, state assumptions explicitly and ask the user to confirm before writing
+- Ask questions **one at a time** — pose a single question, wait for the user's answer, then ask the next
+- Work through Q1 → Q6 in order, skipping any already answered in the input
+- After each answer, briefly acknowledge it (one sentence) before asking the next question
+- Once all gaps are filled, summarize what you understood and confirm before writing
 - If the user says "just write it" or "use your best judgment", proceed with clearly labeled assumptions
 
 ### Step 3 — Read existing codebase context
@@ -86,7 +88,8 @@ Do not auto-create these — wait for the user to confirm.
 ## Rules
 
 - **Never skip the clarification step** if any of Q1–Q4 are unanswered
-- **One question round only** — gather everything in a single message
+- **One question at a time** — ask Q1, wait for answer, then Q2, and so on
+- **Acknowledge each answer** before moving to the next question
 - **Assumptions must be labelled** — mark with `> **Assumption:**` inline
 - **Use the official template** from `templates/artifacts/prd.template.md` — do not invent a different structure
 - **Fill every section** — use `N/A` or `TBD` only when genuinely unknown, not as a shortcut

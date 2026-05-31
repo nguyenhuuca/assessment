@@ -38,15 +38,18 @@ Start with any rough description. Claude will ask clarifying questions before wr
 /scope add a comment section to video pages
 ```
 
-Claude asks (in one message):
-- What problem does this solve? Who has this pain?
-- Who are the primary users?
-- How will we measure success?
-- What is explicitly in scope for v1?
-- What is explicitly out of scope?
-- Any known technical constraints?
+Claude asks questions **one at a time**, working through:
 
-After you answer, Claude:
+1. What problem does this solve? Who has this pain?
+2. Who are the primary users?
+3. How will we measure success?
+4. What is explicitly in scope for v1?
+5. What is explicitly out of scope?
+6. Any known technical constraints?
+
+After each answer Claude briefly acknowledges it, then asks the next question. Once all gaps are filled, Claude summarizes its understanding and confirms before writing.
+
+After the conversation, Claude:
 1. Reads relevant existing code via Grep/Glob
 2. Writes `docs/prd/PRD-comment-section.md` using `templates/artifacts/prd.template.md`
 3. Offers to create an ADR and Plan
