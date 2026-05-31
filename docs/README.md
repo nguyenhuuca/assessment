@@ -35,10 +35,10 @@ A personal side project for streaming funny videos — built to explore modern b
 Every feature follows a structured flow powered by Claude:
 
 ```
-/scope → PRD → ADR → Plan → /builder → /qa-engineer → /code-review → merge
+/scope → PRD → /architect → ADR → /swarm-plan → Plan → /swarm-execute → /qa-engineer → /code-review → merge
 ```
 
-See the full guide: [From Scope to Implementation](flow-scope-to-implement.md)
+See the full guide: [From Scope to Implementation](flow-scope-to-implement.md) · [Tiếng Việt](flow-scope-to-implement-vi.md)
 
 ---
 
@@ -66,3 +66,4 @@ See the full guide: [From Scope to Implementation](flow-scope-to-implement.md)
 | [ADR-0009](adr/0009-unified-video-list-api.md) | Unified Video List API for UI Display | Proposed |
 | [ADR-0010](adr/0010-trivy-container-scanning.md) | Add Trivy Dependency & Filesystem Scanning to CI | Accepted |
 | [ADR-0011](adr/0011-hot-video-priority.md) | Hot Video Priority Scoring | Accepted |
+| [ADR-0012](adr/0012-bookmark-feature-design.md) | Bookmark Feature — Storage and API Design | Proposed |

@@ -74,10 +74,12 @@ nav:
       - 0009 - Unified Video List API: adr/0009-unified-video-list-api.md
       - 0010 - Trivy Dependency Scanning: adr/0010-trivy-container-scanning.md
       - 0011 - Hot Video Priority: adr/0011-hot-video-priority.md
+      - 0012 - Bookmark Feature Design: adr/0012-bookmark-feature-design.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
       - React Migration: prd/PRD-react-migration.md
+      - Bookmark Feature: prd/PRD-bookmark-feature.md
 
   - Feature Flags:
       - English: feature-flags.md
@@ -93,6 +95,7 @@ nav:
       - Hot Video Priority: plans/plan-hot-video-priority.md
       - Plan A (File-based Hooks): plans/plan-a-file-based-hooks.md
       - Plan B (Direct CLI Spawn): plans/plan-b-direct-cli-spawn.md
+      - Bookmark Feature: plans/plan-bookmark-feature.md
 
   - Reports:
       - System Health 2026-05-30: system_health_report_2026-05-30.md
@@ -105,6 +108,7 @@ nav:
       - English: claude-guide-en.md
       - Tiếng Việt: claude-guide-vi.md
       - Scope to Implement Flow: flow-scope-to-implement.md
+      - Scope to Implement Flow (VI): flow-scope-to-implement-vi.md
 
   - Claude Workspace:
       - Commands:
