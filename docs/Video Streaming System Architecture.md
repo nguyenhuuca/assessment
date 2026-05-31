@@ -108,3 +108,57 @@ Adopt Spring Boot monolith with clearly defined layers and caching mechanism, an
 - Virtual Threads are used in Backend for efficient streaming
 - In-memory cache with Guava used until Redis is integrated
 - CronJob handles background downloading and database update
+
+---
+
+## Architecture Decision Records (ADR)
+
+The following ADRs record the key decisions made for this system. Each links to the full decision document including context, options considered, and consequences.
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [ADR-0001](adr/0001-use-relational-database.md) | Use Relational Database (PostgreSQL) for Core Data | Accepted |
+| [ADR-0002](adr/0002-backend-architecture.md) | Use Layered Spring Boot Architecture with Virtual Threads | Accepted |
+| [ADR-0003](adr/0003-use-cache.md) | Use Guava Cache Initially, with Planned Migration to Redis | Accepted |
+| [ADR-0004](adr/0004-frontend-structure.md) | Use Vanilla JS + Bootstrap with Planned Migration to React | Accepted |
+| [ADR-0005](adr/0005-use_lru_cache_video_streaming.md) | Use LRU Cache for Video Streaming | Accepted |
+| [ADR-0006](adr/0006-hls-video-streaming.md) | Switch to HLS for Local Video Streaming | Proposed |
+| [ADR-0007](adr/0007-admin-dashboard.md) | Admin Dashboard — Content & Account Management | Accepted |
+| [ADR-0008](adr/0008-react-migration.md) | Migrate Frontend to React with Vite | Proposed |
+| [ADR-0009](adr/0009-unified-video-list-api.md) | Unified Video List API for UI Display | Proposed |
+| [ADR-0010](adr/0010-trivy-container-scanning.md) | Add Trivy Dependency & Filesystem Scanning to CI | Accepted |
+
+### Decision Map
+
+The diagram below shows how the ADRs relate to each architectural layer:
+
+```mermaid
+graph TD
+    subgraph "Data Layer"
+        ADR1[ADR-0001<br/>PostgreSQL]
+    end
+
+    subgraph "Backend"
+        ADR2[ADR-0002<br/>Spring Boot + Virtual Threads]
+        ADR3[ADR-0003<br/>Guava Cache → Redis]
+        ADR5[ADR-0005<br/>LRU Cache for Streaming]
+        ADR6[ADR-0006<br/>HLS Streaming]
+        ADR7[ADR-0007<br/>Admin Dashboard]
+        ADR10[ADR-0010<br/>Trivy CI Scanning]
+    end
+
+    subgraph "Frontend"
+        ADR4[ADR-0004<br/>Vanilla JS → React]
+        ADR8[ADR-0008<br/>React + Vite Migration]
+        ADR9[ADR-0009<br/>Unified Video List API]
+    end
+
+    ADR2 --> ADR1
+    ADR3 --> ADR2
+    ADR5 --> ADR3
+    ADR6 --> ADR5
+    ADR7 --> ADR2
+    ADR8 --> ADR4
+    ADR9 --> ADR8
+    ADR10 --> ADR2
+```
