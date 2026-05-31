@@ -2134,10 +2134,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-2-identify-gaps-and-ask-questions" class="md-nav__link">
+  <a href="#step-2-identify-gaps-and-ask-questions-one-at-a-time" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2 — Identify gaps and ask questions
+        Step 2 — Identify gaps and ask questions one at a time
       
     </span>
   </a>
@@ -5317,10 +5317,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-2-identify-gaps-and-ask-questions" class="md-nav__link">
+  <a href="#step-2-identify-gaps-and-ask-questions-one-at-a-time" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2 — Identify gaps and ask questions
+        Step 2 — Identify gaps and ask questions one at a time
       
     </span>
   </a>
@@ -5416,7 +5416,7 @@
 - Target users / persona (if stated)
 - Success signal (if stated)
 - Known constraints (if stated)</p>
-<h3 id="step-2-identify-gaps-and-ask-questions">Step 2 — Identify gaps and ask questions<a class="headerlink" href="#step-2-identify-gaps-and-ask-questions" title="Permanent link">&para;</a></h3>
+<h3 id="step-2-identify-gaps-and-ask-questions-one-at-a-time">Step 2 — Identify gaps and ask questions one at a time<a class="headerlink" href="#step-2-identify-gaps-and-ask-questions-one-at-a-time" title="Permanent link">&para;</a></h3>
 <p>Before writing anything, check which of the following are <strong>missing or ambiguous</strong>. Ask ONLY for what is genuinely unclear — do not re-ask information already in the input.</p>
 <p><strong>Required information:</strong></p>
 <table>
@@ -5461,8 +5461,10 @@
 </tbody>
 </table>
 <p><strong>Rules:</strong>
-- Ask all unclear questions in <strong>a single message</strong> — never one at a time
-- If the input is detailed enough to make reasonable assumptions, state assumptions explicitly and ask the user to confirm before writing
+- Ask questions <strong>one at a time</strong> — pose a single question, wait for the user's answer, then ask the next
+- Work through Q1 → Q6 in order, skipping any already answered in the input
+- After each answer, briefly acknowledge it (one sentence) before asking the next question
+- Once all gaps are filled, summarize what you understood and confirm before writing
 - If the user says "just write it" or "use your best judgment", proceed with clearly labeled assumptions</p>
 <h3 id="step-3-read-existing-codebase-context">Step 3 — Read existing codebase context<a class="headerlink" href="#step-3-read-existing-codebase-context" title="Permanent link">&para;</a></h3>
 <p>Use Glob and Grep to find relevant existing components, entities, services, or APIs related to the feature. This informs the Requirements, Dependencies, and Next Steps sections.</p>
@@ -5489,7 +5491,8 @@
 <h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Never skip the clarification step</strong> if any of Q1–Q4 are unanswered</li>
-<li><strong>One question round only</strong> — gather everything in a single message</li>
+<li><strong>One question at a time</strong> — ask Q1, wait for answer, then Q2, and so on</li>
+<li><strong>Acknowledge each answer</strong> before moving to the next question</li>
 <li><strong>Assumptions must be labelled</strong> — mark with <code>&gt; **Assumption:**</code> inline</li>
 <li><strong>Use the official template</strong> from <code>templates/artifacts/prd.template.md</code> — do not invent a different structure</li>
 <li><strong>Fill every section</strong> — use <code>N/A</code> or <code>TBD</code> only when genuinely unknown, not as a shortcut</li>

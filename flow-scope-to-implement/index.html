@@ -5540,14 +5540,17 @@
 <p>Start with any rough description. Claude will ask clarifying questions before writing.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/scope add a comment section to video pages
 </code></pre></div>
-<p>Claude asks (in one message):
-- What problem does this solve? Who has this pain?
-- Who are the primary users?
-- How will we measure success?
-- What is explicitly in scope for v1?
-- What is explicitly out of scope?
-- Any known technical constraints?</p>
-<p>After you answer, Claude:
+<p>Claude asks questions <strong>one at a time</strong>, working through:</p>
+<ol>
+<li>What problem does this solve? Who has this pain?</li>
+<li>Who are the primary users?</li>
+<li>How will we measure success?</li>
+<li>What is explicitly in scope for v1?</li>
+<li>What is explicitly out of scope?</li>
+<li>Any known technical constraints?</li>
+</ol>
+<p>After each answer Claude briefly acknowledges it, then asks the next question. Once all gaps are filled, Claude summarizes its understanding and confirms before writing.</p>
+<p>After the conversation, Claude:
 1. Reads relevant existing code via Grep/Glob
 2. Writes <code>docs/prd/PRD-comment-section.md</code> using <code>templates/artifacts/prd.template.md</code>
 3. Offers to create an ADR and Plan</p>
