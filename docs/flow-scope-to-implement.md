@@ -13,7 +13,7 @@ graph LR
     C --> D["/architect"]
     D --> E["📐 ADR"]
     E --> F["/swarm-plan"]
-    F --> G["📋 Plan + Beads"]
+    F --> G["📋 Plan"]
     G --> H["/swarm-execute"]
     H --> I["🧪 /qa-engineer"]
     I --> J["/code-review"]
@@ -24,7 +24,7 @@ graph LR
 |------|---------|--------|----------|
 | 1. Scope | `/scope` | `docs/prd/PRD-{slug}.md` | `templates/artifacts/prd.template.md` |
 | 2. Architecture | `/architect` | `docs/adr/NNNN-{slug}.md` | `templates/artifacts/adr.template.md` |
-| 3. Plan | `/swarm-plan` | `docs/plans/plan-{slug}.md` + Beads | `templates/artifacts/plan.template.md` |
+| 3. Plan | `/swarm-plan` | `docs/plans/plan-{slug}.md` | `templates/artifacts/plan.template.md` |
 | 4. Implement | `/swarm-execute` or `/builder` | Code changes | — |
 | 5. Test | `/qa-engineer` | Test files | — |
 | 6. Review | `/code-review` | Findings | — |
@@ -86,7 +86,7 @@ The ADR contains:
 
 ## Step 3 — Implementation plan
 
-With PRD + ADR approved, use `/swarm-plan` to decompose the feature into a phased plan and Beads.
+With PRD + ADR approved, use `/swarm-plan` to decompose the feature into a phased implementation plan.
 
 ```
 /swarm-plan docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
@@ -96,16 +96,14 @@ With PRD + ADR approved, use `/swarm-plan` to decompose the feature into a phase
 
 | | `/architect` | `/swarm-plan` |
 |---|---|---|
-| **Primary output** | ADR (decision record) | Plan + Beads (task breakdown) |
+| **Primary output** | ADR (decision record) | Plan (task breakdown) |
 | **Asks questions** | No — explores codebase | No — reads PRD/ADR |
 | **Creates ADR** | Always | Only for One-Way Door (High) decisions found during planning |
-| **Creates Beads** | No | Yes — ready for `/swarm-execute` |
 
 `/swarm-plan` will:
 1. Launch 3–6 `worker-explorer` agents in parallel to research existing patterns
 2. Classify decision reversibility (Two-Way Door vs One-Way Door)
 3. Write `docs/plans/plan-{slug}.md` using `templates/artifacts/plan.template.md`
-4. Output Beads commands for all implementation tasks with dependencies
 
 The plan contains:
 - Phased steps with exact file paths and acceptance criteria
@@ -114,7 +112,7 @@ The plan contains:
 - Dependency graph showing task order
 - Before/During/After PR checklist
 
-**Output:** `docs/plans/plan-{slug}.md` + Beads
+**Output:** `docs/plans/plan-{slug}.md`
 
 ---
 
@@ -214,7 +212,7 @@ Fix findings, then commit and open a PR.
 /swarm-plan docs/prd/PRD-realtime-view-count.md docs/adr/0013-realtime-view-count.md
 
 # Launches parallel explorer agents → researches codebase
-# → docs/plans/plan-realtime-view-count.md + Beads
+# → docs/plans/plan-realtime-view-count.md
 
 # 4. Implement
 git checkout -b feat/realtime-view-count
