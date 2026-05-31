@@ -1,9 +1,11 @@
 # PRD: Hot Video Priority Feature
 
-**Status:** Draft
-**Author:** Team
-**Created:** 2026-02-28
+**Status:** Accepted
+**Author:** nguyenhuuca
+**Date:** 2026-02-28
 **Version:** 1.0
+**ADR:** [ADR-0011](../adr/0011-hot-video-priority.md)
+**Plan:** [plan-hot-video-priority](../plans/plan-hot-video-priority.md)
 
 ---
 
@@ -158,7 +160,6 @@ GET /api/videos/trending?limit=10
     {
       "videoId": "abc123",
       "title": "Funny Cat Video",
-      "upCount": 12500,
       "embedLink": "...",
       "hotScore": 0.87,
       "isHot": true,
@@ -171,7 +172,7 @@ GET /api/videos/trending?limit=10
 **Rules:**
 - Returns top `limit` videos by hotScore (default 10, max 50)
 - Scores served from `StatsCacheImpl` (TTL: 30 minutes)
-- Falls back to `upCount` sort if no access stats available
+- Falls back to `createdAt DESC` sort if no access stats available
 
 ---
 
@@ -317,7 +318,6 @@ Response 200:
     data[].videoId     String
     data[].title       String
     data[].embedLink   String
-    data[].upCount     Long
     data[].hotScore    Double   ← new
     data[].isHot       Boolean  ← new
     data[].rank        Integer  ← new (1 = hottest)
@@ -340,7 +340,7 @@ Response: same VideoDto structure, ordered by hotScore DESC
 ### Phase 1 — Data Foundation (1-2 days)
 - [ ] Activate `recordAccess()` — uncomment + test
 - [ ] Add DB migration: hot_score column + indexes
-- [ ] Update `YouTubeVideo` entity + `VideoDto`
+- [ ] Update `VideoSource` entity + `VideoDto`
 
 ### Phase 2 — Scoring Engine (1-2 days)
 - [ ] Implement `HotVideoServiceImpl` with score formula
@@ -391,7 +391,10 @@ Response: same VideoDto structure, ordered by hotScore DESC
 
 ## 12. Related Documents
 
-- `doc/adr/0003-use-cache.md` — Cache strategy (Guava → Redis)
-- `doc/adr/0005-use_lru_cache_video_streaming.md` — LRU cache trade-offs
+- [ADR-0011](../adr/0011-hot-video-priority.md) — Architecture decision for hot video scoring
+- [plan-hot-video-priority](../plans/plan-hot-video-priority.md) — Step-by-step implementation plan
+- [ADR-0003](../adr/0003-use-cache.md) — Cache strategy (Guava → Redis)
+- [ADR-0005](../adr/0005-use_lru_cache_video_streaming.md) — LRU cache trade-offs
 - `VideoAccessStats` entity: `api/src/main/java/com/canhlabs/funnyapp/entity/VideoAccessStats.java`
 - `VideoAccessServiceImpl`: `api/src/main/java/com/canhlabs/funnyapp/service/impl/VideoAccessServiceImpl.java`
+- `VideoSource` entity: `api/src/main/java/com/canhlabs/funnyapp/entity/VideoSource.java`

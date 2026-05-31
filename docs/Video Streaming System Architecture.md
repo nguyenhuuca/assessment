@@ -127,6 +127,7 @@ The following ADRs record the key decisions made for this system. Each links to 
 | [ADR-0008](adr/0008-react-migration.md) | Migrate Frontend to React with Vite | Proposed |
 | [ADR-0009](adr/0009-unified-video-list-api.md) | Unified Video List API for UI Display | Proposed |
 | [ADR-0010](adr/0010-trivy-container-scanning.md) | Add Trivy Dependency & Filesystem Scanning to CI | Accepted |
+| [ADR-0011](adr/0011-hot-video-priority.md) | Hot Video Priority Scoring | Accepted |
 
 ### Decision Map
 

@@ -74,6 +74,7 @@ nav:
       - 0008 - React Migration: adr/0008-react-migration.md
       - 0009 - Unified Video List API: adr/0009-unified-video-list-api.md
       - 0010 - Trivy Dependency Scanning: adr/0010-trivy-container-scanning.md
+      - 0011 - Hot Video Priority: adr/0011-hot-video-priority.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -90,6 +91,7 @@ nav:
       - Permissions (Bitwise): plans/plan-permissions-bitwise.md
       - Hot Score Migration: plans/plan-vid2-hot-score-migration.md
       - Trivy Scan: plans/plan-trivy-scan.md
+      - Hot Video Priority: plans/plan-hot-video-priority.md
       - Plan A (File-based Hooks): plans/plan-a-file-based-hooks.md
       - Plan B (Direct CLI Spawn): plans/plan-b-direct-cli-spawn.md
 
