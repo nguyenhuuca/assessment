@@ -76,6 +76,9 @@ nav:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
       - React Migration: prd/PRD-react-migration.md
 
+  - Feature Flags:
+      - Harness Feature Flags: feature-flags.md
+
   - Plans:
       - HLS Migration: plans/plan-hls-migration.md
       - React Migration: plans/plan-react-migration.md
