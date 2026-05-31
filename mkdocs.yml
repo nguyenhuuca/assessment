@@ -100,3 +100,94 @@ nav:
   - Claude Guide:
       - English: claude-guide-en.md
       - Tiếng Việt: claude-guide-vi.md
+
+  - Claude Workspace:
+      - Commands:
+          - Builder: claude/commands/builder.md
+          - Architect: claude/commands/architect.md
+          - QA Engineer: claude/commands/qa-engineer.md
+          - Code Check: claude/commands/code-check.md
+          - Security Auditor: claude/commands/security-auditor.md
+          - UI/UX Designer: claude/commands/ui-ux-designer.md
+          - Swarm Execute: claude/commands/swarm-execute.md
+          - Swarm Plan: claude/commands/swarm-plan.md
+          - Swarm Review: claude/commands/swarm-review.md
+
+      - Agents:
+          - Worker Builder: claude/agents/worker-builder.md
+          - Worker Architect: claude/agents/worker-architect.md
+          - Worker Explorer: claude/agents/worker-explorer.md
+          - Worker Researcher: claude/agents/worker-researcher.md
+          - Worker Reviewer: claude/agents/worker-reviewer.md
+
+      - Rules:
+          - Core Directives: claude/rules/core-directives.md
+          - Code Quality: claude/rules/code-quality.md
+          - Security: claude/rules/security.md
+          - Swarm Workers: claude/rules/swarm-workers.md
+          - Tech Strategy: claude/rules/tech-strategy.md
+
+      - Skills — Architecture:
+          - Designing Systems: claude/skills/architecture/designing-systems.md
+          - Designing APIs: claude/skills/architecture/designing-apis.md
+          - Writing ADRs: claude/skills/architecture/writing-adrs.md
+          - Domain Driven Design: claude/skills/architecture/domain-driven-design.md
+          - Cloud Native Patterns: claude/skills/architecture/cloud-native-patterns.md
+          - Capacity Planning: claude/skills/architecture/capacity-planning.md
+          - Defense in Depth: claude/skills/architecture/defense-in-depth.md
+
+      - Skills — Core Engineering:
+          - Implementing Code: claude/skills/core-engineering/implementing-code.md
+          - Debugging: claude/skills/core-engineering/debugging.md
+          - Testing: claude/skills/core-engineering/testing.md
+          - Test Driven Development: claude/skills/core-engineering/test-driven-development.md
+          - Refactoring Code: claude/skills/core-engineering/refactoring-code.md
+          - Optimizing Code: claude/skills/core-engineering/optimizing-code.md
+          - Data to UI: claude/skills/core-engineering/data-to-ui.md
+          - Data Management: claude/skills/core-engineering/data-management.md
+          - Dependency Management: claude/skills/core-engineering/dependency-management.md
+
+      - Skills — Design:
+          - Interface Design: claude/skills/design/interface-design.md
+          - Design Systems: claude/skills/design/design-systems.md
+          - Component Recipes: claude/skills/design/component-recipes.md
+          - Accessibility: claude/skills/design/accessibility.md
+          - Visual Assets: claude/skills/design/visual-assets.md
+          - Design Tokens (Demo): claude/skills/design/demo-design-tokens.md
+
+      - Skills — Languages:
+          - Java: claude/skills/languages/java.md
+          - TypeScript: claude/skills/languages/typescript.md
+          - Python: claude/skills/languages/python.md
+          - Bash: claude/skills/languages/bash.md
+          - Terraform: claude/skills/languages/terraform.md
+
+      - Skills — Operations:
+          - Infrastructure: claude/skills/operations/infrastructure.md
+          - Observability: claude/skills/operations/observability.md
+          - Incident Management: claude/skills/operations/incident-management.md
+          - Chaos Engineering: claude/skills/operations/chaos-engineering.md
+          - Beads Workflow: claude/skills/operations/beads-workflow.md
+          - Deploy AWS ECS: claude/skills/operations/deploy-aws-ecs.md
+          - Deploy Cloudflare: claude/skills/operations/deploy-cloudflare.md
+          - Deploy Railway: claude/skills/operations/deploy-railway.md
+
+      - Skills — Product:
+          - Requirements Analysis: claude/skills/product/requirements-analysis.md
+          - Writing PRDs: claude/skills/product/writing-prds.md
+          - Writing PR FAQs: claude/skills/product/writing-pr-faqs.md
+          - Decomposing Tasks: claude/skills/product/decomposing-tasks.md
+          - Estimating Work: claude/skills/product/estimating-work.md
+          - Agile Methodology: claude/skills/product/agile-methodology.md
+          - Brainstorming: claude/skills/product/brainstorming.md
+          - Reaching Consensus: claude/skills/product/reaching-consensus.md
+          - Documentation: claude/skills/product/documentation.md
+          - Context Management: claude/skills/product/context-management.md
+          - Execution Roadmaps: claude/skills/product/execution-roadmaps.md
+
+      - Skills — Security:
+          - Security Review: claude/skills/security/security-review.md
+          - Application Security: claude/skills/security/application-security.md
+          - Threat Modeling: claude/skills/security/threat-modeling.md
+          - Identity & Access: claude/skills/security/identity-access.md
+          - Compliance: claude/skills/security/compliance.md
