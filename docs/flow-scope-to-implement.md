@@ -12,19 +12,20 @@ graph LR
     B --> C["📄 PRD"]
     C --> D["/architect"]
     D --> E["📐 ADR"]
-    E --> F["📋 Plan"]
-    F --> G["/builder"]
-    G --> H["🧪 /qa-engineer"]
-    H --> I["/code-review"]
-    I --> J["✅ Merge"]
+    E --> F["/swarm-plan"]
+    F --> G["📋 Plan + Beads"]
+    G --> H["/swarm-execute"]
+    H --> I["🧪 /qa-engineer"]
+    I --> J["/code-review"]
+    J --> K["✅ Merge"]
 ```
 
 | Step | Command | Output | Template |
 |------|---------|--------|----------|
 | 1. Scope | `/scope` | `docs/prd/PRD-{slug}.md` | `templates/artifacts/prd.template.md` |
 | 2. Architecture | `/architect` | `docs/adr/NNNN-{slug}.md` | `templates/artifacts/adr.template.md` |
-| 3. Plan | `/architect` or `/builder` | `docs/plans/plan-{slug}.md` | `templates/artifacts/plan.template.md` |
-| 4. Implement | `/builder` or `/swarm-execute` | Code changes | — |
+| 3. Plan | `/swarm-plan` | `docs/plans/plan-{slug}.md` + Beads | `templates/artifacts/plan.template.md` |
+| 4. Implement | `/swarm-execute` or `/builder` | Code changes | — |
 | 5. Test | `/qa-engineer` | Test files | — |
 | 6. Review | `/code-review` | Findings | — |
 
@@ -85,25 +86,35 @@ The ADR contains:
 
 ## Step 3 — Implementation plan
 
-With PRD + ADR approved, create a phased implementation plan.
+With PRD + ADR approved, use `/swarm-plan` to decompose the feature into a phased plan and Beads.
 
 ```
-/architect create an implementation plan for docs/prd/PRD-comment-section.md
+/swarm-plan docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
 ```
 
-Or if the task is straightforward:
+`/swarm-plan` differs from `/architect`:
 
-```
-/builder create a plan for the comment section feature
-```
+| | `/architect` | `/swarm-plan` |
+|---|---|---|
+| **Primary output** | ADR (decision record) | Plan + Beads (task breakdown) |
+| **Asks questions** | No — explores codebase | No — reads PRD/ADR |
+| **Creates ADR** | Always | Only for One-Way Door (High) decisions found during planning |
+| **Creates Beads** | No | Yes — ready for `/swarm-execute` |
 
-The plan (`templates/artifacts/plan.template.md`) contains:
-- Phased steps with exact file paths
+`/swarm-plan` will:
+1. Launch 3–6 `worker-explorer` agents in parallel to research existing patterns
+2. Classify decision reversibility (Two-Way Door vs One-Way Door)
+3. Write `docs/plans/plan-{slug}.md` using `templates/artifacts/plan.template.md`
+4. Output Beads commands for all implementation tasks with dependencies
+
+The plan contains:
+- Phased steps with exact file paths and acceptance criteria
 - Testing strategy (unit + integration + manual)
 - Rollback plan
+- Dependency graph showing task order
 - Before/During/After PR checklist
 
-**Output:** `docs/plans/plan-{slug}.md`
+**Output:** `docs/plans/plan-{slug}.md` + Beads
 
 ---
 
@@ -190,26 +201,29 @@ Fix findings, then commit and open a PR.
 # 1. Scope
 /scope add real-time view count to video cards
 
-# Claude asks questions → you answer → PRD created
+# Claude asks questions one at a time → you answer → PRD created
 # → docs/prd/PRD-realtime-view-count.md
 
 # 2. Architecture
-/architect review PRD and create ADR for view count approach
+/architect docs/prd/PRD-realtime-view-count.md
 
-# → docs/adr/0012-realtime-view-count.md
+# Uses Sequential Thinking for trade-off analysis
+# → docs/adr/0013-realtime-view-count.md
 
 # 3. Plan
-/builder create implementation plan
+/swarm-plan docs/prd/PRD-realtime-view-count.md docs/adr/0013-realtime-view-count.md
 
-# → docs/plans/plan-realtime-view-count.md
+# Launches parallel explorer agents → researches codebase
+# → docs/plans/plan-realtime-view-count.md + Beads
 
 # 4. Implement
 git checkout -b feat/realtime-view-count
-/builder implement the plan
+/swarm-execute docs/plans/plan-realtime-view-count.md
 
 # 5. Test
 /qa-engineer test view count feature
 cd api && mvn verify
+cd webapp && npm run test
 
 # 6. Review
 /code-review
