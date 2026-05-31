@@ -6,35 +6,35 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Improve code performance without changing behavior. Use when code fails latency/throughput requirements. Covers profiling, caching, and algorithmic optimization.">
+        <meta name="description" content="Architecture documentation for the Funny Movies video streaming platform">
       
       
         <meta name="author" content="nguyenhuuca">
       
       
       
-        <link rel="prev" href="../refactoring-code/">
+        <link rel="prev" href="..">
       
       
-        <link rel="next" href="../data-to-ui/">
+        <link rel="next" href="../Video%20Streaming%20System%20Architecture/">
       
       
         
       
       
-      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Optimizing Code - Funny Movies - Architecture Docs</title>
+        <title>Feature Tracking - Funny Movies - Architecture Docs</title>
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,7 +53,7 @@
       
     
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#optimizing-code" class="md-skip">
+        <a href="#feature-tracking" class="md-skip">
           Skip to content
         </a>
       
@@ -92,7 +92,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../.." title="Funny Movies - Architecture Docs" class="md-header__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+    <a href=".." title="Funny Movies - Architecture Docs" class="md-header__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Optimizing Code
+              Feature Tracking
             
           </span>
         </div>
@@ -225,7 +225,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../.." class="md-tabs__link">
+      <a href=".." class="md-tabs__link">
         
   
   
@@ -242,9 +242,11 @@
   
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="../../../../tracking/" class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
   
@@ -265,7 +267,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../Video%20Streaming%20System%20Architecture/" class="md-tabs__link">
+        <a href="../Video%20Streaming%20System%20Architecture/" class="md-tabs__link">
           
   
   
@@ -285,7 +287,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../adr/0001-use-relational-database/" class="md-tabs__link">
+        <a href="../adr/0001-use-relational-database/" class="md-tabs__link">
           
   
   
@@ -305,7 +307,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../prd/PRD-hot-video-priority/" class="md-tabs__link">
+        <a href="../prd/PRD-hot-video-priority/" class="md-tabs__link">
           
   
   
@@ -325,7 +327,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../feature-flags/" class="md-tabs__link">
+        <a href="../feature-flags/" class="md-tabs__link">
           
   
   
@@ -345,7 +347,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../plans/plan-hls-migration/" class="md-tabs__link">
+        <a href="../plans/plan-hls-migration/" class="md-tabs__link">
           
   
   
@@ -365,7 +367,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../system_health_report_2026-05-30/" class="md-tabs__link">
+        <a href="../system_health_report_2026-05-30/" class="md-tabs__link">
           
   
   
@@ -385,7 +387,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../claude-guide-en/" class="md-tabs__link">
+        <a href="../claude-guide-en/" class="md-tabs__link">
           
   
   
@@ -401,8 +403,6 @@
   
   
   
-    
-  
   
     
     
@@ -410,13 +410,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../../commands/scope/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../claude/commands/scope/" class="md-tabs__link">
           
   
   
@@ -453,7 +451,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../.." title="Funny Movies - Architecture Docs" class="md-nav__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+    <a href=".." title="Funny Movies - Architecture Docs" class="md-nav__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -483,7 +481,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../.." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -507,10 +505,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../../../tracking/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature Tracking
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -526,6 +551,120 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#legend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Legend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#feature-tracker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Feature Tracker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#status-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status Summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Status Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#done" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Done
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 In Progress
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 In Review
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#draft-proposed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📝 Draft / Proposed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adr-status-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ADR Status Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -591,7 +730,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../Video%20Streaming%20System%20Architecture/" class="md-nav__link">
+      <a href="../Video%20Streaming%20System%20Architecture/" class="md-nav__link">
         
   
   
@@ -619,7 +758,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../Sequence-Diagram/" class="md-nav__link">
+      <a href="../Sequence-Diagram/" class="md-nav__link">
         
   
   
@@ -647,7 +786,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../performance-review/" class="md-nav__link">
+      <a href="../performance-review/" class="md-nav__link">
         
   
   
@@ -675,7 +814,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../diagrams/ci-pipeline/" class="md-nav__link">
+      <a href="../diagrams/ci-pipeline/" class="md-nav__link">
         
   
   
@@ -764,7 +903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0001-use-relational-database/" class="md-nav__link">
+      <a href="../adr/0001-use-relational-database/" class="md-nav__link">
         
   
   
@@ -792,7 +931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0002-backend-architecture/" class="md-nav__link">
+      <a href="../adr/0002-backend-architecture/" class="md-nav__link">
         
   
   
@@ -820,7 +959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0003-use-cache/" class="md-nav__link">
+      <a href="../adr/0003-use-cache/" class="md-nav__link">
         
   
   
@@ -848,7 +987,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0004-frontend-structure/" class="md-nav__link">
+      <a href="../adr/0004-frontend-structure/" class="md-nav__link">
         
   
   
@@ -876,7 +1015,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
+      <a href="../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
         
   
   
@@ -904,7 +1043,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0006-hls-video-streaming/" class="md-nav__link">
+      <a href="../adr/0006-hls-video-streaming/" class="md-nav__link">
         
   
   
@@ -932,7 +1071,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0007-admin-dashboard/" class="md-nav__link">
+      <a href="../adr/0007-admin-dashboard/" class="md-nav__link">
         
   
   
@@ -960,7 +1099,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0008-react-migration/" class="md-nav__link">
+      <a href="../adr/0008-react-migration/" class="md-nav__link">
         
   
   
@@ -988,7 +1127,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0009-unified-video-list-api/" class="md-nav__link">
+      <a href="../adr/0009-unified-video-list-api/" class="md-nav__link">
         
   
   
@@ -1016,7 +1155,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0010-trivy-container-scanning/" class="md-nav__link">
+      <a href="../adr/0010-trivy-container-scanning/" class="md-nav__link">
         
   
   
@@ -1044,7 +1183,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0011-hot-video-priority/" class="md-nav__link">
+      <a href="../adr/0011-hot-video-priority/" class="md-nav__link">
         
   
   
@@ -1072,7 +1211,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../adr/0012-bookmark-feature-design/" class="md-nav__link">
+      <a href="../adr/0012-bookmark-feature-design/" class="md-nav__link">
         
   
   
@@ -1161,7 +1300,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../prd/PRD-hot-video-priority/" class="md-nav__link">
+      <a href="../prd/PRD-hot-video-priority/" class="md-nav__link">
         
   
   
@@ -1189,7 +1328,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../prd/PRD-react-migration/" class="md-nav__link">
+      <a href="../prd/PRD-react-migration/" class="md-nav__link">
         
   
   
@@ -1217,7 +1356,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../prd/PRD-bookmark-feature/" class="md-nav__link">
+      <a href="../prd/PRD-bookmark-feature/" class="md-nav__link">
         
   
   
@@ -1306,7 +1445,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../feature-flags/" class="md-nav__link">
+      <a href="../feature-flags/" class="md-nav__link">
         
   
   
@@ -1334,7 +1473,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../feature-flags-vi/" class="md-nav__link">
+      <a href="../feature-flags-vi/" class="md-nav__link">
         
   
   
@@ -1423,7 +1562,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plans/plan-hls-migration/" class="md-nav__link">
+      <a href="../plans/plan-hls-migration/" class="md-nav__link">
         
   
   
@@ -1451,7 +1590,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plans/plan-react-migration/" class="md-nav__link">
+      <a href="../plans/plan-react-migration/" class="md-nav__link">
         
   
   
@@ -1479,7 +1618,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plans/plan-admin-dashboard/" class="md-nav__link">
+      <a href="../plans/plan-admin-dashboard/" class="md-nav__link">
         
   
   
@@ -1507,7 +1646,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plans/plan-permissions-bitwise/" class="md-nav__link">
+      <a href="../plans/plan-permissions-bitwise/" class="md-nav__link">
         
   
   
@@ -1535,7 +1674,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plans/plan-vid2-hot-score-migration/" class="md-nav__link">
+      <a href="../plans/plan-vid2-hot-score-migration/" class="md-nav__link">
         
   
   
@@ -1563,7 +1702,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plans/plan-trivy-scan/" class="md-nav__link">
+      <a href="../plans/plan-trivy-scan/" class="md-nav__link">
         
   
   
@@ -1591,7 +1730,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plans/plan-hot-video-priority/" class="md-nav__link">
+      <a href="../plans/plan-hot-video-priority/" class="md-nav__link">
         
   
   
@@ -1619,7 +1758,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plans/plan-a-file-based-hooks/" class="md-nav__link">
+      <a href="../plans/plan-a-file-based-hooks/" class="md-nav__link">
         
   
   
@@ -1647,7 +1786,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plans/plan-b-direct-cli-spawn/" class="md-nav__link">
+      <a href="../plans/plan-b-direct-cli-spawn/" class="md-nav__link">
         
   
   
@@ -1675,7 +1814,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../plans/plan-bookmark-feature/" class="md-nav__link">
+      <a href="../plans/plan-bookmark-feature/" class="md-nav__link">
         
   
   
@@ -1764,7 +1903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../system_health_report_2026-05-30/" class="md-nav__link">
+      <a href="../system_health_report_2026-05-30/" class="md-nav__link">
         
   
   
@@ -1792,7 +1931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../system_health_report_2026-02-06/" class="md-nav__link">
+      <a href="../system_health_report_2026-02-06/" class="md-nav__link">
         
   
   
@@ -1820,7 +1959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
+      <a href="../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
         
   
   
@@ -1848,7 +1987,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
+      <a href="../architecture_quality_report_2025-07-13._VN/" class="md-nav__link">
         
   
   
@@ -1876,7 +2015,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../architecture_quality_report_2025-07-05/" class="md-nav__link">
+      <a href="../architecture_quality_report_2025-07-05/" class="md-nav__link">
         
   
   
@@ -1965,7 +2104,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../claude-guide-en/" class="md-nav__link">
+      <a href="../claude-guide-en/" class="md-nav__link">
         
   
   
@@ -1993,7 +2132,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../claude-guide-vi/" class="md-nav__link">
+      <a href="../claude-guide-vi/" class="md-nav__link">
         
   
   
@@ -2021,7 +2160,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../flow-scope-to-implement/" class="md-nav__link">
+      <a href="../flow-scope-to-implement/" class="md-nav__link">
         
   
   
@@ -2049,7 +2188,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../flow-scope-to-implement-vi/" class="md-nav__link">
+      <a href="../flow-scope-to-implement-vi/" class="md-nav__link">
         
   
   
@@ -2081,31 +2220,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
         
           
-          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
             
   
   
@@ -2123,7 +2259,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_10">
             <span class="md-nav__icon md-icon"></span>
             
@@ -2147,13 +2283,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -2162,7 +2295,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_1" >
         
           
-          <label class="md-nav__link" for="__nav_10_1" id="__nav_10_1_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_1" id="__nav_10_1_label" tabindex="0">
             
   
   
@@ -2198,7 +2331,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/scope/" class="md-nav__link">
+      <a href="../claude/commands/scope/" class="md-nav__link">
         
   
   
@@ -2226,7 +2359,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/builder/" class="md-nav__link">
+      <a href="../claude/commands/builder/" class="md-nav__link">
         
   
   
@@ -2254,7 +2387,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/architect/" class="md-nav__link">
+      <a href="../claude/commands/architect/" class="md-nav__link">
         
   
   
@@ -2282,7 +2415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/qa-engineer/" class="md-nav__link">
+      <a href="../claude/commands/qa-engineer/" class="md-nav__link">
         
   
   
@@ -2310,7 +2443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/code-check/" class="md-nav__link">
+      <a href="../claude/commands/code-check/" class="md-nav__link">
         
   
   
@@ -2338,7 +2471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/security-auditor/" class="md-nav__link">
+      <a href="../claude/commands/security-auditor/" class="md-nav__link">
         
   
   
@@ -2366,7 +2499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/ui-ux-designer/" class="md-nav__link">
+      <a href="../claude/commands/ui-ux-designer/" class="md-nav__link">
         
   
   
@@ -2394,7 +2527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/swarm-execute/" class="md-nav__link">
+      <a href="../claude/commands/swarm-execute/" class="md-nav__link">
         
   
   
@@ -2422,7 +2555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/swarm-plan/" class="md-nav__link">
+      <a href="../claude/commands/swarm-plan/" class="md-nav__link">
         
   
   
@@ -2450,7 +2583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/swarm-review/" class="md-nav__link">
+      <a href="../claude/commands/swarm-review/" class="md-nav__link">
         
   
   
@@ -2492,13 +2625,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -2507,7 +2637,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_2" >
         
           
-          <label class="md-nav__link" for="__nav_10_2" id="__nav_10_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_2" id="__nav_10_2_label" tabindex="0">
             
   
   
@@ -2543,7 +2673,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../agents/worker-builder/" class="md-nav__link">
+      <a href="../claude/agents/worker-builder/" class="md-nav__link">
         
   
   
@@ -2571,7 +2701,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../agents/worker-architect/" class="md-nav__link">
+      <a href="../claude/agents/worker-architect/" class="md-nav__link">
         
   
   
@@ -2599,7 +2729,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../agents/worker-explorer/" class="md-nav__link">
+      <a href="../claude/agents/worker-explorer/" class="md-nav__link">
         
   
   
@@ -2627,7 +2757,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../agents/worker-researcher/" class="md-nav__link">
+      <a href="../claude/agents/worker-researcher/" class="md-nav__link">
         
   
   
@@ -2655,7 +2785,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../agents/worker-reviewer/" class="md-nav__link">
+      <a href="../claude/agents/worker-reviewer/" class="md-nav__link">
         
   
   
@@ -2697,13 +2827,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -2712,7 +2839,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_3" >
         
           
-          <label class="md-nav__link" for="__nav_10_3" id="__nav_10_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_3" id="__nav_10_3_label" tabindex="0">
             
   
   
@@ -2748,7 +2875,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../rules/core-directives/" class="md-nav__link">
+      <a href="../claude/rules/core-directives/" class="md-nav__link">
         
   
   
@@ -2776,7 +2903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../rules/code-quality/" class="md-nav__link">
+      <a href="../claude/rules/code-quality/" class="md-nav__link">
         
   
   
@@ -2804,7 +2931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../rules/security/" class="md-nav__link">
+      <a href="../claude/rules/security/" class="md-nav__link">
         
   
   
@@ -2832,7 +2959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../rules/swarm-workers/" class="md-nav__link">
+      <a href="../claude/rules/swarm-workers/" class="md-nav__link">
         
   
   
@@ -2860,7 +2987,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../rules/tech-strategy/" class="md-nav__link">
+      <a href="../claude/rules/tech-strategy/" class="md-nav__link">
         
   
   
@@ -2902,13 +3029,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -2917,7 +3041,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_4" >
         
           
-          <label class="md-nav__link" for="__nav_10_4" id="__nav_10_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_4" id="__nav_10_4_label" tabindex="0">
             
   
   
@@ -2953,7 +3077,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/designing-systems/" class="md-nav__link">
+      <a href="../claude/skills/architecture/designing-systems/" class="md-nav__link">
         
   
   
@@ -2981,7 +3105,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/designing-apis/" class="md-nav__link">
+      <a href="../claude/skills/architecture/designing-apis/" class="md-nav__link">
         
   
   
@@ -3009,7 +3133,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/writing-adrs/" class="md-nav__link">
+      <a href="../claude/skills/architecture/writing-adrs/" class="md-nav__link">
         
   
   
@@ -3037,7 +3161,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/domain-driven-design/" class="md-nav__link">
+      <a href="../claude/skills/architecture/domain-driven-design/" class="md-nav__link">
         
   
   
@@ -3065,7 +3189,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/cloud-native-patterns/" class="md-nav__link">
+      <a href="../claude/skills/architecture/cloud-native-patterns/" class="md-nav__link">
         
   
   
@@ -3093,7 +3217,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/capacity-planning/" class="md-nav__link">
+      <a href="../claude/skills/architecture/capacity-planning/" class="md-nav__link">
         
   
   
@@ -3121,7 +3245,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/defense-in-depth/" class="md-nav__link">
+      <a href="../claude/skills/architecture/defense-in-depth/" class="md-nav__link">
         
   
   
@@ -3154,31 +3278,28 @@
                 
   
   
-    
   
   
-  
     
     
     
     
       
       
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
         
           
-          
         
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10_5" checked>
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_5" >
         
           
-          <label class="md-nav__link" for="__nav_10_5" id="__nav_10_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_5" id="__nav_10_5_label" tabindex="0">
             
   
   
@@ -3196,7 +3317,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_10_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_10_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_10_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -3214,7 +3335,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../implementing-code/" class="md-nav__link">
+      <a href="../claude/skills/core-engineering/implementing-code/" class="md-nav__link">
         
   
   
@@ -3242,7 +3363,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../debugging/" class="md-nav__link">
+      <a href="../claude/skills/core-engineering/debugging/" class="md-nav__link">
         
   
   
@@ -3270,7 +3391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../testing/" class="md-nav__link">
+      <a href="../claude/skills/core-engineering/testing/" class="md-nav__link">
         
   
   
@@ -3298,7 +3419,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../test-driven-development/" class="md-nav__link">
+      <a href="../claude/skills/core-engineering/test-driven-development/" class="md-nav__link">
         
   
   
@@ -3326,7 +3447,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../refactoring-code/" class="md-nav__link">
+      <a href="../claude/skills/core-engineering/refactoring-code/" class="md-nav__link">
         
   
   
@@ -3351,37 +3472,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimizing Code
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../claude/skills/core-engineering/optimizing-code/" class="md-nav__link">
         
   
   
@@ -3397,153 +3491,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-optimization-hat" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The Optimization Hat
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#golden-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Golden Rules
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#workflows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Workflows
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-optimizations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common Optimizations
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Common Optimizations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#algorithm-complexity" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Algorithm Complexity
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#caching-java-guava" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Caching (Java + Guava)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#virtual-threads-java-24" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Virtual Threads (Java 24)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#database-queries-jpahibernate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Database Queries (JPA/Hibernate)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#memory" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Memory
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#profiling-tools" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Profiling Tools
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#anti-patterns-to-avoid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anti-Patterns to Avoid
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -3556,7 +3503,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../data-to-ui/" class="md-nav__link">
+      <a href="../claude/skills/core-engineering/data-to-ui/" class="md-nav__link">
         
   
   
@@ -3584,7 +3531,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../data-management/" class="md-nav__link">
+      <a href="../claude/skills/core-engineering/data-management/" class="md-nav__link">
         
   
   
@@ -3612,7 +3559,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dependency-management/" class="md-nav__link">
+      <a href="../claude/skills/core-engineering/dependency-management/" class="md-nav__link">
         
   
   
@@ -3654,13 +3601,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -3669,7 +3613,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_6" >
         
           
-          <label class="md-nav__link" for="__nav_10_6" id="__nav_10_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_6" id="__nav_10_6_label" tabindex="0">
             
   
   
@@ -3705,7 +3649,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/interface-design/" class="md-nav__link">
+      <a href="../claude/skills/design/interface-design/" class="md-nav__link">
         
   
   
@@ -3733,7 +3677,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/design-systems/" class="md-nav__link">
+      <a href="../claude/skills/design/design-systems/" class="md-nav__link">
         
   
   
@@ -3761,7 +3705,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/component-recipes/" class="md-nav__link">
+      <a href="../claude/skills/design/component-recipes/" class="md-nav__link">
         
   
   
@@ -3789,7 +3733,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/accessibility/" class="md-nav__link">
+      <a href="../claude/skills/design/accessibility/" class="md-nav__link">
         
   
   
@@ -3817,7 +3761,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/visual-assets/" class="md-nav__link">
+      <a href="../claude/skills/design/visual-assets/" class="md-nav__link">
         
   
   
@@ -3845,7 +3789,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/demo-design-tokens/" class="md-nav__link">
+      <a href="../claude/skills/design/demo-design-tokens/" class="md-nav__link">
         
   
   
@@ -3887,13 +3831,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -3902,7 +3843,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_7" >
         
           
-          <label class="md-nav__link" for="__nav_10_7" id="__nav_10_7_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_7" id="__nav_10_7_label" tabindex="0">
             
   
   
@@ -3938,7 +3879,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../languages/java/" class="md-nav__link">
+      <a href="../claude/skills/languages/java/" class="md-nav__link">
         
   
   
@@ -3966,7 +3907,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../languages/typescript/" class="md-nav__link">
+      <a href="../claude/skills/languages/typescript/" class="md-nav__link">
         
   
   
@@ -3994,7 +3935,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../languages/python/" class="md-nav__link">
+      <a href="../claude/skills/languages/python/" class="md-nav__link">
         
   
   
@@ -4022,7 +3963,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../languages/bash/" class="md-nav__link">
+      <a href="../claude/skills/languages/bash/" class="md-nav__link">
         
   
   
@@ -4050,7 +3991,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../languages/terraform/" class="md-nav__link">
+      <a href="../claude/skills/languages/terraform/" class="md-nav__link">
         
   
   
@@ -4092,13 +4033,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -4107,7 +4045,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_8" >
         
           
-          <label class="md-nav__link" for="__nav_10_8" id="__nav_10_8_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_8" id="__nav_10_8_label" tabindex="0">
             
   
   
@@ -4143,7 +4081,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/infrastructure/" class="md-nav__link">
+      <a href="../claude/skills/operations/infrastructure/" class="md-nav__link">
         
   
   
@@ -4171,7 +4109,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/observability/" class="md-nav__link">
+      <a href="../claude/skills/operations/observability/" class="md-nav__link">
         
   
   
@@ -4199,7 +4137,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/incident-management/" class="md-nav__link">
+      <a href="../claude/skills/operations/incident-management/" class="md-nav__link">
         
   
   
@@ -4227,7 +4165,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/chaos-engineering/" class="md-nav__link">
+      <a href="../claude/skills/operations/chaos-engineering/" class="md-nav__link">
         
   
   
@@ -4255,7 +4193,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/beads-workflow/" class="md-nav__link">
+      <a href="../claude/skills/operations/beads-workflow/" class="md-nav__link">
         
   
   
@@ -4283,7 +4221,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/deploy-aws-ecs/" class="md-nav__link">
+      <a href="../claude/skills/operations/deploy-aws-ecs/" class="md-nav__link">
         
   
   
@@ -4311,7 +4249,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/deploy-cloudflare/" class="md-nav__link">
+      <a href="../claude/skills/operations/deploy-cloudflare/" class="md-nav__link">
         
   
   
@@ -4339,7 +4277,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/deploy-railway/" class="md-nav__link">
+      <a href="../claude/skills/operations/deploy-railway/" class="md-nav__link">
         
   
   
@@ -4381,13 +4319,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -4396,7 +4331,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_9" >
         
           
-          <label class="md-nav__link" for="__nav_10_9" id="__nav_10_9_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_9" id="__nav_10_9_label" tabindex="0">
             
   
   
@@ -4432,7 +4367,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/requirements-analysis/" class="md-nav__link">
+      <a href="../claude/skills/product/requirements-analysis/" class="md-nav__link">
         
   
   
@@ -4460,7 +4395,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/writing-prds/" class="md-nav__link">
+      <a href="../claude/skills/product/writing-prds/" class="md-nav__link">
         
   
   
@@ -4488,7 +4423,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/writing-pr-faqs/" class="md-nav__link">
+      <a href="../claude/skills/product/writing-pr-faqs/" class="md-nav__link">
         
   
   
@@ -4516,7 +4451,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/decomposing-tasks/" class="md-nav__link">
+      <a href="../claude/skills/product/decomposing-tasks/" class="md-nav__link">
         
   
   
@@ -4544,7 +4479,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/estimating-work/" class="md-nav__link">
+      <a href="../claude/skills/product/estimating-work/" class="md-nav__link">
         
   
   
@@ -4572,7 +4507,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/agile-methodology/" class="md-nav__link">
+      <a href="../claude/skills/product/agile-methodology/" class="md-nav__link">
         
   
   
@@ -4600,7 +4535,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/brainstorming/" class="md-nav__link">
+      <a href="../claude/skills/product/brainstorming/" class="md-nav__link">
         
   
   
@@ -4628,7 +4563,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/reaching-consensus/" class="md-nav__link">
+      <a href="../claude/skills/product/reaching-consensus/" class="md-nav__link">
         
   
   
@@ -4656,7 +4591,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/documentation/" class="md-nav__link">
+      <a href="../claude/skills/product/documentation/" class="md-nav__link">
         
   
   
@@ -4684,7 +4619,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/context-management/" class="md-nav__link">
+      <a href="../claude/skills/product/context-management/" class="md-nav__link">
         
   
   
@@ -4712,7 +4647,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../product/execution-roadmaps/" class="md-nav__link">
+      <a href="../claude/skills/product/execution-roadmaps/" class="md-nav__link">
         
   
   
@@ -4754,13 +4689,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -4769,7 +4701,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_10" >
         
           
-          <label class="md-nav__link" for="__nav_10_10" id="__nav_10_10_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_10" id="__nav_10_10_label" tabindex="0">
             
   
   
@@ -4805,7 +4737,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/security-review/" class="md-nav__link">
+      <a href="../claude/skills/security/security-review/" class="md-nav__link">
         
   
   
@@ -4833,7 +4765,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/application-security/" class="md-nav__link">
+      <a href="../claude/skills/security/application-security/" class="md-nav__link">
         
   
   
@@ -4861,7 +4793,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/threat-modeling/" class="md-nav__link">
+      <a href="../claude/skills/security/threat-modeling/" class="md-nav__link">
         
   
   
@@ -4889,7 +4821,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/identity-access/" class="md-nav__link">
+      <a href="../claude/skills/security/identity-access/" class="md-nav__link">
         
   
   
@@ -4917,7 +4849,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/compliance/" class="md-nav__link">
+      <a href="../claude/skills/security/compliance/" class="md-nav__link">
         
   
   
@@ -4959,13 +4891,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -4974,7 +4903,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_11" >
         
           
-          <label class="md-nav__link" for="__nav_10_11" id="__nav_10_11_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_11" id="__nav_10_11_label" tabindex="0">
             
   
   
@@ -5010,7 +4939,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/artifacts/prd.template/" class="md-nav__link">
+      <a href="../claude/templates/artifacts/prd.template/" class="md-nav__link">
         
   
   
@@ -5038,7 +4967,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/artifacts/adr.template/" class="md-nav__link">
+      <a href="../claude/templates/artifacts/adr.template/" class="md-nav__link">
         
   
   
@@ -5066,7 +4995,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/artifacts/plan.template/" class="md-nav__link">
+      <a href="../claude/templates/artifacts/plan.template/" class="md-nav__link">
         
   
   
@@ -5094,7 +5023,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/artifacts/system_design.template/" class="md-nav__link">
+      <a href="../claude/templates/artifacts/system_design.template/" class="md-nav__link">
         
   
   
@@ -5122,7 +5051,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/artifacts/design_spec.template/" class="md-nav__link">
+      <a href="../claude/templates/artifacts/design_spec.template/" class="md-nav__link">
         
   
   
@@ -5150,7 +5079,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/artifacts/pr_faq.template/" class="md-nav__link">
+      <a href="../claude/templates/artifacts/pr_faq.template/" class="md-nav__link">
         
   
   
@@ -5178,7 +5107,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/artifacts/roadmap.template/" class="md-nav__link">
+      <a href="../claude/templates/artifacts/roadmap.template/" class="md-nav__link">
         
   
   
@@ -5206,7 +5135,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/artifacts/security_audit.template/" class="md-nav__link">
+      <a href="../claude/templates/artifacts/security_audit.template/" class="md-nav__link">
         
   
   
@@ -5234,7 +5163,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/artifacts/postmortem.template/" class="md-nav__link">
+      <a href="../claude/templates/artifacts/postmortem.template/" class="md-nav__link">
         
   
   
@@ -5276,13 +5205,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -5291,7 +5217,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10_12" >
         
           
-          <label class="md-nav__link" for="__nav_10_12" id="__nav_10_12_label" tabindex="">
+          <label class="md-nav__link" for="__nav_10_12" id="__nav_10_12_label" tabindex="0">
             
   
   
@@ -5327,7 +5253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/claude_mechanisms/command.template/" class="md-nav__link">
+      <a href="../claude/templates/claude_mechanisms/command.template/" class="md-nav__link">
         
   
   
@@ -5355,7 +5281,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/claude_mechanisms/skill.template/" class="md-nav__link">
+      <a href="../claude/templates/claude_mechanisms/skill.template/" class="md-nav__link">
         
   
   
@@ -5383,7 +5309,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/claude_mechanisms/agent.template/" class="md-nav__link">
+      <a href="../claude/templates/claude_mechanisms/agent.template/" class="md-nav__link">
         
   
   
@@ -5411,7 +5337,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../templates/claude_mechanisms/rule.template/" class="md-nav__link">
+      <a href="../claude/templates/claude_mechanisms/rule.template/" class="md-nav__link">
         
   
   
@@ -5474,10 +5400,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-optimization-hat" class="md-nav__link">
+  <a href="#legend" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Optimization Hat
+        Legend
       
     </span>
   </a>
@@ -5485,10 +5411,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#golden-rules" class="md-nav__link">
+  <a href="#feature-tracker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Golden Rules
+        Feature Tracker
       
     </span>
   </a>
@@ -5496,33 +5422,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#workflows" class="md-nav__link">
+  <a href="#status-summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Workflows
+        Status Summary
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-optimizations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common Optimizations
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Common Optimizations">
+    <nav class="md-nav" aria-label="Status Summary">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#algorithm-complexity" class="md-nav__link">
+  <a href="#done" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Algorithm Complexity
+        ✅ Done
       
     </span>
   </a>
@@ -5530,10 +5445,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#caching-java-guava" class="md-nav__link">
+  <a href="#in-progress" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Caching (Java + Guava)
+        🔄 In Progress
       
     </span>
   </a>
@@ -5541,10 +5456,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#virtual-threads-java-24" class="md-nav__link">
+  <a href="#in-review" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Virtual Threads (Java 24)
+        🔍 In Review
       
     </span>
   </a>
@@ -5552,21 +5467,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#database-queries-jpahibernate" class="md-nav__link">
+  <a href="#draft-proposed" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Database Queries (JPA/Hibernate)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#memory" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Memory
+        📝 Draft / Proposed
       
     </span>
   </a>
@@ -5579,21 +5483,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#profiling-tools" class="md-nav__link">
+  <a href="#adr-status-summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Profiling Tools
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#anti-patterns-to-avoid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anti-Patterns to Avoid
+        ADR Status Summary
       
     </span>
   </a>
@@ -5617,7 +5510,7 @@
 
 
   
-    <a href="https://github.com/nguyenhuuca/assessment/edit/main/docs/claude/skills/core-engineering/optimizing-code.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/nguyenhuuca/assessment/edit/main/docs/tracking.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -5625,169 +5518,280 @@
   
 
 
-<h1 id="optimizing-code">Optimizing Code<a class="headerlink" href="#optimizing-code" title="Permanent link">&para;</a></h1>
-<h2 id="the-optimization-hat">The Optimization Hat<a class="headerlink" href="#the-optimization-hat" title="Permanent link">&para;</a></h2>
-<p>When optimizing, you improve <strong>performance</strong> without changing <strong>behavior</strong>. Always measure before and after.</p>
-<h2 id="golden-rules">Golden Rules<a class="headerlink" href="#golden-rules" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>Measure First</strong>: Never optimize without a benchmark</li>
-<li><strong>Profile Before Guessing</strong>: Find the actual bottleneck</li>
-<li><strong>Optimize the Right Thing</strong>: Focus on the critical path</li>
-<li><strong>Measure After</strong>: Verify the optimization worked</li>
-</ol>
-<h2 id="workflows">Workflows<a class="headerlink" href="#workflows" title="Permanent link">&para;</a></h2>
+<h1 id="feature-tracking">Feature Tracking<a class="headerlink" href="#feature-tracking" title="Permanent link">&para;</a></h1>
+<p>Status tracker for all PRDs, ADRs, and Plans in the project.</p>
+<h2 id="legend">Legend<a class="headerlink" href="#legend" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅</td>
+<td>Done — implemented and merged</td>
+</tr>
+<tr>
+<td>🔄</td>
+<td>In Progress — currently being worked on</td>
+</tr>
+<tr>
+<td>🔍</td>
+<td>In Review — plan/design ready, pending implementation start</td>
+</tr>
+<tr>
+<td>📋</td>
+<td>Ready — plan approved, ready to implement</td>
+</tr>
+<tr>
+<td>📝</td>
+<td>Draft — still being scoped or planned</td>
+</tr>
+<tr>
+<td>💡</td>
+<td>Proposed — decision made, not yet started</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="feature-tracker">Feature Tracker<a class="headerlink" href="#feature-tracker" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>PRD</th>
+<th>ADR</th>
+<th>Plan</th>
+<th>Implemented</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Use RDBMS (PostgreSQL)</strong></td>
+<td>—</td>
+<td><a href="../adr/0001-use-relational-database/">0001 ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td>Foundation</td>
+</tr>
+<tr>
+<td><strong>Backend Architecture</strong></td>
+<td>—</td>
+<td><a href="../adr/0002-backend-architecture/">0002 ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td>Spring Boot + Virtual Threads</td>
+</tr>
+<tr>
+<td><strong>Cache Strategy</strong></td>
+<td>—</td>
+<td><a href="../adr/0003-use-cache/">0003 ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td>Guava LRU</td>
+</tr>
+<tr>
+<td><strong>Frontend Structure</strong></td>
+<td>—</td>
+<td><a href="../adr/0004-frontend-structure/">0004 ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td>Vanilla JS → React</td>
+</tr>
+<tr>
+<td><strong>LRU Video Cache</strong></td>
+<td>—</td>
+<td><a href="../adr/0005-use_lru_cache_video_streaming/">0005 ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td>Video chunk caching</td>
+</tr>
+<tr>
+<td><strong>HLS Video Streaming</strong></td>
+<td>—</td>
+<td><a href="../adr/0006-hls-video-streaming/">0006 💡</a></td>
+<td><a href="../plans/plan-hls-migration/">Plan 📋</a></td>
+<td>🔍</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Admin Dashboard</strong></td>
+<td>—</td>
+<td><a href="../adr/0007-admin-dashboard/">0007 ✅</a></td>
+<td><a href="../plans/plan-admin-dashboard/">Plan 🔄</a></td>
+<td>🔄</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>React Migration</strong></td>
+<td><a href="../prd/PRD-react-migration/">PRD ✅</a></td>
+<td><a href="../adr/0008-react-migration/">0008 ✅</a></td>
+<td><a href="../plans/plan-react-migration/">Plan</a></td>
+<td>✅</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Unified Video List API</strong></td>
+<td>—</td>
+<td><a href="../adr/0009-unified-video-list-api/">0009 💡</a></td>
+<td>—</td>
+<td>🔍</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Trivy Container Scanning</strong></td>
+<td>—</td>
+<td><a href="../adr/0010-trivy-container-scanning/">0010 ✅</a></td>
+<td><a href="../plans/plan-trivy-scan/">Plan</a></td>
+<td>✅</td>
+<td>CI scanning</td>
+</tr>
+<tr>
+<td><strong>Hot Video Priority</strong></td>
+<td><a href="../prd/PRD-hot-video-priority/">PRD ✅</a></td>
+<td><a href="../adr/0011-hot-video-priority/">0011 ✅</a></td>
+<td><a href="../plans/plan-hot-video-priority/">Plan 📋</a></td>
+<td>🔍</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Bitwise Permissions</strong></td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-permissions-bitwise/">Plan</a></td>
+<td>✅</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Hot Score Migration</strong></td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-vid2-hot-score-migration/">Plan 📋</a></td>
+<td>🔍</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>File-based Hooks</strong></td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-a-file-based-hooks/">Plan A 📋</a> · <a href="../plans/plan-b-direct-cli-spawn/">Plan B 📋</a></td>
+<td>🔍</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Bookmark Feature</strong></td>
+<td><a href="../prd/PRD-bookmark-feature/">PRD 📝</a></td>
+<td><a href="../adr/0012-bookmark-feature-design/">0012 💡</a></td>
+<td><a href="../plans/plan-bookmark-feature/">Plan 📋</a></td>
+<td>🔍</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="status-summary">Status Summary<a class="headerlink" href="#status-summary" title="Permanent link">&para;</a></h2>
+<h3 id="done">✅ Done<a class="headerlink" href="#done" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>Benchmark</strong>: Establish baseline performance metrics</li>
-<li>[ ] <strong>Profile</strong>: Identify the actual bottleneck</li>
-<li>[ ] <strong>Hypothesize</strong>: What optimization will help?</li>
-<li>[ ] <strong>Implement</strong>: Make the change</li>
-<li>[ ] <strong>Measure</strong>: Verify improvement</li>
-<li>[ ] <strong>Document</strong>: Record the optimization and results</li>
+<li>Use RDBMS, Backend Architecture, Cache Strategy, Frontend Structure, LRU Video Cache</li>
+<li>Trivy Container Scanning, Bitwise Permissions, React Migration</li>
 </ul>
-<h2 id="common-optimizations">Common Optimizations<a class="headerlink" href="#common-optimizations" title="Permanent link">&para;</a></h2>
-<h3 id="algorithm-complexity">Algorithm Complexity<a class="headerlink" href="#algorithm-complexity" title="Permanent link">&para;</a></h3>
+<h3 id="in-progress">🔄 In Progress<a class="headerlink" href="#in-progress" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Replace O(n²) with O(n log n) or O(n)</li>
-<li>Use appropriate data structures (Set for lookups, Map for key-value)</li>
+<li>Admin Dashboard</li>
 </ul>
-<h3 id="caching-java-guava">Caching (Java + Guava)<a class="headerlink" href="#caching-java-guava" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// In-memory caching with Guava</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nd">@Service</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DataService</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">LoadingCache</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Result</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cache</span><span class="p">;</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">DataService</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CacheBuilder</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">()</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">            </span><span class="p">.</span><span class="na">maximumSize</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">            </span><span class="p">.</span><span class="na">expireAfterWrite</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">)</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">CacheLoader</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Result</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">                </span><span class="nd">@Override</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">                </span><span class="kd">public</span><span class="w"> </span><span class="n">Result</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">                    </span><span class="k">return</span><span class="w"> </span><span class="n">expensiveCalculation</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">                </span><span class="p">}</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">            </span><span class="p">});</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Result</span><span class="w"> </span><span class="nf">getData</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">cache</span><span class="p">.</span><span class="na">getUnchecked</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Result</span><span class="w"> </span><span class="nf">expensiveCalculation</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">        </span><span class="c1">// Expensive work here</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Result</span><span class="p">();</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="p">}</span>
-</code></pre></div>
-<h3 id="virtual-threads-java-24">Virtual Threads (Java 24)<a class="headerlink" href="#virtual-threads-java-24" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// Leverage Virtual Threads for I/O-heavy operations</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nd">@Configuration</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">VirtualThreadConfig</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nd">@Bean</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">TomcatProtocolHandlerCustomizer</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="nf">protocolHandlerVirtualThreadExecutor</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">protocolHandler</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">            </span><span class="n">protocolHandler</span><span class="p">.</span><span class="na">setExecutor</span><span class="p">(</span><span class="n">Executors</span><span class="p">.</span><span class="na">newVirtualThreadPerTaskExecutor</span><span class="p">());</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">        </span><span class="p">};</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p">}</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="c1">// Parallel processing with StructuredTaskScope</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StructuredTaskScope</span><span class="p">.</span><span class="na">ShutdownOnFailure</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">UserDto</span><span class="o">&gt;</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scope</span><span class="p">.</span><span class="na">fork</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fetchUser</span><span class="p">(</span><span class="n">userId</span><span class="p">));</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">    </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Order</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scope</span><span class="p">.</span><span class="na">fork</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fetchOrders</span><span class="p">(</span><span class="n">userId</span><span class="p">));</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="n">scope</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">    </span><span class="n">scope</span><span class="p">.</span><span class="na">throwIfFailed</span><span class="p">();</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
-<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">buildProfile</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="na">resultNow</span><span class="p">(),</span><span class="w"> </span><span class="n">orders</span><span class="p">.</span><span class="na">resultNow</span><span class="p">());</span>
-<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="p">}</span>
-</code></pre></div>
-<h3 id="database-queries-jpahibernate">Database Queries (JPA/Hibernate)<a class="headerlink" href="#database-queries-jpahibernate" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// ❌ BAD: N+1 query problem</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nd">@GetMapping</span><span class="p">(</span><span class="s">&quot;/users&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">UserDto</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getUsers</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userRepository</span><span class="p">.</span><span class="na">findAll</span><span class="p">();</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="c1">// This triggers N additional queries!</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">users</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="n">user</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UserDto</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="na">getOrders</span><span class="p">()))</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">        </span><span class="p">.</span><span class="na">toList</span><span class="p">();</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="c1">// ✅ GOOD: Use JOIN FETCH to load in one query</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="nd">@Query</span><span class="p">(</span><span class="s">&quot;SELECT u FROM User u LEFT JOIN FETCH u.orders WHERE u.status = :status&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">Page</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findActiveUsersWithOrders</span><span class="p">(</span><span class="nd">@Param</span><span class="p">(</span><span class="s">&quot;status&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">UserStatus</span><span class="w"> </span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="n">Pageable</span><span class="w"> </span><span class="n">pageable</span><span class="p">);</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="c1">// ✅ GOOD: Use @EntityGraph for eager loading</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="nd">@EntityGraph</span><span class="p">(</span><span class="n">attributePaths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;orders&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;profile&quot;</span><span class="p">})</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findByStatus</span><span class="p">(</span><span class="n">UserStatus</span><span class="w"> </span><span class="n">status</span><span class="p">);</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="c1">// ✅ GOOD: Pagination for large result sets</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="nd">@GetMapping</span><span class="p">(</span><span class="s">&quot;/users&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="kd">public</span><span class="w"> </span><span class="n">Page</span><span class="o">&lt;</span><span class="n">UserDto</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getUsers</span><span class="p">(</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">    </span><span class="nd">@RequestParam</span><span class="p">(</span><span class="n">defaultValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;0&quot;</span><span class="p">)</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">page</span><span class="p">,</span>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">    </span><span class="nd">@RequestParam</span><span class="p">(</span><span class="n">defaultValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;20&quot;</span><span class="p">)</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span>
-<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">    </span><span class="n">Pageable</span><span class="w"> </span><span class="n">pageable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PageRequest</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">page</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">);</span>
-<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">userService</span><span class="p">.</span><span class="na">findAll</span><span class="p">(</span><span class="n">pageable</span><span class="p">);</span>
-<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="p">}</span>
-</code></pre></div>
+<h3 id="in-review">🔍 In Review<a class="headerlink" href="#in-review" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Add indexes for frequently queried columns</li>
-<li>Avoid N+1 queries (use JOIN FETCH or @EntityGraph)</li>
-<li>Use pagination for large result sets</li>
-<li>Use read-only transactions for queries: <code>@Transactional(readOnly = true)</code></li>
+<li>HLS Video Streaming, Unified Video List API, Hot Video Priority</li>
+<li>Hot Score Migration, File-based Hooks, Bookmark Feature</li>
 </ul>
-<h3 id="memory">Memory<a class="headerlink" href="#memory" title="Permanent link">&para;</a></h3>
+<h3 id="draft-proposed">📝 Draft / Proposed<a class="headerlink" href="#draft-proposed" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Avoid creating unnecessary objects in loops</li>
-<li>Use streaming for large files</li>
-<li>Release references when done</li>
+<li>Unified Video List API</li>
 </ul>
-<h2 id="profiling-tools">Profiling Tools<a class="headerlink" href="#profiling-tools" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Java/JVM Profiling</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># 1. JProfiler (commercial)</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># 2. VisualVM (free, included with JDK)</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>jvisualvm
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1"># 3. Async Profiler (open-source, production-ready)</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>java<span class="w"> </span>-agentpath:/path/to/libasyncProfiler.so<span class="o">=</span>start,event<span class="o">=</span>cpu,file<span class="o">=</span>profile.html<span class="w"> </span>-jar<span class="w"> </span>app.jar
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># 4. Spring Boot Actuator + Micrometer</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Add to application.yaml:</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1"># management.endpoints.web.exposure.include=metrics,health</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="c1"># management.metrics.export.prometheus.enabled=true</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1"># View metrics</span>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>curl<span class="w"> </span>http://localhost:8081/actuator/metrics
-<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
-<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="c1"># 5. JMH (Java Microbenchmark Harness) for method-level benchmarking</span>
-<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>mvn<span class="w"> </span>exec:java<span class="w"> </span>-Dexec.mainClass<span class="o">=</span>org.openjdk.jmh.Main
-<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
-<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="c1"># 6. Heap dump analysis</span>
-<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>jmap<span class="w"> </span>-dump:format<span class="o">=</span>b,file<span class="o">=</span>heap.bin<span class="w"> </span>&lt;pid&gt;
-<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>jhat<span class="w"> </span>heap.bin
-<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>
-<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="c1"># 7. Thread dump</span>
-<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>jstack<span class="w"> </span>&lt;pid&gt;<span class="w"> </span>&gt;<span class="w"> </span>threads.txt
-<a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>
-<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a><span class="c1"># 8. GC logging</span>
-<a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>java<span class="w"> </span>-Xlog:gc*:file<span class="o">=</span>gc.log<span class="w"> </span>-jar<span class="w"> </span>app.jar
-</code></pre></div>
-<h2 id="anti-patterns-to-avoid">Anti-Patterns to Avoid<a class="headerlink" href="#anti-patterns-to-avoid" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Premature optimization (no benchmark)</li>
-<li>Micro-optimizations (negligible impact)</li>
-<li>Optimizing cold paths</li>
-<li>Sacrificing readability for minor gains</li>
-</ul>
+<hr />
+<h2 id="adr-status-summary">ADR Status Summary<a class="headerlink" href="#adr-status-summary" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>ADR</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0001</td>
+<td>Use Relational Database</td>
+<td>✅ Accepted</td>
+</tr>
+<tr>
+<td>0002</td>
+<td>Backend Architecture</td>
+<td>✅ Accepted</td>
+</tr>
+<tr>
+<td>0003</td>
+<td>Cache Strategy</td>
+<td>✅ Accepted</td>
+</tr>
+<tr>
+<td>0004</td>
+<td>Frontend Structure</td>
+<td>✅ Accepted</td>
+</tr>
+<tr>
+<td>0005</td>
+<td>LRU Video Cache</td>
+<td>✅ Accepted</td>
+</tr>
+<tr>
+<td>0006</td>
+<td>HLS Video Streaming</td>
+<td>💡 Proposed</td>
+</tr>
+<tr>
+<td>0007</td>
+<td>Admin Dashboard</td>
+<td>✅ Accepted</td>
+</tr>
+<tr>
+<td>0008</td>
+<td>React Migration</td>
+<td>💡 Proposed</td>
+</tr>
+<tr>
+<td>0009</td>
+<td>Unified Video List API</td>
+<td>💡 Proposed</td>
+</tr>
+<tr>
+<td>0010</td>
+<td>Trivy Container Scanning</td>
+<td>✅ Accepted</td>
+</tr>
+<tr>
+<td>0011</td>
+<td>Hot Video Priority</td>
+<td>✅ Accepted</td>
+</tr>
+<tr>
+<td>0012</td>
+<td>Bookmark Feature Design</td>
+<td>💡 Proposed</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Last updated: 2026-05-31</em></p>
 
 
 
 
 
 
-
-  
-  
 
 
 
@@ -5837,14 +5841,14 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.suggest", "content.code.copy", "content.action.edit"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.suggest", "content.code.copy", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
-        <script src="../../../../javascripts/copy-markdown.js"></script>
+        <script src="../javascripts/copy-markdown.js"></script>
       
     
   </body>
