@@ -108,6 +108,7 @@ nav:
 
   - Claude Workspace:
       - Commands:
+          - Scope (PRD Generator): claude/commands/scope.md
           - Builder: claude/commands/builder.md
           - Architect: claude/commands/architect.md
           - QA Engineer: claude/commands/qa-engineer.md
