@@ -746,6 +746,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#architecture-decision-records-adr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Decision Records (ADR)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Decision Records (ADR)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#decision-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Map
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2249,6 +2277,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#architecture-decision-records-adr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Decision Records (ADR)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Decision Records (ADR)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#decision-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Map
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2347,6 +2403,100 @@ Superseded-by: -</p>
 <li>In-memory cache with Guava used until Redis is integrated</li>
 <li>CronJob handles background downloading and database update</li>
 </ul>
+<hr />
+<h2 id="architecture-decision-records-adr">Architecture Decision Records (ADR)<a class="headerlink" href="#architecture-decision-records-adr" title="Permanent link">&para;</a></h2>
+<p>The following ADRs record the key decisions made for this system. Each links to the full decision document including context, options considered, and consequences.</p>
+<table>
+<thead>
+<tr>
+<th>ADR</th>
+<th>Title</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../adr/0001-use-relational-database/">ADR-0001</a></td>
+<td>Use Relational Database (PostgreSQL) for Core Data</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../adr/0002-backend-architecture/">ADR-0002</a></td>
+<td>Use Layered Spring Boot Architecture with Virtual Threads</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../adr/0003-use-cache/">ADR-0003</a></td>
+<td>Use Guava Cache Initially, with Planned Migration to Redis</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../adr/0004-frontend-structure/">ADR-0004</a></td>
+<td>Use Vanilla JS + Bootstrap with Planned Migration to React</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../adr/0005-use_lru_cache_video_streaming/">ADR-0005</a></td>
+<td>Use LRU Cache for Video Streaming</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../adr/0006-hls-video-streaming/">ADR-0006</a></td>
+<td>Switch to HLS for Local Video Streaming</td>
+<td>Proposed</td>
+</tr>
+<tr>
+<td><a href="../adr/0007-admin-dashboard/">ADR-0007</a></td>
+<td>Admin Dashboard — Content &amp; Account Management</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../adr/0008-react-migration/">ADR-0008</a></td>
+<td>Migrate Frontend to React with Vite</td>
+<td>Proposed</td>
+</tr>
+<tr>
+<td><a href="../adr/0009-unified-video-list-api/">ADR-0009</a></td>
+<td>Unified Video List API for UI Display</td>
+<td>Proposed</td>
+</tr>
+<tr>
+<td><a href="../adr/0010-trivy-container-scanning/">ADR-0010</a></td>
+<td>Add Trivy Dependency &amp; Filesystem Scanning to CI</td>
+<td>Accepted</td>
+</tr>
+</tbody>
+</table>
+<h3 id="decision-map">Decision Map<a class="headerlink" href="#decision-map" title="Permanent link">&para;</a></h3>
+<p>The diagram below shows how the ADRs relate to each architectural layer:</p>
+<pre class="mermaid"><code>graph TD
+    subgraph "Data Layer"
+        ADR1[ADR-0001&lt;br/&gt;PostgreSQL]
+    end
+
+    subgraph "Backend"
+        ADR2[ADR-0002&lt;br/&gt;Spring Boot + Virtual Threads]
+        ADR3[ADR-0003&lt;br/&gt;Guava Cache → Redis]
+        ADR5[ADR-0005&lt;br/&gt;LRU Cache for Streaming]
+        ADR6[ADR-0006&lt;br/&gt;HLS Streaming]
+        ADR7[ADR-0007&lt;br/&gt;Admin Dashboard]
+        ADR10[ADR-0010&lt;br/&gt;Trivy CI Scanning]
+    end
+
+    subgraph "Frontend"
+        ADR4[ADR-0004&lt;br/&gt;Vanilla JS → React]
+        ADR8[ADR-0008&lt;br/&gt;React + Vite Migration]
+        ADR9[ADR-0009&lt;br/&gt;Unified Video List API]
+    end
+
+    ADR2 --&gt; ADR1
+    ADR3 --&gt; ADR2
+    ADR5 --&gt; ADR3
+    ADR6 --&gt; ADR5
+    ADR7 --&gt; ADR2
+    ADR8 --&gt; ADR4
+    ADR9 --&gt; ADR8
+    ADR10 --&gt; ADR2</code></pre>
 
 
 
