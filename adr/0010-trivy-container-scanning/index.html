@@ -5559,15 +5559,46 @@
 
 <h1 id="adr-0010-add-trivy-dependency-and-filesystem-scanning-to-ci">ADR-0010: Add Trivy Dependency and Filesystem Scanning to CI<a class="headerlink" href="#adr-0010-add-trivy-dependency-and-filesystem-scanning-to-ci" title="Permanent link">&para;</a></h1>
 <h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
-<p><strong>Status:</strong> Accepted
-<strong>Date:</strong> 2026-05-30
-<strong>Deciders:</strong> nguyenhuuca
-<strong>Related PRD:</strong> N/A
-<strong>Tech Strategy Alignment:</strong>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Status</strong></td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><strong>Date</strong></td>
+<td>2026-05-30</td>
+</tr>
+<tr>
+<td><strong>Deciders</strong></td>
+<td>nguyenhuuca</td>
+</tr>
+<tr>
+<td><strong>Related PRD</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Domain Tags</strong></td>
+<td>security, devops</td>
+</tr>
+<tr>
+<td><strong>Supersedes</strong></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Superseded By</strong></td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tech Strategy Alignment:</strong>
 - [x] Decision follows Golden Path in <code>.claude/rules/tech-strategy.md</code></p>
-<p><strong>Domain Tags:</strong> security, devops
-<strong>Supersedes:</strong> N/A
-<strong>Superseded By:</strong> N/A</p>
 <hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
 <p>The CI pipeline covers build, test (coverage gate and SonarCloud), Docker build, and deploy. There is no automated vulnerability scanning of the container image or runtime dependencies before pushing to Docker Hub and deploying to production.</p>
