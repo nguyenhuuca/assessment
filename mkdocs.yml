@@ -77,7 +77,8 @@ nav:
       - React Migration: prd/PRD-react-migration.md
 
   - Feature Flags:
-      - Harness Feature Flags: feature-flags.md
+      - English: feature-flags.md
+      - Tiếng Việt: feature-flags-vi.md
 
   - Plans:
       - HLS Migration: plans/plan-hls-migration.md
