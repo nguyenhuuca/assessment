@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../system_health_report_2026-02-06/">
+        <link rel="prev" href="../prd/PRD-react-migration/">
       
       
-        <link rel="next" href="../architecture_quality_report_2025-07-13._VN/">
+        <link rel="next" href="../plans/plan-hls-migration/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Architecture Quality 2025-07-13 EN - Funny Movies - Architecture Docs</title>
+        <title>Harness Feature Flags - Funny Movies - Architecture Docs</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sonargraph-code-quality-report" class="md-skip">
+        <a href="#harness-feature-flags" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Architecture Quality 2025-07-13 EN
+              Harness Feature Flags
             
           </span>
         </div>
@@ -302,11 +302,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../feature-flags/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -342,12 +344,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../system_health_report_2026-05-30/" class="md-tabs__link">
           
   
@@ -1115,28 +1115,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -1154,7 +1157,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1169,10 +1172,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../feature-flags/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Harness Feature Flags
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1188,6 +1218,136 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Interface
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#user-targeting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User Targeting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-permission-enforcement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Permission Enforcement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graceful-degradation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graceful Degradation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Flag
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Coverage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1489,31 +1649,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
         
           
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
             
   
   
@@ -1531,7 +1688,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1602,37 +1759,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Architecture Quality 2025-07-13 EN
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../architecture_quality_report_2025-07-13_EN/" class="md-nav__link">
         
   
   
@@ -1648,109 +1778,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#code-quality-report-english" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CODE QUALITY REPORT (ENGLISH)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="CODE QUALITY REPORT (ENGLISH)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-code-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Code Analysis
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-coupling-and-cohesion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Coupling and Cohesion
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-complexity" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Complexity
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-cyclic-dependencies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Cyclic Dependencies
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-system-size" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. System Size
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#summary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Summary
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1963,85 +1990,112 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#code-quality-report-english" class="md-nav__link">
+  <a href="#architecture-overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CODE QUALITY REPORT (ENGLISH)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="CODE QUALITY REPORT (ENGLISH)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-code-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Code Analysis
+        Architecture Overview
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#2-coupling-and-cohesion" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Coupling and Cohesion
+        Configuration
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#3-complexity" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#service-interface" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Complexity
+        Service Interface
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#4-cyclic-dependencies" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#current-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Cyclic Dependencies
+        Current Flags
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#5-system-size" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#user-targeting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. System Size
+        User Targeting
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#summary" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#example-permission-enforcement" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Summary
+        Example: Permission Enforcement
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#graceful-degradation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graceful Degradation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Flag
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Coverage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Files
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2065,164 +2119,282 @@
   
 
 
-<h1 id="sonargraph-code-quality-report">Sonargraph Code Quality Report<a class="headerlink" href="#sonargraph-code-quality-report" title="Permanent link">&para;</a></h1>
-<p><strong>Tool used:</strong> Sonargraph by hello2morrow<br />
-<strong>Scope:</strong> Full project<br />
-<strong>Date:</strong> 2025-07-05</p>
+<h1 id="harness-feature-flags">Harness Feature Flags<a class="headerlink" href="#harness-feature-flags" title="Permanent link">&para;</a></h1>
+<p>Funny Movies integrates feature flags via the <strong>Harness Feature Flag (FF) SDK</strong> (<code>ff-java-server-sdk 1.9.3</code>). Flags allow enabling or disabling features without redeploying, and support per-user gradual rollouts.</p>
 <hr />
-<h2 id="code-quality-report-english">CODE QUALITY REPORT (ENGLISH)<a class="headerlink" href="#code-quality-report-english" title="Permanent link">&para;</a></h2>
-<h3 id="1-code-analysis">1. Code Analysis<a class="headerlink" href="#1-code-analysis" title="Permanent link">&para;</a></h3>
+<h2 id="architecture-overview">Architecture Overview<a class="headerlink" href="#architecture-overview" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TD
+    A[Controller / AOP] --&gt; B[FeatureFlagService]
+    B --&gt;|API key present| C[Harness CfClient]
+    B --&gt;|API key blank / Harness unreachable| D[defaultValue]
+    C --&gt;|boolVariation| E[Flag ON / OFF]
+    E --&gt; F[Business Logic]
+    D --&gt; F
+
+    subgraph "Harness Cloud"
+        C
+    end</code></pre>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>On Spring Boot startup, <code>FeatureFlagServiceImpl.init()</code> initializes <code>CfClient</code> if <code>FF_API_KEY</code> is configured.</li>
+<li>When a flag check is needed, <code>isEnabled(flagName, defaultValue)</code> is called.</li>
+<li><code>CfClient.boolVariation()</code> contacts Harness Cloud using the current user as the <code>Target</code>.</li>
+<li>If Harness is unavailable, <code>defaultValue</code> is returned — no exceptions thrown.</li>
+</ol>
+<hr />
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<p><strong>Environment variable</strong> (required to activate):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">FF_API_KEY</span><span class="o">=</span>&lt;your-harness-sdk-key&gt;
+</code></pre></div>
+<p><strong><code>application.yaml</code>:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">harness</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">ff</span><span class="p">:</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">api-key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${FF_API_KEY:}</span><span class="w">   </span><span class="c1"># Blank = disabled, all flags use defaultValue</span>
+</code></pre></div>
+<p>If <code>FF_API_KEY</code> is empty, all flags fall back to <code>defaultValue</code> and the application continues normally.</p>
+<hr />
+<h2 id="service-interface">Service Interface<a class="headerlink" href="#service-interface" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// FeatureFlagService.java</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">FeatureFlagService</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isEnabled</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">defaultValue</span><span class="p">);</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">boolean</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">featureFlagService</span><span class="p">.</span><span class="na">isEnabled</span><span class="p">(</span><span class="n">AppConstant</span><span class="p">.</span><span class="na">Flags</span><span class="p">.</span><span class="na">MY_FLAG</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
+</code></pre></div>
+<hr />
+<h2 id="current-flags">Current Flags<a class="headerlink" href="#current-flags" title="Permanent link">&para;</a></h2>
+<p>Flag name constants are centralized in <code>AppConstant.Flags</code>:</p>
 <table>
 <thead>
 <tr>
-<th>Metric</th>
-<th>Value</th>
-<th>Comment</th>
+<th>Constant</th>
+<th>Flag Name (Harness)</th>
+<th>Default</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Issue Density</td>
-<td>0.00</td>
-<td>✅ No issues found</td>
-</tr>
-<tr>
-<td>Code Duplicates</td>
-<td>0</td>
-<td>✅ No duplication detected</td>
-</tr>
-<tr>
-<td>Redundant Code</td>
-<td>0%</td>
-<td>✅ Clean code</td>
-</tr>
-<tr>
-<td>Structural Debt</td>
-<td>0</td>
-<td>✅ No technical debt</td>
+<td><code>AppConstant.Flags.PERMISSION_ENFORCEMENT</code></td>
+<td><code>permission_enforcement_enabled</code></td>
+<td><code>false</code></td>
+<td>Enables bitwise permission enforcement. When OFF, all permission checks pass unconditionally.</td>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong>Adding a new flag:</strong> Declare a constant in <code>AppConstant.Flags</code>, then create a matching flag on the Harness console with the exact same name string.</p>
+</blockquote>
 <hr />
-<h3 id="2-coupling-and-cohesion">2. Coupling and Cohesion<a class="headerlink" href="#2-coupling-and-cohesion" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Metric</th>
-<th>Value</th>
-<th>Comment</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ACD (Average Component Dependency)</td>
-<td>5.08</td>
-<td>⚠️ Could be improved to reduce tight coupling</td>
-</tr>
-<tr>
-<td>CCD (Cumulative Component Dependency)</td>
-<td>716</td>
-<td>📈 High for a growing system</td>
-</tr>
-<tr>
-<td>NCCD (Normalized CCD)</td>
-<td>0.82</td>
-<td>✅ Below 1 – acceptable</td>
-</tr>
-<tr>
-<td>Maintainability Level</td>
-<td>92.54</td>
-<td>✅ Excellent maintainability</td>
-</tr>
-<tr>
-<td>Propagation Cost</td>
-<td>3.60</td>
-<td>✅ Low – good design separation</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h3 id="3-complexity">3. Complexity<a class="headerlink" href="#3-complexity" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Metric</th>
-<th>Value</th>
-<th>Comment</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Average Complexity (McCabe)</td>
-<td>1.65</td>
-<td>✅ Very low – easy-to-understand code</td>
-</tr>
-<tr>
-<td>Complex Methods</td>
-<td>0</td>
-<td>✅ No method exceeds the complexity threshold</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h3 id="4-cyclic-dependencies">4. Cyclic Dependencies<a class="headerlink" href="#4-cyclic-dependencies" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Metric</th>
-<th>Value</th>
-<th>Comment</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Cyclic Components/Packages</td>
-<td>0</td>
-<td>✅ No cycles found</td>
-</tr>
-<tr>
-<td>Relative Entanglement (%)</td>
-<td>0.00%</td>
-<td>✅ Very clean design</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h3 id="5-system-size">5. System Size<a class="headerlink" href="#5-system-size" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Metric</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Lines of Code</td>
-<td>6,735</td>
-</tr>
-<tr>
-<td>Number of Components</td>
-<td>141</td>
-</tr>
-<tr>
-<td>Java Packages</td>
-<td>20</td>
-</tr>
-<tr>
-<td>Total Source Files</td>
-<td>141</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h3 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h3>
+<h2 id="user-targeting">User Targeting<a class="headerlink" href="#user-targeting" title="Permanent link">&para;</a></h2>
+<p>Every flag evaluation automatically resolves the current user from the Spring Security context:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">currentUserId</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">Authentication</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SecurityContextHolder</span><span class="p">.</span><span class="na">getContext</span><span class="p">().</span><span class="na">getAuthentication</span><span class="p">();</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">auth</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="na">isAuthenticated</span><span class="p">())</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;system&quot;</span><span class="p">;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">}</span>
+</code></pre></div>
 <ul>
-<li>✅ <strong>Very clean and maintainable codebase with no redundancy, no technical debt, and no cyclic dependencies</strong></li>
-<li>⚠️ <strong>Consider lowering ACD to reduce tight coupling</strong></li>
-<li>📌 <strong>Scalable structure ready for growth</strong></li>
+<li><strong>Authenticated user:</strong> <code>target.identifier</code> = username / email.</li>
+<li><strong>No active session</strong> (batch jobs, startup tasks): falls back to <code>"system"</code>.</li>
 </ul>
+<p>This enables per-user rollouts on the Harness console — for example, enabling a flag for <code>admin@example.com</code> before a full rollout.</p>
 <hr />
+<h2 id="example-permission-enforcement">Example: Permission Enforcement<a class="headerlink" href="#example-permission-enforcement" title="Permanent link">&para;</a></h2>
+<p>The <code>permission_enforcement_enabled</code> flag gates the entire bitwise permission system.</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant C as Controller
+    participant AOP as @HasPermission AOP
+    participant PS as PermissionServiceImpl
+    participant FF as FeatureFlagService
+    participant H as Harness Cloud
+
+    C-&gt;&gt;AOP: Incoming request
+    AOP-&gt;&gt;PS: hasAllPermissions(userBits, [ADMIN])
+    PS-&gt;&gt;FF: isEnabled("permission_enforcement_enabled", false)
+    FF-&gt;&gt;H: boolVariation(flagName, target)
+    H--&gt;&gt;FF: true / false
+    alt Flag = OFF (default)
+        FF--&gt;&gt;PS: false
+        PS--&gt;&gt;AOP: true (bypass — all checks pass)
+    else Flag = ON
+        FF--&gt;&gt;PS: true
+        PS-&gt;&gt;PS: (userBits &amp; ADMIN.bit) != 0
+        PS--&gt;&gt;AOP: granted / denied
+    end
+    AOP--&gt;&gt;C: 200 OK / 403 Forbidden</code></pre>
+<p><strong>Permission bits (<code>Permission</code> enum):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Permission</th>
+<th>Bit</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>READ</code></td>
+<td><code>1 &lt;&lt; 0</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>WRITE</code></td>
+<td><code>1 &lt;&lt; 1</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>EXEC</code></td>
+<td><code>1 &lt;&lt; 2</code></td>
+<td>4</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>1 &lt;&lt; 3</code></td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>ADMIN</code></td>
+<td><code>1 &lt;&lt; 4</code></td>
+<td>16</td>
+</tr>
+</tbody>
+</table>
+<p>A user with <code>permissions = 17</code> (binary <code>10001</code>) holds <code>READ</code> + <code>ADMIN</code>.</p>
+<hr />
+<h2 id="graceful-degradation">Graceful Degradation<a class="headerlink" href="#graceful-degradation" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FF_API_KEY</code> is blank</td>
+<td>Logs info, skips init, returns <code>defaultValue</code> for all flags</td>
+</tr>
+<tr>
+<td>Harness unreachable at startup</td>
+<td>Logs warning, <code>cfClient</code> still created, continues retrying</td>
+</tr>
+<tr>
+<td><code>cfClient == null</code></td>
+<td><code>isEnabled()</code> returns <code>defaultValue</code> immediately</td>
+</tr>
+<tr>
+<td>Flag not created on Harness</td>
+<td><code>boolVariation()</code> returns <code>defaultValue</code></td>
+</tr>
+</tbody>
+</table>
+<p>The application <strong>never crashes</strong> due to Harness being unavailable. All errors fall back to the configured default.</p>
+<hr />
+<h2 id="adding-a-new-flag">Adding a New Flag<a class="headerlink" href="#adding-a-new-flag" title="Permanent link">&para;</a></h2>
+<p><strong>Step 1 — Declare the constant:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// AppConstant.java</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Flags</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">PERMISSION_ENFORCEMENT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;permission_enforcement_enabled&quot;</span><span class="p">;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">MY_NEW_FEATURE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;my_new_feature_enabled&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// add here</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Step 2 — Use it in a service:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@Autowired</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">private</span><span class="w"> </span><span class="n">FeatureFlagService</span><span class="w"> </span><span class="n">featureFlagService</span><span class="p">;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">doSomething</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">featureFlagService</span><span class="p">.</span><span class="na">isEnabled</span><span class="p">(</span><span class="n">AppConstant</span><span class="p">.</span><span class="na">Flags</span><span class="p">.</span><span class="na">MY_NEW_FEATURE</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">        </span><span class="c1">// new behavior</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">        </span><span class="c1">// existing / fallback behavior</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Step 3 — Create the flag on the Harness console:</strong></p>
+<ol>
+<li>Go to <strong>Harness → Feature Flags → New Flag</strong>.</li>
+<li>The flag name must exactly match the constant string: <code>my_new_feature_enabled</code>.</li>
+<li>Set type to <strong>Boolean</strong>.</li>
+<li>Configure default rules and rollout targeting.</li>
+</ol>
+<hr />
+<h2 id="test-coverage">Test Coverage<a class="headerlink" href="#test-coverage" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Test Class</th>
+<th>Tests</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FeatureFlagServiceImplTest</code></td>
+<td>11</td>
+<td>Init, degradation, security context resolution</td>
+</tr>
+<tr>
+<td><code>PermissionServiceImplTest</code></td>
+<td>20</td>
+<td>Flag ON/OFF, bitwise operations</td>
+</tr>
+<tr>
+<td><code>HasPermissionAnnotationTest</code></td>
+<td>24</td>
+<td>AOP chain, SpEL, integration</td>
+</tr>
+<tr>
+<td><code>AdminControllerPermissionTest</code></td>
+<td>9</td>
+<td>HTTP 200/403, flag bypass</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="related-files">Related Files<a class="headerlink" href="#related-files" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>service/FeatureFlagService.java</code></td>
+<td>Service interface</td>
+</tr>
+<tr>
+<td><code>service/impl/FeatureFlagServiceImpl.java</code></td>
+<td>Harness CfClient integration</td>
+</tr>
+<tr>
+<td><code>service/impl/PermissionServiceImpl.java</code></td>
+<td>Consumer: permission enforcement gate</td>
+</tr>
+<tr>
+<td><code>utils/AppConstant.java</code> → inner class <code>Flags</code></td>
+<td>Centralized flag name constants</td>
+</tr>
+<tr>
+<td><code>aop/HasPermission.java</code></td>
+<td><code>@HasPermission</code> annotation for endpoints</td>
+</tr>
+<tr>
+<td><code>filter/WebSecurityConfig.java</code></td>
+<td>Spring Security + SpEL expression handler</td>
+</tr>
+<tr>
+<td><code>application.yaml</code> (<code>harness.ff.api-key</code>)</td>
+<td>API key configuration</td>
+</tr>
+<tr>
+<td><code>pom.xml</code> (<code>ff-java-server-sdk 1.9.3</code>)</td>
+<td>Maven dependency</td>
+</tr>
+</tbody>
+</table>
 
 
 
