@@ -587,6 +587,35 @@ Frontend Phase 8 can start once the API contract is finalised (after Phase 6).
 
 ---
 
+## Beads
+
+```bash
+# Epic
+bd create --title="Bookmark Feature" --type=feature --priority=2
+
+# Backend tasks
+bd create --title="[BE-1] DB migration: bookmark tables" --type=task
+bd create --title="[BE-2] Bookmark + Collection entities" --type=task
+bd create --title="[BE-3] BookmarkRepository + CollectionRepository" --type=task
+bd create --title="[BE-4] Bookmark DTOs" --type=task
+bd create --title="[BE-5] BookmarkService (core + collections)" --type=task
+bd create --title="[BE-6] BookmarkController" --type=task
+bd create --title="[BE-7] Backend tests + coverage" --type=task
+
+# Frontend tasks
+bd create --title="[FE-1] api/bookmarks.js API module" --type=task
+bd create --title="[FE-2] useBookmarks + useBookmarkActions hooks" --type=task
+bd create --title="[FE-3] BookmarkButton in VideoSwiper" --type=task
+bd create --title="[FE-4] BookmarksPage + AppShell nav entry" --type=task
+bd create --title="[FE-5] Collections UI (Manager + Modal)" --type=task
+
+# Dependencies
+# BE-2 depends on BE-1; BE-3 on BE-2; BE-5 on BE-3+BE-4; BE-6 on BE-5; BE-7 on BE-6
+# FE-2 depends on FE-1; FE-3 on FE-2; FE-4 on FE-2; FE-5 on FE-4
+```
+
+---
+
 ## Progress Log
 
 | Date | Update |
