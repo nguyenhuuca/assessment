@@ -15,28 +15,30 @@ flowchart LR
         B --> C["📄 PRD"]
         C --> D["/architect"]
         D --> E["📐 ADR"]
-        E --> F["/swarm-plan"]
-        F --> G["📋 Plan + Beads"]
+        E --> F["📋 Spec"]
+        F --> G["/swarm-plan"]
+        G --> H["📋 Plan + Beads"]
     end
 
     subgraph exec ["⚙️ Execution"]
         direction LR
-        H["/swarm-execute"] --> I["🧪 /qa-engineer"]
-        I --> J["/code-review"]
-        J --> K["✅ Merge"]
+        I["/swarm-execute"] --> J["🧪 /qa-engineer"]
+        J --> K["/code-review"]
+        K --> L["✅ Merge"]
     end
 
-    G --> H
+    H --> I
 ```
 
 | Step | Command | Output | Template |
 |------|---------|--------|----------|
 | 1. Scope | `/scope` | `docs/prd/PRD-{slug}.md` | `templates/artifacts/prd.template.md` |
 | 2. Architecture | `/architect` | `docs/adr/NNNN-{slug}.md` | `templates/artifacts/adr.template.md` |
-| 3. Plan | `/swarm-plan` | `docs/plans/plan-{slug}.md` + Beads | `templates/artifacts/plan.template.md` |
-| 4. Implement | `/swarm-execute` or `/builder` | Code changes | — |
-| 5. Test | `/qa-engineer` | Test files | — |
-| 6. Review | `/code-review` | Findings | — |
+| 3. Spec | `/spec` | `docs/specs/spec-{slug}.md` | `templates/artifacts/spec.template.md` |
+| 4. Plan | `/swarm-plan` | `docs/plans/plan-{slug}.md` + Beads | `templates/artifacts/plan.template.md` |
+| 5. Implement | `/swarm-execute` or `/builder` | Code changes | — |
+| 6. Test | `/qa-engineer` | Test files | — |
+| 7. Review | `/code-review` | Findings | — |
 
 ---
 
@@ -93,7 +95,66 @@ The ADR contains:
 
 ---
 
-## Step 3 — Implementation plan
+## Step 3 — Feature Specification (Spec)
+
+With the ADR approved, write a Spec that translates architectural decisions into an exact, unambiguous contract for developers and QA.
+
+Run `/spec` with the PRD and ADR as inputs — it reads both files, asks clarifying questions one at a time, then writes the Spec.
+
+```
+/spec docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
+```
+
+### What goes in a Spec
+
+| Section | Purpose |
+|---------|---------|
+| **Business Rules** | Numbered, precise rules. Each rule is independently testable. |
+| **Functional Requirements** | What the system must do (FR-1, FR-2...). Use "must", "must not". |
+| **API Changes** | Exact endpoint, request body, response body, all error codes and conditions. |
+| **Database Changes** | Final SQL schema — tables, columns, indexes, constraints. |
+| **Security Requirements** | Which endpoints require JWT. Role checks. Fields to mask in logs. |
+| **Edge Cases** | EC-1, EC-2... — every non-obvious scenario with exact expected behavior. |
+| **Acceptance Criteria** | Testable checklist. QA uses this directly. |
+
+### Example
+
+```markdown
+## Business Rules
+
+### Rule 1
+A user may post at most 10 comments per video per day.
+
+### Rule 2
+Deleted comments are soft-deleted — content replaced with "[deleted]", replies remain.
+
+## Edge Cases
+
+### EC-1: User posts 10th comment
+Expected: Success (201)
+
+### EC-2: User posts 11th comment same day
+Expected: Reject — HTTP 429, code: COMMENT_LIMIT_EXCEEDED
+
+### EC-3: Two requests from same user arrive simultaneously
+Expected: At most one succeeds; limit remains enforced
+```
+
+### When to skip Spec
+
+| Scenario | Skip? |
+|----------|-------|
+| Bug fix | ✅ Skip — go straight to Plan |
+| Feature < 1 day | ✅ Skip |
+| Feature with backend + frontend in parallel | ❌ Required — Spec is the shared contract |
+| Feature > 3 days | ❌ Required |
+| Any ambiguous business rules | ❌ Required |
+
+**Output:** `docs/specs/spec-{slug}.md`
+
+---
+
+## Step 4 — Implementation plan
 
 With PRD + ADR approved, use `/swarm-plan` to decompose the feature into a phased plan and Beads.
 
@@ -127,7 +188,7 @@ The plan contains:
 
 ---
 
-## Step 4 — Implement
+## Step 5 — Implement
 
 ### Option A — Single builder (small/medium tasks)
 
@@ -160,7 +221,7 @@ Use swarm when the plan has 3+ independent phases that can run in parallel.
 
 ---
 
-## Step 5 — Test
+## Step 6 — Test
 
 ```
 /qa-engineer test the comment section feature
@@ -182,7 +243,7 @@ cd webapp && npm run test     # frontend
 
 ---
 
-## Step 6 — Review
+## Step 7 — Review
 
 ```
 /code-review
@@ -219,7 +280,12 @@ Fix findings, then commit and open a PR.
 # Uses Sequential Thinking for trade-off analysis
 # → docs/adr/0013-realtime-view-count.md
 
-# 3. Plan
+# 3. Spec
+/spec docs/prd/PRD-realtime-view-count.md docs/adr/0013-realtime-view-count.md
+
+# → docs/specs/spec-realtime-view-count.md
+
+# 4. Plan
 /swarm-plan docs/prd/PRD-realtime-view-count.md docs/adr/0013-realtime-view-count.md
 
 # Launches parallel explorer agents → researches codebase
@@ -263,11 +329,13 @@ git push
 docs/
 ├── prd/          → PRD-{feature}.md
 ├── adr/          → NNNN-{decision}.md
+├── specs/        → spec-{feature}.md
 └── plans/        → plan-{feature}.md
 
 templates/artifacts/
 ├── prd.template.md
 ├── adr.template.md
+├── spec.template.md
 └── plan.template.md
 ```
 

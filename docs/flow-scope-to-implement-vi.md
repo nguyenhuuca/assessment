@@ -15,28 +15,30 @@ flowchart LR
         B --> C["📄 PRD"]
         C --> D["/architect"]
         D --> E["📐 ADR"]
-        E --> F["/swarm-plan"]
-        F --> G["📋 Plan + Beads"]
+        E --> F["📋 Spec"]
+        F --> G["/swarm-plan"]
+        G --> H["📋 Plan + Beads"]
     end
 
     subgraph exec ["⚙️ Triển Khai"]
         direction LR
-        H["/swarm-execute"] --> I["🧪 /qa-engineer"]
-        I --> J["/code-review"]
-        J --> K["✅ Merge"]
+        I["/swarm-execute"] --> J["🧪 /qa-engineer"]
+        J --> K["/code-review"]
+        K --> L["✅ Merge"]
     end
 
-    G --> H
+    H --> I
 ```
 
 | Bước | Lệnh | Output | Template |
 |------|------|--------|----------|
 | 1. Scope | `/scope` | `docs/prd/PRD-{slug}.md` | `templates/artifacts/prd.template.md` |
 | 2. Kiến trúc | `/architect` | `docs/adr/NNNN-{slug}.md` | `templates/artifacts/adr.template.md` |
-| 3. Kế hoạch | `/swarm-plan` | `docs/plans/plan-{slug}.md` + Beads | `templates/artifacts/plan.template.md` |
-| 4. Triển khai | `/swarm-execute` hoặc `/builder` | Code changes | — |
-| 5. Kiểm thử | `/qa-engineer` | Test files | — |
-| 6. Review | `/code-review` | Findings | — |
+| 3. Spec | `/spec` | `docs/specs/spec-{slug}.md` | `templates/artifacts/spec.template.md` |
+| 4. Kế hoạch | `/swarm-plan` | `docs/plans/plan-{slug}.md` + Beads | `templates/artifacts/plan.template.md` |
+| 5. Triển khai | `/swarm-execute` hoặc `/builder` | Code changes | — |
+| 6. Kiểm thử | `/qa-engineer` | Test files | — |
+| 7. Review | `/code-review` | Findings | — |
 
 ---
 
@@ -94,7 +96,66 @@ ADR bao gồm:
 
 ---
 
-## Bước 3 — Kế hoạch triển khai
+## Bước 3 — Feature Specification (Spec)
+
+Sau khi ADR được duyệt, viết Spec để dịch các quyết định kiến trúc thành contract chính xác cho dev và QA.
+
+Chạy `/spec` với PRD và ADR làm input — AI đọc cả hai file, hỏi từng câu một, rồi viết Spec.
+
+```
+/spec docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
+```
+
+### Spec gồm những gì
+
+| Phần | Mục đích |
+|------|---------|
+| **Business Rules** | Quy tắc đánh số, chính xác. Mỗi rule có thể test độc lập. |
+| **Functional Requirements** | Hệ thống phải làm gì (FR-1, FR-2...). Dùng "must", "must not". |
+| **API Changes** | Endpoint, request body, response body, tất cả error codes và điều kiện. |
+| **Database Changes** | SQL schema cuối cùng — tables, columns, indexes, constraints. |
+| **Security Requirements** | Endpoint nào cần JWT. Role checks. Fields cần mask trong logs. |
+| **Edge Cases** | EC-1, EC-2... — mọi scenario không rõ ràng với expected behavior chính xác. |
+| **Acceptance Criteria** | Checklist có thể test. QA dùng trực tiếp. |
+
+### Ví dụ
+
+```markdown
+## Business Rules
+
+### Rule 1
+Người dùng chỉ được đăng tối đa 10 comment mỗi video mỗi ngày.
+
+### Rule 2
+Comment bị xóa là soft-delete — nội dung thay bằng "[deleted]", replies vẫn còn.
+
+## Edge Cases
+
+### EC-1: Người dùng đăng comment thứ 10
+Expected: Thành công (201)
+
+### EC-2: Người dùng đăng comment thứ 11 cùng ngày
+Expected: Từ chối — HTTP 429, code: COMMENT_LIMIT_EXCEEDED
+
+### EC-3: Hai request từ cùng user đến đồng thời
+Expected: Tối đa một request thành công; limit vẫn được đảm bảo
+```
+
+### Khi nào bỏ qua Spec
+
+| Tình huống | Bỏ qua? |
+|------------|--------|
+| Bug fix | ✅ Bỏ qua — vào thẳng Plan |
+| Feature < 1 ngày | ✅ Bỏ qua |
+| Feature có backend + frontend song song | ❌ Bắt buộc — Spec là contract chung |
+| Feature > 3 ngày | ❌ Bắt buộc |
+| Business rules mơ hồ | ❌ Bắt buộc |
+
+**Output:** `docs/specs/spec-{slug}.md`
+
+---
+
+## Bước 4 — Kế hoạch triển khai
 
 Sau khi PRD + ADR được duyệt, dùng `/swarm-plan` để phân rã tính năng thành kế hoạch theo giai đoạn và Beads.
 
@@ -128,7 +189,7 @@ Kế hoạch bao gồm:
 
 ---
 
-## Bước 4 — Triển khai
+## Bước 5 — Triển khai
 
 ### Lựa chọn A — Builder đơn lẻ (task nhỏ/vừa)
 
@@ -161,7 +222,7 @@ Dùng swarm khi plan có 3+ giai đoạn độc lập có thể chạy song song
 
 ---
 
-## Bước 5 — Kiểm thử
+## Bước 6 — Kiểm thử
 
 ```
 /qa-engineer test the comment section feature
@@ -183,7 +244,7 @@ cd webapp && npm run test     # frontend
 
 ---
 
-## Bước 6 — Review
+## Bước 7 — Review
 
 ```
 /code-review
@@ -264,11 +325,13 @@ git push
 docs/
 ├── prd/          → PRD-{feature}.md
 ├── adr/          → NNNN-{decision}.md
+├── specs/        → spec-{feature}.md
 └── plans/        → plan-{feature}.md
 
 templates/artifacts/
 ├── prd.template.md
 ├── adr.template.md
+├── spec.template.md
 └── plan.template.md
 ```
 

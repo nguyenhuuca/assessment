@@ -1,6 +1,6 @@
 # Feature Tracking
 
-Status tracker for all PRDs, ADRs, and Plans in the project.
+Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 
 ## Legend
 
@@ -17,23 +17,24 @@ Status tracker for all PRDs, ADRs, and Plans in the project.
 
 ## Feature Tracker
 
-| Feature | PRD | ADR | Plan | Implemented | Notes |
-|---------|-----|-----|------|-------------|-------|
-| **Use RDBMS (PostgreSQL)** | — | [0001 ✅](adr/0001-use-relational-database.md) | — | ✅ | Foundation |
-| **Backend Architecture** | — | [0002 ✅](adr/0002-backend-architecture.md) | — | ✅ | Spring Boot + Virtual Threads |
-| **Cache Strategy** | — | [0003 ✅](adr/0003-use-cache.md) | — | ✅ | Guava LRU |
-| **Frontend Structure** | — | [0004 ✅](adr/0004-frontend-structure.md) | — | ✅ | Vanilla JS → React |
-| **LRU Video Cache** | — | [0005 ✅](adr/0005-use_lru_cache_video_streaming.md) | — | ✅ | Video chunk caching |
-| **HLS Video Streaming** | — | [0006 💡](adr/0006-hls-video-streaming.md) | [Plan 📋](plans/plan-hls-migration.md) | 🔍 | |
-| **Admin Dashboard** | — | [0007 ✅](adr/0007-admin-dashboard.md) | [Plan 🔄](plans/plan-admin-dashboard.md) | 🔄 | |
-| **React Migration** | [PRD ✅](prd/PRD-react-migration.md) | [0008 ✅](adr/0008-react-migration.md) | [Plan](plans/plan-react-migration.md) | ✅ | |
-| **Unified Video List API** | — | [0009 💡](adr/0009-unified-video-list-api.md) | — | 🔍 | |
-| **Trivy Container Scanning** | — | [0010 ✅](adr/0010-trivy-container-scanning.md) | [Plan](plans/plan-trivy-scan.md) | ✅ | CI scanning |
-| **Hot Video Priority** | [PRD ✅](prd/PRD-hot-video-priority.md) | [0011 ✅](adr/0011-hot-video-priority.md) | [Plan 📋](plans/plan-hot-video-priority.md) | 🔍 | |
-| **Bitwise Permissions** | — | — | [Plan](plans/plan-permissions-bitwise.md) | ✅ | |
-| **Hot Score Migration** | — | — | [Plan 📋](plans/plan-vid2-hot-score-migration.md) | 🔍 | |
-| **File-based Hooks** | — | — | [Plan A 📋](plans/plan-a-file-based-hooks.md) · [Plan B 📋](plans/plan-b-direct-cli-spawn.md) | 🔍 | |
-| **Bookmark Feature** | [PRD 📝](prd/PRD-bookmark-feature.md) | [0012 💡](adr/0012-bookmark-feature-design.md) | [Plan 📋](plans/plan-bookmark-feature.md) | 🔍 | |
+| Feature | PRD | ADR | Spec | Plan | Implemented | Notes |
+|---------|-----|-----|------|------|-------------|-------|
+| **Use RDBMS (PostgreSQL)** | — | [0001 ✅](adr/0001-use-relational-database.md) | — | — | ✅ | Foundation |
+| **Backend Architecture** | — | [0002 ✅](adr/0002-backend-architecture.md) | — | — | ✅ | Spring Boot + Virtual Threads |
+| **Cache Strategy** | — | [0003 ✅](adr/0003-use-cache.md) | — | — | ✅ | Guava LRU |
+| **Frontend Structure** | — | [0004 ✅](adr/0004-frontend-structure.md) | — | — | ✅ | Vanilla JS → React |
+| **LRU Video Cache** | — | [0005 ✅](adr/0005-use_lru_cache_video_streaming.md) | — | — | ✅ | Video chunk caching |
+| **HLS Video Streaming** | — | [0006 💡](adr/0006-hls-video-streaming.md) | — | [Plan 📋](plans/plan-hls-migration.md) | 🔍 | |
+| **Admin Dashboard** | — | [0007 ✅](adr/0007-admin-dashboard.md) | — | [Plan 🔄](plans/plan-admin-dashboard.md) | 🔄 | |
+| **React Migration** | [PRD ✅](prd/PRD-react-migration.md) | [0008 ✅](adr/0008-react-migration.md) | — | [Plan](plans/plan-react-migration.md) | ✅ | |
+| **Unified Video List API** | — | [0009 💡](adr/0009-unified-video-list-api.md) | — | — | 🔍 | |
+| **Trivy Container Scanning** | — | [0010 ✅](adr/0010-trivy-container-scanning.md) | — | [Plan](plans/plan-trivy-scan.md) | ✅ | CI scanning |
+| **Hot Video Priority** | [PRD ✅](prd/PRD-hot-video-priority.md) | [0011 ✅](adr/0011-hot-video-priority.md) | — | [Plan 📋](plans/plan-hot-video-priority.md) | 🔍 | |
+| **Bitwise Permissions** | — | — | — | [Plan](plans/plan-permissions-bitwise.md) | ✅ | |
+| **Hot Score Migration** | — | — | — | [Plan 📋](plans/plan-vid2-hot-score-migration.md) | 🔍 | |
+| **File-based Hooks** | — | — | — | [Plan A 📋](plans/plan-a-file-based-hooks.md) · [Plan B 📋](plans/plan-b-direct-cli-spawn.md) | 🔍 | |
+| **Bookmark Feature** | [PRD 📝](prd/PRD-bookmark-feature.md) | [0012 💡](adr/0012-bookmark-feature-design.md) | — | [Plan 📋](plans/plan-bookmark-feature.md) | 🔍 | |
+| **Watch History** | [PRD 📝](prd/PRD-watch-history.md) | [0013 💡](adr/0013-watch-history-design.md) | [Spec 📋](specs/spec-watch-history.md) | [Plan 📋](plans/plan-watch-history.md) | 🔍 | |
 
 ---
 
@@ -52,13 +53,14 @@ Status tracker for all PRDs, ADRs, and Plans in the project.
 ### 🔄 In Progress (1)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
 
-### 🔍 In Review (6)
+### 🔍 In Review (7)
 - [HLS Video Streaming](plans/plan-hls-migration.md)
 - [Unified Video List API](adr/0009-unified-video-list-api.md)
 - [Hot Video Priority](plans/plan-hot-video-priority.md)
 - [Hot Score Migration](plans/plan-vid2-hot-score-migration.md)
 - [File-based Hooks](plans/plan-a-file-based-hooks.md)
 - [Bookmark Feature](plans/plan-bookmark-feature.md)
+- [Watch History](specs/spec-watch-history.md)
 
 ### 💡 Proposed / No Plan Yet (0)
 - —

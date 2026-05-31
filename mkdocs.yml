@@ -76,15 +76,21 @@ nav:
       - 0010 - Trivy Dependency Scanning: adr/0010-trivy-container-scanning.md
       - 0011 - Hot Video Priority: adr/0011-hot-video-priority.md
       - 0012 - Bookmark Feature Design: adr/0012-bookmark-feature-design.md
+      - 0013 - Watch History Design: adr/0013-watch-history-design.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
       - React Migration: prd/PRD-react-migration.md
       - Bookmark Feature: prd/PRD-bookmark-feature.md
+      - Watch History: prd/PRD-watch-history.md
 
   - Feature Flags:
       - English: feature-flags.md
       - Tiếng Việt: feature-flags-vi.md
+
+  - Specs:
+      - Overview: specs/index.md
+      - Watch History: specs/spec-watch-history.md
 
   - Plans:
       - HLS Migration: plans/plan-hls-migration.md
@@ -97,6 +103,7 @@ nav:
       - Plan A (File-based Hooks): plans/plan-a-file-based-hooks.md
       - Plan B (Direct CLI Spawn): plans/plan-b-direct-cli-spawn.md
       - Bookmark Feature: plans/plan-bookmark-feature.md
+      - Watch History: plans/plan-watch-history.md
 
   - Reports:
       - System Health 2026-05-30: system_health_report_2026-05-30.md
@@ -114,6 +121,7 @@ nav:
   - Claude Workspace:
       - Commands:
           - Scope (PRD Generator): claude/commands/scope.md
+          - Spec (Specification): claude/commands/spec.md
           - Builder: claude/commands/builder.md
           - Architect: claude/commands/architect.md
           - QA Engineer: claude/commands/qa-engineer.md
@@ -206,6 +214,7 @@ nav:
       - Templates — Artifacts:
           - PRD: claude/templates/artifacts/prd.template.md
           - ADR: claude/templates/artifacts/adr.template.md
+          - Spec: claude/templates/artifacts/spec.template.md
           - Plan: claude/templates/artifacts/plan.template.md
           - System Design: claude/templates/artifacts/system_design.template.md
           - Design Spec: claude/templates/artifacts/design_spec.template.md
