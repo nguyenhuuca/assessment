@@ -86,7 +86,7 @@
 ---
 ##  A/I Chart
 
-![AIChart.jpg](images/AIChart.jpg)
+![AIChart.jpg](../images/AIChart.jpg)
 
 ### Abstractness vs Instability Analysis
 

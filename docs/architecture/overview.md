@@ -42,37 +42,37 @@ Adopt Spring Boot monolith with clearly defined layers and caching mechanism, an
 
 ### Level 1 - System Context
 
-![img.png](images/C4-L1.png)
+![img.png](../images/C4-L1.png)
 
 ---
 
 ### Level 2 - Container Diagram
 
-![img_1.png](images/C4-L2.png)
+![img_1.png](../images/C4-L2.png)
 
 ---
 
 ### Level 3 - Component Diagram (Backend)
 
-![img_2.png](images/C4-L3.png)
+![img_2.png](../images/C4-L3.png)
 
 ---
 
 ### Deployment Diagram
 
-![Deployment.png](images/Deployment.png)
+![Deployment.png](../images/Deployment.png)
 
 ---
 
 ### Deployment process (Current CICD) 
 
-![CiCd-Deployment.png](images/CiCd-Deployment.png)
+![CiCd-Deployment.png](../images/CiCd-Deployment.png)
 
 ---
 
 ### Gitops Continuous Deployment Process (Future improvement)
 
-![Gitops-arch.png](images/Gitops-arch.png)
+![Gitops-arch.png](../images/Gitops-arch.png)
 
 ------
 
