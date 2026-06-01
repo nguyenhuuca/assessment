@@ -7057,12 +7057,22 @@
 </ul>
 <hr />
 <h2 id="dependency-graph">Dependency Graph<a class="headerlink" href="#dependency-graph" title="Permanent link">&para;</a></h2>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>P1 Migration → P2 Entity → P3 Repository → P4 DTOs ┐
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>                                           P5 Service ┘→ P6 Controller → P7 BE Tests
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>P8 API module (after P6 contract) → P9 Hooks ┬→ P10 Badge+Swiper
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>                                             └→ P11 HistoryPage+AppShell
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Backend (sequential):
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>P1 (Migration)
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  └── P2 (Entity)
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>        └── P3 (Repository)
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>              ├── P4 (DTOs) ──┐
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>              └── P5 (Service) ┘── P6 (Controller) ── P7 (BE Tests)
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>Frontend (starts once P6 API contract is fixed):
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>P8 (API Module)
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>  └── P9 (Hooks)
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>        ├── P10 (Badge + Swiper)
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>        └── P11 (HistoryPage + AppShell)
 </code></pre></div>
-Backend P1–P7 before end-to-end FE testing; FE P8–P11 can start once P6 contract is fixed.</p>
+<blockquote>
+<p>P10 and P11 run in parallel. FE can start from P8 as soon as P6 is done, without waiting for P7.</p>
+</blockquote>
 <hr />
 <h2 id="rollback-plan">Rollback Plan<a class="headerlink" href="#rollback-plan" title="Permanent link">&para;</a></h2>
 <ol>
