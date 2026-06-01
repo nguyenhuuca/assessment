@@ -126,6 +126,7 @@ nav:
       - Watch History (baseline) - Plan: plans/plan-watch-history.md
 
   - Claude Workspace:
+      - Overview & Attribution: claude/index.md
       - Commands:
           - Scope (PRD Generator): claude/commands/scope.md
           - Spec (Specification): claude/commands/spec.md
