@@ -302,12 +302,21 @@ The `history` nav currently falls through to `<ComingSoon page="history" />`. Ad
 ## Dependency Graph
 
 ```
-P1 Migration → P2 Entity → P3 Repository → P4 DTOs ┐
-                                           P5 Service ┘→ P6 Controller → P7 BE Tests
-P8 API module (after P6 contract) → P9 Hooks ┬→ P10 Badge+Swiper
-                                             └→ P11 HistoryPage+AppShell
+Backend (sequential):
+P1 (Migration)
+  └── P2 (Entity)
+        └── P3 (Repository)
+              ├── P4 (DTOs) ──┐
+              └── P5 (Service) ┘── P6 (Controller) ── P7 (BE Tests)
+
+Frontend (starts once P6 API contract is fixed):
+P8 (API Module)
+  └── P9 (Hooks)
+        ├── P10 (Badge + Swiper)
+        └── P11 (HistoryPage + AppShell)
 ```
-Backend P1–P7 before end-to-end FE testing; FE P8–P11 can start once P6 contract is fixed.
+
+> P10 and P11 run in parallel. FE can start from P8 as soon as P6 is done, without waiting for P7.
 
 ---
 
