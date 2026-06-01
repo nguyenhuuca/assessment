@@ -34,7 +34,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Hot Score Migration** | — | — | — | [Plan 📋](plans/plan-vid2-hot-score-migration.md) | 🔍 | |
 | **File-based Hooks** | — | — | — | [Plan A 📋](plans/plan-a-file-based-hooks.md) · [Plan B 📋](plans/plan-b-direct-cli-spawn.md) | 🔍 | |
 | **Bookmark Feature** | [PRD 📝](prd/PRD-bookmark-feature.md) | [0012 💡](adr/0012-bookmark-feature-design.md) | — | [Plan 📋](plans/plan-bookmark-feature.md) | 🔍 | |
-| **Watch History** | [PRD 📝](prd/PRD-watch-history.md) | [0013 💡](adr/0013-watch-history-design.md) | [Spec 📋](specs/spec-watch-history.md) | [Plan 📋](plans/plan-watch-history.md) | 🔍 | |
+| **Watch History (Opus)** | [PRD 📝](prd/PRD-watch-history-opus.md) | [0014 💡](adr/0014-watch-history-design-opus.md) | [Spec 📋](specs/spec-watch-history-opus.md) | [Plan 📝](plans/plan-watch-history-opus.md) | 🔍 | Active branch · [comparison](comparison-watch-history-models.md) |
+| **Watch History (baseline)** | [PRD 📝](prd/PRD-watch-history.md) | [0013 💡](adr/0013-watch-history-design.md) | [Spec 📋](specs/spec-watch-history.md) | [Plan 📋](plans/plan-watch-history.md) | 🔍 | 🗄️ Archived — model-comparison baseline |
 
 ---
 
@@ -60,7 +61,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Hot Score Migration](plans/plan-vid2-hot-score-migration.md)
 - [File-based Hooks](plans/plan-a-file-based-hooks.md)
 - [Bookmark Feature](plans/plan-bookmark-feature.md)
-- [Watch History](plans/plan-watch-history.md)
+- [Watch History (Opus)](plans/plan-watch-history-opus.md) · baseline archived
 
 ### 💡 Proposed / No Plan Yet (0)
 - —
@@ -83,8 +84,9 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0010 | Trivy Container Scanning | ✅ Accepted |
 | 0011 | Hot Video Priority | ✅ Accepted |
 | 0012 | Bookmark Feature Design | 💡 Proposed |
-| 0013 | Watch History Design | 💡 Proposed |
+| 0013 | Watch History Design (baseline, archived) | 💡 Proposed |
+| 0014 | Watch History Design (Opus) | 💡 Proposed |
 
 ---
 
-*Last updated: 2026-05-31 — Watch History added*
+*Last updated: 2026-06-01 — Watch History (Opus) branch added; baseline archived*
