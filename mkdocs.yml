@@ -110,6 +110,7 @@ nav:
       - Scope to Implement Flow (VI): guides/flow-scope-to-implement-vi.md
       - Feature Flags (EN): guides/feature-flags.md
       - Feature Flags (VI): guides/feature-flags-vi.md
+      - Bitwise Permissions: guides/bitwise-permissions.md
       - Trello Setup: guides/trello-setup-guide.md
       - Trello Board Status: guides/trello-board-status.md
 
