@@ -30,3 +30,4 @@ See: [Spec Template](../claude/templates/artifacts/spec.template.md)
 | Feature | File | Status |
 |---------|------|--------|
 | Watch History | [spec-watch-history.md](spec-watch-history.md) | 📋 Draft |
+| Bitwise Permissions | [spec-bitwise-permissions.md](spec-bitwise-permissions.md) | ✅ Implemented |

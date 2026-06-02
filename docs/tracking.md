@@ -30,7 +30,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Unified Video List API** | — | [0009 💡](adr/0009-unified-video-list-api.md) | — | — | 🔍 | |
 | **Trivy Container Scanning** | — | [0010 ✅](adr/0010-trivy-container-scanning.md) | — | [Plan](plans/plan-trivy-scan.md) | ✅ | CI scanning |
 | **Hot Video Priority** | [PRD ✅](prd/PRD-hot-video-priority.md) | [0011 ✅](adr/0011-hot-video-priority.md) | — | [Plan 📋](plans/plan-hot-video-priority.md) | 🔍 | |
-| **Bitwise Permissions** | — | — | — | [Plan](plans/plan-permissions-bitwise.md) | ✅ | |
+| **Bitwise Permissions** | — | [0015 ✅](adr/0015-bitwise-permission-system.md) | [Spec ✅](specs/spec-bitwise-permissions.md) | [Plan](plans/plan-permissions-bitwise.md) | ✅ | AS-BUILT docs |
 | **Hot Score Migration** | — | — | — | [Plan 📋](plans/plan-vid2-hot-score-migration.md) | 🔍 | |
 | **File-based Hooks** | — | — | — | [Plan A 📋](plans/plan-a-file-based-hooks.md) · [Plan B 📋](plans/plan-b-direct-cli-spawn.md) | 🔍 | |
 | **Bookmark Feature** | [PRD 📝](prd/PRD-bookmark-feature.md) | [0012 💡](adr/0012-bookmark-feature-design.md) | — | [Plan 📋](plans/plan-bookmark-feature.md) | 🔍 | |
@@ -48,7 +48,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Frontend Structure](adr/0004-frontend-structure.md)
 - [LRU Video Cache](adr/0005-use_lru_cache_video_streaming.md)
 - [Trivy Container Scanning](adr/0010-trivy-container-scanning.md)
-- [Bitwise Permissions](plans/plan-permissions-bitwise.md)
+- [Bitwise Permissions](adr/0015-bitwise-permission-system.md)
 - [React Migration](prd/PRD-react-migration.md)
 
 ### 🔄 In Progress (1)
