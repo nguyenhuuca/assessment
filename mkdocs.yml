@@ -77,6 +77,7 @@ nav:
       - 0011 - Hot Video Priority: adr/0011-hot-video-priority.md
       - 0012 - Bookmark Feature Design: adr/0012-bookmark-feature-design.md
       - 0014 - Watch History Design (Opus): adr/0014-watch-history-design-opus.md
+      - 0015 - Bitwise Permission System: adr/0015-bitwise-permission-system.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -87,6 +88,7 @@ nav:
   - Specs:
       - Overview: specs/index.md
       - Watch History: specs/spec-watch-history-opus.md
+      - Bitwise Permissions: specs/spec-bitwise-permissions.md
 
   - Plans:
       - HLS Migration: plans/plan-hls-migration.md
