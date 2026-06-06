@@ -8,7 +8,7 @@
 
 1. [Introduction](#introduction)
 2. [Pre-configured Setup](#pre-configured-setup)
-3. [Personas — 11 Commands](#personas--11-commands)
+3. [Personas — 12 Commands](#personas--12-commands)
 4. [Skills — 90+ Automated Workflows](#skills--90-automated-workflows)
 5. [Swarm — Multi-Agent Parallel Execution](#swarm--multi-agent-parallel-execution)
 6. [Real-World Workflows](#real-world-workflows)
@@ -22,7 +22,7 @@
 This project is pre-configured with the **Claude Code Framework** — a powerful AI assistant system that provides:
 
 - ✅ **Auto-loaded skills** matching the current context
-- ✅ **11 specialist commands** (scope, spec, architect, builder, security, QA…)
+- ✅ **12 specialist commands** (scope, spec, architect, builder, security, QA, presentation…)
 - ✅ **90+ workflows** covering every development task
 - ✅ **Multi-agent swarm** for parallel task execution
 - ✅ **Templates** for ADR, PRD, design docs, and more
@@ -55,7 +55,7 @@ templates/
 
 ---
 
-## Personas — 11 Commands
+## Personas — 12 Commands
 
 ### 1. `/scope` — PRD Generator
 
@@ -281,6 +281,26 @@ templates/
 ```
 
 **Output:** Comprehensive review report from multiple perspectives
+
+---
+
+### 12. `/presentation` — Presentation Renderer
+
+**Use when:** Turning a doc into a stakeholder-ready slide deck
+
+**Capabilities:**
+- Renders ONE markdown doc (PRD / Spec / ADR / Plan) into ONE self-contained `.html` deck
+- Auto-detects document type and maps sections to tabs
+- Render-only — keeps wording, tables, code, and diagrams faithful (no new content)
+- Opens directly in any browser, no build step
+
+**Examples:**
+```
+/presentation docs/prd/PRD-hot-video-priority.md
+/presentation docs/adr/0006-hls-video-streaming.md
+```
+
+**Output:** `<doc-name>.html` (next to the source) — see the [Presentation Command guide](presentation-command.md)
 
 ---
 
@@ -677,6 +697,7 @@ mvn verify
 | `/security-auditor review …` | Security audit | Audit report |
 | `/code-check review …` | Code quality | Quality report |
 | `/swarm-execute …` | Parallel execution | Feature complete |
+| `/presentation …` | Render doc into HTML deck | `<doc-name>.html` |
 
 ### Common Skills
 

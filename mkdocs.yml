@@ -120,6 +120,7 @@ nav:
       - Claude Guide (VI): guides/claude-guide-vi.md
       - Scope to Implement Flow: guides/flow-scope-to-implement.md
       - Scope to Implement Flow (VI): guides/flow-scope-to-implement-vi.md
+      - Presentation Command: guides/presentation-command.md
       - Feature Flags (EN): guides/feature-flags.md
       - Feature Flags (VI): guides/feature-flags-vi.md
       - Bitwise Permissions: guides/bitwise-permissions.md

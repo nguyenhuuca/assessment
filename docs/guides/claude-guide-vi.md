@@ -8,7 +8,7 @@
 
 1. [Giới thiệu](#giới-thiệu)
 2. [Cấu hình có sẵn](#cấu-hình-có-sẵn)
-3. [Personas - 11 commands](#personas---11-commands)
+3. [Personas - 12 commands](#personas---12-commands)
 4. [Skills - 90+ workflows tự động](#skills---90-workflows-tự-động)
 5. [Swarm - Multi-agent parallel execution](#swarm---multi-agent-parallel-execution)
 6. [Workflows thực tế](#workflows-thực-tế)
@@ -22,7 +22,7 @@
 Project này đã được config sẵn với **Claude Code Framework** - một hệ thống AI assistant mạnh mẽ giúp:
 
 - ✅ **Tự động load skills** phù hợp với context
-- ✅ **11 commands chuyên môn** (scope, spec, architect, builder, security, QA...)
+- ✅ **12 commands chuyên môn** (scope, spec, architect, builder, security, QA, presentation...)
 - ✅ **90+ workflows** cho mọi task development
 - ✅ **Multi-agent swarm** để execute task song song
 - ✅ **Templates** cho ADR, PRD, design docs...
@@ -55,7 +55,7 @@ templates/
 
 ---
 
-## Personas - 11 commands
+## Personas - 12 commands
 
 ### 1. 📋 `/scope` - PRD Generator
 
@@ -281,6 +281,26 @@ templates/
 ```
 
 **Output:** Comprehensive review report từ multiple perspectives
+
+---
+
+### 12. 🎤 `/presentation` - Presentation Renderer
+
+**Dùng khi:** Biến một tài liệu thành slide deck để present cho stakeholder
+
+**Capabilities:**
+- Render MỘT file markdown (PRD / Spec / ADR / Plan) thành MỘT file `.html` deck self-contained
+- Tự động detect document type và map các section thành tabs
+- Render-only — giữ nguyên wording, tables, code, diagrams (không thêm nội dung mới)
+- Mở trực tiếp trong browser, không cần build step
+
+**Example:**
+```
+/presentation docs/prd/PRD-hot-video-priority.md
+/presentation docs/adr/0006-hls-video-streaming.md
+```
+
+**Output:** `<doc-name>.html` (cạnh file source) — xem [Presentation Command guide](presentation-command.md)
 
 ---
 
@@ -702,6 +722,7 @@ https://github.com/anthropics/claude-code/issues
 | `/security-auditor review ...` | Security audit | Audit report |
 | `/code-check review ...` | Code quality | Quality report |
 | `/swarm-execute ...` | Parallel execution | Feature complete |
+| `/presentation ...` | Render doc thành HTML deck | `<doc-name>.html` |
 
 ### Common Skills
 
