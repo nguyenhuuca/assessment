@@ -34,7 +34,7 @@
   }
 
   /* Header */
-  header.hero{padding:34px 24px 22px;text-align:center;border-bottom:1px solid var(--line);
+  header.hero{padding:34px 24px 22px;text-align:center;position:relative;border-bottom:1px solid var(--line);
     background:linear-gradient(180deg, rgba(79,140,255,.06), transparent);}
   .hero .eyebrow{letter-spacing:.28em;text-transform:uppercase;font-size:.72rem;color:var(--blue);font-weight:700}
   .hero h1{margin:.35em auto .25em;max-width:1000px;font-size:clamp(1.5rem,3.6vw,2.5rem);line-height:1.18;
@@ -42,6 +42,8 @@
   .hero .meta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
   .chip{font-size:.82rem;color:var(--muted);border:1px solid var(--line);background:var(--card);padding:6px 13px;border-radius:999px}
   .chip b{color:var(--ink);font-weight:600}
+  .back-link{position:absolute;left:16px;top:16px;display:inline-flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted);text-decoration:none;border:1px solid var(--line);background:var(--card);padding:6px 12px;border-radius:999px;transition:.18s ease;z-index:60}
+  .back-link:hover{color:#fff;border-color:#39425c}
 
   /* Tab bar */
   nav.tabs{position:sticky;top:0;z-index:50;display:flex;justify-content:safe center;gap:6px;overflow-x:auto;padding:10px 14px;
@@ -115,6 +117,7 @@
 
 <!-- ===== HEADER ===== -->
 <header class="hero">
+  <a class="back-link" href="https://nguyenhuuca.github.io/assessment/presentations/">← Presentations</a>
   <div class="eyebrow">PRD · Hot Video Priority</div>
   <h1>Hot Video Priority &amp; Trending Feed</h1>
   <div class="meta">

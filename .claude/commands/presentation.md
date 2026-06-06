@@ -42,6 +42,8 @@ path. Default output: **next to the source**, same base name, `.html` extension
 ### Step 3 — Fill header
 `<header class="hero">`: eyebrow = type + id (e.g. `ADR-0006`), `<h1>` = doc
 title, chips = Status / Date / Owner / Version from `## Metadata` when present.
+Keep the `.back-link` (`← Presentations`) anchor from the template — it points to
+`https://nguyenhuuca.github.io/assessment/presentations/`.
 
 ### Step 4 — Map sections to tabs (one `.tab-btn` + matching `.panel` each)
 First tab gets `active`, first panel gets `show`.

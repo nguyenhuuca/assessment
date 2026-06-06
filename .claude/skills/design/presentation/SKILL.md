@@ -42,7 +42,9 @@ extension).
 2. **Copy `template-tabbar.html`** to the output path (see §3).
 3. **Fill the `<header class="hero">`**: eyebrow = type + id (e.g. `ADR-0006`),
    `<h1>` = document title, chips = Status / Date / Owner / Version pulled from
-   `## Metadata` when present.
+   `## Metadata` when present. Keep the `.back-link` (`← Presentations`) anchor
+   from the template — it links to
+   `https://nguyenhuuca.github.io/assessment/presentations/`.
 4. **Map sections to tabs** — one `.tab-btn` + matching `.panel` per major `##`
    section, using the type-specific maps below. First tab gets `active` / first
    panel gets `show`.
