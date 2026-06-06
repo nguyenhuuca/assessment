@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Feature Specification: Watch History</title>
+
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+
+<style>
+  :root{
+    --bg:#06070c; --bg2:#0c0f1a; --card:#11141f; --card2:#161a28;
+    --ink:#e7ebf5; --muted:#9aa3b8; --line:#222838;
+    --blue:#4f8cff; --green:#34d399; --yellow:#fbbf24; --amber:#f59e0b;
+    --red:#f87171; --violet:#a78bfa; --cyan:#22d3ee;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(79,140,255,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(167,139,250,.08), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+
+  /* Header */
+  header.hero{padding:34px 24px 22px;text-align:center;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(79,140,255,.06), transparent);}
+  .hero .eyebrow{letter-spacing:.28em;text-transform:uppercase;font-size:.72rem;color:var(--blue);font-weight:700}
+  .hero h1{margin:.35em auto .25em;max-width:1000px;font-size:clamp(1.5rem,3.6vw,2.5rem);line-height:1.18;
+    background:linear-gradient(90deg,#fff,#9fc2ff 60%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .meta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+  .chip{font-size:.82rem;color:var(--muted);border:1px solid var(--line);background:var(--card);padding:6px 13px;border-radius:999px}
+  .chip b{color:var(--ink);font-weight:600}
+
+  /* Tab bar */
+  nav.tabs{position:sticky;top:0;z-index:50;display:flex;gap:6px;overflow-x:auto;padding:10px 14px;
+    background:rgba(6,7,12,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);scrollbar-width:thin}
+  nav.tabs::-webkit-scrollbar{height:6px}
+  nav.tabs::-webkit-scrollbar-thumb{background:#2a3146;border-radius:9px}
+  .tab-btn{flex:0 0 auto;cursor:pointer;white-space:nowrap;border:1px solid var(--line);background:var(--card);
+    color:var(--muted);font-size:.9rem;font-weight:600;padding:9px 16px;border-radius:11px;transition:.18s ease;font-family:inherit}
+  .tab-btn:hover{color:var(--ink);border-color:#39425c}
+  .tab-btn.active{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--blue),#6d5cff);box-shadow:0 6px 20px rgba(79,140,255,.35)}
+  .tab-btn .ico{margin-right:7px}
+
+  /* Panels */
+  main{max-width:980px;margin:0 auto;padding:30px 20px 90px}
+  .panel{display:none;animation:fade .35s ease}
+  .panel.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .panel-title{display:flex;align-items:center;gap:12px;font-size:1.5rem;margin:0 0 6px}
+  .panel-title .num{font-size:.85rem;font-weight:800;color:#0a0a0a;background:linear-gradient(135deg,var(--blue),var(--violet));padding:4px 10px;border-radius:8px;letter-spacing:.05em}
+  .panel-sub{color:var(--muted);margin:0 0 22px;font-size:.95rem}
+
+  /* Cards */
+  .card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);
+    border-left:4px solid var(--accent,var(--blue));border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .card.blue{--accent:var(--blue)} .card.green{--accent:var(--green)} .card.yellow{--accent:var(--yellow)}
+  .card.amber{--accent:var(--amber)} .card.red{--accent:var(--red)} .card.violet{--accent:var(--violet)} .card.cyan{--accent:var(--cyan)}
+  .card h3{margin:0 0 10px;font-size:1.16rem;display:flex;align-items:center;gap:9px;color:#fff}
+  .card h4{margin:16px 0 6px;color:#cdd6ec;font-size:1rem}
+  .card .tag{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent,var(--blue));border:1px solid currentColor;padding:2px 8px;border-radius:6px;opacity:.9}
+  .card .time{margin-left:auto;font-size:.8rem;color:var(--muted);font-weight:600}
+  p,li{color:var(--ink)} .muted{color:var(--muted)} strong{color:#fff}
+
+  .hl{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:10px;margin:10px 0;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+  .hl .ic{flex:0 0 auto;font-size:1.05rem}
+  .hl.goal{border-color:rgba(79,140,255,.4)} .hl.prod{border-color:rgba(52,211,153,.35)}
+
+  .formula{text-align:center;margin:14px 0;padding:16px;border-radius:12px;
+    background:radial-gradient(120% 120% at 50% 0%, rgba(79,140,255,.10), transparent 70%), #0a0d17;
+    border:1px solid rgba(79,140,255,.35);box-shadow:inset 0 0 28px rgba(79,140,255,.08), 0 0 22px rgba(79,140,255,.05)}
+  .formula.green{border-color:rgba(52,211,153,.4);background:radial-gradient(120% 120% at 50% 0%, rgba(52,211,153,.10), transparent 70%), #0a0d17}
+  .formula .label{font-size:.78rem;color:var(--muted);margin-top:8px}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.94rem}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:#1a1f30;color:#cdd6ec;font-weight:700}
+  tr:nth-child(even) td{background:rgba(255,255,255,.018)}
+
+  pre{background:#05060b;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;color:#bcd0ff;font-family:"Cascadia Code","Consolas",monospace;font-size:.86rem;line-height:1.5}
+  code{font-family:"Cascadia Code","Consolas",monospace;font-size:.88em;background:#1a1f30;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#bcd0ff}
+  pre code{background:none;border:none;padding:0}
+
+  .prompt{border-left:3px solid var(--cyan);background:rgba(34,211,238,.05);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;color:#d7eef5}
+
+  details{margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#0a0d17;overflow:hidden}
+  details summary{cursor:pointer;list-style:none;padding:11px 16px;font-weight:700;color:var(--green);user-select:none;display:flex;align-items:center;gap:8px}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸";color:var(--green);transition:.2s}
+  details[open] summary::before{transform:rotate(90deg)}
+  details summary:hover{background:rgba(52,211,153,.06)}
+  details .body{padding:4px 18px 14px;border-top:1px solid var(--line)}
+
+  .ex{margin:10px 0;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.025);border:1px dashed var(--line)}
+  .ex b.lbl{color:var(--yellow)}
+
+  ul{padding-left:22px} li{margin:4px 0}
+  .footer{text-align:center;color:var(--muted);font-size:.82rem;padding:24px;border-top:1px solid var(--line)}
+  .kbd{font-family:monospace;background:#1a1f30;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;font-size:.8rem;color:#cdd6ec}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="hero">
+  <div class="eyebrow">SPEC · Watch History</div>
+  <h1>Feature Specification: Watch History</h1>
+  <div class="meta">
+    <span class="chip">📄 <b>Type:</b> Spec</span>
+    <span class="chip">🟡 <b>Status:</b> Draft</span>
+    <span class="chip">👤 <b>Author:</b> nguyenhuuca</span>
+    <span class="chip">📅 <b>Date:</b> 2026-05-31</span>
+    <span class="chip">🔖 <b>Version:</b> 1.0</span>
+  </div>
+</header>
+
+<!-- ===== TAB BAR ===== -->
+<nav class="tabs" id="tabbar">
+  <button class="tab-btn active" data-tab="t1"><span class="ico">🎯</span>Overview</button>
+  <button class="tab-btn" data-tab="t2"><span class="ico">📐</span>Business Rules</button>
+  <button class="tab-btn" data-tab="t3"><span class="ico">✅</span>Requirements</button>
+  <button class="tab-btn" data-tab="t4"><span class="ico">🔌</span>API Changes</button>
+  <button class="tab-btn" data-tab="t5"><span class="ico">🗄️</span>Data / DB</button>
+  <button class="tab-btn" data-tab="t6"><span class="ico">🔒</span>Security</button>
+  <button class="tab-btn" data-tab="t7"><span class="ico">🎨</span>Frontend</button>
+  <button class="tab-btn" data-tab="t8"><span class="ico">⚡</span>NFR &amp; Caching</button>
+  <button class="tab-btn" data-tab="t9"><span class="ico">🧪</span>Edge Cases</button>
+  <button class="tab-btn" data-tab="t10"><span class="ico">📋</span>Acceptance</button>
+</nav>
+
+<main>
+
+  <!-- ===== T1: OVERVIEW ===== -->
+  <section class="panel show" id="t1">
+    <h2 class="panel-title"><span class="num">I</span> Overview</h2>
+    <p class="panel-sub">What Watch History does and how it is scoped.</p>
+
+    <div class="card blue">
+      <h3>🎯 Summary</h3>
+      <p>When a logged-in user plays any video, the system automatically records it in their personal watch history. Users can view their history on a dedicated page (sorted newest first), see a "watched" indicator on video cards, and delete individual entries or clear all history. History is private and scoped to the authenticated user.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>🔗 Related Documents</h3>
+      <ul>
+        <li><strong>Related PRD:</strong> PRD-watch-history</li>
+        <li><strong>Related ADR:</strong> ADR-0013: Watch History Design</li>
+      </ul>
+    </div>
+
+    <div class="card violet">
+      <h3>❓ Open Questions <span class="tag">Resolved</span></h3>
+      <ul>
+        <li>✔ min-watch-duration threshold — deferred to v2 (fire-and-forget on play start, no timer)</li>
+        <li>✔ cap strategy — auto-evict oldest (not hard reject)</li>
+        <li>✔ re-watch — upsert (update <code>watched_at</code>, move to top)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== T2: BUSINESS RULES ===== -->
+  <section class="panel" id="t2">
+    <h2 class="panel-title"><span class="num">II</span> Business Rules</h2>
+    <p class="panel-sub">Five invariants governing history behaviour.</p>
+
+    <div class="card cyan">
+      <h3>📐 Rule 1 — 500-entry cap <span class="tag">Cap</span></h3>
+      <p>Each user may have at most <strong>500</strong> watch history entries. When a new entry would exceed this cap, the oldest entry (by <code>watched_at</code>) is automatically deleted before the new one is inserted. No error is returned to the caller.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>📐 Rule 2 — One entry per video <span class="tag">Upsert</span></h3>
+      <p>A video can appear at most once per user in watch history. Re-watching the same video updates the existing entry's <code>watched_at</code> timestamp (upsert) — it does not create a duplicate.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>📐 Rule 3 — Survives video deletion <span class="tag">Persist</span></h3>
+      <p>Watch history entries persist even if the source video is deleted. The <code>video_id</code> foreign key becomes <code>NULL</code> on video deletion; the entry remains with <code>source_video_id</code> intact. The UI must handle <code>video_id: null</code> gracefully.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>📐 Rule 4 — Strictly private <span class="tag">Privacy</span></h3>
+      <p>Watch history is strictly private. A user can only read, record, or delete their own history. No cross-user access is permitted.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>📐 Rule 5 — Fire-and-forget <span class="tag">Async</span></h3>
+      <p>Recording a watch event is fire-and-forget. The frontend does not await the response. A failed POST does not affect video playback or surface an error to the user.</p>
+    </div>
+  </section>
+
+  <!-- ===== T3: REQUIREMENTS ===== -->
+  <section class="panel" id="t3">
+    <h2 class="panel-title"><span class="num">III</span> Functional Requirements</h2>
+    <p class="panel-sub">FR-1 through FR-7.</p>
+
+    <div class="card cyan">
+      <h3>Auto-record on play <span class="tag">FR-1</span></h3>
+      <p>The system must accept a <code>POST /watch-history</code> request when a user plays a video. If the video is already in the user's history, update <code>watched_at</code> to now (upsert). If it is a new entry and the user has 500 entries, delete the oldest before inserting.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>History IDs endpoint <span class="tag">FR-2</span></h3>
+      <p>The system must expose <code>GET /watch-history/ids</code> returning the list of <code>source_video_id</code> values for the authenticated user. Used by the frontend for client-side watched-indicator lookup.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>History list endpoint <span class="tag">FR-3</span></h3>
+      <p>The system must expose <code>GET /watch-history</code> returning full history entries for the authenticated user, sorted by <code>watched_at</code> DESC.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>Watched indicator on video cards <span class="tag">FR-4</span></h3>
+      <p>Each video card must display a visual indicator if the video's ID is present in the user's history. The frontend must derive this from the <code>GET /watch-history/ids</code> response using a client-side <code>Set.has()</code> lookup — no per-card API call.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>Delete single entry <span class="tag">FR-5</span></h3>
+      <p>The system must accept <code>DELETE /watch-history?videoId=X</code> to remove a single entry. If the entry does not exist, return 204 (idempotent).</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>Clear all history <span class="tag">FR-6</span></h3>
+      <p>The system must accept <code>DELETE /watch-history/all</code> to remove all entries for the authenticated user. The frontend must show a confirmation dialog before calling this endpoint.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>History page <span class="tag">FR-7</span></h3>
+      <p>The <code>/history</code> route must replace the current <code>ComingSoon</code> placeholder with a real <code>HistoryPage</code> component displaying all history entries.</p>
+    </div>
+  </section>
+
+  <!-- ===== T4: API CHANGES ===== -->
+  <section class="panel" id="t4">
+    <h2 class="panel-title"><span class="num">IV</span> API Changes</h2>
+    <p class="panel-sub">Five new endpoints under <code>/v1/funny-app/watch-history</code>.</p>
+
+    <div class="card green">
+      <h3>GET <code>/watch-history/ids</code></h3>
+      <p>Returns all watched video IDs for the current user. Used at page load for client-side card indicators. <strong>Auth:</strong> Required (JWT Bearer) · <strong>Rate limit:</strong> None</p>
+      <h4>Response — Success (200)</h4>
+      <pre><code>{
+  "status": "SUCCESS",
+  "data": {
+    "videoIds": [123, 456, 789]
+  }
+}</code></pre>
+      <p class="muted">Uses <code>ResultObjectInfo&lt;WatchHistoryIdsDto&gt;</code>.</p>
+    </div>
+
+    <div class="card green">
+      <h3>GET <code>/watch-history</code></h3>
+      <p>Returns full history list, newest first. <strong>Auth:</strong> Required (JWT Bearer) · <strong>Rate limit:</strong> None</p>
+      <h4>Response — Success (200)</h4>
+      <pre><code>{
+  "status": "SUCCESS",
+  "data": [
+    {
+      "id": "uuid",
+      "sourceVideoId": 123,
+      "videoId": 123,
+      "title": "Funny Cat Video",
+      "poster": "https://...",
+      "watchedAt": "2026-05-31T10:00:00Z"
+    }
+  ],
+  "total": 42
+}</code></pre>
+      <p class="muted">Uses <code>ResultListInfo&lt;WatchHistoryDto&gt;</code>. <code>videoId</code> may be <code>null</code> if source video was deleted — <code>title</code> and <code>poster</code> will also be <code>null</code> in that case.</p>
+    </div>
+
+    <div class="card green">
+      <h3>POST <code>/watch-history</code></h3>
+      <p>Record or update a watch event. Fire-and-forget — frontend does not await. <strong>Auth:</strong> Required (JWT Bearer) · <strong>Rate limit:</strong> 30 requests/minute/user (<code>@RateLimited(permit = 30)</code>)</p>
+      <h4>Request</h4>
+      <pre><code>{
+  "videoId": 123
+}</code></pre>
+      <h4>Response — Success</h4>
+      <table>
+        <tr><th>Condition</th><th>HTTP</th><th>Body</th></tr>
+        <tr><td>New entry created</td><td>201</td><td><code>ResultObjectInfo&lt;WatchHistoryDto&gt;</code></td></tr>
+        <tr><td>Existing entry updated (re-watch)</td><td>200</td><td><code>ResultObjectInfo&lt;WatchHistoryDto&gt;</code></td></tr>
+        <tr><td><code>videoId</code> not found in <code>video_sources</code></td><td>200</td><td><code>ResultObjectInfo&lt;WatchHistoryDto&gt;</code> with <code>videoId: null</code> — silent, recorded with null video_id</td></tr>
+      </table>
+      <h4>Response — Error</h4>
+      <table>
+        <tr><th>HTTP</th><th>Code</th><th>Condition</th></tr>
+        <tr><td>401</td><td><code>UNAUTHORIZED</code></td><td>Missing or invalid JWT</td></tr>
+        <tr><td>500</td><td><code>INTERNAL_ERROR</code></td><td>Unexpected DB or server failure</td></tr>
+      </table>
+      <div class="prompt">Note: Invalid <code>videoId</code> is NOT a 404. It is silently recorded with <code>video_id = null</code> and <code>source_video_id = videoId</code>. This supports the fire-and-forget contract — the frontend never inspects the response.</div>
+    </div>
+
+    <div class="card amber">
+      <h3>DELETE <code>/watch-history</code></h3>
+      <p>Remove a single history entry by video ID. <strong>Auth:</strong> Required (JWT Bearer) · <strong>Rate limit:</strong> None · <strong>Query param:</strong> <code>?videoId=X</code> (Long, required)</p>
+      <table>
+        <tr><th>Condition</th><th>HTTP</th></tr>
+        <tr><td>Entry deleted</td><td>204</td></tr>
+        <tr><td>Entry not found (idempotent)</td><td>204</td></tr>
+        <tr><td><code>videoId</code> param missing</td><td>400</td></tr>
+        <tr><td>Unauthenticated</td><td>401</td></tr>
+      </table>
+    </div>
+
+    <div class="card amber">
+      <h3>DELETE <code>/watch-history/all</code></h3>
+      <p>Clear all history entries for the authenticated user. <strong>Auth:</strong> Required (JWT Bearer) · <strong>Rate limit:</strong> None</p>
+      <table>
+        <tr><th>Condition</th><th>HTTP</th></tr>
+        <tr><td>All entries deleted (or none existed)</td><td>204</td></tr>
+        <tr><td>Unauthenticated</td><td>401</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== T5: DATA / DB ===== -->
+  <section class="panel" id="t5">
+    <h2 class="panel-title"><span class="num">V</span> Database Changes</h2>
+    <p class="panel-sub">One new table; no changes to existing tables.</p>
+
+    <div class="card violet">
+      <h3>🗄️ New Table — <code>watch_history</code></h3>
+      <pre><code>-- Migration: api/src/main/resources/db/changelog/sql/202605310002-create-watch-history-table.sql
+
+CREATE TABLE watch_history (
+    id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id         BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    video_id        BIGINT               REFERENCES video_sources(id) ON DELETE SET NULL,
+    source_video_id BIGINT      NOT NULL,
+    watched_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT uq_watch_history_user_video UNIQUE (user_id, source_video_id)
+);
+
+CREATE INDEX idx_watch_history_user_watched ON watch_history(user_id, watched_at DESC);</code></pre>
+    </div>
+
+    <div class="card cyan">
+      <h3>📝 Column Notes</h3>
+      <ul>
+        <li><code>video_id</code> — nullable FK; becomes <code>NULL</code> if video is deleted (<code>ON DELETE SET NULL</code>)</li>
+        <li><code>source_video_id</code> — immutable copy of the original video ID; used for uniqueness and delete-by-videoId operations</li>
+        <li><code>watched_at</code> — updated on re-watch (upsert); drives sort order</li>
+      </ul>
+      <div class="hl"><span class="ic">ℹ️</span><div>No Changes to Existing Tables</div></div>
+    </div>
+  </section>
+
+  <!-- ===== T6: SECURITY ===== -->
+  <section class="panel" id="t6">
+    <h2 class="panel-title"><span class="num">VI</span> Security Requirements</h2>
+    <p class="panel-sub">Authentication, authorization, validation, and audit posture.</p>
+
+    <div class="card blue">
+      <h3>🔐 Authentication</h3>
+      <p>All five endpoints require a valid JWT Bearer token. The <code>JWTAuthenticationFilter</code> enforces this for any path not in the whitelist. <code>/v1/funny-app/watch-history/**</code> must NOT be added to the whitelist.</p>
+    </div>
+
+    <div class="card blue">
+      <h3>🛡️ Authorization</h3>
+      <p>User identity is extracted in the service layer via <code>SecurityContextHolder.getContext().getAuthentication().getDetails()</code> → <code>UserDetailDto</code>. All queries are scoped to <code>WHERE user_id = currentUser.getId()</code>. No cross-user access is possible.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>✔ Data Validation</h3>
+      <table>
+        <tr><th>Field</th><th>Rule</th><th>Behaviour on violation</th></tr>
+        <tr><td><code>videoId</code> (POST body)</td><td>Not null, Long</td><td>400 if missing</td></tr>
+        <tr><td><code>videoId</code> (DELETE param)</td><td>Not null, Long</td><td>400 if missing</td></tr>
+        <tr><td><code>videoId</code> value</td><td>Must be positive</td><td>200 silent ignore if not found in DB</td></tr>
+      </table>
+    </div>
+
+    <div class="card amber">
+      <h3>🔏 Sensitive Data</h3>
+      <p>No sensitive fields. <code>@AuditLog</code> is NOT applied to <code>WatchHistoryController</code> — POST volume would generate excessive audit log noise.</p>
+    </div>
+  </section>
+
+  <!-- ===== T7: FRONTEND ===== -->
+  <section class="panel" id="t7">
+    <h2 class="panel-title"><span class="num">VII</span> Frontend Changes</h2>
+    <p class="panel-sub">Routes, components, API module, and React Query state.</p>
+
+    <div class="card blue">
+      <h3>🧭 Modified Routes</h3>
+      <table>
+        <tr><th>Path</th><th>Component</th><th>Change</th></tr>
+        <tr><td><code>/history</code> (side nav)</td><td><code>HistoryPage.jsx</code></td><td>Replace <code>ComingSoon</code> with real component</td></tr>
+      </table>
+      <p class="muted"><strong>How to replace:</strong> In <code>AppShell.jsx</code>, the <code>history</code> nav key currently renders <code>&lt;ComingSoon page="history" /&gt;</code>. Change to render <code>&lt;HistoryPage /&gt;</code> when <code>activeNav === 'history'</code>.</p>
+    </div>
+
+    <div class="card green">
+      <h3>🧩 New Components</h3>
+      <table>
+        <tr><th>Component</th><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>HistoryPage</code></td><td><code>webapp/src/pages/HistoryPage.jsx</code></td><td>Lists all watch history entries, newest first</td></tr>
+        <tr><td><code>WatchedBadge</code></td><td><code>webapp/src/components/video/WatchedBadge.jsx</code></td><td>Overlay indicator on watched video cards</td></tr>
+      </table>
+    </div>
+
+    <div class="card violet">
+      <h3>🔌 New API Module — <code>webapp/src/api/watchHistory.js</code></h3>
+      <pre><code>export const watchHistoryApi = {
+  ids:      ()         =&gt; api.get('/watch-history/ids'),
+  list:     ()         =&gt; api.get('/watch-history'),
+  record:   (videoId)  =&gt; api.post('/watch-history', { videoId }),   // fire-and-forget
+  remove:   (videoId)  =&gt; api.delete(`/watch-history?videoId=${videoId}`),
+  clearAll: ()         =&gt; api.delete('/watch-history/all'),
+}</code></pre>
+      <p class="muted"><code>record()</code> must be called without <code>await</code>. Errors must be silently swallowed.</p>
+    </div>
+
+    <div class="card violet">
+      <h3>🔑 React Query Keys &amp; State</h3>
+      <pre><code>// Page-load fetch — cached for entire session
+['watchHistory', 'ids']    → GET /watch-history/ids  → Set&lt;Long&gt;
+
+// History page fetch
+['watchHistory', 'list']   → GET /watch-history
+
+// Invalidate after any mutation
+queryClient.invalidateQueries(['watchHistory', 'ids'])
+queryClient.invalidateQueries(['watchHistory', 'list'])</code></pre>
+      <p><strong>Watched indicator per card:</strong> <code>watchedIds.has(video.id)</code> — O(1), no extra API call.</p>
+      <h4>Fire-and-forget pattern</h4>
+      <pre><code>// On video play event — do NOT await
+watchHistoryApi.record(video.id).catch(() =&gt; {})
+// Then invalidate to keep indicator in sync
+queryClient.invalidateQueries(['watchHistory', 'ids'])</code></pre>
+    </div>
+  </section>
+
+  <!-- ===== T8: NFR & CACHING ===== -->
+  <section class="panel" id="t8">
+    <h2 class="panel-title"><span class="num">VIII</span> Non-Functional &amp; Caching</h2>
+    <p class="panel-sub">Performance targets, availability, and cache impact.</p>
+
+    <div class="card blue">
+      <h3>⚡ Performance</h3>
+      <table>
+        <tr><th>Operation</th><th>Target</th><th>Notes</th></tr>
+        <tr><td><code>GET /watch-history</code> (history page load)</td><td>&lt; 500 ms p99</td><td>Index on <code>(user_id, watched_at DESC)</code> covers this query</td></tr>
+        <tr><td>All other endpoints</td><td>No specific target</td><td>Upsert + delete are single-row operations; expected &lt; 50 ms</td></tr>
+      </table>
+    </div>
+
+    <div class="card green">
+      <h3>🟢 Availability</h3>
+      <p>No degradation to video playback. POST is fire-and-forget — a timeout or 5xx does not surface to the user.</p>
+    </div>
+
+    <div class="card violet">
+      <h3>🗃️ Caching Impact</h3>
+      <table>
+        <tr><th>Cache</th><th>Impact</th></tr>
+        <tr><td><code>VideoCacheImpl</code></td><td>No impact — watch history does not read from or write to video metadata cache</td></tr>
+        <tr><td><code>StatsCacheImpl</code></td><td>No impact — watch history is separate from aggregate view stats (<code>VideoAccessStats</code>)</td></tr>
+      </table>
+      <div class="prompt"><code>VideoAccessStats</code> tracks aggregate hit counts per video (not per-user). Watch history is per-user. These are independent systems.</div>
+    </div>
+  </section>
+
+  <!-- ===== T9: EDGE CASES ===== -->
+  <section class="panel" id="t9">
+    <h2 class="panel-title"><span class="num">IX</span> Edge Cases</h2>
+    <p class="panel-sub">EC-1 through EC-7.</p>
+
+    <div class="card amber">
+      <h3>Re-watch same video (same tab) <span class="tag">EC-1</span></h3>
+      <p><strong>Condition:</strong> User plays video A, then plays video A again in the same session.</p>
+      <p><strong>Expected:</strong> Single entry in history. <code>watched_at</code> updated to latest play time. Entry appears at top of list.</p>
+    </div>
+
+    <div class="card amber">
+      <h3>Two tabs play same video simultaneously <span class="tag">EC-2</span></h3>
+      <p><strong>Condition:</strong> User has two tabs open and plays the same video at the same moment.</p>
+      <p><strong>Expected:</strong> <code>UPSERT ON CONFLICT (user_id, source_video_id) DO UPDATE SET watched_at = now()</code> handles concurrency. Exactly one entry exists. <code>watched_at</code> reflects whichever write lands last. No error.</p>
+    </div>
+
+    <div class="card amber">
+      <h3>At exactly 500 entries, new video played <span class="tag">EC-3</span></h3>
+      <p><strong>Condition:</strong> User has 500 entries. Plays a new (not-yet-watched) video.</p>
+      <p><strong>Expected:</strong> Oldest entry (min <code>watched_at</code>) is deleted. New entry is inserted. Total remains 500. No error returned to frontend.</p>
+    </div>
+
+    <div class="card amber">
+      <h3>At exactly 500 entries, re-watching existing <span class="tag">EC-4</span></h3>
+      <p><strong>Condition:</strong> User has 500 entries. Re-watches a video already in history.</p>
+      <p><strong>Expected:</strong> Upsert updates <code>watched_at</code> only. No deletion. Total remains 500.</p>
+    </div>
+
+    <div class="card amber">
+      <h3>Delete entry that does not exist <span class="tag">EC-5</span></h3>
+      <p><strong>Condition:</strong> <code>DELETE /watch-history?videoId=999</code> where no entry exists for this user + videoId.</p>
+      <p><strong>Expected:</strong> 204 — idempotent, no error.</p>
+    </div>
+
+    <div class="card red">
+      <h3>Source video deleted while in history <span class="tag">EC-6</span></h3>
+      <p><strong>Condition:</strong> Admin deletes a <code>VideoSource</code> record. One or more users have it in watch history.</p>
+      <p><strong>Expected:</strong> <code>video_id</code> → <code>NULL</code> via <code>ON DELETE SET NULL</code>. <code>source_video_id</code> unchanged. <code>GET /watch-history</code> returns the entry with <code>videoId: null</code>, <code>title: null</code>, <code>poster: null</code>. Frontend renders "Video no longer available" placeholder — does not crash.</p>
+    </div>
+
+    <div class="card amber">
+      <h3>Clear all history — confirmation <span class="tag">EC-7</span></h3>
+      <p><strong>Condition:</strong> User clicks "Clear all" button.</p>
+      <p><strong>Expected:</strong> Frontend shows confirmation dialog ("Are you sure? This cannot be undone."). Only on confirm does it call <code>DELETE /watch-history/all</code>. On cancel, no API call is made.</p>
+    </div>
+  </section>
+
+  <!-- ===== T10: ACCEPTANCE ===== -->
+  <section class="panel" id="t10">
+    <h2 class="panel-title"><span class="num">X</span> Acceptance Criteria</h2>
+    <p class="panel-sub">Definition of done.</p>
+
+    <div class="card green">
+      <h3>✅ Criteria</h3>
+      <ul>
+        <li>Playing any video automatically creates or updates a history entry (no manual action required)</li>
+        <li><code>GET /watch-history</code> returns entries sorted by <code>watched_at</code> DESC</li>
+        <li><code>GET /watch-history/ids</code> returns correct set of <code>source_video_id</code> values</li>
+        <li>Video cards show watched indicator for videos in history — zero extra API calls per card</li>
+        <li>Re-watching a video moves it to the top of the history list</li>
+        <li>500th entry: success; 501st (new video): oldest entry evicted, total stays 500</li>
+        <li>Re-watching at cap 500 does NOT trigger eviction (upsert, not insert)</li>
+        <li>Delete non-existent entry returns 204 (idempotent)</li>
+        <li>Clear all requires frontend confirmation dialog before API call</li>
+        <li>Deleted video appears as "Video no longer available" in history — frontend does not crash</li>
+        <li>Two concurrent POSTs for same video result in exactly one history entry</li>
+        <li>POST /watch-history does not block or delay video playback</li>
+        <li>Unauthenticated requests to any endpoint return 401</li>
+        <li><code>mvn verify</code> passes with coverage gate met</li>
+        <li><code>npm run test</code> passes</li>
+      </ul>
+    </div>
+
+    <div class="card cyan">
+      <h3>📜 Version History</h3>
+      <table>
+        <tr><th>Version</th><th>Date</th><th>Author</th><th>Change</th></tr>
+        <tr><td>1.0</td><td>2026-05-31</td><td>nguyenhuuca</td><td>Initial draft</td></tr>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<div class="footer">
+  Navigate: click a <strong>tab</strong> above · keys <span class="kbd">←</span> / <span class="kbd">→</span> change section ·
+  click <span class="kbd">🔎 Details</span> to expand.
+</div>
+
+<script>
+  const btns   = Array.from(document.querySelectorAll('.tab-btn'));
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  let idx = 0;
+  function activate(i){
+    idx = (i + panels.length) % panels.length;
+    btns.forEach((b,k)=>b.classList.toggle('active', k===idx));
+    panels.forEach((p,k)=>p.classList.toggle('show', k===idx));
+    btns[idx].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+    window.scrollTo({top:0, behavior:'smooth'});
+    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([panels[idx]]);
+  }
+  btns.forEach((b,i)=>b.addEventListener('click', ()=>activate(i)));
+  document.addEventListener('keydown', e=>{
+    if (e.target.tagName === 'SUMMARY') return;
+    if (e.key === 'ArrowRight') activate(idx+1);
+    if (e.key === 'ArrowLeft')  activate(idx-1);
+  });
+</script>
+</body>
+</html>
