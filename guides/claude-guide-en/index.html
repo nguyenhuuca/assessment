@@ -2253,6 +2253,8 @@
       
         
       
+        
+      
     
     
     
@@ -2418,15 +2420,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#personas-11-commands" class="md-nav__link">
+  <a href="#personas-12-commands" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Personas — 11 Commands
+        Personas — 12 Commands
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Personas — 11 Commands">
+    <nav class="md-nav" aria-label="Personas — 12 Commands">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2544,6 +2546,17 @@
     <span class="md-ellipsis">
       
         11. /swarm-review — Swarm Reviewer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-presentation-presentation-renderer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. /presentation — Presentation Renderer
       
     </span>
   </a>
@@ -3185,6 +3198,34 @@
     
   
     Scope to Implement Flow (VI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presentation-command/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presentation Command
   
 
     
@@ -7296,15 +7337,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#personas-11-commands" class="md-nav__link">
+  <a href="#personas-12-commands" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Personas — 11 Commands
+        Personas — 12 Commands
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Personas — 11 Commands">
+    <nav class="md-nav" aria-label="Personas — 12 Commands">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7422,6 +7463,17 @@
     <span class="md-ellipsis">
       
         11. /swarm-review — Swarm Reviewer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-presentation-presentation-renderer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. /presentation — Presentation Renderer
       
     </span>
   </a>
@@ -8017,7 +8069,7 @@
 <ol>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#pre-configured-setup">Pre-configured Setup</a></li>
-<li><a href="#personas--11-commands">Personas — 11 Commands</a></li>
+<li><a href="#personas--12-commands">Personas — 12 Commands</a></li>
 <li><a href="#skills--90-automated-workflows">Skills — 90+ Automated Workflows</a></li>
 <li><a href="#swarm--multi-agent-parallel-execution">Swarm — Multi-Agent Parallel Execution</a></li>
 <li><a href="#real-world-workflows">Real-World Workflows</a></li>
@@ -8029,7 +8081,7 @@
 <p>This project is pre-configured with the <strong>Claude Code Framework</strong> — a powerful AI assistant system that provides:</p>
 <ul>
 <li>✅ <strong>Auto-loaded skills</strong> matching the current context</li>
-<li>✅ <strong>11 specialist commands</strong> (scope, spec, architect, builder, security, QA…)</li>
+<li>✅ <strong>12 specialist commands</strong> (scope, spec, architect, builder, security, QA, presentation…)</li>
 <li>✅ <strong>90+ workflows</strong> covering every development task</li>
 <li>✅ <strong>Multi-agent swarm</strong> for parallel task execution</li>
 <li>✅ <strong>Templates</strong> for ADR, PRD, design docs, and more</li>
@@ -8056,7 +8108,7 @@
 <a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>└── claude_mechanisms/ # Agent, command, skill, rule templates
 </code></pre></div>
 <hr />
-<h2 id="personas-11-commands">Personas — 11 Commands<a class="headerlink" href="#personas-11-commands" title="Permanent link">&para;</a></h2>
+<h2 id="personas-12-commands">Personas — 12 Commands<a class="headerlink" href="#personas-12-commands" title="Permanent link">&para;</a></h2>
 <h3 id="1-scope-prd-generator">1. <code>/scope</code> — PRD Generator<a class="headerlink" href="#1-scope-prd-generator" title="Permanent link">&para;</a></h3>
 <p><strong>Use when:</strong> Turning a rough feature idea into a structured PRD</p>
 <p><strong>Capabilities:</strong>
@@ -8206,6 +8258,19 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>/swarm-review security audit entire codebase
 </code></pre></div></p>
 <p><strong>Output:</strong> Comprehensive review report from multiple perspectives</p>
+<hr />
+<h3 id="12-presentation-presentation-renderer">12. <code>/presentation</code> — Presentation Renderer<a class="headerlink" href="#12-presentation-presentation-renderer" title="Permanent link">&para;</a></h3>
+<p><strong>Use when:</strong> Turning a doc into a stakeholder-ready slide deck</p>
+<p><strong>Capabilities:</strong>
+- Renders ONE markdown doc (PRD / Spec / ADR / Plan) into ONE self-contained <code>.html</code> deck
+- Auto-detects document type and maps sections to tabs
+- Render-only — keeps wording, tables, code, and diagrams faithful (no new content)
+- Opens directly in any browser, no build step</p>
+<p><strong>Examples:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/presentation docs/prd/PRD-hot-video-priority.md
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>/presentation docs/adr/0006-hls-video-streaming.md
+</code></pre></div></p>
+<p><strong>Output:</strong> <code>&lt;doc-name&gt;.html</code> (next to the source) — see the <a href="../presentation-command/">Presentation Command guide</a></p>
 <hr />
 <h2 id="skills-90-automated-workflows">Skills — 90+ Automated Workflows<a class="headerlink" href="#skills-90-automated-workflows" title="Permanent link">&para;</a></h2>
 <h3 id="auto-triggered-skills">Auto-triggered Skills<a class="headerlink" href="#auto-triggered-skills" title="Permanent link">&para;</a></h3>
@@ -8486,139 +8551,139 @@
 </tbody>
 </table>
 <h3 id="swarm-workflow">Swarm Workflow<a class="headerlink" href="#swarm-workflow" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>1. /swarm-plan &quot;implement user authentication&quot;
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>   → Decompose into subtasks
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>   → Create execution plan
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>2. /swarm-execute
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>   → Launch 4–8 workers in parallel
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>   → Each worker handles 1 subtask
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>   → Workers coordinate via Beads
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>3. /swarm-review
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>   → Multi-perspective review
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>   → Aggregate findings
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>   → Report completion
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>1. /swarm-plan &quot;implement user authentication&quot;
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>   → Decompose into subtasks
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>   → Create execution plan
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>2. /swarm-execute
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>   → Launch 4–8 workers in parallel
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>   → Each worker handles 1 subtask
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>   → Workers coordinate via Beads
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>3. /swarm-review
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>   → Multi-perspective review
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>   → Aggregate findings
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>   → Report completion
 </code></pre></div>
 <h3 id="swarm-patterns">Swarm Patterns<a class="headerlink" href="#swarm-patterns" title="Permanent link">&para;</a></h3>
 <h4 id="pattern-1-parallel-implementation">Pattern 1: Parallel Implementation<a class="headerlink" href="#pattern-1-parallel-implementation" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Task: Implement video recommendation feature
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>Swarm breakdown:
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>├── Worker 1: YouTubeApiClient (fetch metadata)
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>├── Worker 2: ChatGptService (get recommendations)
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>├── Worker 3: RecommendationController (REST API)
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>├── Worker 4: RecommendationService (business logic)
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>└── Worker 5: Tests (unit + integration)
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>All workers execute in parallel → 5x faster
-</code></pre></div>
-<h4 id="pattern-2-security-sweep">Pattern 2: Security Sweep<a class="headerlink" href="#pattern-2-security-sweep" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Task: Security audit entire codebase
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Task: Implement video recommendation feature
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
 <a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>Swarm breakdown:
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>├── Worker 1: Scan authentication module
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>├── Worker 2: Scan API endpoints
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>├── Worker 3: Scan database layer
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>├── Worker 4: Scan file operations
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>├── Worker 5: Scan external integrations
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>├── Worker 6: Check OWASP Top 10
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>├── Worker 7: Dependency vulnerability scan
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>└── Worker 8: Configuration security check
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>Aggregate findings → Comprehensive security report
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>├── Worker 1: YouTubeApiClient (fetch metadata)
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>├── Worker 2: ChatGptService (get recommendations)
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>├── Worker 3: RecommendationController (REST API)
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>├── Worker 4: RecommendationService (business logic)
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>└── Worker 5: Tests (unit + integration)
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>All workers execute in parallel → 5x faster
 </code></pre></div>
-<h4 id="pattern-3-parallel-exploration">Pattern 3: Parallel Exploration<a class="headerlink" href="#pattern-3-parallel-exploration" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Task: Find all usages of deprecated API
+<h4 id="pattern-2-security-sweep">Pattern 2: Security Sweep<a class="headerlink" href="#pattern-2-security-sweep" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Task: Security audit entire codebase
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>Swarm breakdown:
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>├── Worker 1: Search controllers/
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>├── Worker 2: Search services/
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>├── Worker 3: Search repositories/
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>├── Worker 4: Search utils/
-<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>└── Worker 5: Search tests/
-<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
-<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>Fast parallel search → Complete results
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>├── Worker 1: Scan authentication module
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>├── Worker 2: Scan API endpoints
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>├── Worker 3: Scan database layer
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>├── Worker 4: Scan file operations
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>├── Worker 5: Scan external integrations
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>├── Worker 6: Check OWASP Top 10
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>├── Worker 7: Dependency vulnerability scan
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>└── Worker 8: Configuration security check
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>Aggregate findings → Comprehensive security report
+</code></pre></div>
+<h4 id="pattern-3-parallel-exploration">Pattern 3: Parallel Exploration<a class="headerlink" href="#pattern-3-parallel-exploration" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Task: Find all usages of deprecated API
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>Swarm breakdown:
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>├── Worker 1: Search controllers/
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>├── Worker 2: Search services/
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>├── Worker 3: Search repositories/
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>├── Worker 4: Search utils/
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>└── Worker 5: Search tests/
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>Fast parallel search → Complete results
 </code></pre></div>
 <hr />
 <h2 id="real-world-workflows">Real-World Workflows<a class="headerlink" href="#real-world-workflows" title="Permanent link">&para;</a></h2>
 <h3 id="workflow-1-implement-a-new-feature-spec-driven">Workflow 1: Implement a New Feature (Spec-Driven)<a class="headerlink" href="#workflow-1-implement-a-new-feature-spec-driven" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Step 1: Scope — clarify requirements, produce PRD</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>/scope<span class="w"> </span>add<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>feature
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># Step 2: Architect — key technical decisions, produce ADR</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>/architect<span class="w"> </span>docs/prd/PRD-video-recommendation.md
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="c1"># Step 3: Spec — exact behavior contract, produce Spec</span>
-<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>/spec<span class="w"> </span>docs/prd/PRD-video-recommendation.md<span class="w"> </span>docs/adr/NNNN-video-recommendation.md
-<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>
-<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="c1"># Step 4: Plan — task breakdown from Spec</span>
-<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-video-recommendation.md
-<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>
-<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="c1"># Step 5: Execute (Swarm)</span>
-<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-video-recommendation.md
-<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>
-<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="c1"># Step 6: Test (QA)</span>
-<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>tests<span class="w"> </span><span class="k">for</span><span class="w"> </span>RecommendationService
-<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a>
-<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="c1"># Step 7: Security (Security Auditor)</span>
-<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>/security-auditor<span class="w"> </span>review<span class="w"> </span>recommendation<span class="w"> </span>feature
-<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a>
-<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="c1"># Step 8: Review (Code Check)</span>
-<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a>/code-check<span class="w"> </span>review<span class="w"> </span>recommendation<span class="w"> </span>module
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Step 1: Scope — clarify requirements, produce PRD</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>/scope<span class="w"> </span>add<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>feature
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Step 2: Architect — key technical decisions, produce ADR</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>/architect<span class="w"> </span>docs/prd/PRD-video-recommendation.md
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="c1"># Step 3: Spec — exact behavior contract, produce Spec</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>/spec<span class="w"> </span>docs/prd/PRD-video-recommendation.md<span class="w"> </span>docs/adr/NNNN-video-recommendation.md
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="c1"># Step 4: Plan — task breakdown from Spec</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-video-recommendation.md
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="c1"># Step 5: Execute (Swarm)</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-video-recommendation.md
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="c1"># Step 6: Test (QA)</span>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>tests<span class="w"> </span><span class="k">for</span><span class="w"> </span>RecommendationService
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="c1"># Step 7: Security (Security Auditor)</span>
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>/security-auditor<span class="w"> </span>review<span class="w"> </span>recommendation<span class="w"> </span>feature
+<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>
+<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a><span class="c1"># Step 8: Review (Code Check)</span>
+<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>/code-check<span class="w"> </span>review<span class="w"> </span>recommendation<span class="w"> </span>module
 </code></pre></div>
 <hr />
 <h3 id="workflow-2-debug-a-production-issue">Workflow 2: Debug a Production Issue<a class="headerlink" href="#workflow-2-debug-a-production-issue" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Step 1: Investigate</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="s2">&quot;debug login timeout issue&quot;</span>
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>→<span class="w"> </span>Auto-load:<span class="w"> </span>debugging<span class="w"> </span>skill
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c1"># Step 2: Analyze</span>
-<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>/architect<span class="w"> </span>analyze<span class="w"> </span>authentication<span class="w"> </span>flow
-<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
-<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="c1"># Step 3: Fix</span>
-<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>/builder<span class="w"> </span>fix<span class="w"> </span>timeout<span class="w"> </span><span class="k">in</span><span class="w"> </span>UserService
-<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>
-<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="c1"># Step 4: Test</span>
-<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>regression<span class="w"> </span>tests
-<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>
-<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="c1"># Step 5: Postmortem</span>
-<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="s2">&quot;write postmortem for login timeout&quot;</span>
-<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>→<span class="w"> </span>Auto-load:<span class="w"> </span>incident-management<span class="w"> </span>skill
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Step 1: Investigate</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="s2">&quot;debug login timeout issue&quot;</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>→<span class="w"> </span>Auto-load:<span class="w"> </span>debugging<span class="w"> </span>skill
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># Step 2: Analyze</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>/architect<span class="w"> </span>analyze<span class="w"> </span>authentication<span class="w"> </span>flow
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="c1"># Step 3: Fix</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>/builder<span class="w"> </span>fix<span class="w"> </span>timeout<span class="w"> </span><span class="k">in</span><span class="w"> </span>UserService
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="c1"># Step 4: Test</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>regression<span class="w"> </span>tests
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="c1"># Step 5: Postmortem</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="s2">&quot;write postmortem for login timeout&quot;</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>→<span class="w"> </span>Auto-load:<span class="w"> </span>incident-management<span class="w"> </span>skill
 </code></pre></div>
 <hr />
 <h3 id="workflow-3-security-audit">Workflow 3: Security Audit<a class="headerlink" href="#workflow-3-security-audit" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Step 1: Full audit</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>/swarm-review<span class="w"> </span>security<span class="w"> </span>audit<span class="w"> </span>entire<span class="w"> </span>codebase
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># Step 2: Fix critical issues</span>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>/builder<span class="w"> </span>fix<span class="w"> </span>SQL<span class="w"> </span>injection<span class="w"> </span><span class="k">in</span><span class="w"> </span>UserRepo
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>/builder<span class="w"> </span>fix<span class="w"> </span>hardcoded<span class="w"> </span>credentials<span class="w"> </span><span class="k">in</span><span class="w"> </span>Helm<span class="w"> </span>values
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="c1"># Step 3: Verify</span>
-<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>/security-auditor<span class="w"> </span>verify<span class="w"> </span>security<span class="w"> </span>fixes
-<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>
-<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="c1"># Step 4: Document</span>
-<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="s2">&quot;document security improvements&quot;</span>
-<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>→<span class="w"> </span>Save<span class="w"> </span>to<span class="w"> </span>security_audit_YYYY-MM-DD.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Step 1: Full audit</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>/swarm-review<span class="w"> </span>security<span class="w"> </span>audit<span class="w"> </span>entire<span class="w"> </span>codebase
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Step 2: Fix critical issues</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>/builder<span class="w"> </span>fix<span class="w"> </span>SQL<span class="w"> </span>injection<span class="w"> </span><span class="k">in</span><span class="w"> </span>UserRepo
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>/builder<span class="w"> </span>fix<span class="w"> </span>hardcoded<span class="w"> </span>credentials<span class="w"> </span><span class="k">in</span><span class="w"> </span>Helm<span class="w"> </span>values
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="c1"># Step 3: Verify</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>/security-auditor<span class="w"> </span>verify<span class="w"> </span>security<span class="w"> </span>fixes
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="c1"># Step 4: Document</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="s2">&quot;document security improvements&quot;</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>→<span class="w"> </span>Save<span class="w"> </span>to<span class="w"> </span>security_audit_YYYY-MM-DD.md
 </code></pre></div>
 <hr />
 <h3 id="workflow-4-performance-optimization">Workflow 4: Performance Optimization<a class="headerlink" href="#workflow-4-performance-optimization" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Step 1: Profile</span>
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="s2">&quot;analyze slow API endpoints&quot;</span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>→<span class="w"> </span>Auto-load:<span class="w"> </span>optimizing-code<span class="w"> </span>skill
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="c1"># Step 2: Design solution</span>
-<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>/architect<span class="w"> </span>design<span class="w"> </span>Redis<span class="w"> </span>caching<span class="w"> </span>strategy
-<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>
-<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="c1"># Step 3: Implement</span>
-<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>/swarm-execute<span class="w"> </span>implement<span class="w"> </span>Redis<span class="w"> </span>cache
-<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>
-<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="c1"># Step 4: Test performance</span>
-<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>performance<span class="w"> </span>tests
-<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>
-<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="c1"># Step 5: Verify</span>
-<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="s2">&quot;benchmark before/after caching&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Step 1: Profile</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="s2">&quot;analyze slow API endpoints&quot;</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>→<span class="w"> </span>Auto-load:<span class="w"> </span>optimizing-code<span class="w"> </span>skill
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="c1"># Step 2: Design solution</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>/architect<span class="w"> </span>design<span class="w"> </span>Redis<span class="w"> </span>caching<span class="w"> </span>strategy
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="c1"># Step 3: Implement</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>/swarm-execute<span class="w"> </span>implement<span class="w"> </span>Redis<span class="w"> </span>cache
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="c1"># Step 4: Test performance</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>performance<span class="w"> </span>tests
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="c1"># Step 5: Verify</span>
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="s2">&quot;benchmark before/after caching&quot;</span>
 </code></pre></div>
 <hr />
 <h2 id="available-templates">Available Templates<a class="headerlink" href="#available-templates" title="Permanent link">&para;</a></h2>
@@ -8717,58 +8782,58 @@
 <h2 id="tips-tricks">Tips &amp; Tricks<a class="headerlink" href="#tips-tricks" title="Permanent link">&para;</a></h2>
 <h3 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h3>
 <h4 id="1-always-design-before-coding">1. Always design before coding<a class="headerlink" href="#1-always-design-before-coding" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Bad</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="s2">&quot;implement video recommendation&quot;</span>
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
-<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1"># Good</span>
-<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>API
-<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="c1"># Review design → Approve</span>
-<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>/swarm-execute<span class="w"> </span>implement<span class="w"> </span>video<span class="w"> </span>recommendation
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Bad</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="s2">&quot;implement video recommendation&quot;</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Good</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>API
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="c1"># Review design → Approve</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>/swarm-execute<span class="w"> </span>implement<span class="w"> </span>video<span class="w"> </span>recommendation
 </code></pre></div>
 <h4 id="2-use-swarm-for-complex-tasks">2. Use swarm for complex tasks<a class="headerlink" href="#2-use-swarm-for-complex-tasks" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Bad: Single agent for a large task</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>/builder<span class="w"> </span>implement<span class="w"> </span>entire<span class="w"> </span>authentication<span class="w"> </span>system
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Good: Swarm for parallel execution</span>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>/swarm-plan<span class="w"> </span>implement<span class="w"> </span>authentication<span class="w"> </span>system
-<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>/swarm-execute
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Bad: Single agent for a large task</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>/builder<span class="w"> </span>implement<span class="w"> </span>entire<span class="w"> </span>authentication<span class="w"> </span>system
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># Good: Swarm for parallel execution</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>/swarm-plan<span class="w"> </span>implement<span class="w"> </span>authentication<span class="w"> </span>system
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>/swarm-execute
 </code></pre></div>
 <h4 id="3-security-first-mindset">3. Security-first mindset<a class="headerlink" href="#3-security-first-mindset" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># After implementing any feature:</span>
-<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>/security-auditor<span class="w"> </span>review<span class="w"> </span><span class="o">[</span>feature-name<span class="o">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># After implementing any feature:</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>/security-auditor<span class="w"> </span>review<span class="w"> </span><span class="o">[</span>feature-name<span class="o">]</span>
 </code></pre></div>
 <h4 id="4-keep-test-coverage-above-80">4. Keep test coverage above 80%<a class="headerlink" href="#4-keep-test-coverage-above-80" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># After implementing:</span>
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>tests<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="o">[</span>service-name<span class="o">]</span>
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="c1"># Check coverage:</span>
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>mvn<span class="w"> </span>verify
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># After implementing:</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>/qa-engineer<span class="w"> </span>write<span class="w"> </span>tests<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="o">[</span>service-name<span class="o">]</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="c1"># Check coverage:</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>mvn<span class="w"> </span>verify
 </code></pre></div>
 <h4 id="5-document-important-decisions">5. Document important decisions<a class="headerlink" href="#5-document-important-decisions" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># Any major decision → Write ADR</span>
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>/architect<span class="w"> </span>document<span class="w"> </span>decision<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>Redis<span class="w"> </span>cache
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Any major decision → Write ADR</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>/architect<span class="w"> </span>document<span class="w"> </span>decision<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>Redis<span class="w"> </span>cache
 </code></pre></div>
 <hr />
 <h3 id="shortcuts">Shortcuts<a class="headerlink" href="#shortcuts" title="Permanent link">&para;</a></h3>
 <h4 id="auto-triggered-skills-no-manual-call-needed">Auto-triggered skills (no manual call needed)<a class="headerlink" href="#auto-triggered-skills-no-manual-call-needed" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="s2">&quot;implement user login&quot;</span><span class="w">   </span>→<span class="w"> </span>auto-load:<span class="w"> </span>implementing-code
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="s2">&quot;fix bug in UserService&quot;</span><span class="w"> </span>→<span class="w"> </span>auto-load:<span class="w"> </span>debugging
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="s2">&quot;write tests&quot;</span><span class="w">            </span>→<span class="w"> </span>auto-load:<span class="w"> </span>testing
-<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="s2">&quot;design API&quot;</span><span class="w">             </span>→<span class="w"> </span>auto-load:<span class="w"> </span>designing-apis
-<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="s2">&quot;security review&quot;</span><span class="w">        </span>→<span class="w"> </span>auto-load:<span class="w"> </span>application-security
-<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="s2">&quot;optimize queries&quot;</span><span class="w">       </span>→<span class="w"> </span>auto-load:<span class="w"> </span>optimizing-code
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="s2">&quot;implement user login&quot;</span><span class="w">   </span>→<span class="w"> </span>auto-load:<span class="w"> </span>implementing-code
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="s2">&quot;fix bug in UserService&quot;</span><span class="w"> </span>→<span class="w"> </span>auto-load:<span class="w"> </span>debugging
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="s2">&quot;write tests&quot;</span><span class="w">            </span>→<span class="w"> </span>auto-load:<span class="w"> </span>testing
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="s2">&quot;design API&quot;</span><span class="w">             </span>→<span class="w"> </span>auto-load:<span class="w"> </span>designing-apis
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="s2">&quot;security review&quot;</span><span class="w">        </span>→<span class="w"> </span>auto-load:<span class="w"> </span>application-security
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="s2">&quot;optimize queries&quot;</span><span class="w">       </span>→<span class="w"> </span>auto-load:<span class="w"> </span>optimizing-code
 </code></pre></div>
 <h4 id="quick-commands">Quick commands<a class="headerlink" href="#quick-commands" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1"># Git</span>
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="s2">&quot;create commit&quot;</span><span class="w">       </span>→<span class="w"> </span>Auto<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>+<span class="w"> </span>commit<span class="w"> </span>with<span class="w"> </span>message
-<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="s2">&quot;create pull request&quot;</span><span class="w"> </span>→<span class="w"> </span>Auto<span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>+<span class="w"> </span>gh<span class="w"> </span>pr<span class="w"> </span>create
-<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>
-<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="c1"># Code quality</span>
-<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="s2">&quot;check code quality&quot;</span><span class="w">  </span>→<span class="w"> </span>SOLID,<span class="w"> </span>DRY<span class="w"> </span>analysis
-<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="s2">&quot;increase coverage&quot;</span><span class="w">   </span>→<span class="w"> </span>Generate<span class="w"> </span>missing<span class="w"> </span>tests
-<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>
-<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="c1"># Documentation</span>
-<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="s2">&quot;explain this code&quot;</span><span class="w">   </span>→<span class="w"> </span>Code<span class="w"> </span>explanation
-<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="s2">&quot;document this API&quot;</span><span class="w">   </span>→<span class="w"> </span>OpenAPI/Swagger<span class="w"> </span>docs
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># Git</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="s2">&quot;create commit&quot;</span><span class="w">       </span>→<span class="w"> </span>Auto<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>+<span class="w"> </span>commit<span class="w"> </span>with<span class="w"> </span>message
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="s2">&quot;create pull request&quot;</span><span class="w"> </span>→<span class="w"> </span>Auto<span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>+<span class="w"> </span>gh<span class="w"> </span>pr<span class="w"> </span>create
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="c1"># Code quality</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="s2">&quot;check code quality&quot;</span><span class="w">  </span>→<span class="w"> </span>SOLID,<span class="w"> </span>DRY<span class="w"> </span>analysis
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="s2">&quot;increase coverage&quot;</span><span class="w">   </span>→<span class="w"> </span>Generate<span class="w"> </span>missing<span class="w"> </span>tests
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="c1"># Documentation</span>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="s2">&quot;explain this code&quot;</span><span class="w">   </span>→<span class="w"> </span>Code<span class="w"> </span>explanation
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="s2">&quot;document this API&quot;</span><span class="w">   </span>→<span class="w"> </span>OpenAPI/Swagger<span class="w"> </span>docs
 </code></pre></div>
 <hr />
 <h3 id="learning-path">Learning Path<a class="headerlink" href="#learning-path" title="Permanent link">&para;</a></h3>
@@ -8848,6 +8913,11 @@
 <td>Parallel execution</td>
 <td>Feature complete</td>
 </tr>
+<tr>
+<td><code>/presentation …</code></td>
+<td>Render doc into HTML deck</td>
+<td><code>&lt;doc-name&gt;.html</code></td>
+</tr>
 </tbody>
 </table>
 <h3 id="common-skills">Common Skills<a class="headerlink" href="#common-skills" title="Permanent link">&para;</a></h3>
@@ -8904,17 +8974,17 @@
 <li><strong>Deployment</strong>: Docker + Kubernetes (Helm)</li>
 </ul>
 <h3 id="project-specific-commands">Project-Specific Commands<a class="headerlink" href="#project-specific-commands" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># Build &amp; Run</span>
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./startLocal.sh
-<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
-<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="c1"># Run tests</span>
-<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./unittest.sh
-<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>
-<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="c1"># Tests + coverage report</span>
-<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify
-<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>
-<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="c1"># Docker build</span>
-<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>funny-app<span class="w"> </span>.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1"># Build &amp; Run</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./startLocal.sh
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="c1"># Run tests</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./unittest.sh
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="c1"># Tests + coverage report</span>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="c1"># Docker build</span>
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>funny-app<span class="w"> </span>.
 </code></pre></div>
 <hr />
 <h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
