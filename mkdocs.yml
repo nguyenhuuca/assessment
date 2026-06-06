@@ -126,6 +126,7 @@ nav:
       - Watch History (baseline) - PRD: prd/PRD-watch-history.md
       - Watch History (baseline) - ADR 0013: adr/0013-watch-history-design.md
       - Watch History (baseline) - Spec: specs/spec-watch-history.md
+      - Watch History (baseline) - Presentation: specs/spec-watch-history.html
       - Watch History (baseline) - Plan: plans/plan-watch-history.md
 
   - Claude Workspace:
