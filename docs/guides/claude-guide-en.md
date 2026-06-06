@@ -300,7 +300,7 @@ templates/
 /presentation docs/adr/0006-hls-video-streaming.md
 ```
 
-**Output:** `<doc-name>.html` (next to the source) — see the [Presentation Command guide](presentation-command.md)
+**Output:** `<doc-name>.html` (next to the source) — see the [Presentation command](../claude/commands/presentation.md)
 
 ---
 

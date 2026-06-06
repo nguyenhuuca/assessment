@@ -120,7 +120,6 @@ nav:
       - Claude Guide (VI): guides/claude-guide-vi.md
       - Scope to Implement Flow: guides/flow-scope-to-implement.md
       - Scope to Implement Flow (VI): guides/flow-scope-to-implement-vi.md
-      - Presentation Command: guides/presentation-command.md
       - Feature Flags (EN): guides/feature-flags.md
       - Feature Flags (VI): guides/feature-flags-vi.md
       - Bitwise Permissions: guides/bitwise-permissions.md
@@ -146,6 +145,7 @@ nav:
       - Commands:
           - Scope (PRD Generator): claude/commands/scope.md
           - Spec (Specification): claude/commands/spec.md
+          - Presentation (HTML Deck): claude/commands/presentation.md
           - Builder: claude/commands/builder.md
           - Architect: claude/commands/architect.md
           - QA Engineer: claude/commands/qa-engineer.md
