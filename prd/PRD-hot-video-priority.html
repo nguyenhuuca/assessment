@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PRD: Hot Video Priority &amp; Trending Feed</title>
+
+<!-- MathJax (for the hot score formula) -->
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+
+<style>
+  :root{
+    --bg:#06070c; --bg2:#0c0f1a; --card:#11141f; --card2:#161a28;
+    --ink:#e7ebf5; --muted:#9aa3b8; --line:#222838;
+    --blue:#4f8cff; --green:#34d399; --yellow:#fbbf24; --amber:#f59e0b;
+    --red:#f87171; --violet:#a78bfa; --cyan:#22d3ee;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(79,140,255,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(167,139,250,.08), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+
+  /* Header */
+  header.hero{padding:34px 24px 22px;text-align:center;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(79,140,255,.06), transparent);}
+  .hero .eyebrow{letter-spacing:.28em;text-transform:uppercase;font-size:.72rem;color:var(--blue);font-weight:700}
+  .hero h1{margin:.35em auto .25em;max-width:1000px;font-size:clamp(1.5rem,3.6vw,2.5rem);line-height:1.18;
+    background:linear-gradient(90deg,#fff,#9fc2ff 60%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .meta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+  .chip{font-size:.82rem;color:var(--muted);border:1px solid var(--line);background:var(--card);padding:6px 13px;border-radius:999px}
+  .chip b{color:var(--ink);font-weight:600}
+
+  /* Tab bar */
+  nav.tabs{position:sticky;top:0;z-index:50;display:flex;gap:6px;overflow-x:auto;padding:10px 14px;
+    background:rgba(6,7,12,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);scrollbar-width:thin}
+  nav.tabs::-webkit-scrollbar{height:6px}
+  nav.tabs::-webkit-scrollbar-thumb{background:#2a3146;border-radius:9px}
+  .tab-btn{flex:0 0 auto;cursor:pointer;white-space:nowrap;border:1px solid var(--line);background:var(--card);
+    color:var(--muted);font-size:.9rem;font-weight:600;padding:9px 16px;border-radius:11px;transition:.18s ease;font-family:inherit}
+  .tab-btn:hover{color:var(--ink);border-color:#39425c}
+  .tab-btn.active{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--blue),#6d5cff);box-shadow:0 6px 20px rgba(79,140,255,.35)}
+  .tab-btn .ico{margin-right:7px}
+
+  /* Panels */
+  main{max-width:980px;margin:0 auto;padding:30px 20px 90px}
+  .panel{display:none;animation:fade .35s ease}
+  .panel.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .panel-title{display:flex;align-items:center;gap:12px;font-size:1.5rem;margin:0 0 6px}
+  .panel-title .num{font-size:.85rem;font-weight:800;color:#0a0a0a;background:linear-gradient(135deg,var(--blue),var(--violet));padding:4px 10px;border-radius:8px;letter-spacing:.05em}
+  .panel-sub{color:var(--muted);margin:0 0 22px;font-size:.95rem}
+
+  /* Cards */
+  .card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);
+    border-left:4px solid var(--accent,var(--blue));border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .card.blue{--accent:var(--blue)} .card.green{--accent:var(--green)} .card.yellow{--accent:var(--yellow)}
+  .card.amber{--accent:var(--amber)} .card.red{--accent:var(--red)} .card.violet{--accent:var(--violet)} .card.cyan{--accent:var(--cyan)}
+  .card h3{margin:0 0 10px;font-size:1.16rem;display:flex;align-items:center;gap:9px;color:#fff}
+  .card h4{margin:16px 0 6px;color:#cdd6ec;font-size:1rem}
+  .card .tag{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent,var(--blue));border:1px solid currentColor;padding:2px 8px;border-radius:6px;opacity:.9}
+  .card .time{margin-left:auto;font-size:.8rem;color:var(--muted);font-weight:600}
+  p,li{color:var(--ink)} .muted{color:var(--muted)} strong{color:#fff}
+
+  .hl{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:10px;margin:10px 0;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+  .hl .ic{flex:0 0 auto;font-size:1.05rem}
+  .hl.goal{border-color:rgba(79,140,255,.4)} .hl.prod{border-color:rgba(52,211,153,.35)}
+
+  .formula{text-align:center;margin:14px 0;padding:16px;border-radius:12px;
+    background:radial-gradient(120% 120% at 50% 0%, rgba(79,140,255,.10), transparent 70%), #0a0d17;
+    border:1px solid rgba(79,140,255,.35);box-shadow:inset 0 0 28px rgba(79,140,255,.08), 0 0 22px rgba(79,140,255,.05)}
+  .formula.green{border-color:rgba(52,211,153,.4);background:radial-gradient(120% 120% at 50% 0%, rgba(52,211,153,.10), transparent 70%), #0a0d17}
+  .formula .label{font-size:.78rem;color:var(--muted);margin-top:8px}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.94rem}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:#1a1f30;color:#cdd6ec;font-weight:700}
+  tr:nth-child(even) td{background:rgba(255,255,255,.018)}
+
+  pre{background:#05060b;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;color:#bcd0ff;font-family:"Cascadia Code","Consolas",monospace;font-size:.86rem;line-height:1.5}
+  code{font-family:"Cascadia Code","Consolas",monospace;font-size:.88em;background:#1a1f30;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#bcd0ff}
+  pre code{background:none;border:none;padding:0}
+
+  .prompt{border-left:3px solid var(--cyan);background:rgba(34,211,238,.05);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;color:#d7eef5}
+
+  details{margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#0a0d17;overflow:hidden}
+  details summary{cursor:pointer;list-style:none;padding:11px 16px;font-weight:700;color:var(--green);user-select:none;display:flex;align-items:center;gap:8px}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸";color:var(--green);transition:.2s}
+  details[open] summary::before{transform:rotate(90deg)}
+  details summary:hover{background:rgba(52,211,153,.06)}
+  details .body{padding:4px 18px 14px;border-top:1px solid var(--line)}
+
+  .ex{margin:10px 0;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.025);border:1px dashed var(--line)}
+  .ex b.lbl{color:var(--yellow)}
+
+  ul{padding-left:22px} li{margin:4px 0}
+  .footer{text-align:center;color:var(--muted);font-size:.82rem;padding:24px;border-top:1px solid var(--line)}
+  .kbd{font-family:monospace;background:#1a1f30;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;font-size:.8rem;color:#cdd6ec}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="hero">
+  <div class="eyebrow">PRD · Hot Video Priority</div>
+  <h1>Hot Video Priority &amp; Trending Feed</h1>
+  <div class="meta">
+    <span class="chip">📄 <b>Type:</b> PRD</span>
+    <span class="chip">🟢 <b>Status:</b> Approved</span>
+    <span class="chip">📅 <b>Date:</b> 2026-02-28</span>
+    <span class="chip">👤 <b>Owner:</b> nguyenhuuca</span>
+    <span class="chip">🏷️ <b>Version:</b> 1.0</span>
+  </div>
+</header>
+
+<!-- ===== TAB BAR ===== -->
+<nav class="tabs" id="tabbar">
+  <button class="tab-btn active" data-tab="t1"><span class="ico">🎯</span>Overview</button>
+  <button class="tab-btn" data-tab="t2"><span class="ico">❓</span>Problem</button>
+  <button class="tab-btn" data-tab="t3"><span class="ico">📈</span>Goals &amp; Metrics</button>
+  <button class="tab-btn" data-tab="t4"><span class="ico">👤</span>User Stories</button>
+  <button class="tab-btn" data-tab="t5"><span class="ico">✅</span>Requirements</button>
+  <button class="tab-btn" data-tab="t6"><span class="ico">🧭</span>Scope</button>
+  <button class="tab-btn" data-tab="t7"><span class="ico">🔗</span>Dependencies</button>
+  <button class="tab-btn" data-tab="t8"><span class="ico">⚠️</span>Risks</button>
+  <button class="tab-btn" data-tab="t9"><span class="ico">🗄️</span>Data &amp; API</button>
+  <button class="tab-btn" data-tab="t10"><span class="ico">🧩</span>Open Questions</button>
+</nav>
+
+<main>
+
+  <!-- ===== T1 · OVERVIEW ===== -->
+  <section class="panel show" id="t1">
+    <h2 class="panel-title"><span class="num">I</span> Overview</h2>
+    <p class="panel-sub">A trending signal that surfaces popular videos and pre-warms them for faster playback.</p>
+
+    <div class="card blue">
+      <h3>🎯 What &amp; Why</h3>
+      <div class="hl goal"><span class="ic">🎯</span><div>Give viewers a curated <strong>"Trending Now"</strong> experience instead of a flat, unordered video list — improving discovery, engagement, and viral spread.</div></div>
+      <p>This PRD introduces a hot-score ranking, a dedicated trending endpoint, a sort option on the existing feed, a scheduled recompute job, cache pre-warming for hot videos, and frontend surfacing (trending section + 🔥 badge).</p>
+    </div>
+
+    <div class="card violet">
+      <h3>📋 Metadata</h3>
+      <table>
+        <tr><th>Field</th><th>Value</th></tr>
+        <tr><td>Status</td><td>Approved</td></tr>
+        <tr><td>Author</td><td>nguyenhuuca</td></tr>
+        <tr><td>Date</td><td>2026-02-28</td></tr>
+        <tr><td>Version</td><td>1.0</td></tr>
+        <tr><td>Beads Issue</td><td>N/A</td></tr>
+        <tr><td>PR-FAQ</td><td>N/A</td></tr>
+        <tr><td>Stakeholders</td><td>Backend Team, Frontend Team, Product</td></tr>
+      </table>
+    </div>
+
+    <details>
+      <summary>🔎 Next Steps &amp; Related Artifacts</summary>
+      <div class="body">
+        <h4>After PRD approval</h4>
+        <ul>
+          <li>[x] <strong>Architect Review</strong>: Technical feasibility — Output: ADR-0011</li>
+          <li>[ ] <strong>UI/UX Designer</strong>: Wireframes for Trending Now section + Hot badge (<code>/ui-ux-designer</code>) — Output: <code>artifacts/design_spec_hot-video.md</code></li>
+          <li>[x] <strong>Engineering Estimate</strong>: Effort estimation &amp; decomposition — Output: plan-hot-video-priority</li>
+          <li>[ ] <strong>Create Beads Issues</strong>: <code>bd create "Hot Video Priority" -t feature</code></li>
+        </ul>
+        <h4>Related Artifacts</h4>
+        <ul>
+          <li>ADR: ADR-0011 — Hot Video Priority Scoring</li>
+          <li>Implementation Plan: plan-hot-video-priority</li>
+          <li>Cache Strategy: ADR-0003</li>
+          <li>LRU Cache: ADR-0005</li>
+        </ul>
+        <h4>Approval</h4>
+        <table>
+          <tr><th>Role</th><th>Name</th><th>Date</th><th>Status</th></tr>
+          <tr><td>Product</td><td>nguyenhuuca</td><td>2026-02-28</td><td>Approved</td></tr>
+          <tr><td>Engineering</td><td>nguyenhuuca</td><td>2026-02-28</td><td>Approved</td></tr>
+          <tr><td>Design</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+        </table>
+        <h4>Version History</h4>
+        <table>
+          <tr><th>Version</th><th>Date</th><th>Author</th><th>Changes</th></tr>
+          <tr><td>1.0</td><td>2026-02-28</td><td>nguyenhuuca</td><td>Initial draft</td></tr>
+          <tr><td>1.1</td><td>2026-05-31</td><td>nguyenhuuca</td><td>Restructured to official PRD template; removed non-existent <code>upCount</code> field; fixed entity name <code>YouTubeVideo</code> → <code>VideoSource</code>; fixed doc paths</td></tr>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===== T2 · PROBLEM ===== -->
+  <section class="panel" id="t2">
+    <h2 class="panel-title"><span class="num">II</span> Problem Statement</h2>
+    <p class="panel-sub">No trending signal exists — discovery is 100% manual browsing.</p>
+
+    <div class="card red">
+      <h3>❓ The Problem</h3>
+      <p>All videos are displayed in a flat, unordered list. Users have no signal about which videos are trending or popular — leading to poor content discovery and lower engagement. Users who want to watch something good must manually browse without any curation.</p>
+    </div>
+
+    <div class="card cyan">
+      <h3>📊 Quantitative Evidence</h3>
+      <ul>
+        <li>No trending signal exists — 100% of content discovery is manual browsing</li>
+        <li><code>VideoAccessStats</code> table exists and tracks <code>hitCount</code> + <code>lastAccessedAt</code>, but <code>recordAccess()</code> is <strong>commented out</strong> — zero access data is being written</li>
+        <li><code>ShareLink</code> table tracks share events but is not used for ranking</li>
+        <li><code>VideoCacheImpl</code> already promotes videos with ≥5 cache hits — evidence that popularity signals are valuable</li>
+      </ul>
+    </div>
+
+    <div class="card yellow">
+      <h3>💬 Qualitative Evidence</h3>
+      <ul>
+        <li>Users who want to watch "something good" have no starting point other than scrolling</li>
+        <li>Hot content buried in a flat list reduces the chance of viral spread</li>
+        <li>Pre-caching popular videos is already partially designed in <code>VideoCacheImpl</code> — the infrastructure anticipates this need</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== T3 · GOALS & METRICS ===== -->
+  <section class="panel" id="t3">
+    <h2 class="panel-title"><span class="num">III</span> Goals &amp; Success Metrics</h2>
+    <p class="panel-sub">Discovery, consumption, latency, and trending engagement.</p>
+
+    <div class="card green">
+      <h3>📈 Goals &amp; Targets</h3>
+      <table>
+        <tr><th>Goal</th><th>Metric</th><th>Target</th></tr>
+        <tr><td>Improve content discovery</td><td>Average session duration</td><td>+15%</td></tr>
+        <tr><td>Increase video consumption</td><td>Videos watched per session</td><td>+20%</td></tr>
+        <tr><td>Reduce hot video latency</td><td>Time-to-first-frame for hot videos</td><td>&lt; 500ms (from ~2s via pre-cache)</td></tr>
+        <tr><td>Drive trending engagement</td><td>User click-through on hot badges</td><td>&gt; 30%</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== T4 · USER STORIES ===== -->
+  <section class="panel" id="t4">
+    <h2 class="panel-title"><span class="num">IV</span> User Stories</h2>
+    <p class="panel-sub">Viewer-facing experience and API consumer integration.</p>
+
+    <div class="card cyan">
+      <h3><span class="tag">Viewer</span> Trending Now section</h3>
+      <p>As a <strong>viewer</strong>, I want to see a "Trending Now" section at the top of the home page so that I can quickly find popular content without browsing.</p>
+      <div class="prompt"><strong>Acceptance:</strong> A "🔥 Trending Now" section shows top 5 hot videos above the main feed.</div>
+    </div>
+
+    <div class="card cyan">
+      <h3><span class="tag">Viewer</span> Visual hot marker</h3>
+      <p>As a <strong>viewer</strong>, I want hot videos to be visually marked so that I know at a glance which content is currently popular.</p>
+      <div class="prompt"><strong>Acceptance:</strong> Video cards with <code>isHot = true</code> display a 🔥 badge.</div>
+    </div>
+
+    <div class="card cyan">
+      <h3><span class="tag">Viewer</span> Faster hot playback</h3>
+      <p>As a <strong>viewer</strong>, I want hot videos to start playing faster so that I don't wait when choosing trending content.</p>
+      <div class="prompt"><strong>Acceptance:</strong> Top 10 hot videos are pre-warmed in cache; first-frame latency &lt; 500ms.</div>
+    </div>
+
+    <div class="card violet">
+      <h3><span class="tag">API consumer</span> Dedicated trending endpoint</h3>
+      <p>As an <strong>API consumer</strong>, I want a dedicated <code>/api/videos/trending</code> endpoint so that I can build trending feeds in any client.</p>
+      <div class="prompt"><strong>Acceptance:</strong> <code>GET /api/videos/trending?limit=N</code> returns top N videos sorted by <code>hotScore DESC</code>.</div>
+    </div>
+
+    <div class="card violet">
+      <h3><span class="tag">API consumer</span> Sort main list by hotness</h3>
+      <p>As an <strong>API consumer</strong>, I want to sort the main video list by hotness so that I can offer multiple sort options without a separate endpoint.</p>
+      <div class="prompt"><strong>Acceptance:</strong> <code>GET /api/videos?sort=hot</code> returns all videos sorted by <code>hotScore DESC</code>; existing calls without <code>sort</code> are unchanged.</div>
+    </div>
+  </section>
+
+  <!-- ===== T5 · REQUIREMENTS ===== -->
+  <section class="panel" id="t5">
+    <h2 class="panel-title"><span class="num">V</span> Requirements</h2>
+    <p class="panel-sub">Functional (FR) and non-functional (NFR) requirements.</p>
+
+    <div class="card blue">
+      <h3>✅ Functional Requirements</h3>
+      <table>
+        <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr>
+        <tr><td>FR-1</td><td>Activate <code>recordAccess()</code> — async upsert of <code>VideoAccessStats</code> on every stream</td><td>Must Have</td><td>Must not block stream response</td></tr>
+        <tr><td>FR-2</td><td>Implement hot score formula: weighted hits (60%) + shares (25%) + recency decay (15%)</td><td>Must Have</td><td>Min-max normalised across active videos</td></tr>
+        <tr><td>FR-3</td><td><code>GET /api/videos/trending?limit=N</code> endpoint (default 10, max 50)</td><td>Must Have</td><td>Served from <code>StatsCacheImpl</code>, TTL 30 min</td></tr>
+        <tr><td>FR-4</td><td>Extend <code>GET /api/videos?sort=hot</code> — backward compatible</td><td>Must Have</td><td>No change to calls without <code>sort</code> param</td></tr>
+        <tr><td>FR-5</td><td>Scheduled job: recompute hot scores every 30 minutes</td><td>Must Have</td><td>Runs in <code>AppScheduler</code></td></tr>
+        <tr><td>FR-6</td><td>Pre-warm <code>VideoCacheImpl</code> for top 10 hot videos after each recomputation</td><td>Should Have</td><td>Goal: first-frame &lt; 500ms</td></tr>
+        <tr><td>FR-7</td><td>Frontend: "🔥 Trending Now" section at top of home page (top 5 videos)</td><td>Must Have</td><td></td></tr>
+        <tr><td>FR-8</td><td>Frontend: "🔥 Hot" badge on video cards where <code>isHot = true</code></td><td>Must Have</td><td>Show when hotScore ≥ top 20% threshold</td></tr>
+      </table>
+    </div>
+
+    <div class="card amber">
+      <h3>⚙️ Non-Functional Requirements</h3>
+      <table>
+        <tr><th>ID</th><th>Requirement</th><th>Target</th></tr>
+        <tr><td>NFR-1</td><td><code>recordAccess()</code> latency overhead</td><td>&lt; 5ms (async, fire-and-forget)</td></tr>
+        <tr><td>NFR-2</td><td>Trending API response time</td><td>&lt; 100ms (served from cache)</td></tr>
+        <tr><td>NFR-3</td><td>Score recomputation time</td><td>&lt; 10s for 10,000 videos</td></tr>
+        <tr><td>NFR-4</td><td>Additional memory overhead</td><td>&lt; 50MB</td></tr>
+        <tr><td>NFR-5</td><td>Backward compatibility</td><td><code>GET /api/videos</code> without <code>sort</code> param — unchanged behaviour</td></tr>
+        <tr><td>NFR-6</td><td>Resilience</td><td>DB write failure in <code>recordAccess()</code> must not fail the stream request</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== T6 · SCOPE ===== -->
+  <section class="panel" id="t6">
+    <h2 class="panel-title"><span class="num">VI</span> Scope</h2>
+    <p class="panel-sub">What ships in v1 versus what is deferred.</p>
+
+    <div class="card green">
+      <h3>✅ In Scope</h3>
+      <ul>
+        <li>Activate <code>VideoAccessServiceImpl.recordAccess()</code> (upsert <code>VideoAccessStats</code>)</li>
+        <li>Hot score algorithm with configurable weights (<code>app.hot-video.*</code> in <code>application.yaml</code>)</li>
+        <li>New <code>GET /api/videos/trending</code> endpoint</li>
+        <li><code>sort=hot</code> parameter on existing <code>GET /api/videos</code></li>
+        <li>Liquibase migration: <code>hot_score</code>, <code>is_hot</code>, <code>hot_rank</code> columns on <code>video_sources</code></li>
+        <li>Scheduled recomputation job every 30 minutes</li>
+        <li>Cache pre-warming for top 10 hot videos</li>
+        <li>Frontend: Trending Now section + 🔥 badge on video cards</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🚫 Out of Scope</h3>
+      <ul class="muted">
+        <li>Personalised recommendations (per-user hot scores) — v2</li>
+        <li>Real-time score updates via WebSocket — v2</li>
+        <li>A/B testing framework for ranking algorithms — v2</li>
+        <li>Machine learning-based scoring — v3</li>
+        <li>Like/dislike counts (not present on <code>VideoSource</code> entity)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== T7 · DEPENDENCIES ===== -->
+  <section class="panel" id="t7">
+    <h2 class="panel-title"><span class="num">VII</span> Dependencies</h2>
+    <p class="panel-sub">Most infrastructure already exists; the Liquibase migration is the one gap.</p>
+
+    <div class="card violet">
+      <h3>🔗 Dependencies</h3>
+      <table>
+        <tr><th>Dependency</th><th>Owner</th><th>Status</th><th>Risk</th></tr>
+        <tr><td><code>VideoAccessStats</code> entity + repo</td><td>Backend</td><td>✅ Exists</td><td>Low — just needs <code>recordAccess()</code> uncommented</td></tr>
+        <tr><td><code>ShareLink</code> table</td><td>Backend</td><td>✅ Exists</td><td>Low — read-only query for share count</td></tr>
+        <tr><td><code>StatsCacheImpl</code></td><td>Backend</td><td>✅ Exists</td><td>Low — already used for stats</td></tr>
+        <tr><td><code>VideoCacheImpl</code></td><td>Backend</td><td>✅ Exists</td><td>Low — <code>preWarm()</code> needs to be called</td></tr>
+        <tr><td><code>AppScheduler</code></td><td>Backend</td><td>✅ Exists</td><td>Low — add new <code>@Scheduled</code> method</td></tr>
+        <tr><td>Liquibase migration</td><td>Backend</td><td>❌ Missing</td><td>Medium — must land before entity changes</td></tr>
+        <tr><td><code>VideoSource</code> entity</td><td>Backend</td><td>✅ Active table</td><td>Low — add 3 columns</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== T8 · RISKS ===== -->
+  <section class="panel" id="t8">
+    <h2 class="panel-title"><span class="num">VIII</span> Risks &amp; Mitigations</h2>
+    <p class="panel-sub">Load, score bias, table growth, and staleness — each with a mitigation.</p>
+
+    <div class="card amber">
+      <h3>⚠️ Risks &amp; Mitigations</h3>
+      <table>
+        <tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr>
+        <tr><td><code>recordAccess()</code> creates DB bottleneck under high load</td><td>Medium</td><td>High</td><td>Keep <code>@Async</code> + catch all exceptions; add write queue in v2 if needed</td></tr>
+        <tr><td>Hot score biased toward old high-hit videos</td><td>Medium</td><td>Medium</td><td>Apply 24h rolling window + exponential recency decay (<code>e^(-0.1 × hoursAgo)</code>)</td></tr>
+        <tr><td><code>video_access_stats</code> table grows unbounded</td><td>Medium</td><td>Medium</td><td>Activate <code>cleanUpOldVideos()</code> in <code>AppScheduler</code> to purge rows older than window</td></tr>
+        <tr><td>Scores stale up to 30 minutes after new viral video</td><td>Low</td><td>Low</td><td>TTL is configurable; acceptable for v1</td></tr>
+        <tr><td>Cache invalidation on new video added</td><td>Low</td><td>Low</td><td>TTL-based invalidation (30 min) sufficient for v1</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== T9 · DATA & API (Appendix) ===== -->
+  <section class="panel" id="t9">
+    <h2 class="panel-title"><span class="num">IX</span> Data &amp; API</h2>
+    <p class="panel-sub">Appendix — data model, hot score formula, API contract, and new components.</p>
+
+    <div class="card violet">
+      <h3>🗄️ Data Model</h3>
+<pre><code>-- Liquibase migration: 202602280001-add-hot-score.sql
+ALTER TABLE video_sources ADD COLUMN hot_score  DECIMAL(5,4) DEFAULT 0;
+ALTER TABLE video_sources ADD COLUMN is_hot     BOOLEAN      DEFAULT FALSE;
+ALTER TABLE video_sources ADD COLUMN hot_rank   INT          DEFAULT NULL;
+
+CREATE INDEX idx_video_sources_hot_score
+    ON video_sources(hot_score DESC) WHERE is_hot = TRUE;
+
+CREATE INDEX IF NOT EXISTS idx_video_access_stats_video_id
+    ON video_access_stats(video_id);</code></pre>
+    </div>
+
+    <div class="card blue">
+      <h3>🧮 Hot Score Formula</h3>
+      <div class="formula">
+        $$hotScore = (0.60 \times normalizedHits) + (0.25 \times normalizedShares) + (0.15 \times recencyBoost)$$
+        $$recencyBoost = e^{-0.1 \times hoursAgo}$$
+        <div class="label">All inputs min-max normalised to [0, 1] across active videos.</div>
+      </div>
+    </div>
+
+    <div class="card cyan">
+      <h3>🔌 API Contract</h3>
+      <h4><code>GET /api/videos/trending</code></h4>
+<pre><code>Query params: limit (int, default=10, max=50)
+Response: ResultListInfo&lt;VideoDto&gt;
+  data[].videoId     String
+  data[].title       String
+  data[].embedLink   String
+  data[].hotScore    Double
+  data[].isHot       Boolean
+  data[].rank        Integer  (1 = hottest)</code></pre>
+      <h4><code>GET /api/videos?sort=hot</code></h4>
+<pre><code>Same VideoDto structure, ordered by hotScore DESC</code></pre>
+    </div>
+
+    <div class="card green">
+      <h3>🧩 New Components</h3>
+<pre><code>service/
+├── HotVideoService.java
+└── impl/HotVideoServiceImpl.java
+
+jobs/
+└── AppScheduler.java  ← add recomputeHotScores()</code></pre>
+    </div>
+
+    <details>
+      <summary>🔎 Research — existing code references</summary>
+      <div class="body">
+        <ul>
+          <li><code>VideoAccessStats</code> entity: <code>api/src/main/java/com/canhlabs/funnyapp/entity/VideoAccessStats.java</code></li>
+          <li><code>VideoSource</code> entity: <code>api/src/main/java/com/canhlabs/funnyapp/entity/VideoSource.java</code></li>
+          <li><code>VideoCacheImpl</code>: <code>api/src/main/java/com/canhlabs/funnyapp/cache/</code></li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===== T10 · OPEN QUESTIONS ===== -->
+  <section class="panel" id="t10">
+    <h2 class="panel-title"><span class="num">X</span> Open Questions</h2>
+    <p class="panel-sub">Decisions to resolve before the related requirements are implemented.</p>
+
+    <div class="card yellow">
+      <h3>🧩 Open Questions</h3>
+      <div class="prompt">[ ] Should <code>/api/videos/trending</code> be a public endpoint (no auth required)? — <strong>Owner:</strong> Backend — <strong>Due:</strong> Before FR-3 implementation</div>
+      <div class="prompt">[ ] What threshold defines <code>isHot</code> — top 20% by score or a fixed score cutoff? — <strong>Owner:</strong> Product — <strong>Due:</strong> Before FR-2 implementation</div>
+      <div class="prompt">[ ] Should shares from private share-links count toward the hot score? — <strong>Owner:</strong> Backend — <strong>Due:</strong> Before FR-2 implementation</div>
+      <div class="prompt">[ ] Do we need a <code>hot_score_history</code> table for analytics / score trending over time? — <strong>Owner:</strong> Data — <strong>Due:</strong> v2 planning</div>
+    </div>
+  </section>
+
+</main>
+
+<div class="footer">
+  Navigate: click a <strong>tab</strong> above · keys <span class="kbd">←</span> / <span class="kbd">→</span> change section ·
+  click <span class="kbd">🔎 Details</span> to expand.
+</div>
+
+<script>
+  const btns   = Array.from(document.querySelectorAll('.tab-btn'));
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  let idx = 0;
+  function activate(i){
+    idx = (i + panels.length) % panels.length;
+    btns.forEach((b,k)=>b.classList.toggle('active', k===idx));
+    panels.forEach((p,k)=>p.classList.toggle('show', k===idx));
+    btns[idx].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+    window.scrollTo({top:0, behavior:'smooth'});
+    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([panels[idx]]);
+  }
+  btns.forEach((b,i)=>b.addEventListener('click', ()=>activate(i)));
+  document.addEventListener('keydown', e=>{
+    if (e.target.tagName === 'SUMMARY') return;
+    if (e.key === 'ArrowRight') activate(idx+1);
+    if (e.key === 'ArrowLeft')  activate(idx-1);
+  });
+</script>
+</body>
+</html>
