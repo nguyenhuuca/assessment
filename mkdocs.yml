@@ -104,7 +104,14 @@ nav:
       - Watch History: plans/plan-watch-history-opus.md
 
   - Presentations:
-      - Watch History (Spec): specs/spec-watch-history.html
+      # - PRDs:
+      #     - <title>: prd/<name>.html
+      - Specs:
+          - Watch History: specs/spec-watch-history.html
+      # - ADRs:
+      #     - <title>: adr/<name>.html
+      # - Plans:
+      #     - <title>: plans/<name>.html
 
   - Guides:
       - Claude Guide (EN): guides/claude-guide-en.md

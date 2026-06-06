@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  TEMPLATE: Self-contained dark "tab-bar" HTML presentation.
+  Source documents: a Spec / ADR / Plan markdown file (NOT Marp).
+  ----------------------------------------------------------------------------
+  HOW TO USE (for the `presentation` skill):
+  1. Copy this file to "<doc-name>.html" next to the source .md (or into
+     docs/presentations/).
+  2. Edit <title> and the <header class="hero"> block to match the document.
+  3. In <nav class="tabs">: add one <button class="tab-btn" data-tab="tN"> per
+     major section of the document. The first tab gets class "active".
+  4. In <main>: add one <section class="panel" id="tN"> per tab (first one also
+     gets class "show"). Use "cards" inside to highlight each point.
+  5. DO NOT invent new content. Only restructure the existing document into
+     tabs/cards. Keep wording, decisions, tables, code and diagrams faithful.
+
+  AVAILABLE BUILDING BLOCKS (classes) — reuse them, don't write new CSS:
+  • .card.<color>          content card, left accent border.
+        color = blue | green | yellow | amber | red | violet | cyan
+  • .card h3 / h4          card title / sub-heading.
+  • .tag                   small label (e.g. "FR-1", "Decision", "Phase 3").
+  • .time                  duration/estimate at the title's right edge (e.g. 1d).
+  • .hl.goal / .hl.prod / .hl   accent line "🎯 Goal" / "📦 Deliverable" / note.
+  • .formula / .formula.green   boxed formula (glow). Put $$...$$ inside.
+  • .prompt                requirement / question / quote block (cyan border).
+  • <details><summary>🔎 Details</summary><div class="body">…</div></details>
+                           collapsible detail (rationale, alternatives, code).
+  • .ex / b.lbl            example.
+  • table / pre            tables & ASCII diagrams (keep <pre> for diagrams/code).
+
+  FORMULAS: write LaTeX verbatim — inline $...$, display $$...$$, \boxed{}.
+  MathJax (CDN) renders them; each tab switch re-typesets the active panel.
+
+  SUGGESTED TAB ICONS BY DOCUMENT TYPE:
+  • Spec : 🎯 Overview · 📐 Rules · ✅ Requirements · 🔌 API · 🗄️ Data · 🔒 Security
+  • ADR  : 📌 Context · 🎚️ Drivers · ⚖️ Options · ✅ Decision · 📊 Consequences
+  • Plan : 🎯 Objective · 🧭 Scope · 🏗️ Approach · 🪜 Phases · 📁 Files · ⚠️ Risks
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title><!-- DOCUMENT TITLE --></title>
+
+<!-- MathJax (optional — for formulas in specs/plans) -->
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+
+<style>
+  :root{
+    --bg:#06070c; --bg2:#0c0f1a; --card:#11141f; --card2:#161a28;
+    --ink:#e7ebf5; --muted:#9aa3b8; --line:#222838;
+    --blue:#4f8cff; --green:#34d399; --yellow:#fbbf24; --amber:#f59e0b;
+    --red:#f87171; --violet:#a78bfa; --cyan:#22d3ee;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(79,140,255,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(167,139,250,.08), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+
+  /* Header */
+  header.hero{padding:34px 24px 22px;text-align:center;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(79,140,255,.06), transparent);}
+  .hero .eyebrow{letter-spacing:.28em;text-transform:uppercase;font-size:.72rem;color:var(--blue);font-weight:700}
+  .hero h1{margin:.35em auto .25em;max-width:1000px;font-size:clamp(1.5rem,3.6vw,2.5rem);line-height:1.18;
+    background:linear-gradient(90deg,#fff,#9fc2ff 60%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .meta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+  .chip{font-size:.82rem;color:var(--muted);border:1px solid var(--line);background:var(--card);padding:6px 13px;border-radius:999px}
+  .chip b{color:var(--ink);font-weight:600}
+
+  /* Tab bar */
+  nav.tabs{position:sticky;top:0;z-index:50;display:flex;gap:6px;overflow-x:auto;padding:10px 14px;
+    background:rgba(6,7,12,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);scrollbar-width:thin}
+  nav.tabs::-webkit-scrollbar{height:6px}
+  nav.tabs::-webkit-scrollbar-thumb{background:#2a3146;border-radius:9px}
+  .tab-btn{flex:0 0 auto;cursor:pointer;white-space:nowrap;border:1px solid var(--line);background:var(--card);
+    color:var(--muted);font-size:.9rem;font-weight:600;padding:9px 16px;border-radius:11px;transition:.18s ease;font-family:inherit}
+  .tab-btn:hover{color:var(--ink);border-color:#39425c}
+  .tab-btn.active{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--blue),#6d5cff);box-shadow:0 6px 20px rgba(79,140,255,.35)}
+  .tab-btn .ico{margin-right:7px}
+
+  /* Panels */
+  main{max-width:980px;margin:0 auto;padding:30px 20px 90px}
+  .panel{display:none;animation:fade .35s ease}
+  .panel.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .panel-title{display:flex;align-items:center;gap:12px;font-size:1.5rem;margin:0 0 6px}
+  .panel-title .num{font-size:.85rem;font-weight:800;color:#0a0a0a;background:linear-gradient(135deg,var(--blue),var(--violet));padding:4px 10px;border-radius:8px;letter-spacing:.05em}
+  .panel-sub{color:var(--muted);margin:0 0 22px;font-size:.95rem}
+
+  /* Cards */
+  .card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);
+    border-left:4px solid var(--accent,var(--blue));border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .card.blue{--accent:var(--blue)} .card.green{--accent:var(--green)} .card.yellow{--accent:var(--yellow)}
+  .card.amber{--accent:var(--amber)} .card.red{--accent:var(--red)} .card.violet{--accent:var(--violet)} .card.cyan{--accent:var(--cyan)}
+  .card h3{margin:0 0 10px;font-size:1.16rem;display:flex;align-items:center;gap:9px;color:#fff}
+  .card h4{margin:16px 0 6px;color:#cdd6ec;font-size:1rem}
+  .card .tag{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent,var(--blue));border:1px solid currentColor;padding:2px 8px;border-radius:6px;opacity:.9}
+  .card .time{margin-left:auto;font-size:.8rem;color:var(--muted);font-weight:600}
+  p,li{color:var(--ink)} .muted{color:var(--muted)} strong{color:#fff}
+
+  .hl{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:10px;margin:10px 0;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+  .hl .ic{flex:0 0 auto;font-size:1.05rem}
+  .hl.goal{border-color:rgba(79,140,255,.4)} .hl.prod{border-color:rgba(52,211,153,.35)}
+
+  .formula{text-align:center;margin:14px 0;padding:16px;border-radius:12px;
+    background:radial-gradient(120% 120% at 50% 0%, rgba(79,140,255,.10), transparent 70%), #0a0d17;
+    border:1px solid rgba(79,140,255,.35);box-shadow:inset 0 0 28px rgba(79,140,255,.08), 0 0 22px rgba(79,140,255,.05)}
+  .formula.green{border-color:rgba(52,211,153,.4);background:radial-gradient(120% 120% at 50% 0%, rgba(52,211,153,.10), transparent 70%), #0a0d17}
+  .formula .label{font-size:.78rem;color:var(--muted);margin-top:8px}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.94rem}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:#1a1f30;color:#cdd6ec;font-weight:700}
+  tr:nth-child(even) td{background:rgba(255,255,255,.018)}
+
+  pre{background:#05060b;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;color:#bcd0ff;font-family:"Cascadia Code","Consolas",monospace;font-size:.86rem;line-height:1.5}
+  code{font-family:"Cascadia Code","Consolas",monospace;font-size:.88em;background:#1a1f30;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#bcd0ff}
+  pre code{background:none;border:none;padding:0}
+
+  .prompt{border-left:3px solid var(--cyan);background:rgba(34,211,238,.05);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;color:#d7eef5}
+
+  details{margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#0a0d17;overflow:hidden}
+  details summary{cursor:pointer;list-style:none;padding:11px 16px;font-weight:700;color:var(--green);user-select:none;display:flex;align-items:center;gap:8px}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸";color:var(--green);transition:.2s}
+  details[open] summary::before{transform:rotate(90deg)}
+  details summary:hover{background:rgba(52,211,153,.06)}
+  details .body{padding:4px 18px 14px;border-top:1px solid var(--line)}
+
+  .ex{margin:10px 0;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.025);border:1px dashed var(--line)}
+  .ex b.lbl{color:var(--yellow)}
+
+  ul{padding-left:22px} li{margin:4px 0}
+  .footer{text-align:center;color:var(--muted);font-size:.82rem;padding:24px;border-top:1px solid var(--line)}
+  .kbd{font-family:monospace;background:#1a1f30;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;font-size:.8rem;color:#cdd6ec}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER: edit per document ===== -->
+<header class="hero">
+  <div class="eyebrow"><!-- e.g. SPEC · ADR-0006 · PLAN --></div>
+  <h1><!-- DOCUMENT TITLE --></h1>
+  <div class="meta">
+    <span class="chip">📄 <b>Type:</b> …</span>
+    <span class="chip">🟢 <b>Status:</b> …</span>
+    <!-- add more .chip as needed (date, owner, version) -->
+  </div>
+</header>
+
+<!-- ===== TAB BAR: one button per major section ===== -->
+<nav class="tabs" id="tabbar">
+  <button class="tab-btn active" data-tab="t1"><span class="ico">🎯</span>Section 1</button>
+  <button class="tab-btn" data-tab="t2"><span class="ico">📘</span>Section 2</button>
+  <!-- … add more tabs … -->
+</nav>
+
+<main>
+
+  <!-- ===== PANEL per tab (id matches data-tab) ===== -->
+  <section class="panel show" id="t1">
+    <h2 class="panel-title"><span class="num">I</span> Section title</h2>
+    <p class="panel-sub">Short description.</p>
+
+    <div class="card blue">
+      <h3>🔑 Card title</h3>
+      <p>Content… inline code <code>foo()</code>, inline math $a^2+b^2$.</p>
+      <details><summary>🔎 Details</summary><div class="body">Rationale / alternatives / code.</div></details>
+    </div>
+  </section>
+
+  <section class="panel" id="t2">
+    <h2 class="panel-title"><span class="num">II</span> Section title</h2>
+    <!-- … cards … -->
+  </section>
+
+</main>
+
+<div class="footer">
+  Navigate: click a <strong>tab</strong> above · keys <span class="kbd">←</span> / <span class="kbd">→</span> change section ·
+  click <span class="kbd">🔎 Details</span> to expand.
+</div>
+
+<script>
+  const btns   = Array.from(document.querySelectorAll('.tab-btn'));
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  let idx = 0;
+  function activate(i){
+    idx = (i + panels.length) % panels.length;
+    btns.forEach((b,k)=>b.classList.toggle('active', k===idx));
+    panels.forEach((p,k)=>p.classList.toggle('show', k===idx));
+    btns[idx].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+    window.scrollTo({top:0, behavior:'smooth'});
+    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([panels[idx]]);
+  }
+  btns.forEach((b,i)=>b.addEventListener('click', ()=>activate(i)));
+  document.addEventListener('keydown', e=>{
+    if (e.target.tagName === 'SUMMARY') return;
+    if (e.key === 'ArrowRight') activate(idx+1);
+    if (e.key === 'ArrowLeft')  activate(idx-1);
+  });
+</script>
+</body>
+</html>
