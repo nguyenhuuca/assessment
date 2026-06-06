@@ -11,6 +11,7 @@ theme:
     - navigation.tabs
     - navigation.sections
     - navigation.expand
+    - navigation.indexes
     - navigation.top
     - search.highlight
     - search.suggest
@@ -103,7 +104,12 @@ nav:
       - Bookmark Feature: plans/plan-bookmark-feature.md
       - Watch History: plans/plan-watch-history-opus.md
 
-  - Presentations: presentations/index.md
+  - Presentations:
+      - presentations/index.md
+      - PRDs:
+          - Hot Video Priority: prd/PRD-hot-video-priority.html
+      - Specs:
+          - Watch History: specs/spec-watch-history.html
       # - ADRs:
       #     - <title>: adr/<name>.html
       # - Plans:
