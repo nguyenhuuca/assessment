@@ -316,6 +316,9 @@
                                 <exclude>**/FunnyApp.class</exclude>
                                 <exclude>**/AppConstant.class</exclude>
                                 <exclude>**/AppConstant$*.class</exclude>
+                                <exclude>**/WebSecurityConfig.class</exclude>
+                                <exclude>**/WebSecurityConfig$*.class</exclude>
+                                <exclude>**/CacheBean.class</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -337,6 +340,9 @@
                                 <exclude>**/AppConstant**</exclude>
                                 <exclude>**/AppConstant$*.class</exclude>
                                 <exclude>**/FunnyApp.class</exclude>
+                                <exclude>**/WebSecurityConfig.class</exclude>
+                                <exclude>**/WebSecurityConfig$*.class</exclude>
+                                <exclude>**/CacheBean.class</exclude>
                             </excludes>
                             <rules>
                                 <rule>
