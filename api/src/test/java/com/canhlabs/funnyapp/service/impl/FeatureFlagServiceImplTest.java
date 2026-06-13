@@ -1,9 +1,12 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.utils.AppConstant;
+import io.harness.cf.client.api.CfClient;
+import io.harness.cf.client.dto.Target;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +15,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FeatureFlagServiceImplTest {
@@ -108,6 +116,75 @@ class FeatureFlagServiceImplTest {
         FeatureFlagServiceImpl svc = serviceWithKey("");
         // Must not throw even though cfClient is null
         svc.destroy();
+    }
+
+    // ── cfClient present – isEnabled delegates to boolVariation ────────────────
+
+    @Test
+    void isEnabled_cfClientPresent_authenticatedUser_returnsBoolVariation() {
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken("bob", null, Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        CfClient cfClient = mock(CfClient.class);
+        when(cfClient.boolVariation(eq("flagX"), any(Target.class), eq(false))).thenReturn(true);
+
+        FeatureFlagServiceImpl svc = serviceWithKey("");
+        ReflectionTestUtils.setField(svc, "cfClient", cfClient);
+
+        assertThat(svc.isEnabled("flagX", false)).isTrue();
+
+        ArgumentCaptor<Target> captor = ArgumentCaptor.forClass(Target.class);
+        verify(cfClient).boolVariation(eq("flagX"), captor.capture(), eq(false));
+        assertThat(captor.getValue().getIdentifier()).isEqualTo("bob");
+    }
+
+    @Test
+    void isEnabled_cfClientPresent_noAuth_usesSystemIdentifier() {
+        SecurityContextHolder.clearContext();
+
+        CfClient cfClient = mock(CfClient.class);
+        when(cfClient.boolVariation(eq("flagY"), any(Target.class), eq(true))).thenReturn(false);
+
+        FeatureFlagServiceImpl svc = serviceWithKey("");
+        ReflectionTestUtils.setField(svc, "cfClient", cfClient);
+
+        assertThat(svc.isEnabled("flagY", true)).isFalse();
+
+        ArgumentCaptor<Target> captor = ArgumentCaptor.forClass(Target.class);
+        verify(cfClient).boolVariation(eq("flagY"), captor.capture(), eq(true));
+        assertThat(captor.getValue().getIdentifier()).isEqualTo("system");
+    }
+
+    @Test
+    void isEnabled_cfClientPresent_unauthenticatedToken_usesSystemIdentifier() {
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken("ghost", null);
+        auth.setAuthenticated(false);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        CfClient cfClient = mock(CfClient.class);
+        when(cfClient.boolVariation(eq("flagZ"), any(Target.class), eq(false))).thenReturn(true);
+
+        FeatureFlagServiceImpl svc = serviceWithKey("");
+        ReflectionTestUtils.setField(svc, "cfClient", cfClient);
+
+        assertThat(svc.isEnabled("flagZ", false)).isTrue();
+
+        ArgumentCaptor<Target> captor = ArgumentCaptor.forClass(Target.class);
+        verify(cfClient).boolVariation(eq("flagZ"), captor.capture(), eq(false));
+        assertThat(captor.getValue().getIdentifier()).isEqualTo("system");
+    }
+
+    @Test
+    void destroy_whenCfClientPresent_closesClient() throws Exception {
+        CfClient cfClient = mock(CfClient.class);
+        FeatureFlagServiceImpl svc = serviceWithKey("");
+        ReflectionTestUtils.setField(svc, "cfClient", cfClient);
+
+        svc.destroy();
+
+        verify(cfClient).close();
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────
