@@ -25,6 +25,9 @@ cp core/target/aic-cli.jar /path/to/assessment/ci/aic-cli.jar
 ### What the CI runs
 
 ```bash
-java -jar ci/aic-cli.jar --scan=api --arch=layered --no-cycles --fail-on-distance=0.7 \
-     --output=api/target/aic-metrics.json
+java -jar ci/aic-cli.jar --scan=api --output=api/target/aic-metrics.json
 ```
+
+The check policy (gates + architecture) lives in **`api/aic-check.yaml`** — the CLI discovers it
+automatically, so no flags are needed. Edit that file to change thresholds, enable/disable gates, or
+switch the architecture template.

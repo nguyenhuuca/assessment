@@ -1,0 +1,54 @@
+# Architecture & package-metrics policy for funny-app.
+# Read by aic-cli (ci/aic-cli.jar) during CI: `java -jar ci/aic-cli.jar --scan=api`.
+# Precedence: code defaults < this file < CLI flags. Every field is optional.
+
+gates:
+  # Fail when any package's distance from the Main Sequence (D = |A + I - 1|) exceeds the threshold.
+  max-package-distance:
+    enabled: false
+    threshold: 0.7
+
+  # Fail when any package falls in the Zone of Pain or the Zone of Uselessness.
+  forbidden-zones:
+    enabled: false
+
+  # Fail when the AVERAGE distance across all packages exceeds the threshold.
+  max-average-distance:
+    enabled: false
+    threshold: 0.5
+
+  # Fail when there is any circular dependency between packages.
+  no-cycles:
+    enabled: true
+
+architecture:
+  enabled: true
+  # Use a built-in template: layered | hexagonal | onion
+  template: layered
+
+  # ...or define the rules inline instead of a template (uncomment and remove `template` above).
+  # A "component" is matched by fully-qualified class-name regex (a layer or a module).
+  # spec:
+  #   name: Funny App Layers
+  #   components:
+  #     - name: Web
+  #       matches: ['.*\.controller(\..*)?$', '.*\.web(\..*)?$']
+  #     - name: Service
+  #       matches: ['.*\.service(\..*)?$']
+  #     - name: Repository
+  #       matches: ['.*\.repo(sitory)?(\..*)?$']
+  #     - name: Domain
+  #       matches: ['.*\.domain(\..*)?$', '.*\.entity(\..*)?$']
+  #   access:                 # allow-list: a component may depend ONLY on those listed
+  #     Web: [Service, Domain]
+  #     Service: [Repository, Domain]
+  #     Repository: [Domain]
+  #     Domain: []
+  #   forbidden:              # explicit deny edges (independent of access)
+  #     - from: Domain
+  #       to: Web
+  #   naming:                 # required class simple-name regex per component
+  #     Repository: '.*Repository$'
+  #   options:
+  #     ignoreUnmatched: true # classes matching no component are skipped
+  #     forbidCycles: true    # no dependency cycle between components
