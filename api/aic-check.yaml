@@ -21,34 +21,27 @@ gates:
   no-cycles:
     enabled: true
 
+  # Fail when any method's cyclomatic complexity exceeds the threshold.
+  max-complexity:
+    enabled: true
+    threshold: 15
+
 architecture:
   enabled: true
-  # Use a built-in template: layered | hexagonal | onion
   template: layered
 
-  # ...or define the rules inline instead of a template (uncomment and remove `template` above).
-  # A "component" is matched by fully-qualified class-name regex (a layer or a module).
-  # spec:
-  #   name: Funny App Layers
-  #   components:
-  #     - name: Web
-  #       matches: ['.*\.controller(\..*)?$', '.*\.web(\..*)?$']
-  #     - name: Service
-  #       matches: ['.*\.service(\..*)?$']
-  #     - name: Repository
-  #       matches: ['.*\.repo(sitory)?(\..*)?$']
-  #     - name: Domain
-  #       matches: ['.*\.domain(\..*)?$', '.*\.entity(\..*)?$']
-  #   access:                 # allow-list: a component may depend ONLY on those listed
-  #     Web: [Service, Domain]
-  #     Service: [Repository, Domain]
-  #     Repository: [Domain]
-  #     Domain: []
-  #   forbidden:              # explicit deny edges (independent of access)
-  #     - from: Domain
-  #       to: Web
-  #   naming:                 # required class simple-name regex per component
-  #     Repository: '.*Repository$'
-  #   options:
-  #     ignoreUnmatched: true # classes matching no component are skipped
-  #     forbidCycles: true    # no dependency cycle between components
+# Forbidden APIs (a gate). allowedIn exempts classes whose FQCN matches the regex.
+banned-apis:
+  enabled: true
+  rules:
+    - method: java.lang.System.exit
+      message: "Don't call System.exit"
+    - class: java.util.Date
+      message: "Use java.time instead of java.util.Date"
+    - package: java.sql
+      message: "Access the database only through the repository layer"
+      allowedIn: ['.*\.repo\..*', '.*\.repository\..*']
+
+# Dead-code report (class-level). Report-only — never fails the build.
+dead-code:
+  enabled: true

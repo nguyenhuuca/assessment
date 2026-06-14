@@ -34,7 +34,10 @@ app jar) defines the gates and the architecture check. Currently effective:
 | `forbidden-zones` | disabled |
 | `max-average-distance` | disabled |
 | `no-cycles` | **enabled** |
+| `max-complexity` | **enabled**, threshold 15 |
+| `banned-apis` | **enabled** (System.exit, java.util.Date, java.sql outside the repository layer) |
 | architecture | **enabled**, template `layered` |
+| `dead-code` | **enabled** (report-only) |
 
 Edit that file to change thresholds, enable/disable gates, or switch the architecture template/spec.
 Precedence is **code defaults < `aic-check.yaml` < CLI flags**.
