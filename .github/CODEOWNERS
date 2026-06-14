@@ -1,0 +1,5 @@
+# Code owners — listed owners are auto-requested for review and (with branch
+# protection's "Require review from Code Owners") must approve before merge.
+
+# Architecture & package-metrics check policy: only @nguyenhuuca may approve changes.
+/api/aic-check.yaml @nguyenhuuca
