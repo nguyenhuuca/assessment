@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.dto.ShareRequestDto;
-import com.canhlabs.funnyapp.dto.VideoDto;
+import com.canhlabs.funnyapp.dto.video.ShareRequestDto;
+import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.service.ShareService;

@@ -1,13 +1,13 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.canhlabs.funnyapp.dto.DisableRequest;
-import com.canhlabs.funnyapp.dto.EnableRequest;
-import com.canhlabs.funnyapp.dto.LoginDto;
-import com.canhlabs.funnyapp.dto.MfaRequest;
-import com.canhlabs.funnyapp.dto.SetupResponse;
-import com.canhlabs.funnyapp.dto.UserDetailDto;
-import com.canhlabs.funnyapp.dto.UserInfoDto;
+import com.canhlabs.funnyapp.dto.auth.DisableRequest;
+import com.canhlabs.funnyapp.dto.auth.EnableRequest;
+import com.canhlabs.funnyapp.dto.auth.LoginDto;
+import com.canhlabs.funnyapp.dto.auth.MfaRequest;
+import com.canhlabs.funnyapp.dto.auth.SetupResponse;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
+import com.canhlabs.funnyapp.dto.user.UserInfoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.service.UserService;

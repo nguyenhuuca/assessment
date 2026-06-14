@@ -1,4 +1,6 @@
-package com.canhlabs.funnyapp.dto;
+package com.canhlabs.funnyapp.dto.auth;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
+import com.canhlabs.funnyapp.dto.BaseDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

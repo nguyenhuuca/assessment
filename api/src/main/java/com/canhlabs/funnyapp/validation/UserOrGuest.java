@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.dto;
+package com.canhlabs.funnyapp.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

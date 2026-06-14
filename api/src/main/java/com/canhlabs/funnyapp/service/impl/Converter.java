@@ -2,9 +2,9 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.entity.ShareLink;
 import com.canhlabs.funnyapp.entity.User;
-import com.canhlabs.funnyapp.dto.UserDetailDto;
-import com.canhlabs.funnyapp.dto.UserInfoDto;
-import com.canhlabs.funnyapp.dto.VideoDto;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
+import com.canhlabs.funnyapp.dto.user.UserInfoDto;
+import com.canhlabs.funnyapp.dto.video.VideoDto;
 
 import java.util.List;
 import java.util.stream.Collectors;

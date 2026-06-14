@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.dto;
+package com.canhlabs.funnyapp.streaming;
 
 import lombok.Builder;
 import lombok.Getter;

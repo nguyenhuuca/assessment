@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.service;
 
-import com.canhlabs.funnyapp.dto.VideoDto;
+import com.canhlabs.funnyapp.dto.video.VideoDto;
 
 import java.util.List;
 

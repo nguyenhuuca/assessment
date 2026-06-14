@@ -1,10 +1,10 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.aop.HasPermission;
-import com.canhlabs.funnyapp.dto.AdminAccountDto;
-import com.canhlabs.funnyapp.dto.AdminStatsDto;
-import com.canhlabs.funnyapp.dto.AdminVideoDto;
-import com.canhlabs.funnyapp.dto.UserDetailDto;
+import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
+import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
+import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.ResultStatus;

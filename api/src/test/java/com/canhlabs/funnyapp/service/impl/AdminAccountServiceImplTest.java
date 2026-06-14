@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.dto.AdminAccountDto;
+import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.repo.UserRepo;

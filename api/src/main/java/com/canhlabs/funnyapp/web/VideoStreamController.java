@@ -1,8 +1,8 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.dto.Range;
-import com.canhlabs.funnyapp.dto.StreamChunkResult;
-import com.canhlabs.funnyapp.dto.VideoDto;
+import com.canhlabs.funnyapp.streaming.Range;
+import com.canhlabs.funnyapp.streaming.StreamChunkResult;
+import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ResultStatus;

@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.utils;
 
-import com.canhlabs.funnyapp.dto.UserDetailDto;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
