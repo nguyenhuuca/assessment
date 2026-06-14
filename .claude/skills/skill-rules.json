@@ -720,6 +720,17 @@
         "file_patterns": []
       },
       "priority": "high"
+    },
+    {
+      "name": "presentation",
+      "path": ".claude/skills/design/presentation/SKILL.md",
+      "description": "Render a self-contained HTML tab-bar presentation from a markdown Spec, ADR, or implementation Plan",
+      "triggers": {
+        "keywords": ["presentation", "slides", "slide deck", "render slides", "present", "deck", "export to html", "show on screen", "thuyettrinh"],
+        "intent_patterns": ["make.*presentation", "render.*slide", "turn.*(spec|adr|plan).*(deck|slide|presentation)", "present.*(spec|adr|plan|doc)", "export.*html.*(spec|adr|plan)", "(spec|adr|plan).*to.*html"],
+        "file_patterns": ["docs/specs/spec-*.md", "docs/adr/*.md", "docs/plans/plan-*.md"]
+      },
+      "priority": "medium"
     }
   ]
 }

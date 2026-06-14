@@ -19,7 +19,17 @@
       "Read(//tmp/**)",
       "mcp__atlassian__getAccessibleAtlassianResources",
       "mcp__atlassian__searchJiraIssuesUsingJql",
-      "Bash(mvn test *)"
+      "Bash(mvn test *)",
+      "Bash(cp \"D:\\\\DO\\\\assessment\\\\.claude\\\\commands\\\\scope.md\" \"D:\\\\DO\\\\assessment\\\\docs\\\\claude\\\\commands\\\\scope.md\")",
+      "Bash(cp \"D:\\\\DO\\\\assessment\\\\templates\\\\artifacts\\\\adr.template.md\" \"D:\\\\DO\\\\assessment\\\\docs\\\\claude\\\\commands\\\\scope.md\")",
+      "Bash(Get-ChildItem -Path \"D:\\\\DO\\\\assessment\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Skill(scope)",
+      "Skill(architect)",
+      "Skill(spec)",
+      "Skill(presentation)",
+      "Bash(cd /d D:\\\\DO\\\\assessment\\\\api)",
+      "Bash(mvn -q verify)"
     ]
   },
   "enableAllProjectMcpServers": false,
@@ -27,6 +37,8 @@
     "context7",
     "github",
     "trello-python",
-    "sequential-thinking"
+    "sequential-thinking",
+    "chrome-devtools",
+    "fetch"
   ]
 }
