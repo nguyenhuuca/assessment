@@ -1,5 +1,6 @@
-package com.canhlabs.funnyapp.dto;
+package com.canhlabs.funnyapp.validation;
 
+import com.canhlabs.funnyapp.dto.comment.CreateCommentRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

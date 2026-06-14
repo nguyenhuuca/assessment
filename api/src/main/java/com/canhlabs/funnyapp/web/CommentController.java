@@ -1,9 +1,9 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.aop.RateLimited;
-import com.canhlabs.funnyapp.dto.CommentNode;
-import com.canhlabs.funnyapp.dto.CreateCommentRequest;
-import com.canhlabs.funnyapp.dto.CreateCommentResponse;
+import com.canhlabs.funnyapp.dto.comment.CommentNode;
+import com.canhlabs.funnyapp.dto.comment.CreateCommentRequest;
+import com.canhlabs.funnyapp.dto.comment.CreateCommentResponse;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ResultStatus;

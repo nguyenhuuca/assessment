@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.dto;
+package com.canhlabs.funnyapp.dto.admin;
 
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import lombok.AllArgsConstructor;

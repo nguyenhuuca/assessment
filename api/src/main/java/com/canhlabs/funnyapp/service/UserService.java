@@ -1,10 +1,10 @@
 package com.canhlabs.funnyapp.service;
 
-import com.canhlabs.funnyapp.dto.LoginDto;
-import com.canhlabs.funnyapp.dto.MfaRequest;
-import com.canhlabs.funnyapp.dto.SetupResponse;
-import com.canhlabs.funnyapp.dto.UserDetailDto;
-import com.canhlabs.funnyapp.dto.UserInfoDto;
+import com.canhlabs.funnyapp.dto.auth.LoginDto;
+import com.canhlabs.funnyapp.dto.auth.MfaRequest;
+import com.canhlabs.funnyapp.dto.auth.SetupResponse;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
+import com.canhlabs.funnyapp.dto.user.UserInfoDto;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService extends UserDetailsService {

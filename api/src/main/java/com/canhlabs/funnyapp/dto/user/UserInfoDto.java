@@ -1,4 +1,5 @@
-package com.canhlabs.funnyapp.dto;
+package com.canhlabs.funnyapp.dto.user;
+import com.canhlabs.funnyapp.dto.BaseDto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;

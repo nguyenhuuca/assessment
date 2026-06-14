@@ -2,7 +2,7 @@ package com.canhlabs.funnyapp.jobs;
 
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.canhlabs.funnyapp.dto.CacheStat;
+import com.canhlabs.funnyapp.cache.CacheStat;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.FfmpegService;

@@ -1,6 +1,5 @@
 package com.canhlabs.funnyapp.cache;
 
-import com.canhlabs.funnyapp.dto.CacheStat;
 
 import java.util.Map;
 

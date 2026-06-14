@@ -1,6 +1,5 @@
 package com.canhlabs.funnyapp.cache;
 
-import com.canhlabs.funnyapp.dto.CacheStat;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.utils;
 
-import com.canhlabs.funnyapp.dto.UserDetailDto;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.regex.Pattern;

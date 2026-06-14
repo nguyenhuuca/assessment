@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.service;
 
-import com.canhlabs.funnyapp.dto.AdminStatsDto;
-import com.canhlabs.funnyapp.dto.AdminVideoDto;
+import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
+import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

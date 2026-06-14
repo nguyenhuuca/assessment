@@ -1,4 +1,5 @@
-package com.canhlabs.funnyapp.dto;
+package com.canhlabs.funnyapp.dto.video;
+import com.canhlabs.funnyapp.dto.BaseDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

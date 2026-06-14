@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.config.AppUserDetails;
-import com.canhlabs.funnyapp.dto.AdminStatsDto;
+import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.UserRole;

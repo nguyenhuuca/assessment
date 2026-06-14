@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.dto;
+package com.canhlabs.funnyapp.dto.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

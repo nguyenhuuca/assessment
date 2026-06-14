@@ -5,8 +5,8 @@ import com.canhlabs.funnyapp.client.YouTubeApiClient;
 import com.canhlabs.funnyapp.entity.YouTubeVideo;
 import com.canhlabs.funnyapp.repo.YoutubeVideoRepo;
 import com.canhlabs.funnyapp.service.ChatGptService;
-import com.canhlabs.funnyapp.dto.VideoDto;
-import com.canhlabs.funnyapp.dto.YouTubeVideoDTO;
+import com.canhlabs.funnyapp.dto.video.VideoDto;
+import com.canhlabs.funnyapp.client.YouTubeVideoDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

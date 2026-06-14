@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.dto.AdminStatsDto;
-import com.canhlabs.funnyapp.dto.AdminVideoDto;
+import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
+import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.repo.UserRepo;

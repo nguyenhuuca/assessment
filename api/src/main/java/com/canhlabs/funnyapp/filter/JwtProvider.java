@@ -1,10 +1,10 @@
 package com.canhlabs.funnyapp.filter;
 
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.canhlabs.funnyapp.dto.JwtGenerationDto;
-import com.canhlabs.funnyapp.dto.JwtVerificationResultDto;
-import com.canhlabs.funnyapp.dto.TokenDto;
-import com.canhlabs.funnyapp.dto.UserDetailDto;
+import com.canhlabs.funnyapp.dto.auth.JwtGenerationDto;
+import com.canhlabs.funnyapp.dto.auth.JwtVerificationResultDto;
+import com.canhlabs.funnyapp.dto.auth.TokenDto;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

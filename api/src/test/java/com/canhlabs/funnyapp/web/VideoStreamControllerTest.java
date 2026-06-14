@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.dto.StreamChunkResult;
-import com.canhlabs.funnyapp.dto.VideoDto;
+import com.canhlabs.funnyapp.streaming.StreamChunkResult;
+import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

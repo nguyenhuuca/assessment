@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.service;
 
-import com.canhlabs.funnyapp.dto.StreamChunkResult;
-import com.canhlabs.funnyapp.dto.VideoDto;
+import com.canhlabs.funnyapp.streaming.StreamChunkResult;
+import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.google.api.services.drive.Drive;
 
 import java.io.IOException;

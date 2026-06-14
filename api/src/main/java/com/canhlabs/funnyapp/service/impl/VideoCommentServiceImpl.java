@@ -1,8 +1,8 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.dto.CommentNode;
-import com.canhlabs.funnyapp.dto.CreateCommentRequest;
-import com.canhlabs.funnyapp.dto.CreateCommentResponse;
+import com.canhlabs.funnyapp.dto.comment.CommentNode;
+import com.canhlabs.funnyapp.dto.comment.CreateCommentRequest;
+import com.canhlabs.funnyapp.dto.comment.CreateCommentResponse;
 import com.canhlabs.funnyapp.entity.VideoComment;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.utils.AppUtils;

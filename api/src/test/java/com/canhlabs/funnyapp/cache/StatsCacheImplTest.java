@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.cache;
 
-import com.canhlabs.funnyapp.dto.CacheStat;
+import com.canhlabs.funnyapp.cache.CacheStat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

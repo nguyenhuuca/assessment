@@ -1,5 +1,6 @@
-package com.canhlabs.funnyapp.dto;
+package com.canhlabs.funnyapp.dto.comment;
 
+import com.canhlabs.funnyapp.validation.UserOrGuest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.cache;
 
-import com.canhlabs.funnyapp.dto.Range;
+import com.canhlabs.funnyapp.streaming.Range;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

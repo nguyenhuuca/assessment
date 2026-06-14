@@ -1,23 +1,21 @@
-package com.canhlabs.funnyapp.dto;
+package com.canhlabs.funnyapp.dto.user;
+import com.canhlabs.funnyapp.dto.BaseDto;
 
-import com.canhlabs.funnyapp.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.Instant;
-
 @Getter
 @Setter
 @SuperBuilder
-@NoArgsConstructor
 @AllArgsConstructor
-public class AdminAccountDto {
+@NoArgsConstructor
+public class UserDetailDto extends BaseDto{
     private Long id;
     private String email;
-    private UserRole role;
-    private boolean mfaEnabled;
-    private Instant createdAt;
+    private boolean mfaEnabled = false;
+    private String role;
+    private int permissions;
 }
