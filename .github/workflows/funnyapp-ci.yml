@@ -44,6 +44,34 @@ jobs:
       - name: Build project (skip tests)
         run: mvn -B clean package -DskipTests=true --file api/pom.xml
 
+      # Architecture & package-metrics check (report-only for now) using the
+      # abstractness/instability CLI. Vendored jar at ci/aic-cli.jar; reads api/target/classes.
+      - name: Architecture & metrics check (report-only)
+        continue-on-error: true
+        run: |
+          java -jar ci/aic-cli.jar \
+            --scan=api \
+            --arch=layered \
+            --no-cycles \
+            --fail-on-distance=0.7 \
+            --output=api/target/aic-metrics.json
+
+      - name: Show architecture & metrics summary
+        if: always()
+        run: |
+          if [ -f api/target/aic-metrics.json ]; then
+            jq '{summary, gate, cycles, architecture}' api/target/aic-metrics.json || cat api/target/aic-metrics.json
+          else
+            echo "No metrics report produced."
+          fi
+
+      - name: Upload architecture/metrics report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aic-metrics
+          path: api/target/aic-metrics.json
+
       # Pass JAR path to the next jobs
       - name: Output JAR path
         id: build
