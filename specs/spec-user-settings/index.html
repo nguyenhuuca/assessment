@@ -13,6 +13,10 @@
       
       
       
+        <link rel="prev" href="../spec-bitwise-permissions/">
+      
+      
+        <link rel="next" href="../../plans/plan-hls-migration/">
       
       
         
@@ -23,7 +27,7 @@
     
     
       
-        <title>Feature Specification: User Settings Page - Funny Movies - Architecture Docs</title>
+        <title>User Settings - Funny Movies - Architecture Docs</title>
       
     
     
@@ -108,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Feature Specification: User Settings Page
+              User Settings
             
           </span>
         </div>
@@ -323,10 +327,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../" class="md-tabs__link">
           
   
@@ -763,6 +769,8 @@
   
     
     
+      
+        
       
         
       
@@ -1231,6 +1239,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0016-user-settings-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0016 - User Settings Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1246,6 +1282,8 @@
   
     
     
+      
+        
       
         
       
@@ -1414,6 +1452,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-user-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1425,6 +1491,8 @@
       
   
   
+    
+  
   
   
     
@@ -1438,22 +1506,25 @@
       
         
       
+        
+      
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -1475,13 +1546,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1550,6 +1621,829 @@
 
               
             
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Settings
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#business-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Business Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Business Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-1-one-settings-row-per-user-lazily-created" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 1 — One settings row per user, lazily created
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-2-default-preference-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 2 — Default preference values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-3-defaultquality-is-a-closed-enum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 3 — defaultQuality is a closed enum
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-4-patch-is-partial-and-atomic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 4 — PATCH is partial and atomic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-5-account-deletion-is-a-soft-delete-with-anonymization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 5 — Account deletion is a soft-delete with anonymization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-6-deletion-requires-step-up-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 6 — Deletion requires step-up verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-7-deactivated-users-cannot-authenticate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 7 — Deactivated users cannot authenticate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-8-settings-are-strictly-owner-scoped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 8 — Settings are strictly owner-scoped
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-9-subscriptionaccount-status-is-display-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 9 — Subscription/account status is display-only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-10-incognito-suppresses-watch-history-recording" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 10 — Incognito suppresses watch-history recording
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fr-1-read-settings-lazy-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-1: Read settings (lazy create)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-2-update-settings-partial-atomic-validated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-2: Update settings (partial, atomic, validated)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-3-delete-account-soft-step-up-verified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-3: Delete account (soft, step-up verified)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-4-capability-driven-security-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-4: Capability-driven security surface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-5-block-deactivated-user-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-5: Block deactivated-user authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-6-settings-page-frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-6: Settings page (frontend)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Endpoints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="New Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-v1funny-appusersettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /v1/funny-app/user/settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patch-v1funny-appusersettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PATCH /v1/funny-app/user/settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-v1funny-appuseraccount" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DELETE /v1/funny-app/user/account
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Endpoints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modified Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-v1funny-appuserjoin-get-v1funny-appuserverify-magic-post-v1funny-appusermfaverify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /v1/funny-app/user/join, GET /v1/funny-app/user/verify-magic, POST /v1/funny-app/user/mfa/verify
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-v1funny-appuserme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /v1/funny-app/user/me
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Database Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sensitive-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensitive Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caching-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caching Impact
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#frontend-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontend Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Frontend Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Routes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-modified-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New / Modified Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#event-job-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event / Job Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Event / Job Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#domain-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domain Events
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scheduled-jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scheduled Jobs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Non-Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Non-Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#availability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Availability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scalability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scalability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edge-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edge Cases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Edge Cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ec-1-first-read-creates-defaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-1: First read creates defaults
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-2-invalid-value-in-a-multi-field-patch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-2: Invalid value in a multi-field PATCH
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-3-concurrent-patches-two-tabs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-3: Concurrent PATCHes (two tabs)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-4-empty-patch-body" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-4: Empty PATCH body
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-5-delete-with-wrong-confirmation-non-mfa-user" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-5: Delete with wrong confirmation (non-MFA user)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-6-delete-with-invalid-otp-mfa-user" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-6: Delete with invalid OTP (MFA user)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-7-delete-already-deactivated-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-7: Delete already-deactivated account
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-8-deactivated-user-attempts-login-magic-link" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-8: Deactivated user attempts login / magic-link
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-9-incognito-while-watch-history-not-implemented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-9: Incognito while watch-history not implemented
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-10-subscription-flag-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-10: Subscription flag off
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acceptance-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Acceptance Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version History
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1565,6 +2459,8 @@
   
     
     
+      
+        
       
         
       
@@ -1930,6 +2826,34 @@
     
   
     Watch History
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-user-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Settings
   
 
     
