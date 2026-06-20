@@ -79,17 +79,20 @@ nav:
       - 0012 - Bookmark Feature Design: adr/0012-bookmark-feature-design.md
       - 0014 - Watch History Design (Opus): adr/0014-watch-history-design-opus.md
       - 0015 - Bitwise Permission System: adr/0015-bitwise-permission-system.md
+      - 0016 - User Settings Design: adr/0016-user-settings-design.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
       - React Migration: prd/PRD-react-migration.md
       - Bookmark Feature: prd/PRD-bookmark-feature.md
       - Watch History: prd/PRD-watch-history-opus.md
+      - User Settings: prd/PRD-user-settings.md
 
   - Specs:
       - Overview: specs/index.md
       - Watch History: specs/spec-watch-history-opus.md
       - Bitwise Permissions: specs/spec-bitwise-permissions.md
+      - User Settings: specs/spec-user-settings.md
 
   - Plans:
       - HLS Migration: plans/plan-hls-migration.md
@@ -103,6 +106,7 @@ nav:
       - Plan B (Direct CLI Spawn): plans/plan-b-direct-cli-spawn.md
       - Bookmark Feature: plans/plan-bookmark-feature.md
       - Watch History: plans/plan-watch-history-opus.md
+      - User Settings: plans/plan-user-settings.md
 
   - Presentations:
       - presentations/index.md

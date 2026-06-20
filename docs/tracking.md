@@ -36,12 +36,13 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Bookmark Feature** | [PRD 📝](prd/PRD-bookmark-feature.md) | [0012 💡](adr/0012-bookmark-feature-design.md) | — | [Plan 📋](plans/plan-bookmark-feature.md) | — | 🔍 | |
 | **Watch History (Opus)** | [PRD 📝](prd/PRD-watch-history-opus.md) | [0014 💡](adr/0014-watch-history-design-opus.md) | [Spec 📋](specs/spec-watch-history-opus.md) | [Plan 📝](plans/plan-watch-history-opus.md) | — | 🔍 | Active branch · [comparison](comparison-watch-history-models.md) |
 | **Watch History (baseline)** | [PRD 📝](prd/PRD-watch-history.md) | [0013 💡](adr/0013-watch-history-design.md) | [Spec 📋](specs/spec-watch-history.md) | [Plan 📋](plans/plan-watch-history.md) | [Spec deck 🎤](specs/spec-watch-history.html) | 🔍 | 🗄️ Archived — model-comparison baseline |
+| **User Settings** | [PRD ✅](prd/PRD-user-settings.md) | [0016 ✅](adr/0016-user-settings-design.md) | [Spec ✅](specs/spec-user-settings.md) | [Plan ✅](plans/plan-user-settings.md) | — | ✅ | Pushed to main `dd45fc0`; coverage 95.91% |
 
 ---
 
 ## Status Summary
 
-### ✅ Done (8)
+### ✅ Done (9)
 - [Use RDBMS](adr/0001-use-relational-database.md)
 - [Backend Architecture](adr/0002-backend-architecture.md)
 - [Cache Strategy](adr/0003-use-cache.md)
@@ -50,6 +51,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Trivy Container Scanning](adr/0010-trivy-container-scanning.md)
 - [Bitwise Permissions](adr/0015-bitwise-permission-system.md)
 - [React Migration](prd/PRD-react-migration.md)
+- [User Settings](adr/0016-user-settings-design.md)
 
 ### 🔄 In Progress (1)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
@@ -86,7 +88,9 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0012 | Bookmark Feature Design | 💡 Proposed |
 | 0013 | Watch History Design (baseline, archived) | 💡 Proposed |
 | 0014 | Watch History Design (Opus) | 💡 Proposed |
+| 0015 | Bitwise Permission System | ✅ Accepted |
+| 0016 | User Settings Design | ✅ Accepted |
 
 ---
 
-*Last updated: 2026-06-06 — Added Presentation column; Hot Video Priority PRD deck added to mkdocs Presentations menu*
+*Last updated: 2026-06-20 — User Settings feature implemented and merged to main (dd45fc0)*
