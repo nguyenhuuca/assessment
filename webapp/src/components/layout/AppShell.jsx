@@ -12,6 +12,7 @@ import { PublicFeed, PrivateFeed } from '../video/VideoFeed.jsx'
 import ExploreView from '../explore/ExploreView.jsx'
 import ComingSoon from './ComingSoon.jsx'
 import AdminView from '../admin/AdminView.jsx'
+import SettingsPage from '../settings/SettingsPage.jsx'
 
 const TABS = [
   { key: 'popular', label: 'Popular', icon: 'local_fire_department' },
@@ -256,8 +257,8 @@ export default function AppShell() {
         marginLeft: 'var(--sidenav-w)',
         marginTop: 'var(--topnav-h)',
         height: 'calc(100vh - var(--topnav-h))',
-        overflow: (activeNav === 'explore' || activeNav === 'admin') ? 'auto' : 'hidden',
-        display: (activeNav === 'explore' || activeNav === 'admin') ? 'block' : 'flex',
+        overflow: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings') ? 'auto' : 'hidden',
+        display: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings') ? 'block' : 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--bg)',
@@ -266,6 +267,10 @@ export default function AppShell() {
           <ExploreView onNavigateToVideo={handleExploreNavigate} />
         ) : activeNav === 'admin' && user?.isAdmin ? (
           <AdminView />
+        ) : activeNav === 'settings' && isLoggedIn ? (
+          <SettingsPage />
+        ) : activeNav === 'settings' && !isLoggedIn ? (
+          <ComingSoon page="settings" />
         ) : activeNav !== 'home' ? (
           <ComingSoon page={activeNav} />
         ) : (

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings - VibeStream</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed-dim": "#00deec",
+              "surface-bright": "#2c2c2c",
+              "surface-tint": "#ff8d89",
+              "background": "#0e0e0e",
+              "secondary-dim": "#00deec",
+              "primary-container": "#ff7573",
+              "on-primary-fixed": "#000000",
+              "tertiary-fixed": "#cb9cff",
+              "on-secondary-fixed-variant": "#005e64",
+              "primary-dim": "#e9002d",
+              "secondary-fixed": "#00eefc",
+              "surface-container-high": "#201f1f",
+              "outline": "#767575",
+              "error-dim": "#d53d18",
+              "surface-container-lowest": "#000000",
+              "error-container": "#b92902",
+              "tertiary-container": "#bf8cf7",
+              "primary-fixed": "#ff7573",
+              "on-tertiary": "#460e7a",
+              "outline-variant": "#484847",
+              "on-background": "#ffffff",
+              "on-surface": "#ffffff",
+              "on-secondary-fixed": "#003f43",
+              "error": "#ff7351",
+              "inverse-on-surface": "#565555",
+              "primary": "#ff8d89",
+              "tertiary-dim": "#b987f2",
+              "on-surface-variant": "#adaaaa",
+              "on-tertiary-container": "#380069",
+              "surface-variant": "#262626",
+              "on-primary-container": "#4e0008",
+              "on-secondary-container": "#e3fdff",
+              "on-primary": "#65000d",
+              "on-error-container": "#ffd2c8",
+              "on-error": "#450900",
+              "surface-container": "#1a1919",
+              "secondary": "#00eefc",
+              "on-tertiary-fixed-variant": "#4f1c84",
+              "primary-fixed-dim": "#ff5a5b",
+              "surface": "#0e0e0e",
+              "on-tertiary-fixed": "#26004a",
+              "tertiary": "#cb9cff",
+              "secondary-container": "#006970",
+              "inverse-primary": "#c10023",
+              "on-primary-fixed-variant": "#60000c",
+              "inverse-surface": "#fcf9f8",
+              "tertiary-fixed-dim": "#bf8cf7",
+              "surface-container-low": "#131313",
+              "surface-container-highest": "#262626",
+              "surface-dim": "#0e0e0e",
+              "on-secondary": "#005359"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-card {
+        background: rgba(38, 38, 38, 0.6);
+        backdrop-filter: blur(24px);
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased no-scrollbar">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-[#0e0e0e] text-[#ff0032] font-inter text-sm antialiased flex justify-between items-center h-16 px-6 w-full no-border">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black tracking-tighter text-[#ff0032]">VibeStream</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-[#ffffff] hover:text-[#ff8d89] transition-colors duration-300 active:scale-95 transition-transform" href="#">Home</a>
+<a class="text-[#ffffff] hover:text-[#ff8d89] transition-colors duration-300 active:scale-95 transition-transform" href="#">Subscriptions</a>
+<a class="text-[#ffffff] hover:text-[#ff8d89] transition-colors duration-300 active:scale-95 transition-transform" href="#">Library</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface cursor-pointer hover:text-primary transition-colors">search</span>
+</div>
+<span class="material-symbols-outlined text-on-surface cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined text-on-surface cursor-pointer hover:text-primary transition-colors">upload</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/30">
+<img alt="User profile" data-alt="User profile avatar close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEBhrBBzYHh12Ey9OjmqhJTPZVQDZNQc8OZ22_zAu0ffvya2JEBLNRf22jbAmtvcAppbI1KRVfyBEXjkiigB1chyE0W7AyweevC5bNbC_rnwAffHKHmn_TWKmVLNCwRU3ve1EFUkWfXx63Wyhdl9PPblTgIe9coBxiHUqhhRkTS7vFK78Bn9jf3V4yilh2n2GUlGfJwpM4z1Pa_JhX532CTVOvoMGosF_qxC08Rxv6lXK2rGsbmaPXxHnHUpa5yq67IvuUH2sXe5i3"/>
+</div>
+</div>
+</header>
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-0 h-full w-24 z-40 bg-[#131313] text-[#00eefc] font-inter text-xs font-bold uppercase tracking-widest flex flex-col items-center pt-20 pb-8 no-border mr-8">
+<div class="flex flex-col items-center w-full gap-2">
+<a class="flex flex-col items-center justify-center text-[#adaaaa] py-4 w-full hover:bg-[#262626] hover:text-[#ffffff] transition-all duration-200 active:opacity-80" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span>Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#adaaaa] py-4 w-full hover:bg-[#262626] hover:text-[#ffffff] transition-all duration-200 active:opacity-80" href="#">
+<span class="material-symbols-outlined mb-1">subscriptions</span>
+<span>Subs</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#adaaaa] py-4 w-full hover:bg-[#262626] hover:text-[#ffffff] transition-all duration-200 active:opacity-80" href="#">
+<span class="material-symbols-outlined mb-1">video_library</span>
+<span>Library</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col items-center w-full gap-2">
+<a class="flex flex-col items-center justify-center border-l-4 border-[#00eefc] text-[#00eefc] py-4 w-full hover:bg-[#262626] hover:text-[#ffffff] transition-all duration-200 active:opacity-80" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#adaaaa] py-4 w-full hover:bg-[#262626] hover:text-[#ffffff] transition-all duration-200 active:opacity-80" href="#">
+<span class="material-symbols-outlined mb-1">help</span>
+<span>Help</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-24 pt-24 px-8 pb-12 min-h-screen">
+<div class="max-w-5xl mx-auto">
+<!-- Header Section -->
+<div class="mb-12">
+<h1 class="text-5xl font-black tracking-tighter text-on-surface mb-2">Settings</h1>
+<p class="text-on-surface-variant font-medium">Manage your cinematic experience and account preferences.</p>
+</div>
+<!-- Bento Grid Layout for Settings Sections -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Account Section -->
+<section class="md:col-span-8 glass-card rounded-xl p-8 flex flex-col gap-8 shadow-2xl">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">account_circle</span>
+</div>
+<h2 class="text-2xl font-bold tracking-tight">Account Identity</h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-secondary">Email Address</label>
+<input class="w-full bg-surface-container-highest border-none rounded-lg p-4 text-on-surface focus:ring-2 focus:ring-primary transition-all" readonly="" type="email" value="alex.vibe@noir.stream"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-secondary">Password</label>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-none rounded-lg p-4 text-on-surface focus:ring-2 focus:ring-primary transition-all" readonly="" type="password" value="••••••••••••"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-primary font-bold text-xs uppercase hover:underline">Change</button>
+</div>
+</div>
+</div>
+<div class="pt-4 flex flex-wrap gap-4">
+<button class="px-6 py-3 bg-gradient-to-br from-primary to-primary-dim text-on-primary-fixed font-bold rounded-full hover:scale-105 transition-transform active:scale-95">Update Profile</button>
+<button class="px-6 py-3 bg-surface-variant text-on-surface font-bold rounded-full hover:bg-surface-bright transition-colors">Manage Connected Apps</button>
+</div>
+</section>
+<!-- Status Panel (Small Bento Card) -->
+<aside class="md:col-span-4 bg-surface-container-low rounded-xl p-8 flex flex-col justify-between border-l-4 border-secondary">
+<div>
+<h3 class="text-secondary font-bold text-sm tracking-widest uppercase mb-4">Account Status</h3>
+<div class="flex items-center gap-3 mb-6">
+<div class="w-3 h-3 bg-secondary rounded-full animate-pulse shadow-[0_0_10px_#00eefc]"></div>
+<span class="font-bold text-lg">Premium Plus</span>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Your subscription is active and will renew on October 24, 2024.</p>
+</div>
+<button class="w-full py-3 bg-surface-container-highest border border-outline-variant/30 text-on-surface font-bold rounded-lg hover:bg-surface-bright transition-colors">View Billing History</button>
+</aside>
+<!-- Notifications & Performance (Row 2) -->
+<section class="md:col-span-6 glass-card rounded-xl p-8 flex flex-col gap-6">
+<div class="flex items-center gap-4 mb-2">
+<div class="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">notifications_active</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">Notifications</h2>
+</div>
+<div class="space-y-6">
+<div class="flex justify-between items-center">
+<div>
+<p class="font-bold">New Content Alerts</p>
+<p class="text-xs text-on-surface-variant">Notify me when followed artists post</p>
+</div>
+<div class="w-12 h-6 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<p class="font-bold">Livestream Invites</p>
+<p class="text-xs text-on-surface-variant">Real-time alerts for live events</p>
+</div>
+<div class="w-12 h-6 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<p class="font-bold">Direct Messages</p>
+<p class="text-xs text-on-surface-variant">Receive alerts for new messages</p>
+</div>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full relative cursor-pointer">
+<div class="absolute left-1 top-1 w-4 h-4 bg-on-surface-variant rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="md:col-span-6 glass-card rounded-xl p-8 flex flex-col gap-6">
+<div class="flex items-center gap-4 mb-2">
+<div class="w-10 h-10 rounded-lg bg-tertiary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">speed</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">Playback &amp; Performance</h2>
+</div>
+<div class="space-y-6">
+<div class="space-y-3">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Default Quality</label>
+<div class="flex gap-2">
+<button class="flex-1 py-2 bg-surface-container-highest rounded-md text-xs font-bold border border-outline-variant/30">Auto</button>
+<button class="flex-1 py-2 bg-secondary/10 border border-secondary/50 text-secondary rounded-md text-xs font-bold">4K Ultra</button>
+<button class="flex-1 py-2 bg-surface-container-highest rounded-md text-xs font-bold border border-outline-variant/30">1080p</button>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<p class="font-bold">Hardware Acceleration</p>
+<p class="text-xs text-on-surface-variant">Use GPU for smoother rendering</p>
+</div>
+<div class="w-12 h-6 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<p class="font-bold">Low Latency Mode</p>
+<p class="text-xs text-on-surface-variant">Prioritize speed over buffering</p>
+</div>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full relative cursor-pointer">
+<div class="absolute left-1 top-1 w-4 h-4 bg-on-surface-variant rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Privacy & Security Section -->
+<section class="md:col-span-12 glass-card rounded-xl p-8 flex flex-col gap-8 mb-12">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-error/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-error text-3xl">security</span>
+</div>
+<h2 class="text-2xl font-bold tracking-tight">Privacy &amp; Visibility</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="p-6 bg-surface-container rounded-xl border border-outline-variant/10 hover:border-secondary/30 transition-colors">
+<span class="material-symbols-outlined text-secondary mb-4">visibility_off</span>
+<h3 class="font-bold mb-2">Incognito Mode</h3>
+<p class="text-sm text-on-surface-variant mb-4">Watch history and search terms won't be saved while active.</p>
+<button class="text-secondary text-sm font-bold uppercase tracking-widest hover:underline">Enable Now</button>
+</div>
+<div class="p-6 bg-surface-container rounded-xl border border-outline-variant/10 hover:border-secondary/30 transition-colors">
+<span class="material-symbols-outlined text-secondary mb-4">database</span>
+<h3 class="font-bold mb-2">Data Export</h3>
+<p class="text-sm text-on-surface-variant mb-4">Download a full archive of your platform activity and metrics.</p>
+<button class="text-secondary text-sm font-bold uppercase tracking-widest hover:underline">Request Data</button>
+</div>
+<div class="p-6 bg-surface-container rounded-xl border border-outline-variant/10 hover:border-secondary/30 transition-colors">
+<span class="material-symbols-outlined text-secondary mb-4">group</span>
+<h3 class="font-bold mb-2">Profile Privacy</h3>
+<p class="text-sm text-on-surface-variant mb-4">Control who can see your following list and liked videos.</p>
+<button class="text-secondary text-sm font-bold uppercase tracking-widest hover:underline">Configure</button>
+</div>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="md:col-span-12 p-8 border border-error/30 rounded-xl bg-error/5 flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="text-center md:text-left">
+<h3 class="text-error font-bold text-lg">Danger Zone</h3>
+<p class="text-on-surface-variant text-sm">Deleting your account is permanent. All data will be wiped from our servers.</p>
+</div>
+<button class="px-8 py-3 bg-error text-on-error font-black uppercase tracking-widest text-sm rounded-full hover:bg-error-dim transition-colors">Delete Account</button>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer Mobile Nav (Visible on small screens) -->
+<nav class="md:hidden fixed bottom-0 w-full bg-[#131313] flex justify-around items-center h-16 z-50">
+<span class="material-symbols-outlined text-[#adaaaa]">home</span>
+<span class="material-symbols-outlined text-[#adaaaa]">explore</span>
+<span class="material-symbols-outlined text-[#adaaaa]">add_circle</span>
+<span class="material-symbols-outlined text-[#00eefc]">settings</span>
+<div class="w-6 h-6 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="User" data-alt="Small circular user avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqFZobUTmpBW8tPRkgGlirleE0-PTAo1booPUuMOvnLar95N0kXEqL85O5vYwq5n9-hr7TFQZ8EPi1zTW-QL5O2h2lCDlZRAjGDmbEs2fQEvLi5Kga6k6aH1MZdGM-nfAwXYNVIR0iaNJ3NdEKD5kwbSNUSITFwDYnUIUnAvrnQmYEB3nhWuD__a51A9zLp6I-ihwtKFVJp0833NL5t1hZytOEbVhmR19I273nei3tUvDHEBWakLimc5bs3ITs9jPyDiFLM1qTAUvn"/>
+</div>
+</nav>
+</body></html>

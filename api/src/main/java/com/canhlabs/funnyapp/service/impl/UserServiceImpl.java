@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.MFASessionStore;
+import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.entity.UserEmailRequest;
 import com.canhlabs.funnyapp.dto.auth.JwtGenerationDto;
@@ -9,6 +10,8 @@ import com.canhlabs.funnyapp.dto.auth.MfaRequest;
 import com.canhlabs.funnyapp.dto.auth.SetupResponse;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.user.UserInfoDto;
+import com.canhlabs.funnyapp.enums.UserStatus;
+import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.filter.JwtProvider;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.service.UserService;
@@ -20,6 +23,7 @@ import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,10 +49,16 @@ public class UserServiceImpl implements UserService {
     private MFASessionStore mfaSessionStore;
     private InviteServiceImpl inviteService;
     private Totp totp;
+    private AppProperties appProperties;
 
     @Autowired
     public void injectTotp(Totp totp) {
         this.totp = totp;
+    }
+
+    @Autowired
+    public void injectAppProperties(AppProperties appProperties) {
+        this.appProperties = appProperties;
     }
 
     @Autowired
@@ -89,6 +99,7 @@ public class UserServiceImpl implements UserService {
         log.info( "User join system with email: {}", loginDto.getEmail());
         User user = userRepo.findAllByUserName(loginDto.getEmail());
         if (user != null) {
+            requireActive(user);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
                     loginDto.getPassword());
             authenticationManager.authenticate(authenticationToken);
@@ -156,6 +167,7 @@ public class UserServiceImpl implements UserService {
             raiseErr("Invalid or expired session");
         }
         User user = userRepo.findAllByUserName(userIdOpt.get());
+        requireActive(user);
         if (!totp.verify(mfaRequest.otp(), user.getMfaSecret())) {
             raiseErr("Otp is incorrectly");
         }
@@ -172,6 +184,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepo.findAllByUserName(userReq.get().getEmail());
         if (user != null) {
+            requireActive(user);
             inviteService.markTokenAsUsed(userReq.get(), userReq.get().getUserId());
             if (user.isMfaEnabled()) {
                 String sessionToken = UUID.randomUUID().toString();
@@ -220,14 +233,31 @@ public class UserServiceImpl implements UserService {
 
     private String getToken(User user) {
         String role = user.getRole() != null ? user.getRole().name() : "USER";
+        boolean passwordEnabled = appProperties != null && !appProperties.isUsePasswordless();
         return jwtProvider.generateToken(JwtGenerationDto.builder()
                 .payload(UserDetailDto.builder()
                         .id(user.getId())
                         .email(user.getUserName())
                         .role(role)
                         .permissions(user.getPermissions())
+                        .mfaEnabled(user.isMfaEnabled())
+                        .passwordEnabled(passwordEnabled)
+                        .mfaAvailable(true)
                         .build())
                 .build()).getToken();
+    }
+
+    /**
+     * Throws CustomException 403 if the user account is deactivated.
+     */
+    private void requireActive(User user) {
+        if (user != null && user.getStatus() == UserStatus.DEACTIVATED) {
+            throw CustomException.builder()
+                    .status(HttpStatus.FORBIDDEN)
+                    .subCode(403)
+                    .message("Account deactivated")
+                    .build();
+        }
     }
 
     private void validate(LoginDto loginDto) {

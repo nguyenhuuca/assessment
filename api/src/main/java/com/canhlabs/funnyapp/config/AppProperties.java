@@ -35,6 +35,7 @@ public class AppProperties {
     private String imageUrl;
     private String mainDomain;
     private String imageStoragePath;
+    private boolean subscriptionStatusEnabled;
     private EmailSetting emailSetting = new EmailSetting();
 
 

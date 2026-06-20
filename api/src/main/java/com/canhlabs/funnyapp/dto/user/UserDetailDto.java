@@ -18,4 +18,6 @@ public class UserDetailDto extends BaseDto{
     private boolean mfaEnabled = false;
     private String role;
     private int permissions;
+    private boolean passwordEnabled;
+    private boolean mfaAvailable;
 }

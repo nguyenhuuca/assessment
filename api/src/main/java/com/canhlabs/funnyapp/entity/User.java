@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.entity;
 
 import com.canhlabs.funnyapp.enums.UserRole;
+import com.canhlabs.funnyapp.enums.UserStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -56,5 +58,13 @@ public class User extends BaseDomain {
 
     @Column(name = "permissions", nullable = false)
     private int permissions = 0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    @Builder.Default
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
 }

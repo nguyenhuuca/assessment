@@ -198,8 +198,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<Object> handleCustomException(CustomException ex) {
-        Error error = new Error(BAD_REQUEST);
-        error.setMessage(ex.getMessage());
+        HttpStatus httpStatus = (ex.getStatus() != null) ? ex.getStatus() : BAD_REQUEST;
+        Error error = new Error(httpStatus, ex.getSubCode(), ex.getMessage());
         log.error(ex.getMessage());
         return buildResponseEntity(error);
     }
