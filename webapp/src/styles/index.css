@@ -142,7 +142,14 @@ body {
 
 .action-btn:hover { background: var(--bg-bright); transform: scale(1.06); }
 
-[data-theme="light"] .action-btn { color: #ffffff; }
+[data-theme="light"] .action-btn {
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
 .action-btn:active { transform: scale(0.90); }
 .action-btn:disabled { opacity: 0.28; pointer-events: none; }
 
