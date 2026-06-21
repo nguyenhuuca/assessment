@@ -52,6 +52,19 @@
   --text-muted:       #555555;
   --border:           rgba(0,0,0,0.08);
   --border-subtle:    rgba(0,0,0,0.12);
+
+  /* Accent colors reworked for white backgrounds */
+  --accent-cyan:      #0097a8;
+  --accent-cyan-glow: rgba(0, 151, 168, 0.18);
+  --accent-cyan-dim:  rgba(0, 151, 168, 0.10);
+
+  --primary:          #e8364a;
+  --primary-dim:      #c41f32;
+  --primary-glow:     rgba(232, 54, 74, 0.18);
+
+  --danger:           #c94422;
+  --danger-bg:        rgba(201, 68, 34, 0.10);
+  --danger-border:    rgba(201, 68, 34, 0.30);
 }
 
 [data-theme="light"] body {
@@ -812,7 +825,7 @@ body {
   margin-bottom: 16px;
 }
 .app-alert.error   { background: rgba(185,41,2,0.2);  color: #ff8a7a; border: 1px solid rgba(185,41,2,0.3); }
-.app-alert.success { background: rgba(0,105,112,0.2); color: var(--accent-cyan); border: 1px solid rgba(0,238,252,0.2); }
+.app-alert.success { background: rgba(0,105,112,0.2); color: var(--accent-cyan); border: 1px solid var(--accent-cyan-glow); }
 
 /* ── App buttons ── */
 .app-btn {
@@ -1741,6 +1754,12 @@ body {
   border: 1px solid var(--border-subtle);
 }
 
+[data-theme="light"] .settings-card {
+  background: var(--bg-surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 .settings-card-header {
   display: flex;
   align-items: center;
@@ -1758,9 +1777,9 @@ body {
   flex-shrink: 0;
 }
 
-.settings-card-icon.cyan  { background: rgba(0, 238, 252, 0.12); color: var(--accent-cyan); }
-.settings-card-icon.pink  { background: rgba(255, 141, 137, 0.12); color: var(--primary); }
-.settings-card-icon.danger{ background: rgba(255, 115, 81, 0.12); color: var(--danger); }
+.settings-card-icon.cyan  { background: var(--accent-cyan-dim); color: var(--accent-cyan); }
+.settings-card-icon.pink  { background: var(--primary-glow);    color: var(--primary); }
+.settings-card-icon.danger{ background: var(--danger-bg);        color: var(--danger); }
 
 .settings-card-title {
   font-size: 18px;
