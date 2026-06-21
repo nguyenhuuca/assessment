@@ -29,7 +29,13 @@
       "Skill(spec)",
       "Skill(presentation)",
       "Bash(cd /d D:\\\\DO\\\\assessment\\\\api)",
-      "Bash(mvn -q verify)"
+      "Bash(mvn -q verify)",
+      "Bash(mvn -q -DskipTests compile)",
+      "Bash(ls -la *.js *.mjs *.cjs)",
+      "Bash(ls -la .eslint*)",
+      "Bash(mvn -q test)",
+      "Bash(mvn -q -Dtest=UserSettingsServiceImplTest,UserSettingsControllerTest test)",
+      "Bash(mvn -Dtest=UserSettingsServiceImplTest,UserSettingsControllerTest test)"
     ]
   },
   "enableAllProjectMcpServers": false,
