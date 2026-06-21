@@ -321,7 +321,7 @@ export default function AppShell() {
       <nav className="mobile-nav" style={{
         position: 'fixed', bottom: 0, left: 0, right: 0,
         height: 64, zIndex: 50,
-        background: 'rgba(14,14,14,0.88)',
+        background: theme === 'light' ? 'rgba(255,255,255,0.95)' : 'rgba(14,14,14,0.88)',
         backdropFilter: 'blur(20px)',
         borderTop: '1px solid var(--border)',
         justifyContent: 'space-around',
