@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   ============================================================================
-  TEMPLATE: Self-contained dark "tab-bar" HTML presentation.
+  TEMPLATE: Self-contained dark/light "tab-bar" HTML presentation.
   Source documents: a Spec / ADR / Plan markdown file (NOT Marp).
   ----------------------------------------------------------------------------
   HOW TO USE (for the `presentation` skill):
@@ -38,7 +38,7 @@
   • Plan : 🎯 Objective · 🧭 Scope · 🏗️ Approach · 🪜 Phases · 📁 Files · ⚠️ Risks
   ============================================================================
 -->
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -150,6 +150,44 @@
   ul{padding-left:22px} li{margin:4px 0}
   .footer{text-align:center;color:var(--muted);font-size:.82rem;padding:24px;border-top:1px solid var(--line)}
   .kbd{font-family:monospace;background:#1a1f30;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;font-size:.8rem;color:#cdd6ec}
+
+  /* Theme toggle button */
+  .theme-toggle{position:absolute;right:16px;top:16px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:.82rem;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:6px 12px;border-radius:999px;transition:.18s ease;z-index:60;font-family:inherit}
+  .theme-toggle:hover{color:var(--ink);border-color:#39425c}
+
+  /* ── Light theme ─────────────────────────────────────────────── */
+  [data-theme="light"]{
+    --bg:#f4f5f9; --bg2:#eaedf5; --card:#ffffff; --card2:#f0f2f8;
+    --ink:#1a1e2e; --muted:#5a6480; --line:#d4d8e8;
+  }
+  [data-theme="light"] body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(79,140,255,.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(167,139,250,.05), transparent 55%),
+      var(--bg);
+  }
+  [data-theme="light"] .hero h1{background:linear-gradient(90deg,#1a1e2e,#3a6bcc 60%,#7c5cdb);-webkit-background-clip:text;background-clip:text;color:transparent}
+  [data-theme="light"] nav.tabs{background:rgba(244,245,249,.92)}
+  [data-theme="light"] .tab-btn{background:#fff;color:var(--muted)}
+  [data-theme="light"] .tab-btn:hover{color:var(--ink);border-color:#b4b8c8}
+  [data-theme="light"] .card{box-shadow:0 10px 30px rgba(0,0,0,.10)}
+  [data-theme="light"] .card h3{color:#1a1e2e}
+  [data-theme="light"] p,[data-theme="light"] li{color:var(--ink)}
+  [data-theme="light"] strong{color:#1a1e2e}
+  [data-theme="light"] .hl{background:rgba(0,0,0,.025)}
+  [data-theme="light"] .prompt{background:rgba(34,211,238,.08);color:#1a3a45}
+  [data-theme="light"] pre{background:#e8ebf5;color:#2a3560}
+  [data-theme="light"] code{background:#e0e4f0;color:#2a3560;border-color:var(--line)}
+  [data-theme="light"] pre code{background:none;border:none;color:#2a3560}
+  [data-theme="light"] th{background:#dde0ee;color:#1a1e2e}
+  [data-theme="light"] tr:nth-child(even) td{background:rgba(0,0,0,.025)}
+  [data-theme="light"] .formula{background:radial-gradient(120% 120% at 50% 0%, rgba(79,140,255,.08), transparent 70%), #eef0f8}
+  [data-theme="light"] .formula.green{background:radial-gradient(120% 120% at 50% 0%, rgba(52,211,153,.08), transparent 70%), #eef0f8}
+  [data-theme="light"] details{background:#f0f2f8}
+  [data-theme="light"] details .body{border-color:var(--line)}
+  [data-theme="light"] .ex{background:rgba(0,0,0,.03)}
+  [data-theme="light"] .kbd{background:#e0e4f0;color:#2a3560;border-color:#c4c8d8}
+  [data-theme="light"] .theme-toggle:hover{border-color:#b4b8c8}
 </style>
 </head>
 <body>
@@ -157,6 +195,7 @@
 <!-- ===== HEADER: edit per document ===== -->
 <header class="hero">
   <a class="back-link" href="https://nguyenhuuca.github.io/assessment/presentations/">← Presentations</a>
+  <button class="theme-toggle" id="themeToggle" title="Toggle dark / light theme">☀️ Light</button>
   <div class="eyebrow"><!-- e.g. SPEC · ADR-0006 · PLAN --></div>
   <h1><!-- DOCUMENT TITLE --></h1>
   <div class="meta">
@@ -217,6 +256,17 @@
     if (e.key === 'ArrowRight') activate(idx+1);
     if (e.key === 'ArrowLeft')  activate(idx-1);
   });
+
+  // Theme toggle
+  const root   = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  function applyTheme(t){
+    root.setAttribute('data-theme', t);
+    toggle.textContent = t === 'dark' ? '☀️ Light' : '🌙 Dark';
+    try { localStorage.setItem('pres-theme', t); } catch(e){}
+  }
+  applyTheme((()=>{ try{ return localStorage.getItem('pres-theme') || 'dark'; }catch(e){ return 'dark'; } })());
+  toggle.addEventListener('click', ()=>applyTheme(root.getAttribute('data-theme')==='dark' ? 'light' : 'dark'));
 </script>
 </body>
 </html>

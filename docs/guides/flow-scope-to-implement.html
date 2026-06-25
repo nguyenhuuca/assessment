@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From Idea to Implementation — Claude Workflow</title>
+
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+
+<style>
+  :root{
+    --bg:#06070c; --bg2:#0c0f1a; --card:#11141f; --card2:#161a28;
+    --ink:#e7ebf5; --muted:#9aa3b8; --line:#222838;
+    --blue:#4f8cff; --green:#34d399; --yellow:#fbbf24; --amber:#f59e0b;
+    --red:#f87171; --violet:#a78bfa; --cyan:#22d3ee;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(79,140,255,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(167,139,250,.08), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+
+  /* Header */
+  header.hero{padding:34px 24px 22px;text-align:center;position:relative;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(79,140,255,.06), transparent);}
+  .hero .eyebrow{letter-spacing:.28em;text-transform:uppercase;font-size:.72rem;color:var(--blue);font-weight:700}
+  .hero h1{margin:.35em auto .25em;max-width:1000px;font-size:clamp(1.5rem,3.6vw,2.5rem);line-height:1.18;
+    background:linear-gradient(90deg,#fff,#9fc2ff 60%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .meta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+  .chip{font-size:.82rem;color:var(--muted);border:1px solid var(--line);background:var(--card);padding:6px 13px;border-radius:999px}
+  .chip b{color:var(--ink);font-weight:600}
+  .back-link{position:absolute;left:16px;top:16px;display:inline-flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted);text-decoration:none;border:1px solid var(--line);background:var(--card);padding:6px 12px;border-radius:999px;transition:.18s ease;z-index:60}
+  .back-link:hover{color:#fff;border-color:#39425c}
+
+  /* Tab bar */
+  nav.tabs{position:sticky;top:0;z-index:50;display:flex;justify-content:safe center;gap:6px;overflow-x:auto;padding:10px 14px;
+    background:rgba(6,7,12,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);scrollbar-width:thin}
+  nav.tabs::-webkit-scrollbar{height:6px}
+  nav.tabs::-webkit-scrollbar-thumb{background:#2a3146;border-radius:9px}
+  .tab-btn{flex:0 0 auto;cursor:pointer;white-space:nowrap;border:1px solid var(--line);background:var(--card);
+    color:var(--muted);font-size:.9rem;font-weight:600;padding:9px 16px;border-radius:11px;transition:.18s ease;font-family:inherit}
+  .tab-btn:hover{color:var(--ink);border-color:#39425c}
+  .tab-btn.active{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--blue),#6d5cff);box-shadow:0 6px 20px rgba(79,140,255,.35)}
+  .tab-btn .ico{margin-right:7px}
+
+  /* Panels */
+  main{max-width:980px;margin:0 auto;padding:30px 20px 90px}
+  .panel{display:none;animation:fade .35s ease}
+  .panel.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .panel-title{display:flex;align-items:center;gap:12px;font-size:1.5rem;margin:0 0 6px}
+  .panel-title .num{font-size:.85rem;font-weight:800;color:#0a0a0a;background:linear-gradient(135deg,var(--blue),var(--violet));padding:4px 10px;border-radius:8px;letter-spacing:.05em}
+  .panel-sub{color:var(--muted);margin:0 0 22px;font-size:.95rem}
+
+  /* Cards */
+  .card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);
+    border-left:4px solid var(--accent,var(--blue));border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .card.blue{--accent:var(--blue)} .card.green{--accent:var(--green)} .card.yellow{--accent:var(--yellow)}
+  .card.amber{--accent:var(--amber)} .card.red{--accent:var(--red)} .card.violet{--accent:var(--violet)} .card.cyan{--accent:var(--cyan)}
+  .card h3{margin:0 0 10px;font-size:1.16rem;display:flex;align-items:center;gap:9px;color:#fff}
+  .card h4{margin:16px 0 6px;color:#cdd6ec;font-size:1rem}
+  .card .tag{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent,var(--blue));border:1px solid currentColor;padding:2px 8px;border-radius:6px;opacity:.9}
+  .card .time{margin-left:auto;font-size:.8rem;color:var(--muted);font-weight:600}
+  p,li{color:var(--ink)} .muted{color:var(--muted)} strong{color:#fff}
+
+  .hl{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:10px;margin:10px 0;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+  .hl .ic{flex:0 0 auto;font-size:1.05rem}
+  .hl.goal{border-color:rgba(79,140,255,.4)} .hl.prod{border-color:rgba(52,211,153,.35)}
+
+  .formula{text-align:center;margin:14px 0;padding:16px;border-radius:12px;
+    background:radial-gradient(120% 120% at 50% 0%, rgba(79,140,255,.10), transparent 70%), #0a0d17;
+    border:1px solid rgba(79,140,255,.35);box-shadow:inset 0 0 28px rgba(79,140,255,.08), 0 0 22px rgba(79,140,255,.05)}
+  .formula.green{border-color:rgba(52,211,153,.4);background:radial-gradient(120% 120% at 50% 0%, rgba(52,211,153,.10), transparent 70%), #0a0d17}
+  .formula .label{font-size:.78rem;color:var(--muted);margin-top:8px}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.94rem}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:#1a1f30;color:#cdd6ec;font-weight:700}
+  tr:nth-child(even) td{background:rgba(255,255,255,.018)}
+
+  pre{background:#05060b;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;color:#bcd0ff;font-family:"Cascadia Code","Consolas",monospace;font-size:.86rem;line-height:1.5}
+  code{font-family:"Cascadia Code","Consolas",monospace;font-size:.88em;background:#1a1f30;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#bcd0ff}
+  pre code{background:none;border:none;padding:0}
+
+  .prompt{border-left:3px solid var(--cyan);background:rgba(34,211,238,.05);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;color:#d7eef5}
+
+  details{margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#0a0d17;overflow:hidden}
+  details summary{cursor:pointer;list-style:none;padding:11px 16px;font-weight:700;color:var(--green);user-select:none;display:flex;align-items:center;gap:8px}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸";color:var(--green);transition:.2s}
+  details[open] summary::before{transform:rotate(90deg)}
+  details summary:hover{background:rgba(52,211,153,.06)}
+  details .body{padding:4px 18px 14px;border-top:1px solid var(--line)}
+
+  .ex{margin:10px 0;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.025);border:1px dashed var(--line)}
+  .ex b.lbl{color:var(--yellow)}
+
+  ul{padding-left:22px} li{margin:4px 0}
+  .footer{text-align:center;color:var(--muted);font-size:.82rem;padding:24px;border-top:1px solid var(--line)}
+  .kbd{font-family:monospace;background:#1a1f30;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;font-size:.8rem;color:#cdd6ec}
+
+  /* Theme toggle button */
+  .theme-toggle{position:absolute;right:16px;top:16px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:.82rem;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:6px 12px;border-radius:999px;transition:.18s ease;z-index:60;font-family:inherit}
+  .theme-toggle:hover{color:var(--ink);border-color:#39425c}
+
+  /* ── Light theme ─────────────────────────────────────────────── */
+  [data-theme="light"]{
+    --bg:#f4f5f9; --bg2:#eaedf5; --card:#ffffff; --card2:#f0f2f8;
+    --ink:#1a1e2e; --muted:#5a6480; --line:#d4d8e8;
+  }
+  [data-theme="light"] body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(79,140,255,.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(167,139,250,.05), transparent 55%),
+      var(--bg);
+  }
+  [data-theme="light"] .hero h1{background:linear-gradient(90deg,#1a1e2e,#3a6bcc 60%,#7c5cdb);-webkit-background-clip:text;background-clip:text;color:transparent}
+  [data-theme="light"] nav.tabs{background:rgba(244,245,249,.92)}
+  [data-theme="light"] .tab-btn{background:#fff;color:var(--muted)}
+  [data-theme="light"] .tab-btn:hover{color:var(--ink);border-color:#b4b8c8}
+  [data-theme="light"] .card{box-shadow:0 10px 30px rgba(0,0,0,.10)}
+  [data-theme="light"] .card h3{color:#1a1e2e}
+  [data-theme="light"] p,[data-theme="light"] li{color:var(--ink)}
+  [data-theme="light"] strong{color:#1a1e2e}
+  [data-theme="light"] .hl{background:rgba(0,0,0,.025)}
+  [data-theme="light"] .prompt{background:rgba(34,211,238,.08);color:#1a3a45}
+  [data-theme="light"] pre{background:#e8ebf5;color:#2a3560}
+  [data-theme="light"] code{background:#e0e4f0;color:#2a3560;border-color:var(--line)}
+  [data-theme="light"] pre code{background:none;border:none;color:#2a3560}
+  [data-theme="light"] th{background:#dde0ee;color:#1a1e2e}
+  [data-theme="light"] tr:nth-child(even) td{background:rgba(0,0,0,.025)}
+  [data-theme="light"] .formula{background:radial-gradient(120% 120% at 50% 0%, rgba(79,140,255,.08), transparent 70%), #eef0f8}
+  [data-theme="light"] .formula.green{background:radial-gradient(120% 120% at 50% 0%, rgba(52,211,153,.08), transparent 70%), #eef0f8}
+  [data-theme="light"] details{background:#f0f2f8}
+  [data-theme="light"] details .body{border-color:var(--line)}
+  [data-theme="light"] .ex{background:rgba(0,0,0,.03)}
+  [data-theme="light"] .kbd{background:#e0e4f0;color:#2a3560;border-color:#c4c8d8}
+  [data-theme="light"] .theme-toggle:hover{border-color:#b4b8c8}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a class="back-link" href="https://nguyenhuuca.github.io/assessment/presentations/">← Presentations</a>
+  <button class="theme-toggle" id="themeToggle" title="Toggle dark / light theme">☀️ Light</button>
+  <div class="eyebrow">GUIDE</div>
+  <h1>From Idea to Implementation — Claude Workflow</h1>
+  <div class="meta">
+    <span class="chip">📄 <b>Type:</b> Workflow Guide</span>
+    <span class="chip">🪜 <b>Steps:</b> 7</span>
+    <span class="chip">🛠️ <b>Commands:</b> /scope · /architect · /spec · /swarm-plan · /swarm-execute · /qa-engineer · /code-review</span>
+  </div>
+</header>
+
+<nav class="tabs" id="tabbar">
+  <button class="tab-btn active" data-tab="t1"><span class="ico">🗺️</span>Overview</button>
+  <button class="tab-btn" data-tab="t2"><span class="ico">📝</span>1 · Scope</button>
+  <button class="tab-btn" data-tab="t3"><span class="ico">🏗️</span>2 · Architecture</button>
+  <button class="tab-btn" data-tab="t4"><span class="ico">📐</span>3 · Spec</button>
+  <button class="tab-btn" data-tab="t5"><span class="ico">📋</span>4 · Plan</button>
+  <button class="tab-btn" data-tab="t6"><span class="ico">⚙️</span>5 · Implement</button>
+  <button class="tab-btn" data-tab="t7"><span class="ico">🧪</span>6–7 · QA &amp; Review</button>
+  <button class="tab-btn" data-tab="t8"><span class="ico">🚀</span>Full Example</button>
+  <button class="tab-btn" data-tab="t9"><span class="ico">🧭</span>Reference</button>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════ t1 — Overview -->
+<section class="panel show" id="t1">
+  <h2 class="panel-title"><span class="num">0</span> Overview</h2>
+  <p class="panel-sub">End-to-end flow for taking a rough feature idea all the way to merged, tested code using Claude commands and templates.</p>
+
+  <div class="card blue">
+    <h3>🗺️ Pipeline</h3>
+    <pre>🗺️ Planning
+  💡 Idea → /scope → 📄 PRD → /architect → 📐 ADR → 📋 Spec → /swarm-plan → 📋 Plan + Beads
+
+⚙️ Execution
+  /swarm-execute → 🧪 /qa-engineer → /code-review → ✅ Merge</pre>
+  </div>
+
+  <div class="card violet">
+    <h3>📋 Step Table</h3>
+    <table>
+      <thead><tr><th>Step</th><th>Command</th><th>Output</th><th>Template</th></tr></thead>
+      <tbody>
+        <tr><td>1. Scope</td><td><code>/scope</code></td><td><code>docs/prd/PRD-{slug}.md</code></td><td><code>templates/artifacts/prd.template.md</code></td></tr>
+        <tr><td>2. Architecture</td><td><code>/architect</code></td><td><code>docs/adr/NNNN-{slug}.md</code></td><td><code>templates/artifacts/adr.template.md</code></td></tr>
+        <tr><td>3. Spec</td><td><code>/spec</code></td><td><code>docs/specs/spec-{slug}.md</code></td><td><code>templates/artifacts/spec.template.md</code></td></tr>
+        <tr><td>4. Plan</td><td><code>/swarm-plan</code></td><td><code>docs/plans/plan-{slug}.md</code> + Beads</td><td><code>templates/artifacts/plan.template.md</code></td></tr>
+        <tr><td>5. Implement</td><td><code>/swarm-execute</code> or <code>/builder</code></td><td>Code changes</td><td>—</td></tr>
+        <tr><td>6. Test</td><td><code>/qa-engineer</code></td><td>Test files</td><td>—</td></tr>
+        <tr><td>7. Review</td><td><code>/code-review</code></td><td>Findings</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ t2 — Scope -->
+<section class="panel" id="t2">
+  <h2 class="panel-title"><span class="num">1</span> Scope the idea into a PRD</h2>
+  <p class="panel-sub">Start with any rough description. Claude will ask clarifying questions before writing.</p>
+
+  <div class="card violet">
+    <h3>💬 Command</h3>
+    <pre>/scope add a comment section to video pages</pre>
+  </div>
+
+  <div class="card blue">
+    <h3>🔄 Process — Clarifying Questions</h3>
+    <p>Claude asks questions <strong>one at a time</strong>, working through:</p>
+    <ol>
+      <li>What problem does this solve? Who has this pain?</li>
+      <li>Who are the primary users?</li>
+      <li>How will we measure success?</li>
+      <li>What is explicitly in scope for v1?</li>
+      <li>What is explicitly out of scope?</li>
+      <li>Any known technical constraints?</li>
+    </ol>
+    <p class="muted">After each answer Claude briefly acknowledges it, then asks the next question. Once all gaps are filled, Claude summarizes its understanding and confirms before writing.</p>
+  </div>
+
+  <div class="card cyan">
+    <h3>⚙️ After the conversation, Claude:</h3>
+    <ol>
+      <li>Reads relevant existing code via Grep/Glob</li>
+      <li>Writes <code>docs/prd/PRD-comment-section.md</code> using <code>templates/artifacts/prd.template.md</code></li>
+      <li>Offers to create an ADR and Plan</li>
+    </ol>
+  </div>
+
+  <div class="card green">
+    <h3>📦 Output</h3>
+    <div class="hl prod"><span class="ic">📄</span><span><code>docs/prd/PRD-{slug}.md</code></span></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ t3 — Architecture -->
+<section class="panel" id="t3">
+  <h2 class="panel-title"><span class="num">2</span> Architecture decision (ADR)</h2>
+  <p class="panel-sub">Once the PRD is approved, run <code>/architect</code> to make and record the key technical decisions.</p>
+
+  <div class="card violet">
+    <h3>💬 Command</h3>
+    <pre>/architect review docs/prd/PRD-comment-section.md and create an ADR</pre>
+  </div>
+
+  <div class="card blue">
+    <h3>🔄 Process</h3>
+    <ol>
+      <li>Reads the PRD</li>
+      <li>Identifies the key architectural decisions (data model, API design, caching strategy, etc.)</li>
+      <li>Researches the existing codebase for constraints</li>
+      <li>Writes <code>docs/adr/NNNN-comment-section.md</code> using <code>templates/artifacts/adr.template.md</code></li>
+    </ol>
+  </div>
+
+  <div class="card cyan">
+    <h3>📋 The ADR contains</h3>
+    <ul>
+      <li><strong>Considered Options</strong> — at least 2–3 alternatives with Pros/Cons tables</li>
+      <li><strong>Decision Outcome</strong> — chosen option + rationale + quantified impact</li>
+      <li><strong>Consequences</strong> — positive, negative, risks</li>
+    </ul>
+  </div>
+
+  <div class="card amber">
+    <h3>📌 Rule</h3>
+    <p>One ADR per major decision. If a feature has multiple independent decisions (e.g., data model + caching strategy), create multiple ADRs.</p>
+  </div>
+
+  <div class="card green">
+    <h3>📦 Output</h3>
+    <div class="hl prod"><span class="ic">📄</span><span><code>docs/adr/NNNN-{slug}.md</code></span></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ t4 — Spec -->
+<section class="panel" id="t4">
+  <h2 class="panel-title"><span class="num">3</span> Feature Specification (Spec)</h2>
+  <p class="panel-sub">With the ADR approved, write a Spec that translates architectural decisions into an exact, unambiguous contract for developers and QA.</p>
+
+  <div class="card violet">
+    <h3>💬 Command</h3>
+    <pre>/spec docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md</pre>
+    <p class="muted">Run <code>/spec</code> with the PRD and ADR as inputs — it reads both files, asks clarifying questions one at a time, then writes the Spec.</p>
+  </div>
+
+  <div class="card blue">
+    <h3>📋 What goes in a Spec</h3>
+    <table>
+      <thead><tr><th>Section</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Business Rules</strong></td><td>Numbered, precise rules. Each rule is independently testable.</td></tr>
+        <tr><td><strong>Functional Requirements</strong></td><td>What the system must do (FR-1, FR-2…). Use "must", "must not".</td></tr>
+        <tr><td><strong>API Changes</strong></td><td>Exact endpoint, request body, response body, all error codes and conditions.</td></tr>
+        <tr><td><strong>Database Changes</strong></td><td>Final SQL schema — tables, columns, indexes, constraints.</td></tr>
+        <tr><td><strong>Security Requirements</strong></td><td>Which endpoints require JWT. Role checks. Fields to mask in logs.</td></tr>
+        <tr><td><strong>Edge Cases</strong></td><td>EC-1, EC-2… — every non-obvious scenario with exact expected behavior.</td></tr>
+        <tr><td><strong>Acceptance Criteria</strong></td><td>Testable checklist. QA uses this directly.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <details>
+    <summary>🔎 Example Spec excerpt</summary>
+    <div class="body">
+<pre>## Business Rules
+
+### Rule 1
+A user may post at most 10 comments per video per day.
+
+### Rule 2
+Deleted comments are soft-deleted — content replaced with "[deleted]", replies remain.
+
+## Edge Cases
+
+### EC-1: User posts 10th comment
+Expected: Success (201)
+
+### EC-2: User posts 11th comment same day
+Expected: Reject — HTTP 429, code: COMMENT_LIMIT_EXCEEDED
+
+### EC-3: Two requests from same user arrive simultaneously
+Expected: At most one succeeds; limit remains enforced</pre>
+    </div>
+  </details>
+
+  <div class="card amber">
+    <h3>⚖️ When to skip Spec</h3>
+    <table>
+      <thead><tr><th>Scenario</th><th>Skip?</th></tr></thead>
+      <tbody>
+        <tr><td>Bug fix</td><td>✅ Skip — go straight to Plan</td></tr>
+        <tr><td>Feature &lt; 1 day</td><td>✅ Skip</td></tr>
+        <tr><td>Feature with backend + frontend in parallel</td><td>❌ Required — Spec is the shared contract</td></tr>
+        <tr><td>Feature &gt; 3 days</td><td>❌ Required</td></tr>
+        <tr><td>Any ambiguous business rules</td><td>❌ Required</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card green">
+    <h3>📦 Output</h3>
+    <div class="hl prod"><span class="ic">📄</span><span><code>docs/specs/spec-{slug}.md</code></span></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ t5 — Plan -->
+<section class="panel" id="t5">
+  <h2 class="panel-title"><span class="num">4</span> Implementation plan</h2>
+  <p class="panel-sub">With Spec (or PRD + ADR) ready, use <code>/swarm-plan</code> to decompose the feature into a phased plan and Beads.</p>
+
+  <div class="card violet">
+    <h3>💬 Command variants</h3>
+    <pre># With Spec (recommended — most detailed input)
+/swarm-plan docs/specs/spec-comment-section.md
+
+# With Spec + PRD + ADR (maximum context)
+/swarm-plan docs/specs/spec-comment-section.md docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md
+
+# Without Spec (PRD + ADR only)
+/swarm-plan docs/prd/PRD-comment-section.md docs/adr/NNNN-comment-section.md</pre>
+  </div>
+
+  <div class="card yellow">
+    <h3>💡 Tip</h3>
+    <p>The Spec is the richest input — it already contains FR-1/FR-2, API contract, edge cases, and acceptance criteria. <code>/swarm-plan</code> can derive tasks directly from it without needing PRD or ADR.</p>
+  </div>
+
+  <div class="card blue">
+    <h3>⚖️ /architect vs /swarm-plan</h3>
+    <table>
+      <thead><tr><th></th><th><code>/architect</code></th><th><code>/swarm-plan</code></th></tr></thead>
+      <tbody>
+        <tr><td><strong>Primary output</strong></td><td>ADR (decision record)</td><td>Plan + Beads (task breakdown)</td></tr>
+        <tr><td><strong>Asks questions</strong></td><td>No — explores codebase</td><td>No — reads input artifacts</td></tr>
+        <tr><td><strong>Creates ADR</strong></td><td>Always</td><td>Only for One-Way Door (High) decisions found during planning</td></tr>
+        <tr><td><strong>Creates Beads</strong></td><td>No</td><td>Yes — ready for <code>/swarm-execute</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card cyan">
+    <h3>⚙️ /swarm-plan will:</h3>
+    <ol>
+      <li>Launch 3–6 <code>worker-explorer</code> agents in parallel to research existing patterns</li>
+      <li>Classify decision reversibility (Two-Way Door vs One-Way Door)</li>
+      <li>Write <code>docs/plans/plan-{slug}.md</code> using <code>templates/artifacts/plan.template.md</code></li>
+      <li>Output Beads commands for all implementation tasks with dependencies</li>
+    </ol>
+    <h4>The plan contains:</h4>
+    <ul>
+      <li>Phased steps with exact file paths and acceptance criteria</li>
+      <li>Testing strategy (unit + integration + manual)</li>
+      <li>Rollback plan</li>
+      <li>Dependency graph showing task order</li>
+      <li>Before/During/After PR checklist</li>
+    </ul>
+  </div>
+
+  <div class="card green">
+    <h3>📦 Output</h3>
+    <div class="hl prod"><span class="ic">📄</span><span><code>docs/plans/plan-{slug}.md</code> + Beads</span></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ t6 — Implement -->
+<section class="panel" id="t6">
+  <h2 class="panel-title"><span class="num">5</span> Implement</h2>
+  <p class="panel-sub">Choose between a single builder (small/medium) or a swarm (large/parallel) based on plan complexity.</p>
+
+  <div class="card blue">
+    <h3>🔨 Option A — Single builder <span class="tag">small / medium tasks</span></h3>
+    <pre>/builder implement docs/plans/plan-comment-section.md</pre>
+    <h4>The builder:</h4>
+    <ol>
+      <li>Reads the plan, PRD, and ADR</li>
+      <li>Reads existing code patterns via Grep/Glob before writing</li>
+      <li>Implements phase by phase</li>
+      <li>Writes tests alongside code (TDD)</li>
+      <li>Runs <code>mvn verify</code> or <code>npm run test</code> to confirm passing</li>
+    </ol>
+  </div>
+
+  <div class="card violet">
+    <h3>🐝 Option B — Swarm <span class="tag">large / parallel tasks</span></h3>
+    <pre>/swarm-execute implement docs/plans/plan-comment-section.md</pre>
+    <h4>The swarm:</h4>
+    <ol>
+      <li>Decomposes the plan into parallel tracks (e.g., backend + frontend + tests)</li>
+      <li>Spawns multiple <code>worker-builder</code> agents simultaneously</li>
+      <li>Each worker handles one track</li>
+      <li>Orchestrator integrates and resolves conflicts</li>
+    </ol>
+  </div>
+
+  <div class="card amber">
+    <h3>📌 When to use Swarm</h3>
+    <p>Use swarm when the plan has <strong>3+ independent phases</strong> that can run in parallel.</p>
+  </div>
+
+  <div class="card green">
+    <h3>📦 Output</h3>
+    <div class="hl prod"><span class="ic">🌿</span><span>Code commits on a feature branch</span></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ t7 — QA & Review -->
+<section class="panel" id="t7">
+  <h2 class="panel-title"><span class="num">6–7</span> Test &amp; Review</h2>
+  <p class="panel-sub">Validate correctness with QA then catch issues with code review before opening a PR.</p>
+
+  <div class="card cyan">
+    <h3>🧪 Step 6 — Test</h3>
+    <pre>/qa-engineer test the comment section feature</pre>
+    <h4>QA engineer:</h4>
+    <ol>
+      <li>Reviews the implementation against PRD acceptance criteria</li>
+      <li>Writes missing unit tests</li>
+      <li>Writes integration tests for the happy path and edge cases</li>
+      <li>Checks test isolation (no shared state, no order-dependent tests)</li>
+    </ol>
+    <h4>Run tests manually to confirm:</h4>
+    <pre>cd api && mvn verify          # backend
+cd webapp && npm run test     # frontend</pre>
+    <div class="hl prod"><span class="ic">📦</span><span>Test files, coverage report</span></div>
+  </div>
+
+  <div class="card blue">
+    <h3>🔍 Step 7 — Review</h3>
+    <pre>/code-review</pre>
+    <p class="muted">Or for a deeper multi-perspective review:</p>
+    <pre>/swarm-review</pre>
+    <h4>The reviewer checks:</h4>
+    <ul>
+      <li><strong>Correctness</strong> — logic errors, edge cases missed</li>
+      <li><strong>Security</strong> — OWASP Top 10, input validation, auth/authz</li>
+      <li><strong>Performance</strong> — N+1 queries, blocking I/O, missing indexes</li>
+      <li><strong>Code quality</strong> — SOLID, DRY, naming, test coverage</li>
+    </ul>
+    <p>Fix findings, then commit and open a PR.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ t8 — Full Example -->
+<section class="panel" id="t8">
+  <h2 class="panel-title"><span class="num">★</span> Full example — end to end</h2>
+  <p class="panel-sub">Real-time view count feature: complete walkthrough of all 7 steps.</p>
+
+  <div class="card violet">
+    <h3>🚀 Complete bash runbook</h3>
+    <pre># 1. Scope
+/scope add real-time view count to video cards
+
+# Claude asks questions one at a time → you answer → PRD created
+# → docs/prd/PRD-realtime-view-count.md
+
+# 2. Architecture
+/architect docs/prd/PRD-realtime-view-count.md
+
+# Uses Sequential Thinking for trade-off analysis
+# → docs/adr/0013-realtime-view-count.md
+
+# 3. Spec
+/spec docs/prd/PRD-realtime-view-count.md docs/adr/0013-realtime-view-count.md
+
+# → docs/specs/spec-realtime-view-count.md
+
+# 4. Plan
+/swarm-plan docs/prd/PRD-realtime-view-count.md docs/adr/0013-realtime-view-count.md
+
+# Launches parallel explorer agents → researches codebase
+# → docs/plans/plan-realtime-view-count.md + Beads
+
+# 4. Implement
+git checkout -b feat/realtime-view-count
+/swarm-execute docs/plans/plan-realtime-view-count.md
+
+# 5. Test
+/qa-engineer test view count feature
+cd api && mvn verify
+cd webapp && npm run test
+
+# 6. Review
+/code-review
+
+# 7. Commit and push
+git add .
+git commit -m "feat: add real-time view count to video cards"
+git push</pre>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ t9 — Reference -->
+<section class="panel" id="t9">
+  <h2 class="panel-title"><span class="num">Ref</span> Reference</h2>
+  <p class="panel-sub">When to skip steps and where artifacts live.</p>
+
+  <div class="card amber">
+    <h3>⏭️ When to skip steps</h3>
+    <table>
+      <thead><tr><th>Scenario</th><th>Skip</th></tr></thead>
+      <tbody>
+        <tr><td>Bug fix &lt; 1 day</td><td>Skip PRD, ADR, Plan — go straight to <code>/builder</code></td></tr>
+        <tr><td>Config / dependency update</td><td>Skip PRD, ADR — create Plan only if non-trivial</td></tr>
+        <tr><td>Small refactor</td><td>Skip PRD, ADR — use <code>/simplify</code> directly</td></tr>
+        <tr><td>New feature &gt; 3 days</td><td>Run all steps</td></tr>
+        <tr><td>Breaking architectural change</td><td>Run all steps, extra emphasis on ADR</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card green">
+    <h3>📁 Artifacts location reference</h3>
+    <pre>docs/
+├── prd/          → PRD-{feature}.md
+├── adr/          → NNNN-{decision}.md
+├── specs/        → spec-{feature}.md
+└── plans/        → plan-{feature}.md
+
+templates/artifacts/
+├── prd.template.md
+├── adr.template.md
+├── spec.template.md
+└── plan.template.md</pre>
+  </div>
+
+  <div class="card blue">
+    <h3>🔗 Related</h3>
+    <ul>
+      <li><a href="claude-guide-en.md" style="color:var(--blue)">Claude Guide (English)</a></li>
+      <li><a href="claude-guide-vi.md" style="color:var(--blue)">Claude Guide (Vietnamese)</a></li>
+      <li><a href="README.md#-design-decisions" style="color:var(--blue)">ADR Index</a></li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  Navigate: click a <strong>tab</strong> above · keys <span class="kbd">←</span> / <span class="kbd">→</span> change section ·
+  click <span class="kbd">🔎 Details</span> to expand · <span class="kbd">☀️ / 🌙</span> toggle theme.
+</div>
+
+<script>
+  const btns   = Array.from(document.querySelectorAll('.tab-btn'));
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  let idx = 0;
+  function activate(i){
+    idx = (i + panels.length) % panels.length;
+    btns.forEach((b,k)=>b.classList.toggle('active', k===idx));
+    panels.forEach((p,k)=>p.classList.toggle('show', k===idx));
+    btns[idx].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+    window.scrollTo({top:0, behavior:'smooth'});
+    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([panels[idx]]);
+  }
+  btns.forEach((b,i)=>b.addEventListener('click', ()=>activate(i)));
+  document.addEventListener('keydown', e=>{
+    if (e.target.tagName === 'SUMMARY') return;
+    if (e.key === 'ArrowRight') activate(idx+1);
+    if (e.key === 'ArrowLeft')  activate(idx-1);
+  });
+
+  // Theme toggle
+  const root   = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  function applyTheme(t){
+    root.setAttribute('data-theme', t);
+    toggle.textContent = t === 'dark' ? '☀️ Light' : '🌙 Dark';
+    try { localStorage.setItem('pres-theme', t); } catch(e){}
+  }
+  applyTheme((()=>{ try{ return localStorage.getItem('pres-theme') || 'dark'; }catch(e){ return 'dark'; } })());
+  toggle.addEventListener('click', ()=>applyTheme(root.getAttribute('data-theme')==='dark' ? 'light' : 'dark'));
+</script>
+</body>
+</html>

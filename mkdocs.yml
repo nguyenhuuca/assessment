@@ -114,6 +114,8 @@ nav:
           - Hot Video Priority: prd/PRD-hot-video-priority.html
       - Specs:
           - Watch History: specs/spec-watch-history.html
+      - Guides:
+          - Scope to Implement Flow: guides/flow-scope-to-implement.html
       # - ADRs:
       #     - <title>: adr/<name>.html
       # - Plans:
