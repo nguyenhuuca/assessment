@@ -38,16 +38,16 @@ Every feature follows a structured flow powered by Claude:
 /scope → PRD → /architect → ADR → /swarm-plan → Plan → /swarm-execute → /qa-engineer → /code-review → merge
 ```
 
-See the full guide: [From Scope to Implementation](flow-scope-to-implement.md) · [Tiếng Việt](flow-scope-to-implement-vi.md)
+See the full guide: [From Scope to Implementation](guides/flow-scope-to-implement.md) · [Tiếng Việt](guides/flow-scope-to-implement-vi.md)
 
 ---
 
 ## Architecture Documents
 
-- [System Architecture Overview](Video%20Streaming%20System%20Architecture.md)
-- [Sequence Diagram](Sequence-Diagram.md)
-- [Performance Review](performance-review.md)
-- [CI/CD Pipeline](diagrams/ci-pipeline.md)
+- [System Architecture Overview](architecture/overview.md)
+- [Sequence Diagram](architecture/sequence-diagrams.md)
+- [Performance Review](architecture/performance-review.md)
+- [CI/CD Pipeline](architecture/diagrams/ci-pipeline.md)
 
 ---
 
@@ -67,3 +67,7 @@ See the full guide: [From Scope to Implementation](flow-scope-to-implement.md) �
 | [ADR-0010](adr/0010-trivy-container-scanning.md) | Add Trivy Dependency & Filesystem Scanning to CI | Accepted |
 | [ADR-0011](adr/0011-hot-video-priority.md) | Hot Video Priority Scoring | Accepted |
 | [ADR-0012](adr/0012-bookmark-feature-design.md) | Bookmark Feature — Storage and API Design | Proposed |
+| [ADR-0013](adr/0013-watch-history-design.md) | Watch History — Recording, Cap, and Re-watch Design | Proposed |
+| [ADR-0014](adr/0014-watch-history-design-opus.md) | Watch History — Recording, Storage, and Ownership Design | Proposed |
+| [ADR-0015](adr/0015-bitwise-permission-system.md) | Bitwise Permission System — Fine-Grained Method Authorization | Accepted |
+| [ADR-0016](adr/0016-user-settings-design.md) | User Settings — Storage, API Shape, and Account Deletion | Proposed |
