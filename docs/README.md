@@ -67,7 +67,6 @@ See the full guide: [From Scope to Implementation](guides/flow-scope-to-implemen
 | [ADR-0010](adr/0010-trivy-container-scanning.md) | Add Trivy Dependency & Filesystem Scanning to CI | Accepted |
 | [ADR-0011](adr/0011-hot-video-priority.md) | Hot Video Priority Scoring | Accepted |
 | [ADR-0012](adr/0012-bookmark-feature-design.md) | Bookmark Feature — Storage and API Design | Proposed |
-| [ADR-0013](adr/0013-watch-history-design.md) | Watch History — Recording, Cap, and Re-watch Design | Proposed |
 | [ADR-0014](adr/0014-watch-history-design-opus.md) | Watch History — Recording, Storage, and Ownership Design | Proposed |
 | [ADR-0015](adr/0015-bitwise-permission-system.md) | Bitwise Permission System — Fine-Grained Method Authorization | Accepted |
 | [ADR-0016](adr/0016-user-settings-design.md) | User Settings — Storage, API Shape, and Account Deletion | Proposed |
