@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -7346,7 +7346,7 @@
 <h2 id="core-commands">Core Commands<a class="headerlink" href="#core-commands" title="Permanent link">&para;</a></h2>
 <h3 id="issue-management">Issue Management<a class="headerlink" href="#issue-management" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Create a new issue</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>bd<span class="w"> </span>create<span class="w"> </span><span class="s2">&quot;Title&quot;</span><span class="w"> </span>-t<span class="w"> </span>feature<span class="w"> </span>-p<span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>bd<span class="w"> </span>create<span class="w"> </span><span class="s2">"Title"</span><span class="w"> </span>-t<span class="w"> </span>feature<span class="w"> </span>-p<span class="w"> </span><span class="m">2</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># List open issues</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>bd<span class="w"> </span>list<span class="w"> </span>--status<span class="w"> </span>open
@@ -7359,7 +7359,7 @@
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>bd<span class="w"> </span>update<span class="w"> </span>&lt;id&gt;<span class="w"> </span>--assignee<span class="w"> </span>claude
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1"># Close issue</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>bd<span class="w"> </span>close<span class="w"> </span>&lt;id&gt;<span class="w"> </span>--reason<span class="w"> </span><span class="s2">&quot;Completed: description&quot;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>bd<span class="w"> </span>close<span class="w"> </span>&lt;id&gt;<span class="w"> </span>--reason<span class="w"> </span><span class="s2">"Completed: description"</span>
 </code></pre></div>
 <h3 id="finding-work">Finding Work<a class="headerlink" href="#finding-work" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Get unblocked issues (no dependencies blocking)</span>
@@ -7432,15 +7432,15 @@
 <li><strong>Check next</strong>: <code>bd ready</code></li>
 </ol>
 <h3 id="multi-agent-coordination">Multi-Agent Coordination<a class="headerlink" href="#multi-agent-coordination" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># See who&#39;s working on what</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>bd<span class="w"> </span>list<span class="w"> </span>--status<span class="w"> </span>in_progress<span class="w"> </span>--json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.[] | {id, title, assignee}&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># See who's working on what</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>bd<span class="w"> </span>list<span class="w"> </span>--status<span class="w"> </span>in_progress<span class="w"> </span>--json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | {id, title, assignee}'</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Avoid conflicts - check before claiming</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>bd<span class="w"> </span>show<span class="w"> </span>&lt;id&gt;<span class="w">  </span><span class="c1"># Check assignee field</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Hand off work</span>
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>bd<span class="w"> </span>update<span class="w"> </span>&lt;id&gt;<span class="w"> </span>--assignee<span class="w"> </span>other-agent
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>bd<span class="w"> </span>comment<span class="w"> </span>&lt;id&gt;<span class="w"> </span><span class="s2">&quot;Handoff: context and next steps&quot;</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>bd<span class="w"> </span>comment<span class="w"> </span>&lt;id&gt;<span class="w"> </span><span class="s2">"Handoff: context and next steps"</span>
 </code></pre></div>
 <h2 id="issue-types">Issue Types<a class="headerlink" href="#issue-types" title="Permanent link">&para;</a></h2>
 <table>
@@ -7601,7 +7601,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "search.highlight", "search.suggest", "content.code.copy", "content.action.edit"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       

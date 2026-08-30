@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -7070,14 +7070,14 @@ Ask ONLY for what is genuinely unclear or not stated in the inputs.</p>
 <p><strong>Example — asking Q1 for a bookmark feature:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>AskUserQuestion({
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  questions: [{
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    question: &quot;What are the core business rules for bookmarks?&quot;,
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    header: &quot;Business Rules&quot;,
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    question: "What are the core business rules for bookmarks?",
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    header: "Business Rules",
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    multiSelect: true,
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    options: [
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>      { label: &quot;Max 500 bookmarks per user (Recommended)&quot;, description: &quot;Cap enforced at API layer — 409 if exceeded&quot; },
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>      { label: &quot;A video can only be bookmarked once per user&quot;, description: &quot;Idempotent add — no duplicates&quot; },
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>      { label: &quot;Bookmarks survive video deletion&quot;, description: &quot;video_id becomes null, bookmark entry persists&quot; },
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>      { label: &quot;Max 50 collections per user&quot;, description: &quot;Cap on named folders to prevent abuse&quot; }
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>      { label: "Max 500 bookmarks per user (Recommended)", description: "Cap enforced at API layer — 409 if exceeded" },
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>      { label: "A video can only be bookmarked once per user", description: "Idempotent add — no duplicates" },
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>      { label: "Bookmarks survive video deletion", description: "video_id becomes null, bookmark entry persists" },
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>      { label: "Max 50 collections per user", description: "Cap on named folders to prevent abuse" }
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    ]
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>  }]
 <a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>})
@@ -7085,14 +7085,14 @@ Ask ONLY for what is genuinely unclear or not stated in the inputs.</p>
 <p><strong>Example — asking Q4 for edge cases:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>AskUserQuestion({
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  questions: [{
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    question: &quot;Which edge cases must be explicitly handled?&quot;,
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    header: &quot;Edge Cases&quot;,
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    question: "Which edge cases must be explicitly handled?",
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    header: "Edge Cases",
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    multiSelect: true,
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    options: [
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>      { label: &quot;Bookmark exactly at the cap (Recommended)&quot;, description: &quot;500th bookmark → success; 501st → 409&quot; },
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>      { label: &quot;Concurrent bookmark requests from same user&quot;, description: &quot;Two simultaneous POSTs for same video → at most one created&quot; },
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>      { label: &quot;Bookmark a deleted video&quot;, description: &quot;video_id becomes null → UI shows placeholder&quot; },
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>      { label: &quot;Delete collection with items&quot;, description: &quot;Bookmarks remain in &#39;All Bookmarks&#39;; only collection link removed&quot; }
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>      { label: "Bookmark exactly at the cap (Recommended)", description: "500th bookmark → success; 501st → 409" },
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>      { label: "Concurrent bookmark requests from same user", description: "Two simultaneous POSTs for same video → at most one created" },
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>      { label: "Bookmark a deleted video", description: "video_id becomes null → UI shows placeholder" },
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>      { label: "Delete collection with items", description: "Bookmarks remain in 'All Bookmarks'; only collection link removed" }
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    ]
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>  }]
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>})
@@ -7207,7 +7207,7 @@ Ask ONLY for what is genuinely unclear or not stated in the inputs.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "search.highlight", "search.suggest", "content.code.copy", "content.action.edit"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
