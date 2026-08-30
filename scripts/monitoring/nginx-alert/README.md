@@ -120,13 +120,16 @@ Separate from the crash alert above: `nginx-traffic-alert.timer` runs every
 minute, diffs `access.log` growth since the last run, and alerts on Telegram
 when either:
 
-- **total requests** in the last minute exceed `THRESHOLD_TOTAL`, or
+- **total requests** in the last minute exceed `THRESHOLD_TOTAL` (message
+  includes the busiest IP for context), or
 - **a single IP** accounts for more than `THRESHOLD_IP` requests in the
-  last minute.
+  last minute (message includes that IP's top 3 called endpoints, so you
+  can tell a login brute-force apart from generic scraping).
 
 Each alert type has its own cooldown (`ALERT_COOLDOWN_SEC`, default 10 min)
 so a sustained spike pings once, not every minute. Assumes the default
-nginx combined/common log format (client IP is the first field).
+nginx combined/common log format (client IP is the first field, request
+line is the `"$request"` quoted field).
 
 ### Install
 

@@ -75,8 +75,16 @@ Top IP: ${TOP_IP:-n/a} (${TOP_IP_COUNT:-0} reqs)"
 fi
 
 if [[ -n "${TOP_IP:-}" ]] && (( TOP_IP_COUNT > THRESHOLD_IP )) && cooldown_ok "$LAST_IP_ALERT"; then
+  # Extract the "$request" field (e.g. "GET /api/v1/videos HTTP/1.1") for this
+  # IP's lines, then rank endpoints hit most often by this IP.
+  TOP_PATHS="$(awk -v ip="$TOP_IP" '$1==ip' <<< "$NEW_LINES" \
+    | awk -F'"' '{print $2}' | awk '{print $2}' \
+    | sort | uniq -c | sort -rn | head -3)"
+
   send_telegram_message "⚠️ Abnormal request volume from single IP on $(hostname)
 IP: ${TOP_IP}
-Requests in last interval: ${TOP_IP_COUNT} (threshold ${THRESHOLD_IP})"
+Requests in last interval: ${TOP_IP_COUNT} (threshold ${THRESHOLD_IP})
+Top endpoints:
+${TOP_PATHS:-n/a}"
   echo "$NOW" > "$LAST_IP_ALERT"
 fi
