@@ -10,6 +10,36 @@ Notifications go through a provider abstraction (`lib-notify.sh` +
 service directly — see "Switching notification provider" below. Telegram
 is the only provider implemented today.
 
+## Quick deploy: run-all.sh
+
+Sections 2-6 below can be done manually, but `run-all.sh` automates all of
+it over SSH from your local machine in one shot — deploy + verify,
+idempotent (safe to re-run; never overwrites existing credential files).
+
+```bash
+cd scripts/monitoring/nginx-alert
+cp server.config.example server.config   # git-ignored, fill in your server
+./run-all.sh
+```
+
+`server.config`:
+```bash
+SSH_HOST=203.0.113.10
+SSH_USER=root
+SSH_PORT=22
+# Windows-style D:\... paths are auto-converted to Git-Bash form, but MUST
+# be single-quoted here or bash eats the backslashes while sourcing this file.
+SSH_KEY_PATH='/path/to/your/private_key'
+```
+
+First run creates `/etc/nginx-alert/telegram.env` on the server with
+`REPLACE_ME` placeholders (it will warn you to fill it in and re-run) —
+after that, it prints a pass/fail checklist and, once real credentials are
+in place, fires a real end-to-end delivery test. The step-by-step sections
+below are what `run-all.sh` does under the hood — read them if you want to
+understand or debug a specific piece, or to add fail2ban (section 6) if
+you skipped it initially since `run-all.sh` deploys everything together.
+
 ## Repo → server file map
 
 Every path below is created by the `sudo cp`/`sudo tee` commands in the

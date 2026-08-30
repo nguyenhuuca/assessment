@@ -43,3 +43,5 @@ deploy-funny-app.sh
 
 **googlekey.json
 .mcp.json
+
+scripts/monitoring/nginx-alert/server.config

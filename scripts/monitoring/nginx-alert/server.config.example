@@ -1,0 +1,9 @@
+# Copy to server.config (git-ignored, kept out of the repo) and fill in
+# your real values, then run: ./run-all.sh
+SSH_HOST=203.0.113.10
+SSH_USER=root
+SSH_PORT=22
+# Windows-style paths (D:\path\to\key) are auto-converted to Git-Bash form,
+# but MUST be single-quoted here — unquoted backslashes get eaten by bash
+# when this file is sourced, before the conversion ever runs.
+SSH_KEY_PATH='/path/to/your/private_key'
