@@ -1,0 +1,22 @@
+# Install at /etc/fail2ban/jail.d/nginx-custom.conf
+[nginx-exploit-probe]
+enabled  = true
+port     = http,https
+filter   = nginx-exploit-probe
+logpath  = /var/log/nginx/access.log
+maxretry = 2
+findtime = 10m
+bantime  = 7d
+action   = %(action_)s
+           telegram
+
+[nginx-req-limit]
+enabled  = true
+port     = http,https
+filter   = nginx-req-limit
+logpath  = /var/log/nginx/access.log
+maxretry = 1000
+findtime = 1m
+bantime  = 1h
+action   = %(action_)s
+           telegram

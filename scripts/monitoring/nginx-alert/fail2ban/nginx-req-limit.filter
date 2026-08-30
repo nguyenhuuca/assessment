@@ -1,0 +1,7 @@
+# Install at /etc/fail2ban/filter.d/nginx-req-limit.conf
+#
+# Matches any well-formed nginx request; the jail's maxretry/findtime does
+# the actual rate limiting (volumetric abuse regardless of path).
+[Definition]
+failregex = ^<HOST> - \S+ \[.*?\] "\S+ \S+ HTTP/\d\.\d"
+ignoreregex =

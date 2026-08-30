@@ -185,7 +185,74 @@ sudo sed -i 's/THRESHOLD_TOTAL=.*/THRESHOLD_TOTAL=600/' /etc/nginx-alert/traffic
 - `THRESHOLD_IP` will false-positive on shared-NAT clients (corporate
   networks, mobile carriers) or legitimate crawlers/monitoring bots —
   consider an allowlist if that becomes noisy.
-- This only *alerts*; it does not block anything. If you want the single-IP
-  case to also auto-block, pair it with `fail2ban` reading the same
-  `access.log`, or add an `nginx limit_req_zone` rate limit — ask if you
-  want that wired up too.
+- This only *alerts*; it does not block anything. See section 6 below for
+  the fail2ban setup that actually auto-bans offending IPs.
+
+## 6. Auto-block with fail2ban (optional)
+
+Two fail2ban jails that firewall-block (not just alert on) abusive IPs,
+using the existing Telegram bot for ban/unban notifications. Assumes
+fail2ban is already installed (`fail2ban-client --version`).
+
+- **`nginx-exploit-probe`**: bans on the 2nd request (within 10 min) for a
+  path that only exists in vulnerability-scanner probes (`.env`, `.git`,
+  `.sql`, `.php`, `wp-*`, `phpmyadmin`, `adminer`). Since this app is
+  Java/Spring Boot and serves none of these, false positives are
+  essentially impossible — bantime 7 days.
+- **`nginx-req-limit`**: bans any IP exceeding `maxretry` requests/minute
+  regardless of path — catches volumetric abuse the path-based jail
+  misses. Default `maxretry=1000` (tune in `jail.d/nginx-custom.conf`);
+  keep this generous — the app serves video over Range requests, which
+  can burst many requests per real user in a short window. bantime 1h
+  (shorter than the exploit jail, since this one carries more
+  false-positive risk).
+
+Both jails run an extra `telegram` action (ban/unban) alongside fail2ban's
+normal iptables action — see `fail2ban-telegram-notify.sh` /
+`telegram.action`.
+
+### Install
+
+```bash
+# 1. Filters
+sudo cp fail2ban/nginx-exploit-probe.filter /etc/fail2ban/filter.d/nginx-exploit-probe.conf
+sudo cp fail2ban/nginx-req-limit.filter /etc/fail2ban/filter.d/nginx-req-limit.conf
+
+# 2. Telegram notify action + its helper script (reuses lib-telegram.sh from step 1)
+sudo cp fail2ban/fail2ban-telegram-notify.sh /usr/local/bin/fail2ban-telegram-notify.sh
+sudo chmod 755 /usr/local/bin/fail2ban-telegram-notify.sh
+sudo cp fail2ban/telegram.action /etc/fail2ban/action.d/telegram.conf
+
+# 3. Jail definitions
+sudo cp fail2ban/nginx-custom.jail /etc/fail2ban/jail.d/nginx-custom.conf
+
+# 4. Validate + reload
+sudo fail2ban-client -t
+sudo systemctl reload fail2ban
+```
+
+### Verify
+
+```bash
+sudo fail2ban-client status
+# → nginx-exploit-probe, nginx-req-limit, (sshd, ...)
+
+sudo fail2ban-client status nginx-exploit-probe
+sudo fail2ban-client status nginx-req-limit
+# → Currently failed / Currently banned counts
+
+# Dry-run a filter's regex against the real log without waiting for a live hit
+sudo fail2ban-regex /var/log/nginx/access.log /etc/fail2ban/filter.d/nginx-exploit-probe.conf
+```
+
+fail2ban does **not** retroactively scan the existing log on startup — it
+only watches for new lines going forward. If you already identified
+malicious IPs (e.g. from the traffic-spike alerts above), ban them
+immediately instead of waiting for them to re-offend:
+
+```bash
+sudo fail2ban-client set nginx-exploit-probe banip <ip>
+sudo fail2ban-client status nginx-exploit-probe   # confirm it's listed
+sudo iptables -L f2b-nginx-exploit-probe -n        # confirm the real firewall rule
+# to undo: sudo fail2ban-client set nginx-exploit-probe unbanip <ip>
+```
