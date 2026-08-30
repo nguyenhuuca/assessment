@@ -10,6 +10,49 @@ Notifications go through a provider abstraction (`lib-notify.sh` +
 service directly — see "Switching notification provider" below. Telegram
 is the only provider implemented today.
 
+## Repo → server file map
+
+Every path below is created by the `sudo cp`/`sudo tee` commands in the
+install steps further down — nothing deploys itself. Use this as a
+checklist of what should exist on the box once everything is installed.
+
+```
+/usr/local/bin/
+├── lib-notify.sh                 ← lib-notify.sh
+├── nginx-alert-notify.sh         ← nginx-alert-notify.sh
+├── nginx-traffic-alert.sh        ← nginx-traffic-alert.sh
+├── fail2ban-notify.sh            ← fail2ban/fail2ban-notify.sh
+└── providers/
+    └── telegram.sh               ← providers/telegram.sh
+    (slack.sh, etc. — see providers/slack.sh.example)
+
+/etc/nginx-alert/                 (created by install steps, not in repo)
+├── notify.env                    → ALERT_PROVIDER=telegram
+├── telegram.env                  → TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID (secret, 600)
+└── traffic.env                   → ACCESS_LOG / THRESHOLD_* / ALERT_COOLDOWN_SEC
+
+/var/lib/nginx-alert/             (runtime state, auto-created by the scripts)
+├── access.offset
+├── last-total-alert
+└── last-ip-alert
+
+/etc/systemd/system/
+├── nginx-alert.service           ← nginx-alert.service
+├── nginx-traffic-alert.service   ← nginx-traffic-alert.service
+├── nginx-traffic-alert.timer     ← nginx-traffic-alert.timer
+└── nginx.service.d/
+    └── override.conf             ← nginx-override.conf
+
+/etc/fail2ban/
+├── filter.d/
+│   ├── nginx-exploit-probe.conf  ← fail2ban/nginx-exploit-probe.filter
+│   └── nginx-req-limit.conf      ← fail2ban/nginx-req-limit.filter
+├── action.d/
+│   └── notify.conf               ← fail2ban/notify.action
+└── jail.d/
+    └── nginx-custom.conf         ← fail2ban/nginx-custom.jail
+```
+
 ## How it behaves
 
 - `Restart=always` (in `nginx-override.conf`) lets nginx self-heal from a
