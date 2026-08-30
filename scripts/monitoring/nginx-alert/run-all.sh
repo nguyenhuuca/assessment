@@ -95,7 +95,14 @@ echo "--- 6. Reload systemd + fail2ban, enable timer ---"
 remote 'systemctl daemon-reload'
 remote 'systemctl enable --now nginx-traffic-alert.timer'
 remote 'fail2ban-client -t'
-remote 'systemctl reload fail2ban'
+# `restart`, not `reload`: fail2ban does not reliably re-read a jail's
+# *action list* (e.g. adding/removing the notify action) on reload for
+# already-running jails — only a full restart guarantees it. Bans persist
+# across the restart via fail2ban's sqlite ban database (dbfile), though
+# IPs banned purely via manual `fail2ban-client ... banip` (no matching
+# filter ticket) can be dropped on restart — re-ban those manually after
+# if you relied on any.
+remote 'systemctl restart fail2ban'
 
 echo ""
 echo "==> Verifying"
@@ -115,6 +122,12 @@ check "nginx.service override applied"    'systemctl show nginx.service -p Resta
 check "fail2ban config valid"             'fail2ban-client -t >/dev/null'
 check "nginx-exploit-probe jail active"   'fail2ban-client status nginx-exploit-probe >/dev/null'
 check "nginx-req-limit jail active"       'fail2ban-client status nginx-req-limit >/dev/null'
+# Catches the reload-vs-restart pitfall directly: if a previous run only
+# reloaded fail2ban after changing the action list, the notify action can
+# silently be missing from the running jail even though jail.d/*.conf on
+# disk is correct.
+check "nginx-exploit-probe has notify action" 'fail2ban-client get nginx-exploit-probe actions | grep -q notify'
+check "nginx-req-limit has notify action"     'fail2ban-client get nginx-req-limit actions | grep -q notify'
 check "nginx itself is healthy"           'systemctl is-active --quiet nginx'
 
 if remote 'grep -q REPLACE_ME /etc/nginx-alert/telegram.env 2>/dev/null'; then
@@ -123,6 +136,9 @@ else
   echo "--- live delivery test (telegram.env looks configured) ---"
   check "crash-alert delivers"  'systemctl start nginx-alert.service && systemctl show nginx-alert.service -p Result | grep -q Result=success'
   check "traffic-alert runs ok" 'systemctl start nginx-traffic-alert.service && systemctl show nginx-traffic-alert.service -p Result | grep -q Result=success'
+  # Fake IP with zero access-log matches — the exact scenario that once
+  # made fail2ban-notify.sh fail silently under pipefail+set -e.
+  check "fail2ban-notify.sh handles no-match IP" '/usr/local/bin/fail2ban-notify.sh smoke-test 198.51.100.1 1 ban'
 fi
 
 echo ""

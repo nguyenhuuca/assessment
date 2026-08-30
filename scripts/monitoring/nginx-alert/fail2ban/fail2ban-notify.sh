@@ -22,9 +22,12 @@ ACTION="$4"  # ban | unban
 if [[ "$ACTION" == "ban" ]]; then
   TOP_PATHS=""
   if [[ -f "$ACCESS_LOG" ]]; then
+    # `|| true`: grep exits 1 on zero matches (not an error, just "IP not
+    # in this log"), which under pipefail would otherwise abort the whole
+    # script via set -e before send_alert_message ever runs.
     TOP_PATHS="$(grep "^${IP} " "$ACCESS_LOG" 2>/dev/null \
       | awk -F'"' '{print $2}' | awk '{print $2}' \
-      | sort | uniq -c | sort -rn | head -5)"
+      | sort | uniq -c | sort -rn | head -5 || true)"
   fi
 
   send_alert_message "🚫 fail2ban BANNED ${IP} on $(hostname)

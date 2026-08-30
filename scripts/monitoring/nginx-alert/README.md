@@ -307,9 +307,20 @@ sudo cp fail2ban/notify.action /etc/fail2ban/action.d/notify.conf
 # 3. Jail definitions
 sudo cp fail2ban/nginx-custom.jail /etc/fail2ban/jail.d/nginx-custom.conf
 
-# 4. Validate + reload
+# 4. Validate + apply
 sudo fail2ban-client -t
-sudo systemctl reload fail2ban
+sudo systemctl restart fail2ban
+```
+
+Use `restart`, not `reload` — fail2ban does not reliably pick up an
+*action list* change (adding/removing `notify` here) on reload for a jail
+that's already running, only on a full restart. Bans persist across the
+restart via fail2ban's sqlite ban database, **except** IPs banned purely
+via manual `fail2ban-client ... banip` with no matching filter ticket —
+those can be dropped; re-ban them afterward if needed:
+```bash
+fail2ban-client get nginx-exploit-probe actions   # confirm "notify" is listed
+fail2ban-client status nginx-exploit-probe        # re-ban any IP missing from here
 ```
 
 ### Verify
