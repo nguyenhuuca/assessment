@@ -1,0 +1,8 @@
+[Unit]
+Description=Check nginx access log for abnormal request volume
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/nginx-traffic-alert.sh
