@@ -8,7 +8,7 @@ maxretry = 2
 findtime = 10m
 bantime  = 7d
 action   = %(action_)s
-           telegram
+           notify
 
 [nginx-req-limit]
 enabled  = true
@@ -19,4 +19,4 @@ maxretry = 1000
 findtime = 1m
 bantime  = 1h
 action   = %(action_)s
-           telegram
+           notify

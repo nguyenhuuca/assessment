@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# EXAMPLE — not active. Rename to slack.sh, drop your webhook URL into
+# /etc/nginx-alert/slack.env as SLACK_WEBHOOK_URL=..., then set
+# ALERT_PROVIDER=slack in /etc/nginx-alert/notify.env. No changes needed
+# in any caller script — this is the entire contract lib-notify.sh needs.
+
+SLACK_ENV="/etc/nginx-alert/slack.env"
+# shellcheck disable=SC1090
+[[ -f "$SLACK_ENV" ]] && source "$SLACK_ENV"
+
+send_alert_message() {
+  local text="$1"
+  : "${SLACK_WEBHOOK_URL:?SLACK_WEBHOOK_URL not set (see /etc/nginx-alert/slack.env)}"
+
+  # Minimal JSON string escaping: backslash, double-quote, newline.
+  local escaped="${text//\\/\\\\}"
+  escaped="${escaped//\"/\\\"}"
+  escaped="${escaped//$'\n'/\\n}"
+
+  curl -sS --max-time 10 -f \
+    -X POST "$SLACK_WEBHOOK_URL" \
+    -H 'Content-Type: application/json' \
+    -d "{\"text\": \"${escaped}\"}" \
+    >/dev/null
+}

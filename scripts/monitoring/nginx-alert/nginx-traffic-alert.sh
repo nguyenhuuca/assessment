@@ -9,12 +9,9 @@ set -euo pipefail
 
 LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
-source "${LIB_DIR}/lib-telegram.sh"
+source "${LIB_DIR}/lib-notify.sh"
 
-TELEGRAM_ENV="/etc/nginx-alert/telegram.env"
 TRAFFIC_ENV="/etc/nginx-alert/traffic.env"
-# shellcheck disable=SC1090
-[[ -f "$TELEGRAM_ENV" ]] && source "$TELEGRAM_ENV"
 # shellcheck disable=SC1090
 [[ -f "$TRAFFIC_ENV" ]] && source "$TRAFFIC_ENV"
 
@@ -68,7 +65,7 @@ cooldown_ok() {
 }
 
 if (( TOTAL_COUNT > THRESHOLD_TOTAL )) && cooldown_ok "$LAST_TOTAL_ALERT"; then
-  send_telegram_message "⚠️ nginx traffic spike on $(hostname)
+  send_alert_message "⚠️ nginx traffic spike on $(hostname)
 Total requests in last interval: ${TOTAL_COUNT} (threshold ${THRESHOLD_TOTAL})
 Top IP: ${TOP_IP:-n/a} (${TOP_IP_COUNT:-0} reqs)"
   echo "$NOW" > "$LAST_TOTAL_ALERT"
@@ -81,7 +78,7 @@ if [[ -n "${TOP_IP:-}" ]] && (( TOP_IP_COUNT > THRESHOLD_IP )) && cooldown_ok "$
     | awk -F'"' '{print $2}' | awk '{print $2}' \
     | sort | uniq -c | sort -rn | head -3)"
 
-  send_telegram_message "⚠️ Abnormal request volume from single IP on $(hostname)
+  send_alert_message "⚠️ Abnormal request volume from single IP on $(hostname)
 IP: ${TOP_IP}
 Requests in last interval: ${TOP_IP_COUNT} (threshold ${THRESHOLD_IP})
 Top endpoints:

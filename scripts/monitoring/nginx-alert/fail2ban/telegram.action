@@ -1,8 +1,0 @@
-# Install at /etc/fail2ban/action.d/telegram.conf
-#
-# Notifies Telegram (reusing /usr/local/bin/lib-telegram.sh and
-# /etc/nginx-alert/telegram.env from the crash/traffic alert setup) whenever
-# this jail actually bans or unbans an IP.
-[Definition]
-actionban = /usr/local/bin/fail2ban-telegram-notify.sh '<name>' '<ip>' '<failures>' ban
-actionunban = /usr/local/bin/fail2ban-telegram-notify.sh '<name>' '<ip>' '<failures>' unban

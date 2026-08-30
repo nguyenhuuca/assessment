@@ -1,0 +1,8 @@
+# Install at /etc/fail2ban/action.d/notify.conf
+#
+# Notifies via whatever provider is configured in /etc/nginx-alert/notify.env
+# (reuses lib-notify.sh + fail2ban-notify.sh from the crash/traffic alert
+# setup) whenever this jail actually bans or unbans an IP.
+[Definition]
+actionban = /usr/local/bin/fail2ban-notify.sh '<name>' '<ip>' '<failures>' ban
+actionunban = /usr/local/bin/fail2ban-notify.sh '<name>' '<ip>' '<failures>' unban

@@ -1,8 +1,14 @@
-# nginx crash alert (systemd + Telegram)
+# nginx crash/traffic alerting (systemd + fail2ban, provider-agnostic)
 
-Alerts a Telegram chat when `nginx.service` fails on the VM. Files in this
-directory are templates to install on the server — nothing here runs as
-part of the app build/deploy pipeline.
+Alerts when `nginx.service` fails, when traffic looks abnormal, and
+auto-bans IPs that hit vulnerability-scan paths or send excessive request
+volume. Files in this directory are templates to install on the server —
+nothing here runs as part of the app build/deploy pipeline.
+
+Notifications go through a provider abstraction (`lib-notify.sh` +
+`providers/<name>.sh`) so the alert/ban scripts never talk to a specific
+service directly — see "Switching notification provider" below. Telegram
+is the only provider implemented today.
 
 ## How it behaves
 
@@ -28,26 +34,34 @@ part of the app build/deploy pipeline.
 ## 2. Install on the server
 
 ```bash
-# 1. Scripts
-sudo cp lib-telegram.sh nginx-alert-telegram.sh /usr/local/bin/
-sudo chmod 755 /usr/local/bin/lib-telegram.sh /usr/local/bin/nginx-alert-telegram.sh
+# 1. Notify dispatcher + telegram provider
+sudo mkdir -p /usr/local/bin/providers
+sudo cp lib-notify.sh nginx-alert-notify.sh /usr/local/bin/
+sudo cp providers/telegram.sh /usr/local/bin/providers/
+sudo chmod 755 /usr/local/bin/lib-notify.sh /usr/local/bin/nginx-alert-notify.sh \
+  /usr/local/bin/providers/telegram.sh
 
-# 2. Secrets — NOT committed to git, root-only readable
+# 2. Which provider to use (defaults to telegram if this file is absent)
 sudo mkdir -p /etc/nginx-alert
+sudo tee /etc/nginx-alert/notify.env >/dev/null <<'EOF'
+ALERT_PROVIDER=telegram
+EOF
+
+# 3. Telegram credentials — NOT committed to git, root-only readable
 sudo tee /etc/nginx-alert/telegram.env >/dev/null <<'EOF'
 TELEGRAM_BOT_TOKEN=<your-bot-token>
 TELEGRAM_CHAT_ID=<your-chat-id>
 EOF
 sudo chmod 600 /etc/nginx-alert/telegram.env
 
-# 3. Alert unit
+# 4. Alert unit
 sudo cp nginx-alert.service /etc/systemd/system/nginx-alert.service
 
-# 4. nginx.service override
+# 5. nginx.service override
 sudo mkdir -p /etc/systemd/system/nginx.service.d
 sudo cp nginx-override.conf /etc/systemd/system/nginx.service.d/override.conf
 
-# 5. Reload systemd
+# 6. Reload systemd
 sudo systemctl daemon-reload
 sudo systemctl restart nginx
 ```
@@ -55,16 +69,16 @@ sudo systemctl restart nginx
 ## 3. Test it
 
 ```bash
-# Fire the alert unit directly to confirm Telegram delivery works
+# Fire the alert unit directly to confirm delivery works
 sudo systemctl start nginx-alert.service
 
 # Simulate a real crash loop (nginx will restart 3x within 60s, then alert)
 for i in 1 2 3; do sudo pkill -9 -f "nginx: master"; sleep 1; done
 ```
 
-You should receive a Telegram message within a few seconds of the third
-kill. Check `systemctl status nginx` and `systemctl status nginx-alert`
-if nothing arrives — the script logs curl errors to the unit's journal
+You should receive a message within a few seconds of the third kill.
+Check `systemctl status nginx` and `systemctl status nginx-alert` if
+nothing arrives — the script logs curl errors to the unit's journal
 (`journalctl -u nginx-alert`).
 
 ## 4. Verification checklist
@@ -72,9 +86,10 @@ if nothing arrives — the script logs curl errors to the unit's journal
 Run each command; expected output noted after `→`.
 
 ```bash
-# Script exists and is executable
-test -x /usr/local/bin/nginx-alert-telegram.sh && echo OK-script
-# → OK-script
+# Scripts exist and are executable
+test -x /usr/local/bin/nginx-alert-notify.sh && echo OK-script
+test -x /usr/local/bin/providers/telegram.sh && echo OK-provider
+# → OK-script / OK-provider
 
 # Secrets file exists, root-only, no leftover placeholders
 sudo stat -c '%a %U:%G' /etc/nginx-alert/telegram.env
@@ -96,18 +111,11 @@ systemctl show nginx.service -p Restart -p OnFailure
 sudo systemctl is-active nginx
 # → active
 
-# Manual Telegram delivery check (bypasses systemd, shows the raw API response)
-source /etc/nginx-alert/telegram.env
-curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-  --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" --data-urlencode "text=verify"
-unset TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID
-# → {"ok":true, ...}
-
 # End-to-end: fire the alert unit through systemd and confirm it exits clean
 sudo systemctl start nginx-alert.service
 systemctl show nginx-alert.service -p Result
 # → Result=success
-# (also confirm the Telegram message actually arrived in the app)
+# (also confirm the message actually arrived at your notification provider)
 ```
 
 If any step deviates from the expected output, see the Troubleshooting
@@ -117,8 +125,8 @@ moving on.
 ## 5. Traffic anomaly alerts (optional)
 
 Separate from the crash alert above: `nginx-traffic-alert.timer` runs every
-minute, diffs `access.log` growth since the last run, and alerts on Telegram
-when either:
+minute, diffs `access.log` growth since the last run, and alerts when
+either:
 
 - **total requests** in the last minute exceed `THRESHOLD_TOTAL` (message
   includes the busiest IP for context), or
@@ -134,7 +142,7 @@ line is the `"$request"` quoted field).
 ### Install
 
 ```bash
-# 1. Script (reuses lib-telegram.sh installed in step 2 above)
+# 1. Script (reuses lib-notify.sh + provider installed in step 2 above)
 sudo cp nginx-traffic-alert.sh /usr/local/bin/nginx-traffic-alert.sh
 sudo chmod 755 /usr/local/bin/nginx-traffic-alert.sh
 
@@ -171,7 +179,7 @@ sudo journalctl -u nginx-traffic-alert.service -n 20 --no-pager
 sudo sed -i 's/THRESHOLD_TOTAL=.*/THRESHOLD_TOTAL=1/' /etc/nginx-alert/traffic.env
 for i in $(seq 1 5); do curl -s -o /dev/null https://<your-domain>/; done
 sudo systemctl start nginx-traffic-alert.service
-# → Telegram message "⚠️ nginx traffic spike..." should arrive
+# → alert message "⚠️ nginx traffic spike..." should arrive
 # revert the threshold afterwards:
 sudo sed -i 's/THRESHOLD_TOTAL=.*/THRESHOLD_TOTAL=600/' /etc/nginx-alert/traffic.env
 ```
@@ -191,8 +199,8 @@ sudo sed -i 's/THRESHOLD_TOTAL=.*/THRESHOLD_TOTAL=600/' /etc/nginx-alert/traffic
 ## 6. Auto-block with fail2ban (optional)
 
 Two fail2ban jails that firewall-block (not just alert on) abusive IPs,
-using the existing Telegram bot for ban/unban notifications. Assumes
-fail2ban is already installed (`fail2ban-client --version`).
+notifying through the same provider abstraction. Assumes fail2ban is
+already installed (`fail2ban-client --version`).
 
 - **`nginx-exploit-probe`**: bans on the 2nd request (within 10 min) for a
   path that only exists in vulnerability-scanner probes (`.env`, `.git`,
@@ -207,9 +215,9 @@ fail2ban is already installed (`fail2ban-client --version`).
   (shorter than the exploit jail, since this one carries more
   false-positive risk).
 
-Both jails run an extra `telegram` action (ban/unban) alongside fail2ban's
-normal iptables action — see `fail2ban-telegram-notify.sh` /
-`telegram.action`.
+Both jails run an extra `notify` action (ban/unban) alongside fail2ban's
+normal iptables action — see `fail2ban/fail2ban-notify.sh` /
+`fail2ban/notify.action`.
 
 ### Install
 
@@ -218,10 +226,10 @@ normal iptables action — see `fail2ban-telegram-notify.sh` /
 sudo cp fail2ban/nginx-exploit-probe.filter /etc/fail2ban/filter.d/nginx-exploit-probe.conf
 sudo cp fail2ban/nginx-req-limit.filter /etc/fail2ban/filter.d/nginx-req-limit.conf
 
-# 2. Telegram notify action + its helper script (reuses lib-telegram.sh from step 1)
-sudo cp fail2ban/fail2ban-telegram-notify.sh /usr/local/bin/fail2ban-telegram-notify.sh
-sudo chmod 755 /usr/local/bin/fail2ban-telegram-notify.sh
-sudo cp fail2ban/telegram.action /etc/fail2ban/action.d/telegram.conf
+# 2. Notify action + its helper script (reuses lib-notify.sh from step 1)
+sudo cp fail2ban/fail2ban-notify.sh /usr/local/bin/fail2ban-notify.sh
+sudo chmod 755 /usr/local/bin/fail2ban-notify.sh
+sudo cp fail2ban/notify.action /etc/fail2ban/action.d/notify.conf
 
 # 3. Jail definitions
 sudo cp fail2ban/nginx-custom.jail /etc/fail2ban/jail.d/nginx-custom.conf
@@ -256,3 +264,41 @@ sudo fail2ban-client status nginx-exploit-probe   # confirm it's listed
 sudo iptables -L f2b-nginx-exploit-probe -n        # confirm the real firewall rule
 # to undo: sudo fail2ban-client set nginx-exploit-probe unbanip <ip>
 ```
+
+## 7. Switching notification provider
+
+Every alert/ban script in this toolkit (`nginx-alert-notify.sh`,
+`nginx-traffic-alert.sh`, `fail2ban/fail2ban-notify.sh`) only ever calls
+one function: `send_alert_message "text"`. None of them know or care what
+actually delivers the message — that's resolved at runtime by
+`lib-notify.sh`, which reads `ALERT_PROVIDER` from
+`/etc/nginx-alert/notify.env` (defaults to `telegram`) and sources
+`providers/<name>.sh`.
+
+To add a new provider (e.g. Slack):
+
+```bash
+# 1. Copy the example and implement send_alert_message() for the new service
+sudo cp providers/slack.sh.example /usr/local/bin/providers/slack.sh
+sudo chmod 755 /usr/local/bin/providers/slack.sh
+sudo $EDITOR /usr/local/bin/providers/slack.sh   # fill in real logic if the example isn't enough
+
+# 2. Credentials for the new provider, its own file (keeps old provider's
+#    creds intact so you can switch back without re-entering anything)
+sudo tee /etc/nginx-alert/slack.env >/dev/null <<'EOF'
+SLACK_WEBHOOK_URL=<your-webhook-url>
+EOF
+sudo chmod 600 /etc/nginx-alert/slack.env
+
+# 3. Flip the switch — no restart of alert scripts needed, they read this
+#    file fresh on every invocation (crash-alert is event-driven, traffic
+#    check runs every minute anyway)
+sudo sed -i 's/ALERT_PROVIDER=.*/ALERT_PROVIDER=slack/' /etc/nginx-alert/notify.env
+
+# 4. Verify
+sudo systemctl start nginx-alert.service   # should now arrive via Slack
+```
+
+`providers/slack.sh.example` in this directory is a minimal, untested
+skeleton showing the contract (`send_alert_message()` + its own creds
+file) — treat it as a starting point, not a finished integration.
