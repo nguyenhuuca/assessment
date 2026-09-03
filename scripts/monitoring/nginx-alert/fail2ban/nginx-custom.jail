@@ -6,7 +6,7 @@ filter   = nginx-exploit-probe
 logpath  = /var/log/nginx/access.log
 maxretry = 2
 findtime = 10m
-bantime  = 7d
+bantime  = -1
 action   = %(action_)s
            notify
 

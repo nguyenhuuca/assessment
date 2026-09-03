@@ -85,6 +85,10 @@ echo "--- 4. systemd units ---"
 push "${SCRIPT_DIR}/nginx-alert.service" "${SCRIPT_DIR}/nginx-traffic-alert.service" "${SCRIPT_DIR}/nginx-traffic-alert.timer" /etc/systemd/system/
 push "${SCRIPT_DIR}/nginx-override.conf" /etc/systemd/system/nginx.service.d/override.conf
 
+echo "--- 4b. Cloudflare real_ip (so fail2ban bans the real attacker, not Cloudflare's edge) ---"
+push "${SCRIPT_DIR}/cloudflare-realip.conf" /etc/nginx/conf.d/cloudflare-realip.conf
+remote 'nginx -t && systemctl reload nginx'
+
 echo "--- 5. fail2ban filters / action / jail ---"
 push "${SCRIPT_DIR}/fail2ban/nginx-exploit-probe.filter" /etc/fail2ban/filter.d/nginx-exploit-probe.conf
 push "${SCRIPT_DIR}/fail2ban/nginx-req-limit.filter" /etc/fail2ban/filter.d/nginx-req-limit.conf
@@ -119,6 +123,7 @@ check "nginx-alert.service installed"     'test -f /etc/systemd/system/nginx-ale
 check "nginx.service.d override in place" 'test -f /etc/systemd/system/nginx.service.d/override.conf'
 check "nginx-traffic-alert.timer active"  'systemctl is-active --quiet nginx-traffic-alert.timer'
 check "nginx.service override applied"    'systemctl show nginx.service -p Restart | grep -q Restart=always'
+check "Cloudflare real_ip config applied" 'nginx -T 2>/dev/null | grep -q "real_ip_header CF-Connecting-IP"'
 check "fail2ban config valid"             'fail2ban-client -t >/dev/null'
 check "nginx-exploit-probe jail active"   'fail2ban-client status nginx-exploit-probe >/dev/null'
 check "nginx-req-limit jail active"       'fail2ban-client status nginx-req-limit >/dev/null'
