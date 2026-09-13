@@ -131,10 +131,24 @@ class StreamVideoServiceImplTest {
     // -----------------------------------------------------------------------
 
     @Test
+    void getVideosToStream_ordersByPriorityThenCreatedAtDesc() {
+        VideoSource high = VideoSource.builder().id(1L).sourceId("hi").title("High Priority").priority(100).build();
+        VideoSource low = VideoSource.builder().id(2L).sourceId("lo").title("Low Priority").priority(0).build();
+        when(videoSourceRepository.findAllByIsHideOrderByPriorityDescCreatedAtDesc(Boolean.FALSE))
+                .thenReturn(List.of(high, low));
+
+        List<VideoDto> videos = streamVideoService.getVideosToStream();
+
+        assertEquals(2, videos.size());
+        assertEquals("hi", videos.get(0).getFileId());
+        assertEquals("lo", videos.get(1).getFileId());
+    }
+
+    @Test
     void getVideosToStream_returnsMappedDtos() {
         VideoSource source = VideoSource.builder()
                 .id(1L).sourceId("src1").title("My Title").desc("My Desc").build();
-        when(videoSourceRepository.findAllByIsHideOrderByCreatedAtDesc(Boolean.FALSE))
+        when(videoSourceRepository.findAllByIsHideOrderByPriorityDescCreatedAtDesc(Boolean.FALSE))
                 .thenReturn(List.of(source));
 
         List<VideoDto> videos = streamVideoService.getVideosToStream();
@@ -150,7 +164,7 @@ class StreamVideoServiceImplTest {
 
     @Test
     void getVideosToStream_returnsEmptyListWhenNoVideos() {
-        when(videoSourceRepository.findAllByIsHideOrderByCreatedAtDesc(Boolean.FALSE))
+        when(videoSourceRepository.findAllByIsHideOrderByPriorityDescCreatedAtDesc(Boolean.FALSE))
                 .thenReturn(Collections.emptyList());
 
         List<VideoDto> videos = streamVideoService.getVideosToStream();

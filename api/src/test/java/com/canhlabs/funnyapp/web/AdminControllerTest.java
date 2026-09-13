@@ -89,6 +89,20 @@ class AdminControllerTest {
                 () -> controller.updateVideoStatus(1L, Map.of("status", "INVALID_STATUS")));
     }
 
+    // ── PATCH /videos/{id}/priority ───────────────────────────────────────────
+
+    @Test
+    void updateVideoPriority_validValue_returnsOk() {
+        doNothing().when(adminVideoService).updatePriority(1L, 50);
+
+        ResponseEntity<ResultObjectInfo<String>> response =
+                controller.updateVideoPriority(1L, Map.of("priority", 50));
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
+        verify(adminVideoService).updatePriority(1L, 50);
+    }
+
     // ── DELETE /videos/{id} ────────────────────────────────────────────────────
 
     @Test

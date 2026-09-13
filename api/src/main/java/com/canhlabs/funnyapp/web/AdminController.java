@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
+import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.HasPermission;
 import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
@@ -71,6 +72,18 @@ public class AdminController {
         return ResponseEntity.ok(ResultObjectInfo.<String>builder()
                 .status(ResultStatus.SUCCESS)
                 .message("Status updated")
+                .build());
+    }
+
+    @PatchMapping("/videos/{id}/priority")
+    @AuditLog("updateVideoPriority")
+    public ResponseEntity<ResultObjectInfo<String>> updateVideoPriority(
+            @PathVariable Long id,
+            @RequestBody Map<String, Integer> body) {
+        adminVideoService.updatePriority(id, body.get("priority"));
+        return ResponseEntity.ok(ResultObjectInfo.<String>builder()
+                .status(ResultStatus.SUCCESS)
+                .message("Priority updated")
                 .build());
     }
 

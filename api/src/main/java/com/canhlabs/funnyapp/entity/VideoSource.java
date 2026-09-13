@@ -58,4 +58,7 @@ public class VideoSource extends BaseDomain {
     @Column(name = "status", nullable = false, length = 20)
     private VideoStatus status = VideoStatus.PUBLISHED;
 
+    @Column(name = "priority", nullable = false)
+    private Integer priority = 0;
+
 }

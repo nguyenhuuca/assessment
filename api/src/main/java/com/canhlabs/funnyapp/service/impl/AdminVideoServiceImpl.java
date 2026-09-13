@@ -7,6 +7,7 @@ import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.AdminVideoService;
+import com.canhlabs.funnyapp.utils.Contract;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,6 +48,15 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     }
 
     @Override
+    public void updatePriority(Long id, int priority) {
+        Contract.require(priority >= 0 && priority <= 9999, "Priority must be between 0 and 9999");
+        VideoSource source = videoSourceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
+        source.setPriority(priority);
+        videoSourceRepository.save(source);
+    }
+
+    @Override
     public void deleteVideo(Long id) {
         videoSourceRepository.deleteById(id);
     }
@@ -72,6 +82,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .thumbnailPath(v.getThumbnailPath())
                 .status(v.getStatus())
                 .viewCount(0L)
+                .priority(v.getPriority())
                 .createdAt(v.getCreatedAt())
                 .build();
     }

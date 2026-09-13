@@ -36,6 +36,7 @@ function buildUrl(path, params) {
 
 export const getVideos         = (params) => api.get(buildUrl('/admin/videos', params))
 export const updateVideoStatus = (id, status) => patch(`/admin/videos/${id}/status`, { status })
+export const updateVideoPriority = (id, priority) => patch(`/admin/videos/${id}/priority`, { priority })
 export const deleteVideo       = (id) => api.delete(`/admin/videos/${id}`)
 export const getAccounts       = (params) => api.get(buildUrl('/admin/accounts', params))
 export const updateAccountRole = (id, role) => patch(`/admin/accounts/${id}/role`, { role })

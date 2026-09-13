@@ -21,5 +21,6 @@ public class AdminVideoDto {
     private String creatorEmail;
     private VideoStatus status;
     private Long viewCount;
+    private Integer priority;
     private Instant createdAt;
 }

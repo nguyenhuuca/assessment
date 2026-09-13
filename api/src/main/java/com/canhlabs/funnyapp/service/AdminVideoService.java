@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 public interface AdminVideoService {
     Page<AdminVideoDto> getVideos(Pageable pageable, VideoStatus status);
     void updateStatus(Long id, VideoStatus status);
+    void updatePriority(Long id, int priority);
     void deleteVideo(Long id);
     AdminStatsDto getStats();
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useAdminVideos, useUpdateVideoStatus, useDeleteVideo } from '../../hooks/useAdmin.js'
+import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useDeleteVideo } from '../../hooks/useAdmin.js'
 
 const STATUS_COLORS = {
   PUBLISHED: '#00c853',
@@ -12,8 +12,9 @@ const STATUSES = ['PUBLISHED', 'PENDING', 'FLAGGED']
 export default function AdminVideoTable({ statusFilter }) {
   const [page, setPage] = useState(0)
   const { data, isLoading } = useAdminVideos(page, statusFilter)
-  const updateStatus = useUpdateVideoStatus()
-  const deleteVideo  = useDeleteVideo()
+  const updateStatus   = useUpdateVideoStatus()
+  const updatePriority = useUpdateVideoPriority()
+  const deleteVideo    = useDeleteVideo()
 
   const pageData      = data?.data ?? data ?? {}
   const videos        = pageData?.content ?? []
@@ -31,6 +32,7 @@ export default function AdminVideoTable({ statusFilter }) {
             <th>ASSET</th>
             <th>CREATOR</th>
             <th>STATUS</th>
+            <th>PRIORITY</th>
             <th>METRICS</th>
             <th>ACTIONS</th>
           </tr>
@@ -58,6 +60,24 @@ export default function AdminVideoTable({ statusFilter }) {
                 >
                   {v.status}
                 </span>
+              </td>
+              <td>
+                <input
+                  type="number"
+                  className="admin-status-select"
+                  style={{ width: 64 }}
+                  min={0}
+                  max={9999}
+                  key={`${v.id}-${v.priority ?? 0}`}
+                  defaultValue={v.priority ?? 0}
+                  title="Higher number shows first in the public feed"
+                  onBlur={e => {
+                    const next = Number(e.target.value)
+                    if (Number.isFinite(next) && next !== (v.priority ?? 0)) {
+                      updatePriority.mutate({ id: v.id, priority: next })
+                    }
+                  }}
+                />
               </td>
               <td className="admin-cell-muted">{v.viewCount?.toLocaleString() ?? 0} views</td>
               <td>

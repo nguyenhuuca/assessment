@@ -77,6 +77,7 @@ class AdminVideoServiceImplTest {
         assertEquals("https://thumb.jpg", dto.getThumbnailPath());
         assertEquals(VideoStatus.PUBLISHED, dto.getStatus());
         assertEquals(0L, dto.getViewCount());
+        assertEquals(0, dto.getPriority());
     }
 
     // ── updateStatus ──────────────────────────────────────────────────────────
@@ -98,6 +99,39 @@ class AdminVideoServiceImplTest {
 
         assertThrows(IllegalArgumentException.class, () -> service.updateStatus(99L, VideoStatus.FLAGGED));
         verify(videoSourceRepository, never()).save(any());
+    }
+
+    // ── updatePriority ────────────────────────────────────────────────────────
+
+    @Test
+    void updatePriority_videoFound_setsPriorityAndSaves() {
+        VideoSource source = videoSource(5L, "Title", null, VideoStatus.PENDING);
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        service.updatePriority(5L, 50);
+
+        assertEquals(50, source.getPriority());
+        verify(videoSourceRepository).save(source);
+    }
+
+    @Test
+    void updatePriority_videoNotFound_throwsIllegalArgumentException() {
+        when(videoSourceRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> service.updatePriority(99L, 10));
+        verify(videoSourceRepository, never()).save(any());
+    }
+
+    @Test
+    void updatePriority_negativeValue_throwsAndSkipsLookup() {
+        assertThrows(RuntimeException.class, () -> service.updatePriority(5L, -1));
+        verify(videoSourceRepository, never()).findById(any());
+    }
+
+    @Test
+    void updatePriority_aboveMax_throwsAndSkipsLookup() {
+        assertThrows(RuntimeException.class, () -> service.updatePriority(5L, 10000));
+        verify(videoSourceRepository, never()).findById(any());
     }
 
     // ── deleteVideo ───────────────────────────────────────────────────────────
