@@ -290,6 +290,12 @@ body {
   animation: spin 0.75s linear infinite;
 }
 
+/* ── Inline admin field save indicator ── */
+.admin-save-spin {
+  display: inline-block;
+  animation: spin 0.9s linear infinite;
+}
+
 /* ── Video card transition (desktop: fade, mobile: slide via media query) ── */
 /*.video-card.slide-next,*/
 /*.video-card.slide-prev {*/

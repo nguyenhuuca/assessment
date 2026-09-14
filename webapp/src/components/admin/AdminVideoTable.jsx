@@ -9,8 +9,23 @@ const STATUS_COLORS = {
 
 const STATUSES = ['PUBLISHED', 'PENDING', 'FLAGGED']
 
+// Small inline indicator so admins can see whether a field edit actually saved.
+function SaveIndicator({ state }) {
+  if (state === 'saving') {
+    return <span className="material-symbols-outlined admin-save-spin" style={{ fontSize: 16, color: '#adaaaa' }} title="Saving…">sync</span>
+  }
+  if (state === 'saved') {
+    return <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#00c853' }} title="Saved">check_circle</span>
+  }
+  if (state === 'error') {
+    return <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#ff1744' }} title="Failed to save">error</span>
+  }
+  return null
+}
+
 export default function AdminVideoTable({ statusFilter }) {
   const [page, setPage] = useState(0)
+  const [saveState, setSaveState] = useState({}) // { [`${id}:${field}`]: 'saving' | 'saved' | 'error' }
   const { data, isLoading } = useAdminVideos(page, statusFilter)
   const updateStatus   = useUpdateVideoStatus()
   const updatePriority = useUpdateVideoPriority()
@@ -20,6 +35,21 @@ export default function AdminVideoTable({ statusFilter }) {
   const videos        = pageData?.content ?? []
   const totalPages    = pageData?.totalPages ?? 0
   const totalElements = pageData?.totalElements ?? 0
+
+  function markSaving(key) {
+    setSaveState(prev => ({ ...prev, [key]: 'saving' }))
+  }
+  function markResult(key, ok) {
+    setSaveState(prev => ({ ...prev, [key]: ok ? 'saved' : 'error' }))
+    if (ok) {
+      setTimeout(() => {
+        setSaveState(prev => {
+          const { [key]: _removed, ...rest } = prev
+          return rest
+        })
+      }, 2000)
+    }
+  }
 
   if (isLoading) return <div className="admin-loading"><div className="vid-spinner" /></div>
 
@@ -62,22 +92,29 @@ export default function AdminVideoTable({ statusFilter }) {
                 </span>
               </td>
               <td>
-                <input
-                  type="number"
-                  className="admin-status-select"
-                  style={{ width: 64 }}
-                  min={0}
-                  max={9999}
-                  key={`${v.id}-${v.priority ?? 0}`}
-                  defaultValue={v.priority ?? 0}
-                  title="Higher number shows first in the public feed"
-                  onBlur={e => {
-                    const next = Number(e.target.value)
-                    if (Number.isFinite(next) && next !== (v.priority ?? 0)) {
-                      updatePriority.mutate({ id: v.id, priority: next })
-                    }
-                  }}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <input
+                    type="number"
+                    className="admin-status-select"
+                    style={{ width: 64 }}
+                    min={0}
+                    max={9999}
+                    key={`${v.id}-${v.priority ?? 0}`}
+                    defaultValue={v.priority ?? 0}
+                    title="Higher number shows first in the public feed"
+                    onBlur={e => {
+                      const next = Number(e.target.value)
+                      if (!Number.isFinite(next) || next === (v.priority ?? 0)) return
+                      const key = `${v.id}:priority`
+                      markSaving(key)
+                      updatePriority.mutate({ id: v.id, priority: next }, {
+                        onSuccess: () => markResult(key, true),
+                        onError: () => markResult(key, false),
+                      })
+                    }}
+                  />
+                  <SaveIndicator state={saveState[`${v.id}:priority`]} />
+                </div>
               </td>
               <td className="admin-cell-muted">{v.viewCount?.toLocaleString() ?? 0} views</td>
               <td>
@@ -85,10 +122,18 @@ export default function AdminVideoTable({ statusFilter }) {
                   <select
                     className="admin-status-select"
                     value={v.status}
-                    onChange={e => updateStatus.mutate({ id: v.id, status: e.target.value })}
+                    onChange={e => {
+                      const key = `${v.id}:status`
+                      markSaving(key)
+                      updateStatus.mutate({ id: v.id, status: e.target.value }, {
+                        onSuccess: () => markResult(key, true),
+                        onError: () => markResult(key, false),
+                      })
+                    }}
                   >
                     {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
+                  <SaveIndicator state={saveState[`${v.id}:status`]} />
                   <button
                     className="admin-action-btn danger"
                     onClick={() => { if (window.confirm('Delete this video?')) deleteVideo.mutate(v.id) }}
