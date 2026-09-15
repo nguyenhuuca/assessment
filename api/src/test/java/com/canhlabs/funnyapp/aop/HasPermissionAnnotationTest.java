@@ -59,9 +59,13 @@ class HasPermissionAnnotationTest {
     }
 
     @Test
-    void annotation_spel_usesPrincipalPermissions() {
+    void annotation_spel_usesDetailsPermissions() {
+        // JWTAuthenticationFilter sets the principal to the user's email (a String) and
+        // stashes the rich UserDetailDto (which carries the permissions bitmask) in
+        // Authentication.details - see AppUtils.getCurrentUser(). The SpEL must read from
+        // there, not from .principal, or evaluation throws for every authenticated request.
         String spel = HasPermission.class.getAnnotation(PreAuthorize.class).value();
-        assertThat(spel).contains("authentication.principal.permissions");
+        assertThat(spel).contains("authentication.details.permissions");
     }
 
     @Test

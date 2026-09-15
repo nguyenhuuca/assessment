@@ -10,7 +10,10 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("@permissionServiceImpl.hasPermission(authentication.principal.permissions, {perm})")
+// JWTAuthenticationFilter sets the Authentication principal to the user's email (a plain
+// String) and stashes the full UserDetailDto (which carries the permissions bitmask) in
+// Authentication.details instead - see AppUtils.getCurrentUser(), which reads the same slot.
+@PreAuthorize("@permissionServiceImpl.hasPermission(authentication.details.permissions, {perm})")
 public @interface HasPermission {
     // AnnotationTemplateExpressionDefaults expands Permission.ADMIN to the bare identifier ADMIN.
     // PermissionEnumPropertyAccessor (registered in WebSecurityConfig) makes ADMIN resolvable

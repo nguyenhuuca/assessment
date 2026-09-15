@@ -1,8 +1,7 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.config.AppUserDetails;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
-import com.canhlabs.funnyapp.entity.User;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.filter.JWTAuthenticationFilter;
@@ -24,21 +23,27 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AnnotationTemplateExpressionDefaults;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,6 +55,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * - SpEL @permissionServiceImpl resolves to the actual production bean
  * - PermissionServiceImpl.hasBits() is called on every request — breakpoints work
  * - Only FeatureFlagService is mocked (its only external dependency)
+ *
+ * The injected Authentication mirrors exactly what JWTAuthenticationFilter builds in
+ * production: principal = email (String), authorities = ROLE_x, details = UserDetailDto
+ * (carrying the permissions bitmask). @HasPermission reads authentication.details.permissions,
+ * so this shape must match or the test would pass against a principal layout the real filter
+ * never produces.
  *
  * Flag behaviour: setUp configures the flag ON so real bitwise checks run.
  * The flagOff test overrides the mock to return false, triggering the bypass path.
@@ -125,7 +136,7 @@ class AdminControllerPermissionTest {
         when(adminVideoService.getStats()).thenReturn(stats());
 
         mockMvc.perform(get(STATS_URL)
-                        .with(user(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
                 .andExpect(status().isOk());
     }
 
@@ -136,7 +147,7 @@ class AdminControllerPermissionTest {
         for (Permission p : Permission.values()) allBits |= p.getBit();
 
         mockMvc.perform(get(STATS_URL)
-                        .with(user(principal(UserRole.ADMIN, allBits))))
+                        .with(authentication(principal(UserRole.ADMIN, allBits))))
                 .andExpect(status().isOk());
     }
 
@@ -145,14 +156,14 @@ class AdminControllerPermissionTest {
     @Test
     void getStats_adminRoleButReadBitOnly_returns403() throws Exception {
         mockMvc.perform(get(STATS_URL)
-                        .with(user(principal(UserRole.ADMIN, Permission.READ.getBit()))))
+                        .with(authentication(principal(UserRole.ADMIN, Permission.READ.getBit()))))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void getStats_adminRoleButZeroBits_returns403() throws Exception {
         mockMvc.perform(get(STATS_URL)
-                        .with(user(principal(UserRole.ADMIN, 0))))
+                        .with(authentication(principal(UserRole.ADMIN, 0))))
                 .andExpect(status().isForbidden());
     }
 
@@ -160,7 +171,7 @@ class AdminControllerPermissionTest {
     void getStats_adminRoleWithWriteExecDeleteButNotAdmin_returns403() throws Exception {
         int bits = Permission.WRITE.getBit() | Permission.EXEC.getBit() | Permission.DELETE.getBit();
         mockMvc.perform(get(STATS_URL)
-                        .with(user(principal(UserRole.ADMIN, bits))))
+                        .with(authentication(principal(UserRole.ADMIN, bits))))
                 .andExpect(status().isForbidden());
     }
 
@@ -169,7 +180,7 @@ class AdminControllerPermissionTest {
     @Test
     void getStats_userRoleWithAdminBit_returns403() throws Exception {
         mockMvc.perform(get(STATS_URL)
-                        .with(user(principal(UserRole.USER, Permission.ADMIN.getBit()))))
+                        .with(authentication(principal(UserRole.USER, Permission.ADMIN.getBit()))))
                 .andExpect(status().isForbidden());
     }
 
@@ -190,18 +201,25 @@ class AdminControllerPermissionTest {
         when(adminVideoService.getStats()).thenReturn(stats());
 
         mockMvc.perform(get(STATS_URL)
-                        .with(user(principal(UserRole.ADMIN, 0))))
+                        .with(authentication(principal(UserRole.ADMIN, 0))))
                 .andExpect(status().isOk());
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────
 
-    private AppUserDetails principal(UserRole role, int permBits) {
-        User user = User.builder()
-                .id(1L).userName("tester@test.com").password("pw")
-                .role(role).permissions(permBits)
+    // Mirrors JWTAuthenticationFilter.doFilterInternal(): principal is the email (String),
+    // authorities carry the role, and the full UserDetailDto (with the permissions bitmask)
+    // is stashed in Authentication.details rather than as the principal.
+    private Authentication principal(UserRole role, int permBits) {
+        UserDetailDto user = UserDetailDto.builder()
+                .id(1L).email("tester@test.com")
+                .role(role.name()).permissions(permBits)
                 .build();
-        return new AppUserDetails(user);
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities);
+        authentication.setDetails(user);
+        return authentication;
     }
 
     private AdminStatsDto stats() {

@@ -71,6 +71,37 @@ class JwtProviderTest {
     }
 
     @Test
+    void verifyToken_roundTripsPermissionsBitmaskFromGeneratedToken() {
+        // Regression: convertValue() used to drop the permissions claim, leaving it at the
+        // int default (0) after verification even though generatePayload() puts it in the
+        // token. @HasPermission relies on this bitmask surviving the round trip.
+        JwtGenerationDto request = JwtGenerationDto.builder()
+                .payload(UserDetailDto.builder().id(1L).email("admin@abc.com").role("ADMIN").permissions(16).build())
+                .duration(3600000L)
+                .build();
+        TokenDto tokenDto = jwtProvider.generateToken(request);
+
+        JwtVerificationResultDto result = jwtProvider.verifyToken(tokenDto.getToken());
+
+        assertThat(result.getSuccessful()).isTrue();
+        assertThat(result.getData().getPermissions()).isEqualTo(16);
+        assertThat(result.getData().getRole()).isEqualTo("ADMIN");
+    }
+
+    @Test
+    void verifyToken_defaultsPermissionsToZeroWhenClaimAbsent() {
+        String token = Jwts.builder()
+                .claims(Map.of("id", 3L, "email", "no-perms@abc.com"))
+                .expiration(new Date(System.currentTimeMillis() + 3600000L))
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                .compact();
+
+        JwtVerificationResultDto result = jwtProvider.verifyToken(token);
+
+        assertThat(result.getData().getPermissions()).isZero();
+    }
+
+    @Test
     void verifyToken_throwsUnauthorizedExceptionForExpiredToken() {
         String token = Jwts.builder()
                 .claims(Map.of("id", 2L, "email", "expired@abc.com"))

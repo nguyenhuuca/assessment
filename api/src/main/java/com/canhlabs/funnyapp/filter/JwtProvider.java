@@ -119,10 +119,12 @@ public class JwtProvider {
     }
 
     private UserDetailDto convertValue(Claims body) {
+        String permissionsRaw = getNonNull(body.get("permissions"));
         return UserDetailDto.builder()
                 .id(Long.valueOf(getNonNull(body.get("id"))))
                 .email(getNonNull(body.get("email")))
                 .role(getNonNull(body.get("role")))
+                .permissions(permissionsRaw.isEmpty() ? 0 : Integer.parseInt(permissionsRaw))
                 .build();
     }
 
