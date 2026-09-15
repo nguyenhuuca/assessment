@@ -10,17 +10,43 @@ const STATUS_COLORS = {
 const STATUSES = ['PUBLISHED', 'PENDING', 'FLAGGED']
 
 // Small inline indicator so admins can see whether a field edit actually saved.
+// Reserves a fixed-size slot at all times so the icon appearing/disappearing
+// doesn't resize the surrounding cell/table.
 function SaveIndicator({ state }) {
+  let icon = null
+  let color = 'transparent'
+  let title
+  let spin = false
   if (state === 'saving') {
-    return <span className="material-symbols-outlined admin-save-spin" style={{ fontSize: 16, color: '#adaaaa' }} title="Saving…">sync</span>
+    icon = 'sync'; color = '#adaaaa'; title = 'Saving…'; spin = true
+  } else if (state === 'saved') {
+    icon = 'check_circle'; color = '#00c853'; title = 'Saved'
+  } else if (state === 'error') {
+    icon = 'error'; color = '#ff1744'; title = 'Failed to save'
   }
-  if (state === 'saved') {
-    return <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#00c853' }} title="Saved">check_circle</span>
-  }
-  if (state === 'error') {
-    return <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#ff1744' }} title="Failed to save">error</span>
-  }
-  return null
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 16,
+        height: 16,
+        flexShrink: 0,
+      }}
+    >
+      {icon && (
+        <span
+          className={`material-symbols-outlined${spin ? ' admin-save-spin' : ''}`}
+          style={{ fontSize: 16, color }}
+          title={title}
+        >
+          {icon}
+        </span>
+      )}
+    </span>
+  )
 }
 
 export default function AdminVideoTable({ statusFilter }) {
