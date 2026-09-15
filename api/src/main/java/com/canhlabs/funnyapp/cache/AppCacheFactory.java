@@ -27,7 +27,8 @@ import org.springframework.stereotype.Component;
     public <K, V> AppCache<K, V> createDefaultCache() {
         String type = cacheProperties.getType();
         if (GUAVA.equalsIgnoreCase(type)) {
-            return new GuavaAppCache<>(5, 1000);
+            CacheProperties.DefaultSetting defaults = cacheProperties.getDefaultSettings();
+            return new GuavaAppCache<>(defaults.getTtlMinutes(), defaults.getMaxSize());
         }
         throw new IllegalArgumentException("Unsupported type: " + type);
     }

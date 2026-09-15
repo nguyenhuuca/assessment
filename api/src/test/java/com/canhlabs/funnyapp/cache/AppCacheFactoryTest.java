@@ -57,6 +57,7 @@ class AppCacheFactoryTest {
     @Test
     void createDefaultCache_guavaType_returnsNonNullAppCache() {
         when(cacheProperties.getType()).thenReturn("guava");
+        when(cacheProperties.getDefaultSettings()).thenReturn(new CacheProperties.DefaultSetting());
 
         AppCache<String, Object> cache = factory.createDefaultCache();
 
@@ -107,6 +108,7 @@ class AppCacheFactoryTest {
     @Test
     void createDefaultCache_returnedCacheIsOperational() {
         when(cacheProperties.getType()).thenReturn("guava");
+        when(cacheProperties.getDefaultSettings()).thenReturn(new CacheProperties.DefaultSetting());
 
         AppCache<String, Integer> cache = factory.createDefaultCache();
         cache.put("num", 42);

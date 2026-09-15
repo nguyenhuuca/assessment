@@ -23,11 +23,14 @@ class VideoCacheImplTest {
     @Mock
     private AppCache<String, byte[]> chunkCache;
 
+    @Mock
+    private StatsCache statsCache;
+
     private VideoCacheImpl videoCache;
 
     @BeforeEach
     void setUp() {
-        videoCache = new VideoCacheImpl(chunkCache);
+        videoCache = new VideoCacheImpl(chunkCache, statsCache);
     }
 
     // ── key format ────────────────────────────────────────────────────────────
@@ -117,6 +120,7 @@ class VideoCacheImplTest {
         assertThat(result).isInstanceOf(ByteArrayInputStream.class);
         byte[] actual = result.readAllBytes();
         assertThat(actual).isEqualTo(cached);
+        verify(statsCache).recordHit("fileG");
     }
 
     // ── getChunkStream – cache MISS ───────────────────────────────────────────

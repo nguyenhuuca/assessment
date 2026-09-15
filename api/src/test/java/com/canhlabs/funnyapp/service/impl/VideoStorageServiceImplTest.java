@@ -231,7 +231,7 @@ class VideoStorageServiceImplTest {
         }
 
         assertThat(new String(read, StandardCharsets.UTF_8)).isEqualTo("2345");
-        verify(statsCache).recordHit("rangefile");
+        verify(statsCache).recordMiss("rangefile");
         verify(videoAccessService).recordAccess("rangefile");
     }
 

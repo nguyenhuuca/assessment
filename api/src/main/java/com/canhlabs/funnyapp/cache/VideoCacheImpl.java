@@ -19,9 +19,11 @@ public class VideoCacheImpl implements VideoCache {
     private final AppCache<String, byte[]> chunkCache;
     private static final int CACHE_THRESHOLD = 5;
     private final ConcurrentMap<String, AtomicInteger> accessCounter = new ConcurrentHashMap<>();
+    private final StatsCache statsCache;
 
-    public VideoCacheImpl(@Qualifier("videoCache") AppCache<String, byte[]> chunkCache) {
+    public VideoCacheImpl(@Qualifier("videoCache") AppCache<String, byte[]> chunkCache, StatsCache statsCache) {
         this.chunkCache = chunkCache;
+        this.statsCache = statsCache;
     }
 
     private String makeKey(String fileId, long start, long end) {
@@ -59,6 +61,7 @@ public class VideoCacheImpl implements VideoCache {
         Optional<byte[]> cached = chunkCache.get(key);
         if (cached.isPresent()) {
             log.info("✅ [CACHE HIT] Chunk {} ({} - {})", fileId, start, end);
+            statsCache.recordHit(fileId);
             return new ByteArrayInputStream(cached.get());
         }
 

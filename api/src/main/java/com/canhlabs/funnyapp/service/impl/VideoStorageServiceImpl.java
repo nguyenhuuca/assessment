@@ -93,7 +93,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
         if (!file.exists()) {
             throw new FileNotFoundException("Full file not found: " + file.getAbsolutePath());
         }
-        statsCache.recordHit(fileId);
+        statsCache.recordMiss(fileId);
         videoAccessService.recordAccess(fileId);
         long length = end - start + 1;
         RandomAccessFile raf = new RandomAccessFile(file, "r");

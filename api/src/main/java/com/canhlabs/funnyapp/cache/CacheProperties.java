@@ -24,7 +24,7 @@ public class CacheProperties {
     @Getter
     @Setter
     public static class DefaultSetting {
-        private long ttlMinutes;
-        private long maxSize;
+        private long ttlMinutes = 1440;
+        private long maxSize = 10_000;
     }
 }
