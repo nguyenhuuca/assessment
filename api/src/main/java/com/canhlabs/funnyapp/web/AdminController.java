@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,7 +55,7 @@ public class AdminController {
 
     @GetMapping("/videos")
     public ResponseEntity<ResultObjectInfo<Page<AdminVideoDto>>> getVideos(
-            @PageableDefault(size = 20) Pageable pageable,
+            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(required = false) VideoStatus status) {
         Page<AdminVideoDto> data = adminVideoService.getVideos(pageable, status);
         return ResponseEntity.ok(ResultObjectInfo.<Page<AdminVideoDto>>builder()
