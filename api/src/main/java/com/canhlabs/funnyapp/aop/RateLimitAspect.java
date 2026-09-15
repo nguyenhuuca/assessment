@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.aop;
 
 import com.canhlabs.funnyapp.exception.RateLimitExceededException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Aspect
 @Component
+@Slf4j
 public class RateLimitAspect {
 
     private final SlidingWindowRateLimiter limiter;
@@ -42,6 +44,7 @@ public class RateLimitAspect {
         );
 
         if (!allowed) {
+            log.warn("Rate limit exceeded for client={}, uri={}", clientKey, apiKey);
             throw new RateLimitExceededException("Rate limit exceeded. Please try again later.");
         }
 
