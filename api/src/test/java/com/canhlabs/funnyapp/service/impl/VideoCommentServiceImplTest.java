@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.dto.comment.CommentNode;
 import com.canhlabs.funnyapp.dto.comment.CreateCommentRequest;
 import com.canhlabs.funnyapp.dto.comment.CreateCommentResponse;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.VideoComment;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -64,6 +65,15 @@ class VideoCommentServiceImplTest {
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .build();
+    }
+
+    private void authenticateAs(String email) {
+        UserDetailDto user = new UserDetailDto();
+        user.setId(42L);
+        user.setEmail(email);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null, List.of());
+        auth.setDetails(user);
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     // -------------------------------------------------------------------------
@@ -149,7 +159,6 @@ class VideoCommentServiceImplTest {
         when(repo.save(any(VideoComment.class))).thenReturn(saved);
 
         CreateCommentRequest req = CreateCommentRequest.builder()
-                .userId(null)
                 .guestName("Alice")
                 .content("hello")
                 .build();
@@ -177,7 +186,6 @@ class VideoCommentServiceImplTest {
         when(repo.save(any(VideoComment.class))).thenReturn(saved);
 
         CreateCommentRequest req = CreateCommentRequest.builder()
-                .userId(null)
                 .guestName("Bob")
                 .content("hello again")
                 .build();
@@ -195,16 +203,17 @@ class VideoCommentServiceImplTest {
     @Test
     void createComment_authenticatedUser_savesUserIdAndNullGuestToken() {
         UUID savedId = UUID.randomUUID();
-        VideoComment saved = buildComment(savedId, "vid1", null, "user-42", null, "user comment");
+        VideoComment saved = buildComment(savedId, "vid1", null, "user-42@mail.com", null, "user comment");
 
         when(repo.save(any(VideoComment.class))).thenReturn(saved);
+        authenticateAs("user-42@mail.com");
 
         CreateCommentRequest req = CreateCommentRequest.builder()
-                .userId("user-42")
                 .content("user comment")
                 .build();
 
-        CreateCommentResponse response = service.createComment("vid1", req, null);
+        // A stale guest token from before login must not turn an authenticated user into a guest
+        CreateCommentResponse response = service.createComment("vid1", req, "old-guest-token");
 
         assertThat(response.getId()).isEqualTo(savedId);
         // Authenticated users do not receive a guest token
@@ -213,7 +222,7 @@ class VideoCommentServiceImplTest {
         ArgumentCaptor<VideoComment> captor = ArgumentCaptor.forClass(VideoComment.class);
         verify(repo).save(captor.capture());
         VideoComment persisted = captor.getValue();
-        assertThat(persisted.getUserId()).isEqualTo("user-42");
+        assertThat(persisted.getUserId()).isEqualTo("user-42@mail.com");
         assertThat(persisted.getGuestName()).isNull();
         assertThat(persisted.getGuestTokenHash()).isNull();
     }

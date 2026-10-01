@@ -152,6 +152,35 @@ class JWTAuthenticationFilterTest {
     }
 
     @Test
+    void doFilterInternal_commentPost_withValidToken_populatesUser() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/v1/funny-app/videos/42/comments");
+        request.setServletPath("/v1/funny-app/videos/42/comments");
+        request.addHeader(HttpHeaders.AUTHORIZATION, "valid-token");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        JwtVerificationResultDto result = new JwtVerificationResultDto();
+        result.setData(UserDetailDto.builder().email("author@example.com").build());
+        when(jwtProvider.verifyToken("valid-token")).thenReturn(result);
+
+        assertFalse(filter.shouldNotFilter(request));
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertEquals("author@example.com", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    void doFilterInternal_commentPost_withoutToken_continuesAsGuest() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/v1/funny-app/videos/42/comments");
+        request.setServletPath("/v1/funny-app/videos/42/comments");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
     void shouldNotFilter_shouldReturnFalse_forProtectedPath() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getServletPath()).thenReturn("/api/protected");

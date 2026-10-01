@@ -1,6 +1,5 @@
 package com.canhlabs.funnyapp.dto.comment;
 
-import com.canhlabs.funnyapp.validation.UserOrGuest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,14 +7,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Author identity is never taken from the body: it comes from the JWT (logged-in user)
+ * or the X-Guest-Token header (guest).
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@UserOrGuest
 public class CreateCommentRequest {
-    private String userId;             // optional
     private String guestName;          // optional
     @NotBlank
     private String content;

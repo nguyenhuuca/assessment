@@ -8,8 +8,7 @@ public class UserOrGuestValidator implements ConstraintValidator<UserOrGuest, Cr
     @Override
     public boolean isValid(CreateCommentRequest value, ConstraintValidatorContext context) {
         if (value == null) return false;
-        boolean hasUser = value.getUserId() != null && !value.getUserId().isBlank();
-        boolean hasGuest = value.getGuestName() != null && !value.getGuestName().isBlank();
-        return hasUser || hasGuest;
+        // Unused since author identity moved to JWT / X-Guest-Token — safe to delete with @UserOrGuest
+        return true;
     }
 }

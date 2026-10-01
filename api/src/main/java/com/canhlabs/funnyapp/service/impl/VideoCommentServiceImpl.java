@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.dto.comment.CommentNode;
 import com.canhlabs.funnyapp.dto.comment.CreateCommentRequest;
 import com.canhlabs.funnyapp.dto.comment.CreateCommentResponse;
+import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.VideoComment;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.utils.AppUtils;
@@ -57,7 +58,9 @@ public class VideoCommentServiceImpl {
 
     @Transactional
     public CreateCommentResponse createComment(String videoId, CreateCommentRequest req, String guestToken) {
-        boolean isGuest = (req.getUserId() == null || req.getUserId().isBlank());
+        // Author comes from the JWT only — a client-supplied user id would allow impersonation
+        UserDetailDto currentUser = AppUtils.getCurrentUser();
+        boolean isGuest = currentUser == null || StringUtils.isBlank(currentUser.getEmail());
 
         // same guest token must be used for subsequent comments and new comment
         String token = guestToken;
@@ -68,7 +71,7 @@ public class VideoCommentServiceImpl {
 
         VideoComment saved = repo.save(VideoComment.builder()
                 .videoId(videoId)
-                .userId(isGuest ? "" : req.getUserId())
+                .userId(isGuest ? "" : currentUser.getEmail())
                 .guestName(isGuest ? req.getGuestName() : null)
                 .guestTokenHash(isGuest ? token : null)
                 .content(req.getContent())

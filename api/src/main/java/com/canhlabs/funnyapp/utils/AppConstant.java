@@ -49,17 +49,19 @@ public class AppConstant {
                 PathObject.builder().path("/share-links").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/health").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build(),
-                PathObject.builder().path("/thread/**").method(HttpMethod.GET.name()).build(),
-                PathObject.builder().path("/videos/*/comments/*").method(HttpMethod.DELETE.name()).build()
+                PathObject.builder().path("/thread/**").method(HttpMethod.GET.name()).build()
 
         );
 
         /**
-         * Public GET endpoints that still read the JWT when one is supplied (to resolve the caller),
-         * but never reject a missing/invalid token. Writes on the same URL stay fully authenticated.
+         * Public endpoints (guests allowed) that still read the JWT when one is supplied (to resolve the caller),
+         * but never reject a missing/invalid token. Methods not listed here stay fully authenticated.
          */
         public static final List<PathObject> OPTIONAL_AUTH_PATH = List.of(
-                PathObject.builder().path("/videos/*/reaction").method(HttpMethod.GET.name()).build()
+                PathObject.builder().path("/videos/*/reaction").method(HttpMethod.GET.name()).build(),
+                PathObject.builder().path("/videos/*/comments").method(HttpMethod.GET.name()).build(),
+                PathObject.builder().path("/videos/*/comments").method(HttpMethod.POST.name()).build(),
+                PathObject.builder().path("/videos/*/comments/*").method(HttpMethod.DELETE.name()).build()
         );
 
         // apply for document swagger
@@ -73,8 +75,7 @@ public class AppConstant {
                 "/webjars/**",
                 "/actuator/**",
                 "/v1/funny-app/top-videos",
-                "/v1/funny-app/top-videos/**",
-                "/v1/funny-app/videos/*/comments"
+                "/v1/funny-app/top-videos/**"
                 // other public endpoints of your API may be appended to this array
         );
 

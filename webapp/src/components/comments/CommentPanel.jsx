@@ -30,13 +30,18 @@ export default function CommentPanel({ video, onClose }) {
   const [text, setText]             = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [confirmId, setConfirmId]   = useState(null) // inline delete confirm
+  const [error, setError]           = useState('')
   const inputRef = useRef(null)
+
+  function loadComments(videoId) {
+    return commentsApi.list(videoId).then(res => setComments(res.data || res || []))
+  }
 
   useEffect(() => {
     if (!video?.id) return
     setLoading(true)
-    commentsApi.list(video.id)
-      .then(res => setComments(res.data || res || []))
+    setError('')
+    loadComments(video.id)
       .catch(() => setComments([]))
       .finally(() => setLoading(false))
   }, [video?.id])
@@ -49,11 +54,15 @@ export default function CommentPanel({ video, onClose }) {
   async function handlePost() {
     if (!text.trim() || !isLoggedIn) return
     setSubmitting(true)
+    setError('')
     try {
-      const res = await commentsApi.post(video.id, text.trim())
-      setComments(prev => [res.data || res, ...prev])
+      // POST only returns { id }, so reload to get the full comment (author, content, createdAt)
+      await commentsApi.post(video.id, text.trim())
       setText('')
-    } catch {}
+      await loadComments(video.id)
+    } catch (e) {
+      setError(e?.message || 'Không gửi được bình luận, thử lại sau')
+    }
     finally { setSubmitting(false) }
   }
 
@@ -194,6 +203,7 @@ export default function CommentPanel({ video, onClose }) {
 
         {/* Input area */}
         <div style={{ borderTop: '1px solid var(--border)', padding: '12px 16px', flexShrink: 0 }}>
+          {error && <div className="app-alert error" role="alert" style={{ marginBottom: 8, fontSize: 13 }}>{error}</div>}
           {isLoggedIn ? (
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
               <textarea
