@@ -1,5 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { videosApi } from '../../api/videos.js'
+import React, { useEffect, useRef, useState } from 'react'
+import { useAuth } from '../../hooks/useAuth.js'
+import { useVideoReaction } from '../../hooks/useVideoReaction.js'
+
+const HINT_MS = 3000
+const LOGIN_HINT = 'Đăng nhập để thích video'
+const ERROR_HINT = 'Không lưu được, thử lại sau'
 
 function fmtCount(n) {
   if (n >= 1000) return `${(n / 1000).toFixed(1)}K`
@@ -7,62 +12,56 @@ function fmtCount(n) {
 }
 
 export default function VoteButtons({ video }) {
-  const [vote,      setVote]      = useState('none') // 'up' | 'down' | 'none'
-  const [upCount,   setUpCount]   = useState(video?.upvotes   || 0)
-  const [downCount, setDownCount] = useState(video?.downvotes || 0)
+  const { isLoggedIn } = useAuth()
+  const { likeCount, myReaction, isPending, react } = useVideoReaction(video?.id)
+  const [hint, setHint] = useState('')
+  const timer = useRef(null)
 
-  // Reset when video changes
+  // Reset hint when video changes (reaction state is keyed by video id in the query cache)
   useEffect(() => {
-    setVote('none')
-    setUpCount(video?.upvotes   || 0)
-    setDownCount(video?.downvotes || 0)
+    setHint('')
+    return () => clearTimeout(timer.current)
   }, [video?.id])
 
-  async function handleUp() {
-    if (vote === 'down') setDownCount(c => Math.max(0, c - 1))
-    if (vote === 'up') {
-      setUpCount(c => Math.max(0, c - 1))
-      setVote('none')
-    } else {
-      setUpCount(c => c + 1)
-      setVote('up')
-      try { await videosApi.like(video?.id) } catch {}
-    }
+  function showHint(message) {
+    setHint(message)
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => setHint(''), HINT_MS)
   }
 
-  async function handleDown() {
-    if (vote === 'up') setUpCount(c => Math.max(0, c - 1))
-    if (vote === 'down') {
-      setDownCount(c => Math.max(0, c - 1))
-      setVote('none')
-    } else {
-      setDownCount(c => c + 1)
-      setVote('down')
-      try { await videosApi.unlike(video?.id) } catch {}
+  function toggle(target) {
+    if (!isLoggedIn) {
+      showHint(LOGIN_HINT)
+      return
     }
+    react(myReaction === target ? null : target, {
+      onError: () => showHint(ERROR_HINT),
+    })
   }
 
   return (
     <>
-      {/* Like */}
       <button
-        className={`action-btn${vote === 'up' ? ' voted' : ''}`}
-        onClick={handleUp}
+        className={`action-btn${myReaction === 'LIKE' ? ' voted' : ''}`}
+        onClick={() => toggle('LIKE')}
+        disabled={isPending}
         title="Like"
       >
         <span className="icon material-symbols-outlined">favorite</span>
-        <span className="label">{fmtCount(upCount)}</span>
+        <span className="label">{fmtCount(likeCount)}</span>
       </button>
 
-      {/* Dislike */}
       <button
-        className={`action-btn${vote === 'down' ? ' voted-down' : ''}`}
-        onClick={handleDown}
+        className={`action-btn${myReaction === 'DISLIKE' ? ' voted-down' : ''}`}
+        onClick={() => toggle('DISLIKE')}
+        disabled={isPending}
         title="Dislike"
       >
         <span className="icon material-symbols-outlined">thumb_down</span>
         <span className="label">Dislike</span>
       </button>
+
+      {hint && <span className="vote-hint" role="status">{hint}</span>}
     </>
   )
 }

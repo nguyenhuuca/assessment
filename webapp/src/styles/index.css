@@ -2075,3 +2075,19 @@ body {
   }
 }
 
+
+/* ── Vote hint (guest tries to react) ── */
+.vote-hint {
+  position: fixed;
+  bottom: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  pointer-events: none;
+}

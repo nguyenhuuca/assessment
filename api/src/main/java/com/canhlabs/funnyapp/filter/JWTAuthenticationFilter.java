@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.ALLOW_ALL_METHOD;
+import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.OPTIONAL_AUTH_PATH;
 import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.WHITE_LIST_PATH;
 
 
@@ -46,6 +47,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull FilterChain filterChain) throws ServletException, IOException {
 
         String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        boolean optionalAuth = isOptionalAuth(httpServletRequest);
+        if (optionalAuth && (token == null || token.isBlank())) {
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+            return;
+        }
         try {
             UsernamePasswordAuthenticationToken authentication;
             JwtVerificationResultDto verificationResult = jwtProvider.verifyToken(token);
@@ -57,6 +63,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (UnauthorizedException e) {
+            if (optionalAuth) {
+                // Public endpoint: treat a bad token as a guest instead of failing the request
+                filterChain.doFilter(httpServletRequest, httpServletResponse);
+                return;
+            }
             log.error("Error UnauthorizedException", e);
             httpServletResponse.setContentType("application/json;charset=UTF-8");
             httpServletResponse.getWriter().write(e.toJson());
@@ -66,6 +77,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
+    }
+
+    private boolean isOptionalAuth(HttpServletRequest request) {
+        String path = request.getServletPath();
+        String method = request.getMethod();
+        return OPTIONAL_AUTH_PATH.stream().anyMatch(p -> pathMatcher.match(p.getFullPath(), path) && p.getMethod().equals(method));
     }
 
     @Override

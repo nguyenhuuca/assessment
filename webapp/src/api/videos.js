@@ -5,6 +5,4 @@ export const videosApi = {
   privateList: () => api.get('/private-videos'),
   share: (data) => api.post('/video/share', data),
   delete: (id) => api.delete(`/share-links/${id}`),
-  like: (id) => api.post('/video/like', { videoId: id }),
-  unlike: (id) => api.post('/video/unlike', { videoId: id }),
 }

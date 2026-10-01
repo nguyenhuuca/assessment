@@ -17,6 +17,8 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
 
     boolean existsBySourceId(String sourceId);
 
+    boolean existsByIdAndIsHide(Long id, boolean isHide);
+
     Optional<VideoSource> findBySourceId(String sourceId);
     List<VideoSource> findAllByOrderByCreatedAtDesc();
     List<VideoSource> findAllByDescIsNullOrDesc(String desc);

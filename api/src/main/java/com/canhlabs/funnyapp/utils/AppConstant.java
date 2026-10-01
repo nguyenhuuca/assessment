@@ -54,6 +54,14 @@ public class AppConstant {
 
         );
 
+        /**
+         * Public GET endpoints that still read the JWT when one is supplied (to resolve the caller),
+         * but never reject a missing/invalid token. Writes on the same URL stay fully authenticated.
+         */
+        public static final List<PathObject> OPTIONAL_AUTH_PATH = List.of(
+                PathObject.builder().path("/videos/*/reaction").method(HttpMethod.GET.name()).build()
+        );
+
         // apply for document swagger
         public static final List<String> ALLOW_ALL_METHOD = List.of(
                 "/",

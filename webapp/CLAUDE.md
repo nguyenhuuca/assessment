@@ -42,7 +42,8 @@ webapp/
 │   ├── api/
 │   │   ├── client.js              # Axios instance (baseURL from VITE_API_BASE_URL)
 │   │   ├── auth.js                # join, me, mfa.* endpoints
-│   │   ├── videos.js              # list, privateList, share, delete, like, unlike
+│   │   ├── videos.js              # list, privateList, share, delete
+│   │   ├── reactions.js           # get/set/remove per-user like/dislike (/videos/{id}/reaction)
 │   │   ├── comments.js            # list, add comments
 │   │   ├── guestToken.js          # guest token init/storage
 │   │   └── index.js               # re-exports

@@ -92,6 +92,66 @@ class JWTAuthenticationFilterTest {
     }
 
     @Test
+    void shouldNotFilter_reactionGet_isFalse_soOptionalTokenIsStillRead() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getServletPath()).thenReturn("/v1/funny-app/videos/42/reaction");
+        when(request.getMethod()).thenReturn("GET");
+
+        assertFalse(filter.shouldNotFilter(request));
+    }
+
+    @Test
+    void shouldNotFilter_reactionPut_isFalse() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getServletPath()).thenReturn("/v1/funny-app/videos/42/reaction");
+        when(request.getMethod()).thenReturn("PUT");
+
+        assertFalse(filter.shouldNotFilter(request));
+    }
+
+    @Test
+    void doFilterInternal_optionalAuthPath_withoutToken_continuesAsGuest() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/funny-app/videos/42/reaction");
+        request.setServletPath("/v1/funny-app/videos/42/reaction");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain).doFilter(request, response);
+        verifyNoInteractions(jwtProvider);
+    }
+
+    @Test
+    void doFilterInternal_optionalAuthPath_withBadToken_continuesAsGuest() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/funny-app/videos/42/reaction");
+        request.setServletPath("/v1/funny-app/videos/42/reaction");
+        request.addHeader(HttpHeaders.AUTHORIZATION, "bad");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        when(jwtProvider.verifyToken("bad")).thenThrow(new UnauthorizedException("TOKEN_INVALID", 601));
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertEquals(200, response.getStatus());
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    void doFilterInternal_reactionPut_badTokenStillRejected() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("PUT", "/v1/funny-app/videos/42/reaction");
+        request.setServletPath("/v1/funny-app/videos/42/reaction");
+        request.addHeader(HttpHeaders.AUTHORIZATION, "bad");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        when(jwtProvider.verifyToken("bad")).thenThrow(new UnauthorizedException("TOKEN_INVALID", 601));
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertEquals(401, response.getStatus());
+        verify(filterChain, never()).doFilter(any(), any());
+    }
+
+    @Test
     void shouldNotFilter_shouldReturnFalse_forProtectedPath() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getServletPath()).thenReturn("/api/protected");
