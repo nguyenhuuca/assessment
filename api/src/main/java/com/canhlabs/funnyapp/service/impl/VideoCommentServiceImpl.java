@@ -127,9 +127,12 @@ public class VideoCommentServiceImpl {
     }
 
     private static CommentNode toNode(VideoComment c) {
-        int hash = AppUtils.hashCode(c.getGuestTokenHash());
-        int anonymousNumber = Math.abs(hash % 1000) + 1;
-        String guestName = "Anonymous" + anonymousNumber;
+        // Anonymous alias only for guest comments; authenticated comments are identified by userId
+        String guestName = null;
+        if (StringUtils.isBlank(c.getUserId())) {
+            int hash = AppUtils.hashCode(c.getGuestTokenHash());
+            guestName = "Anonymous" + (Math.abs(hash % 1000) + 1);
+        }
         return CommentNode.builder()
                 .id(c.getId())
                 .videoId(c.getVideoId())

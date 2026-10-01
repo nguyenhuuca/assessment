@@ -78,7 +78,7 @@ export default function CommentPanel({ video, onClose }) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handlePost() }
   }
 
-  const email = (c) => c.userEmail || c.email || c.guestName || c.userId || ''
+  const email = (c) => c.userEmail || c.email || c.userId || c.guestName || ''
 
   return (
     <>

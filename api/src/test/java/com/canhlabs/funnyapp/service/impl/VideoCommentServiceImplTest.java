@@ -112,6 +112,19 @@ class VideoCommentServiceImplTest {
     }
 
     @Test
+    void getNestedComments_anonymousAliasOnlyForGuests() {
+        VideoComment user = buildComment(UUID.randomUUID(), "vid1", null, "a@b.com", null, "from user");
+        VideoComment guest = buildComment(UUID.randomUUID(), "vid1", null, "", "tok-hash", "from guest");
+        when(repo.findAllByVideoIdOrdered("vid1")).thenReturn(List.of(user, guest));
+
+        List<CommentNode> result = service.getNestedComments("vid1");
+
+        assertThat(result.get(0).getUserId()).isEqualTo("a@b.com");
+        assertThat(result.get(0).getGuestName()).isNull();
+        assertThat(result.get(1).getGuestName()).startsWith("Anonymous");
+    }
+
+    @Test
     void getNestedComments_nestedComment_parentHasReply() {
         UUID parentId = UUID.randomUUID();
         UUID childId = UUID.randomUUID();
