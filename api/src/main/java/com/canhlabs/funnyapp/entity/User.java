@@ -47,6 +47,7 @@ public class User extends BaseDomain {
     private Instant updatedAt;
 
     @Column(name = "mfa_enabled", nullable = false)
+    @Builder.Default
     private boolean mfaEnabled = false;
 
     @Column(name = "mfa_secret")
@@ -54,9 +55,11 @@ public class User extends BaseDomain {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
+    @Builder.Default // without it Lombok's builder leaves role null -> NOT NULL violation on signup
     private UserRole role = UserRole.USER;
 
     @Column(name = "permissions", nullable = false)
+    @Builder.Default
     private int permissions = 0;
 
     @Enumerated(EnumType.STRING)

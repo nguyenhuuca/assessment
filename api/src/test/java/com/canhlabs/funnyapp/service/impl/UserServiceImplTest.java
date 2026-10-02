@@ -288,6 +288,12 @@ class UserServiceImplTest {
 
         assertThat(result.getJwt()).isEqualTo("jwt");
         verify(inviteService).markTokenAsUsed(req, 2L);
+        // regression: users.role is NOT NULL — a new magic-link user must be saved as USER, not null
+        org.mockito.ArgumentCaptor<User> saved = org.mockito.ArgumentCaptor.forClass(User.class);
+        verify(userRepo).save(saved.capture());
+        assertThat(saved.getValue().getRole()).isEqualTo(com.canhlabs.funnyapp.enums.UserRole.USER);
+        assertThat(saved.getValue().getStatus()).isEqualTo(com.canhlabs.funnyapp.enums.UserStatus.ACTIVE);
+        assertThat(saved.getValue().getPermissions()).isZero();
     }
 
     @Test
