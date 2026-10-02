@@ -1,13 +1,16 @@
 export const FUNNY_KEYWORDS = ['funny', 'hài', 'hài hước', 'comedy', 'vui', 'cười']
 
+/**
+ * Stream URL for <video src>. Never put the JWT or guest token in the URL: the stream endpoint
+ * does not read them, and query strings end up in nginx/Cloudflare logs (token leak, CWE-598)
+ * and break shared caching of video bytes.
+ */
 export function buildStreamUrl(src) {
   if (!src) return src
   try {
     const url = new URL(src)
-    const jwt = localStorage.getItem('jwt')
-    const guest = localStorage.getItem('guestToken')
-    if (jwt)   url.searchParams.set('token', jwt)
-    if (guest) url.searchParams.set('guestToken', guest)
+    url.searchParams.delete('token')
+    url.searchParams.delete('guestToken')
     return url.toString()
   } catch { return src }
 }

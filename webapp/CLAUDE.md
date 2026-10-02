@@ -125,7 +125,7 @@ Base URL set via env var: `VITE_API_BASE_URL` (defaults to `https://canh-labs.co
 
 Auth headers (`Authorization: Bearer <jwt>`, `X-Guest-Token`) are injected via Axios interceptor in `client.js`.
 
-Video streams use `buildStreamUrl()` from `videoModel.js` — appends `?token=<jwt>&guestToken=<guest>` to URL because `<video src>` cannot send custom headers.
+Video streams use `buildStreamUrl()` from `videoModel.js`. Never put the JWT or guest token in a URL — the stream endpoint is public and does not read them, and query strings are written to nginx/Cloudflare logs (token leak).
 
 ## State Management
 
