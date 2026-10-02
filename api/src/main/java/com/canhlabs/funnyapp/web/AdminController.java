@@ -3,7 +3,13 @@ package com.canhlabs.funnyapp.web;
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.HasPermission;
 import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
+import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
+import com.canhlabs.funnyapp.dto.admin.ModerateCommentRequest;
+import com.canhlabs.funnyapp.enums.CommentStatus;
+import com.canhlabs.funnyapp.service.AdminCommentService;
+import jakarta.validation.Valid;
+import java.util.UUID;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
@@ -42,6 +48,7 @@ public class AdminController {
 
     private AdminVideoService adminVideoService;
     private AdminAccountService adminAccountService;
+    private AdminCommentService adminCommentService;
 
     @Autowired
     public void injectAdminVideoService(AdminVideoService adminVideoService) {
@@ -51,6 +58,11 @@ public class AdminController {
     @Autowired
     public void injectAdminAccountService(AdminAccountService adminAccountService) {
         this.adminAccountService = adminAccountService;
+    }
+
+    @Autowired
+    public void injectAdminCommentService(AdminCommentService adminCommentService) {
+        this.adminCommentService = adminCommentService;
     }
 
     @GetMapping("/videos")
@@ -127,6 +139,33 @@ public class AdminController {
         return ResponseEntity.ok(ResultObjectInfo.<String>builder()
                 .status(ResultStatus.SUCCESS)
                 .message("Account deleted")
+                .build());
+    }
+
+    @GetMapping("/comments")
+    public ResponseEntity<ResultObjectInfo<Page<AdminCommentDto>>> getComments(
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) CommentStatus status,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String videoId) {
+        Page<AdminCommentDto> data = adminCommentService.getComments(pageable, status, q, videoId);
+        return ResponseEntity.ok(ResultObjectInfo.<Page<AdminCommentDto>>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(data)
+                .build());
+    }
+
+    @PatchMapping("/comments/{id}/moderation")
+    @AuditLog("moderateComment")
+    @HasPermission(perm = Permission.ADMIN)
+    public ResponseEntity<ResultObjectInfo<AdminCommentDto>> moderateComment(
+            @PathVariable UUID id,
+            @Valid @RequestBody ModerateCommentRequest request) {
+        AdminCommentDto data = adminCommentService.moderate(id, request);
+        return ResponseEntity.ok(ResultObjectInfo.<AdminCommentDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .message("Comment moderated")
+                .data(data)
                 .build());
     }
 

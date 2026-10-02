@@ -5,6 +5,8 @@ import com.canhlabs.funnyapp.dto.comment.CreateCommentRequest;
 import com.canhlabs.funnyapp.dto.comment.CreateCommentResponse;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.VideoComment;
+import com.canhlabs.funnyapp.enums.CommentStatus;
+import com.canhlabs.funnyapp.utils.CommentAuthorUtils;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.utils.AppUtils;
 import io.micrometer.common.util.StringUtils;
@@ -53,7 +55,24 @@ public class VideoCommentServiceImpl {
                 }
             }
         }
-        return roots;
+        List<CommentNode> visibleRoots = new ArrayList<>();
+        for (CommentNode root : roots) {
+            if (pruneRemoved(root)) visibleRoots.add(root);
+        }
+        return visibleRoots;
+    }
+
+    /**
+     * Drops removed leaves; a removed node survives (as placeholder) only while it still has
+     * visible descendants. Returns whether the node should be kept.
+     */
+    private static boolean pruneRemoved(CommentNode node) {
+        List<CommentNode> kept = new ArrayList<>();
+        for (CommentNode reply : node.getReplies()) {
+            if (pruneRemoved(reply)) kept.add(reply);
+        }
+        node.setReplies(kept);
+        return !node.isRemoved() || !kept.isEmpty();
     }
 
     @Transactional
@@ -76,6 +95,7 @@ public class VideoCommentServiceImpl {
                 .guestTokenHash(isGuest ? token : null)
                 .content(req.getContent())
                 .parentId(req.getParentId())
+                .status(CommentStatus.VISIBLE)
                 .build());
 
         return CreateCommentResponse.builder()
@@ -127,11 +147,21 @@ public class VideoCommentServiceImpl {
     }
 
     private static CommentNode toNode(VideoComment c) {
+        if (c.getStatus() == CommentStatus.REMOVED) {
+            // Placeholder: never expose removed content or author
+            return CommentNode.builder()
+                    .id(c.getId())
+                    .videoId(c.getVideoId())
+                    .createdAt(c.getCreatedAt())
+                    .parentId(c.getParentId())
+                    .replies(new ArrayList<>())
+                    .removed(true)
+                    .build();
+        }
         // Anonymous alias only for guest comments; authenticated comments are identified by userId
         String guestName = null;
         if (StringUtils.isBlank(c.getUserId())) {
-            int hash = AppUtils.hashCode(c.getGuestTokenHash());
-            guestName = "Anonymous" + (Math.abs(hash % 1000) + 1);
+            guestName = CommentAuthorUtils.guestAlias(c.getGuestTokenHash());
         }
         return CommentNode.builder()
                 .id(c.getId())

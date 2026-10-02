@@ -4,7 +4,9 @@ import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,7 @@ class AdminVideoServiceImplTest {
 
     @Mock VideoSourceRepository videoSourceRepository;
     @Mock UserRepo userRepo;
+    @Mock VideoCommentRepository commentRepository;
 
     @InjectMocks AdminVideoServiceImpl service;
 
@@ -36,6 +39,7 @@ class AdminVideoServiceImplTest {
         MockitoAnnotations.openMocks(this);
         service.injectVideoSourceRepository(videoSourceRepository);
         service.injectUserRepo(userRepo);
+        service.injectVideoCommentRepository(commentRepository);
     }
 
     // ── getVideos ──────────────────────────────────────────────────────────────
@@ -150,6 +154,8 @@ class AdminVideoServiceImplTest {
         when(videoSourceRepository.countByStatus(VideoStatus.PENDING)).thenReturn(12L);
         when(videoSourceRepository.countByStatus(VideoStatus.FLAGGED)).thenReturn(5L);
         when(userRepo.count()).thenReturn(42L);
+        when(commentRepository.count()).thenReturn(300L);
+        when(commentRepository.countByStatus(CommentStatus.REMOVED)).thenReturn(7L);
 
         AdminStatsDto stats = service.getStats();
 
@@ -157,6 +163,8 @@ class AdminVideoServiceImplTest {
         assertEquals(42L,  stats.getTotalUsers());
         assertEquals(12L,  stats.getPendingCount());
         assertEquals(5L,   stats.getFlaggedCount());
+        assertEquals(300L, stats.getTotalComments());
+        assertEquals(7L,   stats.getRemovedComments());
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────

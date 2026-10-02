@@ -61,3 +61,21 @@ export function useDeleteAccount() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'accounts'] }),
   })
 }
+
+export function useAdminComments({ page = 0, status = null, q = '', videoId = null } = {}) {
+  return useQuery({
+    queryKey: ['admin', 'comments', page, status, q, videoId],
+    queryFn: () => adminApi.getComments({ page, size: 20, status, q, videoId }),
+  })
+}
+
+export function useModerateComment() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, body }) => adminApi.moderateComment(id, body),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'comments'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'stats'] })
+    },
+  })
+}

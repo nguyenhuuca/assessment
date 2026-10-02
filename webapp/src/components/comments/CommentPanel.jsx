@@ -140,7 +140,15 @@ export default function CommentPanel({ video, onClose }) {
               <span style={{ fontSize: 13 }}>No comments yet</span>
             </div>
           ) : (
-            comments.map(c => (
+            comments.map(c => c.removed ? (
+              <div
+                key={c.id}
+                data-testid="removed-comment"
+                style={{ marginBottom: 18, fontSize: 13, fontStyle: 'italic', color: 'var(--text-muted)' }}
+              >
+                Bình luận đã bị gỡ do vi phạm chính sách
+              </div>
+            ) : (
               <div key={c.id} style={{
                 display: 'flex', gap: 10, marginBottom: 18,
                 animation: 'fadeIn 0.2s ease',

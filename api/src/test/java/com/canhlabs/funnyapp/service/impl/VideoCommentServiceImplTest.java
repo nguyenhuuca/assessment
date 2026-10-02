@@ -5,6 +5,7 @@ import com.canhlabs.funnyapp.dto.comment.CreateCommentRequest;
 import com.canhlabs.funnyapp.dto.comment.CreateCommentResponse;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.VideoComment;
+import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -356,5 +357,110 @@ class VideoCommentServiceImplTest {
         verify(repo).deleteById(child1Id);
         verify(repo).deleteById(rootId);
         verify(repo, times(3)).deleteById(any(UUID.class));
+    }
+
+    // -------------------------------------------------------------------------
+    // Moderation placeholders
+    // -------------------------------------------------------------------------
+
+    private VideoComment removed(VideoComment c) {
+        c.setStatus(CommentStatus.REMOVED);
+        return c;
+    }
+
+    @Test
+    void getNestedComments_removedLeaf_isOmitted() {
+        UUID a = UUID.randomUUID();
+        UUID b = UUID.randomUUID();
+        when(repo.findAllByVideoIdOrdered("v")).thenReturn(List.of(
+                buildComment(a, "v", null, "u@x.com", null, "keep"),
+                removed(buildComment(b, "v", a.toString(), "bad@x.com", null, "secret"))));
+
+        List<CommentNode> result = service.getNestedComments("v");
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getReplies()).isEmpty();
+    }
+
+    @Test
+    void getNestedComments_removedRootWithVisibleReply_becomesPlaceholder() {
+        UUID a = UUID.randomUUID();
+        UUID b = UUID.randomUUID();
+        when(repo.findAllByVideoIdOrdered("v")).thenReturn(List.of(
+                removed(buildComment(a, "v", null, "bad@x.com", null, "secret")),
+                buildComment(b, "v", a.toString(), "ok@x.com", null, "reply")));
+
+        List<CommentNode> result = service.getNestedComments("v");
+
+        assertThat(result).hasSize(1);
+        CommentNode ph = result.get(0);
+        assertThat(ph.isRemoved()).isTrue();
+        assertThat(ph.getContent()).isNull();
+        assertThat(ph.getUserId()).isNull();
+        assertThat(ph.getGuestName()).isNull();
+        assertThat(ph.getReplies()).hasSize(1);
+        assertThat(ph.getReplies().get(0).getContent()).isEqualTo("reply");
+        assertThat(ph.getReplies().get(0).isRemoved()).isFalse();
+    }
+
+    @Test
+    void getNestedComments_removedGuestComment_doesNotExposeAlias() {
+        UUID a = UUID.randomUUID();
+        UUID b = UUID.randomUUID();
+        when(repo.findAllByVideoIdOrdered("v")).thenReturn(List.of(
+                removed(buildComment(a, "v", null, "", "tok", "secret")),
+                buildComment(b, "v", a.toString(), "ok@x.com", null, "reply")));
+
+        CommentNode ph = service.getNestedComments("v").get(0);
+
+        assertThat(ph.getGuestName()).isNull();
+        assertThat(ph.getContent()).isNull();
+    }
+
+    @Test
+    void getNestedComments_removedChainWithOnlyRemovedDescendants_isOmitted() {
+        UUID a = UUID.randomUUID();
+        UUID b = UUID.randomUUID();
+        when(repo.findAllByVideoIdOrdered("v")).thenReturn(List.of(
+                removed(buildComment(a, "v", null, "x@x.com", null, "s1")),
+                removed(buildComment(b, "v", a.toString(), "y@x.com", null, "s2"))));
+
+        assertThat(service.getNestedComments("v")).isEmpty();
+    }
+
+    @Test
+    void getNestedComments_removedMiddleWithVisibleGrandchild_keepsChain() {
+        UUID a = UUID.randomUUID();
+        UUID b = UUID.randomUUID();
+        UUID c = UUID.randomUUID();
+        when(repo.findAllByVideoIdOrdered("v")).thenReturn(List.of(
+                buildComment(a, "v", null, "a@x.com", null, "root"),
+                removed(buildComment(b, "v", a.toString(), "b@x.com", null, "gone")),
+                buildComment(c, "v", b.toString(), "c@x.com", null, "deep")));
+
+        CommentNode root = service.getNestedComments("v").get(0);
+
+        assertThat(root.getReplies()).hasSize(1);
+        CommentNode mid = root.getReplies().get(0);
+        assertThat(mid.isRemoved()).isTrue();
+        assertThat(mid.getReplies().get(0).getContent()).isEqualTo("deep");
+    }
+
+    @Test
+    void createComment_newComment_isVisible() {
+        authenticateAs("u@x.com");
+        when(repo.save(any(VideoComment.class))).thenAnswer(inv -> {
+            VideoComment c = inv.getArgument(0);
+            c.setId(UUID.randomUUID());
+            return c;
+        });
+        CreateCommentRequest req = new CreateCommentRequest();
+        req.setContent("hi");
+
+        service.createComment("v", req, null);
+
+        ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
+        verify(repo).save(cap.capture());
+        assertThat(cap.getValue().getStatus()).isEqualTo(CommentStatus.VISIBLE);
     }
 }

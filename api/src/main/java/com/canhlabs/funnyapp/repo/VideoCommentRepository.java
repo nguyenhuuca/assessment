@@ -1,13 +1,17 @@
 package com.canhlabs.funnyapp.repo;
 
 import com.canhlabs.funnyapp.entity.VideoComment;
+import com.canhlabs.funnyapp.enums.CommentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface VideoCommentRepository extends JpaRepository<VideoComment, UUID> {
+public interface VideoCommentRepository extends JpaRepository<VideoComment, UUID>, JpaSpecificationExecutor<VideoComment> {
+    long countByStatus(CommentStatus status);
+
     List<VideoComment> findByVideoIdOrderByCreatedAtAsc(String videoId);
 
     List<VideoComment> findByVideoIdAndParentIdIsNullOrderByCreatedAtAsc(String videoId);

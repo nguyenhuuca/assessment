@@ -6,7 +6,11 @@ import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.filter.JWTAuthenticationFilter;
 import com.canhlabs.funnyapp.filter.WebSecurityConfig;
+import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
+import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.service.AdminAccountService;
+import com.canhlabs.funnyapp.service.AdminCommentService;
+import org.springframework.data.domain.Page;
 import com.canhlabs.funnyapp.service.AdminVideoService;
 import com.canhlabs.funnyapp.service.FeatureFlagService;
 import com.canhlabs.funnyapp.service.PermissionService;
@@ -40,7 +44,12 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -111,6 +120,7 @@ class AdminControllerPermissionTest {
     @MockitoBean JWTAuthenticationFilter jwtFilter;
     @MockitoBean AdminVideoService adminVideoService;
     @MockitoBean AdminAccountService adminAccountService;
+    @MockitoBean AdminCommentService adminCommentService;
 
     @Autowired MockMvc mockMvc;
 
@@ -203,6 +213,98 @@ class AdminControllerPermissionTest {
         mockMvc.perform(get(STATS_URL)
                         .with(authentication(principal(UserRole.ADMIN, 0))))
                 .andExpect(status().isOk());
+    }
+
+    // ── comments moderation ───────────────────────────────────────────────────
+
+    private static final String COMMENTS_URL = AppConstant.API.BASE_URL + "/admin/comments";
+    private static final String MODERATE_URL =
+            COMMENTS_URL + "/00000000-0000-0000-0000-000000000001/moderation";
+
+    @Test
+    void getComments_admin_returns200AndPassesPagingAndFilters() throws Exception {
+        when(adminCommentService.getComments(any(), any(), any(), any())).thenReturn(Page.empty());
+
+        mockMvc.perform(get(COMMENTS_URL)
+                        .param("page", "2").param("size", "5")
+                        .param("status", "REMOVED").param("q", "spam").param("videoId", "14")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+
+        verify(adminCommentService).getComments(
+                argThat(p -> p.getPageNumber() == 2 && p.getPageSize() == 5),
+                eq(CommentStatus.REMOVED), eq("spam"), eq("14"));
+    }
+
+    @Test
+    void getComments_defaultsToSize20SortedByCreatedAtDesc() throws Exception {
+        when(adminCommentService.getComments(any(), any(), any(), any())).thenReturn(Page.empty());
+
+        mockMvc.perform(get(COMMENTS_URL)
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+
+        verify(adminCommentService).getComments(
+                argThat(p -> p.getPageSize() == 20
+                        && p.getSort().getOrderFor("createdAt") != null
+                        && p.getSort().getOrderFor("createdAt").isDescending()),
+                isNull(), isNull(), isNull());
+    }
+
+    @Test
+    void getComments_userRole_returns403() throws Exception {
+        mockMvc.perform(get(COMMENTS_URL)
+                        .with(authentication(principal(UserRole.USER, Permission.ADMIN.getBit()))))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(adminCommentService);
+    }
+
+    @Test
+    void moderateComment_admin_returns200() throws Exception {
+        when(adminCommentService.moderate(any(), any())).thenReturn(AdminCommentDto.builder().build());
+
+        mockMvc.perform(patch(MODERATE_URL)
+                        .contentType("application/json")
+                        .content("{\"action\":\"REMOVE\",\"reason\":\"SPAM\"}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void moderateComment_missingAction_returns400() throws Exception {
+        mockMvc.perform(patch(MODERATE_URL)
+                        .contentType("application/json")
+                        .content("{\"reason\":\"SPAM\"}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminCommentService);
+    }
+
+    @Test
+    void moderateComment_noteTooLong_returns400() throws Exception {
+        mockMvc.perform(patch(MODERATE_URL)
+                        .contentType("application/json")
+                        .content("{\"action\":\"REMOVE\",\"reason\":\"OTHER\",\"note\":\"" + "x".repeat(501) + "\"}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void moderateComment_userRole_returns403() throws Exception {
+        mockMvc.perform(patch(MODERATE_URL)
+                        .contentType("application/json")
+                        .content("{\"action\":\"RESTORE\"}")
+                        .with(authentication(principal(UserRole.USER, Permission.ADMIN.getBit()))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void moderateComment_adminWithoutAdminBit_returns403() throws Exception {
+        mockMvc.perform(patch(MODERATE_URL)
+                        .contentType("application/json")
+                        .content("{\"action\":\"RESTORE\"}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.READ.getBit()))))
+                .andExpect(status().isForbidden());
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────

@@ -2091,3 +2091,37 @@ body {
   border: 1px solid var(--border);
   pointer-events: none;
 }
+
+/* ── Admin comment moderation ── */
+.admin-badge.removed {
+  background: rgba(255, 23, 68, 0.13);
+  color: #ff1744;
+  border: 1px solid #ff1744;
+}
+.admin-badge.visible {
+  background: rgba(0, 200, 83, 0.13);
+  color: #00c853;
+  border: 1px solid #00c853;
+}
+.admin-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.admin-comment-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 360px;
+  font-size: 13px;
+  cursor: pointer;
+  word-break: break-word;
+}
+.admin-comment-text.expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+}

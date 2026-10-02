@@ -25,4 +25,5 @@ public class CommentNode {
     private Instant updatedAt;
     private String parentId;
     private List<CommentNode> replies;
+    private boolean removed;
 }

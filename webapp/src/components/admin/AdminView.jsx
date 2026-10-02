@@ -2,11 +2,13 @@ import React, { useState } from 'react'
 import { useAdminStats } from '../../hooks/useAdmin.js'
 import AdminVideoTable from './AdminVideoTable.jsx'
 import AdminAccountTable from './AdminAccountTable.jsx'
+import AdminCommentTable from './AdminCommentTable.jsx'
 
 const TABS = [
   { key: 'VIDEO_VAULT',   label: 'VIDEO_VAULT'   },
   { key: 'USER_ACCOUNTS', label: 'USER_ACCOUNTS' },
   { key: 'FLAGGED_LOGS',  label: 'FLAGGED_LOGS'  },
+  { key: 'COMMENTS',      label: 'COMMENTS'      },
 ]
 
 export default function AdminView() {
@@ -39,6 +41,7 @@ export default function AdminView() {
         {activeTab === 'VIDEO_VAULT'   && <AdminVideoTable statusFilter={null} />}
         {activeTab === 'FLAGGED_LOGS'  && <AdminVideoTable statusFilter="FLAGGED" />}
         {activeTab === 'USER_ACCOUNTS' && <AdminAccountTable />}
+        {activeTab === 'COMMENTS'      && <AdminCommentTable />}
       </div>
 
       <div className="admin-stat-cards">
@@ -55,6 +58,10 @@ export default function AdminView() {
           <span className="admin-stat-value" style={{ color: '#ff1744' }}>
             {stats.flaggedCount ?? '—'} <span style={{ fontSize: 11 }}>FLAGGED</span>
           </span>
+        </div>
+        <div className="admin-stat-card">
+          <span className="admin-stat-label">REMOVED_COMMENTS</span>
+          <span className="admin-stat-value" style={{ color: '#ff1744' }}>{stats.removedComments?.toLocaleString() ?? '—'}</span>
         </div>
         <div className="admin-stat-card">
           <span className="admin-stat-label">USER_GROWTH</span>

@@ -9,6 +9,12 @@ import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.service.AdminAccountService;
+import com.canhlabs.funnyapp.service.AdminCommentService;
+import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
+import com.canhlabs.funnyapp.dto.admin.ModerateCommentRequest;
+import com.canhlabs.funnyapp.enums.CommentModerationAction;
+import com.canhlabs.funnyapp.enums.CommentStatus;
+import java.util.UUID;
 import com.canhlabs.funnyapp.service.AdminVideoService;
 import com.canhlabs.funnyapp.utils.AppUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +41,7 @@ class AdminControllerTest {
 
     @Mock AdminVideoService adminVideoService;
     @Mock AdminAccountService adminAccountService;
+    @Mock AdminCommentService adminCommentService;
 
     @InjectMocks AdminController controller;
 
@@ -43,6 +50,7 @@ class AdminControllerTest {
         MockitoAnnotations.openMocks(this);
         controller.injectAdminVideoService(adminVideoService);
         controller.injectAdminAccountService(adminAccountService);
+        controller.injectAdminCommentService(adminCommentService);
     }
 
     // ── GET /videos ────────────────────────────────────────────────────────────
@@ -192,6 +200,33 @@ class AdminControllerTest {
         assertEquals(50L,  response.getBody().getData().getTotalUsers());
         assertEquals(5L,   response.getBody().getData().getPendingCount());
         assertEquals(3L,   response.getBody().getData().getFlaggedCount());
+    }
+
+    // ── comments ───────────────────────────────────────────────────────────────
+
+    @Test
+    void getComments_passesFiltersAndReturnsPage() {
+        Page<AdminCommentDto> page = new PageImpl<>(List.of(AdminCommentDto.builder().videoId("1").build()));
+        when(adminCommentService.getComments(any(), eq(CommentStatus.REMOVED), eq("q"), eq("1"))).thenReturn(page);
+
+        ResponseEntity<ResultObjectInfo<Page<AdminCommentDto>>> response =
+                controller.getComments(PageRequest.of(0, 20), CommentStatus.REMOVED, "q", "1");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().getData().getContent().size());
+    }
+
+    @Test
+    void moderateComment_delegatesToService() {
+        UUID id = UUID.randomUUID();
+        ModerateCommentRequest req = ModerateCommentRequest.builder()
+                .action(CommentModerationAction.RESTORE).build();
+        when(adminCommentService.moderate(id, req)).thenReturn(AdminCommentDto.builder().id(id).build());
+
+        ResponseEntity<ResultObjectInfo<AdminCommentDto>> response = controller.moderateComment(id, req);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(id, response.getBody().getData().getId());
     }
 
     // ── helpers ────────────────────────────────────────────────────────────────

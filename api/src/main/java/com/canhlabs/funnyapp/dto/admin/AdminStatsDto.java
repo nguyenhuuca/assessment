@@ -14,4 +14,6 @@ public class AdminStatsDto {
     private long totalUsers;
     private long pendingCount;
     private long flaggedCount;
+    private long totalComments;
+    private long removedComments;
 }

@@ -3,8 +3,10 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.AdminVideoService;
 import com.canhlabs.funnyapp.utils.Contract;
@@ -20,6 +22,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
 
     private VideoSourceRepository videoSourceRepository;
     private UserRepo userRepo;
+    private VideoCommentRepository commentRepository;
 
     @Autowired
     public void injectVideoSourceRepository(VideoSourceRepository videoSourceRepository) {
@@ -29,6 +32,11 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     @Autowired
     public void injectUserRepo(UserRepo userRepo) {
         this.userRepo = userRepo;
+    }
+
+    @Autowired
+    public void injectVideoCommentRepository(VideoCommentRepository commentRepository) {
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -72,6 +80,8 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .totalUsers(totalUsers)
                 .pendingCount(pending)
                 .flaggedCount(flagged)
+                .totalComments(commentRepository.count())
+                .removedComments(commentRepository.countByStatus(CommentStatus.REMOVED))
                 .build();
     }
 

@@ -1,8 +1,12 @@
 package com.canhlabs.funnyapp.entity;
 
 
+import com.canhlabs.funnyapp.enums.CommentModerationReason;
+import com.canhlabs.funnyapp.enums.CommentStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -54,4 +58,22 @@ public class VideoComment {
 
     @Column(name = "parent_id")
     private String parentId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    @Builder.Default
+    private CommentStatus status = CommentStatus.VISIBLE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "moderation_reason", length = 30)
+    private CommentModerationReason moderationReason;
+
+    @Column(name = "moderation_note", length = 500)
+    private String moderationNote;
+
+    @Column(name = "moderated_by")
+    private String moderatedBy;
+
+    @Column(name = "moderated_at")
+    private Instant moderatedAt;
 }
