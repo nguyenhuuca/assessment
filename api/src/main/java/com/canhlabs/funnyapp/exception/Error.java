@@ -29,8 +29,8 @@ public class Error {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime timestamp;
     private String message;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String debugMessage;
+    // No exception detail (SQL, row values, class names) is ever serialized to clients (CWE-209).
+    // Handlers log the full exception server-side instead.
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ApiSubError> subErrors;
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -52,18 +52,18 @@ public class Error {
         this.message = message;
     }
 
+    /** {@code ex} is accepted for call-site compatibility only; it is never exposed in the response. */
     public Error(HttpStatus status, Throwable ex) {
         this();
         this.status = status;
         this.message = "Unexpected error";
-        this.debugMessage = ex.getLocalizedMessage();
     }
 
+    /** {@code ex} is accepted for call-site compatibility only; it is never exposed in the response. */
     public Error(HttpStatus status, String message, Throwable ex) {
         this();
         this.status = status;
         this.message = message;
-        this.debugMessage = ex.getLocalizedMessage();
     }
 
     private void addSubError(ApiSubError subError) {
