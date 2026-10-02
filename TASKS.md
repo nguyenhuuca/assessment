@@ -108,10 +108,10 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **PRD:** `docs/prd/PRD-user-notifications.md` · **ADR:** `docs/adr/0017-user-notifications.md` · **Plan:** `docs/plans/plan-user-notifications.md`
 
-- [ ] **NT-1** Migration `notifications` + entity + owner-scoped repo (grouped upsert, mark-all, retention delete) + `UserSettingsRepository.findByUserId`
-- [ ] **NT-2** Events (`CommentRepliedEvent`, `CommentRemovedEvent`) + `NotificationEventListener` (AFTER_COMMIT, @Async virtual threads, recipients, grouping, never throws) + tests — after NT-1
-- [ ] **NT-3** `NotificationController` list / unread-count / read / read-all (owner-only, 404 for others) + tests — after NT-1
-- [ ] **NT-4** SSE: `NotificationPublisher` + `InMemorySsePublisher` (cap 5/user, 30-min timeout, 25 s heartbeat, gauge) + `/notifications/stream` header auth + tests — after NT-3
-- [ ] **NT-5** Email digest every 15 min (notify_email, ≤50% daily budget, emailed_at) + 90-day retention job + tests — after NT-1
-- [ ] **NT-6** FE: `sseStream.js` parser, `useNotificationStream` (fetch + header, backoff, stop on 401), polling fallback, bell + dropdown, deep link `?v=&c=` with highlight + tests — contract-first
+- [x] **NT-1** Migration `notifications` + entity + owner-scoped repo (grouped upsert, mark-all, retention delete) + `UserSettingsRepository.findByUserId`
+- [x] **NT-2** Events (`CommentRepliedEvent`, `CommentRemovedEvent`) + `NotificationEventListener` (AFTER_COMMIT, @Async virtual threads, recipients, grouping, never throws) + tests — after NT-1
+- [x] **NT-3** `NotificationController` list / unread-count / read / read-all (owner-only, 404 for others) + tests — after NT-1
+- [x] **NT-4** SSE: `NotificationPublisher` + `InMemorySsePublisher` (cap 5/user, 30-min timeout, 25 s heartbeat, gauge) + `/notifications/stream` header auth + tests — after NT-3
+- [x] **NT-5** Email digest every 15 min (notify_email, ≤50% daily budget, emailed_at) + 90-day retention job + tests — after NT-1
+- [x] **NT-6** FE: `sseStream.js` parser, `useNotificationStream` (fetch + header, backoff, stop on 401), polling fallback, bell + dropdown, deep link `?v=&c=` with highlight + tests — contract-first
 - [ ] **NT-7** Prod E2E (two accounts, restart reconnect, digest), optional nginx stream location, update `docs/tracking.md` — after all

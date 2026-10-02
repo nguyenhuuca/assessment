@@ -27,6 +27,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.canhlabs.funnyapp.event.CommentRemovedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -61,6 +63,7 @@ class AdminCommentServiceImplTest {
 
     @Mock VideoCommentRepository commentRepository;
     @Mock VideoSourceRepository videoSourceRepository;
+    @Mock ApplicationEventPublisher eventPublisher;
     @InjectMocks AdminCommentServiceImpl service;
 
     private static VideoComment comment(String videoId, String userId) {
@@ -343,6 +346,86 @@ class AdminCommentServiceImplTest {
         assertThat(remove.getUpdated()).isZero();
         assertThat(remove.getUnchanged()).isEqualTo(1);
         assertThat(deleted.getStatus()).isEqualTo(CommentStatus.DELETED);
+    }
+
+    // ── removal notification events ───────────────────────────────────────────
+
+    @Test
+    void moderate_remove_publishesRemovedEventWithReasonOnly() {
+        VideoComment c = comment("14", "a@b.com");
+        when(commentRepository.findById(c.getId())).thenReturn(Optional.of(c));
+
+        service.moderate(c.getId(), req(CommentModerationAction.REMOVE, CommentModerationReason.SPAM, "secret note"));
+
+        ArgumentCaptor<CommentRemovedEvent> cap = ArgumentCaptor.forClass(CommentRemovedEvent.class);
+        verify(eventPublisher).publishEvent(cap.capture());
+        assertThat(cap.getValue().reason()).isEqualTo(CommentModerationReason.SPAM);
+        assertThat(cap.getValue().comments()).containsExactly(
+                new CommentRemovedEvent.RemovedComment(c.getId(), "14", "a@b.com"));
+    }
+
+    @Test
+    void moderate_removeAlreadyRemoved_publishesNothing() {
+        VideoComment c = comment("14", "a@b.com");
+        c.setStatus(CommentStatus.REMOVED);
+        when(commentRepository.findById(c.getId())).thenReturn(Optional.of(c));
+
+        service.moderate(c.getId(), req(CommentModerationAction.REMOVE, CommentModerationReason.SPAM, null));
+
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
+    }
+
+    @Test
+    void moderate_restore_publishesNothing() {
+        VideoComment c = comment("14", "a@b.com");
+        c.setStatus(CommentStatus.REMOVED);
+        when(commentRepository.findById(c.getId())).thenReturn(Optional.of(c));
+
+        service.moderate(c.getId(), req(CommentModerationAction.RESTORE, null, null));
+
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
+    }
+
+    @Test
+    void bulkModerate_remove_publishesOneEventForChangedCommentsOnly() {
+        VideoComment changed = comment("14", "a@b.com");
+        VideoComment already = comment("15", "c@d.com");
+        already.setStatus(CommentStatus.REMOVED);
+        VideoComment deleted = comment("16", "e@f.com");
+        deleted.setStatus(CommentStatus.DELETED);
+        when(commentRepository.findAllById(any())).thenReturn(List.of(changed, already, deleted));
+
+        service.bulkModerate(bulk(List.of(changed.getId(), already.getId(), deleted.getId()),
+                CommentModerationAction.REMOVE, CommentModerationReason.HARASSMENT, null));
+
+        ArgumentCaptor<CommentRemovedEvent> cap = ArgumentCaptor.forClass(CommentRemovedEvent.class);
+        verify(eventPublisher).publishEvent(cap.capture());
+        assertThat(cap.getValue().reason()).isEqualTo(CommentModerationReason.HARASSMENT);
+        assertThat(cap.getValue().comments()).extracting(CommentRemovedEvent.RemovedComment::commentId)
+                .containsExactly(changed.getId());
+    }
+
+    @Test
+    void bulkModerate_removeNothingChanged_publishesNothing() {
+        VideoComment already = comment("15", "c@d.com");
+        already.setStatus(CommentStatus.REMOVED);
+        when(commentRepository.findAllById(any())).thenReturn(List.of(already));
+
+        service.bulkModerate(bulk(List.of(already.getId()), CommentModerationAction.REMOVE,
+                CommentModerationReason.SPAM, null));
+
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
+    }
+
+    @Test
+    void bulkModerate_restore_publishesNothing() {
+        VideoComment removed = comment("14", "a@b.com");
+        removed.setStatus(CommentStatus.REMOVED);
+        when(commentRepository.findAllById(any())).thenReturn(List.of(removed));
+
+        service.bulkModerate(bulk(List.of(removed.getId()), CommentModerationAction.RESTORE, null, null));
+
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
     }
 
     // ── bulkModerate ──────────────────────────────────────────────────────────

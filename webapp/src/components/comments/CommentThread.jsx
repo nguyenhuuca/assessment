@@ -69,14 +69,21 @@ export default function CommentThread({
   onSubmitReply,
   submitting,
   replyError,
+  highlightId,
 }) {
-  const [expanded, setExpanded] = useState(false)
   const replies = flattenReplies(root)
+  const highlightIdx = highlightId ? replies.findIndex(r => String(r.id) === String(highlightId)) : -1
+  const [expanded, setExpanded] = useState(highlightIdx >= COLLAPSED_COUNT)
+
+  // A later deep link to a collapsed reply expands the thread
+  useEffect(() => {
+    if (highlightIdx >= COLLAPSED_COUNT) setExpanded(true)
+  }, [highlightIdx])
   const visibleReplies = expanded ? replies : replies.slice(0, COLLAPSED_COUNT)
   const hidden = replies.length - visibleReplies.length
   const boxOpen = replyTo?.rootId === root.id
 
-  const itemProps = { user, isLoggedIn, confirmId, onAskDelete, onCancelDelete, onDelete }
+  const itemProps = { user, isLoggedIn, confirmId, onAskDelete, onCancelDelete, onDelete, highlightId }
 
   async function submit(text) {
     const ok = await onSubmitReply(root.id, text)

@@ -9,6 +9,7 @@ import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
+import com.canhlabs.funnyapp.service.notification.NotificationDigestService;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class AppScheduler implements ApplicationRunner {
     private final FfmpegService ffmpegService;
     private final VideoSourceRepository videoSourceRepository;
     private final AppProperties appProps;
+    private final NotificationDigestService notificationDigestService;
 
     @Value("${app.jobs.regenerate-thumbnails:false}")
     private boolean regenerateThumbnailsEnabled;
@@ -44,7 +46,8 @@ public class AppScheduler implements ApplicationRunner {
     public AppScheduler(YouTubeVideoService service, StreamVideoService streamVideoService,
                         StatsCache statsCache, VideoAccessService videoAccessService,
                         VideoStorageService videoStorageService, FfmpegService ffmpegService,
-                        VideoSourceRepository videoSourceRepository, AppProperties appProps
+                        VideoSourceRepository videoSourceRepository, AppProperties appProps,
+                        NotificationDigestService notificationDigestService
     ) {
         this.streamVideoService = streamVideoService;
         this.statsCache = statsCache;
@@ -53,6 +56,7 @@ public class AppScheduler implements ApplicationRunner {
         this.ffmpegService = ffmpegService;
         this.videoSourceRepository = videoSourceRepository;
         this.appProps = appProps;
+        this.notificationDigestService = notificationDigestService;
     }
 
     @Override
@@ -99,6 +103,26 @@ public class AppScheduler implements ApplicationRunner {
         }
     }
 
+
+    @Scheduled(cron = "0 */15 * * * *")
+    public void notificationDigest() {
+        try {
+            int sent = notificationDigestService.sendDigests();
+            log.info("Notification digest sent {} email(s)", sent);
+        } catch (Exception e) {
+            log.error("Error running notificationDigest job", e);
+        }
+    }
+
+    @Scheduled(cron = "0 30 3 * * *", zone = "Asia/Ho_Chi_Minh")
+    public void notificationRetention() {
+        try {
+            int deleted = notificationDigestService.purgeOldRead(Instant.now());
+            log.info("Notification retention deleted {} read notification(s)", deleted);
+        } catch (Exception e) {
+            log.error("Error running notificationRetention job", e);
+        }
+    }
 
     @Scheduled(cron = "0 0 3 30 2 *")
     public void cleanUpOldVideos() {

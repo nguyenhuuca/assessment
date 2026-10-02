@@ -50,3 +50,14 @@ describe('API client', () => {
     await expect(api.get('/test')).rejects.toMatchObject({ message: 'Unauthorized', status: 401 })
   })
 })
+
+describe('API client 204 handling', () => {
+  it('returns null for 204 No Content without parsing the body', async () => {
+    const json = vi.fn().mockRejectedValue(new SyntaxError('Unexpected end of JSON input'))
+    mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json })
+
+    const { api } = await import('../client.js')
+    await expect(api.patch('/notifications/read-all')).resolves.toBeNull()
+    expect(json).not.toHaveBeenCalled()
+  })
+})

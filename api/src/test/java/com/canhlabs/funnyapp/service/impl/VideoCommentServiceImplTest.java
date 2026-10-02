@@ -14,6 +14,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.canhlabs.funnyapp.event.CommentRepliedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,6 +43,9 @@ class VideoCommentServiceImplTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private VideoCommentServiceImpl service;
@@ -435,6 +440,71 @@ class VideoCommentServiceImplTest {
     private static void assertHttp(Throwable t, org.springframework.http.HttpStatus status) {
         assertThat(t).isInstanceOfSatisfying(com.canhlabs.funnyapp.exception.CustomException.class,
                 e -> assertThat(e.getStatus()).isEqualTo(status));
+    }
+
+    // -------------------------------------------------------------------------
+    // Reply notification events
+    // -------------------------------------------------------------------------
+
+    @Test
+    void createComment_replyToReply_publishesEventWithOriginalParentAndRoot() {
+        authenticateAs("u@x.com");
+        UUID rootId = UUID.randomUUID();
+        UUID midId = UUID.randomUUID();
+        UUID leafId = UUID.randomUUID();
+        when(repo.findById(leafId)).thenReturn(Optional.of(buildComment(leafId, "v", midId.toString(), "c@x.com", null, "leaf")));
+        when(repo.findById(midId)).thenReturn(Optional.of(buildComment(midId, "v", rootId.toString(), "b@x.com", null, "mid")));
+        when(repo.findById(rootId)).thenReturn(Optional.of(buildComment(rootId, "v", null, "a@x.com", null, "root")));
+        stubSave();
+        CreateCommentRequest req = CreateCommentRequest.builder()
+                .content("  hello \n\n  world ").parentId(leafId.toString()).build();
+
+        CreateCommentResponse res = service.createComment("v", req, null);
+
+        ArgumentCaptor<CommentRepliedEvent> cap = ArgumentCaptor.forClass(CommentRepliedEvent.class);
+        verify(eventPublisher).publishEvent(cap.capture());
+        CommentRepliedEvent e = cap.getValue();
+        assertThat(e.rootId()).isEqualTo(rootId.toString());
+        assertThat(e.parentId()).isEqualTo(leafId.toString()); // original target, not the normalized root
+        assertThat(e.commentId()).isEqualTo(res.getId());
+        assertThat(e.actorEmail()).isEqualTo("u@x.com");
+        assertThat(e.videoId()).isEqualTo("v");
+        assertThat(e.snippet()).isEqualTo("hello world");
+    }
+
+    @Test
+    void createComment_topLevel_publishesNoEvent() {
+        authenticateAs("u@x.com");
+        stubSave();
+
+        service.createComment("v", reply(null), null);
+
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
+    }
+
+    @Test
+    void createComment_guestReply_publishesEventWithNullActor() {
+        UUID rootId = UUID.randomUUID();
+        when(repo.findById(rootId)).thenReturn(Optional.of(buildComment(rootId, "v", null, "a@x.com", null, "root")));
+        stubSave();
+
+        service.createComment("v", reply(rootId.toString()), null);
+
+        ArgumentCaptor<CommentRepliedEvent> cap = ArgumentCaptor.forClass(CommentRepliedEvent.class);
+        verify(eventPublisher).publishEvent(cap.capture());
+        assertThat(cap.getValue().actorEmail()).isNull();
+    }
+
+    @Test
+    void createComment_failedReplyValidation_publishesNoEvent() {
+        authenticateAs("u@x.com");
+        UUID id = UUID.randomUUID();
+        when(repo.findById(id)).thenReturn(Optional.of(buildComment(id, "other", null, "a@x.com", null, "p")));
+
+        assertThatThrownBy(() -> service.createComment("v", reply(id.toString()), null))
+                .isInstanceOf(com.canhlabs.funnyapp.exception.CustomException.class);
+
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
     }
 
     @Test

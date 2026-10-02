@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth.js'
 import CommentThread from './CommentThread.jsx'
 import { countVisible } from './commentUtils.js'
 
-export default function CommentPanel({ video, onClose }) {
+export default function CommentPanel({ video, onClose, highlightCommentId = null }) {
   const { user, isLoggedIn } = useAuth()
   const [comments, setComments]     = useState([])
   const [loading, setLoading]       = useState(true)
@@ -162,6 +162,7 @@ export default function CommentPanel({ video, onClose }) {
                 onSubmitReply={handleReply}
                 submitting={submitting}
                 replyError={replyError}
+                highlightId={highlightCommentId}
               />
             ))
           )}

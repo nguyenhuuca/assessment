@@ -10,6 +10,7 @@ import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.CommentModerationAction;
 import com.canhlabs.funnyapp.enums.CommentModerationReason;
 import com.canhlabs.funnyapp.enums.CommentStatus;
+import com.canhlabs.funnyapp.event.CommentRemovedEvent;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
@@ -19,6 +20,7 @@ import com.canhlabs.funnyapp.utils.CommentAuthorUtils;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +49,7 @@ public class AdminCommentServiceImpl implements AdminCommentService {
 
     private final VideoCommentRepository commentRepository;
     private final VideoSourceRepository videoSourceRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional(readOnly = true)
@@ -73,6 +76,9 @@ public class AdminCommentServiceImpl implements AdminCommentService {
 
         if (apply(comment, request.getAction(), request.getReason(), note, moderator(), Instant.now())) {
             commentRepository.save(comment);
+            if (request.getAction() == CommentModerationAction.REMOVE) {
+                publishRemoved(List.of(comment), request.getReason());
+            }
         }
         return toDto(comment, loadTitles(List.of(comment)).get(comment.getVideoId()));
     }
@@ -95,6 +101,9 @@ public class AdminCommentServiceImpl implements AdminCommentService {
             }
         }
         commentRepository.saveAll(changed);
+        if (request.getAction() == CommentModerationAction.REMOVE) {
+            publishRemoved(changed, request.getReason());
+        }
 
         List<UUID> notFound = ids.stream().filter(id -> !found.contains(id)).toList();
         return BulkModerationResultDto.builder()
@@ -103,6 +112,18 @@ public class AdminCommentServiceImpl implements AdminCommentService {
                 .unchanged(found.size() - changed.size())
                 .notFound(notFound)
                 .build();
+    }
+
+    /**
+     * Notifies authors (after commit) of comments that actually changed to REMOVED; guests have no account.
+     */
+    private void publishRemoved(List<VideoComment> changed, CommentModerationReason reason) {
+        List<CommentRemovedEvent.RemovedComment> removed = changed.stream()
+                .map(c -> new CommentRemovedEvent.RemovedComment(c.getId(), c.getVideoId(), c.getUserId()))
+                .toList();
+        if (!removed.isEmpty()) {
+            eventPublisher.publishEvent(new CommentRemovedEvent(removed, reason));
+        }
     }
 
     /**

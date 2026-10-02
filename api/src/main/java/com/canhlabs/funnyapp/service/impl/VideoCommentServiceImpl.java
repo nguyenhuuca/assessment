@@ -15,6 +15,9 @@ import com.canhlabs.funnyapp.utils.AppUtils;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.canhlabs.funnyapp.event.CommentRepliedEvent;
+import com.canhlabs.funnyapp.utils.NotificationText;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,6 +39,11 @@ public class VideoCommentServiceImpl {
 
     private final VideoCommentRepository repo;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
+
+    /** Reply target: the thread root and the comment actually replied to (before normalization). */
+    private record ReplyTarget(String rootId, String parentId) {
+    }
 
 
     @Transactional(readOnly = true)
@@ -93,7 +101,7 @@ public class VideoCommentServiceImpl {
             token = UUID.randomUUID().toString();
         }
 
-        String rootParentId = resolveRootParentId(videoId, req.getParentId());
+        ReplyTarget target = resolveReplyTarget(videoId, req.getParentId());
 
         VideoComment saved = repo.save(VideoComment.builder()
                 .videoId(videoId)
@@ -101,9 +109,16 @@ public class VideoCommentServiceImpl {
                 .guestName(isGuest ? req.getGuestName() : null)
                 .guestTokenHash(isGuest ? token : null)
                 .content(req.getContent())
-                .parentId(rootParentId)
+                .parentId(target == null ? null : target.rootId())
                 .status(CommentStatus.VISIBLE)
                 .build());
+
+        if (target != null) {
+            // Delivered by NotificationEventListener only after this transaction commits
+            eventPublisher.publishEvent(new CommentRepliedEvent(videoId, target.rootId(), target.parentId(),
+                    saved.getId(), isGuest ? null : currentUser.getEmail(),
+                    NotificationText.snippet(req.getContent())));
+        }
 
         return CreateCommentResponse.builder()
                 .id(saved.getId())
@@ -112,10 +127,10 @@ public class VideoCommentServiceImpl {
     }
 
     /**
-     * Validates the reply target and returns the id of the thread root (threads are 2 levels deep).
-     * Returns null for a top-level comment.
+     * Validates the reply target and returns the thread root (threads are 2 levels deep) together with
+     * the comment replied to. Returns null for a top-level comment.
      */
-    private String resolveRootParentId(String videoId, String parentId) {
+    private ReplyTarget resolveReplyTarget(String videoId, String parentId) {
         if (StringUtils.isBlank(parentId)) {
             return null;
         }
@@ -142,7 +157,7 @@ public class VideoCommentServiceImpl {
             }
             root = next;
         }
-        return root.getId().toString();
+        return new ReplyTarget(root.getId().toString(), parent.getId().toString());
     }
 
     private VideoComment findById(String id) {

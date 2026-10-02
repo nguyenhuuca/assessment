@@ -13,6 +13,8 @@ import ExploreView from '../explore/ExploreView.jsx'
 import ComingSoon from './ComingSoon.jsx'
 import AdminView from '../admin/AdminView.jsx'
 import SettingsPage from '../settings/SettingsPage.jsx'
+import NotificationBell from '../notifications/NotificationBell.jsx'
+import { useNotificationStream } from '../../hooks/useNotifications.js'
 
 const TABS = [
   { key: 'popular', label: 'Popular', icon: 'local_fire_department' },
@@ -39,17 +41,45 @@ export default function AppShell() {
   const [profileOpen,   setProfileOpen]   = useState(false)
   const [shareOpen,     setShareOpen]     = useState(false)
   const [deleteModal,   setDeleteModal]   = useState({ show: false, video: null })
-  const [commentVideo,    setCommentVideo]    = useState(null)
+  // Deep link from the URL: ?v={videoId}[&c={commentId}] — read once, then strip from the address bar
+  const [initialLink] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    const v = params.get('v')
+    const c = params.get('c')
+    if (v) window.history.replaceState({}, document.title, window.location.pathname)
+    return { v: v || null, c: v && c ? c : null }
+  })
+  const [commentVideo,    setCommentVideo]    = useState(() => (initialLink.c ? { id: initialLink.v } : null))
+  const [highlightCommentId, setHighlightCommentId] = useState(initialLink.c)
+  const [feedKey,         setFeedKey]         = useState(0)
   const [mobileLoginOpen, setMobileLoginOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [jumpIndex,       setJumpIndex]       = useState(0)
   const [muted,           setMuted]           = useState(true)
-  const [deepLinkId,      setDeepLinkId]      = useState(() => {
-    const params = new URLSearchParams(window.location.search)
-    const v = params.get('v')
-    if (v) window.history.replaceState({}, document.title, window.location.pathname)
-    return v || null
-  })
+  const [deepLinkId,      setDeepLinkId]      = useState(initialLink.v)
+
+  useNotificationStream()
+
+  function showComments(video) {
+    setHighlightCommentId(null)
+    setCommentVideo(video)
+  }
+
+  function closeComments() {
+    setCommentVideo(null)
+    setHighlightCommentId(null)
+  }
+
+  // Notification click: jump to the video, open its comments and highlight the comment
+  function openNotification(n) {
+    if (!n?.videoId) return
+    setActiveNav('home')
+    setActiveTab('popular')
+    setDeepLinkId(String(n.videoId))
+    setFeedKey(k => k + 1)
+    setHighlightCommentId(n.commentId ? String(n.commentId) : null)
+    setCommentVideo({ id: String(n.videoId) })
+  }
 
   function showMsg(text, type = 'error') {
     setMessage({ text, type })
@@ -137,6 +167,7 @@ export default function AppShell() {
               }}>
                 {user?.email?.split('@')[0]}
               </span>
+              <NotificationBell onOpenNotification={openNotification} />
               <button className="icon-btn" onClick={() => setShareOpen(true)} title="Share video">
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>upload</span>
               </button>
@@ -183,6 +214,7 @@ export default function AppShell() {
           </>
         ) : (
             <>
+                  <NotificationBell overlay onOpenNotification={openNotification} />
                   <button
                     className="icon-btn mobile-overlay-icon"
                     onClick={() => setProfileOpen(true)}
@@ -277,6 +309,7 @@ export default function AppShell() {
           <>
             {activeTab === 'popular' && (
               <PublicFeed
+                key={`public-${feedKey}`}
                 category={null}
                 initialIndex={jumpIndex}
                 deepLinkId={deepLinkId}
@@ -285,7 +318,7 @@ export default function AppShell() {
                 onMutedChange={setMuted}
                 mobileSearchOpen={mobileSearchOpen}
                 onCloseMobileSearch={() => setMobileSearchOpen(false)}
-                onShowComments={setCommentVideo}
+                onShowComments={showComments}
                 onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
                 currentUser={user}
               />
@@ -297,7 +330,7 @@ export default function AppShell() {
                 onMutedChange={setMuted}
                 mobileSearchOpen={mobileSearchOpen}
                 onCloseMobileSearch={() => setMobileSearchOpen(false)}
-                onShowComments={setCommentVideo}
+                onShowComments={showComments}
                 onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
                 currentUser={user}
               />
@@ -308,7 +341,7 @@ export default function AppShell() {
                 onMutedChange={setMuted}
                 mobileSearchOpen={mobileSearchOpen}
                 onCloseMobileSearch={() => setMobileSearchOpen(false)}
-                onShowComments={setCommentVideo}
+                onShowComments={showComments}
                 onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
                 currentUser={user}
               />
@@ -414,7 +447,11 @@ export default function AppShell() {
 
       {/* ── Comment panel ── */}
       {commentVideo && (
-        <CommentPanel video={commentVideo} onClose={() => setCommentVideo(null)} />
+        <CommentPanel
+          video={commentVideo}
+          onClose={closeComments}
+          highlightCommentId={highlightCommentId}
+        />
       )}
     </>
   )

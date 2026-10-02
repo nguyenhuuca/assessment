@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { authorEmail, authorName, formatTime, getAvatarColor, getInitials } from './commentUtils.js'
 
 /**
@@ -15,14 +15,25 @@ export default function CommentItem({
   onCancelDelete,
   onDelete,
   onReply,
+  highlightId,
 }) {
+  const rowRef = useRef(null)
+  const highlighted = !!highlightId && String(highlightId) === String(c.id)
+
+  useEffect(() => {
+    if (highlighted) rowRef.current?.scrollIntoView?.({ block: 'center', behavior: 'smooth' })
+  }, [highlighted])
+
   const size = isReply ? 24 : 34
   const mine = !!user?.email && authorEmail(c) === user.email
 
   if (c.removed || c.deleted) {
     return (
       <div
+        ref={rowRef}
+        data-comment-id={c.id}
         data-testid={c.removed ? 'removed-comment' : 'deleted-comment'}
+        className={highlighted ? 'comment-highlight' : undefined}
         style={{ marginBottom: isReply ? 12 : 18, fontSize: 13, fontStyle: 'italic', color: 'var(--text-muted)' }}
       >
         {c.removed ? 'Bình luận đã bị gỡ do vi phạm chính sách' : 'Bình luận đã bị xoá'}
@@ -33,7 +44,12 @@ export default function CommentItem({
   const email = authorEmail(c)
 
   return (
-    <div style={{ display: 'flex', gap: 10, marginBottom: isReply ? 12 : 18, animation: 'fadeIn 0.2s ease' }}>
+    <div
+      ref={rowRef}
+      data-comment-id={c.id}
+      className={highlighted ? 'comment-highlight' : undefined}
+      style={{ display: 'flex', gap: 10, marginBottom: isReply ? 12 : 18, animation: highlighted ? undefined : 'fadeIn 0.2s ease' }}
+    >
       <div style={{
         width: size, height: size, borderRadius: '50%', flexShrink: 0,
         background: getAvatarColor(email),

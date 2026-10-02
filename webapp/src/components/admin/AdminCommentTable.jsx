@@ -1,15 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { REASONS } from '../../utils/moderationReasons.js'
 import { useAdminComments, useBulkModerateComments, useModerateComment } from '../../hooks/useAdmin.js'
-
-const REASONS = [
-  { code: 'SPAM',          label: 'Spam, quảng cáo, link lặp lại' },
-  { code: 'HARASSMENT',    label: 'Xúc phạm, bắt nạt, công kích cá nhân' },
-  { code: 'HATE_SPEECH',   label: 'Thù ghét (chủng tộc, tôn giáo, giới tính…)' },
-  { code: 'SEXUAL',        label: 'Nội dung tình dục / NSFW' },
-  { code: 'VIOLENCE',      label: 'Đe dọa, kích động bạo lực' },
-  { code: 'PERSONAL_INFO', label: 'Lộ thông tin cá nhân (SĐT, địa chỉ…)' },
-  { code: 'OTHER',         label: 'Khác (cần ghi chú)' },
-]
 
 const NOTE_MAX = 500
 const BULK_MAX = 100

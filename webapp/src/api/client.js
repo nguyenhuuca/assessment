@@ -1,4 +1,4 @@
-const getBaseUrl = () => import.meta.env.VITE_API_BASE_URL || 'https://canh-labs.com/api/v1/funny-app'
+export const getBaseUrl = () => import.meta.env.VITE_API_BASE_URL || 'https://canh-labs.com/api/v1/funny-app'
 
 function createHeaders(extra = {}) {
   const headers = { 'Content-Type': 'application/json', ...extra }
@@ -15,6 +15,8 @@ async function request(method, path, body) {
     headers: createHeaders(),
     body: body ? JSON.stringify(body) : undefined,
   })
+  // 204 No Content (e.g. PATCH .../read) has an empty body
+  if (res.status === 204) return null
   const data = await res.json()
   if (!res.ok) {
     const msg = data?.error?.message || `HTTP ${res.status}`

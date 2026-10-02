@@ -47,6 +47,7 @@ class AppSchedulerTest {
     @Mock VideoSourceRepository videoSourceRepository;
     @Mock AppProperties appProps;
     @Mock YouTubeVideoService youTubeVideoService;
+    @Mock com.canhlabs.funnyapp.service.notification.NotificationDigestService notificationDigestService;
 
     @InjectMocks
     AppScheduler scheduler;
@@ -285,6 +286,51 @@ class AppSchedulerTest {
         verify(videoAccessService).getLeastAccessedVideos(any(Duration.class), anyInt());
         // Storage service must not be touched (deletion is commented out in source)
         verifyNoInteractions(videoStorageService);
+    }
+
+    // ── notification jobs ──────────────────────────────────────────────────────
+
+    @Test
+    void notificationDigest_delegatesToService() {
+        when(notificationDigestService.sendDigests()).thenReturn(2);
+
+        scheduler.notificationDigest();
+
+        verify(notificationDigestService).sendDigests();
+    }
+
+    @Test
+    void notificationDigest_swallowsFailures() {
+        when(notificationDigestService.sendDigests()).thenThrow(new IllegalStateException("boom"));
+
+        org.assertj.core.api.Assertions.assertThatCode(() -> scheduler.notificationDigest()).doesNotThrowAnyException();
+    }
+
+    @Test
+    void notificationRetention_delegatesToService() {
+        when(notificationDigestService.purgeOldRead(any(java.time.Instant.class))).thenReturn(5);
+
+        scheduler.notificationRetention();
+
+        verify(notificationDigestService).purgeOldRead(any(java.time.Instant.class));
+    }
+
+    @Test
+    void notificationRetention_swallowsFailures() {
+        when(notificationDigestService.purgeOldRead(any(java.time.Instant.class))).thenThrow(new IllegalStateException("boom"));
+
+        org.assertj.core.api.Assertions.assertThatCode(() -> scheduler.notificationRetention()).doesNotThrowAnyException();
+    }
+
+    @Test
+    void notificationJobs_scheduleExpressions() throws Exception {
+        var digest = AppScheduler.class.getMethod("notificationDigest")
+                .getAnnotation(org.springframework.scheduling.annotation.Scheduled.class);
+        var retention = AppScheduler.class.getMethod("notificationRetention")
+                .getAnnotation(org.springframework.scheduling.annotation.Scheduled.class);
+        org.assertj.core.api.Assertions.assertThat(digest.cron()).isEqualTo("0 */15 * * * *");
+        org.assertj.core.api.Assertions.assertThat(retention.cron()).isEqualTo("0 30 3 * * *");
+        org.assertj.core.api.Assertions.assertThat(retention.zone()).isEqualTo("Asia/Ho_Chi_Minh");
     }
 
     // ── helpers ────────────────────────────────────────────────────────────────
