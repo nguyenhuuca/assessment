@@ -49,3 +49,4 @@ const cleanParams = (params = {}) =>
 
 export const getComments       = (params) => api.get(buildUrl('/admin/comments', cleanParams(params)))
 export const moderateComment   = (id, body) => patch(`/admin/comments/${id}/moderation`, body)
+export const bulkModerateComments = (body) => patch('/admin/comments/moderation', body)

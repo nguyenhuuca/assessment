@@ -329,4 +329,52 @@ class AdminControllerPermissionTest {
                 .totalVideos(10L).totalUsers(5L).pendingCount(1L).flaggedCount(0L)
                 .build();
     }
+
+    // ── bulk comments moderation ──────────────────────────────────────────────
+
+    private static final String BULK_URL = AppConstant.API.BASE_URL + "/admin/comments/moderation";
+
+    @Test
+    void bulkModerate_admin_returns200() throws Exception {
+        when(adminCommentService.bulkModerate(any())).thenReturn(
+                com.canhlabs.funnyapp.dto.admin.BulkModerationResultDto.builder().requested(1).updated(1).build());
+
+        mockMvc.perform(patch(BULK_URL)
+                        .contentType("application/json")
+                        .content("{\"ids\":[\"" + java.util.UUID.randomUUID() + "\"],\"action\":\"REMOVE\",\"reason\":\"SPAM\"}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void bulkModerate_emptyIds_returns400() throws Exception {
+        mockMvc.perform(patch(BULK_URL)
+                        .contentType("application/json")
+                        .content("{\"ids\":[],\"action\":\"RESTORE\"}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminCommentService);
+    }
+
+    @Test
+    void bulkModerate_tooManyIds_returns400() throws Exception {
+        String ids = java.util.stream.IntStream.range(0, 101)
+                .mapToObj(i -> "\"" + java.util.UUID.randomUUID() + "\"")
+                .collect(java.util.stream.Collectors.joining(","));
+        mockMvc.perform(patch(BULK_URL)
+                        .contentType("application/json")
+                        .content("{\"ids\":[" + ids + "],\"action\":\"RESTORE\"}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminCommentService);
+    }
+
+    @Test
+    void bulkModerate_userRole_returns403() throws Exception {
+        mockMvc.perform(patch(BULK_URL)
+                        .contentType("application/json")
+                        .content("{\"ids\":[\"" + java.util.UUID.randomUUID() + "\"],\"action\":\"RESTORE\"}")
+                        .with(authentication(principal(UserRole.USER, Permission.ADMIN.getBit()))))
+                .andExpect(status().isForbidden());
+    }
 }

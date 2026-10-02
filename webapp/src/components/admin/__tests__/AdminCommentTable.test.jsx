@@ -8,6 +8,7 @@ import * as adminApi from '../../../api/admin.js'
 vi.mock('../../../api/admin.js', () => ({
   getComments: vi.fn(),
   moderateComment: vi.fn(),
+  bulkModerateComments: vi.fn(),
 }))
 
 const visible = {
@@ -31,6 +32,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   adminApi.getComments.mockResolvedValue({ data: { content: [visible, removed], totalPages: 1, totalElements: 2, number: 0 } })
   adminApi.moderateComment.mockResolvedValue({})
+  adminApi.bulkModerateComments.mockResolvedValue({ data: { requested: 2, updated: 1, unchanged: 1, notFound: [] } })
 })
 afterEach(() => vi.restoreAllMocks())
 
@@ -101,5 +103,64 @@ describe('AdminCommentTable', () => {
     await screen.findByText('buy now')
     fireEvent.click(screen.getByTitle('Restore'))
     expect(adminApi.moderateComment).not.toHaveBeenCalled()
+  })
+
+  it('bulk bar appears only when rows are selected', async () => {
+    renderTable()
+    await screen.findByText('hello world')
+    expect(screen.queryByRole('toolbar', { name: 'Bulk actions' })).toBeNull()
+    fireEvent.click(screen.getByLabelText('Select comment c1'))
+    expect(screen.getByRole('toolbar', { name: 'Bulk actions' }).textContent).toContain('Đã chọn 1')
+    fireEvent.click(screen.getByRole('button', { name: 'Bỏ chọn' }))
+    expect(screen.queryByRole('toolbar', { name: 'Bulk actions' })).toBeNull()
+  })
+
+  it('select all selects every row on the page and toggles off', async () => {
+    renderTable()
+    await screen.findByText('hello world')
+    fireEvent.click(screen.getByLabelText('Select all on page'))
+    expect(screen.getByLabelText('Select comment c1').checked).toBe(true)
+    expect(screen.getByLabelText('Select comment c2').checked).toBe(true)
+    fireEvent.click(screen.getByLabelText('Select all on page'))
+    expect(screen.getByLabelText('Select comment c1').checked).toBe(false)
+  })
+
+  it('bulk remove requires a reason and sends all selected ids', async () => {
+    renderTable()
+    await screen.findByText('hello world')
+    fireEvent.click(screen.getByLabelText('Select all on page'))
+    fireEvent.click(screen.getByRole('button', { name: 'Gỡ đã chọn' }))
+    expect(screen.getByRole('dialog').textContent).toContain('2 bình luận đã chọn')
+    fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
+    expect((await screen.findByRole('alert')).textContent).toContain('chọn lý do')
+    expect(adminApi.bulkModerateComments).not.toHaveBeenCalled()
+
+    fireEvent.change(screen.getByLabelText('Lý do'), { target: { value: 'SPAM' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
+    await waitFor(() =>
+      expect(adminApi.bulkModerateComments).toHaveBeenCalledWith({ ids: ['c1', 'c2'], action: 'REMOVE', reason: 'SPAM' })
+    )
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect((await screen.findByRole('status')).textContent).toContain('Đã gỡ 1 bình luận (1 không thay đổi)')
+    expect(screen.queryByRole('toolbar', { name: 'Bulk actions' })).toBeNull()
+  })
+
+  it('bulk restore confirms then calls the API', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    renderTable()
+    await screen.findByText('buy now')
+    fireEvent.click(screen.getByLabelText('Select comment c2'))
+    fireEvent.click(screen.getByRole('button', { name: 'Khôi phục đã chọn' }))
+    await waitFor(() =>
+      expect(adminApi.bulkModerateComments).toHaveBeenCalledWith({ ids: ['c2'], action: 'RESTORE' })
+    )
+  })
+
+  it('changing the status filter clears the selection', async () => {
+    renderTable()
+    await screen.findByText('hello world')
+    fireEvent.click(screen.getByLabelText('Select comment c1'))
+    fireEvent.change(screen.getByLabelText('Status filter'), { target: { value: 'REMOVED' } })
+    await waitFor(() => expect(screen.queryByRole('toolbar', { name: 'Bulk actions' })).toBeNull())
   })
 })

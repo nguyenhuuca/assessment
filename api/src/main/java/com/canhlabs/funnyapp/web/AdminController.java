@@ -5,6 +5,8 @@ import com.canhlabs.funnyapp.aop.HasPermission;
 import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
+import com.canhlabs.funnyapp.dto.admin.BulkModerateCommentRequest;
+import com.canhlabs.funnyapp.dto.admin.BulkModerationResultDto;
 import com.canhlabs.funnyapp.dto.admin.ModerateCommentRequest;
 import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.service.AdminCommentService;
@@ -151,6 +153,19 @@ public class AdminController {
         Page<AdminCommentDto> data = adminCommentService.getComments(pageable, status, q, videoId);
         return ResponseEntity.ok(ResultObjectInfo.<Page<AdminCommentDto>>builder()
                 .status(ResultStatus.SUCCESS)
+                .data(data)
+                .build());
+    }
+
+    @PatchMapping("/comments/moderation")
+    @AuditLog("bulkModerateComments")
+    @HasPermission(perm = Permission.ADMIN)
+    public ResponseEntity<ResultObjectInfo<BulkModerationResultDto>> bulkModerateComments(
+            @Valid @RequestBody BulkModerateCommentRequest request) {
+        BulkModerationResultDto data = adminCommentService.bulkModerate(request);
+        return ResponseEntity.ok(ResultObjectInfo.<BulkModerationResultDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .message("Comments moderated")
                 .data(data)
                 .build());
     }

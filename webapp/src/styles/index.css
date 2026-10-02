@@ -2125,3 +2125,19 @@ body {
   -webkit-line-clamp: unset;
   line-clamp: unset;
 }
+
+/* ── Admin bulk actions ── */
+.admin-bulk-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  font-size: 13px;
+}
+.admin-bulk-bar > span { margin-right: auto; font-weight: 700; }
+.admin-table-row.selected { background: rgba(0, 238, 252, 0.06); }

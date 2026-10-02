@@ -1,6 +1,8 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
+import com.canhlabs.funnyapp.dto.admin.BulkModerationResultDto;
+import com.canhlabs.funnyapp.dto.admin.BulkModerateCommentRequest;
 import com.canhlabs.funnyapp.dto.admin.ModerateCommentRequest;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.VideoComment;
@@ -50,6 +52,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -225,7 +228,6 @@ class AdminCommentServiceImplTest {
     @Test
     void moderate_removeOtherWithoutNote_returns400() {
         VideoComment c = comment("14", "a@b.com");
-        when(commentRepository.findById(c.getId())).thenReturn(Optional.of(c));
 
         assertThatThrownBy(() -> service.moderate(c.getId(),
                 req(CommentModerationAction.REMOVE, CommentModerationReason.OTHER, "   ")))
@@ -238,7 +240,6 @@ class AdminCommentServiceImplTest {
     @Test
     void moderate_removeWithoutReason_returns400() {
         VideoComment c = comment("14", "a@b.com");
-        when(commentRepository.findById(c.getId())).thenReturn(Optional.of(c));
 
         assertThatThrownBy(() -> service.moderate(c.getId(), req(CommentModerationAction.REMOVE, null, null)))
                 .isInstanceOfSatisfying(CustomException.class,
@@ -296,5 +297,78 @@ class AdminCommentServiceImplTest {
         service.moderate(c.getId(), req(CommentModerationAction.RESTORE, null, null));
 
         verify(commentRepository, never()).save(any());
+    }
+
+    // ── bulkModerate ──────────────────────────────────────────────────────────
+
+    private static BulkModerateCommentRequest bulk(List<UUID> ids, CommentModerationAction a,
+                                                   CommentModerationReason r, String note) {
+        return BulkModerateCommentRequest.builder().ids(ids).action(a).reason(r).note(note).build();
+    }
+
+    @Test
+    void bulkModerate_remove_updatesFoundSkipsAlreadyRemovedAndReportsMissing() {
+        VideoComment a = comment("14", "a@b.com");
+        VideoComment b = comment("14", "");
+        VideoComment already = comment("15", "c@d.com");
+        already.setStatus(CommentStatus.REMOVED);
+        already.setModeratedBy("first@x.com");
+        UUID missing = UUID.randomUUID();
+        List<UUID> ids = List.of(a.getId(), b.getId(), already.getId(), missing, a.getId()); // duplicate a
+        when(commentRepository.findAllById(any())).thenReturn(List.of(a, b, already));
+        UserDetailDto admin = UserDetailDto.builder().id(1L).email("admin@x.com").build();
+
+        BulkModerationResultDto result;
+        try (MockedStatic<AppUtils> m = mockStatic(AppUtils.class, CALLS_REAL_METHODS)) {
+            m.when(AppUtils::getCurrentUser).thenReturn(admin);
+            result = service.bulkModerate(bulk(ids, CommentModerationAction.REMOVE, CommentModerationReason.SPAM, null));
+        }
+
+        assertThat(result.getRequested()).isEqualTo(4);
+        assertThat(result.getUpdated()).isEqualTo(2);
+        assertThat(result.getUnchanged()).isEqualTo(1);
+        assertThat(result.getNotFound()).containsExactly(missing);
+        assertThat(a.getStatus()).isEqualTo(CommentStatus.REMOVED);
+        assertThat(b.getModeratedBy()).isEqualTo("admin@x.com");
+        assertThat(a.getModeratedAt()).isEqualTo(b.getModeratedAt());
+        assertThat(already.getModeratedBy()).isEqualTo("first@x.com");
+        ArgumentCaptor<List<VideoComment>> saved = ArgumentCaptor.forClass(List.class);
+        verify(commentRepository).saveAll(saved.capture());
+        assertThat(saved.getValue()).containsExactlyInAnyOrder(a, b);
+    }
+
+    @Test
+    void bulkModerate_restore_onlyChangesRemoved() {
+        VideoComment removed = comment("14", "a@b.com");
+        removed.setStatus(CommentStatus.REMOVED);
+        removed.setModerationReason(CommentModerationReason.SPAM);
+        VideoComment visible = comment("14", "a@b.com");
+        when(commentRepository.findAllById(any())).thenReturn(List.of(removed, visible));
+
+        BulkModerationResultDto result = service.bulkModerate(
+                bulk(List.of(removed.getId(), visible.getId()), CommentModerationAction.RESTORE, null, null));
+
+        assertThat(result.getUpdated()).isEqualTo(1);
+        assertThat(result.getUnchanged()).isEqualTo(1);
+        assertThat(removed.getStatus()).isEqualTo(CommentStatus.VISIBLE);
+        assertThat(removed.getModerationReason()).isEqualTo(CommentModerationReason.SPAM); // history kept
+    }
+
+    @Test
+    void bulkModerate_removeWithoutReason_returns400BeforeLoading() {
+        assertThatThrownBy(() -> service.bulkModerate(
+                bulk(List.of(UUID.randomUUID()), CommentModerationAction.REMOVE, null, null)))
+                .isInstanceOfSatisfying(CustomException.class,
+                        e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST));
+        verifyNoInteractions(commentRepository);
+    }
+
+    @Test
+    void bulkModerate_otherWithoutNote_returns400() {
+        assertThatThrownBy(() -> service.bulkModerate(
+                bulk(List.of(UUID.randomUUID()), CommentModerationAction.REMOVE, CommentModerationReason.OTHER, " ")))
+                .isInstanceOfSatisfying(CustomException.class,
+                        e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST));
+        verifyNoInteractions(commentRepository);
     }
 }

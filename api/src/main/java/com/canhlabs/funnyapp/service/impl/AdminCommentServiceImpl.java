@@ -1,10 +1,13 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
+import com.canhlabs.funnyapp.dto.admin.BulkModerateCommentRequest;
+import com.canhlabs.funnyapp.dto.admin.BulkModerationResultDto;
 import com.canhlabs.funnyapp.dto.admin.ModerateCommentRequest;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.VideoComment;
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.enums.CommentModerationAction;
 import com.canhlabs.funnyapp.enums.CommentModerationReason;
 import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
@@ -29,6 +32,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,44 +63,87 @@ public class AdminCommentServiceImpl implements AdminCommentService {
     @Override
     @Transactional
     public AdminCommentDto moderate(UUID id, ModerateCommentRequest request) {
+        String note = validate(request.getAction(), request.getReason(), request.getNote());
         VideoComment comment = commentRepository.findById(id)
                 .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4041, "Comment not found"));
 
-        switch (request.getAction()) {
-            case REMOVE -> remove(comment, request);
-            case RESTORE -> restore(comment);
+        if (apply(comment, request.getAction(), request.getReason(), note, moderator(), Instant.now())) {
+            commentRepository.save(comment);
         }
         return toDto(comment, loadTitles(List.of(comment)).get(comment.getVideoId()));
     }
 
-    private void remove(VideoComment comment, ModerateCommentRequest request) {
-        CommentModerationReason reason = request.getReason();
-        if (reason == null) {
-            throw error(HttpStatus.BAD_REQUEST, 4001, "Reason is required to remove a comment");
+    @Override
+    @Transactional
+    public BulkModerationResultDto bulkModerate(BulkModerateCommentRequest request) {
+        String note = validate(request.getAction(), request.getReason(), request.getNote());
+        Set<UUID> ids = new LinkedHashSet<>(request.getIds());
+        List<VideoComment> comments = commentRepository.findAllById(ids);
+
+        String moderator = moderator();
+        Instant now = Instant.now();
+        List<VideoComment> changed = new ArrayList<>();
+        Set<UUID> found = new HashSet<>();
+        for (VideoComment c : comments) {
+            found.add(c.getId());
+            if (apply(c, request.getAction(), request.getReason(), note, moderator, now)) {
+                changed.add(c);
+            }
         }
-        String note = request.getNote() == null ? null : request.getNote().trim();
-        boolean noteBlank = note == null || note.isEmpty();
-        if (reason == CommentModerationReason.OTHER && noteBlank) {
-            throw error(HttpStatus.BAD_REQUEST, 4002, "Note is required when reason is OTHER");
-        }
-        if (comment.getStatus() == CommentStatus.REMOVED) {
-            return; // idempotent: keep the original moderation record
-        }
-        UserDetailDto admin = AppUtils.getCurrentUser();
-        comment.setStatus(CommentStatus.REMOVED);
-        comment.setModerationReason(reason);
-        comment.setModerationNote(noteBlank ? null : note);
-        comment.setModeratedBy(admin != null ? admin.getEmail() : "unknown");
-        comment.setModeratedAt(Instant.now());
-        commentRepository.save(comment);
+        commentRepository.saveAll(changed);
+
+        List<UUID> notFound = ids.stream().filter(id -> !found.contains(id)).toList();
+        return BulkModerationResultDto.builder()
+                .requested(ids.size())
+                .updated(changed.size())
+                .unchanged(found.size() - changed.size())
+                .notFound(notFound)
+                .build();
     }
 
-    private void restore(VideoComment comment) {
+    /**
+     * Validates reason/note for the action once, before touching any row. Returns the trimmed note (or null).
+     */
+    private static String validate(CommentModerationAction action, CommentModerationReason reason, String rawNote) {
+        String note = rawNote == null || rawNote.isBlank() ? null : rawNote.trim();
+        if (action == CommentModerationAction.REMOVE) {
+            if (reason == null) {
+                throw error(HttpStatus.BAD_REQUEST, 4001, "Reason is required to remove a comment");
+            }
+            if (reason == CommentModerationReason.OTHER && note == null) {
+                throw error(HttpStatus.BAD_REQUEST, 4002, "Note is required when reason is OTHER");
+            }
+        }
+        return note;
+    }
+
+    /**
+     * Applies the action in memory. Idempotent: returns false when the comment is already in the target state
+     * (a second REMOVE keeps the original moderation record).
+     */
+    private static boolean apply(VideoComment comment, CommentModerationAction action,
+                                 CommentModerationReason reason, String note, String moderator, Instant now) {
+        if (action == CommentModerationAction.REMOVE) {
+            if (comment.getStatus() == CommentStatus.REMOVED) {
+                return false;
+            }
+            comment.setStatus(CommentStatus.REMOVED);
+            comment.setModerationReason(reason);
+            comment.setModerationNote(note);
+            comment.setModeratedBy(moderator);
+            comment.setModeratedAt(now);
+            return true;
+        }
         if (comment.getStatus() == CommentStatus.VISIBLE) {
-            return; // idempotent
+            return false;
         }
         comment.setStatus(CommentStatus.VISIBLE); // moderation_* kept for history
-        commentRepository.save(comment);
+        return true;
+    }
+
+    private static String moderator() {
+        UserDetailDto admin = AppUtils.getCurrentUser();
+        return admin != null ? admin.getEmail() : "unknown";
     }
 
     private static Specification<VideoComment> buildSpec(CommentStatus status, String q, String videoId) {

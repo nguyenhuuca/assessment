@@ -79,3 +79,14 @@ export function useModerateComment() {
     },
   })
 }
+
+export function useBulkModerateComments() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (body) => adminApi.bulkModerateComments(body),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'comments'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'stats'] })
+    },
+  })
+}
