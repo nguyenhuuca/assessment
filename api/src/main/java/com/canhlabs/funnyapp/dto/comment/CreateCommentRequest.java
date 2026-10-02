@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.dto.comment;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ import lombok.Setter;
 public class CreateCommentRequest {
     private String guestName;          // optional
     @NotBlank
+    @Size(max = 2000)
     private String content;
     private String parentId;             // optional
 }

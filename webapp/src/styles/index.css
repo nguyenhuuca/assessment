@@ -2103,6 +2103,39 @@ body {
   color: #00c853;
   border: 1px solid #00c853;
 }
+.admin-badge.deleted {
+  background: rgba(173, 170, 170, 0.13);
+  color: var(--text-muted);
+  border: 1px solid var(--text-muted);
+}
+.admin-reply-tag {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-cyan);
+}
+
+/* ── Comment replies ── */
+.comment-replies {
+  margin-left: 40px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+}
+.comment-reply-box {
+  margin: 4px 0 14px;
+}
+.comment-action-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.comment-action-link:hover { color: var(--text); }
+.comment-action-link.danger { color: #ff6b6b; font-weight: 700; }
+
 .admin-filters {
   display: flex;
   gap: 8px;

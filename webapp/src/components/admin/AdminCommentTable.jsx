@@ -187,6 +187,7 @@ export default function AdminCommentTable() {
           <option value="ALL">ALL</option>
           <option value="VISIBLE">VISIBLE</option>
           <option value="REMOVED">REMOVED</option>
+          <option value="DELETED">DELETED</option>
         </select>
         <input
           className="app-input"
@@ -245,6 +246,8 @@ export default function AdminCommentTable() {
             <tbody>
               {comments.map(c => {
                 const removed = c.status === 'REMOVED'
+                const deleted = c.status === 'DELETED'
+                const badgeClass = removed ? 'removed' : deleted ? 'deleted' : 'visible'
                 const tip = removed
                   ? [c.moderationReason, c.moderationNote, c.moderatedBy && `by ${c.moderatedBy}`, c.moderatedAt && formatDate(c.moderatedAt)]
                       .filter(Boolean).join(' · ')
@@ -260,6 +263,7 @@ export default function AdminCommentTable() {
                       />
                     </td>
                     <td>
+                      {c.parentId && <span className="admin-reply-tag">↳ Reply</span>}
                       <div
                         className={`admin-comment-text${expanded[c.id] ? ' expanded' : ''}`}
                         onClick={() => setExpanded(prev => ({ ...prev, [c.id]: !prev[c.id] }))}
@@ -274,7 +278,7 @@ export default function AdminCommentTable() {
                     </td>
                     <td className="admin-cell-muted">{formatDate(c.createdAt)}</td>
                     <td>
-                      <span className={`admin-badge ${removed ? 'removed' : 'visible'}`} title={tip}>
+                      <span className={`admin-badge ${badgeClass}`} title={tip}>
                         {c.status}
                       </span>
                       {removed && c.moderationReason && (
@@ -283,7 +287,7 @@ export default function AdminCommentTable() {
                     </td>
                     <td>
                       <div className="admin-actions">
-                        {removed ? (
+                        {deleted ? null : removed ? (
                           <button className="admin-action-btn" onClick={() => restore(c)} title="Restore">
                             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>restore</span>
                           </button>

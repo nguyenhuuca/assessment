@@ -2,26 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { commentsApi } from '../../api/comments.js'
 import { useAuth } from '../../hooks/useAuth.js'
 
-function hashCode(str) {
-  let hash = 0
-  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash)
-  return hash
-}
-function getAvatarColor(email = '') {
-  const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22']
-  return colors[Math.abs(hashCode(email)) % colors.length]
-}
-function getInitials(email = '') { return email ? email[0].toUpperCase() : '?' }
-function formatTime(dateStr) {
-  if (!dateStr) return ''
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  return `${Math.floor(hrs / 24)}d ago`
-}
+import CommentThread from './CommentThread.jsx'
+import { countVisible } from './commentUtils.js'
 
 export default function CommentPanel({ video, onClose }) {
   const { user, isLoggedIn } = useAuth()
@@ -31,6 +13,8 @@ export default function CommentPanel({ video, onClose }) {
   const [submitting, setSubmitting] = useState(false)
   const [confirmId, setConfirmId]   = useState(null) // inline delete confirm
   const [error, setError]           = useState('')
+  const [replyTo, setReplyTo]       = useState(null) // { rootId, name } — only one reply box open
+  const [replyError, setReplyError] = useState('')
   const inputRef = useRef(null)
 
   function loadComments(videoId) {
@@ -66,10 +50,32 @@ export default function CommentPanel({ video, onClose }) {
     finally { setSubmitting(false) }
   }
 
+  // Reply to a thread; the server normalizes parentId to the root. Resolves true on success.
+  async function handleReply(rootId, content) {
+    if (!isLoggedIn) return false
+    setSubmitting(true)
+    setReplyError('')
+    try {
+      await commentsApi.post(video.id, content, rootId)
+      await loadComments(video.id)
+      setReplyTo(null)
+      return true
+    } catch (e) {
+      setReplyError(e?.message || 'Không gửi được phản hồi, thử lại sau')
+      return false
+    } finally { setSubmitting(false) }
+  }
+
+  function openReply(target) {
+    setReplyError('')
+    setReplyTo(target)
+  }
+
   async function handleDelete(commentId) {
     try {
       await commentsApi.delete(video.id, commentId)
-      setComments(prev => prev.filter(c => c.id !== commentId))
+      // Reload: the server may keep a "deleted" placeholder when the comment has replies
+      await loadComments(video.id)
     } catch {}
     finally { setConfirmId(null) }
   }
@@ -78,7 +84,7 @@ export default function CommentPanel({ video, onClose }) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handlePost() }
   }
 
-  const email = (c) => c.userEmail || c.email || c.userId || c.guestName || ''
+  const total = countVisible(comments)
 
   return (
     <>
@@ -116,7 +122,7 @@ export default function CommentPanel({ video, onClose }) {
             <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>Comments</div>
             {!loading && (
               <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                {comments.length} comment{comments.length !== 1 ? 's' : ''}
+                {total} comment{total !== 1 ? 's' : ''}
               </div>
             )}
           </div>
@@ -140,71 +146,23 @@ export default function CommentPanel({ video, onClose }) {
               <span style={{ fontSize: 13 }}>No comments yet</span>
             </div>
           ) : (
-            comments.map(c => c.removed ? (
-              <div
+            comments.map(c => (
+              <CommentThread
                 key={c.id}
-                data-testid="removed-comment"
-                style={{ marginBottom: 18, fontSize: 13, fontStyle: 'italic', color: 'var(--text-muted)' }}
-              >
-                Bình luận đã bị gỡ do vi phạm chính sách
-              </div>
-            ) : (
-              <div key={c.id} style={{
-                display: 'flex', gap: 10, marginBottom: 18,
-                animation: 'fadeIn 0.2s ease',
-              }}>
-                {/* Avatar */}
-                <div style={{
-                  width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                  background: getAvatarColor(email(c)),
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#fff', fontWeight: 700, fontSize: 13,
-                }}>
-                  {getInitials(email(c))}
-                </div>
-
-                {/* Body */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent-cyan)', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {email(c).split('@')[0]}
-                    </span>
-                    <span style={{ fontSize: 10, color: 'var(--text-muted)', flexShrink: 0 }}>
-                      {formatTime(c.createdAt || c.created_at)}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.5, margin: 0, wordBreak: 'break-word' }}>
-                    {c.content}
-                  </p>
-
-                  {/* Delete / inline confirm */}
-                  {email(c) === user?.email && (
-                    confirmId === c.id ? (
-                      <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-                        <button
-                          onClick={() => handleDelete(c.id)}
-                          style={{ background: 'none', border: 'none', color: '#ff6b6b', fontSize: 11, fontWeight: 700, cursor: 'pointer', padding: 0 }}
-                        >
-                          Confirm delete
-                        </button>
-                        <button
-                          onClick={() => setConfirmId(null)}
-                          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', padding: 0 }}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setConfirmId(c.id)}
-                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', padding: 0, marginTop: 4 }}
-                      >
-                        Delete
-                      </button>
-                    )
-                  )}
-                </div>
-              </div>
+                root={c}
+                user={user}
+                isLoggedIn={isLoggedIn}
+                confirmId={confirmId}
+                onAskDelete={setConfirmId}
+                onCancelDelete={() => setConfirmId(null)}
+                onDelete={handleDelete}
+                replyTo={replyTo}
+                onReplyTo={openReply}
+                onCloseReply={() => setReplyTo(null)}
+                onSubmitReply={handleReply}
+                submitting={submitting}
+                replyError={replyError}
+              />
             ))
           )}
         </div>

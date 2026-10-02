@@ -299,6 +299,52 @@ class AdminCommentServiceImplTest {
         verify(commentRepository, never()).save(any());
     }
 
+    @Test
+    void moderate_restoreDeleted_returns400() {
+        VideoComment c = comment("abc", "a@b.com");
+        c.setStatus(CommentStatus.DELETED);
+        when(commentRepository.findById(c.getId())).thenReturn(Optional.of(c));
+
+        assertThatThrownBy(() -> service.moderate(c.getId(), req(CommentModerationAction.RESTORE, null, null)))
+                .isInstanceOfSatisfying(CustomException.class, e -> {
+                    assertThat(e.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+                    assertThat(e.getMessage()).contains("Deleted by author");
+                });
+        verify(commentRepository, never()).save(any());
+        assertThat(c.getStatus()).isEqualTo(CommentStatus.DELETED);
+    }
+
+    @Test
+    void moderate_removeDeleted_isNoOp() {
+        VideoComment c = comment("abc", "a@b.com");
+        c.setStatus(CommentStatus.DELETED);
+        when(commentRepository.findById(c.getId())).thenReturn(Optional.of(c));
+
+        service.moderate(c.getId(), req(CommentModerationAction.REMOVE, CommentModerationReason.SPAM, null));
+
+        assertThat(c.getStatus()).isEqualTo(CommentStatus.DELETED);
+        assertThat(c.getModeratedBy()).isNull();
+        verify(commentRepository, never()).save(any());
+    }
+
+    @Test
+    void bulkModerate_deletedComments_countedAsUnchangedForBothActions() {
+        VideoComment deleted = comment("14", "a@b.com");
+        deleted.setStatus(CommentStatus.DELETED);
+        when(commentRepository.findAllById(any())).thenReturn(List.of(deleted));
+
+        BulkModerationResultDto restore = service.bulkModerate(
+                bulk(List.of(deleted.getId()), CommentModerationAction.RESTORE, null, null));
+        BulkModerationResultDto remove = service.bulkModerate(
+                bulk(List.of(deleted.getId()), CommentModerationAction.REMOVE, CommentModerationReason.SPAM, null));
+
+        assertThat(restore.getUpdated()).isZero();
+        assertThat(restore.getUnchanged()).isEqualTo(1);
+        assertThat(remove.getUpdated()).isZero();
+        assertThat(remove.getUnchanged()).isEqualTo(1);
+        assertThat(deleted.getStatus()).isEqualTo(CommentStatus.DELETED);
+    }
+
     // ── bulkModerate ──────────────────────────────────────────────────────────
 
     private static BulkModerateCommentRequest bulk(List<UUID> ids, CommentModerationAction a,

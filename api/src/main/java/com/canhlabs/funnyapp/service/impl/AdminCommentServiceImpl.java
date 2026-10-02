@@ -67,6 +67,10 @@ public class AdminCommentServiceImpl implements AdminCommentService {
         VideoComment comment = commentRepository.findById(id)
                 .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4041, "Comment not found"));
 
+        if (request.getAction() == CommentModerationAction.RESTORE && comment.getStatus() == CommentStatus.DELETED) {
+            throw error(HttpStatus.BAD_REQUEST, 4003, "Deleted by author");
+        }
+
         if (apply(comment, request.getAction(), request.getReason(), note, moderator(), Instant.now())) {
             commentRepository.save(comment);
         }
@@ -119,10 +123,15 @@ public class AdminCommentServiceImpl implements AdminCommentService {
 
     /**
      * Applies the action in memory. Idempotent: returns false when the comment is already in the target state
-     * (a second REMOVE keeps the original moderation record).
+     * (a second REMOVE keeps the original moderation record). Comments deleted by their author are never
+     * changed by moderation: REMOVE and RESTORE are both no-ops here (single RESTORE is rejected earlier with 400;
+     * in bulk they count as "unchanged" so one such row does not fail the whole batch).
      */
     private static boolean apply(VideoComment comment, CommentModerationAction action,
                                  CommentModerationReason reason, String note, String moderator, Instant now) {
+        if (comment.getStatus() == CommentStatus.DELETED) {
+            return false;
+        }
         if (action == CommentModerationAction.REMOVE) {
             if (comment.getStatus() == CommentStatus.REMOVED) {
                 return false;

@@ -2,5 +2,6 @@ package com.canhlabs.funnyapp.enums;
 
 public enum CommentStatus {
     VISIBLE,
-    REMOVED
+    REMOVED,
+    DELETED
 }

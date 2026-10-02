@@ -89,3 +89,15 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **CM-4** `admin.js` + hooks + `AdminCommentTable` (filters, remove modal w/ reason, restore) + COMMENTS tab + stat card + CommentPanel placeholder + tests/lint/build — contract-first, integrates after CM-3
 - [x] **CM-6** Bulk moderation: `PATCH /admin/comments/moderation` (≤100 ids, REMOVE/RESTORE, @AuditLog) + checkbox select / select-all page + bulk bar (Gỡ / Khôi phục / Bỏ chọn) + tests
 - [ ] **CM-5** E2E on prod (remove → hidden → restore), 403 for non-admin, AUDIT log check, update `docs/tracking.md` — depends on CM-2, CM-3, CM-4
+
+---
+
+## Feature: Comment Replies
+
+**Plan:** `docs/plans/plan-comment-replies.md`
+
+- [x] **RC-1** BE: validate `parentId` (exists 404, same video 400, VISIBLE 400, bad UUID 400), normalize to thread root, `content` `@Size(max=2000)` + tests
+- [x] **RC-2** BE: migration `202610020002-comment-status-deleted.sql`, `CommentStatus.DELETED`, owner delete with replies → soft DELETED placeholder (no cascade of others' replies), `CommentNode.deleted`, admin RESTORE on DELETED → 400 + tests + `mvn verify` — after RC-1
+- [x] **RC-3** FE: `comments.post(..., parentId)`, `CommentItem` + `CommentThread`, 2-level threads, collapse after 2, inline reply box (`@name` prefill, Esc/Enter), removed/deleted placeholders + tests/lint/build — contract-first
+- [x] **RC-4** FE admin: `↳ Reply` tag, DELETED filter/badge, hide Restore for DELETED + tests — after RC-2
+- [ ] **RC-5** Prod E2E (reply, reply-to-reply, owner delete keeps replies, admin remove reply), update `docs/tracking.md` — after all

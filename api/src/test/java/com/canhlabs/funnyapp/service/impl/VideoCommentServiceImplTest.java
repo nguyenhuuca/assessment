@@ -258,17 +258,15 @@ class VideoCommentServiceImplTest {
     }
 
     @Test
-    void deleteComment_authenticatedOwner_deletesCommentAndChildren() {
+    void deleteComment_authenticatedOwner_withReplies_softDeletesAndKeepsReplies() {
         UUID commentId = UUID.randomUUID();
         UUID childId = UUID.randomUUID();
 
         VideoComment comment = buildComment(commentId, "vid1", null, "user-42", null, "owner comment");
-        VideoComment child = buildComment(childId, "vid1", commentId.toString(), "user-42", null, "child");
+        VideoComment child = buildComment(childId, "vid1", commentId.toString(), "other-user", null, "child");
 
         when(repo.findById(commentId)).thenReturn(Optional.of(comment));
-        // First call: children of commentId; second call: children of childId (none)
         when(repo.findByParentId(commentId.toString())).thenReturn(List.of(child));
-        when(repo.findByParentId(childId.toString())).thenReturn(Collections.emptyList());
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken("user-42", null, Collections.emptyList());
@@ -276,8 +274,25 @@ class VideoCommentServiceImplTest {
 
         service.deleteComment(commentId, null);
 
-        verify(repo).deleteById(childId);
+        verify(repo, never()).deleteById(any());
+        ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
+        verify(repo).save(cap.capture());
+        assertThat(cap.getValue().getStatus()).isEqualTo(CommentStatus.DELETED);
+        assertThat(cap.getValue().getContent()).isEmpty();
+    }
+
+    @Test
+    void deleteComment_authenticatedOwner_leaf_hardDeletes() {
+        UUID commentId = UUID.randomUUID();
+        VideoComment comment = buildComment(commentId, "vid1", UUID.randomUUID().toString(), "user-42", null, "mine");
+        when(repo.findById(commentId)).thenReturn(Optional.of(comment));
+        when(repo.findByParentId(commentId.toString())).thenReturn(Collections.emptyList());
+        authenticateAs("user-42");
+
+        service.deleteComment(commentId, null);
+
         verify(repo).deleteById(commentId);
+        verify(repo, never()).save(any());
     }
 
     @Test
@@ -332,31 +347,238 @@ class VideoCommentServiceImplTest {
     }
 
     @Test
-    void deleteComment_authenticatedOwner_recursivelyDeletesDeepChildren() {
+    void deleteComment_authenticatedOwner_deepThread_onlySoftDeletesTargetNeverCascades() {
         UUID rootId = UUID.randomUUID();
         UUID child1Id = UUID.randomUUID();
-        UUID grandChildId = UUID.randomUUID();
 
         VideoComment root = buildComment(rootId, "vid1", null, "user-1", null, "root");
-        VideoComment child1 = buildComment(child1Id, "vid1", rootId.toString(), "user-1", null, "child");
-        VideoComment grandChild = buildComment(grandChildId, "vid1", child1Id.toString(), "user-1", null, "grandchild");
+        VideoComment child1 = buildComment(child1Id, "vid1", rootId.toString(), "user-2", null, "child");
 
         when(repo.findById(rootId)).thenReturn(Optional.of(root));
         when(repo.findByParentId(rootId.toString())).thenReturn(List.of(child1));
-        when(repo.findByParentId(child1Id.toString())).thenReturn(List.of(grandChild));
-        when(repo.findByParentId(grandChildId.toString())).thenReturn(Collections.emptyList());
-
-        UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken("user-1", null, Collections.emptyList());
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        authenticateAs("user-1");
 
         service.deleteComment(rootId, null);
 
-        // Deepest child deleted first, then child, then root
-        verify(repo).deleteById(grandChildId);
-        verify(repo).deleteById(child1Id);
-        verify(repo).deleteById(rootId);
-        verify(repo, times(3)).deleteById(any(UUID.class));
+        verify(repo, never()).deleteById(any());
+        verify(repo, times(1)).save(any(VideoComment.class));
+        assertThat(child1.getStatus()).isEqualTo(CommentStatus.VISIBLE);
+        assertThat(child1.getContent()).isEqualTo("child");
+    }
+
+    // -------------------------------------------------------------------------
+    // Deleted placeholders
+    // -------------------------------------------------------------------------
+
+    private VideoComment withStatus(VideoComment c, CommentStatus s) {
+        c.setStatus(s);
+        return c;
+    }
+
+    @Test
+    void getNestedComments_deletedRootWithVisibleReply_becomesDeletedPlaceholder() {
+        UUID a = UUID.randomUUID();
+        UUID b = UUID.randomUUID();
+        when(repo.findAllByVideoIdOrdered("v")).thenReturn(List.of(
+                withStatus(buildComment(a, "v", null, "me@x.com", null, ""), CommentStatus.DELETED),
+                buildComment(b, "v", a.toString(), "ok@x.com", null, "reply")));
+
+        List<CommentNode> result = service.getNestedComments("v");
+
+        assertThat(result).hasSize(1);
+        CommentNode ph = result.get(0);
+        assertThat(ph.isDeleted()).isTrue();
+        assertThat(ph.isRemoved()).isFalse();
+        assertThat(ph.getContent()).isNull();
+        assertThat(ph.getUserId()).isNull();
+        assertThat(ph.getGuestName()).isNull();
+        assertThat(ph.getReplies()).hasSize(1);
+        assertThat(ph.getReplies().get(0).isDeleted()).isFalse();
+    }
+
+    @Test
+    void getNestedComments_deletedLeaf_isOmitted() {
+        UUID a = UUID.randomUUID();
+        when(repo.findAllByVideoIdOrdered("v")).thenReturn(List.of(
+                withStatus(buildComment(a, "v", null, "me@x.com", null, ""), CommentStatus.DELETED)));
+
+        assertThat(service.getNestedComments("v")).isEmpty();
+    }
+
+    @Test
+    void getNestedComments_deletedRootWithOnlyRemovedReply_isOmitted() {
+        UUID a = UUID.randomUUID();
+        UUID b = UUID.randomUUID();
+        when(repo.findAllByVideoIdOrdered("v")).thenReturn(List.of(
+                withStatus(buildComment(a, "v", null, "me@x.com", null, ""), CommentStatus.DELETED),
+                removed(buildComment(b, "v", a.toString(), "bad@x.com", null, "x"))));
+
+        assertThat(service.getNestedComments("v")).isEmpty();
+    }
+
+    // -------------------------------------------------------------------------
+    // Reply validation
+    // -------------------------------------------------------------------------
+
+    private CreateCommentRequest reply(String parentId) {
+        return CreateCommentRequest.builder().content("re").parentId(parentId).build();
+    }
+
+    private void stubSave() {
+        when(repo.save(any(VideoComment.class))).thenAnswer(inv -> {
+            VideoComment c = inv.getArgument(0);
+            c.setId(UUID.randomUUID());
+            return c;
+        });
+    }
+
+    private static void assertHttp(Throwable t, org.springframework.http.HttpStatus status) {
+        assertThat(t).isInstanceOfSatisfying(com.canhlabs.funnyapp.exception.CustomException.class,
+                e -> assertThat(e.getStatus()).isEqualTo(status));
+    }
+
+    @Test
+    void createComment_replyToRoot_storesRootId() {
+        authenticateAs("u@x.com");
+        UUID rootId = UUID.randomUUID();
+        when(repo.findById(rootId)).thenReturn(Optional.of(buildComment(rootId, "v", null, "a@x.com", null, "root")));
+        stubSave();
+
+        service.createComment("v", reply(rootId.toString()), null);
+
+        ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
+        verify(repo).save(cap.capture());
+        assertThat(cap.getValue().getParentId()).isEqualTo(rootId.toString());
+    }
+
+    @Test
+    void createComment_replyToReply_normalizesToRoot() {
+        authenticateAs("u@x.com");
+        UUID rootId = UUID.randomUUID();
+        UUID midId = UUID.randomUUID();
+        UUID leafId = UUID.randomUUID();
+        when(repo.findById(leafId)).thenReturn(Optional.of(buildComment(leafId, "v", midId.toString(), "c@x.com", null, "leaf")));
+        when(repo.findById(midId)).thenReturn(Optional.of(buildComment(midId, "v", rootId.toString(), "b@x.com", null, "mid")));
+        when(repo.findById(rootId)).thenReturn(Optional.of(buildComment(rootId, "v", null, "a@x.com", null, "root")));
+        stubSave();
+
+        service.createComment("v", reply(leafId.toString()), null);
+
+        ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
+        verify(repo).save(cap.capture());
+        assertThat(cap.getValue().getParentId()).isEqualTo(rootId.toString());
+    }
+
+    @Test
+    void createComment_replyWithCyclicLegacyData_terminatesAfterBoundedHops() {
+        authenticateAs("u@x.com");
+        UUID a = UUID.randomUUID();
+        UUID b = UUID.randomUUID();
+        when(repo.findById(a)).thenReturn(Optional.of(buildComment(a, "v", b.toString(), "a@x.com", null, "a")));
+        when(repo.findById(b)).thenReturn(Optional.of(buildComment(b, "v", a.toString(), "b@x.com", null, "b")));
+        stubSave();
+
+        service.createComment("v", reply(a.toString()), null);
+
+        verify(repo, times(51)).findById(any(UUID.class));
+        verify(repo).save(any(VideoComment.class));
+    }
+
+    @Test
+    void createComment_replyWithDanglingAncestor_usesLastKnownAncestor() {
+        authenticateAs("u@x.com");
+        UUID a = UUID.randomUUID();
+        UUID gone = UUID.randomUUID();
+        when(repo.findById(a)).thenReturn(Optional.of(buildComment(a, "v", gone.toString(), "a@x.com", null, "a")));
+        when(repo.findById(gone)).thenReturn(Optional.empty());
+        stubSave();
+
+        service.createComment("v", reply(a.toString()), null);
+
+        ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
+        verify(repo).save(cap.capture());
+        assertThat(cap.getValue().getParentId()).isEqualTo(a.toString());
+    }
+
+    @Test
+    void createComment_replyWithNonUuidAncestor_usesLastKnownAncestor() {
+        authenticateAs("u@x.com");
+        UUID a = UUID.randomUUID();
+        when(repo.findById(a)).thenReturn(Optional.of(buildComment(a, "v", "not-a-uuid", "a@x.com", null, "a")));
+        stubSave();
+
+        service.createComment("v", reply(a.toString()), null);
+
+        ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
+        verify(repo).save(cap.capture());
+        assertThat(cap.getValue().getParentId()).isEqualTo(a.toString());
+    }
+
+    @Test
+    void createComment_blankParentId_isTopLevel() {
+        authenticateAs("u@x.com");
+        stubSave();
+
+        service.createComment("v", reply("  "), null);
+
+        ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
+        verify(repo).save(cap.capture());
+        assertThat(cap.getValue().getParentId()).isNull();
+    }
+
+    @Test
+    void createComment_invalidParentUuid_returns400() {
+        authenticateAs("u@x.com");
+
+        assertThatThrownBy(() -> service.createComment("v", reply("nope"), null))
+                .satisfies(t -> assertHttp(t, org.springframework.http.HttpStatus.BAD_REQUEST));
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void createComment_parentMissing_returns404() {
+        authenticateAs("u@x.com");
+        UUID id = UUID.randomUUID();
+        when(repo.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.createComment("v", reply(id.toString()), null))
+                .satisfies(t -> assertHttp(t, org.springframework.http.HttpStatus.NOT_FOUND));
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void createComment_parentOnOtherVideo_returns400() {
+        authenticateAs("u@x.com");
+        UUID id = UUID.randomUUID();
+        when(repo.findById(id)).thenReturn(Optional.of(buildComment(id, "other", null, "a@x.com", null, "p")));
+
+        assertThatThrownBy(() -> service.createComment("v", reply(id.toString()), null))
+                .satisfies(t -> assertHttp(t, org.springframework.http.HttpStatus.BAD_REQUEST));
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void createComment_parentRemoved_returns400() {
+        authenticateAs("u@x.com");
+        UUID id = UUID.randomUUID();
+        when(repo.findById(id)).thenReturn(Optional.of(
+                removed(buildComment(id, "v", null, "a@x.com", null, "p"))));
+
+        assertThatThrownBy(() -> service.createComment("v", reply(id.toString()), null))
+                .satisfies(t -> assertHttp(t, org.springframework.http.HttpStatus.BAD_REQUEST));
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void createComment_parentDeleted_returns400() {
+        authenticateAs("u@x.com");
+        UUID id = UUID.randomUUID();
+        when(repo.findById(id)).thenReturn(Optional.of(
+                withStatus(buildComment(id, "v", null, "a@x.com", null, ""), CommentStatus.DELETED)));
+
+        assertThatThrownBy(() -> service.createComment("v", reply(id.toString()), null))
+                .satisfies(t -> assertHttp(t, org.springframework.http.HttpStatus.BAD_REQUEST));
+        verify(repo, never()).save(any());
     }
 
     // -------------------------------------------------------------------------

@@ -6,7 +6,10 @@ import com.canhlabs.funnyapp.dto.comment.CreateCommentResponse;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.VideoComment;
 import com.canhlabs.funnyapp.enums.CommentStatus;
+import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.utils.CommentAuthorUtils;
+import org.springframework.http.HttpStatus;
+import java.util.Objects;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.utils.AppUtils;
 import io.micrometer.common.util.StringUtils;
@@ -29,6 +32,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class VideoCommentServiceImpl {
+    private static final int MAX_ROOT_HOPS = 50;
+
     private final VideoCommentRepository repo;
     private final PasswordEncoder passwordEncoder;
 
@@ -72,7 +77,7 @@ public class VideoCommentServiceImpl {
             if (pruneRemoved(reply)) kept.add(reply);
         }
         node.setReplies(kept);
-        return !node.isRemoved() || !kept.isEmpty();
+        return !(node.isRemoved() || node.isDeleted()) || !kept.isEmpty();
     }
 
     @Transactional
@@ -88,13 +93,15 @@ public class VideoCommentServiceImpl {
             token = UUID.randomUUID().toString();
         }
 
+        String rootParentId = resolveRootParentId(videoId, req.getParentId());
+
         VideoComment saved = repo.save(VideoComment.builder()
                 .videoId(videoId)
                 .userId(isGuest ? "" : currentUser.getEmail())
                 .guestName(isGuest ? req.getGuestName() : null)
                 .guestTokenHash(isGuest ? token : null)
                 .content(req.getContent())
-                .parentId(req.getParentId())
+                .parentId(rootParentId)
                 .status(CommentStatus.VISIBLE)
                 .build());
 
@@ -102,6 +109,52 @@ public class VideoCommentServiceImpl {
                 .id(saved.getId())
                 .guestToken(isGuest ? token : null) // return once for guests
                 .build();
+    }
+
+    /**
+     * Validates the reply target and returns the id of the thread root (threads are 2 levels deep).
+     * Returns null for a top-level comment.
+     */
+    private String resolveRootParentId(String videoId, String parentId) {
+        if (StringUtils.isBlank(parentId)) {
+            return null;
+        }
+        UUID parentUuid;
+        try {
+            parentUuid = UUID.fromString(parentId.trim());
+        } catch (IllegalArgumentException e) {
+            throw error(HttpStatus.BAD_REQUEST, 4003, "Invalid parentId");
+        }
+        VideoComment parent = repo.findById(parentUuid)
+                .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4042, "Parent comment not found"));
+        if (!Objects.equals(videoId, parent.getVideoId())) {
+            throw error(HttpStatus.BAD_REQUEST, 4004, "Parent comment belongs to another video");
+        }
+        if (parent.getStatus() != CommentStatus.VISIBLE) {
+            throw error(HttpStatus.BAD_REQUEST, 4005, "Cannot reply to a removed or deleted comment");
+        }
+        // Walk up to the top-level ancestor; bounded to guard against cycles in legacy data
+        VideoComment root = parent;
+        for (int hops = 0; hops < MAX_ROOT_HOPS && root.getParentId() != null; hops++) {
+            VideoComment next = findById(root.getParentId());
+            if (next == null) {
+                break;
+            }
+            root = next;
+        }
+        return root.getId().toString();
+    }
+
+    private VideoComment findById(String id) {
+        try {
+            return repo.findById(UUID.fromString(id)).orElse(null);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    private static CustomException error(HttpStatus status, int subCode, String message) {
+        return CustomException.builder().status(status).subCode(subCode).message(message).build();
     }
 
     /**
@@ -134,28 +187,27 @@ public class VideoCommentServiceImpl {
             throw new SecurityException("Not authorized to delete this comment");
         }
 
-        // Manual cascade delete (since no FK cascade) — delete subtree
-        deleteRecursively(c.getId());
-    }
-
-    private void deleteRecursively(UUID id) {
-        List<VideoComment> children = repo.findByParentId(id.toString());
-        for (VideoComment child : children) {
-            deleteRecursively(child.getId());
+        // Never destroy other people's replies: keep a placeholder when replies exist
+        if (repo.findByParentId(c.getId().toString()).isEmpty()) {
+            repo.deleteById(c.getId());
+        } else {
+            c.setStatus(CommentStatus.DELETED);
+            c.setContent(""); // column is NOT NULL; author text is erased
+            repo.save(c);
         }
-        repo.deleteById(id);
     }
 
     private static CommentNode toNode(VideoComment c) {
-        if (c.getStatus() == CommentStatus.REMOVED) {
-            // Placeholder: never expose removed content or author
+        if (c.getStatus() == CommentStatus.REMOVED || c.getStatus() == CommentStatus.DELETED) {
+            // Placeholder: never expose removed/deleted content or author
             return CommentNode.builder()
                     .id(c.getId())
                     .videoId(c.getVideoId())
                     .createdAt(c.getCreatedAt())
                     .parentId(c.getParentId())
                     .replies(new ArrayList<>())
-                    .removed(true)
+                    .removed(c.getStatus() == CommentStatus.REMOVED)
+                    .deleted(c.getStatus() == CommentStatus.DELETED)
                     .build();
         }
         // Anonymous alias only for guest comments; authenticated comments are identified by userId

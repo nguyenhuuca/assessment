@@ -156,6 +156,35 @@ describe('AdminCommentTable', () => {
     )
   })
 
+  it('shows a reply tag only for comments with a parentId', async () => {
+    adminApi.getComments.mockResolvedValue({
+      data: { content: [visible, { ...visible, id: 'c9', content: 'a reply', parentId: 'c1' }], totalPages: 1, totalElements: 2, number: 0 },
+    })
+    renderTable()
+    await screen.findByText('a reply')
+    expect(screen.getAllByText('↳ Reply')).toHaveLength(1)
+  })
+
+  it('DELETED comments get the deleted badge and no Restore action', async () => {
+    adminApi.getComments.mockResolvedValue({
+      data: { content: [{ ...visible, id: 'c8', content: 'gone', status: 'DELETED' }], totalPages: 1, totalElements: 1, number: 0 },
+    })
+    renderTable()
+    await screen.findByText('gone')
+    expect(screen.getAllByText('DELETED').some(el => el.classList.contains('admin-badge') && el.classList.contains('deleted'))).toBe(true)
+    expect(screen.queryByTitle('Restore')).toBeNull()
+    expect(screen.queryByTitle('Remove')).toBeNull()
+  })
+
+  it('status filter offers DELETED', async () => {
+    renderTable()
+    await screen.findByText('hello world')
+    fireEvent.change(screen.getByLabelText('Status filter'), { target: { value: 'DELETED' } })
+    await waitFor(() =>
+      expect(adminApi.getComments).toHaveBeenLastCalledWith(expect.objectContaining({ status: 'DELETED' }))
+    )
+  })
+
   it('changing the status filter clears the selection', async () => {
     renderTable()
     await screen.findByText('hello world')

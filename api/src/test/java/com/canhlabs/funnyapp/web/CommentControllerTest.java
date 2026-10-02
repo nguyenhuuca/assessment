@@ -149,6 +149,28 @@ class CommentControllerTest {
     }
 
     @Test
+    void createComment_contentOver2000Chars_returns400() throws Exception {
+        String body = "{\"content\": \"" + "a".repeat(2001) + "\"}";
+
+        mockMvc.perform(post(BASE_URL, "vid-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createComment_content2000Chars_isAccepted() throws Exception {
+        when(videoCommentService.createComment(eq("vid-1"), any(), eq(null)))
+                .thenReturn(CreateCommentResponse.builder().id(UUID.randomUUID()).build());
+        String body = "{\"content\": \"" + "a".repeat(2000) + "\"}";
+
+        mockMvc.perform(post(BASE_URL, "vid-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void createComment_asGuest_withGuestTokenHeader_returnsOkWithToken() throws Exception {
         UUID commentId = UUID.randomUUID();
         String existingToken = UUID.randomUUID().toString();

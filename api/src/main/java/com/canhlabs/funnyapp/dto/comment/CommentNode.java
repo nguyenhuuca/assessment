@@ -26,4 +26,5 @@ public class CommentNode {
     private String parentId;
     private List<CommentNode> replies;
     private boolean removed;
+    private boolean deleted;
 }
