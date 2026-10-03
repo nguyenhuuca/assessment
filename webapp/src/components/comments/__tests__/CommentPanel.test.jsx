@@ -97,7 +97,7 @@ describe('CommentPanel', () => {
     expect(screen.queryByLabelText('Reply')).toBeNull() // box closed
   })
 
-  it('replying to a reply prefills @name and posts the root id', async () => {
+  it('replying to a reply prefills @name and posts the replied comment id (server notifies its author)', async () => {
     commentsApi.list.mockResolvedValue({
       data: [node('a', 'alice@x.com', 'root text', 60, { replies: [node('b', 'bob@x.com', 'bob says', 30)] })],
     })
@@ -109,7 +109,10 @@ describe('CommentPanel', () => {
     expect(box.value).toBe('@bob ')
     fireEvent.change(box, { target: { value: '@bob thanks' } })
     fireEvent.click(screen.getByLabelText('Send reply'))
-    await waitFor(() => expect(commentsApi.post).toHaveBeenCalledWith('1', '@bob thanks', 'a'))
+    // 'b' (bob's reply), not root 'a' — otherwise bob is never notified (regression)
+    await waitFor(() => expect(commentsApi.post).toHaveBeenCalledWith('1', '@bob thanks', 'b'))
+    // the reply box still lives in the root's thread
+    await waitFor(() => expect(screen.queryByLabelText('Reply')).toBeNull())
   })
 
   it('Shift+Enter does not send and Esc closes the box; only one box is open', async () => {

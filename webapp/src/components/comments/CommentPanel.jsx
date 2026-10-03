@@ -13,7 +13,7 @@ export default function CommentPanel({ video, onClose, highlightCommentId = null
   const [submitting, setSubmitting] = useState(false)
   const [confirmId, setConfirmId]   = useState(null) // inline delete confirm
   const [error, setError]           = useState('')
-  const [replyTo, setReplyTo]       = useState(null) // { rootId, name } — only one reply box open
+  const [replyTo, setReplyTo]       = useState(null) // { rootId, targetId, name } — only one reply box open
   const [replyError, setReplyError] = useState('')
   const inputRef = useRef(null)
 
@@ -50,13 +50,14 @@ export default function CommentPanel({ video, onClose, highlightCommentId = null
     finally { setSubmitting(false) }
   }
 
-  // Reply to a thread; the server normalizes parentId to the root. Resolves true on success.
-  async function handleReply(rootId, content) {
+  // Reply to a comment (root or reply). The server normalizes parentId to the thread root for storage
+  // and notifies the author of `targetId`. Resolves true on success.
+  async function handleReply(targetId, content) {
     if (!isLoggedIn) return false
     setSubmitting(true)
     setReplyError('')
     try {
-      await commentsApi.post(video.id, content, rootId)
+      await commentsApi.post(video.id, content, targetId)
       await loadComments(video.id)
       setReplyTo(null)
       return true

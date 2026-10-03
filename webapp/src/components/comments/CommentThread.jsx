@@ -86,7 +86,9 @@ export default function CommentThread({
   const itemProps = { user, isLoggedIn, confirmId, onAskDelete, onCancelDelete, onDelete, highlightId }
 
   async function submit(text) {
-    const ok = await onSubmitReply(root.id, text)
+    // Send the comment actually being replied to (not always the root): the server stores the root
+    // as parent but uses this id to notify that reply's author.
+    const ok = await onSubmitReply(replyTo?.targetId ?? root.id, text)
     if (ok) setExpanded(true)
   }
 
@@ -95,7 +97,7 @@ export default function CommentThread({
       <CommentItem
         comment={root}
         {...itemProps}
-        onReply={() => onReplyTo({ rootId: root.id, name: null })}
+        onReply={() => onReplyTo({ rootId: root.id, targetId: root.id, name: null })}
       />
 
       {(replies.length > 0 || boxOpen) && (
@@ -106,7 +108,7 @@ export default function CommentThread({
               comment={r}
               isReply
               {...itemProps}
-              onReply={c => onReplyTo({ rootId: root.id, name: authorName(c) })}
+              onReply={c => onReplyTo({ rootId: root.id, targetId: c.id, name: authorName(c) })}
             />
           ))}
           {replies.length > COLLAPSED_COUNT && (
@@ -120,7 +122,7 @@ export default function CommentThread({
           )}
           {boxOpen && (
             <ReplyBox
-              key={`${root.id}:${replyTo.name || ''}`}
+              key={`${root.id}:${replyTo.targetId || ''}`}
               prefill={replyTo.name ? `@${replyTo.name} ` : ''}
               submitting={submitting}
               error={replyError}
