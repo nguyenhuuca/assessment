@@ -6855,6 +6855,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Operations (single VM)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#connection-capacity-measured-2026-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connection capacity (measured 2026-10-03)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -7361,7 +7378,36 @@
 <a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">    </span><span class="kn">access_log</span><span class="w">            </span><span class="s">/var/log/nginx/access.log</span><span class="w"> </span><span class="s">no_query</span><span class="p">;</span>
 <a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="p">}</span>
 </code></pre></div>
-<p>The backend also sets <code>X-Accel-Buffering: no</code> and <code>Cache-Control: no-cache</code>. Spring: <code>server.tomcat.max-connections</code> default 8192 is enough for one VM; expose <code>notifications_sse_active_connections</code> on <code>/actuator/prometheus</code>.</p>
+<p>The backend also sets <code>X-Accel-Buffering: no</code> and <code>Cache-Control: no-cache</code>. Spring: <code>server.tomcat.max-connections</code> default 8192; expose <code>notifications_sse_active_connections</code> on <code>/actuator/prometheus</code>.</p>
+<h3 id="connection-capacity-measured-2026-10-03">Connection capacity (measured 2026-10-03)<a class="headerlink" href="#connection-capacity-measured-2026-10-03" title="Permanent link">&para;</a></h3>
+<p>An SSE stream does not occupy port 443 — it occupies <strong>one TCP connection / file descriptor per hop</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Browser ══HTTP/2══► Cloudflare ──HTTP/1.1──► nginx :443 ──HTTP/1.1──► Tomcat :8081
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a> (multiplexed with the      (1 conn per stream)      (1 conn per stream)
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  page's other requests)
+</code></pre></div>
+<p>nginx holds <strong>2 connections per stream</strong> (downstream + upstream). Server facts: 1 vCPU → <code>worker_processes auto</code> = 1 worker; JVM <code>nofile</code> 65535, heap <code>-Xmx256m</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Before</th>
+<th>After (applied 2026-10-03, backup <code>/etc/nginx/nginx.conf.bak-20261003-sse</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>events.worker_connections</code></td>
+<td>768 → <strong>≈ 380 SSE streams</strong> max, shared with video/API traffic; exceeding it rejects <em>all</em> traffic (<code>worker_connections are not enough</code>)</td>
+<td><strong>8192</strong> → ≈ 4,000 streams</td>
+</tr>
+<tr>
+<td><code>worker_rlimit_nofile</code></td>
+<td>unset (soft limit 1024)</td>
+<td><strong>16384</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Applied with <code>nginx -t &amp;&amp; systemctl reload nginx</code> (graceful, no dropped connections). Next limits after nginx: Tomcat <code>max-connections</code> 8192 and the 256 MB heap — revisit both before ~4,000 concurrent streams.</p>
 <h2 id="scaling-path">Scaling Path<a class="headerlink" href="#scaling-path" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -7372,12 +7418,12 @@
 </thead>
 <tbody>
 <tr>
-<td>&lt; 5k (today)</td>
+<td>&lt; 4k (today, after nginx tuning)</td>
 <td>One JVM, <code>InMemorySsePublisher</code>, polling fallback</td>
 </tr>
 <tr>
-<td>5k – 8k</td>
-<td>Same, raise JVM heap / VM size; watch the SSE gauge</td>
+<td>4k – 8k</td>
+<td>Same, raise nginx <code>worker_connections</code>, JVM heap and VM size (more vCPU = more nginx workers); watch the SSE gauge</td>
 </tr>
 <tr>
 <td>&gt; 1 instance needed</td>

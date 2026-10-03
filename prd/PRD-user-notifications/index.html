@@ -7127,7 +7127,7 @@ Handoff to: Architect (ADR-0017, accepted), Builder (/builder)
 </tr>
 <tr>
 <td>NFR-4</td>
-<td>Capacity: ≥ 5,000 concurrent SSE connections on the current single VM; <code>notifications_sse_active_connections</code> gauge exposed</td>
+<td>Capacity: ≥ 3,000 concurrent SSE connections on the current single VM (nginx <code>worker_connections</code> 8192 since 2026-10-03; was ≈ 380); <code>notifications_sse_active_connections</code> gauge exposed</td>
 </tr>
 <tr>
 <td>NFR-5</td>
