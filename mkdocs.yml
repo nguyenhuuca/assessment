@@ -80,6 +80,7 @@ nav:
       - 0014 - Watch History Design (Opus): adr/0014-watch-history-design-opus.md
       - 0015 - Bitwise Permission System: adr/0015-bitwise-permission-system.md
       - 0016 - User Settings Design: adr/0016-user-settings-design.md
+      - 0017 - User Notifications: adr/0017-user-notifications.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -87,6 +88,7 @@ nav:
       - Bookmark Feature: prd/PRD-bookmark-feature.md
       - Watch History: prd/PRD-watch-history-opus.md
       - User Settings: prd/PRD-user-settings.md
+      - User Notifications: prd/PRD-user-notifications.md
 
   - Specs:
       - Overview: specs/index.md
@@ -107,6 +109,10 @@ nav:
       - Bookmark Feature: plans/plan-bookmark-feature.md
       - Watch History: plans/plan-watch-history-opus.md
       - User Settings: plans/plan-user-settings.md
+      - Video Reactions: plans/plan-video-reactions.md
+      - Admin Comment Moderation: plans/plan-admin-comment-moderation.md
+      - Comment Replies: plans/plan-comment-replies.md
+      - User Notifications: plans/plan-user-notifications.md
 
   - Presentations:
       - presentations/index.md
