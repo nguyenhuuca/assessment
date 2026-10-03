@@ -86,7 +86,7 @@ The Settings page already shows **"Email notifications"** and **"New content"** 
 | NFR-1 | Security: owner isolation (other user's id → 404, CWE-639); no credentials in URLs (CWE-598); snippet ≤ 140 chars, rendered as text (no HTML) |
 | NFR-2 | Privacy: actor shown as display name / email local part, never full email |
 | NFR-3 | Performance: `unread-count` < 20 ms p95 (indexed); SSE idle cost ≈ one socket per tab |
-| NFR-4 | Capacity: ≥ 5,000 concurrent SSE connections on the current single VM; `notifications_sse_active_connections` gauge exposed |
+| NFR-4 | Capacity: ≥ 3,000 concurrent SSE connections on the current single VM (nginx `worker_connections` 8192 since 2026-10-03; was ≈ 380); `notifications_sse_active_connections` gauge exposed |
 | NFR-5 | Email budget: digest must leave ≥ 50% of `app.email-setting.max-daily-emails` (currently 200/day) for login magic links |
 | NFR-6 | Accessibility: bell button has `aria-label` with unread count; dropdown keyboard-navigable; Esc closes |
 

@@ -252,14 +252,33 @@ location /api/v1/funny-app/notifications/stream {
 }
 ```
 
-The backend also sets `X-Accel-Buffering: no` and `Cache-Control: no-cache`. Spring: `server.tomcat.max-connections` default 8192 is enough for one VM; expose `notifications_sse_active_connections` on `/actuator/prometheus`.
+The backend also sets `X-Accel-Buffering: no` and `Cache-Control: no-cache`. Spring: `server.tomcat.max-connections` default 8192; expose `notifications_sse_active_connections` on `/actuator/prometheus`.
+
+### Connection capacity (measured 2026-10-03)
+
+An SSE stream does not occupy port 443 — it occupies **one TCP connection / file descriptor per hop**:
+
+```
+Browser ══HTTP/2══► Cloudflare ──HTTP/1.1──► nginx :443 ──HTTP/1.1──► Tomcat :8081
+ (multiplexed with the      (1 conn per stream)      (1 conn per stream)
+  page's other requests)
+```
+
+nginx holds **2 connections per stream** (downstream + upstream). Server facts: 1 vCPU → `worker_processes auto` = 1 worker; JVM `nofile` 65535, heap `-Xmx256m`.
+
+| Setting | Before | After (applied 2026-10-03, backup `/etc/nginx/nginx.conf.bak-20261003-sse`) |
+|---------|--------|-------|
+| `events.worker_connections` | 768 → **≈ 380 SSE streams** max, shared with video/API traffic; exceeding it rejects *all* traffic (`worker_connections are not enough`) | **8192** → ≈ 4,000 streams |
+| `worker_rlimit_nofile` | unset (soft limit 1024) | **16384** |
+
+Applied with `nginx -t && systemctl reload nginx` (graceful, no dropped connections). Next limits after nginx: Tomcat `max-connections` 8192 and the 256 MB heap — revisit both before ~4,000 concurrent streams.
 
 ## Scaling Path
 
 | Concurrent online users | Setup |
 |-------------------------|-------|
-| < 5k (today) | One JVM, `InMemorySsePublisher`, polling fallback |
-| 5k – 8k | Same, raise JVM heap / VM size; watch the SSE gauge |
+| < 4k (today, after nginx tuning) | One JVM, `InMemorySsePublisher`, polling fallback |
+| 4k – 8k | Same, raise nginx `worker_connections`, JVM heap and VM size (more vCPU = more nginx workers); watch the SSE gauge |
 | > 1 instance needed | `PgNotifyPublisher` (PostgreSQL `LISTEN/NOTIFY`, one dedicated non-pooled connection per instance, payload = userId) — no new infra |
 | 50k+ or high event rate | `RedisPublisher` (revisit ADR-0003) or a dedicated push gateway |
 
