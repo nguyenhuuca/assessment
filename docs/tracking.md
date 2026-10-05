@@ -37,12 +37,16 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Watch History (Opus)** | [PRD 📝](prd/PRD-watch-history-opus.md) | [0014 💡](adr/0014-watch-history-design-opus.md) | [Spec 📋](specs/spec-watch-history-opus.md) | [Plan 📝](plans/plan-watch-history-opus.md) | — | 🔍 | Active branch · [comparison](comparison-watch-history-models.md) |
 | **Watch History (baseline)** | [PRD 📝](prd/PRD-watch-history.md) | [0013 💡](adr/0013-watch-history-design.md) | [Spec 📋](specs/spec-watch-history.md) | [Plan 📋](plans/plan-watch-history.md) | [Spec deck 🎤](specs/spec-watch-history.html) | 🔍 | 🗄️ Archived — model-comparison baseline |
 | **User Settings** | [PRD ✅](prd/PRD-user-settings.md) | [0016 ✅](adr/0016-user-settings-design.md) | [Spec ✅](specs/spec-user-settings.md) | [Plan ✅](plans/plan-user-settings.md) | — | ✅ | Pushed to main `dd45fc0`; coverage 95.91% |
+| **Video Reactions (like / unlike / dislike)** | — | — | — | [Plan ✅](plans/plan-video-reactions.md) | — | ✅ | `28cc167`; fixes 404 on `/video/like`; per-user reactions, optional-auth GET |
+| **Admin Comment Moderation** | — | — | — | [Plan ✅](plans/plan-admin-comment-moderation.md) | — | ✅ | `acfc953` soft remove/restore with policy reasons; `6f66b15` bulk (≤100) |
+| **Comment Replies** | — | — | — | [Plan ✅](plans/plan-comment-replies.md) | — | ✅ | `a23950f` 2-level threads, author delete keeps others' replies; `368bf0c` reply-to-reply notifies the replied author |
+| **User Notifications** | [PRD ✅](prd/PRD-user-notifications.md) | [0017 ✅](adr/0017-user-notifications.md) | — | [Plan ✅](plans/plan-user-notifications.md) | — | ✅ | `a11d31e` in-app + SSE (fetch + header auth) + 15-min digest; verified on prod 2026-10-03; nginx `worker_connections` 768→8192 |
 
 ---
 
 ## Status Summary
 
-### ✅ Done (9)
+### ✅ Done (13)
 - [Use RDBMS](adr/0001-use-relational-database.md)
 - [Backend Architecture](adr/0002-backend-architecture.md)
 - [Cache Strategy](adr/0003-use-cache.md)
@@ -52,6 +56,10 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Bitwise Permissions](adr/0015-bitwise-permission-system.md)
 - [React Migration](prd/PRD-react-migration.md)
 - [User Settings](adr/0016-user-settings-design.md)
+- [Video Reactions](plans/plan-video-reactions.md)
+- [Admin Comment Moderation](plans/plan-admin-comment-moderation.md)
+- [Comment Replies](plans/plan-comment-replies.md)
+- [User Notifications](adr/0017-user-notifications.md)
 
 ### 🔄 In Progress (1)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
@@ -90,7 +98,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0014 | Watch History Design (Opus) | 💡 Proposed |
 | 0015 | Bitwise Permission System | ✅ Accepted |
 | 0016 | User Settings Design | ✅ Accepted |
+| 0017 | User Notifications | ✅ Accepted |
 
 ---
 
-*Last updated: 2026-06-20 — User Settings feature implemented and merged to main (dd45fc0)*
+*Last updated: 2026-10-06 — Video reactions, comment moderation (+bulk), threaded replies and user notifications (ADR-0017) shipped to main*
