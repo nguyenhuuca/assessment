@@ -652,10 +652,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#done-9" class="md-nav__link">
+  <a href="#done-13" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✅ Done (9)
+        ✅ Done (13)
       
     </span>
   </a>
@@ -7059,10 +7059,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#done-9" class="md-nav__link">
+  <a href="#done-13" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✅ Done (9)
+        ✅ Done (13)
       
     </span>
   </a>
@@ -7376,11 +7376,51 @@
 <td>✅</td>
 <td>Pushed to main <code>dd45fc0</code>; coverage 95.91%</td>
 </tr>
+<tr>
+<td><strong>Video Reactions (like / unlike / dislike)</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-video-reactions/">Plan ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td><code>28cc167</code>; fixes 404 on <code>/video/like</code>; per-user reactions, optional-auth GET</td>
+</tr>
+<tr>
+<td><strong>Admin Comment Moderation</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-admin-comment-moderation/">Plan ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td><code>acfc953</code> soft remove/restore with policy reasons; <code>6f66b15</code> bulk (≤100)</td>
+</tr>
+<tr>
+<td><strong>Comment Replies</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-comment-replies/">Plan ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td><code>a23950f</code> 2-level threads, author delete keeps others' replies; <code>368bf0c</code> reply-to-reply notifies the replied author</td>
+</tr>
+<tr>
+<td><strong>User Notifications</strong></td>
+<td><a href="../prd/PRD-user-notifications/">PRD ✅</a></td>
+<td><a href="../adr/0017-user-notifications/">0017 ✅</a></td>
+<td>—</td>
+<td><a href="../plans/plan-user-notifications/">Plan ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td><code>a11d31e</code> in-app + SSE (fetch + header auth) + 15-min digest; verified on prod 2026-10-03; nginx <code>worker_connections</code> 768→8192</td>
+</tr>
 </tbody>
 </table>
 <hr />
 <h2 id="status-summary">Status Summary<a class="headerlink" href="#status-summary" title="Permanent link">&para;</a></h2>
-<h3 id="done-9">✅ Done (9)<a class="headerlink" href="#done-9" title="Permanent link">&para;</a></h3>
+<h3 id="done-13">✅ Done (13)<a class="headerlink" href="#done-13" title="Permanent link">&para;</a></h3>
 <ul>
 <li><a href="../adr/0001-use-relational-database/">Use RDBMS</a></li>
 <li><a href="../adr/0002-backend-architecture/">Backend Architecture</a></li>
@@ -7391,6 +7431,10 @@
 <li><a href="../adr/0015-bitwise-permission-system/">Bitwise Permissions</a></li>
 <li><a href="../prd/PRD-react-migration/">React Migration</a></li>
 <li><a href="../adr/0016-user-settings-design/">User Settings</a></li>
+<li><a href="../plans/plan-video-reactions/">Video Reactions</a></li>
+<li><a href="../plans/plan-admin-comment-moderation/">Admin Comment Moderation</a></li>
+<li><a href="../plans/plan-comment-replies/">Comment Replies</a></li>
+<li><a href="../adr/0017-user-notifications/">User Notifications</a></li>
 </ul>
 <h3 id="in-progress-1">🔄 In Progress (1)<a class="headerlink" href="#in-progress-1" title="Permanent link">&para;</a></h3>
 <ul>
@@ -7501,10 +7545,15 @@
 <td>User Settings Design</td>
 <td>✅ Accepted</td>
 </tr>
+<tr>
+<td>0017</td>
+<td>User Notifications</td>
+<td>✅ Accepted</td>
+</tr>
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-06-20 — User Settings feature implemented and merged to main (dd45fc0)</em></p>
+<p><em>Last updated: 2026-10-06 — Video reactions, comment moderation (+bulk), threaded replies and user notifications (ADR-0017) shipped to main</em></p>
 
 
 
