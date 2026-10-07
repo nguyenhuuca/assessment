@@ -34,7 +34,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer), Security Auditor (/s
 ## Implementation Steps
 
 ### Phase 1 — Data & config (0.5 d) — `PW-1`
-- [ ] Pre-check on prod (read-only): `SELECT count(*) FROM users WHERE password IS NOT NULL` — record result in this plan
+- [x] Pre-check on prod: no existing account has a password (owner-confirmed 2026-10-07) → schema-only migration, no data migration
 - [ ] Migration `202610070001-users-password-login.sql`: `password_set_at`, `failed_login_count`, `locked_until`, `credentials_version` (ADR-0018)
 - [ ] `User`: new fields with `@Builder.Default` where defaulted (see `ee6ad36` lesson)
 - [ ] `AppProperties.auth.passwordLoginEnabled` (`app.auth.password-login-enabled`, default `true`); remove reads of `usePasswordless` (log a deprecation warning if the old key is present)

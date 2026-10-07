@@ -106,7 +106,7 @@ ALTER TABLE users
     ADD COLUMN credentials_version  INT         NOT NULL DEFAULT 0;
 ```
 
-Existing rows: `password` is NULL for magic-link users (verify on prod before migration; any non-null legacy passwords are kept and keep working).
+Existing rows: **no account has a password** (confirmed by the owner on prod, 2026-10-07) — schema-only migration, no data migration or backfill. Existing JWTs carry no `cv` claim and are treated as `cv = 0` (the column default), so nobody is logged out by the deploy.
 
 ## Security Notes
 

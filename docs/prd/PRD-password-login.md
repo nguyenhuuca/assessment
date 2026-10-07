@@ -110,7 +110,7 @@ Password signup, separate reset-token flow, CAPTCHA, breached-password API, pass
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|-----------|
-| Legacy non-null passwords exist on prod | Low | Medium | Check before migration; they keep working with the new endpoint |
+| Legacy non-null passwords exist on prod | — | — | None exist (owner-confirmed 2026-10-07) |
 | Third party locks a victim out | Medium | Low | 15 min only; magic link still works |
 | Extra lookup per request for `credentials_version` | High | Low | Guava cache 60 s |
 | Users expect password signup | Medium | Low | Copy on login tab: "Chưa có mật khẩu? Đăng nhập bằng link rồi đặt mật khẩu trong Cài đặt" |
