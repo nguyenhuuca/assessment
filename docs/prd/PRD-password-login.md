@@ -9,7 +9,7 @@ Handoff to: Architect (ADR-0018), Builder (/builder)
 
 ## Overview
 
-**Status:** Draft
+**Status:** Approved
 **Author:** nguyenhuuca
 **Date:** 2026-10-07
 **Related ADR:** [ADR-0018 Optional Email + Password Login](../adr/0018-password-login-option.md)
@@ -121,8 +121,8 @@ Password signup, separate reset-token flow, CAPTCHA, breached-password API, pass
 
 | # | Question | Proposed |
 |---|----------|----------|
-| OQ-1 | Allow password signup with email verification? | No (v1) — ADR-0018 option A2 deferred |
-| OQ-2 | Lockout thresholds | 5 failures / 15 min |
+| OQ-1 | Allow password signup with email verification? | **Decided: No** — first login always by magic link (owner, 2026-10-07) |
+| OQ-2 | Lockout thresholds | **Decided: 5 failures / 15 min** (owner, 2026-10-07) |
 | OQ-3 | Keep `app.use-password-less` for backward compat? | Replace with `app.auth.password-login-enabled`; read old key once with deprecation log |
 
 ---
@@ -131,8 +131,8 @@ Password signup, separate reset-token flow, CAPTCHA, breached-password API, pass
 
 | Role | Name | Date | Status |
 |------|------|------|--------|
-| Product | nguyenhuuca | | Pending |
-| Engineering | nguyenhuuca | | Pending (ADR-0018) |
+| Product | nguyenhuuca | 2026-10-07 | Approved |
+| Engineering | nguyenhuuca | 2026-10-07 | Approved (ADR-0018 accepted) |
 
 ## Next Steps & Handoffs
 1. Review ADR-0018 → Accepted

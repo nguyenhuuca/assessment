@@ -1,6 +1,6 @@
 # ADR-0018: Optional Email + Password Login
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-07
 **Deciders:** nguyenhuuca
 **Related:** [ADR-0016 User Settings](0016-user-settings-design.md) (`passwordEnabled` capability, R-1), [PRD-user-notifications](../prd/PRD-user-notifications.md) (email budget), [PRD-password-login](../prd/PRD-password-login.md), [plan-password-login](../plans/plan-password-login.md)
