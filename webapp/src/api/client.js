@@ -1,5 +1,7 @@
 export const getBaseUrl = () => import.meta.env.VITE_API_BASE_URL || 'https://canh-labs.com/api/v1/funny-app'
 
+export const AUTH_REVOKED_EVENT = 'auth:revoked'
+
 function createHeaders(extra = {}) {
   const headers = { 'Content-Type': 'application/json', ...extra }
   const jwt = localStorage.getItem('jwt')
@@ -20,6 +22,11 @@ async function request(method, path, body) {
   const data = await res.json()
   if (!res.ok) {
     const msg = data?.error?.message || `HTTP ${res.status}`
+    if (res.status === 401 && msg === 'TOKEN_REVOKED') {
+      localStorage.removeItem('jwt')
+      localStorage.removeItem('user')
+      window.dispatchEvent(new Event(AUTH_REVOKED_EVENT))
+    }
     throw { message: msg, status: res.status }
   }
   return data

@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { authApi } from '../api/auth.js'
+import { AUTH_REVOKED_EVENT } from '../api/client.js'
 
 const AuthContext = createContext(null)
 
@@ -21,6 +22,20 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(initial.user)
   const [guestToken, setGuestTokenState] = useState(initial.guestToken)
   const [loading, setLoading] = useState(!!initial.jwt)
+  const [sessionNotice, setSessionNotice] = useState(null)
+
+  // Server revoked this token (e.g. password changed on another device)
+  useEffect(() => {
+    function onRevoked() {
+      localStorage.removeItem('jwt')
+      localStorage.removeItem('user')
+      setJwt(null)
+      setUser(null)
+      setSessionNotice('Phiên đăng nhập đã hết hiệu lực, vui lòng đăng nhập lại')
+    }
+    window.addEventListener(AUTH_REVOKED_EVENT, onRevoked)
+    return () => window.removeEventListener(AUTH_REVOKED_EVENT, onRevoked)
+  }, [])
 
   // Validate session on mount if JWT present
   useEffect(() => {
@@ -76,6 +91,8 @@ export function AuthProvider({ children }) {
     setUser(updatedUser)
   }, [])
 
+  const clearSessionNotice = useCallback(() => setSessionNotice(null), [])
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -87,6 +104,8 @@ export function AuthProvider({ children }) {
       logout,
       setGuestToken,
       updateUser,
+      sessionNotice,
+      clearSessionNotice,
     }}>
       {children}
     </AuthContext.Provider>

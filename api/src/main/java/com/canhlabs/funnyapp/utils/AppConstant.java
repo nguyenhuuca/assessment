@@ -44,6 +44,8 @@ public class AppConstant {
 
         public static final List<PathObject> WHITE_LIST_PATH = List.of(
                 PathObject.builder().path("/user/join").method(HttpMethod.POST.name()).build(),
+                PathObject.builder().path("/user/login").method(HttpMethod.POST.name()).build(),
+                PathObject.builder().path("/user/auth-options").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().path("/user/verify-magic").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().path("/user/mfa/verify").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().path("/share-links").method(HttpMethod.GET.name()).build(),

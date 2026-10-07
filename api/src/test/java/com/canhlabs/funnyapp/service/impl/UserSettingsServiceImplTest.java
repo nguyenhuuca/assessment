@@ -76,7 +76,7 @@ class UserSettingsServiceImplTest {
             when(userSettingsRepository.save(any(UserSettings.class))).thenReturn(defaultSettings);
             when(userRepo.findAllById(1L)).thenReturn(user);
             when(appProperties.isSubscriptionStatusEnabled()).thenReturn(false);
-            when(appProperties.isUsePasswordless()).thenReturn(false);
+            when(appProperties.isPasswordLoginEnabled()).thenReturn(true);
 
             UserSettingsDto dto = userSettingsService.getSettings();
 
@@ -106,7 +106,7 @@ class UserSettingsServiceImplTest {
             when(userSettingsRepository.findById(1L)).thenReturn(Optional.of(existing));
             when(userRepo.findAllById(1L)).thenReturn(user);
             when(appProperties.isSubscriptionStatusEnabled()).thenReturn(false);
-            when(appProperties.isUsePasswordless()).thenReturn(false);
+            when(appProperties.isPasswordLoginEnabled()).thenReturn(true);
 
             UserSettingsDto dto = userSettingsService.getSettings();
 
@@ -118,6 +118,31 @@ class UserSettingsServiceImplTest {
             assertThat(dto.isMfaEnabled()).isTrue();
             // findById was called but save was NOT called (no new row)
             verify(userSettingsRepository, never()).save(any());
+        }
+    }
+
+    @Test
+    void getSettings_passwordEnabledIsPerUser() {
+        UserSettings existing = new UserSettings();
+        existing.setUserId(1L);
+        existing.setDefaultQuality("AUTO");
+        try (MockedStatic<AppUtils> ms = mockStatic(AppUtils.class)) {
+            ms.when(AppUtils::getCurrentUser).thenReturn(CURRENT_USER);
+            when(userSettingsRepository.findById(1L)).thenReturn(Optional.of(existing));
+            when(appProperties.isPasswordLoginEnabled()).thenReturn(true);
+
+            when(userRepo.findAllById(1L)).thenReturn(User.builder().id(1L).userName("a@b.com").build());
+            UserSettingsDto noPassword = userSettingsService.getSettings();
+            assertThat(noPassword.isPasswordEnabled()).isFalse();
+            assertThat(noPassword.isPasswordLoginAvailable()).isTrue();
+
+            when(userRepo.findAllById(1L)).thenReturn(User.builder().id(1L).userName("a@b.com").password("hash").build());
+            assertThat(userSettingsService.getSettings().isPasswordEnabled()).isTrue();
+
+            when(appProperties.isPasswordLoginEnabled()).thenReturn(false);
+            UserSettingsDto flagOff = userSettingsService.getSettings();
+            assertThat(flagOff.isPasswordEnabled()).isFalse();
+            assertThat(flagOff.isPasswordLoginAvailable()).isFalse();
         }
     }
 
@@ -177,7 +202,7 @@ class UserSettingsServiceImplTest {
             when(userSettingsRepository.save(any(UserSettings.class))).thenReturn(existing);
             when(userRepo.findAllById(1L)).thenReturn(user);
             when(appProperties.isSubscriptionStatusEnabled()).thenReturn(false);
-            when(appProperties.isUsePasswordless()).thenReturn(false);
+            when(appProperties.isPasswordLoginEnabled()).thenReturn(true);
 
             UserSettingsDto dto = userSettingsService.updateSettings(req);
 
@@ -208,7 +233,7 @@ class UserSettingsServiceImplTest {
             when(userSettingsRepository.save(any(UserSettings.class))).thenReturn(existing);
             when(userRepo.findAllById(1L)).thenReturn(user);
             when(appProperties.isSubscriptionStatusEnabled()).thenReturn(false);
-            when(appProperties.isUsePasswordless()).thenReturn(false);
+            when(appProperties.isPasswordLoginEnabled()).thenReturn(true);
 
             UserSettingsDto dto = userSettingsService.updateSettings(req);
 
@@ -360,7 +385,7 @@ class UserSettingsServiceImplTest {
             when(userSettingsRepository.findById(1L)).thenReturn(Optional.of(existing));
             when(userRepo.findAllById(1L)).thenReturn(user);
             when(appProperties.isSubscriptionStatusEnabled()).thenReturn(true);
-            when(appProperties.isUsePasswordless()).thenReturn(false);
+            when(appProperties.isPasswordLoginEnabled()).thenReturn(true);
 
             UserSettingsDto dto = userSettingsService.getSettings();
 
@@ -382,7 +407,7 @@ class UserSettingsServiceImplTest {
             when(userSettingsRepository.findById(1L)).thenReturn(Optional.of(existing));
             when(userRepo.findAllById(1L)).thenReturn(user);
             when(appProperties.isSubscriptionStatusEnabled()).thenReturn(false);
-            when(appProperties.isUsePasswordless()).thenReturn(false);
+            when(appProperties.isPasswordLoginEnabled()).thenReturn(true);
 
             UserSettingsDto dto = userSettingsService.getSettings();
 

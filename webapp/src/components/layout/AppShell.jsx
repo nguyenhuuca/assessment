@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useTheme } from '../../hooks/useTheme.js'
 import LoginForm from '../auth/LoginForm.jsx'
@@ -31,7 +31,7 @@ const SIDE_NAV = [
 ]
 
 export default function AppShell() {
-  const { isLoggedIn, user, logout } = useAuth()
+  const { isLoggedIn, user, logout, sessionNotice, clearSessionNotice } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
   const [activeNav,     setActiveNav]     = useState('home')
   const [activeTab,     setActiveTab]     = useState('popular')
@@ -59,6 +59,14 @@ export default function AppShell() {
   const [deepLinkId,      setDeepLinkId]      = useState(initialLink.v)
 
   useNotificationStream()
+
+  useEffect(() => {
+    if (!sessionNotice) return
+    setMessage({ text: sessionNotice, type: 'error' })
+    clearSessionNotice()
+    const t = setTimeout(() => setMessage(null), 5000)
+    return () => clearTimeout(t)
+  }, [sessionNotice, clearSessionNotice])
 
   function showComments(video) {
     setHighlightCommentId(null)

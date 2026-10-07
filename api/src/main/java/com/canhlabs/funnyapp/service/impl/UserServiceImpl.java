@@ -92,31 +92,6 @@ public class UserServiceImpl implements UserService {
         this.bCrypt = bCrypt;
     }
 
-    @Transactional
-    @Override
-    public UserInfoDto joinSystem(LoginDto loginDto) {
-        validate(loginDto);
-        log.info( "User join system with email: {}", loginDto.getEmail());
-        User user = userRepo.findAllByUserName(loginDto.getEmail());
-        if (user != null) {
-            requireActive(user);
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
-                    loginDto.getPassword());
-            authenticationManager.authenticate(authenticationToken);
-            if (user.isMfaEnabled()) {
-                String sessionToken = UUID.randomUUID().toString();
-                mfaSessionStore.storeSession(sessionToken, user.getUserName());
-                return toUserInfo(user, null, "MFA_REQUIRED", sessionToken);
-
-            }
-            return toUserInfo(user, getToken(user));
-        }
-        // create new user
-        User newUser = toEntity(loginDto);
-        newUser = userRepo.save(newUser);
-        return toUserInfo(newUser, getToken(newUser));
-
-    }
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
@@ -186,12 +161,7 @@ public class UserServiceImpl implements UserService {
         if (user != null) {
             requireActive(user);
             inviteService.markTokenAsUsed(userReq.get(), userReq.get().getUserId());
-            if (user.isMfaEnabled()) {
-                String sessionToken = UUID.randomUUID().toString();
-                mfaSessionStore.storeSession(sessionToken, user.getUserName());
-                return toUserInfo(user, null, "MFA_REQUIRED", sessionToken);
-            }
-            return toUserInfo(user, getToken(user));
+            return completeLogin(user);
         }
         // create new user
         User newUser = User.builder()
@@ -221,19 +191,54 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetailDto getCurrent() {
-        return AppUtils.getCurrentUser();
-    }
-
-    private User toEntity(LoginDto loginDto) {
-        return User.builder()
-                .userName(loginDto.getEmail())
-                .password(bCrypt.encode(loginDto.getPassword()))
+        UserDetailDto current = AppUtils.getCurrentUser();
+        if (current == null || current.getId() == null) {
+            return current;
+        }
+        User user = userRepo.findAllById(current.getId());
+        if (user == null) {
+            return current;
+        }
+        // capabilities are not part of the JWT claims: derive them per user from the database
+        return UserDetailDto.builder()
+                .id(current.getId())
+                .email(current.getEmail())
+                .role(current.getRole())
+                .permissions(current.getPermissions())
+                .mfaEnabled(user.isMfaEnabled())
+                .mfaAvailable(true)
+                .passwordEnabled(isPasswordEnabled(user))
+                .passwordLoginAvailable(isPasswordLoginAvailable())
                 .build();
     }
 
+    @Override
+    public UserInfoDto completeLogin(User user) {
+        if (user.isMfaEnabled()) {
+            String sessionToken = UUID.randomUUID().toString();
+            mfaSessionStore.storeSession(sessionToken, user.getUserName());
+            return toUserInfo(user, null, "MFA_REQUIRED", sessionToken);
+        }
+        return toUserInfo(user, issueToken(user));
+    }
+
+    private boolean isPasswordLoginAvailable() {
+        return appProperties != null && appProperties.isPasswordLoginEnabled();
+    }
+
+    /** Per user: the global kill switch is on and the account actually has a password. */
+    private boolean isPasswordEnabled(User user) {
+        return isPasswordLoginAvailable() && user.getPassword() != null;
+    }
+
+
     private String getToken(User user) {
+        return issueToken(user);
+    }
+
+    @Override
+    public String issueToken(User user) {
         String role = user.getRole() != null ? user.getRole().name() : "USER";
-        boolean passwordEnabled = appProperties != null && !appProperties.isUsePasswordless();
         return jwtProvider.generateToken(JwtGenerationDto.builder()
                 .payload(UserDetailDto.builder()
                         .id(user.getId())
@@ -241,7 +246,9 @@ public class UserServiceImpl implements UserService {
                         .role(role)
                         .permissions(user.getPermissions())
                         .mfaEnabled(user.isMfaEnabled())
-                        .passwordEnabled(passwordEnabled)
+                        .passwordEnabled(isPasswordEnabled(user))
+                        .passwordLoginAvailable(isPasswordLoginAvailable())
+                        .credentialsVersion(user.getCredentialsVersion())
                         .mfaAvailable(true)
                         .build())
                 .build()).getToken();
@@ -260,14 +267,5 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void validate(LoginDto loginDto) {
-        if (StringUtils.isEmpty(loginDto.getEmail()) || StringUtils.isEmpty(loginDto.getPassword())) {
-            raiseErr("Field is not empty");
-        }
-
-        if (!AppUtils.isValidEmail(loginDto.getEmail())) {
-            raiseErr("Invalid email");
-        }
-    }
 
 }

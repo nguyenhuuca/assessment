@@ -37,7 +37,8 @@ public class ConfigBean {
 
     @Bean
     public PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
+        // cost 12; hashes created with another cost still verify because the cost is stored in the hash
+        return new BCryptPasswordEncoder(12);
     }
 
     // initialize bean for rest template

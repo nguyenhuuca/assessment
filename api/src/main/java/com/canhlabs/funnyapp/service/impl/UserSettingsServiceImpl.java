@@ -169,6 +169,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     }
 
     private UserSettingsDto buildDto(String email, User user, UserSettings settings) {
+        boolean passwordLoginAvailable = appProperties.isPasswordLoginEnabled();
         AccountStatusDto accountStatus = null;
         if (appProperties.isSubscriptionStatusEnabled()) {
             accountStatus = AccountStatusDto.builder()
@@ -179,7 +180,8 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
         return UserSettingsDto.builder()
                 .email(email)
-                .passwordEnabled(!appProperties.isUsePasswordless())
+                .passwordEnabled(passwordLoginAvailable && user != null && user.getPassword() != null)
+                .passwordLoginAvailable(passwordLoginAvailable)
                 .mfaEnabled(user != null && user.isMfaEnabled())
                 .mfaAvailable(true)
                 .notifyNewContent(settings.isNotifyNewContent())

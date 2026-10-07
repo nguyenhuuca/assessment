@@ -10,6 +10,13 @@ import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.user.UserInfoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ResultStatus;
+import com.canhlabs.funnyapp.aop.AuditLog;
+import com.canhlabs.funnyapp.aop.RateLimited;
+import com.canhlabs.funnyapp.dto.auth.AuthOptionsDto;
+import com.canhlabs.funnyapp.dto.auth.PasswordLoginRequest;
+import com.canhlabs.funnyapp.dto.auth.RemovePasswordRequest;
+import com.canhlabs.funnyapp.dto.auth.SetPasswordRequest;
+import com.canhlabs.funnyapp.service.PasswordLoginService;
 import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.service.impl.InviteServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +41,8 @@ class UserControllerTest {
     private AppProperties appProperties;
     @Mock
     private InviteServiceImpl inviteService;
+    @Mock
+    private PasswordLoginService passwordLoginService;
 
     @InjectMocks
     private UserController userController;
@@ -44,36 +53,34 @@ class UserControllerTest {
         userController.injectUser(userService);
         userController.injectProp(appProperties);
         userController.injectInvite(inviteService);
+        userController.injectPasswordLogin(passwordLoginService);
     }
 
     @Test
-    void signIn_shouldJoinSystem_whenPasswordlessIsFalse() {
+    void signIn_alwaysSendsMagicLink_neverAutoRegistersWithPassword() {
         LoginDto loginDto = new LoginDto();
-        UserInfoDto userInfo = UserInfoDto.builder().build();
-        when(appProperties.isUsePasswordless()).thenReturn(false);
-        when(userService.joinSystem(loginDto)).thenReturn(userInfo);
+        loginDto.setEmail("test@example.com");
+        loginDto.setPassword("whatever-password");
 
         ResponseEntity<ResultObjectInfo<UserInfoDto>> response = userController.signIn(loginDto);
 
-        assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
-        assertEquals(userInfo, response.getBody().getData());
-        verify(userService).joinSystem(loginDto);
-        verify(inviteService, never()).inviteUser(anyString(), any());
+        assertEquals("INVITED_SEND", response.getBody().getData().getAction());
+        verify(inviteService).inviteUser("test@example.com", null);
+        // legacy joinSystem removed (ADR-0018): /user/join only sends magic links
     }
 
     @Test
-    void signIn_shouldInviteUser_whenPasswordlessIsTrue() {
+    void signIn_shouldInviteUser() {
         LoginDto loginDto = new LoginDto();
         loginDto.setEmail("test@example.com");
         UserInfoDto userInfo = UserInfoDto.builder().build();
-        when(appProperties.isUsePasswordless()).thenReturn(true);
 
         ResponseEntity<ResultObjectInfo<UserInfoDto>> response = userController.signIn(loginDto);
 
         assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
         assertEquals("INVITED_SEND", response.getBody().getData().getAction());
         verify(inviteService).inviteUser("test@example.com", null);
-        verify(userService, never()).joinSystem(any());
+        // legacy joinSystem removed (ADR-0018): /user/join only sends magic links
     }
 
     @Test
@@ -145,5 +152,54 @@ class UserControllerTest {
         assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
         assertEquals(userDetail, response.getBody().getData());
         verify(userService).getCurrent();
+    }
+
+    @Test
+    void login_delegatesToPasswordLoginService() {
+        PasswordLoginRequest req = new PasswordLoginRequest("a@b.com", "pw");
+        UserInfoDto info = UserInfoDto.builder().jwt("jwt").build();
+        when(passwordLoginService.login(req)).thenReturn(info);
+
+        ResponseEntity<ResultObjectInfo<UserInfoDto>> response = userController.login(req);
+
+        assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
+        assertEquals(info, response.getBody().getData());
+    }
+
+    @Test
+    void authOptions_reflectsKillSwitch() {
+        when(appProperties.isPasswordLoginEnabled()).thenReturn(true);
+        AuthOptionsDto on = userController.authOptions().getBody().getData();
+        when(appProperties.isPasswordLoginEnabled()).thenReturn(false);
+        AuthOptionsDto off = userController.authOptions().getBody().getData();
+
+        assertEquals(true, on.isPasswordLoginAvailable());
+        assertEquals(false, off.isPasswordLoginAvailable());
+    }
+
+    @Test
+    void setAndRemovePassword_delegate() {
+        SetPasswordRequest set = new SetPasswordRequest(null, "a-long-new-password", null);
+        RemovePasswordRequest remove = new RemovePasswordRequest("cur", null);
+        UserInfoDto info = UserInfoDto.builder().jwt("jwt").build();
+        when(passwordLoginService.setPassword(set)).thenReturn(info);
+        when(passwordLoginService.removePassword(remove)).thenReturn(info);
+
+        assertEquals(info, userController.setPassword(set).getBody().getData());
+        assertEquals(info, userController.removePassword(remove).getBody().getData());
+    }
+
+    @Test
+    void passwordEndpoints_haveRateLimitAndAudit() throws NoSuchMethodException {
+        var login = UserController.class.getMethod("login", PasswordLoginRequest.class);
+        var put = UserController.class.getMethod("setPassword", SetPasswordRequest.class);
+        var del = UserController.class.getMethod("removePassword", RemovePasswordRequest.class);
+
+        assertEquals(10, login.getAnnotation(RateLimited.class).permit());
+        assertEquals(5, put.getAnnotation(RateLimited.class).permit());
+        assertEquals(5, del.getAnnotation(RateLimited.class).permit());
+        for (var m : new java.lang.reflect.Method[]{login, put, del}) {
+            org.junit.jupiter.api.Assertions.assertNotNull(m.getAnnotation(AuditLog.class));
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.filter;
 
+import com.canhlabs.funnyapp.cache.CredentialsVersionCache;
 import com.canhlabs.funnyapp.dto.auth.JwtVerificationResultDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.exception.UnauthorizedException;
@@ -35,8 +36,17 @@ import static com.canhlabs.funnyapp.utils.AppConstant.WebIgnoringConfig.WHITE_LI
 @Slf4j
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
+    public static final String TOKEN_REVOKED = "TOKEN_REVOKED";
+    public static final int TOKEN_REVOKED_SUB_CODE = 603;
+
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private JwtProvider jwtProvider;
+    private CredentialsVersionCache credentialsVersionCache;
+
+    @Autowired
+    public void injectCredentialsVersionCache(CredentialsVersionCache credentialsVersionCache) {
+        this.credentialsVersionCache = credentialsVersionCache;
+    }
 
     @Autowired
     public void injectJwt(JwtProvider jwtProvider) {
@@ -56,6 +66,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authentication;
             JwtVerificationResultDto verificationResult = jwtProvider.verifyToken(token);
             UserDetailDto user = verificationResult.getData();
+            // Session revocation: a password set/change/removal bumps credentials_version; older tokens are rejected.
+            // Tokens without a "cv" claim were parsed as version 0 (backward compatible).
+            if (user.getCredentialsVersion() != credentialsVersionCache.currentVersion(user.getId())) {
+                throw new UnauthorizedException(TOKEN_REVOKED, TOKEN_REVOKED_SUB_CODE);
+            }
             String role = user.getRole() != null && !user.getRole().isEmpty() ? user.getRole() : "USER";
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
             authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities);

@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,12 @@ public class AppProperties {
     // query condition
     private String googlePart;
     private String gptKey;
-    private boolean usePasswordless;
+    /**
+     * @deprecated no longer drives behaviour; replaced by {@code app.auth.password-login-enabled}.
+     * Kept (nullable) only to detect the old key and log a deprecation warning.
+     */
+    @Deprecated
+    private Boolean usePasswordless;
     private String domain;
     private String inviteTemplate;
     private String chatGptUrl;
@@ -37,6 +43,25 @@ public class AppProperties {
     private String imageStoragePath;
     private boolean subscriptionStatusEnabled;
     private EmailSetting emailSetting = new EmailSetting();
+    private Auth auth = new Auth();
+
+    @PostConstruct
+    void warnDeprecatedKeys() {
+        if (usePasswordless != null) {
+            log.warn("'app.use-password-less' is deprecated and ignored; use 'app.auth.password-login-enabled' (magic link is always enabled)");
+        }
+    }
+
+    /** Kill switch for the password endpoints only; magic link login is always on. */
+    public boolean isPasswordLoginEnabled() {
+        return auth != null && auth.isPasswordLoginEnabled();
+    }
+
+    @Getter
+    @Setter
+    public static class Auth {
+        private boolean passwordLoginEnabled = true;
+    }
 
 
     @Getter

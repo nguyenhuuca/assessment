@@ -72,54 +72,9 @@ class UserServiceImplTest {
         userService.injectTotp(totp);
     }
 
-    @Test
-    void joinSystem_registersNewUser() {
-        LoginDto loginDto = LoginDto.builder().email("test@abc.com").password("pass").build();
-        when(userRepo.findAllByUserName("test@abc.com")).thenReturn(null);
-        User savedUser = User.builder().id(1L).userName("test@abc.com").password("encoded").build();
-        when(userRepo.save(any())).thenReturn(savedUser);
-        when(jwtProvider.generateToken(any(JwtGenerationDto.class))).thenReturn(TokenDto.builder().token("jwt").build());
-        when(passwordEncoder.encode("pass")).thenReturn("encoded");
 
-        UserInfoDto result = userService.joinSystem(loginDto);
 
-        assertThat(result.getJwt()).isEqualTo("jwt");
-    }
 
-    @Test
-    void joinSystem_logsInExistingUser() {
-        LoginDto loginDto = LoginDto.builder().email("test@abc.com").password("pass").build();
-        User user = User.builder().id(1L).userName("test@abc.com").password("encoded").build();
-        when(userRepo.findAllByUserName("test@abc.com")).thenReturn(user);
-        when(jwtProvider.generateToken(any(JwtGenerationDto.class))).thenReturn(TokenDto.builder().token("jwt").build());
-
-        UserInfoDto result = userService.joinSystem(loginDto);
-
-        assertThat(result.getJwt()).isEqualTo("jwt");
-        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-    }
-
-    @Test
-    void joinSystem_invalidEmail_throwsException() {
-        LoginDto loginDto = LoginDto.builder().email("invalid").password("pass").build();
-
-        assertThatThrownBy(() -> userService.joinSystem(loginDto))
-                .isInstanceOf(CustomException.class)
-                .hasMessage("Invalid email");
-    }
-
-    @Test
-    void joinSystem_mfaRequired_returnsMfaRequired() {
-        LoginDto loginDto = LoginDto.builder().email("test@abc.com").password("pass").build();
-        User user = User.builder().id(1L).userName("test@abc.com").password("encoded").mfaEnabled(true).build();
-        when(userRepo.findAllByUserName("test@abc.com")).thenReturn(user);
-
-        UserInfoDto result = userService.joinSystem(loginDto);
-
-        assertThat(result.getAction()).isEqualTo("MFA_REQUIRED");
-        assertThat(result.getSessionToken()).isNotNull();
-        verify(mfaSessionStore).storeSession(anyString(), eq("test@abc.com"));
-    }
 
     @Test
     void loadUserByUsername_success() {
@@ -381,6 +336,93 @@ class UserServiceImplTest {
             UserDetailDto result = userService.getCurrent();
 
             assertThat(result).isEqualTo(mockUser);
+        }
+    }
+
+    // ---- PW-3 / PW-4 ----
+
+    private org.mockito.ArgumentCaptor<JwtGenerationDto> captureIssued(User user, boolean flag) {
+        com.canhlabs.funnyapp.config.AppProperties props = org.mockito.Mockito.mock(com.canhlabs.funnyapp.config.AppProperties.class);
+        when(props.isPasswordLoginEnabled()).thenReturn(flag);
+        userService.injectAppProperties(props);
+        when(jwtProvider.generateToken(any(JwtGenerationDto.class))).thenReturn(TokenDto.builder().token("jwt").build());
+        userService.issueToken(user);
+        org.mockito.ArgumentCaptor<JwtGenerationDto> captor = org.mockito.ArgumentCaptor.forClass(JwtGenerationDto.class);
+        verify(jwtProvider).generateToken(captor.capture());
+        return captor;
+    }
+
+    @Test
+    void issueToken_carriesCredentialsVersion_andPerUserPasswordEnabled() {
+        User withPw = User.builder().id(1L).userName("a@b.com").password("hash").credentialsVersion(4).build();
+
+        UserDetailDto payload = captureIssued(withPw, true).getValue().getPayload();
+
+        assertThat(payload.getCredentialsVersion()).isEqualTo(4);
+        assertThat(payload.isPasswordEnabled()).isTrue();
+        assertThat(payload.isPasswordLoginAvailable()).isTrue();
+    }
+
+    @Test
+    void issueToken_userWithoutPassword_passwordEnabledFalse_butLoginAvailable() {
+        User noPw = User.builder().id(1L).userName("a@b.com").build();
+
+        UserDetailDto payload = captureIssued(noPw, true).getValue().getPayload();
+
+        assertThat(payload.isPasswordEnabled()).isFalse();
+        assertThat(payload.isPasswordLoginAvailable()).isTrue();
+    }
+
+    @Test
+    void issueToken_flagOff_passwordEnabledFalseEvenWithPassword() {
+        User withPw = User.builder().id(1L).userName("a@b.com").password("hash").build();
+
+        UserDetailDto payload = captureIssued(withPw, false).getValue().getPayload();
+
+        assertThat(payload.isPasswordEnabled()).isFalse();
+        assertThat(payload.isPasswordLoginAvailable()).isFalse();
+    }
+
+    @Test
+    void completeLogin_mfaUser_returnsMfaRequired_nonMfaGetsJwt() {
+        User mfa = User.builder().id(1L).userName("a@b.com").mfaEnabled(true).build();
+        UserInfoDto challenge = userService.completeLogin(mfa);
+        assertThat(challenge.getAction()).isEqualTo("MFA_REQUIRED");
+        assertThat(challenge.getJwt()).isNull();
+        verify(mfaSessionStore).storeSession(anyString(), eq("a@b.com"));
+
+        when(jwtProvider.generateToken(any(JwtGenerationDto.class))).thenReturn(TokenDto.builder().token("jwt").build());
+        UserInfoDto done = userService.completeLogin(User.builder().id(2L).userName("c@d.com").build());
+        assertThat(done.getJwt()).isEqualTo("jwt");
+    }
+
+    @Test
+    void getCurrent_enrichesCapabilitiesPerUserFromDatabase() {
+        com.canhlabs.funnyapp.config.AppProperties props = org.mockito.Mockito.mock(com.canhlabs.funnyapp.config.AppProperties.class);
+        when(props.isPasswordLoginEnabled()).thenReturn(true);
+        userService.injectAppProperties(props);
+        UserDetailDto fromJwt = UserDetailDto.builder().id(1L).email("test@abc.com").role("USER").build();
+        when(userRepo.findAllById(1L)).thenReturn(
+                User.builder().id(1L).userName("test@abc.com").password("hash").mfaEnabled(true).build());
+
+        try (MockedStatic<AppUtils> appUtils = mockStatic(AppUtils.class)) {
+            appUtils.when(AppUtils::getCurrentUser).thenReturn(fromJwt);
+
+            UserDetailDto result = userService.getCurrent();
+
+            assertThat(result.isPasswordEnabled()).isTrue();
+            assertThat(result.isPasswordLoginAvailable()).isTrue();
+            assertThat(result.isMfaEnabled()).isTrue();
+            assertThat(result.getEmail()).isEqualTo("test@abc.com");
+        }
+    }
+
+    @Test
+    void getCurrent_noAuthenticatedUser_returnsNull() {
+        try (MockedStatic<AppUtils> appUtils = mockStatic(AppUtils.class)) {
+            appUtils.when(AppUtils::getCurrentUser).thenReturn(null);
+
+            assertThat(userService.getCurrent()).isNull();
         }
     }
 }

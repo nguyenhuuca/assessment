@@ -123,9 +123,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **PRD:** `docs/prd/PRD-password-login.md` · **ADR:** `docs/adr/0018-password-login-option.md` (Accepted) · **Plan:** `docs/plans/plan-password-login.md`
 
-- [ ] **PW-1** ~~Prod pre-check~~ (no legacy passwords — owner-confirmed 2026-10-07), migration (`password_set_at`, `failed_login_count`, `locked_until`, `credentials_version`), `User` fields (`@Builder.Default`), `app.auth.password-login-enabled`, `PasswordPolicy` (10–72 bytes, no email part, common list), BCrypt 12
-- [ ] **PW-2** `POST /user/login` + lockout (5 fails → 15 min) + generic `INVALID_CREDENTIALS` + remove legacy auto-register path in `/user/join` + tests — after PW-1
-- [ ] **PW-3** `PUT/DELETE /user/password` (current pw / OTP rules, policy codes, new JWT, security email, per-user `passwordEnabled`) + tests — after PW-1
-- [ ] **PW-4** JWT `cv` claim + `CredentialsVersionCache` + filter rejects revoked tokens (`TOKEN_REVOKED`) + tests — after PW-1
-- [ ] **PW-5** FE: `PasswordInput`, LoginForm tabs (link / password, forgot → link), Settings set/change/remove, global `TOKEN_REVOKED` logout + tests — contract-first
+- [x] **PW-1** ~~Prod pre-check~~ (no legacy passwords — owner-confirmed 2026-10-07), migration (`password_set_at`, `failed_login_count`, `locked_until`, `credentials_version`), `User` fields (`@Builder.Default`), `app.auth.password-login-enabled`, `PasswordPolicy` (10–72 bytes, no email part, common list), BCrypt 12
+- [x] **PW-2** `POST /user/login` + lockout (5 fails → 15 min) + generic `INVALID_CREDENTIALS` + remove legacy auto-register path in `/user/join` + tests — after PW-1
+- [x] **PW-3** `PUT/DELETE /user/password` (current pw / OTP rules, policy codes, new JWT, security email, per-user `passwordEnabled`) + tests — after PW-1
+- [x] **PW-4** JWT `cv` claim + `CredentialsVersionCache` + filter rejects revoked tokens (`TOKEN_REVOKED`) + tests — after PW-1
+- [x] **PW-5** FE: `PasswordInput`, LoginForm tabs (link / password, forgot → link), Settings set/change/remove, global `TOKEN_REVOKED` logout + tests — contract-first
 - [ ] **PW-6** Prod E2E, security review, `docs/tracking.md` + mkdocs nav — after all

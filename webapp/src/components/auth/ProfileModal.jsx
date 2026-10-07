@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { authApi } from '../../api/auth.js'
 import { useAuth } from '../../hooks/useAuth.js'
+import SignInPanel from './SignInPanel.jsx'
 
 const Spinner = () => (
   <span style={{
@@ -13,9 +14,14 @@ const Spinner = () => (
   }} />
 )
 
-export default function ProfileModal({ show, onHide }) {
+export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
   const { user, updateUser } = useAuth()
-  const [activeTab, setActiveTab] = useState('info')
+  const [activeTab, setActiveTab] = useState(initialTab)
+  const [prevShow, setPrevShow] = useState(show)
+  if (show !== prevShow) {
+    setPrevShow(show)
+    if (show) setActiveTab(initialTab)
+  }
   const [mfaLoading, setMfaLoading] = useState(false)
   const [mfaMsg, setMfaMsg] = useState(null) // { text, type: 'error'|'success' }
   const [qrCode, setQrCode] = useState(null)
@@ -112,7 +118,16 @@ export default function ProfileModal({ show, onHide }) {
             >
               MFA Settings
             </button>
+            <button
+              className={`app-tab${activeTab === 'signin' ? ' active' : ''}`}
+              onClick={() => setActiveTab('signin')}
+            >
+              Đăng nhập
+            </button>
           </div>
+
+          {/* Sign-in (password) tab */}
+          {activeTab === 'signin' && <SignInPanel />}
 
           {/* User Info tab */}
           {activeTab === 'info' && (

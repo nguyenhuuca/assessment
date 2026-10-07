@@ -115,7 +115,13 @@ public class JwtProvider {
         payload.put("email", request.getEmail());
         payload.put("permissions", request.getPermissions());
         payload.put("role", request.getRole() != null ? request.getRole() : "USER");
+        payload.put("cv", request.getCredentialsVersion());
         return payload;
+    }
+
+    /** Tokens issued before PW-4 carry no "cv" claim; they count as version 0 (the column default). */
+    private static int parseCredentialsVersion(Object raw) {
+        return raw instanceof Number n ? n.intValue() : 0;
     }
 
     private UserDetailDto convertValue(Claims body) {
@@ -125,6 +131,7 @@ public class JwtProvider {
                 .email(getNonNull(body.get("email")))
                 .role(getNonNull(body.get("role")))
                 .permissions(permissionsRaw.isEmpty() ? 0 : Integer.parseInt(permissionsRaw))
+                .credentialsVersion(parseCredentialsVersion(body.get("cv")))
                 .build();
     }
 

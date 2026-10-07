@@ -82,7 +82,7 @@ NIST SP 800-63B style: **min 10 characters, max 72 bytes** (BCrypt limit), any c
    ```
    POST   /user/login              {email, password}                 → UserInfoDto | MFA_REQUIRED   (public, @RateLimited 10/min/IP)
    PUT    /user/password           {currentPassword?, newPassword, otp?} → {jwt}                    (auth)
-   DELETE /user/password           {currentPassword, otp?}           → 204                          (auth)
+   DELETE /user/password           {currentPassword, otp?}           → {jwt}  (fresh token; removal also bumps credentials_version)  (auth)
    ```
    - `PUT` first-time set: no `currentPassword`; requires `otp` if MFA enabled.
    - `PUT` change: requires `currentPassword` (and `otp` if MFA).

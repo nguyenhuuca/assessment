@@ -3,6 +3,11 @@ package com.canhlabs.funnyapp.web;
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.RateLimited;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
+import com.canhlabs.funnyapp.dto.auth.AuthOptionsDto;
+import com.canhlabs.funnyapp.dto.auth.PasswordLoginRequest;
+import com.canhlabs.funnyapp.dto.auth.RemovePasswordRequest;
+import com.canhlabs.funnyapp.dto.auth.SetPasswordRequest;
+import com.canhlabs.funnyapp.service.PasswordLoginService;
 import com.canhlabs.funnyapp.service.UserService;
 import com.canhlabs.funnyapp.service.impl.InviteServiceImpl;
 import com.canhlabs.funnyapp.utils.AppConstant;
@@ -22,8 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +46,12 @@ public class UserController extends BaseController {
     private UserService userService;
     private AppProperties appProperties;
     private InviteServiceImpl inviteService;
+    private PasswordLoginService passwordLoginService;
+
+    @Autowired
+    public void injectPasswordLogin(PasswordLoginService passwordLoginService) {
+        this.passwordLoginService = passwordLoginService;
+    }
 
     @Autowired
     public void injectInvite(InviteServiceImpl inviteService) {
@@ -59,21 +72,61 @@ public class UserController extends BaseController {
      * @param loginDto hold the Email and password that client post to server
      * @return toke
      */
-    @Operation(summary = "Login/register to system", description = "If user already registered, it will return token. If not, it will register user and return token")
+    @Operation(summary = "Request a magic link", description = "Sends a sign-in link to the email. Unknown emails are registered when the link is verified, never here.")
     @PostMapping("/join")
     @WithSpan
     @RateLimited(permit = 5)
     public ResponseEntity<ResultObjectInfo<UserInfoDto>> signIn(@RequestBody LoginDto loginDto) {
+        // Magic link only: the legacy email+password auto-register path was removed (ADR-0018, pre-hijacking)
         UserInfoDto userInfoDto = UserInfoDto.builder().build();
-        if(!appProperties.isUsePasswordless()) {
-            userInfoDto = userService.joinSystem(loginDto);
-        } else {
-            inviteService.inviteUser(loginDto.getEmail(), null);
-            userInfoDto.setAction("INVITED_SEND");
-        }
+        inviteService.inviteUser(loginDto.getEmail(), null);
+        userInfoDto.setAction("INVITED_SEND");
         return new ResponseEntity<>(ResultObjectInfo.<UserInfoDto>builder()
                 .status(ResultStatus.SUCCESS)
                 .data(userInfoDto)
+                .build(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Password login", description = "Email + password sign-in. Every failure returns the same 401 INVALID_CREDENTIALS.")
+    @PostMapping("/login")
+    @WithSpan
+    @RateLimited(permit = 10)
+    @AuditLog("Password login")
+    public ResponseEntity<ResultObjectInfo<UserInfoDto>> login(@RequestBody PasswordLoginRequest request) {
+        return ok(passwordLoginService.login(request));
+    }
+
+    @Operation(summary = "Public auth capabilities", description = "Tells the login form whether the password tab should be shown.")
+    @GetMapping("/auth-options")
+    @WithSpan
+    public ResponseEntity<ResultObjectInfo<AuthOptionsDto>> authOptions() {
+        return ok(AuthOptionsDto.builder()
+                .passwordLoginAvailable(appProperties.isPasswordLoginEnabled())
+                .build());
+    }
+
+    @Operation(summary = "Set or change password", description = "Authenticated. Revokes every other session and returns a fresh JWT.")
+    @PutMapping("/password")
+    @WithSpan
+    @RateLimited(permit = 5)
+    @AuditLog("Set/change password")
+    public ResponseEntity<ResultObjectInfo<UserInfoDto>> setPassword(@RequestBody SetPasswordRequest request) {
+        return ok(passwordLoginService.setPassword(request));
+    }
+
+    @Operation(summary = "Remove password", description = "Authenticated. Back to magic link only; revokes every other session and returns a fresh JWT.")
+    @DeleteMapping("/password")
+    @WithSpan
+    @RateLimited(permit = 5)
+    @AuditLog("Remove password")
+    public ResponseEntity<ResultObjectInfo<UserInfoDto>> removePassword(@RequestBody RemovePasswordRequest request) {
+        return ok(passwordLoginService.removePassword(request));
+    }
+
+    private static <T> ResponseEntity<ResultObjectInfo<T>> ok(T data) {
+        return new ResponseEntity<>(ResultObjectInfo.<T>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(data)
                 .build(), HttpStatus.OK);
     }
 

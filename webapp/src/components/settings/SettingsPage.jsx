@@ -49,6 +49,12 @@ export default function SettingsPage() {
   const updateSettings = useUpdateSettings()
 
   const [profileOpen, setProfileOpen] = useState(false)
+  const [profileTab, setProfileTab] = useState('info')
+
+  function openProfile(tab) {
+    setProfileTab(tab)
+    setProfileOpen(true)
+  }
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [patchError, setPatchError] = useState(null)
 
@@ -175,7 +181,7 @@ export default function SettingsPage() {
             {passwordEnabled && (
               <button
                 className="app-btn secondary"
-                onClick={() => setProfileOpen(true)}
+                onClick={() => openProfile('signin')}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>lock</span>
                 Change Password
@@ -184,7 +190,7 @@ export default function SettingsPage() {
             {!passwordEnabled && (
               <button
                 className="app-btn secondary"
-                onClick={() => setProfileOpen(true)}
+                onClick={() => openProfile('signin')}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>link</span>
                 Manage Sign-in
@@ -192,7 +198,7 @@ export default function SettingsPage() {
             )}
             <button
               className="app-btn secondary"
-              onClick={() => setProfileOpen(true)}
+              onClick={() => openProfile('mfa')}
             >
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
                 {mfaEnabled ? 'gpp_good' : 'gpp_maybe'}
@@ -346,7 +352,7 @@ export default function SettingsPage() {
       </div>
 
       {/* ── Modals ── */}
-      <ProfileModal show={profileOpen} onHide={() => setProfileOpen(false)} />
+      <ProfileModal show={profileOpen} initialTab={profileTab} onHide={() => setProfileOpen(false)} />
       <DeleteAccountModal
         show={deleteOpen}
         onHide={() => setDeleteOpen(false)}

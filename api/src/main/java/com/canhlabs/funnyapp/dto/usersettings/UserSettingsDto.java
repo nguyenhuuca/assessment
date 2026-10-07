@@ -16,6 +16,7 @@ import java.time.Instant;
 public class UserSettingsDto {
     private String email;
     private boolean passwordEnabled;
+    private boolean passwordLoginAvailable;
     private boolean mfaEnabled;
     private boolean mfaAvailable;
     private boolean notifyNewContent;

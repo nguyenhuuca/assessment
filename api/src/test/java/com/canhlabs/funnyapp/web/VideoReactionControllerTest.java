@@ -84,6 +84,10 @@ class VideoReactionControllerTest {
     @MockitoBean
     JwtProvider jwtProvider;
 
+    // real JWTAuthenticationFilter needs it; mock answers version 0 = the "cv" of test tokens
+    @MockitoBean
+    com.canhlabs.funnyapp.cache.CredentialsVersionCache credentialsVersionCache;
+
     @Autowired
     MockMvc mockMvc;
 

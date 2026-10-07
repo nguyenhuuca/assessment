@@ -64,6 +64,23 @@ describe('AuthContext', () => {
     expect(localStorage.getItem('jwt')).toBeNull()
   })
 
+  it('logs out and sets a notice when auth:revoked fires', async () => {
+    localStorage.setItem('jwt', 'jwt-x')
+    localStorage.setItem('user', JSON.stringify({ email: 'user@test.com' }))
+    const { authApi } = await import('../../api/auth.js')
+    authApi.me.mockResolvedValue({})
+
+    function Notice() {
+      const { sessionNotice } = useAuth()
+      return <span data-testid="notice">{sessionNotice || ''}</span>
+    }
+    render(<AuthProvider><TestConsumer /><Notice /></AuthProvider>)
+    await waitFor(() => expect(screen.getByTestId('logged').textContent).toBe('true'))
+    act(() => { window.dispatchEvent(new Event('auth:revoked')) })
+    await waitFor(() => expect(screen.getByTestId('logged').textContent).toBe('false'))
+    expect(screen.getByTestId('notice').textContent).toBe('Phiên đăng nhập đã hết hiệu lực, vui lòng đăng nhập lại')
+  })
+
   it('clears session on 401 from /user/me', async () => {
     localStorage.setItem('jwt', 'expired-jwt')
     localStorage.setItem('user', JSON.stringify({ email: 'user@test.com' }))

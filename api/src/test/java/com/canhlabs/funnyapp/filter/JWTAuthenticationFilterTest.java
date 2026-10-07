@@ -24,6 +24,9 @@ class JWTAuthenticationFilterTest {
     @Mock
     private JwtProvider jwtProvider;
 
+    @Mock
+    private com.canhlabs.funnyapp.cache.CredentialsVersionCache credentialsVersionCache;
+
     @InjectMocks
     private JWTAuthenticationFilter filter;
 
@@ -35,6 +38,7 @@ class JWTAuthenticationFilterTest {
         MockitoAnnotations.openMocks(this);
         filter = new JWTAuthenticationFilter();
         filter.injectJwt(jwtProvider);
+        filter.injectCredentialsVersionCache(credentialsVersionCache);
         SecurityContextHolder.clearContext();
     }
 
@@ -187,5 +191,114 @@ class JWTAuthenticationFilterTest {
         when(request.getMethod()).thenReturn("GET");
 
         assertFalse(filter.shouldNotFilter(request));
+    }
+
+    // ---- PW-4: session revocation via credentials_version ----
+
+    private JwtVerificationResultDto tokenWithVersion(long id, int cv) {
+        UserDetailDto user = UserDetailDto.builder().id(id).email("u@example.com").credentialsVersion(cv).build();
+        JwtVerificationResultDto result = new JwtVerificationResultDto();
+        result.setData(user);
+        return result;
+    }
+
+    @Test
+    void doFilterInternal_revokedToken_returns401TokenRevoked() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(HttpHeaders.AUTHORIZATION, "old-token");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        when(jwtProvider.verifyToken("old-token")).thenReturn(tokenWithVersion(7L, 0));
+        when(credentialsVersionCache.currentVersion(7L)).thenReturn(1);
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertEquals(401, response.getStatus());
+        assertTrue(response.getContentAsString().contains("TOKEN_REVOKED"));
+        assertTrue(response.getContentAsString().contains("603"));
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain, never()).doFilter(any(), any());
+    }
+
+    @Test
+    void doFilterInternal_newTokenWithCurrentVersion_isAccepted() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(HttpHeaders.AUTHORIZATION, "new-token");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        when(jwtProvider.verifyToken("new-token")).thenReturn(tokenWithVersion(7L, 1));
+        when(credentialsVersionCache.currentVersion(7L)).thenReturn(1);
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertNotNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    void doFilterInternal_legacyTokenWithoutCv_acceptedWhileVersionIsZero() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(HttpHeaders.AUTHORIZATION, "legacy-token");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        // a token without the claim is parsed to credentialsVersion = 0 (default)
+        UserDetailDto legacy = UserDetailDto.builder().id(7L).email("u@example.com").build();
+        JwtVerificationResultDto result = new JwtVerificationResultDto();
+        result.setData(legacy);
+        when(jwtProvider.verifyToken("legacy-token")).thenReturn(result);
+        when(credentialsVersionCache.currentVersion(7L)).thenReturn(0);
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertNotNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    void doFilterInternal_legacyTokenWithoutCv_rejectedAfterPasswordChange() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(HttpHeaders.AUTHORIZATION, "legacy-token");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        UserDetailDto legacy = UserDetailDto.builder().id(7L).email("u@example.com").build();
+        JwtVerificationResultDto result = new JwtVerificationResultDto();
+        result.setData(legacy);
+        when(jwtProvider.verifyToken("legacy-token")).thenReturn(result);
+        when(credentialsVersionCache.currentVersion(7L)).thenReturn(1);
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertEquals(401, response.getStatus());
+        assertTrue(response.getContentAsString().contains("TOKEN_REVOKED"));
+    }
+
+    @Test
+    void doFilterInternal_optionalAuthPath_revokedToken_continuesAsGuest() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/funny-app/videos/42/reaction");
+        request.setServletPath("/v1/funny-app/videos/42/reaction");
+        request.addHeader(HttpHeaders.AUTHORIZATION, "old-token");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        when(jwtProvider.verifyToken("old-token")).thenReturn(tokenWithVersion(7L, 0));
+        when(credentialsVersionCache.currentVersion(7L)).thenReturn(2);
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        assertNotEquals(401, response.getStatus());
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    void shouldNotFilter_passwordEndpointsAreAuthenticated_loginAndOptionsArePublic() {
+        HttpServletRequest put = mock(HttpServletRequest.class);
+        when(put.getServletPath()).thenReturn("/v1/funny-app/user/password");
+        when(put.getMethod()).thenReturn("PUT");
+        assertFalse(filter.shouldNotFilter(put));
+
+        HttpServletRequest login = mock(HttpServletRequest.class);
+        when(login.getServletPath()).thenReturn("/v1/funny-app/user/login");
+        when(login.getMethod()).thenReturn("POST");
+        assertTrue(filter.shouldNotFilter(login));
+
+        HttpServletRequest options = mock(HttpServletRequest.class);
+        when(options.getServletPath()).thenReturn("/v1/funny-app/user/auth-options");
+        when(options.getMethod()).thenReturn("GET");
+        assertTrue(filter.shouldNotFilter(options));
     }
 }

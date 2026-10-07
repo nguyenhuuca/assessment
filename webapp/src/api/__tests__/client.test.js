@@ -51,6 +51,44 @@ describe('API client', () => {
   })
 })
 
+describe('API client TOKEN_REVOKED handling', () => {
+  it('clears the session and dispatches auth:revoked on 401 TOKEN_REVOKED', async () => {
+    localStorage.setItem('jwt', 'old')
+    localStorage.setItem('user', '{"email":"a@b.com"}')
+    mockFetch.mockResolvedValueOnce({
+      ok: false, status: 401,
+      json: async () => ({ status: 'FAILED', error: { status: 401, message: 'TOKEN_REVOKED' } }),
+    })
+    const handler = vi.fn()
+    window.addEventListener('auth:revoked', handler)
+
+    const { api } = await import('../client.js')
+    await expect(api.get('/user/me')).rejects.toMatchObject({ message: 'TOKEN_REVOKED', status: 401 })
+
+    window.removeEventListener('auth:revoked', handler)
+    expect(handler).toHaveBeenCalledTimes(1)
+    expect(localStorage.getItem('jwt')).toBeNull()
+    expect(localStorage.getItem('user')).toBeNull()
+  })
+
+  it('leaves the session alone for other 401s', async () => {
+    localStorage.setItem('jwt', 'keep')
+    mockFetch.mockResolvedValueOnce({
+      ok: false, status: 401,
+      json: async () => ({ error: { message: 'INVALID_CREDENTIALS' } }),
+    })
+    const handler = vi.fn()
+    window.addEventListener('auth:revoked', handler)
+
+    const { api } = await import('../client.js')
+    await expect(api.post('/user/login', {})).rejects.toMatchObject({ status: 401 })
+
+    window.removeEventListener('auth:revoked', handler)
+    expect(handler).not.toHaveBeenCalled()
+    expect(localStorage.getItem('jwt')).toBe('keep')
+  })
+})
+
 describe('API client 204 handling', () => {
   it('returns null for 204 No Content without parsing the body', async () => {
     const json = vi.fn().mockRejectedValue(new SyntaxError('Unexpected end of JSON input'))

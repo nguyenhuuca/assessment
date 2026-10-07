@@ -122,4 +122,24 @@ class JwtProviderTest {
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessage("TOKEN_INVALID");
     }
+
+    @Test
+    void verifyToken_roundTripsCredentialsVersionClaim() {
+        String token = jwtProvider.generateToken(JwtGenerationDto.builder()
+                .payload(UserDetailDto.builder().id(5L).email("a@b.com").role("USER").credentialsVersion(3).build())
+                .build()).getToken();
+
+        assertThat(jwtProvider.verifyToken(token).getData().getCredentialsVersion()).isEqualTo(3);
+    }
+
+    @Test
+    void verifyToken_legacyTokenWithoutCvClaim_isVersionZero() {
+        String token = Jwts.builder()
+                .claims(Map.of("id", 7L, "email", "old@abc.com", "role", "USER"))
+                .expiration(new Date(System.currentTimeMillis() + 3600000L))
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                .compact();
+
+        assertThat(jwtProvider.verifyToken(token).getData().getCredentialsVersion()).isZero();
+    }
 }

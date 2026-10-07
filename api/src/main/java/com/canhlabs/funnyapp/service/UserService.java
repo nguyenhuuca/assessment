@@ -5,17 +5,19 @@ import com.canhlabs.funnyapp.dto.auth.MfaRequest;
 import com.canhlabs.funnyapp.dto.auth.SetupResponse;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.user.UserInfoDto;
+import com.canhlabs.funnyapp.entity.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService extends UserDetailsService {
 
     /**
-     * Using to join funny system, in case have not exist use, will create new user
-     *
-     * @param loginDto hold email and password user;
-     * @return jwt and user info in case success
+     * Finishes a successful first-factor authentication: MFA users get {@code MFA_REQUIRED} plus a session token
+     * (completed via {@code verifyMfa}), everyone else gets a JWT.
      */
-    UserInfoDto joinSystem(LoginDto loginDto);
+    UserInfoDto completeLogin(User user);
+
+    /** @return a signed JWT for the user reflecting its current role, permissions and credentials version */
+    String issueToken(User user);
 
     String generateSecret();
 

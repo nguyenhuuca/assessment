@@ -70,4 +70,18 @@ public class User extends BaseDomain {
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
+    @Column(name = "password_set_at")
+    private Instant passwordSetAt;
+
+    @Column(name = "failed_login_count", nullable = false)
+    @Builder.Default // builder ignores field initialisers; see ee6ad36
+    private int failedLoginCount = 0;
+
+    @Column(name = "locked_until")
+    private Instant lockedUntil;
+
+    @Column(name = "credentials_version", nullable = false)
+    @Builder.Default
+    private int credentialsVersion = 0;
+
 }
