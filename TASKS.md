@@ -116,3 +116,16 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **NT-6** FE: `sseStream.js` parser, `useNotificationStream` (fetch + header, backoff, stop on 401), polling fallback, bell + dropdown, deep link `?v=&c=` with highlight + tests — contract-first
 - [x] **NT-7** Prod E2E (two accounts, restart reconnect, digest), optional nginx stream location, update `docs/tracking.md` — after all
   - Verified on prod 2026-10-03 by owner with two accounts (reply, reply-to-reply after fix 368bf0c, badge). Grouping per thread keeps the badge at 1 per thread by design (ADR-0017).
+
+---
+
+## Feature: Optional Email + Password Login
+
+**PRD:** `docs/prd/PRD-password-login.md` · **ADR:** `docs/adr/0018-password-login-option.md` (Proposed) · **Plan:** `docs/plans/plan-password-login.md`
+
+- [ ] **PW-1** Prod pre-check (legacy passwords), migration (`password_set_at`, `failed_login_count`, `locked_until`, `credentials_version`), `User` fields (`@Builder.Default`), `app.auth.password-login-enabled`, `PasswordPolicy` (10–72 bytes, no email part, common list), BCrypt 12
+- [ ] **PW-2** `POST /user/login` + lockout (5 fails → 15 min) + generic `INVALID_CREDENTIALS` + remove legacy auto-register path in `/user/join` + tests — after PW-1
+- [ ] **PW-3** `PUT/DELETE /user/password` (current pw / OTP rules, policy codes, new JWT, security email, per-user `passwordEnabled`) + tests — after PW-1
+- [ ] **PW-4** JWT `cv` claim + `CredentialsVersionCache` + filter rejects revoked tokens (`TOKEN_REVOKED`) + tests — after PW-1
+- [ ] **PW-5** FE: `PasswordInput`, LoginForm tabs (link / password, forgot → link), Settings set/change/remove, global `TOKEN_REVOKED` logout + tests — contract-first
+- [ ] **PW-6** Prod E2E, security review, `docs/tracking.md` + mkdocs nav — after all

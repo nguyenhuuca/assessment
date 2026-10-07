@@ -81,6 +81,7 @@ nav:
       - 0015 - Bitwise Permission System: adr/0015-bitwise-permission-system.md
       - 0016 - User Settings Design: adr/0016-user-settings-design.md
       - 0017 - User Notifications: adr/0017-user-notifications.md
+      - 0018 - Password Login Option: adr/0018-password-login-option.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -89,6 +90,7 @@ nav:
       - Watch History: prd/PRD-watch-history-opus.md
       - User Settings: prd/PRD-user-settings.md
       - User Notifications: prd/PRD-user-notifications.md
+      - Password Login: prd/PRD-password-login.md
 
   - Specs:
       - Overview: specs/index.md
@@ -113,6 +115,7 @@ nav:
       - Admin Comment Moderation: plans/plan-admin-comment-moderation.md
       - Comment Replies: plans/plan-comment-replies.md
       - User Notifications: plans/plan-user-notifications.md
+      - Password Login: plans/plan-password-login.md
 
   - Presentations:
       - presentations/index.md
