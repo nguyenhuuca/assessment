@@ -7575,7 +7575,7 @@ Handoff to: Architect (ADR-0018), Builder (/builder)
 <h3 id="persona-viewer-has-an-account">Persona: Viewer (has an account)<a class="headerlink" href="#persona-viewer-has-an-account" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>US-1</strong> As a viewer signed in by magic link, I can <strong>set a password</strong> in Settings → Sign-in.</li>
-<li><strong>US-2</strong> As a viewer with a password, I can <strong>sign in with email + password</strong> from the header login form (tab "Mật khẩu").</li>
+<li><strong>US-2</strong> As a viewer with a password, I can <strong>sign in with email + password</strong> from the password login modal (button "Đăng nhập bằng mật khẩu" in the header).</li>
 <li><strong>US-3</strong> As a viewer with MFA, after a correct password I'm asked for my 6-digit code (same as today).</li>
 <li><strong>US-4</strong> As a viewer, I can <strong>change</strong> my password (current password required) or <strong>remove</strong> it (back to magic link only).</li>
 <li><strong>US-5</strong> As a viewer who forgot the password, I click "Quên mật khẩu? Gửi link đăng nhập", sign in by link and set a new password.</li>
@@ -7605,7 +7605,7 @@ Handoff to: Architect (ADR-0018), Builder (/builder)
 </tr>
 <tr>
 <td>FR-2</td>
-<td>Login form has two tabs: <strong>Link đăng nhập</strong> (current) and <strong>Mật khẩu</strong> (email + password, show/hide toggle)</td>
+<td>Header login form keeps the magic-link email field; a <strong>"Đăng nhập bằng mật khẩu"</strong> button opens a modal (email pre-filled + password with show/hide toggle)</td>
 <td>Must</td>
 </tr>
 <tr>
@@ -7828,6 +7828,11 @@ Handoff to: Architect (ADR-0018), Builder (/builder)
 <td>0.1</td>
 <td>2026-10-07</td>
 <td>Initial draft</td>
+</tr>
+<tr>
+<td>0.2</td>
+<td>2026-10-08</td>
+<td>FR-2: password login moved from header tab to a modal dialog</td>
 </tr>
 </tbody>
 </table>
