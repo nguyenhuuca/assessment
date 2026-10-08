@@ -39,6 +39,9 @@ public class Converter {
                 .id(user.getId())
                 .email(user.getUserName())
                 .mfaEnabled(user.isMfaEnabled())
+                // FE derives isAdmin from this on login; without it the admin menu needs a reload
+                .role(user.getRole() != null ? user.getRole().name() : "USER")
+                .permissions(user.getPermissions())
                 .build();
     }
 

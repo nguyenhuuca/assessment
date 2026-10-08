@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.entity.ShareLink;
 import com.canhlabs.funnyapp.entity.User;
+import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.user.UserInfoDto;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
@@ -53,6 +54,22 @@ class ConverterTest {
         assertThat(dto.getJwt()).isEqualTo("token3");
         assertThat(dto.getAction()).isNull();
         assertThat(dto.getUser().getEmail()).isEqualTo("user3@example.com");
+    }
+
+    @Test
+    void toUserDetail_includesRoleForAdmin() {
+        User user = User.builder().id(7L).userName("admin@example.com").role(UserRole.ADMIN).build();
+        assertThat(Converter.toUserDetail(user).getRole()).isEqualTo("ADMIN");
+        assertThat(Converter.toUserInfo(user, "jwt").getUser().getRole()).isEqualTo("ADMIN");
+    }
+
+    @Test
+    void toUserDetail_nullRoleDefaultsToUser() {
+        User user = new User();
+        user.setId(8L);
+        user.setUserName("u@example.com");
+        user.setRole(null);
+        assertThat(Converter.toUserDetail(user).getRole()).isEqualTo("USER");
     }
 
     @Test

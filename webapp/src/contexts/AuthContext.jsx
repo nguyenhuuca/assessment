@@ -68,6 +68,21 @@ export function AuthProvider({ children }) {
     localStorage.setItem('user', JSON.stringify(userWithAdmin))
     setJwt(newJwt)
     setUser(userWithAdmin)
+    // Older login payloads carry no role: resolve it now so the admin menu shows without a reload
+    if (newUser?.role === undefined && newUser?.isAdmin === undefined) {
+      authApi.me()
+        .then((data) => {
+          const role = (data?.data ?? data)?.role
+          if (role === undefined) return
+          setUser(prev => {
+            if (!prev) return prev
+            const next = { ...prev, role, isAdmin: role === 'ADMIN' }
+            localStorage.setItem('user', JSON.stringify(next))
+            return next
+          })
+        })
+        .catch(() => {})
+    }
   }, [])
 
   const logout = useCallback(() => {
