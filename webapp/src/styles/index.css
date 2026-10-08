@@ -460,6 +460,11 @@ body {
     z-index: 75;
   }
 
+  /* email + Login + key icon must fit a 360px screen (inline width is 200px) */
+  .mobile-login-popover input[type="email"] {
+    width: min(200px, calc(100vw - 170px)) !important;
+  }
+
   .video-mute-btn {
     right: auto !important;
     left: 12px !important;

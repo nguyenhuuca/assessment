@@ -22,17 +22,6 @@ const inputStyle = {
   transition: 'border-color 0.15s ease',
 }
 
-const passwordLinkStyle = {
-  background: 'none',
-  border: 'none',
-  padding: '0 2px',
-  color: 'var(--accent-cyan)',
-  fontSize: 11,
-  fontWeight: 700,
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-}
-
 export default function LoginForm({ onMfaRequired }) {
   const { login } = useAuth()
   const [email,    setEmail]    = useState('')
@@ -97,14 +86,6 @@ export default function LoginForm({ onMfaRequired }) {
 
   return (
     <div style={{ position: 'relative' }}>
-      {passwordAvailable && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 2 }}>
-          <button type="button" style={passwordLinkStyle} onClick={() => { setMessage(null); setPwOpen(true) }}>
-            Đăng nhập bằng mật khẩu
-          </button>
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <input
           type="email"
@@ -144,6 +125,17 @@ export default function LoginForm({ onMfaRequired }) {
             ? <span style={{ width: 14, height: 14, border: '2px solid rgba(0,48,53,0.3)', borderTopColor: '#003035', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
             : 'Login'}
         </button>
+        {passwordAvailable && (
+          <button
+            type="button"
+            className="icon-btn"
+            title="Đăng nhập bằng mật khẩu"
+            aria-label="Đăng nhập bằng mật khẩu"
+            onClick={() => { setMessage(null); setPwOpen(true) }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>key</span>
+          </button>
+        )}
       </form>
 
       {/* Messages float below without shifting the form */}
