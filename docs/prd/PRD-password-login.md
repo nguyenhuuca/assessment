@@ -44,7 +44,7 @@ Login is magic-link only: every sign-in needs an email round-trip (Gmail SMTP, 2
 
 ### Persona: Viewer (has an account)
 - **US-1** As a viewer signed in by magic link, I can **set a password** in Settings → Sign-in.
-- **US-2** As a viewer with a password, I can **sign in with email + password** from the header login form (tab "Mật khẩu").
+- **US-2** As a viewer with a password, I can **sign in with email + password** from the password login modal (button "Đăng nhập bằng mật khẩu" in the header).
 - **US-3** As a viewer with MFA, after a correct password I'm asked for my 6-digit code (same as today).
 - **US-4** As a viewer, I can **change** my password (current password required) or **remove** it (back to magic link only).
 - **US-5** As a viewer who forgot the password, I click "Quên mật khẩu? Gửi link đăng nhập", sign in by link and set a new password.
@@ -63,7 +63,7 @@ Login is magic-link only: every sign-in needs an email round-trip (Gmail SMTP, 2
 | ID | Requirement | Priority |
 |----|-------------|----------|
 | FR-1 | `POST /user/login {email, password}`: success → JWT (or `MFA_REQUIRED`); any failure → 401 `INVALID_CREDENTIALS` | Must |
-| FR-2 | Login form has two tabs: **Link đăng nhập** (current) and **Mật khẩu** (email + password, show/hide toggle) | Must |
+| FR-2 | Header login form keeps the magic-link email field; a **"Đăng nhập bằng mật khẩu"** button opens a modal (email pre-filled + password with show/hide toggle) | Must |
 | FR-3 | `PUT /user/password` set (no current) / change (current required); OTP required when MFA enabled | Must |
 | FR-4 | `DELETE /user/password` (current required) | Should |
 | FR-5 | Policy: 10–72 bytes, not containing email local part, not in common-password list; clear Vietnamese error messages | Must |
@@ -144,3 +144,4 @@ Password signup, separate reset-token flow, CAPTCHA, breached-password API, pass
 | Version | Date | Change |
 |---------|------|--------|
 | 0.1 | 2026-10-07 | Initial draft |
+| 0.2 | 2026-10-08 | FR-2: password login moved from header tab to a modal dialog |
