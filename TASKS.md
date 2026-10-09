@@ -127,5 +127,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **PW-2** `POST /user/login` + lockout (5 fails → 15 min) + generic `INVALID_CREDENTIALS` + remove legacy auto-register path in `/user/join` + tests — after PW-1
 - [x] **PW-3** `PUT/DELETE /user/password` (current pw / OTP rules, policy codes, new JWT, security email, per-user `passwordEnabled`) + tests — after PW-1
 - [x] **PW-4** JWT `cv` claim + `CredentialsVersionCache` + filter rejects revoked tokens (`TOKEN_REVOKED`) + tests — after PW-1
-- [x] **PW-5** FE: `PasswordInput`, LoginForm tabs (link / password, forgot → link), Settings set/change/remove, global `TOKEN_REVOKED` logout + tests — contract-first
-- [ ] **PW-6** Prod E2E, security review, `docs/tracking.md` + mkdocs nav — after all
+- [x] **PW-5** FE: `PasswordInput`, password login modal (🔑 icon in header, forgot → link), Settings set/change/remove, global `TOKEN_REVOKED` logout + tests — contract-first
+- [x] **PW-6** Prod E2E verified by owner 2026-10-09; `docs/tracking.md` + mkdocs nav updated
+  - Follow-up: `3de7a4a` login response now carries `role` (admin menu appeared only after F5)
+  - [ ] `/security-auditor` review of the diff — not run yet

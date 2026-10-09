@@ -41,12 +41,13 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Admin Comment Moderation** | — | — | — | [Plan ✅](plans/plan-admin-comment-moderation.md) | — | ✅ | `acfc953` soft remove/restore with policy reasons; `6f66b15` bulk (≤100) |
 | **Comment Replies** | — | — | — | [Plan ✅](plans/plan-comment-replies.md) | — | ✅ | `a23950f` 2-level threads, author delete keeps others' replies; `368bf0c` reply-to-reply notifies the replied author |
 | **User Notifications** | [PRD ✅](prd/PRD-user-notifications.md) | [0017 ✅](adr/0017-user-notifications.md) | — | [Plan ✅](plans/plan-user-notifications.md) | — | ✅ | `a11d31e` in-app + SSE (fetch + header auth) + 15-min digest; verified on prod 2026-10-03; nginx `worker_connections` 768→8192 |
+| **Password Login (optional)** | [PRD ✅](prd/PRD-password-login.md) | [0018 ✅](adr/0018-password-login-option.md) | — | [Plan ✅](plans/plan-password-login.md) | — | ✅ | `fd319cf` email + password next to magic link, lockout 5/15 min, `cv` session revocation; `e6d6a3f`/`63e21f0` modal + 🔑 icon; `3de7a4a` role in login response; verified on prod 2026-10-09 |
 
 ---
 
 ## Status Summary
 
-### ✅ Done (13)
+### ✅ Done (14)
 - [Use RDBMS](adr/0001-use-relational-database.md)
 - [Backend Architecture](adr/0002-backend-architecture.md)
 - [Cache Strategy](adr/0003-use-cache.md)
@@ -60,6 +61,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Admin Comment Moderation](plans/plan-admin-comment-moderation.md)
 - [Comment Replies](plans/plan-comment-replies.md)
 - [User Notifications](adr/0017-user-notifications.md)
+- [Password Login](adr/0018-password-login-option.md)
 
 ### 🔄 In Progress (1)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)

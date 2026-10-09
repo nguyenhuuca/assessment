@@ -9,7 +9,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer), Security Auditor (/s
 
 ## Overview
 
-**Status:** Approved
+**Status:** Implemented (verified on prod 2026-10-09)
 **Author:** nguyenhuuca
 **Date:** 2026-10-07
 **Related PRD:** [PRD-password-login](../prd/PRD-password-login.md)
@@ -76,9 +76,9 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer), Security Auditor (/s
 - [ ] `npm run lint && npx vitest run && npm run build`
 
 ### Phase 6 — Verification & docs (0.25 d) — `PW-6`
-- [ ] Prod E2E: magic link → set password → logout → password login → wrong ×5 → locked (magic link still works) → change password on device A → device B logged out within 60 s → security emails received
+- [x] Prod E2E (owner, 2026-10-09): magic link → set password → logout → password login → wrong ×5 → locked (magic link still works) → change password on device A → device B logged out within 60 s → security emails received
 - [ ] `/security-auditor` review of the diff
-- [ ] Update `docs/tracking.md`, mkdocs nav
+- [x] Update `docs/tracking.md`, mkdocs nav
 
 ---
 
