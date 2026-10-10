@@ -2277,3 +2277,44 @@ body {
     border-radius: 0 0 12px 12px;
   }
 }
+
+/* ── Admin video import ── */
+.import-panel { display: flex; flex-direction: column; gap: 20px; }
+.import-form {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.import-radios { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin: 4px 0; }
+.import-radios label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.import-title-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.import-title-row .app-input { flex: 1; min-width: 180px; }
+.import-line-list { margin: 0; padding-left: 18px; font-size: 13px; }
+.import-line-list .ok { color: #00c853; }
+.import-line-list .bad { color: #ff1744; }
+.import-scroll { overflow-x: auto; }
+.import-progress {
+  width: 120px;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.import-progress-fill { height: 100%; background: var(--accent-cyan); transition: width 0.3s; }
+.import-error { color: #ff1744; font-size: 12px; max-width: 220px; }
+.admin-badge.pending     { background: rgba(255, 214, 0, 0.13); color: #ffd600; border: 1px solid #ffd600; }
+.admin-badge.downloading,
+.admin-badge.uploading   { background: rgba(0, 238, 252, 0.12); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+.admin-badge.done        { background: rgba(0, 200, 83, 0.13); color: #00c853; border: 1px solid #00c853; }
+.admin-badge.failed      { background: rgba(255, 23, 68, 0.13); color: #ff1744; border: 1px solid #ff1744; }
+.admin-badge.cancelled   { background: rgba(173, 170, 170, 0.13); color: var(--text-muted); border: 1px solid var(--text-muted); }
+@media (max-width: 768px) {
+  .import-form { padding: 12px; }
+  .import-table { min-width: 640px; }
+  .admin-tabs { overflow-x: auto; }
+}

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import * as adminApi from '../api/admin.js'
+import { hasActive } from '../utils/importUtils.js'
 
 export function useAdminVideos(page = 0, status = null) {
   return useQuery({
@@ -90,3 +91,25 @@ export function useBulkModerateComments() {
     },
   })
 }
+
+export function useVideoImports(page = 0, status = null) {
+  return useQuery({
+    queryKey: ['admin', 'imports', page, status],
+    queryFn: () => adminApi.listImports({ page, size: 20, status }),
+    refetchInterval: (query) => (hasActive(query.state.data) ? 2000 : false),
+  })
+}
+
+function useImportMutation(fn) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: fn,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'imports'] }),
+  })
+}
+
+export const useCreateImports  = () => useImportMutation((body) => adminApi.createImports(body))
+export const useRunImportNow   = () => useImportMutation((id) => adminApi.runImportNow(id))
+export const useCancelImport   = () => useImportMutation((id) => adminApi.cancelImport(id))
+export const useRetryImport    = () => useImportMutation((id) => adminApi.retryImport(id))
+export const usePreviewImport  = () => useMutation({ mutationFn: (url) => adminApi.previewImport(url) })

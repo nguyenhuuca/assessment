@@ -3,12 +3,14 @@ import { useAdminStats } from '../../hooks/useAdmin.js'
 import AdminVideoTable from './AdminVideoTable.jsx'
 import AdminAccountTable from './AdminAccountTable.jsx'
 import AdminCommentTable from './AdminCommentTable.jsx'
+import AdminImportPanel from './AdminImportPanel.jsx'
 
 const TABS = [
   { key: 'VIDEO_VAULT',   label: 'VIDEO_VAULT'   },
   { key: 'USER_ACCOUNTS', label: 'USER_ACCOUNTS' },
   { key: 'FLAGGED_LOGS',  label: 'FLAGGED_LOGS'  },
   { key: 'COMMENTS',      label: 'COMMENTS'      },
+  { key: 'IMPORT_VIDEO',  label: 'Import Video'  },
 ]
 
 export default function AdminView() {
@@ -42,6 +44,7 @@ export default function AdminView() {
         {activeTab === 'FLAGGED_LOGS'  && <AdminVideoTable statusFilter="FLAGGED" />}
         {activeTab === 'USER_ACCOUNTS' && <AdminAccountTable />}
         {activeTab === 'COMMENTS'      && <AdminCommentTable />}
+        {activeTab === 'IMPORT_VIDEO'  && <AdminImportPanel />}
       </div>
 
       <div className="admin-stat-cards">

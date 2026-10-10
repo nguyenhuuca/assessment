@@ -50,3 +50,12 @@ const cleanParams = (params = {}) =>
 export const getComments       = (params) => api.get(buildUrl('/admin/comments', cleanParams(params)))
 export const moderateComment   = (id, body) => patch(`/admin/comments/${id}/moderation`, body)
 export const bulkModerateComments = (body) => patch('/admin/comments/moderation', body)
+
+// Video import (admin) — see docs/plans/plan-admin-video-import.md "API Contract"
+export const createImports = ({ items, scheduledAt = null }) =>
+  api.post('/admin/video-imports', { items, scheduledAt })
+export const listImports   = (params) => api.get(buildUrl('/admin/video-imports', cleanParams(params)))
+export const previewImport = (url) => api.post('/admin/video-imports/preview', { url })
+export const runImportNow  = (id) => api.post(`/admin/video-imports/${id}/run-now`)
+export const cancelImport  = (id) => api.post(`/admin/video-imports/${id}/cancel`)
+export const retryImport   = (id) => api.post(`/admin/video-imports/${id}/retry`)

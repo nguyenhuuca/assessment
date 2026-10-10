@@ -122,6 +122,21 @@ app:
   subscription-status-enabled: ${SUBSCRIPTION_STATUS_ENABLED:false}
   jobs:
     regenerate-thumbnails: false
+  video-import:
+    enabled: ${VIDEO_IMPORT_ENABLED:false}
+    yt-dlp-path: ${YT_DLP_PATH:yt-dlp}
+    work-dir: ${VIDEO_IMPORT_WORK_DIR:/opt/data/imports}
+    max-concurrent: ${VIDEO_IMPORT_MAX_CONCURRENT:1}
+    max-file-size: ${VIDEO_IMPORT_MAX_FILE_SIZE:1G}
+    download-timeout: ${VIDEO_IMPORT_DOWNLOAD_TIMEOUT:30m}
+    metadata-timeout: ${VIDEO_IMPORT_METADATA_TIMEOUT:60s}
+    min-free-disk-bytes: ${VIDEO_IMPORT_MIN_FREE_DISK_BYTES:2147483648}
+    cookies-path: ${VIDEO_IMPORT_COOKIES_PATH:}
+    bulk-max: ${VIDEO_IMPORT_BULK_MAX:20}
+  google-oauth:
+    client-id: ${GOOGLE_OAUTH_CLIENT_ID:}
+    client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET:}
+    refresh-token: ${GOOGLE_OAUTH_REFRESH_TOKEN:}
   email-setting:
       enable-preview-mode: false
       percentage: 10
