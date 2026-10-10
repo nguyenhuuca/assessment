@@ -45,3 +45,7 @@ deploy-funny-app.sh
 .mcp.json
 
 scripts/monitoring/nginx-alert/server.config
+scripts/migration/hosts.config
+# Google OAuth helper output (ADR-0019)
+drive-oauth.env
+client_secret*.json

@@ -138,7 +138,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **PRD:** `docs/prd/PRD-admin-video-import.md` (draft) · **ADR:** `docs/adr/0019-admin-video-import.md` (Proposed) · **Plan:** `docs/plans/plan-admin-video-import.md`
 
-- [ ] **VI-0** PoC: upload a test file into `FOLDER_ID` with the Service Account → choose SA vs OAuth uploader, accept ADR-0019 ⚠️ gate
+- [~] **VI-0** PoC done 2026-10-10: SA upload → 403 `storageQuotaExceeded` ⇒ OAuth uploader. **Blocked on owner:** create OAuth client + refresh token (`scripts/google/get-drive-refresh-token.py`), put 3 env vars on server
 - [ ] **VI-1** Migration `video_import_jobs`, entity/repo (`claimNextDue` SKIP LOCKED), `AppProperties.videoImport`, `ImportUrlValidator`, `TitleSanitizer` + tests
 - [ ] **VI-2** `YtDlpClient` (metadata, download, progress parse, timeouts, error codes) + `DriveUploader` (resumable, progress) + tests — after VI-0, VI-1
 - [ ] **VI-3** `VideoImportService`, `VideoImportWorker` (concurrency 1, wake-up, interrupted reset), `/admin/video-imports` API (history kept forever, bulk max 20) + tests — after VI-1, VI-2

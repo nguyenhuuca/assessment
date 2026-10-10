@@ -38,6 +38,8 @@ Upload uses the existing `Drive` bean: `files.create` with `parents = [FOLDER_ID
 
 → Phase 0 of the plan is a **PoC upload** of a small file with the Service Account. If it fails, switch the uploader (only the uploader) to an OAuth 2.0 user credential of the folder owner: a refresh token obtained once (consent screen, scope `drive.file`) and stored in env `GOOGLE_OAUTH_CLIENT_ID / _SECRET / _REFRESH_TOKEN`. The cron keeps using the Service Account for reads. `DriveUploader` is an interface so either implementation can be wired by config.
 
+**PoC result (VI-0, 2026-10-10):** Service Account lists the folder (200) and has `canAddChildren = true`, but `files.create` returns **`403 storageQuotaExceeded`** (folder is in a personal My Drive, not a Shared Drive). → **Decision: `OAuthDriveUploader`** with the folder owner's refresh token, scope `https://www.googleapis.com/auth/drive` (`drive.file` cannot add children to a folder the app did not create). The OAuth consent screen must be **published "In production"** (unverified is fine for the owner's own account) — in "Testing" mode refresh tokens expire after 7 days. Helper: `scripts/google/get-drive-refresh-token.py`.
+
 ### D3 — Persistent job table + in-process worker (no new infrastructure)
 
 Table `video_import_jobs` (Liquibase):
