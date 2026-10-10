@@ -83,9 +83,9 @@ Adding a video today means: download it on a PC, upload it to Google Drive by ha
 
 | # | Question | Proposed |
 |---|----------|----------|
-| OQ-1 | Bulk max per submit | 20 |
+| OQ-1 | Bulk max per submit | **Decided: 20** (owner, 2026-10-10) |
 | OQ-2 | Delete local temp file after upload? | Yes (cron re-downloads; D1) |
-| OQ-3 | Keep job history how long? | 90 days, purge in the existing retention job |
+| OQ-3 | Keep job history how long? | **Decided: forever** — no purge (owner, 2026-10-10) |
 
 ## Approval
 
@@ -99,3 +99,4 @@ Adding a video today means: download it on a PC, upload it to Google Drive by ha
 | Version | Date | Change |
 |---------|------|--------|
 | 0.1 | 2026-10-10 | Initial draft |
+| 0.2 | 2026-10-10 | OQ-1 = 20, OQ-3 = keep history forever |

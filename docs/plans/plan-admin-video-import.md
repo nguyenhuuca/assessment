@@ -57,7 +57,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer), Security Auditor (/s
 - [ ] `VideoImportService`: `create(items, scheduledAt, adminId)` (≤ bulkMax, per-line result `{line, jobId | errorCode}`), `list(status, page)`, `preview(url)`, `runNow(id)`, `cancel(id)`, `retry(id)`; `ingested` flag via `existsBySourceId(drive_file_id)` (batched `findSourceIdsIn`)
 - [ ] `VideoImportWorker`: `@Scheduled(fixedDelay = 15000)` + `wakeUp()` on virtual thread; `Semaphore(maxConcurrent)`; flow: claim → disk guard → resolve title (if none) → download (status DOWNLOADING) → UPLOADING → DONE + `drive_file_id` → delete work dir (always, `finally`); cancel = flag + destroy process; startup `resetInterrupted` (attempts < 3)
 - [ ] Endpoints under `AdminController` or new `AdminVideoImportController` (`/admin/video-imports`): `POST` (create, `@RateLimited(permit = 10)`), `GET` (page, status filter), `POST /preview`, `POST /{id}/run-now`, `POST /{id}/cancel`, `POST /{id}/retry` — all `@HasPermission(ADMIN)` + `@AuditLog`; errors via `CustomException` (400 `INVALID_URL`, 409 `DUPLICATE_ACTIVE`, 409 `INVALID_STATE`)
-- [ ] Retention: purge finished jobs > 90 days in `notificationRetention`-style job
+- [ ] No retention: job history is kept forever (owner, 2026-10-10); list is paginated, newest first
 - [ ] Tests: service rules, state transitions, claim (repository `@DataJpaTest` if available, else mocked), worker happy path / failure / cancel / interrupted reset, controller security (non-admin 403)
 
 ### Phase 4 — Frontend (1.25 d) — `VI-4` (contract-first, parallel with VI-2/3)

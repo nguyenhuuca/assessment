@@ -141,7 +141,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [ ] **VI-0** PoC: upload a test file into `FOLDER_ID` with the Service Account → choose SA vs OAuth uploader, accept ADR-0019 ⚠️ gate
 - [ ] **VI-1** Migration `video_import_jobs`, entity/repo (`claimNextDue` SKIP LOCKED), `AppProperties.videoImport`, `ImportUrlValidator`, `TitleSanitizer` + tests
 - [ ] **VI-2** `YtDlpClient` (metadata, download, progress parse, timeouts, error codes) + `DriveUploader` (resumable, progress) + tests — after VI-0, VI-1
-- [ ] **VI-3** `VideoImportService`, `VideoImportWorker` (concurrency 1, wake-up, interrupted reset), `/admin/video-imports` API, retention + tests — after VI-1, VI-2
+- [ ] **VI-3** `VideoImportService`, `VideoImportWorker` (concurrency 1, wake-up, interrupted reset), `/admin/video-imports` API (history kept forever, bulk max 20) + tests — after VI-1, VI-2
 - [ ] **VI-4** FE tab "Import Video": bulk form, now/schedule, preview title, job table with polling progress, actions + tests — contract-first
 - [ ] **VI-5** Host ops (yt-dlp -U cron, work dir), prod E2E, security review, tracking + docs — after all
 
