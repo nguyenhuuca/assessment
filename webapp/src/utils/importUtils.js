@@ -16,6 +16,9 @@ export const ERROR_MESSAGES = {
   CANCELLED: 'Đã huỷ',
   NOT_INSTALLED: 'Máy chủ chưa cài công cụ tải (yt-dlp/ffmpeg)',
   DRIVE_NOT_CONFIGURED: 'Chưa cấu hình Google Drive',
+  DRIVE_AUTH_FAILED: 'Token Google Drive không hợp lệ hoặc đã hết hạn',
+  DRIVE_UPLOAD_FAILED: 'Upload lên Google Drive thất bại',
+  DISK_LOW: 'Ổ đĩa server không đủ dung lượng trống',
   INTERRUPTED: 'Bị gián đoạn do khởi động lại máy chủ',
 }
 export const GENERIC_ERROR = 'Đã xảy ra lỗi, vui lòng thử lại'

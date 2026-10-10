@@ -143,6 +143,7 @@ nav:
       - Bitwise Permissions: guides/bitwise-permissions.md
       - Trello Setup: guides/trello-setup-guide.md
       - Trello Board Status: guides/trello-board-status.md
+      - Video Import Setup (VI): guides/video-import-setup-vi.md
 
   - Reports:
       - System Health 2026-05-30: reports/system-health-2026-05-30.md
