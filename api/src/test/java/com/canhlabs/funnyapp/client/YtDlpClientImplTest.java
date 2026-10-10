@@ -59,7 +59,7 @@ class YtDlpClientImplTest {
         assertThat(result).isEqualTo(jobDir.resolve("video.mp4"));
         assertThat(commands).hasSize(1);
         assertThat(commands.get(0)).containsExactly(
-                "yt-dlp", "--ignore-config", "--no-playlist", "--use-extractors", "youtube,facebook",
+                "yt-dlp", "--ignore-config", "--no-playlist", "--use-extractors", "youtube,youtube:.*,facebook,facebook:.*",
                 "--no-cache-dir", "--socket-timeout", "30",
                 "--newline", "--progress-template",
                 "download:%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s",
@@ -265,6 +265,37 @@ class YtDlpClientImplTest {
     // ── metadata / version ────────────────────────────────────────────────────
 
     @Test
+    void fetchMetadata_nullOutputWithExitZero_isUnsupportedUrl() {
+        behaviour = cmd -> FakeProcess.finished("null",
+                "ERROR: No suitable extractor found for URL https://www.facebook.com/reel/1", 0);
+
+        assertThatThrownBy(() -> client().fetchMetadata(URL))
+                .isInstanceOf(ImportException.class)
+                .extracting(e -> ((ImportException) e).getErrorCode())
+                .isEqualTo(ImportErrorCode.UNSUPPORTED_URL);
+    }
+
+    @Test
+    void fetchMetadata_facebookReel_titleIsCleaned() {
+        behaviour = cmd -> FakeProcess.finished("{\"id\":\"1101383289299158\",\"extractor_key\":\"Facebook\","
+                + "\"title\":\"242K views \u00b7 5.4K reactions | T\u1ef1 nhi\u00ean mu\u1ed1n \u0111\u00e0n l\u1ea1i b\u00e0i n\u00e0y... "
+                + "#guitar #Boulevard #reelsvideo\u30b7 | Ho\u00e0ng Chi\",\"duration\":58.5}", "", 0);
+
+        VideoMetadata meta = client().fetchMetadata(URL);
+
+        assertThat(meta.title()).isEqualTo("T\u1ef1 nhi\u00ean mu\u1ed1n \u0111\u00e0n l\u1ea1i b\u00e0i n\u00e0y...");
+    }
+
+    @Test
+    void cleanTitle_leavesYoutubeAndPlainFacebookTitlesAlone() {
+        assertThat(YtDlpClientImpl.cleanTitle("Youtube", "Song | Artist")).isEqualTo("Song | Artist");
+        assertThat(YtDlpClientImpl.cleanTitle("Facebook", "Funny cat | Page")).isEqualTo("Funny cat | Page");
+        assertThat(YtDlpClientImpl.cleanTitle("Facebook", "1K views \u00b7 20 reactions | #only #tags | X"))
+                .isEqualTo("#only #tags");
+        assertThat(YtDlpClientImpl.cleanTitle("Facebook", null)).isNull();
+    }
+
+    @Test
     void fetchMetadata_parsesJsonAndUsesMetadataArgs() {
         behaviour = cmd -> FakeProcess.finished(
                 "{\"id\":\"dQw4w9WgXcQ\",\"title\":\"Never Gonna\",\"duration\":212.0,\"formats\":[]}", "", 0);
@@ -273,7 +304,7 @@ class YtDlpClientImplTest {
 
         assertThat(meta).isEqualTo(new VideoMetadata("dQw4w9WgXcQ", "Never Gonna", 212L));
         assertThat(commands.get(0)).containsExactly(
-                "yt-dlp", "--ignore-config", "--no-playlist", "--use-extractors", "youtube,facebook",
+                "yt-dlp", "--ignore-config", "--no-playlist", "--use-extractors", "youtube,youtube:.*,facebook,facebook:.*",
                 "--no-cache-dir", "--socket-timeout", "30",
                 "-J", "--skip-download", "--", URL);
     }

@@ -42,6 +42,12 @@ public class YtDlpClientImpl implements YtDlpClient {
             "download:%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s";
     static final String FORMAT = "bv*[height<=720][ext=mp4]+ba[ext=m4a]/b[height<=720]/b";
     static final int TAIL_LINES = 20;
+    static final String EXTRACTORS = "youtube,youtube:.*,facebook,facebook:.*";
+    /** "242K views · 5.4K reactions | " prefix Facebook puts in front of reel titles. */
+    private static final Pattern FB_STATS_PREFIX = Pattern.compile(
+            "^\\s*[\\d.,]+\\s*[KMB]?\\s+views?\\s*·\\s*[\\d.,]+\\s*[KMB]?\\s+reactions?\\s*\\|\\s*",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern HASHTAG = Pattern.compile("(?U)#[\\w\\p{So}]+");
     static final int MAX_JSON_CHARS = 16 * 1024 * 1024;
     private static final Duration VERSION_TIMEOUT = Duration.ofSeconds(10);
     private static final Pattern PROGRESS =
@@ -91,15 +97,24 @@ public class YtDlpClientImpl implements YtDlpClient {
             metadataPermits.release();
         }
         failIfNotSuccessful(result, "metadata");
+        JsonNode node;
         try {
-            JsonNode node = MAPPER.readTree(json.toString());
-            String id = node.path("id").asText(null);
-            String title = node.path("title").asText(null);
-            Long duration = node.hasNonNull("duration") ? (long) node.get("duration").asDouble() : null;
-            return new VideoMetadata(id, title, duration);
+            node = MAPPER.readTree(json.toString());
         } catch (IOException e) {
             log.warn("yt-dlp metadata output was not valid JSON");
             throw new ImportException(ImportErrorCode.EXTRACTOR_ERROR, e);
+        }
+        if (node == null || !node.isObject() || !node.hasNonNull("id")) {
+            // yt-dlp prints "null" and exits 0 when no extractor accepts the URL
+            String code = mapError(String.join("\n", result.stderrTail()));
+            log.warn("yt-dlp returned no metadata -> {}", code);
+            throw new ImportException(code);
+        }
+        {
+            String id = node.path("id").asText(null);
+            String title = cleanTitle(node.path("extractor_key").asText(""), node.path("title").asText(null));
+            Long duration = node.hasNonNull("duration") ? (long) node.get("duration").asDouble() : null;
+            return new VideoMetadata(id, title, duration);
         }
     }
 
@@ -177,7 +192,8 @@ public class YtDlpClientImpl implements YtDlpClient {
         cmd.add("--ignore-config");
         cmd.add("--no-playlist");
         cmd.add("--use-extractors");
-        cmd.add("youtube,facebook");
+        // sub-extractors (facebook:reel, youtube:tab…) are separate names; regexes match the full name
+        cmd.add(EXTRACTORS);
         cmd.add("--no-cache-dir");
         cmd.add("--socket-timeout");
         cmd.add("30");
@@ -354,6 +370,24 @@ public class YtDlpClientImpl implements YtDlpClient {
 
     // ── parsing / mapping ─────────────────────────────────────────────────────
 
+    /**
+     * Facebook reel titles look like "242K views · 5.4K reactions | caption #tags | Author":
+     * keep the caption without stats, author and hashtags. Other sources are returned unchanged.
+     */
+    static String cleanTitle(String extractorKey, String title) {
+        if (title == null || !extractorKey.toLowerCase(Locale.ROOT).startsWith("facebook")) {
+            return title;
+        }
+        String t = FB_STATS_PREFIX.matcher(title).replaceFirst("");
+        int lastBar = t.lastIndexOf(" | ");
+        if (lastBar > 0 && !t.equals(title)) {
+            t = t.substring(0, lastBar);
+        }
+        String noTags = HASHTAG.matcher(t).replaceAll("").replaceAll("\\s+", " ").strip();
+        String result = noTags.isEmpty() ? t.strip() : noTags;
+        return result.isEmpty() ? title : result;
+    }
+
     /** Returns {downloaded, total} or null when the line is not a progress line. */
     static long[] parseProgress(String line) {
         Matcher m = PROGRESS.matcher(line.trim());
@@ -384,7 +418,7 @@ public class YtDlpClientImpl implements YtDlpClient {
         if (t.contains("larger than max-filesize") || t.contains("max-filesize")) {
             return ImportErrorCode.TOO_LARGE;
         }
-        if (t.contains("unsupported url") || t.contains("is not a valid url")) {
+        if (t.contains("unsupported url") || t.contains("is not a valid url") || t.contains("no suitable extractor")) {
             return ImportErrorCode.UNSUPPORTED_URL;
         }
         if (t.contains("login required") || t.contains("log in") || t.contains("sign in")
