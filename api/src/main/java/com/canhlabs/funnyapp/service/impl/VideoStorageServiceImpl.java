@@ -200,19 +200,26 @@ public class VideoStorageServiceImpl implements VideoStorageService {
 
     @WithSpan
     void saveInfo(String fileId, String title, String thumbnailPath) {
-        if (!videoSourceRepository.existsBySourceId(fileId)) {
-            String desc = chatGptService.makePoem(title);
-            VideoSource entity = VideoSource.builder()
-                    .videoId(System.nanoTime())
-                    .sourceType("google_drive")
-                    .sourceId(fileId)
-                    .title(title)
-                    .desc(desc)
-                    .credentialsRef("")
-                    .thumbnailPath(thumbnailPath)
-                    .build();
-            videoSourceRepository.save(entity);
+        if (videoSourceRepository.existsBySourceId(fileId)) {
+            log.info("Video source already exists for Drive file {}, skipping save", fileId);
+            return;
         }
-
+        log.info("Saving video source for Drive file {} (title: {})", fileId, title);
+        // String desc = chatGptService.makePoem(title);
+        String desc = null;
+        VideoSource entity = VideoSource.builder()
+                .videoId(System.nanoTime())
+                .sourceType("google_drive")
+                .sourceId(fileId)
+                .title(title)
+                .desc(desc)
+                .credentialsRef("")
+                .thumbnailPath(thumbnailPath)
+                .build();
+        log.info("Video source to save: videoId={}, sourceType={}, sourceId={}, title={}, desc={}, thumbnailPath={}, status={}, priority={}, isHide={}",
+                entity.getVideoId(), entity.getSourceType(), entity.getSourceId(), entity.getTitle(), entity.getDesc(),
+                entity.getThumbnailPath(), entity.getStatus(), entity.getPriority(), entity.isHide());
+        videoSourceRepository.save(entity);
+        log.info("Saved video source id={} videoId={} for Drive file {}", entity.getId(), entity.getVideoId(), fileId);
     }
 }

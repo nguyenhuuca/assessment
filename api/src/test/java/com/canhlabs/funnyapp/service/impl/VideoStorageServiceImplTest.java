@@ -105,7 +105,6 @@ class VideoStorageServiceImplTest {
     @Test
     void saveInfo_fileIdNotExists_savesNewVideoSource() {
         when(videoSourceRepository.existsBySourceId("file123")).thenReturn(false);
-        when(chatGptService.makePoem("My Title")).thenReturn("A lovely poem");
         when(videoSourceRepository.save(any(VideoSource.class))).thenAnswer(inv -> inv.getArgument(0));
 
         service.saveInfo("file123", "My Title", "http://img.example.com/thumb.jpg");
@@ -115,7 +114,8 @@ class VideoStorageServiceImplTest {
         VideoSource saved = captor.getValue();
         assertThat(saved.getSourceId()).isEqualTo("file123");
         assertThat(saved.getTitle()).isEqualTo("My Title");
-        assertThat(saved.getDesc()).isEqualTo("A lovely poem");
+        assertThat(saved.getDesc()).isNull(); // ChatGPT poem disabled
+        verify(chatGptService, never()).makePoem(any());
         assertThat(saved.getSourceType()).isEqualTo("google_drive");
     }
 
@@ -350,7 +350,6 @@ class VideoStorageServiceImplTest {
         when(appProps.getImageStoragePath()).thenReturn("images");
         when(appProps.getImageUrl()).thenReturn("http://img.example.com");
         when(videoSourceRepository.existsBySourceId("dlfile")).thenReturn(false);
-        when(chatGptService.makePoem(anyString())).thenReturn("a poem");
 
         service.downloadFileFromFolder("folder-id", "2025-01-01T00:00:00Z");
 

@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -49,6 +50,7 @@ public class VideoSource extends BaseDomain {
 
 
     @Column(name = "is_hide", nullable = false)
+    @Builder.Default
     private boolean isHide = false;
 
     @Column(name = "thumbnail_path")
@@ -56,9 +58,11 @@ public class VideoSource extends BaseDomain {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
+    @Builder.Default
     private VideoStatus status = VideoStatus.PUBLISHED;
 
     @Column(name = "priority", nullable = false)
+    @Builder.Default
     private Integer priority = 0;
 
 }
