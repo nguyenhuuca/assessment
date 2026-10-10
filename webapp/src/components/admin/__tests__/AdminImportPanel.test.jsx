@@ -71,7 +71,8 @@ describe('ImportForm', () => {
     type('https://youtu.be/a')
     fireEvent.click(screen.getByLabelText('Hẹn giờ'))
     // GMT+7 wall time two days from now
-    const local = new Date(Date.now() + 2 * 86400000 + 7 * 3600000).toISOString().slice(0, 16)
+    const slotMs = 5 * 60000
+    const local = new Date(Math.floor((Date.now() + 2 * 86400000 + 7 * 3600000) / slotMs) * slotMs).toISOString().slice(0, 16)
     fireEvent.change(screen.getByLabelText(/Thời gian hẹn giờ/), { target: { value: local } })
     fireEvent.click(screen.getByText('Nhập video'))
     await waitFor(() => expect(adminApi.createImports).toHaveBeenCalled())

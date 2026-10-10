@@ -36,6 +36,10 @@ describe('schedule', () => {
     expect(validateSchedule('2026-12-10T06:00', now)).toMatch(/30/)
     expect(validateSchedule('2026-10-12T06:00', now)).toBe('')
   })
+  it('requires minutes on a 5-minute slot', () => {
+    expect(validateSchedule('2026-10-12T06:05', now)).toBe('')
+    expect(validateSchedule('2026-10-12T06:07', now)).toMatch(/chia hết cho 5/)
+  })
 })
 
 describe('hasActive', () => {

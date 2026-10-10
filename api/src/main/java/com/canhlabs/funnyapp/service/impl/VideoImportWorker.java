@@ -41,7 +41,8 @@ import java.util.stream.Stream;
 @Component
 public class VideoImportWorker {
 
-    static final long POLL_MILLIS = 15_000;
+    /** Every 5 minutes on the clock (:00, :05, …) — schedules are restricted to 5-minute slots. */
+    static final String POLL_CRON = "0 */5 * * * *";
     private static final long PROGRESS_INTERVAL_NANOS = 2_000_000_000L;
     private static final int MAX_ERROR_MESSAGE = 500;
 
@@ -106,7 +107,7 @@ public class VideoImportWorker {
         wakeUp();
     }
 
-    @Scheduled(initialDelay = POLL_MILLIS, fixedDelay = POLL_MILLIS)
+    @Scheduled(cron = POLL_CRON)
     public void poll() {
         drain();
     }

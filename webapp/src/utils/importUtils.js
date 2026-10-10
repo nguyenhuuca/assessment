@@ -1,5 +1,7 @@
 export const MAX_LINES = 20
 export const MAX_SCHEDULE_DAYS = 30
+/** The server worker ticks every 5 minutes on the clock; schedules must fall on those slots. */
+export const SCHEDULE_STEP_MINUTES = 5
 const VN_OFFSET = '+07:00' // Asia/Ho_Chi_Minh has no DST
 
 const HOSTS = ['youtube.com', 'youtu.be', 'facebook.com', 'fb.watch']
@@ -72,6 +74,9 @@ export function validateSchedule(value, now = Date.now()) {
   const iso = localToIso(value)
   if (!iso) return 'Vui lòng chọn thời gian hẹn giờ'
   const t = new Date(iso).getTime()
+  if (new Date(iso).getUTCMinutes() % SCHEDULE_STEP_MINUTES !== 0) {
+    return `Phút phải chia hết cho ${SCHEDULE_STEP_MINUTES} (vd 09:00, 09:05, 09:10)`
+  }
   if (t <= now) return 'Thời gian hẹn giờ phải ở tương lai'
   if (t > now + MAX_SCHEDULE_DAYS * 86400000) return `Chỉ được hẹn tối đa ${MAX_SCHEDULE_DAYS} ngày`
   return ''

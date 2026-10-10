@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useCreateImports, usePreviewImport } from '../../hooks/useAdmin.js'
-import { errorText, localToIso, parseLines, validateSchedule } from '../../utils/importUtils.js'
+import { SCHEDULE_STEP_MINUTES, errorText, localToIso, parseLines, validateSchedule } from '../../utils/importUtils.js'
 
 function ResultList({ items, results }) {
   return (
@@ -95,6 +95,7 @@ export default function ImportForm() {
         {mode === 'LATER' && (
           <input
             type="datetime-local"
+            step={SCHEDULE_STEP_MINUTES * 60}
             className="app-input"
             style={{ maxWidth: 220 }}
             aria-label="Thời gian hẹn giờ (GMT+7)"

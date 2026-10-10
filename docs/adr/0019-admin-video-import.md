@@ -63,7 +63,7 @@ Table `video_import_jobs` (Liquibase):
 Indexes: `(status, scheduled_at)`; partial unique `normalized_url WHERE status IN ('PENDING','DOWNLOADING','UPLOADING')` (no duplicate active import).
 
 Worker (`VideoImportWorker`):
-- `@Scheduled(fixedDelay = 15 s)` **and** an immediate wake-up after "run now" / create-with-no-schedule.
+- `@Scheduled(cron = "0 */5 * * * *")` (every 5 minutes on the clock; scheduled times must be on a 5-minute slot, claim allows 1 min of DB clock slack) **and** an immediate wake-up after "run now" / create-with-no-schedule / retry.
 - Claims one due job atomically: `UPDATE … SET status='DOWNLOADING', started_at=now(), attempts=attempts+1 WHERE id = (SELECT id … WHERE status='PENDING' AND scheduled_at <= now() ORDER BY scheduled_at, id LIMIT 1 FOR UPDATE SKIP LOCKED) RETURNING id`.
 - **Concurrency 1** by default (`app.video-import.max-concurrent`, guarded by a `Semaphore`, no `synchronized`): 1 vCPU, disk and bandwidth shared with streaming.
 - Runs on a virtual thread; the job itself is blocking I/O + one child process.

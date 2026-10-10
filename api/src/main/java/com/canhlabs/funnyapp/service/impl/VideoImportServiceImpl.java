@@ -45,6 +45,8 @@ public class VideoImportServiceImpl implements VideoImportService {
     static final String DUPLICATE_ACTIVE = "DUPLICATE_ACTIVE";
     static final String INVALID_STATE = "INVALID_STATE";
     static final Duration MAX_SCHEDULE_AHEAD = Duration.ofDays(30);
+    /** The worker ticks every 5 minutes on the clock, so schedules must sit on a 5-minute slot. */
+    static final int SCHEDULE_SLOT_MINUTES = 5;
 
     private final VideoImportJobRepository jobRepository;
     private final VideoSourceRepository videoSourceRepository;
@@ -112,6 +114,12 @@ public class VideoImportServiceImpl implements VideoImportService {
         }
     }
 
+    /** Whole minute divisible by 5 (UTC and Asia/Ho_Chi_Minh agree: the offset is whole hours). */
+    static boolean onSlot(Instant t) {
+        long epochSeconds = t.getEpochSecond();
+        return t.getNano() == 0 && epochSeconds % 60 == 0 && (epochSeconds / 60) % SCHEDULE_SLOT_MINUTES == 0;
+    }
+
     private static CreateVideoImportResultDto.LineResult lineError(int line, String code) {
         return CreateVideoImportResultDto.LineResult.builder().line(line).errorCode(code).build();
     }
@@ -120,7 +128,7 @@ public class VideoImportServiceImpl implements VideoImportService {
         if (requested == null) {
             return now;
         }
-        if (!requested.isAfter(now) || requested.isAfter(now.plus(MAX_SCHEDULE_AHEAD))) {
+        if (!requested.isAfter(now) || requested.isAfter(now.plus(MAX_SCHEDULE_AHEAD)) || !onSlot(requested)) {
             throw error(HttpStatus.BAD_REQUEST, 4103, "INVALID_SCHEDULE");
         }
         return requested;

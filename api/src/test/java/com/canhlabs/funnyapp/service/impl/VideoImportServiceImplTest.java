@@ -210,7 +210,7 @@ class VideoImportServiceImplTest {
 
     @Test
     void create_scheduledInFuture_keepsTimeAndDoesNotWake() {
-        Instant at = Instant.now().plus(Duration.ofHours(3));
+        Instant at = slot(Instant.now().plus(Duration.ofHours(3)));
 
         CreateVideoImportResultDto result = service.create(request(at, YT1), 1L);
 
@@ -238,9 +238,34 @@ class VideoImportServiceImplTest {
 
     @Test
     void create_scheduleJustInside30Days_isAccepted() {
-        Instant at = Instant.now().plus(Duration.ofDays(30)).minusSeconds(30);
+        Instant at = slot(Instant.now().plus(Duration.ofDays(30)).minusSeconds(600));
 
         assertThat(service.create(request(at, YT1), 1L).getResults().get(0).getJobId()).isNotNull();
+    }
+
+    @Test
+    void create_scheduleNotOnFiveMinuteSlot_is400() {
+        Instant base = slot(Instant.now().plus(Duration.ofHours(2)));
+        assertError(() -> service.create(request(base.plusSeconds(60), YT1), 1L),
+                HttpStatus.BAD_REQUEST, "INVALID_SCHEDULE");
+        assertError(() -> service.create(request(base.plusSeconds(30), YT1), 1L),
+                HttpStatus.BAD_REQUEST, "INVALID_SCHEDULE");
+        assertThat(service.create(request(base.plusSeconds(300), YT1), 1L).getResults().get(0).getJobId()).isNotNull();
+    }
+
+    @Test
+    void onSlot_checksFiveMinuteBoundary() {
+        assertThat(VideoImportServiceImpl.onSlot(Instant.parse("2026-10-11T02:05:00Z"))).isTrue();
+        assertThat(VideoImportServiceImpl.onSlot(Instant.parse("2026-10-11T02:00:00Z"))).isTrue();
+        assertThat(VideoImportServiceImpl.onSlot(Instant.parse("2026-10-11T02:07:00Z"))).isFalse();
+        assertThat(VideoImportServiceImpl.onSlot(Instant.parse("2026-10-11T02:05:01Z"))).isFalse();
+        assertThat(VideoImportServiceImpl.onSlot(Instant.parse("2026-10-11T02:05:00.001Z"))).isFalse();
+    }
+
+    /** Rounds down to a 5-minute slot. */
+    private static Instant slot(Instant t) {
+        long min = t.getEpochSecond() / 60;
+        return Instant.ofEpochSecond((min - min % 5) * 60);
     }
 
     // ── list ──────────────────────────────────────────────────────────────────
