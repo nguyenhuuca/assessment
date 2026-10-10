@@ -7496,7 +7496,7 @@
 </table>
 <p>Indexes: <code>(status, scheduled_at)</code>; partial unique <code>normalized_url WHERE status IN ('PENDING','DOWNLOADING','UPLOADING')</code> (no duplicate active import).</p>
 <p>Worker (<code>VideoImportWorker</code>):
-- <code>@Scheduled(fixedDelay = 15 s)</code> <strong>and</strong> an immediate wake-up after "run now" / create-with-no-schedule.
+- <code>@Scheduled(cron = "0 */5 * * * *")</code> (every 5 minutes on the clock; scheduled times must be on a 5-minute slot, claim allows 1 min of DB clock slack) <strong>and</strong> an immediate wake-up after "run now" / create-with-no-schedule / retry.
 - Claims one due job atomically: <code>UPDATE … SET status='DOWNLOADING', started_at=now(), attempts=attempts+1 WHERE id = (SELECT id … WHERE status='PENDING' AND scheduled_at &lt;= now() ORDER BY scheduled_at, id LIMIT 1 FOR UPDATE SKIP LOCKED) RETURNING id</code>.
 - <strong>Concurrency 1</strong> by default (<code>app.video-import.max-concurrent</code>, guarded by a <code>Semaphore</code>, no <code>synchronized</code>): 1 vCPU, disk and bandwidth shared with streaming.
 - Runs on a virtual thread; the job itself is blocking I/O + one child process.
