@@ -205,8 +205,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
             return;
         }
         log.info("Saving video source for Drive file {} (title: {})", fileId, title);
-        // String desc = chatGptService.makePoem(title);
-        String desc = null;
+        String desc = makeDesc(title);
         VideoSource entity = VideoSource.builder()
                 .videoId(System.nanoTime())
                 .sourceType("google_drive")
@@ -221,5 +220,15 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 entity.getThumbnailPath(), entity.getStatus(), entity.getPriority(), entity.isHide());
         videoSourceRepository.save(entity);
         log.info("Saved video source id={} videoId={} for Drive file {}", entity.getId(), entity.getVideoId(), fileId);
+    }
+
+    /** The poem is optional: an OpenAI failure (e.g. 429 out of credits) must not stop the video from being saved. */
+    private String makeDesc(String title) {
+        try {
+            return chatGptService.makePoem(title);
+        } catch (RuntimeException e) {
+            log.warn("ChatGPT poem failed for '{}', saving without description: {}", title, e.getMessage());
+            return null;
+        }
     }
 }

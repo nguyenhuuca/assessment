@@ -106,6 +106,7 @@ class VideoStorageServiceImplTest {
     void saveInfo_fileIdNotExists_savesNewVideoSource() {
         when(videoSourceRepository.existsBySourceId("file123")).thenReturn(false);
         when(videoSourceRepository.save(any(VideoSource.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(chatGptService.makePoem("My Title")).thenReturn("A poem");
 
         service.saveInfo("file123", "My Title", "http://img.example.com/thumb.jpg");
 
@@ -114,9 +115,22 @@ class VideoStorageServiceImplTest {
         VideoSource saved = captor.getValue();
         assertThat(saved.getSourceId()).isEqualTo("file123");
         assertThat(saved.getTitle()).isEqualTo("My Title");
-        assertThat(saved.getDesc()).isNull(); // ChatGPT poem disabled
-        verify(chatGptService, never()).makePoem(any());
+        assertThat(saved.getDesc()).isEqualTo("A poem");
         assertThat(saved.getSourceType()).isEqualTo("google_drive");
+    }
+
+    @Test
+    void saveInfo_chatGptFails_stillSavesWithoutDesc() {
+        when(videoSourceRepository.existsBySourceId("file123")).thenReturn(false);
+        when(videoSourceRepository.save(any(VideoSource.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(chatGptService.makePoem("My Title")).thenThrow(new RuntimeException("429 insufficient_quota"));
+
+        service.saveInfo("file123", "My Title", "thumb.jpg");
+
+        ArgumentCaptor<VideoSource> captor = ArgumentCaptor.forClass(VideoSource.class);
+        verify(videoSourceRepository).save(captor.capture());
+        assertThat(captor.getValue().getDesc()).isNull();
+        assertThat(captor.getValue().getSourceId()).isEqualTo("file123");
     }
 
     @Test
