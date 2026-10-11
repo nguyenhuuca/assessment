@@ -103,7 +103,7 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, muted = tru
           maxHeight: 'calc(100vh - 108px)',
           borderRadius: 16,
           overflow: 'hidden',
-          boxShadow: '0 0 0 1px var(--border), 0 20px 60px rgba(0,0,0,0.7)',
+          boxShadow: 'var(--video-card-shadow)',
           flexShrink: 0,
         }}
       >

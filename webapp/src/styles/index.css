@@ -37,6 +37,9 @@
   --danger:           #ff7351;
   --danger-bg:        rgba(255, 115, 81, 0.08);
   --danger-border:    rgba(255, 115, 81, 0.30);
+
+  --video-card-shadow: 0 0 0 1px var(--border), 0 20px 60px rgba(0,0,0,0.7);
+  --float-shadow:      0 24px 64px rgba(0,0,0,0.6);
 }
 
 /* ── Light theme overrides ──
@@ -70,7 +73,16 @@
 
   --cta-bg:           var(--primary);
   --cta-text:         #ffffff;
+
+  /* Stitch ambient shadow: soft and neutral, never a black halo on light surfaces */
+  --video-card-shadow: 0 0 0 1px var(--border), 0 12px 32px rgba(25, 28, 29, 0.14);
+  --float-shadow:      0 12px 32px rgba(25, 28, 29, 0.14);
 }
+
+[data-theme="light"] .app-modal,
+[data-theme="light"] .explore-filter-bar,
+[data-theme="light"] .notif-dropdown { box-shadow: var(--float-shadow); }
+[data-theme="light"] .mobile-search-modal-sheet { box-shadow: -8px 0 32px rgba(25, 28, 29, 0.14); }
 
 /* Primary actions and active navigation use filled crimson with white text */
 [data-theme="light"] .app-btn.primary,
