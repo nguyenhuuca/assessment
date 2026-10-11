@@ -2,9 +2,14 @@ import React, { useState } from 'react'
 import { useAdminAccounts, useUpdateAccountRole, useDeleteAccount } from '../../hooks/useAdmin.js'
 import { useAuth } from '../../hooks/useAuth.js'
 
+// Mirrors the server: you can only manage accounts, and assign roles, strictly below your own
+const ROLE_RANK = { USER: 0, ADMIN: 1, SUPER_ADMIN: 2 }
+const rank = (role) => ROLE_RANK[role] ?? 0
+
 export default function AdminAccountTable() {
   const [page, setPage] = useState(0)
   const { user } = useAuth()
+  const myRank = rank(user?.role)
   const { data, isLoading } = useAdminAccounts(page)
   const updateRole    = useUpdateAccountRole()
   const deleteAccount = useDeleteAccount()
@@ -32,12 +37,20 @@ export default function AdminAccountTable() {
         <tbody>
           {accounts.map(a => {
             const isSelf = a.email === user?.email
+            const isSuper = a.role === 'SUPER_ADMIN'
+            const outranked = myRank <= rank(a.role)
+            const nextRole = a.role === 'ADMIN' ? 'USER' : 'ADMIN'
+            const lockReason = isSelf ? null
+              : outranked ? 'Can only manage accounts with a lower role'
+              : myRank <= rank(nextRole) ? 'Can only assign a role lower than yours' : null
+            const roleLocked = isSelf || lockReason !== null
+            const deleteLocked = isSelf || outranked
             return (
               <tr key={a.id} className="admin-table-row">
                 <td>{a.email}</td>
                 <td>
-                  <span className={`admin-badge ${a.role === 'ADMIN' ? 'admin-badge-admin' : 'admin-badge-user'}`}>
-                    {a.role}
+                  <span className={`admin-badge ${isSuper ? 'admin-badge-super' : a.role === 'ADMIN' ? 'admin-badge-admin' : 'admin-badge-user'}`}>
+                    {isSuper ? 'SA' : a.role}
                   </span>
                 </td>
                 <td className="admin-cell-muted">{a.mfaEnabled ? 'ON' : 'OFF'}</td>
@@ -46,9 +59,9 @@ export default function AdminAccountTable() {
                   <div className="admin-actions">
                     <button
                       className="admin-action-btn"
-                      disabled={isSelf}
-                      title={isSelf ? 'Cannot change own role' : (a.role === 'ADMIN' ? 'Demote to USER' : 'Promote to ADMIN')}
-                      onClick={() => updateRole.mutate({ id: a.id, role: a.role === 'ADMIN' ? 'USER' : 'ADMIN' })}
+                      disabled={roleLocked}
+                      title={isSelf ? 'Cannot change own role' : (lockReason ?? (a.role === 'ADMIN' ? 'Demote to USER' : 'Promote to ADMIN'))}
+                      onClick={() => updateRole.mutate({ id: a.id, role: nextRole })}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
                         {a.role === 'ADMIN' ? 'person_remove' : 'person_add'}
@@ -56,8 +69,8 @@ export default function AdminAccountTable() {
                     </button>
                     <button
                       className="admin-action-btn danger"
-                      disabled={isSelf}
-                      title={isSelf ? 'Cannot delete own account' : 'Delete account'}
+                      disabled={deleteLocked}
+                      title={isSelf ? 'Cannot delete own account' : outranked ? 'Can only manage accounts with a lower role' : 'Delete account'}
                       onClick={() => { if (window.confirm(`Delete ${a.email}?`)) deleteAccount.mutate(a.id) }}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>

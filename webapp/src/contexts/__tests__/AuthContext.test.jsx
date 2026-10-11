@@ -19,6 +19,7 @@ function TestConsumer() {
       <span data-testid="admin">{String(!!auth.user?.isAdmin)}</span>
       <button onClick={() => auth.login('jwt123', { email: 'test@test.com' })}>login</button>
       <button onClick={() => auth.login('jwt-admin', { email: 'a@test.com', role: 'ADMIN' })}>login-admin</button>
+      <button onClick={() => auth.login('jwt-super', { email: 's@test.com', role: 'SUPER_ADMIN' })}>login-super</button>
       <button onClick={auth.logout}>logout</button>
     </div>
   )
@@ -57,6 +58,12 @@ describe('AuthContext', () => {
     act(() => screen.getByText('login-admin').click())
     expect(screen.getByTestId('admin').textContent).toBe('true')
     expect(authApi.me).not.toHaveBeenCalled()
+  })
+
+  it('SUPER_ADMIN counts as admin', async () => {
+    render(<AuthProvider><TestConsumer /></AuthProvider>)
+    act(() => screen.getByText('login-super').click())
+    expect(screen.getByTestId('admin').textContent).toBe('true')
   })
 
   it('login without role resolves admin via /user/me', async () => {

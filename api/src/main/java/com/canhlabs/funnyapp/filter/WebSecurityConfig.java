@@ -13,6 +13,8 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -48,7 +50,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     // Whitelisted endpoints
-                    auth.requestMatchers("/v1/funny-app/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/v1/funny-app/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN");
                     AppConstant.WebIgnoringConfig.WHITE_LIST_PATH.forEach(item -> auth.requestMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()).permitAll());
                     auth.requestMatchers(swaggerWhiteList).permitAll();
                     auth.anyRequest().permitAll();
@@ -74,8 +76,16 @@ public class WebSecurityConfig {
         return permissionAwareExpressionHandler();
     }
 
+    /** SUPER_ADMIN passes every hasRole('ADMIN') check; USER is implied by both. */
+    public static RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withDefaultRolePrefix()
+                .role("SUPER_ADMIN").implies("ADMIN")
+                .role("ADMIN").implies("USER")
+                .build();
+    }
+
     public static MethodSecurityExpressionHandler permissionAwareExpressionHandler() {
-        return new DefaultMethodSecurityExpressionHandler() {
+        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler() {
             @Override
             public EvaluationContext createEvaluationContext(
                     Supplier<Authentication> authentication, MethodInvocation mi) {
@@ -85,6 +95,8 @@ public class WebSecurityConfig {
                 return ctx;
             }
         };
+        handler.setRoleHierarchy(roleHierarchy());
+        return handler;
     }
 
     private static class PermissionEnumPropertyAccessor implements PropertyAccessor {

@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { authApi } from '../api/auth.js'
 import { AUTH_REVOKED_EVENT } from '../api/client.js'
+import { isAdminRole } from '../utils/roles.js'
 
 const AuthContext = createContext(null)
 
@@ -44,7 +45,12 @@ export function AuthProvider({ children }) {
       .then((data) => {
         const userData = data?.data ?? data
         if (userData?.role !== undefined) {
-          setUser(prev => prev ? { ...prev, isAdmin: userData.role === 'ADMIN' } : prev)
+          setUser(prev => {
+            if (!prev) return prev
+            const next = { ...prev, role: userData.role, isAdmin: isAdminRole(userData.role) }
+            localStorage.setItem('user', JSON.stringify(next))
+            return next
+          })
         }
         setLoading(false)
       })
@@ -62,7 +68,7 @@ export function AuthProvider({ children }) {
   const login = useCallback((newJwt, newUser) => {
     const userWithAdmin = {
       ...newUser,
-      isAdmin: newUser?.isAdmin ?? (newUser?.role === 'ADMIN'),
+      isAdmin: newUser?.isAdmin ?? isAdminRole(newUser?.role),
     }
     localStorage.setItem('jwt', newJwt)
     localStorage.setItem('user', JSON.stringify(userWithAdmin))
@@ -76,7 +82,7 @@ export function AuthProvider({ children }) {
           if (role === undefined) return
           setUser(prev => {
             if (!prev) return prev
-            const next = { ...prev, role, isAdmin: role === 'ADMIN' }
+            const next = { ...prev, role, isAdmin: isAdminRole(role) }
             localStorage.setItem('user', JSON.stringify(next))
             return next
           })

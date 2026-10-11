@@ -1592,6 +1592,12 @@ body {
   border: 1px solid var(--accent-cyan);
 }
 
+.admin-badge-super {
+  background: rgba(255, 193, 7, 0.14);
+  color: #ffc107;
+  border: 1px solid #ffc107;
+}
+
 .admin-badge-user {
   background: rgba(173, 170, 170, 0.1);
   color: var(--text-muted);

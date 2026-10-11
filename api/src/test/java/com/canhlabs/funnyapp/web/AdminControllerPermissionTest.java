@@ -50,6 +50,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -86,7 +87,7 @@ class AdminControllerPermissionTest {
             return http
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/v1/funny-app/admin/**").hasRole("ADMIN")
+                            .requestMatchers("/v1/funny-app/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                             .anyRequest().permitAll())
                     .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                     .build();
@@ -159,6 +160,46 @@ class AdminControllerPermissionTest {
         mockMvc.perform(get(STATS_URL)
                         .with(authentication(principal(UserRole.ADMIN, allBits))))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void getStats_superAdminInheritsAdmin_returns200() throws Exception {
+        when(adminVideoService.getStats()).thenReturn(stats());
+
+        mockMvc.perform(get(STATS_URL)
+                        .with(authentication(principal(UserRole.SUPER_ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+    }
+
+    // ── account management: open to ADMIN and SUPER_ADMIN; ranking is checked in the service ─
+
+    private static final String ROLE_URL = AppConstant.API.BASE_URL + "/admin/accounts/10/role";
+    private static final String ACCOUNT_URL = AppConstant.API.BASE_URL + "/admin/accounts/10";
+
+    @Test
+    void updateRole_admin_reachesService() throws Exception {
+        mockMvc.perform(patch(ROLE_URL)
+                        .contentType("application/json").content("{\"role\":\"USER\"}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+        verify(adminAccountService).updateRole(10L, 1L, UserRole.USER);
+    }
+
+    @Test
+    void deleteAccount_superAdmin_reachesService() throws Exception {
+        mockMvc.perform(delete(ACCOUNT_URL)
+                        .with(authentication(principal(UserRole.SUPER_ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+        verify(adminAccountService).deleteAccount(10L, 1L);
+    }
+
+    @Test
+    void updateRole_userRole_returns403() throws Exception {
+        mockMvc.perform(patch(ROLE_URL)
+                        .contentType("application/json").content("{\"role\":\"USER\"}")
+                        .with(authentication(principal(UserRole.USER, Permission.ADMIN.getBit()))))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(adminAccountService);
     }
 
     // ── 403: ROLE_ADMIN present but ADMIN bit missing (@HasPermission blocks) ─
