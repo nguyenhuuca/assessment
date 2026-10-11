@@ -70,3 +70,16 @@ See the full guide: [From Scope to Implementation](guides/flow-scope-to-implemen
 | [ADR-0014](adr/0014-watch-history-design-opus.md) | Watch History — Recording, Storage, and Ownership Design | Proposed |
 | [ADR-0015](adr/0015-bitwise-permission-system.md) | Bitwise Permission System — Fine-Grained Method Authorization | Accepted |
 | [ADR-0016](adr/0016-user-settings-design.md) | User Settings — Storage, API Shape, and Account Deletion | Proposed |
+| [ADR-0017](adr/0017-user-notifications.md) | User Notifications | Accepted |
+| [ADR-0018](adr/0018-password-login-option.md) | Optional Email + Password Login | Accepted |
+| [ADR-0019](adr/0019-admin-video-import.md) | Admin Video Import (YouTube / Facebook → Google Drive) | Proposed |
+
+Feature status for every ADR/PRD/Plan: [Feature Tracking](tracking.md)
+
+---
+
+## Guides
+
+- [From Scope to Implementation](guides/flow-scope-to-implement.md) · [Tiếng Việt](guides/flow-scope-to-implement-vi.md)
+- [Claude Guide (EN)](guides/claude-guide-en.md) · [Tiếng Việt](guides/claude-guide-vi.md)
+- [Video Import Setup — Google Drive OAuth (VI)](guides/video-import-setup-vi.md)
