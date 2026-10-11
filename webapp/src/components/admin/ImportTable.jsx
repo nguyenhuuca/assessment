@@ -71,7 +71,16 @@ export default function ImportTable() {
         <>
           <div className="admin-table-meta">SHOWING {jobs.length} OF {totalElements.toLocaleString()} ENTRIES</div>
           <div className="import-scroll">
+            {/* Fixed column widths: cell content changes with every status update and must not resize the table */}
             <table className="admin-table import-table">
+              <colgroup>
+                <col />
+                <col className="import-col-platform" />
+                <col className="import-col-status" />
+                <col className="import-col-progress" />
+                <col className="import-col-time" />
+                <col className="import-col-actions" />
+              </colgroup>
               <thead>
                 <tr>
                   <th>TIÊU ĐỀ</th><th>NỀN TẢNG</th><th>TRẠNG THÁI</th><th>TIẾN ĐỘ</th><th>THỜI GIAN</th><th>ACTIONS</th>
@@ -80,7 +89,7 @@ export default function ImportTable() {
               <tbody>
                 {jobs.map(j => (
                   <tr key={j.id} className="admin-table-row">
-                    <td>{j.title || j.sourceUrl}</td>
+                    <td><div className="import-cell-title" title={j.title || j.sourceUrl}>{j.title || j.sourceUrl}</div></td>
                     <td className="admin-cell-muted">{platformLabel(j.platform)}</td>
                     <td><span className={`admin-badge ${String(j.status).toLowerCase()}`}>{j.status}</span></td>
                     <td><StateCell job={j} /></td>

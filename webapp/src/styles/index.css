@@ -2304,6 +2304,20 @@ body {
 .import-line-list .ok { color: #00c853; }
 .import-line-list .bad { color: #ff1744; }
 .import-scroll { overflow-x: auto; }
+.import-table { table-layout: fixed; min-width: 900px; }
+.import-col-platform { width: 110px; }
+.import-col-status   { width: 130px; }
+.import-col-progress { width: 230px; }
+.import-col-time     { width: 150px; }
+.import-col-actions  { width: 190px; }
+.import-cell-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
 .import-progress {
   width: 120px;
   height: 6px;
@@ -2313,7 +2327,7 @@ body {
   margin-top: 4px;
 }
 .import-progress-fill { height: 100%; background: var(--accent-cyan); transition: width 0.3s; }
-.import-error { color: #ff1744; font-size: 12px; max-width: 220px; }
+.import-error { color: #ff1744; font-size: 12px; overflow-wrap: anywhere; }
 .admin-badge.pending     { background: rgba(255, 214, 0, 0.13); color: #ffd600; border: 1px solid #ffd600; }
 .admin-badge.downloading,
 .admin-badge.uploading   { background: rgba(0, 238, 252, 0.12); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
@@ -2322,7 +2336,6 @@ body {
 .admin-badge.cancelled   { background: rgba(173, 170, 170, 0.13); color: var(--text-muted); border: 1px solid var(--text-muted); }
 @media (max-width: 768px) {
   .import-form { padding: 12px; }
-  .import-table { min-width: 640px; }
   .admin-tabs { overflow-x: auto; }
 }
 
