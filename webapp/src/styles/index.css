@@ -39,32 +39,69 @@
   --danger-border:    rgba(255, 115, 81, 0.30);
 }
 
-/* ── Light theme overrides ── */
+/* ── Light theme overrides ──
+   Source of truth: Stitch "Shorts Feed - Web View" light screens (Material 3 light palette).
+   surface #f8f9fa · on-surface #191c1d · primary #b80035 / #e11d48 · secondary #006398 */
 [data-theme="light"] {
-  --bg:               #f5f5f5;
-  --bg-surface:       #ffffff;
-  --bg-elevated:      #f0f0f0;
-  --bg-card:          #e8e8e8;
-  --bg-high:          #e0e0e0;
-  --bg-bright:        #d4d4d4;
+  --bg:               #f8f9fa;  /* surface */
+  --bg-surface:       #ffffff;  /* surface-container-lowest */
+  --bg-elevated:      #f3f4f5;  /* surface-container-low */
+  --bg-card:          #edeeef;  /* surface-container */
+  --bg-high:          #e7e8e9;  /* surface-container-high */
+  --bg-bright:        #e1e3e4;  /* surface-container-highest */
 
-  --text:             #0e0e0e;
-  --text-muted:       #555555;
-  --border:           rgba(0,0,0,0.08);
-  --border-subtle:    rgba(0,0,0,0.12);
+  --text:             #191c1d;  /* on-surface */
+  --text-muted:       #5c3f40;  /* on-surface-variant */
+  --border:           rgba(25, 28, 29, 0.06);
+  --border-subtle:    rgba(25, 28, 29, 0.10);
 
-  /* Accent colors reworked for white backgrounds */
-  --accent-cyan:      #0097a8;
-  --accent-cyan-glow: rgba(0, 151, 168, 0.18);
-  --accent-cyan-dim:  rgba(0, 151, 168, 0.10);
+  /* "accent-cyan" carries the secondary (actionable) colour in light mode */
+  --accent-cyan:      #006398;  /* secondary */
+  --accent-cyan-glow: rgba(0, 99, 152, 0.18);
+  --accent-cyan-dim:  rgba(0, 99, 152, 0.08);
 
-  --primary:          #e8364a;
-  --primary-dim:      #c41f32;
-  --primary-glow:     rgba(232, 54, 74, 0.18);
+  --primary:          #e11d48;  /* primary-container */
+  --primary-dim:      #b80035;  /* primary */
+  --primary-glow:     rgba(225, 29, 72, 0.18);
 
-  --danger:           #c94422;
-  --danger-bg:        rgba(201, 68, 34, 0.10);
-  --danger-border:    rgba(201, 68, 34, 0.30);
+  --danger:           #ba1a1a;  /* error */
+  --danger-bg:        rgba(186, 26, 26, 0.08);
+  --danger-border:    rgba(186, 26, 26, 0.30);
+
+  --cta-bg:           var(--primary);
+  --cta-text:         #ffffff;
+}
+
+/* Primary actions and active navigation use filled crimson with white text */
+[data-theme="light"] .app-btn.primary,
+[data-theme="light"] .admin-page-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+[data-theme="light"] .app-btn.primary:not(:disabled):hover { background: var(--primary-dim); }
+[data-theme="light"] .sidenav-item.active {
+  color: #ffffff;
+  background: var(--primary);
+  border-left-color: var(--primary-dim);
+}
+[data-theme="light"] .explore-btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dim) 100%);
+  color: #ffffff;
+}
+[data-theme="light"] .explore-hero-badge {
+  background: var(--primary-glow);
+  color: var(--primary-dim);
+  border-color: rgba(225, 29, 72, 0.30);
+}
+
+/* Video overlay sits on a dark scrim in both themes: keep light text there */
+[data-theme="light"] .scrim {
+  --text:        #ffffff;
+  --text-muted:  #e1e3e4;
+  --accent-cyan: #93ccff;  /* secondary-fixed-dim */
+  --bg-high:     #2e3132;  /* inverse-surface */
+  color: var(--text);
 }
 
 [data-theme="light"] body {

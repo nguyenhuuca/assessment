@@ -103,8 +103,8 @@ export default function LoginForm({ onMfaRequired }) {
           type="submit"
           disabled={loading}
           style={{
-            background: 'var(--accent-cyan)',
-            color: '#003035',
+            background: 'var(--cta-bg, var(--accent-cyan))',
+            color: 'var(--cta-text, #003035)',
             border: 'none',
             borderRadius: 8,
             fontSize: 13,
