@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import DriveSyncPanel from '../DriveSyncPanel.jsx'
 import * as adminApi from '../../../api/admin.js'
@@ -26,6 +26,7 @@ function renderPanel() {
   return render(<QueryClientProvider client={qc}><DriveSyncPanel /></QueryClientProvider>)
 }
 const setRole = (role) => useAuth.mockReturnValue({ user: { role } })
+const confirmSync = () => fireEvent.click(within(screen.getByRole('dialog')).getByText('Force sync'))
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -33,7 +34,6 @@ beforeEach(() => {
   adminApi.getDriveSyncFiles.mockResolvedValue({ data: { files: FILES, orphans: [], maxBatch: 50 } })
   adminApi.getDriveSyncRun.mockResolvedValue({ data: null })
   adminApi.startDriveSyncRun.mockResolvedValue({ data: { runId: 'r1', active: true, items: [] } })
-  vi.spyOn(window, 'confirm').mockReturnValue(true)
 })
 
 describe('DriveSyncPanel', () => {
@@ -53,15 +53,21 @@ describe('DriveSyncPanel', () => {
     fireEvent.click(await screen.findByLabelText('Chọn one.mp4'))
     fireEvent.click(screen.getByLabelText('Chọn two.mp4'))
     fireEvent.click(screen.getByText('FORCE_SYNC (2)'))
-    expect(window.confirm).toHaveBeenCalled()
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByText('one.mp4')).toBeInTheDocument()
+    expect(within(dialog).getByText('two.mp4')).toBeInTheDocument()
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('1 file đã SYNCED')
+    expect(adminApi.startDriveSyncRun).not.toHaveBeenCalled()
+    confirmSync()
     await waitFor(() => expect(adminApi.startDriveSyncRun).toHaveBeenCalledWith(['f1', 'f2']))
   })
 
   it('does not POST when confirm is cancelled', async () => {
-    window.confirm.mockReturnValue(false)
     renderPanel()
     fireEvent.click(await screen.findByLabelText('Chọn one.mp4'))
     fireEvent.click(screen.getByText('FORCE_SYNC (1)'))
+    fireEvent.click(within(screen.getByRole('dialog')).getByText('Huỷ'))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(adminApi.startDriveSyncRun).not.toHaveBeenCalled()
   })
 
@@ -70,6 +76,7 @@ describe('DriveSyncPanel', () => {
     await screen.findByText('one.mp4')
     fireEvent.click(screen.getByText('chọn tất cả chưa sync'))
     fireEvent.click(screen.getByText('FORCE_SYNC (2)'))
+    confirmSync()
     await waitFor(() => expect(adminApi.startDriveSyncRun).toHaveBeenCalledWith(['f1', 'f3']))
   })
 
@@ -112,7 +119,9 @@ describe('DriveSyncPanel', () => {
     renderPanel()
     fireEvent.click(await screen.findByLabelText('Chọn one.mp4'))
     fireEvent.click(screen.getByText('FORCE_SYNC (1)'))
+    confirmSync()
     expect(await screen.findByRole('alert')).toHaveTextContent('SYNC_RUNNING')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
   it('lists orphans read-only', async () => {

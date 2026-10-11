@@ -50,6 +50,46 @@ function RunProgress({ run }) {
   )
 }
 
+function ConfirmSyncModal({ files, pending, onCancel, onConfirm }) {
+  const overwrite = files.filter(f => f.state === 'SYNCED').length
+  return (
+    <div className="app-modal-backdrop" onClick={pending ? undefined : onCancel}>
+      <div className="app-modal" role="dialog" aria-label="Xác nhận force sync" onClick={e => e.stopPropagation()}>
+        <div className="app-modal-header">
+          <span className="app-modal-title">Force sync {files.length} file</span>
+          <button className="app-modal-close" onClick={onCancel} disabled={pending} aria-label="Close">
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+          </button>
+        </div>
+        <div className="app-modal-body">
+          <p className="admin-cell-muted" style={{ marginTop: 0 }}>
+            Các file sau sẽ được tải lại từ Google Drive và cập nhật vào DB:
+          </p>
+          <ul className="drive-sync-confirm-list">
+            {files.map(f => (
+              <li key={f.fileId}>
+                <span>{f.name}</span>
+                <span className="admin-cell-muted">{formatSize(f.sizeBytes)}</span>
+              </li>
+            ))}
+          </ul>
+          {overwrite > 0 && (
+            <div className="app-alert error" role="alert" style={{ marginTop: 12 }}>
+              {overwrite} file đã SYNCED sẽ bị thay thế bản local và cập nhật tiêu đề theo tên trên Drive.
+            </div>
+          )}
+        </div>
+        <div className="app-modal-footer">
+          <button className="app-btn secondary" onClick={onCancel} disabled={pending}>Huỷ</button>
+          <button className="app-btn primary" onClick={onConfirm} disabled={pending}>
+            {pending ? 'Đang gửi…' : 'Force sync'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function DriveSyncPanel() {
   const { user } = useAuth()
   const canSync = isSuperAdmin(user?.role)
@@ -59,6 +99,7 @@ export default function DriveSyncPanel() {
   const [selected, setSelected] = useState(() => new Set())
   const [onlyUnsynced, setOnlyUnsynced] = useState(false)
   const [error, setError] = useState('')
+  const [confirming, setConfirming] = useState(false)
 
   const payload = data?.data ?? data ?? {}
   const allFiles = payload.files ?? []
@@ -85,12 +126,11 @@ export default function DriveSyncPanel() {
   }
 
   function forceSync() {
-    const fileIds = [...selected]
-    if (!window.confirm(`Force sync ${fileIds.length} file từ Google Drive? File local sẽ bị thay thế.`)) return
     setError('')
-    start.mutate(fileIds, {
+    start.mutate([...selected], {
       onSuccess: () => setSelected(new Set()),
       onError: e => setError(e?.message || 'Thao tác thất bại'),
+      onSettled: () => setConfirming(false),
     })
   }
 
@@ -106,7 +146,7 @@ export default function DriveSyncPanel() {
             chọn tất cả chưa sync
           </button>
           <button className="app-btn primary" disabled={locked || selected.size === 0 || start.isPending}
-            title={lockReason} onClick={forceSync}>
+            title={lockReason} onClick={() => setConfirming(true)}>
             FORCE_SYNC ({selected.size})
           </button>
           <span className="admin-cell-muted">Tối đa {maxBatch} file mỗi lần</span>
@@ -148,6 +188,15 @@ export default function DriveSyncPanel() {
           </>
         )}
       </div>
+
+      {confirming && (
+        <ConfirmSyncModal
+          files={allFiles.filter(f => selected.has(f.fileId))}
+          pending={start.isPending}
+          onCancel={() => setConfirming(false)}
+          onConfirm={forceSync}
+        />
+      )}
 
       {run && <RunProgress run={run} />}
 

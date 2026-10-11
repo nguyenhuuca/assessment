@@ -2343,3 +2343,23 @@ body {
 @media (max-width: 768px) {
   .drive-sync-run-item { grid-template-columns: 1fr; }
 }
+
+.drive-sync-confirm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+.drive-sync-confirm-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+.drive-sync-confirm-list li:last-child { border-bottom: none; }
+.drive-sync-confirm-list li span:first-child { overflow-wrap: anywhere; }
