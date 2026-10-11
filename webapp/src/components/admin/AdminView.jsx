@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useIsFetching, useQueryClient } from '@tanstack/react-query'
 import { useAdminStats } from '../../hooks/useAdmin.js'
 import AdminVideoTable from './AdminVideoTable.jsx'
 import AdminAccountTable from './AdminAccountTable.jsx'
@@ -15,8 +16,25 @@ const TABS = [
   { key: 'DRIVE_SYNC',    label: 'DRIVE_SYNC'    },
 ]
 
+// Query key prefix (see hooks/useAdmin.js) that each tab reads from
+const TAB_QUERY = {
+  VIDEO_VAULT:   ['admin', 'videos'],
+  FLAGGED_LOGS:  ['admin', 'videos'],
+  USER_ACCOUNTS: ['admin', 'accounts'],
+  COMMENTS:      ['admin', 'comments'],
+  IMPORT_VIDEO:  ['admin', 'imports'],
+  DRIVE_SYNC:    ['admin', 'drive-sync'],
+}
+
 export default function AdminView() {
   const [activeTab, setActiveTab] = useState('VIDEO_VAULT')
+  const qc = useQueryClient()
+  const refreshing = useIsFetching({ queryKey: TAB_QUERY[activeTab] }) > 0
+
+  function refresh() {
+    qc.invalidateQueries({ queryKey: TAB_QUERY[activeTab] })
+    qc.invalidateQueries({ queryKey: ['admin', 'stats'] })
+  }
   const { data: statsData } = useAdminStats()
   const stats = statsData?.data ?? statsData ?? {}
 
@@ -39,6 +57,16 @@ export default function AdminView() {
             {t.label}
           </button>
         ))}
+        <button
+          className="admin-refresh-btn"
+          onClick={refresh}
+          disabled={refreshing}
+          title="Lấy dữ liệu mới nhất"
+          aria-label="Refresh"
+        >
+          <span className={`material-symbols-outlined${refreshing ? ' spinning' : ''}`} style={{ fontSize: 18 }}>refresh</span>
+          REFRESH
+        </button>
       </div>
 
       <div className="admin-content">

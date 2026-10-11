@@ -1531,6 +1531,26 @@ body {
   margin-bottom: 20px;
 }
 
+.admin-refresh-btn {
+  margin-left: auto;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.admin-refresh-btn:hover:not(:disabled) { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+.admin-refresh-btn:disabled { opacity: 0.6; cursor: default; }
+.admin-refresh-btn .spinning { animation: spin 0.75s linear infinite; }
+
 .admin-tab {
   background: none;
   border: none;
