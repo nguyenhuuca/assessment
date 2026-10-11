@@ -1,6 +1,10 @@
 package com.canhlabs.funnyapp.enums;
 
-/** Declared lowest to highest: an account can only manage accounts and assign roles strictly below its own. */
+/**
+ * Declared lowest to highest; this order is the only place role rank is defined.
+ * Used by {@link #outranks} (account management) and WebSecurityConfig.roleHierarchy() (hasRole checks).
+ * Append new roles in rank position; never reorder existing ones without reviewing both.
+ */
 public enum UserRole {
     USER,
     ADMIN,

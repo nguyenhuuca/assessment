@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.filter;
 
 import com.canhlabs.funnyapp.enums.Permission;
+import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,12 +77,14 @@ public class WebSecurityConfig {
         return permissionAwareExpressionHandler();
     }
 
-    /** SUPER_ADMIN passes every hasRole('ADMIN') check; USER is implied by both. */
+    /** Built from the UserRole declaration order (the single source of rank): each role implies the one below it. */
     public static RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.withDefaultRolePrefix()
-                .role("SUPER_ADMIN").implies("ADMIN")
-                .role("ADMIN").implies("USER")
-                .build();
+        UserRole[] roles = UserRole.values();
+        RoleHierarchyImpl.Builder builder = RoleHierarchyImpl.withDefaultRolePrefix();
+        for (int i = roles.length - 1; i > 0; i--) {
+            builder.role(roles[i].name()).implies(roles[i - 1].name());
+        }
+        return builder.build();
     }
 
     public static MethodSecurityExpressionHandler permissionAwareExpressionHandler() {
