@@ -9,7 +9,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer), Security Auditor (/s
 
 ## Overview
 
-**Status:** Draft
+**Status:** Done
 **Author:** nguyenhuuca
 **Date:** 2026-10-10
 **Related PRD:** [PRD-admin-video-import](../prd/PRD-admin-video-import.md)

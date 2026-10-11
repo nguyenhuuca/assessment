@@ -1,6 +1,6 @@
 # ADR-0019: Admin Video Import (YouTube / Facebook → Google Drive)
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-10
 **Deciders:** nguyenhuuca
 **Related:** [PRD-admin-video-import](../prd/PRD-admin-video-import.md) · [plan-admin-video-import](../plans/plan-admin-video-import.md)

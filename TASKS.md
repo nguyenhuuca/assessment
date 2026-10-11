@@ -138,12 +138,12 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **PRD:** `docs/prd/PRD-admin-video-import.md` (draft) · **ADR:** `docs/adr/0019-admin-video-import.md` (Proposed) · **Plan:** `docs/plans/plan-admin-video-import.md`
 
-- [~] **VI-0** PoC done 2026-10-10: SA upload → 403 `storageQuotaExceeded` ⇒ OAuth uploader. **Blocked on owner:** create OAuth client + refresh token (`scripts/google/get-drive-refresh-token.py`), put 3 env vars on server
+- [x] **VI-0** PoC 2026-10-10: SA upload → 403 `storageQuotaExceeded` ⇒ OAuth uploader; owner created OAuth client + refresh token, env set on server
 - [x] **VI-1** Migration `video_import_jobs`, entity/repo (`claimNextDue` SKIP LOCKED), `AppProperties.videoImport`, `ImportUrlValidator`, `TitleSanitizer` + tests
 - [x] **VI-2** `YtDlpClient` (metadata, download, progress parse, timeouts, error codes) + `DriveUploader` (resumable, progress) + tests — after VI-0, VI-1
 - [x] **VI-3** `VideoImportService`, `VideoImportWorker` (concurrency 1, wake-up, interrupted reset), `/admin/video-imports` API (history kept forever, bulk max 20) + tests — after VI-1, VI-2
 - [x] **VI-4** FE tab "Import Video": bulk form, now/schedule, preview title, job table with polling progress, actions + tests — contract-first
   - Security review (2026-10-10): no Critical/High; fixed Medium (child env allowlist, dir-size cap + `!is_live`, preview rate limit + metadata semaphore) and Low (kill descendants, log sanitizing, `--no-cache-dir`, `--socket-timeout`)
   - Not verified locally: native SQL on Postgres, real yt-dlp/Drive run → covered by VI-5 E2E
-- [ ] **VI-5** Host ops (yt-dlp -U cron, work dir), prod E2E, security review, tracking + docs — after all
+- [x] **VI-5** Host ops, prod E2E (verified 2026-10-11), security review (2026-10-10), tracking + docs; ADR-0019 Accepted
 

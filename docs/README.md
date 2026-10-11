@@ -72,7 +72,7 @@ See the full guide: [From Scope to Implementation](guides/flow-scope-to-implemen
 | [ADR-0016](adr/0016-user-settings-design.md) | User Settings — Storage, API Shape, and Account Deletion | Proposed |
 | [ADR-0017](adr/0017-user-notifications.md) | User Notifications | Accepted |
 | [ADR-0018](adr/0018-password-login-option.md) | Optional Email + Password Login | Accepted |
-| [ADR-0019](adr/0019-admin-video-import.md) | Admin Video Import (YouTube / Facebook → Google Drive) | Proposed |
+| [ADR-0019](adr/0019-admin-video-import.md) | Admin Video Import (YouTube / Facebook → Google Drive) | Accepted |
 
 Feature status for every ADR/PRD/Plan: [Feature Tracking](tracking.md)
 

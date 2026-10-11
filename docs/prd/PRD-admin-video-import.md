@@ -9,7 +9,7 @@ Handoff to: Architect (ADR-0019), Builder (/builder)
 
 ## Overview
 
-**Status:** Draft
+**Status:** Done
 **Author:** nguyenhuuca
 **Date:** 2026-10-10
 **Related ADR:** [ADR-0019 Admin Video Import](../adr/0019-admin-video-import.md)

@@ -42,13 +42,13 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Comment Replies** | — | — | — | [Plan ✅](plans/plan-comment-replies.md) | — | ✅ | `a23950f` 2-level threads, author delete keeps others' replies; `368bf0c` reply-to-reply notifies the replied author |
 | **User Notifications** | [PRD ✅](prd/PRD-user-notifications.md) | [0017 ✅](adr/0017-user-notifications.md) | — | [Plan ✅](plans/plan-user-notifications.md) | — | ✅ | `a11d31e` in-app + SSE (fetch + header auth) + 15-min digest; verified on prod 2026-10-03; nginx `worker_connections` 768→8192 |
 | **Password Login (optional)** | [PRD ✅](prd/PRD-password-login.md) | [0018 ✅](adr/0018-password-login-option.md) | — | [Plan ✅](plans/plan-password-login.md) | — | ✅ | `fd319cf` email + password next to magic link, lockout 5/15 min, `cv` session revocation; `e6d6a3f`/`63e21f0` modal + 🔑 icon; `3de7a4a` role in login response; verified on prod 2026-10-09 |
-| **Admin Video Import (YouTube / Facebook → Drive)** | [PRD 📝](prd/PRD-admin-video-import.md) | [0019 💡](adr/0019-admin-video-import.md) | — | [Plan 📝](plans/plan-admin-video-import.md) | — | 🔍 | yt-dlp → Drive folder → existing cron ingests; VI-0 PoC upload gate |
+| **Admin Video Import (YouTube / Facebook → Drive)** | [PRD ✅](prd/PRD-admin-video-import.md) | [0019 ✅](adr/0019-admin-video-import.md) | — | [Plan ✅](plans/plan-admin-video-import.md) | — | ✅ | `795ec5e` yt-dlp → Drive (OAuth uploader) → existing cron ingests; bulk ≤20, run now / 5-min schedule slots, polling progress; `d9bddd9` FB reels; [setup guide](guides/video-import-setup-vi.md); verified on prod 2026-10-11 |
 
 ---
 
 ## Status Summary
 
-### ✅ Done (14)
+### ✅ Done (15)
 - [Use RDBMS](adr/0001-use-relational-database.md)
 - [Backend Architecture](adr/0002-backend-architecture.md)
 - [Cache Strategy](adr/0003-use-cache.md)
@@ -63,11 +63,12 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Comment Replies](plans/plan-comment-replies.md)
 - [User Notifications](adr/0017-user-notifications.md)
 - [Password Login](adr/0018-password-login-option.md)
+- [Admin Video Import](adr/0019-admin-video-import.md)
 
 ### 🔄 In Progress (1)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
 
-### 🔍 In Review (8)
+### 🔍 In Review (7)
 - [HLS Video Streaming](plans/plan-hls-migration.md)
 - [Unified Video List API](adr/0009-unified-video-list-api.md)
 - [Hot Video Priority](plans/plan-hot-video-priority.md)
@@ -75,7 +76,6 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [File-based Hooks](plans/plan-a-file-based-hooks.md)
 - [Bookmark Feature](plans/plan-bookmark-feature.md)
 - [Watch History (Opus)](plans/plan-watch-history-opus.md) · baseline archived
-- [Admin Video Import](plans/plan-admin-video-import.md)
 
 ### 💡 Proposed / No Plan Yet (0)
 - —
@@ -103,7 +103,9 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0015 | Bitwise Permission System | ✅ Accepted |
 | 0016 | User Settings Design | ✅ Accepted |
 | 0017 | User Notifications | ✅ Accepted |
+| 0018 | Password Login Option | ✅ Accepted |
+| 0019 | Admin Video Import | ✅ Accepted |
 
 ---
 
-*Last updated: 2026-10-06 — Video reactions, comment moderation (+bulk), threaded replies and user notifications (ADR-0017) shipped to main*
+*Last updated: 2026-10-11 — Password login (ADR-0018) and admin video import (ADR-0019) shipped and verified on prod*
