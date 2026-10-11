@@ -119,6 +119,7 @@ nav:
       - User Notifications: plans/plan-user-notifications.md
       - Password Login: plans/plan-password-login.md
       - Admin Video Import: plans/plan-admin-video-import.md
+      - Admin Drive Force Sync: plans/plan-admin-drive-force-sync.md
 
   - Presentations:
       - presentations/index.md
