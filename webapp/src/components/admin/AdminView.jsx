@@ -4,6 +4,7 @@ import AdminVideoTable from './AdminVideoTable.jsx'
 import AdminAccountTable from './AdminAccountTable.jsx'
 import AdminCommentTable from './AdminCommentTable.jsx'
 import AdminImportPanel from './AdminImportPanel.jsx'
+import DriveSyncPanel from './DriveSyncPanel.jsx'
 
 const TABS = [
   { key: 'VIDEO_VAULT',   label: 'VIDEO_VAULT'   },
@@ -11,6 +12,7 @@ const TABS = [
   { key: 'FLAGGED_LOGS',  label: 'FLAGGED_LOGS'  },
   { key: 'COMMENTS',      label: 'COMMENTS'      },
   { key: 'IMPORT_VIDEO',  label: 'IMPORT_VIDEO'  },
+  { key: 'DRIVE_SYNC',    label: 'DRIVE_SYNC'    },
 ]
 
 export default function AdminView() {
@@ -45,6 +47,7 @@ export default function AdminView() {
         {activeTab === 'USER_ACCOUNTS' && <AdminAccountTable />}
         {activeTab === 'COMMENTS'      && <AdminCommentTable />}
         {activeTab === 'IMPORT_VIDEO'  && <AdminImportPanel />}
+        {activeTab === 'DRIVE_SYNC'    && <DriveSyncPanel />}
       </div>
 
       <div className="admin-stat-cards">

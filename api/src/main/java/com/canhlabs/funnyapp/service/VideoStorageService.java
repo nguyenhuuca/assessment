@@ -27,4 +27,10 @@ public interface VideoStorageService {
      */
     void deleteIfEligible(String fileId);
 
+    /**
+     * Inserts the Drive video row, or refreshes title and thumbnail of the existing one (force sync).
+     * A ChatGPT description is generated only when the row has none.
+     */
+    void upsertInfo(String fileId, String title, String thumbnailPath);
+
 }

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import * as adminApi from '../api/admin.js'
 import { hasActive } from '../utils/importUtils.js'
@@ -113,3 +114,38 @@ export const useRunImportNow   = () => useImportMutation((id) => adminApi.runImp
 export const useCancelImport   = () => useImportMutation((id) => adminApi.cancelImport(id))
 export const useRetryImport    = () => useImportMutation((id) => adminApi.retryImport(id))
 export const usePreviewImport  = () => useMutation({ mutationFn: (url) => adminApi.previewImport(url) })
+
+export function useDriveSyncFiles() {
+  return useQuery({
+    queryKey: ['admin', 'drive-sync', 'files'],
+    queryFn: () => adminApi.getDriveSyncFiles(),
+  })
+}
+
+/** Polls the current run every 2 s while active; refreshes the files list when it finishes. */
+export function useDriveSyncRun() {
+  const qc = useQueryClient()
+  const query = useQuery({
+    queryKey: ['admin', 'drive-sync', 'run'],
+    queryFn: () => adminApi.getDriveSyncRun(),
+    refetchInterval: (q) => (q.state.data?.data?.active ? 2000 : false),
+  })
+  const run = query.data?.data ?? null
+  const active = !!run?.active
+  const wasActive = useRef(false)
+  useEffect(() => {
+    if (wasActive.current && !active) {
+      qc.invalidateQueries({ queryKey: ['admin', 'drive-sync', 'files'] })
+    }
+    wasActive.current = active
+  }, [active, qc])
+  return { ...query, run, active }
+}
+
+export function useStartDriveSyncRun() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (fileIds) => adminApi.startDriveSyncRun(fileIds),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'drive-sync', 'run'] }),
+  })
+}

@@ -16,4 +16,7 @@ public interface VideoCache {
     InputStream getChunkStream(String fileId, long start, long end, Callable<byte[]> loader);
 
     void invalidateAllChunks();
+
+    /** Drops every cached chunk of one file, e.g. after the local file was replaced. */
+    void invalidateFile(String fileId);
 }

@@ -147,3 +147,17 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
   - Not verified locally: native SQL on Postgres, real yt-dlp/Drive run → covered by VI-5 E2E
 - [x] **VI-5** Host ops, prod E2E (verified 2026-10-11), security review (2026-10-10), tracking + docs; ADR-0019 Accepted
 
+
+---
+
+## Feature: Admin Drive Force Sync (Drive ↔ local ↔ DB; ADMIN views, SUPER_ADMIN syncs)
+
+**Plan:** `docs/plans/plan-admin-drive-force-sync.md` (Approved 2026-10-11)
+
+- [x] **FS-0** Prod check 2026-10-11: 0 duplicate `(source_type, source_id)` rows in `video_sources` (run by owner) → unique index is safe
+- [x] **FS-1** Unique index migration, `upsertDriveSource`, `DriveFileLocks`, `DriveVideoDownloader` (temp `.part` + atomic move + cache eviction; cron reuses it) + tests — after FS-0
+- [x] **FS-2** `DriveSyncService` (folder listing + states, single in-memory run, folder-membership check, per-file progress) + tests — after FS-1
+- [x] **FS-3** `AdminDriveSyncController` `/admin/drive-sync` (GETs `hasRole('ADMIN')`, `POST /runs` `hasRole('SUPER_ADMIN')`) + permission tests — after FS-2
+- [x] **FS-4** FE tab `DRIVE_SYNC` (all admins view; select/FORCE_SYNC SA only): table + states, select, FORCE_SYNC, polling progress + tests — contract-first
+  - Fix found by test: `@HasPermission` is a meta `@PreAuthorize`, so the SA POST inlines the permission check into one `@PreAuthorize` (two would be a 500)
+- [ ] **FS-5** Prod E2E, `/security-auditor`, tracking + docs — after FS-3, FS-4

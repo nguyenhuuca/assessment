@@ -1,0 +1,164 @@
+import React, { useState } from 'react'
+import { useDriveSyncFiles, useDriveSyncRun, useStartDriveSyncRun } from '../../hooks/useAdmin.js'
+import { useAuth } from '../../hooks/useAuth.js'
+import { isSuperAdmin } from '../../utils/roles.js'
+import { formatTime } from '../../utils/importUtils.js'
+
+const DEFAULT_MAX_BATCH = 50
+const NO_PERMISSION = 'Chỉ SUPER_ADMIN được force sync'
+const RUN_ACTIVE = 'Đang có tiến trình sync chạy'
+
+function formatSize(bytes) {
+  if (bytes === null || bytes === undefined) return '—'
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  let v = bytes
+  let i = 0
+  while (v >= 1024 && i < units.length - 1) { v /= 1024; i++ }
+  return `${i === 0 ? v : v.toFixed(1)} ${units[i]}`
+}
+
+function ItemProgress({ item }) {
+  const total = item.totalBytes || 0
+  const pct = total > 0 ? Math.max(0, Math.min(100, Math.round((item.downloadedBytes / total) * 100))) : 0
+  return (
+    <div>
+      <div className="import-progress" role="progressbar" aria-label={`Tiến độ ${item.name}`}
+        aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
+        <div className="import-progress-fill" style={{ width: `${pct}%` }} />
+      </div>
+      <div className="admin-cell-muted">{pct}% · {formatSize(item.downloadedBytes)} / {formatSize(item.totalBytes)}</div>
+    </div>
+  )
+}
+
+function RunProgress({ run }) {
+  return (
+    <div className="admin-table-wrap">
+      <div className="admin-table-meta">
+        {run.active ? 'ĐANG SYNC' : 'LẦN SYNC GẦN NHẤT'} · bắt đầu {formatTime(run.startedAt)}
+        {run.finishedAt ? ` · kết thúc ${formatTime(run.finishedAt)}` : ''}
+      </div>
+      {(run.items ?? []).map(it => (
+        <div key={it.fileId} className="drive-sync-run-item" data-testid="run-item">
+          <span>{it.name}</span>
+          <span><span className={`admin-badge ${String(it.status).toLowerCase()}`}>{it.status}</span></span>
+          <ItemProgress item={it} />
+          <span className="import-error">{it.errorCode || ''}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export default function DriveSyncPanel() {
+  const { user } = useAuth()
+  const canSync = isSuperAdmin(user?.role)
+  const { data, isLoading } = useDriveSyncFiles()
+  const { run, active } = useDriveSyncRun()
+  const start = useStartDriveSyncRun()
+  const [selected, setSelected] = useState(() => new Set())
+  const [onlyUnsynced, setOnlyUnsynced] = useState(false)
+  const [error, setError] = useState('')
+
+  const payload = data?.data ?? data ?? {}
+  const allFiles = payload.files ?? []
+  const orphans = payload.orphans ?? []
+  const maxBatch = payload.maxBatch ?? DEFAULT_MAX_BATCH
+  const files = onlyUnsynced ? allFiles.filter(f => f.state !== 'SYNCED') : allFiles
+
+  const lockReason = !canSync ? NO_PERMISSION : active ? RUN_ACTIVE : undefined
+  const locked = !canSync || active
+  const atCap = selected.size >= maxBatch
+
+  function toggle(id) {
+    setSelected(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else if (next.size < maxBatch) next.add(id)
+      return next
+    })
+  }
+
+  function selectAllUnsynced() {
+    const ids = allFiles.filter(f => f.state !== 'SYNCED').map(f => f.fileId).slice(0, maxBatch)
+    setSelected(new Set(ids))
+  }
+
+  function forceSync() {
+    const fileIds = [...selected]
+    if (!window.confirm(`Force sync ${fileIds.length} file từ Google Drive? File local sẽ bị thay thế.`)) return
+    setError('')
+    start.mutate(fileIds, {
+      onSuccess: () => setSelected(new Set()),
+      onError: e => setError(e?.message || 'Thao tác thất bại'),
+    })
+  }
+
+  return (
+    <div className="drive-sync-panel">
+      <div className="admin-table-wrap">
+        <div className="drive-sync-toolbar">
+          <label>
+            <input type="checkbox" checked={onlyUnsynced} onChange={e => setOnlyUnsynced(e.target.checked)} />
+            chỉ chưa sync
+          </label>
+          <button className="app-btn secondary" disabled={locked} title={lockReason} onClick={selectAllUnsynced}>
+            chọn tất cả chưa sync
+          </button>
+          <button className="app-btn primary" disabled={locked || selected.size === 0 || start.isPending}
+            title={lockReason} onClick={forceSync}>
+            FORCE_SYNC ({selected.size})
+          </button>
+          <span className="admin-cell-muted">Tối đa {maxBatch} file mỗi lần</span>
+        </div>
+        {error && <div className="app-alert error" role="alert" style={{ margin: '12px 0' }}>{error}</div>}
+        {isLoading ? (
+          <div className="admin-loading"><div className="vid-spinner" /></div>
+        ) : (
+          <>
+            <div className="admin-table-meta">SHOWING {files.length} OF {allFiles.length} FILES</div>
+            <div className="import-scroll">
+              <table className="admin-table">
+                <thead>
+                  <tr><th></th><th>TÊN FILE</th><th>DUNG LƯỢNG</th><th>NGÀY TẠO</th><th>TRẠNG THÁI</th><th>TIÊU ĐỀ (DB)</th></tr>
+                </thead>
+                <tbody>
+                  {files.map(f => (
+                    <tr key={f.fileId} className="admin-table-row">
+                      <td>
+                        <input
+                          type="checkbox"
+                          aria-label={`Chọn ${f.name}`}
+                          checked={selected.has(f.fileId)}
+                          disabled={locked || (atCap && !selected.has(f.fileId))}
+                          title={lockReason}
+                          onChange={() => toggle(f.fileId)}
+                        />
+                      </td>
+                      <td>{f.name}</td>
+                      <td className="admin-cell-muted">{formatSize(f.sizeBytes)}</td>
+                      <td className="admin-cell-muted">{formatTime(f.createdAt)}</td>
+                      <td><span className={`admin-badge ${String(f.state).toLowerCase()}`}>{f.state}</span></td>
+                      <td className="admin-cell-muted">{f.dbTitle || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </div>
+
+      {run && <RunProgress run={run} />}
+
+      {orphans.length > 0 && (
+        <div className="admin-table-wrap">
+          <div className="admin-table-meta">ORPHANS: có trong DB nhưng không có trên Drive ({orphans.length})</div>
+          <ul className="import-line-list">
+            {orphans.map(o => <li key={o.videoSourceId}>{o.title} <span className="admin-cell-muted">({o.sourceId})</span></li>)}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}

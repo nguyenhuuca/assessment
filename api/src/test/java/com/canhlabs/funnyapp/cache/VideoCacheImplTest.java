@@ -189,4 +189,18 @@ class VideoCacheImplTest {
         }
         verify(chunkCache, never()).put(any(), any());
     }
+
+    @Test
+    void invalidateFile_removesOnlyChunksOfThatFile() {
+        java.util.Map<String, byte[]> map = new java.util.concurrent.ConcurrentHashMap<>();
+        map.put("abc_0_99", new byte[]{1});
+        map.put("abc_100_199", new byte[]{2});
+        map.put("abc_x_0_99", new byte[]{3}); // another Drive id that starts with "abc_"
+        map.put("other_0_99", new byte[]{4});
+        when(chunkCache.asMap()).thenReturn(map);
+
+        videoCache.invalidateFile("abc");
+
+        assertThat(map).containsOnlyKeys("abc_x_0_99", "other_0_99");
+    }
 }

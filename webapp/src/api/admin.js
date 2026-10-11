@@ -59,3 +59,8 @@ export const previewImport = (url) => api.post('/admin/video-imports/preview', {
 export const runImportNow  = (id) => api.post(`/admin/video-imports/${id}/run-now`)
 export const cancelImport  = (id) => api.post(`/admin/video-imports/${id}/cancel`)
 export const retryImport   = (id) => api.post(`/admin/video-imports/${id}/retry`)
+
+// Drive force sync — see docs/plans/plan-admin-drive-force-sync.md
+export const getDriveSyncFiles  = () => api.get('/admin/drive-sync/files')
+export const startDriveSyncRun  = (fileIds) => api.post('/admin/drive-sync/runs', { fileIds })
+export const getDriveSyncRun    = () => api.get('/admin/drive-sync/runs/current')

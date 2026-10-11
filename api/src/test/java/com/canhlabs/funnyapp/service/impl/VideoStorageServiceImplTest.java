@@ -1,11 +1,11 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.DriveFileLocks;
 import com.canhlabs.funnyapp.cache.StatsCache;
-import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
-import com.canhlabs.funnyapp.service.FfmpegService;
+import com.canhlabs.funnyapp.service.DriveVideoDownloader;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import com.google.api.services.drive.Drive;
@@ -24,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,7 +35,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -47,8 +45,8 @@ class VideoStorageServiceImplTest {
 
     @Mock StatsCache statsCache;
     @Mock VideoAccessService videoAccessService;
-    @Mock FfmpegService ffmpegService;
-    @Mock AppProperties appProps;
+    @Mock DriveVideoDownloader driveVideoDownloader;
+    DriveFileLocks driveFileLocks = new DriveFileLocks();
     @Mock VideoSourceRepository videoSourceRepository;
     @Mock ChatGptService chatGptService;
     @Mock Drive drive;
@@ -60,8 +58,8 @@ class VideoStorageServiceImplTest {
         service.injectChatGptService(chatGptService);
         service.injectVideoSourceRepository(videoSourceRepository);
         service.injectDrive(drive);
-        service.injectFfmpegService(ffmpegService);
-        service.injectAppProperties(appProps);
+        service.injectDriveVideoDownloader(driveVideoDownloader);
+        service.injectDriveFileLocks(driveFileLocks);
         service.injectVideoAccessService(videoAccessService);
         service.injectCacheStatsService(statsCache);
     }
@@ -202,7 +200,7 @@ class VideoStorageServiceImplTest {
 
         service.downloadFileFromFolder("folder-id", "2025-01-01T00:00:00Z");
 
-        verify(ffmpegService, never()).generateThumbnail(anyString(), anyString());
+        verify(driveVideoDownloader, never()).download(anyString(), any(), any());
     }
 
     // ── cleanup of real files written into CACHE_DIR ────────────────────────────
@@ -261,27 +259,6 @@ class VideoStorageServiceImplTest {
         assertThat(Files.exists(path)).isFalse();
     }
 
-    // ── downloadFile — streams drive content into destination ───────────────────
-
-    @Test
-    void downloadFile_writesDriveContentToDestination(@TempDir Path tempDir) throws IOException {
-        java.io.File dest = tempDir.resolve("out.bin").toFile();
-        Drive.Files driveFiles = mock(Drive.Files.class);
-        Drive.Files.Get getReq = mock(Drive.Files.Get.class);
-
-        when(drive.files()).thenReturn(driveFiles);
-        when(driveFiles.get("file-id")).thenReturn(getReq);
-        doAnswer(inv -> {
-            OutputStream out = inv.getArgument(0);
-            out.write("hello-drive".getBytes(StandardCharsets.UTF_8));
-            return null;
-        }).when(getReq).executeMediaAndDownloadTo(any());
-
-        service.downloadFile("file-id", dest);
-
-        assertThat(Files.readString(dest.toPath())).isEqualTo("hello-drive");
-    }
-
     // ── listFilesInFolder(Drive, folderId) overload — single page ───────────────
 
     @Test
@@ -330,48 +307,77 @@ class VideoStorageServiceImplTest {
 
         service.downloadFileFromFolder("folder-id", "2025-01-01T00:00:00Z");
 
-        // existing local file → no download, no thumbnail, no DB write
-        verify(driveFiles, never()).get(anyString());
-        verify(ffmpegService, never()).generateThumbnail(anyString(), anyString());
+        // existing local file → no download, no DB write
+        verify(driveVideoDownloader, never()).download(anyString(), any(), any());
         verify(videoSourceRepository, never()).save(any());
     }
 
-    // ── downloadFileFromFolder — full happy path (download + thumbnail + save) ───
+    // ── downloadFileFromFolder — new file: shared downloader + save ──────────────
 
-    @Test
-    void downloadFileFromFolder_newFile_downloadsThumbnailsAndSaves() throws IOException {
+    private void stubListing(String id, String name, long size) throws IOException {
         Drive.Files driveFiles = mock(Drive.Files.class);
         Drive.Files.List listRequest = mock(Drive.Files.List.class);
-        Drive.Files.Get getReq = mock(Drive.Files.Get.class);
         FileList fileList = new FileList();
         File f = new File();
-        f.setId("dlfile");
-        f.setName("clip.mp4");
-        f.setSize(5L);
+        f.setId(id);
+        f.setName(name);
+        f.setSize(size);
         fileList.setFiles(List.of(f));
-
         when(drive.files()).thenReturn(driveFiles);
         when(driveFiles.list()).thenReturn(listRequest);
         when(listRequest.setQ(anyString())).thenReturn(listRequest);
         when(listRequest.setFields(anyString())).thenReturn(listRequest);
         when(listRequest.execute()).thenReturn(fileList);
-        when(driveFiles.get("dlfile")).thenReturn(getReq);
-        doAnswer(inv -> {
-            OutputStream out = inv.getArgument(0);
-            out.write("video".getBytes(StandardCharsets.UTF_8));
-            return null;
-        }).when(getReq).executeMediaAndDownloadTo(any());
-        when(appProps.getImageStoragePath()).thenReturn("images");
-        when(appProps.getImageUrl()).thenReturn("http://img.example.com");
+    }
+
+    @Test
+    void downloadFileFromFolder_newFile_downloadsAndSaves() throws IOException {
+        stubListing("dlfile", "clip.mp4", 5L);
+        when(driveVideoDownloader.download(eq("dlfile"), eq(5L), any())).thenReturn("http://img.example.com/dlfile.jpg");
         when(videoSourceRepository.existsBySourceId("dlfile")).thenReturn(false);
 
         service.downloadFileFromFolder("folder-id", "2025-01-01T00:00:00Z");
 
-        assertThat(Files.exists(cachePath("dlfile"))).isTrue();
-        verify(ffmpegService).generateThumbnail(anyString(), eq(Paths.get("images/thumbnails", "dlfile.jpg").toString()));
         ArgumentCaptor<VideoSource> captor = ArgumentCaptor.forClass(VideoSource.class);
         verify(videoSourceRepository).save(captor.capture());
         assertThat(captor.getValue().getSourceId()).isEqualTo("dlfile");
         assertThat(captor.getValue().getTitle()).isEqualTo("clip");
+        assertThat(captor.getValue().getThumbnailPath()).isEqualTo("http://img.example.com/dlfile.jpg");
+        assertThat(driveFileLocks.isHeld("dlfile")).isFalse();
+    }
+
+    @Test
+    void downloadFileFromFolder_fileHeldByForceSync_skips() throws IOException {
+        stubListing("dlfile", "clip.mp4", 5L);
+        driveFileLocks.tryClaim("dlfile");
+
+        service.downloadFileFromFolder("folder-id", "2025-01-01T00:00:00Z");
+
+        verify(driveVideoDownloader, never()).download(anyString(), any(), any());
+        verify(videoSourceRepository, never()).save(any());
+        assertThat(driveFileLocks.isHeld("dlfile")).isTrue(); // still owned by the force sync
+    }
+
+    // ── upsertInfo ───────────────────────────────────────────────────────────────
+
+    @Test
+    void upsertInfo_rowWithDescription_keepsItWithoutChatGpt() {
+        when(videoSourceRepository.findBySourceId("f1"))
+                .thenReturn(java.util.Optional.of(VideoSource.builder().sourceId("f1").desc("old poem").build()));
+
+        service.upsertInfo("f1", "Title", "thumb");
+
+        verify(chatGptService, never()).makePoem(anyString());
+        verify(videoSourceRepository).upsertDriveSource(any(), eq("f1"), eq("Title"), eq(null), eq("thumb"));
+    }
+
+    @Test
+    void upsertInfo_newRow_generatesDescription() {
+        when(videoSourceRepository.findBySourceId("f2")).thenReturn(java.util.Optional.empty());
+        when(chatGptService.makePoem("Title")).thenReturn("A poem");
+
+        service.upsertInfo("f2", "Title", "thumb");
+
+        verify(videoSourceRepository).upsertDriveSource(any(), eq("f2"), eq("Title"), eq("A poem"), eq("thumb"));
     }
 }

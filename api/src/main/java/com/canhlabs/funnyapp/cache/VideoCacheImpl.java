@@ -11,6 +11,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 @Component
 @Slf4j
@@ -87,6 +88,16 @@ public class VideoCacheImpl implements VideoCache {
             log.error("❌ Failed to load chunk {} ({} - {})", fileId, start, end, e);
             throw new RuntimeException("Failed to load chunk for: " + key, e);
         }
+    }
+
+    @Override
+    public void invalidateFile(String fileId) {
+        // keys are fileId_start_end; Drive ids may contain '_', so also check the numeric tail
+        String prefix = fileId + "_";
+        Predicate<String> ofFile =
+                k -> k.startsWith(prefix) && k.substring(prefix.length()).matches("\\d+_\\d+");
+        chunkCache.asMap().keySet().removeIf(ofFile);
+        accessCounter.keySet().removeIf(ofFile);
     }
 
     @Override

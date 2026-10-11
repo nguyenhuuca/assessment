@@ -1,11 +1,11 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.DriveFileLocks;
 import com.canhlabs.funnyapp.cache.StatsCache;
-import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
-import com.canhlabs.funnyapp.service.FfmpegService;
+import com.canhlabs.funnyapp.service.DriveVideoDownloader;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.utils.AppConstant;
@@ -20,10 +20,8 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,8 +41,8 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     public static final String EXTENSION = ".full";
     private StatsCache statsCache;
     private VideoAccessService videoAccessService;
-    private FfmpegService ffmpegService;
-    private AppProperties appProps;
+    private DriveVideoDownloader driveVideoDownloader;
+    private DriveFileLocks driveFileLocks;
     private Drive drive;
     private VideoSourceRepository videoSourceRepository;
     private ChatGptService chatGptService;
@@ -65,13 +63,13 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     }
 
     @Autowired
-    public void injectFfmpegService(FfmpegService ffmpegService) {
-        this.ffmpegService = ffmpegService;
+    public void injectDriveVideoDownloader(DriveVideoDownloader driveVideoDownloader) {
+        this.driveVideoDownloader = driveVideoDownloader;
     }
 
     @Autowired
-    public void injectAppProperties(AppProperties appProps) {
-        this.appProps = appProps;
+    public void injectDriveFileLocks(DriveFileLocks driveFileLocks) {
+        this.driveFileLocks = driveFileLocks;
     }
 
 
@@ -128,16 +126,18 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                         log.info("File already exists: {}, skipping", file.getName());
                         return null;
                     }
-
-                    log.info("Downloading {} ({} bytes)", file.getName(), file.getSize());
-                    downloadFile(file.getId(), localFile);
-                    log.info("Downloaded file {} completely", file.getName());
-                    // Generate thumbnail
-                    String imageName = file.getId().concat(".jpg");
-                    String thumbnailPath = Paths.get(appProps.getImageStoragePath().concat("/thumbnails"), imageName).toString();
-                    ffmpegService.generateThumbnail(localFile.getAbsolutePath(), thumbnailPath);
-                    // update info in database
-                    saveInfo(file.getId(), file.getName().replaceFirst("[.][^.]+$", ""), appProps.getImageUrl().concat("/") + imageName);
+                    if (!driveFileLocks.tryClaim(file.getId())) {
+                        log.info("File {} is being synced by an admin force sync, skipping", file.getName());
+                        return null;
+                    }
+                    try {
+                        log.info("Downloading {} ({} bytes)", file.getName(), file.getSize());
+                        String thumbnailUrl = driveVideoDownloader.download(file.getId(), file.getSize(), bytes -> { });
+                        log.info("Downloaded file {} completely", file.getName());
+                        saveInfo(file.getId(), DriveVideoDownloader.titleOf(file.getName()), thumbnailUrl);
+                    } finally {
+                        driveFileLocks.release(file.getId());
+                    }
                     return null;
                 });
             }
@@ -169,13 +169,6 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 .setFields("files(id, name, size, createdTime)")
                 .execute()
                 .getFiles();
-    }
-
-    @WithSpan
-    void downloadFile(String fileId, java.io.File destination) throws IOException {
-        try (OutputStream out = new FileOutputStream(destination)) {
-            drive.files().get(fileId).executeMediaAndDownloadTo(out);
-        }
     }
 
     @WithSpan
@@ -220,6 +213,19 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 entity.getThumbnailPath(), entity.getStatus(), entity.getPriority(), entity.isHide());
         videoSourceRepository.save(entity);
         log.info("Saved video source id={} videoId={} for Drive file {}", entity.getId(), entity.getVideoId(), fileId);
+    }
+
+    @WithSpan
+    @Override
+    public void upsertInfo(String fileId, String title, String thumbnailPath) {
+        // poem only for a new row or one still without description; the upsert keeps an existing one
+        boolean hasDesc = videoSourceRepository.findBySourceId(fileId)
+                .map(VideoSource::getDesc)
+                .filter(d -> !d.isBlank())
+                .isPresent();
+        String desc = hasDesc ? null : makeDesc(title);
+        videoSourceRepository.upsertDriveSource(System.nanoTime(), fileId, title, desc, thumbnailPath);
+        log.info("Upserted video source for Drive file {} (title: {})", fileId, title);
     }
 
     /** The poem is optional: an OpenAI failure (e.g. 429 out of credits) must not stop the video from being saved. */
