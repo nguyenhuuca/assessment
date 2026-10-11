@@ -9,6 +9,7 @@ const CATEGORIES = [
 
 const SORT_OPTIONS = [
   { key: 'popular', label: 'Most Liked' },
+  { key: 'views',   label: 'Most Viewed' },
   { key: 'recent',  label: 'Recently Added' },
 ]
 
@@ -19,42 +20,34 @@ function getThumbnail(video) {
     : video.poster || ''
 }
 
-function ThumbFallback() {
-  return (
-    <div className="explore-thumb-fallback">
-      <span className="material-symbols-outlined" style={{ fontSize: 36 }}>movie</span>
-    </div>
-  )
+const compactCount = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
+
+function formatViews(n) {
+  return compactCount.format(n || 0)
 }
 
-function VideoCard({ video, onClick, size = 'bottom' }) {
+function ReelTile({ video, onClick }) {
   const thumb = getThumbnail(video)
+  const title = video.title || 'Untitled'
   return (
     <div
-      className={`explore-card explore-card-${size}`}
+      className="explore-reel"
       onClick={onClick}
       role="button"
       tabIndex={0}
+      title={title}
+      aria-label={`${title}, ${formatViews(video.viewCount)} views`}
       onKeyDown={e => e.key === 'Enter' && onClick?.()}
     >
-      <div className="explore-card-thumb">
-        {thumb
-          ? <img src={thumb} alt={video.title || 'Video'} className="explore-card-img" loading="lazy" />
-          : <ThumbFallback />
-        }
-        <div className="explore-card-play-overlay">
-          <div className="explore-card-play-btn">
-            <span className="material-symbols-outlined" style={{ fontSize: 32, fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-          </div>
-        </div>
-      </div>
-      <div className="explore-card-info">
-        <h4 className="explore-card-title">{video.title || 'Untitled'}</h4>
-        <p className="explore-card-meta">
-          @{video.userShared?.split('@')[0] || 'anonymous'}
-          {video.upvotes > 0 && <> · <span style={{ color: 'var(--accent-cyan)' }}>{video.upvotes.toLocaleString()} likes</span></>}
-        </p>
-      </div>
+      {thumb
+        ? <img src={thumb} alt="" className="explore-reel-img" loading="lazy" />
+        : <div className="explore-reel-fallback"><span className="material-symbols-outlined" style={{ fontSize: 36 }}>movie</span></div>
+      }
+      <div className="explore-reel-scrim" />
+      <span className="explore-reel-views">
+        <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>visibility</span>
+        {formatViews(video.viewCount)}
+      </span>
     </div>
   )
 }
@@ -69,6 +62,7 @@ export default function ExploreView({ onNavigateToVideo }) {
       ? allVideos
       : allVideos.filter(v => v.category === activeCategory)
     if (sortBy === 'recent') return [...list].sort((a, b) => b.id - a.id)
+    if (sortBy === 'views')  return [...list].sort((a, b) => b.viewCount - a.viewCount)
     return [...list].sort((a, b) => b.upvotes - a.upvotes)
   }, [allVideos, activeCategory, sortBy])
 
@@ -87,11 +81,7 @@ export default function ExploreView({ onNavigateToVideo }) {
   }
 
   const heroVideo   = filteredVideos[0] || null
-  const gridVideos  = filteredVideos.slice(1)
-  const largeCard   = gridVideos[0]
-  const stackCards  = gridVideos.slice(1, 3)
-  const bottomCards = gridVideos.slice(3, 6)
-  const moreCards   = gridVideos.slice(6)
+  const reelVideos  = filteredVideos.slice(1)
   const heroThumb   = getThumbnail(heroVideo)
 
   return (
@@ -175,65 +165,12 @@ export default function ExploreView({ onNavigateToVideo }) {
           <h2 className="explore-section-title explore-section-title-xl">RECOMMENDED FOR YOU</h2>
         </div>
 
-        {filteredVideos.length <= 1 ? (
+        {reelVideos.length === 0 ? (
           <p className="explore-empty-grid">No videos in this category</p>
         ) : (
-          <div className="explore-bento">
-            {/* Large feature card */}
-            {largeCard && (
-              <div
-                className="explore-card explore-card-large"
-                onClick={() => navigateTo(largeCard)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={e => e.key === 'Enter' && navigateTo(largeCard)}
-              >
-                <div className="explore-card-thumb">
-                  {getThumbnail(largeCard)
-                    ? <img src={getThumbnail(largeCard)} alt={largeCard.title || 'Video'} className="explore-card-img" loading="lazy" />
-                    : <ThumbFallback />
-                  }
-                  <div className="explore-card-play-overlay">
-                    <div className="explore-card-play-btn">
-                      <span className="material-symbols-outlined" style={{ fontSize: 40, fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="explore-card-info explore-card-info-large">
-                  <h3 className="explore-card-title explore-card-title-lg">{largeCard.title || 'Untitled'}</h3>
-                  <div className="explore-card-meta">
-                    <span>@{largeCard.userShared?.split('@')[0] || 'anonymous'}</span>
-                    {largeCard.upvotes > 0 && (
-                      <><span className="explore-meta-dot" /><span style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>{largeCard.upvotes.toLocaleString()} likes</span></>
-                    )}
-                    <span className="explore-meta-dot" />
-                    <span>{largeCard.category}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Stacked small cards */}
-            {stackCards.length > 0 && (
-              <div className="explore-bento-stack">
-                {stackCards.map(v => (
-                  <VideoCard key={v.id} video={v} size="small" onClick={() => navigateTo(v)} />
-                ))}
-              </div>
-            )}
-
-            {/* Bottom row */}
-            {bottomCards.map(v => (
-              <VideoCard key={v.id} video={v} size="bottom" onClick={() => navigateTo(v)} />
-            ))}
-          </div>
-        )}
-
-        {/* Extra cards */}
-        {moreCards.length > 0 && (
-          <div className="explore-more-grid">
-            {moreCards.map(v => (
-              <VideoCard key={v.id} video={v} size="bottom" onClick={() => navigateTo(v)} />
+          <div className="explore-reels-grid">
+            {reelVideos.map(v => (
+              <ReelTile key={v.id} video={v} onClick={() => navigateTo(v)} />
             ))}
           </div>
         )}

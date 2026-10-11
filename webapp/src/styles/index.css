@@ -1250,71 +1250,34 @@ body {
   text-transform: uppercase;
 }
 
-/* ── Bento Grid ── */
-.explore-bento {
+/* ── Reels Grid (portrait 9:16 tiles, view count bottom-left) ── */
+.explore-reels-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
 }
 
-.explore-card {
+.explore-reel {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
   cursor: pointer;
   outline: none;
 }
+.explore-reel:focus-visible { box-shadow: 0 0 0 2px var(--accent-cyan); }
 
-.explore-card:focus-visible .explore-card-thumb {
-  outline: 2px solid var(--accent-cyan);
-  outline-offset: 2px;
-}
-
-.explore-card-large {
-  grid-column: span 2;
-}
-
-.explore-bento-stack {
-  grid-column: span 1;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.explore-card-small {
-  flex: 1;
-}
-
-.explore-card-bottom {
-  /* 1/3 width by default in grid */
-}
-
-.explore-more-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-top: 20px;
-}
-
-/* ── Card Thumb ── */
-.explore-card-thumb {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--bg-elevated);
-  margin-bottom: 12px;
-}
-
-.explore-card-img {
+.explore-reel-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.65s ease;
+  transition: transform 0.35s ease;
 }
+.explore-reel:hover .explore-reel-img { transform: scale(1.04); }
 
-.explore-card:hover .explore-card-img { transform: scale(1.05); }
-
-.explore-thumb-fallback {
+.explore-reel-fallback {
   width: 100%;
   height: 100%;
   display: flex;
@@ -1323,78 +1286,27 @@ body {
   color: var(--text-muted);
 }
 
-.explore-card-play-overlay {
+/* Bottom scrim keeps the counter readable on bright thumbnails, in both themes */
+.explore-reel-scrim {
   position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
+  inset: auto 0 0 0;
+  height: 38%;
+  background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.explore-reel-views {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity var(--transition);
-}
-
-.explore-card:hover .explore-card-play-overlay { opacity: 1; }
-
-.explore-card-play-btn {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ff8d89 0%, #c10023 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  transform: scale(0.78);
-  transition: transform var(--transition);
-}
-
-.explore-card:hover .explore-card-play-btn { transform: scale(1); }
-
-/* ── Card Info ── */
-.explore-card-info {
-  padding: 0 2px;
-}
-
-.explore-card-info-large {
-  padding: 0;
-}
-
-.explore-card-title {
-  font-size: 13px;
+  gap: 5px;
+  color: #ffffff;
+  font-size: 14px;
   font-weight: 700;
-  color: var(--text);
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  transition: color var(--transition);
-}
-
-.explore-card:hover .explore-card-title { color: var(--primary); }
-
-.explore-card-title-lg {
-  font-size: 18px;
-}
-
-.explore-card-meta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 5px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.explore-meta-dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  display: inline-block;
-  flex-shrink: 0;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  pointer-events: none;
 }
 
 /* ── Floating Filter Bar ── */
@@ -1456,16 +1368,6 @@ body {
 .explore-filter-opt.active { color: var(--text); font-weight: 700; }
 
 /* ── Responsive ── */
-@media (max-width: 1024px) {
-  .explore-bento,
-  .explore-more-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .explore-card-large   { grid-column: span 2; }
-  .explore-bento-stack  { grid-column: span 2; flex-direction: row; }
-  .explore-card-bottom  { grid-column: span 1; }
-}
-
 @media (max-width: 768px) {
   .explore-hero { height: 340px; }
 
@@ -1473,13 +1375,8 @@ body {
 
   .explore-section { padding: 24px 16px 0; }
 
-  .explore-bento,
-  .explore-more-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .explore-card-large  { grid-column: span 1; }
-  .explore-bento-stack { grid-column: span 1; flex-direction: column; }
+  .explore-reels-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+  .explore-reel-views { font-size: 12px; left: 8px; bottom: 8px; }
 
   .explore-filter-bar {
     bottom: 76px; /* above mobile nav */

@@ -148,7 +148,7 @@ class StreamVideoServiceImplTest {
     @Test
     void getVideosToStream_returnsMappedDtos() {
         VideoSource source = VideoSource.builder()
-                .id(1L).sourceId("src1").title("My Title").desc("My Desc").build();
+                .id(1L).sourceId("src1").title("My Title").desc("My Desc").viewCount(42L).build();
         when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
                 .thenReturn(List.of(source));
 
@@ -160,6 +160,7 @@ class StreamVideoServiceImplTest {
         assertEquals("src1", dto.getFileId());
         assertEquals("My Title", dto.getTitle());
         assertEquals("My Desc", dto.getDesc());
+        assertEquals(42L, dto.getViewCount());
         assertEquals(1L, dto.getId());
     }
 

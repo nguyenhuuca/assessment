@@ -116,6 +116,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         dto.setUserShared("unknown"); // set nếu có user info
         dto.setTitle(source.getTitle());
         dto.setDesc(source.getDesc());
+        dto.setViewCount(source.getViewCount());
         dto.setUrlLink("https://canh-labs.com/api/v1/funny-app/video-stream/stream/" + source.getSourceId());
         dto.setEmbedLink("https://canh-labs.com/api/v1/funny-app/video-stream/stream/" + source.getSourceId());
         return dto;

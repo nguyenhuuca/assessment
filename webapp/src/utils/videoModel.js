@@ -29,6 +29,7 @@ export function mapApiVideo(raw) {
     desc: raw.desc || raw.description || '',
     upvotes: raw.upvotes || 0,
     downvotes: raw.downvotes || 0,
+    viewCount: raw.viewCount || 0,
     isPrivate: raw.isPrivate || raw.is_private || false,
     fileId: raw.fileId || raw.file_id || null,
     category: determineCategory(raw.title, raw.desc || raw.description),
