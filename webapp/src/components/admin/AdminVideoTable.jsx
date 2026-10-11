@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useDeleteVideo } from '../../hooks/useAdmin.js'
+import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useUpdateVideoVisibility, useDeleteVideo } from '../../hooks/useAdmin.js'
 
 const STATUS_COLORS = {
   PUBLISHED: '#00c853',
@@ -55,6 +55,7 @@ export default function AdminVideoTable({ statusFilter }) {
   const { data, isLoading } = useAdminVideos(page, statusFilter)
   const updateStatus   = useUpdateVideoStatus()
   const updatePriority = useUpdateVideoPriority()
+  const updateVisibility = useUpdateVideoVisibility()
   const deleteVideo    = useDeleteVideo()
 
   const pageData      = data?.data ?? data ?? {}
@@ -88,6 +89,7 @@ export default function AdminVideoTable({ statusFilter }) {
             <th>ASSET</th>
             <th>CREATOR</th>
             <th>STATUS</th>
+            <th title="Ẩn video khỏi feed công khai">HIDDEN</th>
             <th>PRIORITY</th>
             <th>METRICS</th>
             <th>ACTIONS</th>
@@ -95,7 +97,7 @@ export default function AdminVideoTable({ statusFilter }) {
         </thead>
         <tbody>
           {videos.map(v => (
-            <tr key={v.id} className="admin-table-row">
+            <tr key={v.id} className={`admin-table-row${v.hidden ? ' is-hidden' : ''}`}>
               <td>
                 <div className="admin-asset-cell">
                   {v.thumbnailPath && (
@@ -116,6 +118,27 @@ export default function AdminVideoTable({ statusFilter }) {
                 >
                   {v.status}
                 </span>
+              </td>
+              <td>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <label title={v.hidden ? 'Đang ẩn khỏi feed' : 'Đang hiện trên feed'}>
+                    <input
+                      type="checkbox"
+                      className="admin-hide-toggle"
+                      aria-label={`Ẩn ${v.title || 'video'}`}
+                      checked={!!v.hidden}
+                      onChange={e => {
+                        const key = `${v.id}:hidden`
+                        markSaving(key)
+                        updateVisibility.mutate({ id: v.id, hidden: e.target.checked }, {
+                          onSuccess: () => markResult(key, true),
+                          onError: () => markResult(key, false),
+                        })
+                      }}
+                    />
+                  </label>
+                  <SaveIndicator state={saveState[`${v.id}:hidden`]} />
+                </div>
               </td>
               <td>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

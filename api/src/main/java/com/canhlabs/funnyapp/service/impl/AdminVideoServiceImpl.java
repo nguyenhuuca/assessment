@@ -65,6 +65,14 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     }
 
     @Override
+    public void updateHidden(Long id, boolean hidden) {
+        VideoSource source = videoSourceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
+        source.setHide(hidden);
+        videoSourceRepository.save(source);
+    }
+
+    @Override
     public void deleteVideo(Long id) {
         videoSourceRepository.deleteById(id);
     }
@@ -91,6 +99,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .title(v.getTitle())
                 .thumbnailPath(v.getThumbnailPath())
                 .status(v.getStatus())
+                .hidden(v.isHide())
                 .viewCount(v.getViewCount())
                 .priority(v.getPriority())
                 .createdAt(v.getCreatedAt())

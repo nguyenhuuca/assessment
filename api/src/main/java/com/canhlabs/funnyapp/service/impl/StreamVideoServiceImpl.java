@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.streaming.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
@@ -72,7 +73,8 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @WithSpan
     @Override
     public List<VideoDto> getVideosToStream() {
-        return videoSourceRepository.findAllByIsHideOrderByPriorityDescCreatedAtDesc(Boolean.FALSE).stream()
+        return videoSourceRepository
+                .findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED).stream()
                 .map(this::toDto)
                 .toList();
     }
@@ -80,7 +82,9 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @WithSpan
     @Override
     public VideoDto getVideoById(Long id) {
+        // hidden / PENDING / FLAGGED videos answer exactly like a missing one (deep links included)
         VideoSource source = videoSourceRepository.findById(id)
+                .filter(v -> !v.isHide() && v.getStatus() == VideoStatus.PUBLISHED)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found with id: " + id));
         return toDto(source);
     }

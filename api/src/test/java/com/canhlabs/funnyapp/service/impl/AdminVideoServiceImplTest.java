@@ -106,6 +106,27 @@ class AdminVideoServiceImplTest {
         verify(videoSourceRepository, never()).save(any());
     }
 
+    // ── updateHidden ──────────────────────────────────────────────────────────
+
+    @Test
+    void updateHidden_videoFound_setsFlagAndSaves() {
+        VideoSource source = videoSource(5L, "Title", null, VideoStatus.PUBLISHED);
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        service.updateHidden(5L, true);
+
+        assertTrue(source.isHide());
+        verify(videoSourceRepository).save(source);
+    }
+
+    @Test
+    void updateHidden_videoNotFound_throwsIllegalArgumentException() {
+        when(videoSourceRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> service.updateHidden(99L, true));
+        verify(videoSourceRepository, never()).save(any());
+    }
+
     // ── updatePriority ────────────────────────────────────────────────────────
 
     @Test

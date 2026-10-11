@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.streaming.StreamChunkResult;
@@ -134,7 +135,7 @@ class StreamVideoServiceImplTest {
     void getVideosToStream_ordersByPriorityThenCreatedAtDesc() {
         VideoSource high = VideoSource.builder().id(1L).sourceId("hi").title("High Priority").priority(100).build();
         VideoSource low = VideoSource.builder().id(2L).sourceId("lo").title("Low Priority").priority(0).build();
-        when(videoSourceRepository.findAllByIsHideOrderByPriorityDescCreatedAtDesc(Boolean.FALSE))
+        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
                 .thenReturn(List.of(high, low));
 
         List<VideoDto> videos = streamVideoService.getVideosToStream();
@@ -148,7 +149,7 @@ class StreamVideoServiceImplTest {
     void getVideosToStream_returnsMappedDtos() {
         VideoSource source = VideoSource.builder()
                 .id(1L).sourceId("src1").title("My Title").desc("My Desc").build();
-        when(videoSourceRepository.findAllByIsHideOrderByPriorityDescCreatedAtDesc(Boolean.FALSE))
+        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
                 .thenReturn(List.of(source));
 
         List<VideoDto> videos = streamVideoService.getVideosToStream();
@@ -164,7 +165,7 @@ class StreamVideoServiceImplTest {
 
     @Test
     void getVideosToStream_returnsEmptyListWhenNoVideos() {
-        when(videoSourceRepository.findAllByIsHideOrderByPriorityDescCreatedAtDesc(Boolean.FALSE))
+        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
                 .thenReturn(Collections.emptyList());
 
         List<VideoDto> videos = streamVideoService.getVideosToStream();
@@ -188,6 +189,24 @@ class StreamVideoServiceImplTest {
         assertNotNull(dto);
         assertEquals("src1", dto.getFileId());
         assertEquals(1L, dto.getId());
+    }
+
+    @Test
+    void getVideoById_hiddenVideo_answersLikeNotFound() {
+        VideoSource source = VideoSource.builder().id(1L).sourceId("src1").isHide(true).build();
+        when(videoSourceRepository.findById(1L)).thenReturn(Optional.of(source));
+
+        assertThrows(IllegalArgumentException.class, () -> streamVideoService.getVideoById(1L));
+    }
+
+    @Test
+    void getVideoById_flaggedOrPendingVideo_answersLikeNotFound() {
+        for (VideoStatus status : List.of(VideoStatus.FLAGGED, VideoStatus.PENDING)) {
+            VideoSource source = VideoSource.builder().id(1L).sourceId("src1").status(status).build();
+            when(videoSourceRepository.findById(1L)).thenReturn(Optional.of(source));
+
+            assertThrows(IllegalArgumentException.class, () -> streamVideoService.getVideoById(1L), status.name());
+        }
     }
 
     @Test

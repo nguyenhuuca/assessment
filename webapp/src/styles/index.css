@@ -1563,6 +1563,9 @@ body {
   .admin-tab-select option { color: var(--text); background: var(--bg-surface); }
 }
 
+.admin-hide-toggle { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; vertical-align: middle; }
+.admin-table-row.is-hidden .admin-asset-cell { opacity: 0.45; }
+
 .admin-refresh-btn {
   margin-left: auto;
   align-self: center;

@@ -10,6 +10,7 @@ public interface AdminVideoService {
     Page<AdminVideoDto> getVideos(Pageable pageable, VideoStatus status);
     void updateStatus(Long id, VideoStatus status);
     void updatePriority(Long id, int priority);
+    void updateHidden(Long id, boolean hidden);
     void deleteVideo(Long id);
     AdminStatsDto getStats();
 }

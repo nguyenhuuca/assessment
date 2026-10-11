@@ -111,6 +111,25 @@ class AdminControllerTest {
         verify(adminVideoService).updatePriority(1L, 50);
     }
 
+    // ── PATCH /videos/{id}/visibility ─────────────────────────────────────────
+
+    @Test
+    void updateVideoVisibility_hide_returnsOk() {
+        doNothing().when(adminVideoService).updateHidden(1L, true);
+
+        ResponseEntity<ResultObjectInfo<String>> response =
+                controller.updateVideoVisibility(1L, Map.of("hidden", true));
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(adminVideoService).updateHidden(1L, true);
+    }
+
+    @Test
+    void updateVideoVisibility_missingFlag_throwsAndSkipsService() {
+        assertThrows(RuntimeException.class, () -> controller.updateVideoVisibility(1L, Map.of()));
+        verifyNoInteractions(adminVideoService);
+    }
+
     // ── DELETE /videos/{id} ────────────────────────────────────────────────────
 
     @Test

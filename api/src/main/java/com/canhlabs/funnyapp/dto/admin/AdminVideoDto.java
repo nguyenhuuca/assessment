@@ -20,6 +20,7 @@ public class AdminVideoDto {
     private String thumbnailPath;
     private String creatorEmail;
     private VideoStatus status;
+    private boolean hidden;
     private Long viewCount;
     private Integer priority;
     private Instant createdAt;

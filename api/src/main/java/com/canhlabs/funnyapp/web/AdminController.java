@@ -19,6 +19,7 @@ import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.utils.Contract;
 import com.canhlabs.funnyapp.service.AdminAccountService;
 import com.canhlabs.funnyapp.service.AdminVideoService;
 import com.canhlabs.funnyapp.utils.AppConstant;
@@ -99,6 +100,19 @@ public class AdminController {
         return ResponseEntity.ok(ResultObjectInfo.<String>builder()
                 .status(ResultStatus.SUCCESS)
                 .message("Priority updated")
+                .build());
+    }
+
+    @PatchMapping("/videos/{id}/visibility")
+    @AuditLog("updateVideoVisibility")
+    public ResponseEntity<ResultObjectInfo<String>> updateVideoVisibility(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> body) {
+        Contract.require(body != null && body.get("hidden") != null, "hidden is required");
+        adminVideoService.updateHidden(id, body.get("hidden"));
+        return ResponseEntity.ok(ResultObjectInfo.<String>builder()
+                .status(ResultStatus.SUCCESS)
+                .message("Visibility updated")
                 .build());
     }
 

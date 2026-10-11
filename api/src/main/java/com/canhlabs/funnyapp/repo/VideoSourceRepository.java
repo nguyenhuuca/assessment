@@ -26,12 +26,13 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
     @Query("select v.sourceId from VideoSource v where v.sourceId in :ids")
     List<String> findSourceIdsIn(@Param("ids") Collection<String> ids);
 
-    boolean existsByIdAndIsHide(Long id, boolean isHide);
+    /** Public visibility: not hidden by admin and moderation status PUBLISHED. */
+    boolean existsByIdAndIsHideAndStatus(Long id, boolean isHide, VideoStatus status);
 
     Optional<VideoSource> findBySourceId(String sourceId);
     List<VideoSource> findAllByOrderByCreatedAtDesc();
     List<VideoSource> findAllByDescIsNullOrDesc(String desc);
-    List<VideoSource> findAllByIsHideOrderByPriorityDescCreatedAtDesc(boolean hide);
+    List<VideoSource> findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(boolean hide, VideoStatus status);
 
     Page<VideoSource> findAllByStatus(VideoStatus status, Pageable pageable);
 

@@ -40,6 +40,14 @@ export function useUpdateVideoPriority() {
   })
 }
 
+export function useUpdateVideoVisibility() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, hidden }) => adminApi.updateVideoVisibility(id, hidden),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'videos'] }),
+  })
+}
+
 export function useDeleteVideo() {
   const qc = useQueryClient()
   return useMutation({

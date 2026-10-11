@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.dto.reaction.ReactionSummaryDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.enums.ReactionType;
+import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.VideoReactionRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
@@ -59,7 +60,7 @@ public class VideoReactionServiceImpl implements VideoReactionService {
     }
 
     private void requireVideo(Long videoId) {
-        if (videoId == null || !videoSourceRepository.existsByIdAndIsHide(videoId, false)) {
+        if (videoId == null || !videoSourceRepository.existsByIdAndIsHideAndStatus(videoId, false, VideoStatus.PUBLISHED)) {
             throw CustomException.builder()
                     .status(HttpStatus.NOT_FOUND)
                     .subCode(404)
