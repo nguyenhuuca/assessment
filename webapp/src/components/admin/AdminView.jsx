@@ -73,6 +73,15 @@ export default function AdminView() {
       </div>
 
       <div className="admin-tabs">
+        {/* Narrow screens: the tab row collapses into this menu (see .admin-tab-select in index.css) */}
+        <select
+          className="admin-tab-select"
+          aria-label="Admin section"
+          value={activeTab}
+          onChange={e => setActiveTab(e.target.value)}
+        >
+          {TABS.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
+        </select>
         {TABS.map(t => (
           <button
             key={t.key}

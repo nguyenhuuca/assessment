@@ -28,9 +28,16 @@ describe('AdminView refresh', () => {
 
   it('targets the tab that is currently open', () => {
     const spy = renderView()
-    fireEvent.click(screen.getByText('DRIVE_SYNC'))
+    fireEvent.click(screen.getByRole('button', { name: 'DRIVE_SYNC' }))
     fireEvent.click(screen.getByLabelText('Refresh'))
     expect(spy).toHaveBeenCalledWith({ queryKey: ['admin', 'drive-sync'] })
     expect(spy).not.toHaveBeenCalledWith({ queryKey: ['admin', 'videos'] })
+  })
+
+  it('the compact menu switches tabs too', () => {
+    renderView()
+    fireEvent.change(screen.getByLabelText('Admin section'), { target: { value: 'COMMENTS' } })
+    expect(screen.getByText('comments')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'COMMENTS' })).toHaveClass('active')
   })
 })
