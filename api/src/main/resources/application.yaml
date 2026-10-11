@@ -158,7 +158,7 @@ cache:
 
 logging:
   masking:
-    fields: [password, currentPassword, newPassword, token, secret, otp, apiKey, api_key, gptKey, gpt_key, googleApiKey, google_api_key, jwt, confirmation]
+    fields: [password, currentPassword, newPassword, token, secret, otp, apiKey, api_key, gptKey, gpt_key, googleApiKey, google_api_key, jwt, sessionToken, guestToken, accessToken, refreshToken, authorization, mfaSecret, confirmation]
 
 
 

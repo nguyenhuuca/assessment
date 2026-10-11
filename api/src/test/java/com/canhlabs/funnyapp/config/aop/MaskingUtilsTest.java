@@ -40,6 +40,35 @@ class MaskingUtilsTest {
     }
 
     @Test
+    void toJsonSafe_masksNestedSensitiveKeysAtAnyDepth() {
+        when(maskingProperties.getFields()).thenReturn(List.of("jwt", "sessionToken"));
+        var user = new java.util.LinkedHashMap<String, Object>();
+        user.put("email", "a@test.com");
+        user.put("jwt", "eyJ.secret.sig");
+        var body = java.util.Map.of("data", user, "items", List.of(java.util.Map.of("SessionToken", "s3cr3t")));
+        var response = org.springframework.http.ResponseEntity.ok(body);
+
+        String json = maskingUtils.toJsonSafe(response);
+
+        assertThat(json).doesNotContain("eyJ.secret.sig").doesNotContain("s3cr3t")
+                .contains("\"jwt\":\"***MASKED***\"")
+                .contains("\"SessionToken\":\"***MASKED***\"")
+                .contains("a@test.com");
+    }
+
+    @Test
+    void toJsonSafe_keepsNullSensitiveValuesAndNeverFallsBackToToString() {
+        when(maskingProperties.getFields()).thenReturn(List.of("jwt"));
+        assertThat(maskingUtils.toJsonSafe(java.util.Collections.singletonMap("jwt", null))).isEqualTo("{\"jwt\":null}");
+
+        Object unserializable = new Object() {
+            final Object self = this; // cycle → serialization fails
+            @Override public String toString() { return "jwt=eyJ.leak"; }
+        };
+        assertThat(maskingUtils.toJsonSafe(unserializable)).doesNotContain("eyJ.leak");
+    }
+
+    @Test
     void maskSensitiveFields_shouldReturnNullForNullInput() {
         assertThat(maskingUtils.maskSensitiveFields(null)).isNull();
     }

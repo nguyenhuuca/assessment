@@ -1,6 +1,5 @@
 package com.canhlabs.funnyapp.aop;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -68,9 +67,7 @@ public class AuditLogAspect {
             long duration = System.currentTimeMillis() - start;
 
             log.info("AUDIT | IP={} | User={} | Method={} | Input={} | Output={} | Time={}ms",
-                    clientIp, username, methodName, inputArgs,
-                    new ObjectMapper().writeValueAsString(outputStr),
-                    duration);
+                    clientIp, username, methodName, inputArgs, outputStr, duration);
             return result;
         } catch (Throwable ex) {
             long duration = System.currentTimeMillis() - start;

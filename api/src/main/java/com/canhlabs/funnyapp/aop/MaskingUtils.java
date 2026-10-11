@@ -1,13 +1,25 @@
 package com.canhlabs.funnyapp.aop;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class MaskingUtils {
+
+    private static final String MASK = "***MASKED***";
+    private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private final MaskingProperties maskingProperties;
 
@@ -55,12 +67,43 @@ public class MaskingUtils {
         }
     }
 
+    /**
+     * Serializes to JSON with every configured sensitive key masked at any depth
+     * (e.g. ResponseEntity → body → data → jwt), not just the top-level fields.
+     */
     public String toJsonSafe(Object obj) {
         try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            return String.valueOf(obj);
+            JsonNode node = MAPPER.valueToTree(obj);
+            maskTree(node);
+            return MAPPER.writeValueAsString(node);
+        } catch (IllegalArgumentException | JsonProcessingException e) {
+            // Never fall back to toString(): it could print the very values we mask
+            return "<unserializable " + (obj == null ? "null" : obj.getClass().getSimpleName()) + ">";
         }
+    }
+
+    private void maskTree(JsonNode node) {
+        if (node instanceof ObjectNode object) {
+            Set<String> sensitive = sensitiveKeys();
+            List<String> names = new ArrayList<>();
+            object.fieldNames().forEachRemaining(names::add);
+            for (String name : names) {
+                JsonNode child = object.get(name);
+                if (sensitive.contains(name.toLowerCase(Locale.ROOT)) && !child.isNull()) {
+                    object.put(name, MASK);
+                } else {
+                    maskTree(child);
+                }
+            }
+        } else if (node instanceof ArrayNode array) {
+            array.forEach(this::maskTree);
+        }
+    }
+
+    private Set<String> sensitiveKeys() {
+        return maskingProperties.getFields().stream()
+                .map(f -> f.toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
     }
 
     /** Mask the middle half of the input string, leaving the first and last quarters unmasked
