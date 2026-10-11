@@ -5,8 +5,10 @@ import com.canhlabs.funnyapp.enums.VideoStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,5 +36,11 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
     Page<VideoSource> findAllByStatus(VideoStatus status, Pageable pageable);
 
     long countByStatus(VideoStatus status);
+
+    /** Atomic increment in the DB; hidden videos are not counted. Returns rows updated (0 = unknown or hidden). */
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE video_sources SET view_count = view_count + 1 WHERE id = :id AND is_hide = false", nativeQuery = true)
+    int incrementViewCount(@Param("id") Long id);
 
 }

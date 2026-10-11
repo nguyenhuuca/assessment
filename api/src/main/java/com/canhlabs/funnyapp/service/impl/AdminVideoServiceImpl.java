@@ -91,7 +91,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .title(v.getTitle())
                 .thumbnailPath(v.getThumbnailPath())
                 .status(v.getStatus())
-                .viewCount(0L)
+                .viewCount(v.getViewCount())
                 .priority(v.getPriority())
                 .createdAt(v.getCreatedAt())
                 .build();

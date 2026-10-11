@@ -10,7 +10,7 @@ const TABS = [
   { key: 'USER_ACCOUNTS', label: 'USER_ACCOUNTS' },
   { key: 'FLAGGED_LOGS',  label: 'FLAGGED_LOGS'  },
   { key: 'COMMENTS',      label: 'COMMENTS'      },
-  { key: 'IMPORT_VIDEO',  label: 'Import Video'  },
+  { key: 'IMPORT_VIDEO',  label: 'IMPORT_VIDEO'  },
 ]
 
 export default function AdminView() {

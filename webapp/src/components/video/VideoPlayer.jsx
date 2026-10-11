@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { buildStreamUrl } from '../../utils/videoModel.js'
+import { viewsApi } from '../../api/views.js'
+
+/** Seconds actually played (not seeked) while visible before a view counts; server dedupes per viewer per video for 30 min. */
+const VIEW_THRESHOLD_SEC = 3
+/** timeupdate fires every ~250 ms; a bigger jump between two updates is a seek, not playback. */
+const MAX_PLAY_STEP_SEC = 1.5
 
 export default function VideoPlayer({ video, onEnded, active, muted = true, onMutedChange, showMuteButton = true }) {
   const videoRef = useRef(null)
@@ -8,6 +14,9 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
   const [paused,       setPaused]       = useState(false)
   const [progress,     setProgress]     = useState(0)
   const [descExpanded, setDescExpanded] = useState(false)
+  const viewSentRef = useRef(false)
+  const watchedRef  = useRef(0)
+  const lastTimeRef = useRef(0)
 
   // Play / pause driven by `active` prop
   useEffect(() => {
@@ -28,6 +37,9 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
     setProgress(0)
     setPaused(false)
     setLoading(true)
+    viewSentRef.current = false
+    watchedRef.current = 0
+    lastTimeRef.current = 0
   }, [video?.id])
 
   function handleLoadStart() { setLoading(true) }
@@ -38,6 +50,22 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
   function handleTimeUpdate() {
     const v = videoRef.current
     if (v?.duration) setProgress((v.currentTime / v.duration) * 100)
+    trackView(v)
+  }
+
+  function trackView(v) {
+    if (!v) return
+    const step = v.currentTime - lastTimeRef.current
+    lastTimeRef.current = v.currentTime
+    // Only real playback counts: no seeks (big or backward jumps), no background tab, no inactive slide
+    const visible = typeof document === 'undefined' || document.visibilityState !== 'hidden'
+    if (step > 0 && step <= MAX_PLAY_STEP_SEC && active && visible) {
+      watchedRef.current += step
+    }
+    if (!viewSentRef.current && video?.id != null && watchedRef.current >= VIEW_THRESHOLD_SEC) {
+      viewSentRef.current = true
+      viewsApi.record(video.id).catch(() => {}) // best effort: a lost view must never disturb playback
+    }
   }
 
   // Click body of player to toggle play/pause, but skip interactive children

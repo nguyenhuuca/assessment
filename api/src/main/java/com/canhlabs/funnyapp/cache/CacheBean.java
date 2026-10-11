@@ -38,5 +38,10 @@ public class CacheBean {
     public  AppCache<String, Integer> emailLimiterCache(AppCacheFactory factory, CacheProperties props) {
         return factory.createDefaultCache();
     }
-}
 
+    /** viewer|videoId keys already counted: one view per viewer per video per 30 min. */
+    @Bean(name = "videoViewDedupCache")
+    public AppCache<String, Boolean> videoViewDedupCache(AppCacheFactory factory) {
+        return factory.createCache(30, 100_000);
+    }
+}

@@ -63,7 +63,8 @@ public class AppConstant {
                 PathObject.builder().path("/videos/*/reaction").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().path("/videos/*/comments").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().path("/videos/*/comments").method(HttpMethod.POST.name()).build(),
-                PathObject.builder().path("/videos/*/comments/*").method(HttpMethod.DELETE.name()).build()
+                PathObject.builder().path("/videos/*/comments/*").method(HttpMethod.DELETE.name()).build(),
+                PathObject.builder().path("/videos/*/view").method(HttpMethod.POST.name()).build()
         );
 
         // apply for document swagger

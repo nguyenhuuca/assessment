@@ -65,4 +65,8 @@ public class VideoSource extends BaseDomain {
     @Builder.Default
     private Integer priority = 0;
 
+    /** Only changed by VideoSourceRepository.incrementViewCount: a save() must never overwrite concurrent increments. */
+    @Column(name = "view_count", nullable = false, insertable = false, updatable = false)
+    private long viewCount;
+
 }
