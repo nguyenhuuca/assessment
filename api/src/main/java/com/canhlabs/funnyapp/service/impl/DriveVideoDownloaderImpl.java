@@ -10,6 +10,7 @@ import com.canhlabs.funnyapp.utils.AppConstant;
 import com.google.api.services.drive.Drive;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class DriveVideoDownloaderImpl implements DriveVideoDownloader {
     private final DriveFileLocks locks;
     private final Path cacheDir;
 
+    @Autowired
     public DriveVideoDownloaderImpl(Drive drive, FfmpegService ffmpegService, AppProperties appProps,
                                     VideoCache videoCache, DriveFileLocks locks) {
         this(drive, ffmpegService, appProps, videoCache, locks, Paths.get(AppConstant.CACHE_DIR));
