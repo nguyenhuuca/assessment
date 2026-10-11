@@ -663,10 +663,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#in-progress-1" class="md-nav__link">
+  <a href="#in-progress-2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔄 In Progress (1)
+        🔄 In Progress (2)
       
     </span>
   </a>
@@ -2019,6 +2019,8 @@
       
         
       
+        
+      
     
     
     
@@ -2557,6 +2559,34 @@
     
   
     Admin Video Import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-admin-drive-force-sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Drive Force Sync
   
 
     
@@ -7280,10 +7310,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#in-progress-1" class="md-nav__link">
+  <a href="#in-progress-2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔄 In Progress (1)
+        🔄 In Progress (2)
       
     </span>
   </a>
@@ -7646,6 +7676,16 @@
 <td>✅</td>
 <td><code>795ec5e</code> yt-dlp → Drive (OAuth uploader) → existing cron ingests; bulk ≤20, run now / 5-min schedule slots, polling progress; <code>d9bddd9</code> FB reels; <a href="../guides/video-import-setup-vi/">setup guide</a>; verified on prod 2026-10-11</td>
 </tr>
+<tr>
+<td><strong>Admin Drive Force Sync</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-admin-drive-force-sync/">Plan 🔄</a></td>
+<td>—</td>
+<td>🔄</td>
+<td><code>1e961cc</code> tab DRIVE_SYNC: Drive ↔ local ↔ DB states; ADMIN views, SUPER_ADMIN force-syncs (re-download + upsert, ≤50/run); unique <code>(source_type, source_id)</code>; prod E2E pending</td>
+</tr>
 </tbody>
 </table>
 <hr />
@@ -7668,9 +7708,10 @@
 <li><a href="../adr/0018-password-login-option/">Password Login</a></li>
 <li><a href="../adr/0019-admin-video-import/">Admin Video Import</a></li>
 </ul>
-<h3 id="in-progress-1">🔄 In Progress (1)<a class="headerlink" href="#in-progress-1" title="Permanent link">&para;</a></h3>
+<h3 id="in-progress-2">🔄 In Progress (2)<a class="headerlink" href="#in-progress-2" title="Permanent link">&para;</a></h3>
 <ul>
 <li><a href="../plans/plan-admin-dashboard/">Admin Dashboard</a></li>
+<li><a href="../plans/plan-admin-drive-force-sync/">Admin Drive Force Sync</a></li>
 </ul>
 <h3 id="in-review-7">🔍 In Review (7)<a class="headerlink" href="#in-review-7" title="Permanent link">&para;</a></h3>
 <ul>
@@ -7795,7 +7836,7 @@
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-11 — Password login (ADR-0018) and admin video import (ADR-0019) shipped and verified on prod</em></p>
+<p><em>Last updated: 2026-10-11 — Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 
