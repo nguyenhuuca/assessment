@@ -47,6 +47,31 @@ export default function AdminView() {
         </div>
       </div>
 
+      <div className="admin-stat-cards">
+        <div className="admin-stat-card">
+          <span className="admin-stat-label">TOTAL_VIDEOS</span>
+          <span className="admin-stat-value">{stats.totalVideos?.toLocaleString() ?? '—'}</span>
+        </div>
+        <div className="admin-stat-card">
+          <span className="admin-stat-label">PENDING_REVIEW</span>
+          <span className="admin-stat-value" style={{ color: '#ffd600' }}>{stats.pendingCount ?? '—'}</span>
+        </div>
+        <div className="admin-stat-card">
+          <span className="admin-stat-label">SECURITY_STATUS</span>
+          <span className="admin-stat-value" style={{ color: '#ff1744' }}>
+            {stats.flaggedCount ?? '—'} <span style={{ fontSize: 11 }}>FLAGGED</span>
+          </span>
+        </div>
+        <div className="admin-stat-card">
+          <span className="admin-stat-label">REMOVED_COMMENTS</span>
+          <span className="admin-stat-value" style={{ color: '#ff1744' }}>{stats.removedComments?.toLocaleString() ?? '—'}</span>
+        </div>
+        <div className="admin-stat-card">
+          <span className="admin-stat-label">USER_GROWTH</span>
+          <span className="admin-stat-value" style={{ color: 'var(--accent-cyan)' }}>{stats.totalUsers?.toLocaleString() ?? '—'}</span>
+        </div>
+      </div>
+
       <div className="admin-tabs">
         {TABS.map(t => (
           <button
@@ -76,31 +101,6 @@ export default function AdminView() {
         {activeTab === 'COMMENTS'      && <AdminCommentTable />}
         {activeTab === 'IMPORT_VIDEO'  && <AdminImportPanel />}
         {activeTab === 'DRIVE_SYNC'    && <DriveSyncPanel />}
-      </div>
-
-      <div className="admin-stat-cards">
-        <div className="admin-stat-card">
-          <span className="admin-stat-label">TOTAL_VIDEOS</span>
-          <span className="admin-stat-value">{stats.totalVideos?.toLocaleString() ?? '—'}</span>
-        </div>
-        <div className="admin-stat-card">
-          <span className="admin-stat-label">PENDING_REVIEW</span>
-          <span className="admin-stat-value" style={{ color: '#ffd600' }}>{stats.pendingCount ?? '—'}</span>
-        </div>
-        <div className="admin-stat-card">
-          <span className="admin-stat-label">SECURITY_STATUS</span>
-          <span className="admin-stat-value" style={{ color: '#ff1744' }}>
-            {stats.flaggedCount ?? '—'} <span style={{ fontSize: 11 }}>FLAGGED</span>
-          </span>
-        </div>
-        <div className="admin-stat-card">
-          <span className="admin-stat-label">REMOVED_COMMENTS</span>
-          <span className="admin-stat-value" style={{ color: '#ff1744' }}>{stats.removedComments?.toLocaleString() ?? '—'}</span>
-        </div>
-        <div className="admin-stat-card">
-          <span className="admin-stat-label">USER_GROWTH</span>
-          <span className="admin-stat-value" style={{ color: 'var(--accent-cyan)' }}>{stats.totalUsers?.toLocaleString() ?? '—'}</span>
-        </div>
       </div>
     </div>
   )
