@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +18,8 @@ public interface VideoCommentRepository extends JpaRepository<VideoComment, UUID
     List<VideoComment> findByVideoIdAndParentIdIsNullOrderByCreatedAtAsc(String videoId);
 
     List<VideoComment> findByParentId(String parentId);
+
+    List<VideoComment> findByParentIdIn(Collection<String> parentIds);
 
     @Query("select c from VideoComment c where c.videoId = :videoId order by c.createdAt asc")
     List<VideoComment> findAllByVideoIdOrdered(String videoId);

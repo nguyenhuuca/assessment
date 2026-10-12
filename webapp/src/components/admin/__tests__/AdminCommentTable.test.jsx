@@ -9,6 +9,7 @@ vi.mock('../../../api/admin.js', () => ({
   getComments: vi.fn(),
   moderateComment: vi.fn(),
   bulkModerateComments: vi.fn(),
+  hardDeleteComments: vi.fn(),
 }))
 
 const visible = {
@@ -33,6 +34,7 @@ beforeEach(() => {
   adminApi.getComments.mockResolvedValue({ data: { content: [visible, removed], totalPages: 1, totalElements: 2, number: 0 } })
   adminApi.moderateComment.mockResolvedValue({})
   adminApi.bulkModerateComments.mockResolvedValue({ data: { requested: 2, updated: 1, unchanged: 1, notFound: [] } })
+  adminApi.hardDeleteComments.mockResolvedValue({ data: { requested: 1, deleted: 1, repliesDeleted: 2, notFound: [] } })
 })
 afterEach(() => vi.restoreAllMocks())
 
@@ -192,5 +194,33 @@ describe('AdminCommentTable', () => {
     fireEvent.click(screen.getByLabelText('Select comment c1'))
     fireEvent.change(screen.getByLabelText('Status filter'), { target: { value: 'REMOVED' } })
     await waitFor(() => expect(screen.queryByRole('toolbar', { name: 'Bulk actions' })).toBeNull())
+  })
+
+  it('hard delete asks for confirmation then deletes the row permanently', async () => {
+    renderTable()
+    await screen.findByText('hello world')
+    fireEvent.click(screen.getAllByTitle('Delete permanently')[0])
+    const dialog = await screen.findByRole('dialog', { name: 'Xoá vĩnh viễn' })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Xoá vĩnh viễn' }))
+    await waitFor(() => expect(adminApi.hardDeleteComments).toHaveBeenCalledWith(['c1']))
+    expect(await screen.findByText('Đã xoá vĩnh viễn 1 bình luận (+2 reply)')).toBeInTheDocument()
+  })
+
+  it('hard delete does nothing when cancelled', async () => {
+    renderTable()
+    await screen.findByText('hello world')
+    fireEvent.click(screen.getAllByTitle('Delete permanently')[1])
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Huỷ' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect(adminApi.hardDeleteComments).not.toHaveBeenCalled()
+  })
+
+  it('bulk hard delete sends the selected ids', async () => {
+    renderTable()
+    await screen.findByText('buy now')
+    fireEvent.click(screen.getByLabelText('Select comment c2'))
+    fireEvent.click(within(screen.getByRole('toolbar', { name: 'Bulk actions' })).getByRole('button', { name: 'Xoá vĩnh viễn' }))
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xoá vĩnh viễn' }))
+    await waitFor(() => expect(adminApi.hardDeleteComments).toHaveBeenCalledWith(['c2']))
   })
 })

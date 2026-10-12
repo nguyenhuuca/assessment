@@ -6,6 +6,8 @@ import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.BulkModerateCommentRequest;
+import com.canhlabs.funnyapp.dto.admin.HardDeleteCommentsRequest;
+import com.canhlabs.funnyapp.dto.admin.HardDeleteCommentsResultDto;
 import com.canhlabs.funnyapp.dto.admin.BulkModerationResultDto;
 import com.canhlabs.funnyapp.dto.admin.ModerateCommentRequest;
 import com.canhlabs.funnyapp.enums.CommentStatus;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -180,6 +183,20 @@ public class AdminController {
         return ResponseEntity.ok(ResultObjectInfo.<BulkModerationResultDto>builder()
                 .status(ResultStatus.SUCCESS)
                 .message("Comments moderated")
+                .data(data)
+                .build());
+    }
+
+    /** Permanent delete (with replies); REMOVE moderation is the reversible alternative. */
+    @PostMapping("/comments/hard-delete")
+    @AuditLog("hardDeleteComments")
+    @HasPermission(perm = Permission.ADMIN)
+    public ResponseEntity<ResultObjectInfo<HardDeleteCommentsResultDto>> hardDeleteComments(
+            @Valid @RequestBody HardDeleteCommentsRequest request) {
+        HardDeleteCommentsResultDto data = adminCommentService.hardDelete(request.getIds());
+        return ResponseEntity.ok(ResultObjectInfo.<HardDeleteCommentsResultDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .message("Comments deleted")
                 .data(data)
                 .build());
     }

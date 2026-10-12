@@ -90,6 +90,17 @@ export function useModerateComment() {
   })
 }
 
+export function useHardDeleteComments() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids) => adminApi.hardDeleteComments(ids),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'comments'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'stats'] })
+    },
+  })
+}
+
 export function useBulkModerateComments() {
   const qc = useQueryClient()
   return useMutation({

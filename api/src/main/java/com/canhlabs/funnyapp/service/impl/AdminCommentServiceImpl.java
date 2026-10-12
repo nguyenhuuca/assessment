@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
 import com.canhlabs.funnyapp.dto.admin.BulkModerateCommentRequest;
 import com.canhlabs.funnyapp.dto.admin.BulkModerationResultDto;
+import com.canhlabs.funnyapp.dto.admin.HardDeleteCommentsResultDto;
 import com.canhlabs.funnyapp.dto.admin.ModerateCommentRequest;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.VideoComment;
@@ -111,6 +112,43 @@ public class AdminCommentServiceImpl implements AdminCommentService {
                 .updated(changed.size())
                 .unchanged(found.size() - changed.size())
                 .notFound(notFound)
+                .build();
+    }
+
+    /**
+     * Replies only reference their parent by id text (no FK), so they are collected level by level and deleted
+     * with it; otherwise they would be orphaned. The visited set guards against a malformed parent cycle.
+     */
+    @Override
+    @Transactional
+    public HardDeleteCommentsResultDto hardDelete(List<UUID> rawIds) {
+        Set<UUID> ids = new LinkedHashSet<>(rawIds);
+        Set<UUID> found = new HashSet<>();
+        commentRepository.findAllById(ids).forEach(c -> found.add(c.getId()));
+
+        Set<UUID> toDelete = new LinkedHashSet<>(found);
+        Set<String> frontier = new HashSet<>();
+        found.forEach(id -> frontier.add(id.toString()));
+        while (!frontier.isEmpty()) {
+            Set<String> next = new HashSet<>();
+            for (VideoComment reply : commentRepository.findByParentIdIn(frontier)) {
+                if (toDelete.add(reply.getId())) {
+                    next.add(reply.getId().toString());
+                }
+            }
+            frontier.clear();
+            frontier.addAll(next);
+        }
+        if (!toDelete.isEmpty()) {
+            commentRepository.deleteAllByIdInBatch(toDelete);
+        }
+        log.info("Hard-deleted {} comment(s) ({} replies) by {}", found.size(), toDelete.size() - found.size(), moderator());
+
+        return HardDeleteCommentsResultDto.builder()
+                .requested(ids.size())
+                .deleted(found.size())
+                .repliesDeleted(toDelete.size() - found.size())
+                .notFound(ids.stream().filter(id -> !found.contains(id)).toList())
                 .build();
     }
 

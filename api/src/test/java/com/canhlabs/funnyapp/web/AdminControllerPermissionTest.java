@@ -7,6 +7,7 @@ import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.filter.JWTAuthenticationFilter;
 import com.canhlabs.funnyapp.filter.WebSecurityConfig;
 import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
+import com.canhlabs.funnyapp.dto.admin.HardDeleteCommentsResultDto;
 import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.service.AdminAccountService;
 import com.canhlabs.funnyapp.service.AdminCommentService;
@@ -41,6 +42,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -50,6 +52,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
@@ -417,5 +420,42 @@ class AdminControllerPermissionTest {
                         .content("{\"ids\":[\"" + java.util.UUID.randomUUID() + "\"],\"action\":\"RESTORE\"}")
                         .with(authentication(principal(UserRole.USER, Permission.ADMIN.getBit()))))
                 .andExpect(status().isForbidden());
+    }
+
+    // ── comments hard delete ──────────────────────────────────────────────────
+
+    private static final String HARD_DELETE_URL = COMMENTS_URL + "/hard-delete";
+
+    @Test
+    void hardDeleteComments_admin_returns200() throws Exception {
+        when(adminCommentService.hardDelete(any())).thenReturn(HardDeleteCommentsResultDto.builder().deleted(1).build());
+
+        mockMvc.perform(post(HARD_DELETE_URL)
+                        .contentType("application/json")
+                        .content("{\"ids\":[\"00000000-0000-0000-0000-000000000001\"]}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+
+        verify(adminCommentService).hardDelete(List.of(UUID.fromString("00000000-0000-0000-0000-000000000001")));
+    }
+
+    @Test
+    void hardDeleteComments_emptyIds_returns400() throws Exception {
+        mockMvc.perform(post(HARD_DELETE_URL)
+                        .contentType("application/json")
+                        .content("{\"ids\":[]}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminCommentService);
+    }
+
+    @Test
+    void hardDeleteComments_userRole_returns403() throws Exception {
+        mockMvc.perform(post(HARD_DELETE_URL)
+                        .contentType("application/json")
+                        .content("{\"ids\":[\"00000000-0000-0000-0000-000000000001\"]}")
+                        .with(authentication(principal(UserRole.USER, Permission.ADMIN.getBit()))))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(adminCommentService);
     }
 }

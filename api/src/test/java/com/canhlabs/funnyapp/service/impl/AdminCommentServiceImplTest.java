@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
 import com.canhlabs.funnyapp.dto.admin.BulkModerationResultDto;
 import com.canhlabs.funnyapp.dto.admin.BulkModerateCommentRequest;
+import com.canhlabs.funnyapp.dto.admin.HardDeleteCommentsResultDto;
 import com.canhlabs.funnyapp.dto.admin.ModerateCommentRequest;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.VideoComment;
@@ -499,5 +500,62 @@ class AdminCommentServiceImplTest {
                 .isInstanceOfSatisfying(CustomException.class,
                         e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST));
         verifyNoInteractions(commentRepository);
+    }
+
+    // ── hardDelete ────────────────────────────────────────────────────────────
+
+    private static VideoComment reply(VideoComment parent) {
+        VideoComment r = comment(parent.getVideoId(), "x@y.com");
+        r.setParentId(parent.getId().toString());
+        return r;
+    }
+
+    @Test
+    void hardDelete_deletesCommentsWithNestedRepliesAndReportsMissing() {
+        VideoComment root = comment("14", "a@b.com");
+        VideoComment child = reply(root);
+        VideoComment grandChild = reply(child);
+        UUID missing = UUID.randomUUID();
+        when(commentRepository.findAllById(Set.of(root.getId(), missing))).thenReturn(List.of(root));
+        when(commentRepository.findByParentIdIn(Set.of(root.getId().toString()))).thenReturn(List.of(child));
+        when(commentRepository.findByParentIdIn(Set.of(child.getId().toString()))).thenReturn(List.of(grandChild));
+        when(commentRepository.findByParentIdIn(Set.of(grandChild.getId().toString()))).thenReturn(List.of());
+
+        HardDeleteCommentsResultDto r = service.hardDelete(List.of(root.getId(), missing, root.getId()));
+
+        ArgumentCaptor<Iterable<UUID>> deleted = ArgumentCaptor.forClass(Iterable.class);
+        verify(commentRepository).deleteAllByIdInBatch(deleted.capture());
+        assertThat(deleted.getValue()).containsExactlyInAnyOrder(root.getId(), child.getId(), grandChild.getId());
+        assertThat(r.getRequested()).isEqualTo(2);
+        assertThat(r.getDeleted()).isEqualTo(1);
+        assertThat(r.getRepliesDeleted()).isEqualTo(2);
+        assertThat(r.getNotFound()).containsExactly(missing);
+    }
+
+    @Test
+    void hardDelete_replyAlsoSelected_isCountedOnceAndCycleTerminates() {
+        VideoComment root = comment("14", "a@b.com");
+        VideoComment child = reply(root);
+        root.setParentId(child.getId().toString()); // malformed cycle
+        when(commentRepository.findAllById(any())).thenReturn(List.of(root, child));
+        when(commentRepository.findByParentIdIn(any())).thenReturn(List.of(root, child));
+
+        HardDeleteCommentsResultDto r = service.hardDelete(List.of(root.getId(), child.getId()));
+
+        verify(commentRepository).deleteAllByIdInBatch(Set.of(root.getId(), child.getId()));
+        assertThat(r.getDeleted()).isEqualTo(2);
+        assertThat(r.getRepliesDeleted()).isZero();
+    }
+
+    @Test
+    void hardDelete_nothingFound_deletesNothing() {
+        UUID missing = UUID.randomUUID();
+        when(commentRepository.findAllById(any())).thenReturn(List.of());
+
+        HardDeleteCommentsResultDto r = service.hardDelete(List.of(missing));
+
+        verify(commentRepository, never()).deleteAllByIdInBatch(any());
+        assertThat(r.getDeleted()).isZero();
+        assertThat(r.getNotFound()).containsExactly(missing);
     }
 }

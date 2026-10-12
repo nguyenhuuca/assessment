@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { REASONS } from '../../utils/moderationReasons.js'
-import { useAdminComments, useBulkModerateComments, useModerateComment } from '../../hooks/useAdmin.js'
+import { useAdminComments, useBulkModerateComments, useHardDeleteComments, useModerateComment } from '../../hooks/useAdmin.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 
 const NOTE_MAX = 500
@@ -99,6 +99,7 @@ export default function AdminCommentTable() {
   })
   const moderate = useModerateComment()
   const bulkModerate = useBulkModerateComments()
+  const hardDelete = useHardDeleteComments()
   const [confirm, confirmDialog] = useConfirm()
 
   const pageData      = data?.data ?? data ?? {}
@@ -164,6 +165,32 @@ export default function AdminCommentTable() {
     })
   }
 
+  // Permanent: also removes replies. "Gỡ" (REMOVE) is the reversible option.
+  async function hardDeleteIds(ids, label) {
+    const ok = await confirm({
+      title: 'Xoá vĩnh viễn',
+      message: `Xoá vĩnh viễn ${label} và toàn bộ reply? Không thể khôi phục.`,
+      confirmLabel: 'Xoá vĩnh viễn',
+      danger: true,
+    })
+    if (!ok) return
+    setError('')
+    setNotice('')
+    hardDelete.mutate(ids, {
+      onSuccess: res => {
+        const r = res?.data ?? {}
+        const replies = r.repliesDeleted ? ` (+${r.repliesDeleted} reply)` : ''
+        setNotice(`Đã xoá vĩnh viễn ${r.deleted ?? 0} bình luận${replies}`)
+        setSelected(prev => {
+          const next = new Set(prev)
+          ids.forEach(id => next.delete(id))
+          return next
+        })
+      },
+      onError: e => setError(e?.message || 'Thao tác thất bại'),
+    })
+  }
+
   async function restore(c) {
     if (await confirm({ title: 'Khôi phục bình luận', message: 'Khôi phục bình luận này?', confirmLabel: 'Khôi phục' })) run(c.id, { action: 'RESTORE' })
   }
@@ -207,6 +234,13 @@ export default function AdminCommentTable() {
           </button>
           <button className="app-btn secondary" onClick={restoreSelected} disabled={bulkModerate.isPending}>
             Khôi phục đã chọn
+          </button>
+          <button
+            className="app-btn danger-outline"
+            onClick={() => hardDeleteIds([...selected], `${selected.size} bình luận đã chọn`)}
+            disabled={hardDelete.isPending}
+          >
+            Xoá vĩnh viễn
           </button>
           <button className="app-btn secondary" onClick={() => setSelected(new Set())}>Bỏ chọn</button>
         </div>
@@ -294,6 +328,14 @@ export default function AdminCommentTable() {
                             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>block</span>
                           </button>
                         )}
+                        <button
+                          className="admin-action-btn danger"
+                          onClick={() => hardDeleteIds([c.id], 'bình luận này')}
+                          disabled={hardDelete.isPending}
+                          title="Delete permanently"
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete_forever</span>
+                        </button>
                       </div>
                     </td>
                   </tr>

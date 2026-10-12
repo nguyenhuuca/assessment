@@ -51,6 +51,7 @@ const cleanParams = (params = {}) =>
 export const getComments       = (params) => api.get(buildUrl('/admin/comments', cleanParams(params)))
 export const moderateComment   = (id, body) => patch(`/admin/comments/${id}/moderation`, body)
 export const bulkModerateComments = (body) => patch('/admin/comments/moderation', body)
+export const hardDeleteComments = (ids) => api.post('/admin/comments/hard-delete', { ids })
 
 // Video import (admin) — see docs/plans/plan-admin-video-import.md "API Contract"
 export const createImports = ({ items, scheduledAt = null }) =>
