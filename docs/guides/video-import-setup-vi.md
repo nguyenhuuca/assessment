@@ -172,25 +172,46 @@ sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o
 sudo chmod a+rx /usr/local/bin/yt-dlp
 ```
 
+Cài deno (JS runtime, yt-dlp bản mới cần để giải JS challenge của YouTube; thiếu thì mất format / 403):
+
+```bash
+command -v unzip || sudo apt install -y unzip
+curl -fsSL https://deno.land/install.sh | sudo DENO_INSTALL=/opt/deno sh -s -- -y --no-modify-path
+sudo ln -sf /opt/deno/bin/deno /usr/local/bin/deno
+deno --version
+```
+
+Không cần restart app — mỗi job gọi process yt-dlp mới, tự tìm `deno` trong PATH.
+
 Tự update hằng ngày (YouTube/Facebook đổi liên tục):
 
 ```bash
 echo '0 3 * * * root /usr/local/bin/yt-dlp -U >/dev/null 2>&1' | sudo tee /etc/cron.d/yt-dlp-update
 ```
 
-### 4.4 (Tuỳ chọn) Cookies cho Facebook
+### 4.4 Cookies (YouTube bắt buộc trên VM cloud, Facebook tuỳ chọn)
 
-Chỉ cần khi video Facebook yêu cầu đăng nhập (lỗi `LOGIN_REQUIRED`). Export cookies từ trình duyệt (định dạng Netscape) rồi:
+YouTube chặn IP datacenter (DigitalOcean, AWS, GCP…): mọi video, kể cả public, đều lỗi `Sign in to confirm you're not a bot` → app báo `LOGIN_REQUIRED`. Máy local (IP residential) không bị. Cách xử lý: cho yt-dlp dùng cookies của một tài khoản đã đăng nhập.
+
+1. Dùng **tài khoản Google phụ** (có rủi ro bị YouTube khoá).
+2. Mở cửa sổ ẩn danh → đăng nhập YouTube → export cookies định dạng Netscape (extension "Get cookies.txt LOCALLY") → **đóng cửa sổ ẩn danh, không logout** (logout làm cookies mất hiệu lực).
+3. Cần cả Facebook thì nối cookies Facebook vào cùng file — app chỉ đọc 1 file.
 
 ```bash
-sudo cp cookies.txt /opt/funnyapp/fb-cookies.txt
-sudo chown <user-chạy-app> /opt/funnyapp/fb-cookies.txt
-sudo chmod 600 /opt/funnyapp/fb-cookies.txt
+sudo cp cookies.txt /opt/funnyapp/cookies.txt
+sudo chown <user-chạy-app> /opt/funnyapp/cookies.txt
+sudo chmod 600 /opt/funnyapp/cookies.txt
 # .env
-VIDEO_IMPORT_COOKIES_PATH=/opt/funnyapp/fb-cookies.txt
+VIDEO_IMPORT_COOKIES_PATH=/opt/funnyapp/cookies.txt
 ```
 
-> Cookies chứa phiên đăng nhập Facebook của bạn, coi như mật khẩu.
+Kiểm tra trên server:
+
+```bash
+yt-dlp --cookies /opt/funnyapp/cookies.txt -J --skip-download -- "https://www.youtube.com/watch?v=jNQXAC9IVRw" >/dev/null && echo OK
+```
+
+> Cookies chứa phiên đăng nhập, coi như mật khẩu. Cookies hết hạn sau vài tuần → lại `LOGIN_REQUIRED` → export lại.
 
 ### 4.5 Restart
 
@@ -219,7 +240,7 @@ cd /opt/funnyapp && ./stopServer.sh && ./startServer.sh
 | `DRIVE_UPLOAD_FAILED` | Upload lên Drive lỗi (mạng, quota Drive đầy, folder bị xoá) | Kiểm tra dung lượng Drive → **Thử lại** |
 | `DISK_LOW` | Thư mục làm việc còn < 2 GB | Dọn ổ đĩa server |
 | `NOT_INSTALLED` | Không tìm thấy yt-dlp | Bước 4.3 hoặc set `YT_DLP_PATH` |
-| `LOGIN_REQUIRED` | Video riêng tư / cần đăng nhập | Bước 4.4 |
+| `LOGIN_REQUIRED` | YouTube chặn IP server ("not a bot"), video riêng tư, hoặc cookies hết hạn | Bước 4.4 |
 | `EXTRACTOR_ERROR` | yt-dlp không đọc được trang (thường do site đổi) | `sudo yt-dlp -U` → **Thử lại** |
 | `TOO_LARGE` | Vượt `VIDEO_IMPORT_MAX_FILE_SIZE` | Tăng giới hạn hoặc bỏ qua |
 | `TIMEOUT` | Tải quá 30 phút / metadata quá 60 s | Thử lại lúc mạng ổn |
