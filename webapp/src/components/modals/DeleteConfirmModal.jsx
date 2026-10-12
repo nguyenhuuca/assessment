@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Alert, Button, Modal, Spinner } from 'react-bootstrap'
 import { useQueryClient } from '@tanstack/react-query'
 import { videosApi } from '../../api/videos.js'
+import ConfirmModal from '../common/ConfirmModal.jsx'
 
 export default function DeleteConfirmModal({ show, video, onHide, onDeleted }) {
   const queryClient = useQueryClient()
@@ -33,22 +33,19 @@ export default function DeleteConfirmModal({ show, video, onHide, onDeleted }) {
     onHide()
   }
 
+  if (!show) return null
+
   return (
-    <Modal show={show} onHide={handleClose} centered size="sm">
-      <Modal.Header closeButton>
-        <Modal.Title>Delete Video</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {error && <Alert variant="danger">{error}</Alert>}
-        <p>Are you sure you want to delete <strong>{video?.title || 'this video'}</strong>?</p>
-        <p className="text-muted" style={{ fontSize: '0.85rem' }}>This action cannot be undone.</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose} disabled={loading}>Cancel</Button>
-        <Button variant="danger" onClick={handleConfirm} disabled={loading}>
-          {loading ? <Spinner size="sm" animation="border" /> : 'Delete'}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <ConfirmModal
+      title="Xoá video"
+      message={<>Xoá <strong>{video?.title || 'video này'}</strong>? Thao tác này không thể hoàn tác.</>}
+      confirmLabel="Xoá"
+      danger
+      pending={loading}
+      onCancel={handleClose}
+      onConfirm={handleConfirm}
+    >
+      {error && <div className="app-alert error" role="alert">{error}</div>}
+    </ConfirmModal>
   )
 }

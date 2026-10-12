@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useUpdateVideoVisibility, useDeleteVideo } from '../../hooks/useAdmin.js'
+import { useConfirm } from '../../hooks/useConfirm.jsx'
 
 const STATUS_COLORS = {
   PUBLISHED: '#00c853',
@@ -78,10 +79,13 @@ export default function AdminVideoTable({ statusFilter }) {
     }
   }
 
+  const [confirm, confirmDialog] = useConfirm()
+
   if (isLoading) return <div className="admin-loading"><div className="vid-spinner" /></div>
 
   return (
     <div className="admin-table-wrap">
+      {confirmDialog}
       <div className="admin-table-meta">SHOWING {videos.length} OF {totalElements.toLocaleString()} ENTRIES</div>
       <table className="admin-table">
         <thead>
@@ -185,7 +189,9 @@ export default function AdminVideoTable({ statusFilter }) {
                   <SaveIndicator state={saveState[`${v.id}:status`]} />
                   <button
                     className="admin-action-btn danger"
-                    onClick={() => { if (window.confirm('Delete this video?')) deleteVideo.mutate(v.id) }}
+                    onClick={async () => {
+                      if (await confirm({ title: 'Xoá video', message: `Xoá "${v.title}"? Thao tác này không thể hoàn tác.`, confirmLabel: 'Xoá', danger: true })) deleteVideo.mutate(v.id)
+                    }}
                     title="Delete"
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>

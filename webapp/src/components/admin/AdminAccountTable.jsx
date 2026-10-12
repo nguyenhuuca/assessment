@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAdminAccounts, useUpdateAccountRole, useDeleteAccount } from '../../hooks/useAdmin.js'
+import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
 
 // Mirrors the server: you can only manage accounts, and assign roles, strictly below your own
@@ -19,10 +20,13 @@ export default function AdminAccountTable() {
   const totalPages    = pageData?.totalPages ?? 0
   const totalElements = pageData?.totalElements ?? 0
 
+  const [confirm, confirmDialog] = useConfirm()
+
   if (isLoading) return <div className="admin-loading"><div className="vid-spinner" /></div>
 
   return (
     <div className="admin-table-wrap">
+      {confirmDialog}
       <div className="admin-table-meta">SHOWING {accounts.length} OF {totalElements.toLocaleString()} ENTRIES</div>
       <table className="admin-table">
         <thead>
@@ -71,7 +75,9 @@ export default function AdminAccountTable() {
                       className="admin-action-btn danger"
                       disabled={deleteLocked}
                       title={isSelf ? 'Cannot delete own account' : outranked ? 'Can only manage accounts with a lower role' : 'Delete account'}
-                      onClick={() => { if (window.confirm(`Delete ${a.email}?`)) deleteAccount.mutate(a.id) }}
+                      onClick={async () => {
+                        if (await confirm({ title: 'Xoá tài khoản', message: `Xoá tài khoản ${a.email}? Thao tác này không thể hoàn tác.`, confirmLabel: 'Xoá', danger: true })) deleteAccount.mutate(a.id)
+                      }}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
                     </button>

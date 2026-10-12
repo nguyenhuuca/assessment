@@ -3,6 +3,7 @@ import { useDriveSyncFiles, useDriveSyncRun, useStartDriveSyncRun } from '../../
 import { useAuth } from '../../hooks/useAuth.js'
 import { isSuperAdmin } from '../../utils/roles.js'
 import { formatTime } from '../../utils/importUtils.js'
+import ConfirmModal from '../common/ConfirmModal.jsx'
 
 const DEFAULT_MAX_BATCH = 50
 const NO_PERMISSION = 'Chỉ SUPER_ADMIN được force sync'
@@ -53,40 +54,29 @@ function RunProgress({ run }) {
 function ConfirmSyncModal({ files, pending, onCancel, onConfirm }) {
   const overwrite = files.filter(f => f.state === 'SYNCED').length
   return (
-    <div className="app-modal-backdrop" onClick={pending ? undefined : onCancel}>
-      <div className="app-modal" role="dialog" aria-label="Xác nhận force sync" onClick={e => e.stopPropagation()}>
-        <div className="app-modal-header">
-          <span className="app-modal-title">Force sync {files.length} file</span>
-          <button className="app-modal-close" onClick={onCancel} disabled={pending} aria-label="Close">
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
-          </button>
+    <ConfirmModal
+      title={`Force sync ${files.length} file`}
+      ariaLabel="Xác nhận force sync"
+      message="Các file sau sẽ được tải lại từ Google Drive và cập nhật vào DB:"
+      confirmLabel="Force sync"
+      pending={pending}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+    >
+      <ul className="drive-sync-confirm-list">
+        {files.map(f => (
+          <li key={f.fileId}>
+            <span>{f.name}</span>
+            <span className="admin-cell-muted">{formatSize(f.sizeBytes)}</span>
+          </li>
+        ))}
+      </ul>
+      {overwrite > 0 && (
+        <div className="app-alert error" role="alert" style={{ marginTop: 12 }}>
+          {overwrite} file đã SYNCED sẽ bị thay thế bản local và cập nhật tiêu đề theo tên trên Drive.
         </div>
-        <div className="app-modal-body">
-          <p className="admin-cell-muted" style={{ marginTop: 0 }}>
-            Các file sau sẽ được tải lại từ Google Drive và cập nhật vào DB:
-          </p>
-          <ul className="drive-sync-confirm-list">
-            {files.map(f => (
-              <li key={f.fileId}>
-                <span>{f.name}</span>
-                <span className="admin-cell-muted">{formatSize(f.sizeBytes)}</span>
-              </li>
-            ))}
-          </ul>
-          {overwrite > 0 && (
-            <div className="app-alert error" role="alert" style={{ marginTop: 12 }}>
-              {overwrite} file đã SYNCED sẽ bị thay thế bản local và cập nhật tiêu đề theo tên trên Drive.
-            </div>
-          )}
-        </div>
-        <div className="app-modal-footer">
-          <button className="app-btn secondary" onClick={onCancel} disabled={pending}>Huỷ</button>
-          <button className="app-btn primary" onClick={onConfirm} disabled={pending}>
-            {pending ? 'Đang gửi…' : 'Force sync'}
-          </button>
-        </div>
-      </div>
-    </div>
+      )}
+    </ConfirmModal>
   )
 }
 

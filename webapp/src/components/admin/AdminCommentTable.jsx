@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { REASONS } from '../../utils/moderationReasons.js'
 import { useAdminComments, useBulkModerateComments, useModerateComment } from '../../hooks/useAdmin.js'
+import { useConfirm } from '../../hooks/useConfirm.jsx'
 
 const NOTE_MAX = 500
 const BULK_MAX = 100
@@ -98,6 +99,7 @@ export default function AdminCommentTable() {
   })
   const moderate = useModerateComment()
   const bulkModerate = useBulkModerateComments()
+  const [confirm, confirmDialog] = useConfirm()
 
   const pageData      = data?.data ?? data ?? {}
   const comments      = pageData?.content ?? []
@@ -150,8 +152,8 @@ export default function AdminCommentTable() {
     })
   }
 
-  function restoreSelected() {
-    if (window.confirm(`Khôi phục ${selected.size} bình luận đã chọn?`)) runBulk({ action: 'RESTORE' })
+  async function restoreSelected() {
+    if (await confirm({ title: 'Khôi phục bình luận', message: `Khôi phục ${selected.size} bình luận đã chọn?`, confirmLabel: 'Khôi phục' })) runBulk({ action: 'RESTORE' })
   }
 
   function run(id, body, onDone) {
@@ -162,12 +164,13 @@ export default function AdminCommentTable() {
     })
   }
 
-  function restore(c) {
-    if (window.confirm('Khôi phục bình luận này?')) run(c.id, { action: 'RESTORE' })
+  async function restore(c) {
+    if (await confirm({ title: 'Khôi phục bình luận', message: 'Khôi phục bình luận này?', confirmLabel: 'Khôi phục' })) run(c.id, { action: 'RESTORE' })
   }
 
   return (
     <div className="admin-table-wrap">
+      {confirmDialog}
       <div className="admin-filters">
         <select
           className="admin-status-select"

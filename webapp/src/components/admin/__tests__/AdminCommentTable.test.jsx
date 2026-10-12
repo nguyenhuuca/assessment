@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import AdminCommentTable from '../AdminCommentTable.jsx'
 import * as adminApi from '../../../api/admin.js'
@@ -90,18 +90,19 @@ describe('AdminCommentTable', () => {
   })
 
   it('restore confirms then calls the API', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
     renderTable()
     await screen.findByText('buy now')
     fireEvent.click(screen.getByTitle('Restore'))
+    fireEvent.click(within(await screen.findByRole('dialog', { name: 'Khôi phục bình luận' })).getByRole('button', { name: 'Khôi phục' }))
     await waitFor(() => expect(adminApi.moderateComment).toHaveBeenCalledWith('c2', { action: 'RESTORE' }))
   })
 
   it('restore does nothing when confirm is cancelled', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false)
     renderTable()
     await screen.findByText('buy now')
     fireEvent.click(screen.getByTitle('Restore'))
+    fireEvent.click(within(await screen.findByRole('dialog', { name: 'Khôi phục bình luận' })).getByRole('button', { name: 'Huỷ' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     expect(adminApi.moderateComment).not.toHaveBeenCalled()
   })
 
@@ -146,11 +147,11 @@ describe('AdminCommentTable', () => {
   })
 
   it('bulk restore confirms then calls the API', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
     renderTable()
     await screen.findByText('buy now')
     fireEvent.click(screen.getByLabelText('Select comment c2'))
     fireEvent.click(screen.getByRole('button', { name: 'Khôi phục đã chọn' }))
+    fireEvent.click(within(await screen.findByRole('dialog', { name: 'Khôi phục bình luận' })).getByRole('button', { name: 'Khôi phục' }))
     await waitFor(() =>
       expect(adminApi.bulkModerateComments).toHaveBeenCalledWith({ ids: ['c2'], action: 'RESTORE' })
     )
