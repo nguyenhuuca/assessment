@@ -71,7 +71,7 @@ export default function ImportForm() {
         id="import-urls"
         className="app-input"
         rows={5}
-        placeholder="https://www.youtube.com/watch?v=... | Tiêu đề"
+        placeholder="https://www.facebook.com/reel/... | Tiêu đề"
         value={text}
         onChange={e => setText(e.target.value)}
       />
