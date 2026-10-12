@@ -3384,10 +3384,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#44-tuy-chon-cookies-cho-facebook" class="md-nav__link">
+  <a href="#44-cookies-youtube-bat-buoc-tren-vm-cloud-facebook-tuy-chon" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.4 (Tuỳ chọn) Cookies cho Facebook
+        4.4 Cookies (YouTube bắt buộc trên VM cloud, Facebook tuỳ chọn)
       
     </span>
   </a>
@@ -7552,10 +7552,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#44-tuy-chon-cookies-cho-facebook" class="md-nav__link">
+  <a href="#44-cookies-youtube-bat-buoc-tren-vm-cloud-facebook-tuy-chon" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.4 (Tuỳ chọn) Cookies cho Facebook
+        4.4 Cookies (YouTube bắt buộc trên VM cloud, Facebook tuỳ chọn)
       
     </span>
   </a>
@@ -7879,22 +7879,37 @@
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>sudo<span class="w"> </span>curl<span class="w"> </span>-L<span class="w"> </span>https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp<span class="w"> </span>-o<span class="w"> </span>/usr/local/bin/yt-dlp
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>sudo<span class="w"> </span>chmod<span class="w"> </span>a+rx<span class="w"> </span>/usr/local/bin/yt-dlp
 </code></pre></div>
-<p>Tự update hằng ngày (YouTube/Facebook đổi liên tục):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">'0 3 * * * root /usr/local/bin/yt-dlp -U &gt;/dev/null 2&gt;&amp;1'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/cron.d/yt-dlp-update
+<p>Cài deno (JS runtime, yt-dlp bản mới cần để giải JS challenge của YouTube; thiếu thì mất format / 403):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>unzip<span class="w"> </span><span class="o">||</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>unzip
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://deno.land/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span><span class="nv">DENO_INSTALL</span><span class="o">=</span>/opt/deno<span class="w"> </span>sh<span class="w"> </span>-s<span class="w"> </span>--<span class="w"> </span>-y<span class="w"> </span>--no-modify-path
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>sudo<span class="w"> </span>ln<span class="w"> </span>-sf<span class="w"> </span>/opt/deno/bin/deno<span class="w"> </span>/usr/local/bin/deno
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>deno<span class="w"> </span>--version
 </code></pre></div>
-<h3 id="44-tuy-chon-cookies-cho-facebook">4.4 (Tuỳ chọn) Cookies cho Facebook<a class="headerlink" href="#44-tuy-chon-cookies-cho-facebook" title="Permanent link">&para;</a></h3>
-<p>Chỉ cần khi video Facebook yêu cầu đăng nhập (lỗi <code>LOGIN_REQUIRED</code>). Export cookies từ trình duyệt (định dạng Netscape) rồi:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>cookies.txt<span class="w"> </span>/opt/funnyapp/fb-cookies.txt
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>sudo<span class="w"> </span>chown<span class="w"> </span>&lt;user-chạy-app&gt;<span class="w"> </span>/opt/funnyapp/fb-cookies.txt
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>/opt/funnyapp/fb-cookies.txt
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># .env</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="nv">VIDEO_IMPORT_COOKIES_PATH</span><span class="o">=</span>/opt/funnyapp/fb-cookies.txt
+<p>Không cần restart app — mỗi job gọi process yt-dlp mới, tự tìm <code>deno</code> trong PATH.</p>
+<p>Tự update hằng ngày (YouTube/Facebook đổi liên tục):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">'0 3 * * * root /usr/local/bin/yt-dlp -U &gt;/dev/null 2&gt;&amp;1'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/cron.d/yt-dlp-update
+</code></pre></div>
+<h3 id="44-cookies-youtube-bat-buoc-tren-vm-cloud-facebook-tuy-chon">4.4 Cookies (YouTube bắt buộc trên VM cloud, Facebook tuỳ chọn)<a class="headerlink" href="#44-cookies-youtube-bat-buoc-tren-vm-cloud-facebook-tuy-chon" title="Permanent link">&para;</a></h3>
+<p>YouTube chặn IP datacenter (DigitalOcean, AWS, GCP…): mọi video, kể cả public, đều lỗi <code>Sign in to confirm you're not a bot</code> → app báo <code>LOGIN_REQUIRED</code>. Máy local (IP residential) không bị. Cách xử lý: cho yt-dlp dùng cookies của một tài khoản đã đăng nhập.</p>
+<ol>
+<li>Dùng <strong>tài khoản Google phụ</strong> (có rủi ro bị YouTube khoá).</li>
+<li>Mở cửa sổ ẩn danh → đăng nhập YouTube → export cookies định dạng Netscape (extension "Get cookies.txt LOCALLY") → <strong>đóng cửa sổ ẩn danh, không logout</strong> (logout làm cookies mất hiệu lực).</li>
+<li>Cần cả Facebook thì nối cookies Facebook vào cùng file — app chỉ đọc 1 file.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>cookies.txt<span class="w"> </span>/opt/funnyapp/cookies.txt
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>sudo<span class="w"> </span>chown<span class="w"> </span>&lt;user-chạy-app&gt;<span class="w"> </span>/opt/funnyapp/cookies.txt
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>/opt/funnyapp/cookies.txt
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># .env</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="nv">VIDEO_IMPORT_COOKIES_PATH</span><span class="o">=</span>/opt/funnyapp/cookies.txt
+</code></pre></div>
+<p>Kiểm tra trên server:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>yt-dlp<span class="w"> </span>--cookies<span class="w"> </span>/opt/funnyapp/cookies.txt<span class="w"> </span>-J<span class="w"> </span>--skip-download<span class="w"> </span>--<span class="w"> </span><span class="s2">"https://www.youtube.com/watch?v=jNQXAC9IVRw"</span><span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span>OK
 </code></pre></div>
 <blockquote>
-<p>Cookies chứa phiên đăng nhập Facebook của bạn, coi như mật khẩu.</p>
+<p>Cookies chứa phiên đăng nhập, coi như mật khẩu. Cookies hết hạn sau vài tuần → lại <code>LOGIN_REQUIRED</code> → export lại.</p>
 </blockquote>
 <h3 id="45-restart">4.5 Restart<a class="headerlink" href="#45-restart" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">cd</span><span class="w"> </span>/opt/funnyapp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./stopServer.sh<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./startServer.sh
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">cd</span><span class="w"> </span>/opt/funnyapp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./stopServer.sh<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./startServer.sh
 </code></pre></div>
 <hr />
 <h2 id="5-test">5. Test<a class="headerlink" href="#5-test" title="Permanent link">&para;</a></h2>
@@ -7948,7 +7963,7 @@
 </tr>
 <tr>
 <td><code>LOGIN_REQUIRED</code></td>
-<td>Video riêng tư / cần đăng nhập</td>
+<td>YouTube chặn IP server ("not a bot"), video riêng tư, hoặc cookies hết hạn</td>
 <td>Bước 4.4</td>
 </tr>
 <tr>
