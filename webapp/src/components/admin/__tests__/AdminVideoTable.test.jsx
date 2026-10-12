@@ -39,4 +39,14 @@ describe('AdminVideoTable hidden column', () => {
     fireEvent.click(await screen.findByLabelText('Ẩn Shown'))
     await waitFor(() => expect(adminApi.updateVideoVisibility).toHaveBeenCalledWith(7, true))
   })
+
+  it('marks the row toggle busy while the visibility update is in flight', async () => {
+    adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 7, title: 'Shown' })], totalPages: 1, totalElements: 1 } })
+    adminApi.updateVideoVisibility.mockReturnValue(new Promise(() => {}))
+    renderTable()
+    const box = await screen.findByLabelText('Ẩn Shown')
+    fireEvent.click(box)
+    await waitFor(() => expect(box).toHaveAttribute('aria-busy', 'true'))
+    expect(box).toBeDisabled()
+  })
 })

@@ -47,6 +47,7 @@ export default function NotificationDropdown({ onClose, onOpenNotification, anch
           className="comment-action-link"
           onClick={() => markAllRead.mutate()}
           disabled={!hasUnread || markAllRead.isPending}
+          aria-busy={markAllRead.isPending}
         >
           Đánh dấu đã đọc tất cả
         </button>

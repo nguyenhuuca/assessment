@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { REASONS } from '../../utils/moderationReasons.js'
 import { useAdminComments, useBulkModerateComments, useHardDeleteComments, useModerateComment } from '../../hooks/useAdmin.js'
+import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 
 const NOTE_MAX = 500
@@ -63,7 +64,7 @@ function RemoveModal({ comment, count, onClose, onSubmit, saving, error }) {
         </div>
         <div className="app-modal-footer">
           <button className="app-btn secondary" onClick={onClose}>Cancel</button>
-          <button className="app-btn danger" onClick={submit} disabled={saving}>Remove</button>
+          <button className="app-btn danger" onClick={submit} disabled={saving} aria-busy={saving}>Remove</button>
         </div>
       </div>
     </div>
@@ -229,16 +230,23 @@ export default function AdminCommentTable() {
             className="app-btn danger"
             onClick={() => { setError(''); setTarget('BULK') }}
             disabled={bulkModerate.isPending}
+            aria-busy={bulkModerate.isPending && bulkModerate.variables?.action === 'REMOVE'}
           >
             Gỡ đã chọn
           </button>
-          <button className="app-btn secondary" onClick={restoreSelected} disabled={bulkModerate.isPending}>
+          <button
+            className="app-btn secondary"
+            onClick={restoreSelected}
+            disabled={bulkModerate.isPending}
+            aria-busy={bulkModerate.isPending && bulkModerate.variables?.action === 'RESTORE'}
+          >
             Khôi phục đã chọn
           </button>
           <button
             className="app-btn danger-outline"
             onClick={() => hardDeleteIds([...selected], `${selected.size} bình luận đã chọn`)}
             disabled={hardDelete.isPending}
+            aria-busy={hardDelete.isPending && hardDelete.variables?.length > 1}
           >
             Xoá vĩnh viễn
           </button>
@@ -316,7 +324,12 @@ export default function AdminCommentTable() {
                     <td>
                       <div className="admin-actions">
                         {deleted ? null : removed ? (
-                          <button className="admin-action-btn" onClick={() => restore(c)} title="Restore">
+                          <button
+                            className="admin-action-btn"
+                            onClick={() => restore(c)}
+                            title="Restore"
+                            aria-busy={isBusyFor(moderate, c.id, x => x?.id)}
+                          >
                             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>restore</span>
                           </button>
                         ) : (
@@ -332,6 +345,7 @@ export default function AdminCommentTable() {
                           className="admin-action-btn danger"
                           onClick={() => hardDeleteIds([c.id], 'bình luận này')}
                           disabled={hardDelete.isPending}
+                          aria-busy={isBusyFor(hardDelete, c.id)}
                           title="Delete permanently"
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete_forever</span>

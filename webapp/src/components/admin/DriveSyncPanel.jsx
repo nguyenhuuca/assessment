@@ -136,6 +136,7 @@ export default function DriveSyncPanel() {
             chọn tất cả chưa sync
           </button>
           <button className="app-btn primary" disabled={locked || selected.size === 0 || start.isPending}
+            aria-busy={start.isPending}
             title={lockReason} onClick={() => setConfirming(true)}>
             FORCE_SYNC ({selected.size})
           </button>

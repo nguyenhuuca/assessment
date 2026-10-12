@@ -84,7 +84,7 @@ export default function ImportForm() {
             value={title}
             onChange={e => setTitle(e.target.value)}
           />
-          <button type="button" className="app-btn secondary" onClick={fetchTitle} disabled={preview.isPending}>
+          <button type="button" className="app-btn secondary" onClick={fetchTitle} disabled={preview.isPending} aria-busy={preview.isPending}>
             Lấy tiêu đề
           </button>
         </div>
@@ -112,7 +112,7 @@ export default function ImportForm() {
       {serverError && <div className="app-alert error" role="alert">{serverError}</div>}
       {results && <ResultList items={sent} results={results} />}
       <div>
-        <button type="submit" className="app-btn primary" disabled={create.isPending}>Nhập video</button>
+        <button type="submit" className="app-btn primary" disabled={create.isPending} aria-busy={create.isPending}>Nhập video</button>
       </div>
     </form>
   )

@@ -13,6 +13,7 @@ import ExploreView from '../explore/ExploreView.jsx'
 import ComingSoon from './ComingSoon.jsx'
 import AdminView from '../admin/AdminView.jsx'
 import SettingsPage from '../settings/SettingsPage.jsx'
+import ActivityBar from '../common/ActivityBar.jsx'
 import NotificationBell from '../notifications/NotificationBell.jsx'
 import { useNotificationStream } from '../../hooks/useNotifications.js'
 
@@ -109,6 +110,7 @@ export default function AppShell() {
 
   return (
     <>
+      <ActivityBar />
       <MagicLinkHandler
         onMfaRequired={data => setMfaModal({ show: true, pendingData: data })}
         onError={txt => showMsg(txt)}

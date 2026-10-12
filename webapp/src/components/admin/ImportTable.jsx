@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import {
   useCancelImport, useRetryImport, useRunImportNow, useVideoImports,
 } from '../../hooks/useAdmin.js'
+import { isBusyFor } from '../../utils/mutationBusy.js'
 import {
   canCancel, canRetry, canRunNow, errorText, formatMb, formatTime, isRunning, platformLabel,
 } from '../../utils/importUtils.js'
@@ -97,13 +98,13 @@ export default function ImportTable() {
                     <td>
                       <div className="admin-actions">
                         {canRunNow(j) && (
-                          <button className="app-btn secondary" onClick={() => act(runNow, j.id)} disabled={runNow.isPending}>Chạy ngay</button>
+                          <button className="app-btn secondary" onClick={() => act(runNow, j.id)} disabled={runNow.isPending} aria-busy={isBusyFor(runNow, j.id)}>Chạy ngay</button>
                         )}
                         {canCancel(j) && (
-                          <button className="app-btn danger" onClick={() => act(cancel, j.id)} disabled={cancel.isPending}>Huỷ</button>
+                          <button className="app-btn danger" onClick={() => act(cancel, j.id)} disabled={cancel.isPending} aria-busy={isBusyFor(cancel, j.id)}>Huỷ</button>
                         )}
                         {canRetry(j) && (
-                          <button className="app-btn secondary" onClick={() => act(retry, j.id)} disabled={retry.isPending}>Thử lại</button>
+                          <button className="app-btn secondary" onClick={() => act(retry, j.id)} disabled={retry.isPending} aria-busy={isBusyFor(retry, j.id)}>Thử lại</button>
                         )}
                       </div>
                     </td>

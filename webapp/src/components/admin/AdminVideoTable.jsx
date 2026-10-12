@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useUpdateVideoVisibility, useDeleteVideo } from '../../hooks/useAdmin.js'
+import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 
 const STATUS_COLORS = {
@@ -129,6 +130,8 @@ export default function AdminVideoTable({ statusFilter }) {
                     <input
                       type="checkbox"
                       className="admin-hide-toggle"
+                      aria-busy={isBusyFor(updateVisibility, v.id, x => x?.id)}
+                      disabled={isBusyFor(updateVisibility, v.id, x => x?.id)}
                       aria-label={`Ẩn ${v.title || 'video'}`}
                       checked={!!v.hidden}
                       onChange={e => {
@@ -189,6 +192,7 @@ export default function AdminVideoTable({ statusFilter }) {
                   <SaveIndicator state={saveState[`${v.id}:status`]} />
                   <button
                     className="admin-action-btn danger"
+                    aria-busy={isBusyFor(deleteVideo, v.id)}
                     onClick={async () => {
                       if (await confirm({ title: 'Xoá video', message: `Xoá "${v.title}"? Thao tác này không thể hoàn tác.`, confirmLabel: 'Xoá', danger: true })) deleteVideo.mutate(v.id)
                     }}

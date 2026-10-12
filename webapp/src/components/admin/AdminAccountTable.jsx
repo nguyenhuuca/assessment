@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAdminAccounts, useUpdateAccountRole, useDeleteAccount } from '../../hooks/useAdmin.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
+import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useAuth } from '../../hooks/useAuth.js'
 
 // Mirrors the server: you can only manage accounts, and assign roles, strictly below your own
@@ -64,6 +65,7 @@ export default function AdminAccountTable() {
                     <button
                       className="admin-action-btn"
                       disabled={roleLocked}
+                      aria-busy={isBusyFor(updateRole, a.id, x => x?.id)}
                       title={isSelf ? 'Cannot change own role' : (lockReason ?? (a.role === 'ADMIN' ? 'Demote to USER' : 'Promote to ADMIN'))}
                       onClick={() => updateRole.mutate({ id: a.id, role: nextRole })}
                     >
@@ -74,6 +76,7 @@ export default function AdminAccountTable() {
                     <button
                       className="admin-action-btn danger"
                       disabled={deleteLocked}
+                      aria-busy={isBusyFor(deleteAccount, a.id)}
                       title={isSelf ? 'Cannot delete own account' : outranked ? 'Can only manage accounts with a lower role' : 'Delete account'}
                       onClick={async () => {
                         if (await confirm({ title: 'Xoá tài khoản', message: `Xoá tài khoản ${a.email}? Thao tác này không thể hoàn tác.`, confirmLabel: 'Xoá', danger: true })) deleteAccount.mutate(a.id)

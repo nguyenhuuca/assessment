@@ -45,6 +45,7 @@ function ReplyBox({ prefill, submitting, error, onSubmit, onClose }) {
           aria-label="Send reply"
           onClick={send}
           disabled={submitting || !text.trim()}
+          aria-busy={submitting}
           style={{ padding: '8px 12px', flexShrink: 0 }}
         >
           Gửi

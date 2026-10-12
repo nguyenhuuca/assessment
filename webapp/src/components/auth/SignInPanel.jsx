@@ -207,7 +207,7 @@ export default function SignInPanel() {
           autoComplete="new-password"
         />
         {mfaEnabled && <OtpField id="pw-save-otp" value={otp} onChange={setOtp} />}
-        <button type="submit" className="app-btn primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
+        <button type="submit" className="app-btn primary" disabled={loading} aria-busy={loading} style={{ alignSelf: 'flex-start' }}>
           {passwordEnabled ? 'Đổi mật khẩu' : 'Đặt mật khẩu'}
         </button>
       </form>
@@ -225,7 +225,7 @@ export default function SignInPanel() {
             autoComplete="current-password"
           />
           {mfaEnabled && <OtpField id="pw-remove-otp" value={removeOtp} onChange={setRemoveOtp} />}
-          <button type="submit" className="app-btn danger" disabled={loading} style={{ alignSelf: 'flex-start' }}>
+          <button type="submit" className="app-btn danger" disabled={loading} aria-busy={loading} style={{ alignSelf: 'flex-start' }}>
             Gỡ mật khẩu
           </button>
         </form>

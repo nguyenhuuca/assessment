@@ -2377,3 +2377,59 @@ body {
 }
 .drive-sync-confirm-list li:last-child { border-bottom: none; }
 .drive-sync-confirm-list li span:first-child { overflow-wrap: anywhere; }
+
+/* ── Busy feedback for backend actions ───────────────────────────────────── */
+/* Any button with aria-busy="true" swaps its content for a spinner (keeps its size). */
+.app-btn[aria-busy="true"],
+.admin-action-btn[aria-busy="true"],
+button[aria-busy="true"] {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+  cursor: progress;
+}
+button[aria-busy="true"] > * { visibility: hidden; }
+button[aria-busy="true"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--busy-ring, rgba(127,127,127,.35));
+  border-top-color: var(--busy-spin, var(--accent-cyan));
+  animation: spin .7s linear infinite;
+}
+.app-btn.danger,
+.app-btn.success  { --busy-ring: rgba(255,255,255,.35); --busy-spin: #fff; }
+.admin-action-btn.danger { --busy-spin: #ff1744; }
+.app-btn.primary[aria-busy="true"]  { --busy-ring: rgba(0,48,53,.3); --busy-spin: #003035; }
+[data-theme="light"] .app-btn.primary[aria-busy="true"] { --busy-ring: rgba(255,255,255,.35); --busy-spin: #fff; }
+
+input[aria-busy="true"] { cursor: progress; opacity: .5; }
+
+/* Thin top bar while any mutation is in flight. */
+.activity-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  z-index: 3000;
+  overflow: hidden;
+  pointer-events: none;
+}
+.activity-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--primary), transparent);
+  animation: activity-slide 1.1s ease-in-out infinite;
+}
+@keyframes activity-slide {
+  from { left: -40%; }
+  to   { left: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .activity-bar::before { animation-duration: 3s; }
+}

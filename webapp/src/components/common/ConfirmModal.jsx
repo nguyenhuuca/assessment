@@ -49,8 +49,9 @@ export default function ConfirmModal({
             className={`app-btn ${danger ? 'danger' : 'primary'}`}
             onClick={onConfirm}
             disabled={pending}
+            aria-busy={pending}
           >
-            {pending ? 'Đang xử lý…' : confirmLabel}
+            {confirmLabel}
           </button>
         </div>
       </div>
