@@ -1469,6 +1469,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#amendment-2026-10-13-collections-without-a-bookmarks-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Amendment 2026-10-13 — Collections without a bookmarks table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#changelog" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7661,6 +7672,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#amendment-2026-10-13-collections-without-a-bookmarks-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Amendment 2026-10-13 — Collections without a bookmarks table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#changelog" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8025,6 +8047,15 @@ Related Skills: designing-systems, designing-apis, domain-driven-design
 <li><a href="../0009-unified-video-list-api/">ADR-0009: Unified Video List API</a> — video list endpoints that must not be enriched</li>
 </ul>
 <hr />
+<h2 id="amendment-2026-10-13-collections-without-a-bookmarks-table">Amendment 2026-10-13 — Collections without a bookmarks table<a class="headerlink" href="#amendment-2026-10-13-collections-without-a-bookmarks-table" title="Permanent link">&para;</a></h2>
+<p>Approved by owner 2026-10-13. Details in <a href="../../plans/plan-library-collections/">plan-library-collections</a>.</p>
+<ul>
+<li>Drop the <code>bookmarks</code> table. Collection items (<code>video_collection_items</code>) reference <code>video_sources</code> directly. "Bookmark / watch later" becomes a built-in default collection ("Xem sau").</li>
+<li><code>video_id</code> uses <code>ON DELETE CASCADE</code> (admin delete is a hard delete), which removes the need for <code>source_video_id</code> + <code>SET NULL</code>.</li>
+<li>Bookmark state is fetched per video when the save modal opens (<code>GET /collections/membership?videoId=</code>). There is no global <code>/bookmarks/ids</code> preload. The feed cache is still untouched (Decision 1 driver kept).</li>
+<li>New: collections have <code>visibility</code> PRIVATE/PUBLIC. Only ADMIN/SUPER_ADMIN can make a collection PUBLIC. Any admin can manage public collections. Everyone, including guests, can view them (optional-auth GETs). This reverses the PRD's "public lists out of scope" for admin-curated lists only.</li>
+</ul>
+<hr />
 <h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -8039,6 +8070,11 @@ Related Skills: designing-systems, designing-apis, domain-driven-design
 <td>2026-05-31</td>
 <td>nguyenhuuca</td>
 <td>Initial draft</td>
+</tr>
+<tr>
+<td>2026-10-13</td>
+<td>nguyenhuuca</td>
+<td>Amendment approved: collections-first model + admin public collections</td>
 </tr>
 </tbody>
 </table>
