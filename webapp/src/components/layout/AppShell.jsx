@@ -8,7 +8,7 @@ import ProfileModal from '../auth/ProfileModal.jsx'
 import ShareModal from '../modals/ShareModal.jsx'
 import DeleteConfirmModal from '../modals/DeleteConfirmModal.jsx'
 import { CommentPanel } from '../comments/index.js'
-import { PublicFeed, PrivateFeed } from '../video/VideoFeed.jsx'
+import { PublicFeed } from '../video/VideoFeed.jsx'
 import ExploreView from '../explore/ExploreView.jsx'
 import LibraryView from '../library/LibraryView.jsx'
 import ComingSoon from './ComingSoon.jsx'
@@ -18,10 +18,12 @@ import ActivityBar from '../common/ActivityBar.jsx'
 import NotificationBell from '../notifications/NotificationBell.jsx'
 import { useNotificationStream } from '../../hooks/useNotifications.js'
 
-const TABS = [
-  { key: 'popular', label: 'Popular', icon: 'local_fire_department' },
-  { key: 'funny',   label: 'Funny',   icon: 'sentiment_very_satisfied' },
-  { key: 'private', label: 'Private', icon: 'lock', requiresAuth: true },
+// Mobile bottom nav (no side nav on mobile). Settings is only useful once logged in.
+const MOBILE_NAV = [
+  { key: 'home',     icon: 'home',          label: 'Home'     },
+  { key: 'library',  icon: 'video_library', label: 'Library'  },
+  { key: 'explore',  icon: 'explore',       label: 'Explore'  },
+  { key: 'settings', icon: 'settings',      label: 'Settings', requiresAuth: true },
 ]
 
 const SIDE_NAV = [
@@ -35,8 +37,6 @@ const SIDE_NAV = [
 export default function AppShell() {
   const { isLoggedIn, user, logout, sessionNotice, clearSessionNotice } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
-  const [activeTab,     setActiveTab]     = useState('popular')
-  const [privateLoaded, setPrivateLoaded] = useState(false)
   const [message,       setMessage]       = useState(null)
   const [mfaModal,      setMfaModal]      = useState({ show: false, pendingData: null })
   const [profileOpen,   setProfileOpen]   = useState(false)
@@ -85,7 +85,6 @@ export default function AppShell() {
   function openNotification(n) {
     if (!n?.videoId) return
     setActiveNav('home')
-    setActiveTab('popular')
     setDeepLinkId(String(n.videoId))
     setFeedKey(k => k + 1)
     setHighlightCommentId(n.commentId ? String(n.commentId) : null)
@@ -97,18 +96,35 @@ export default function AppShell() {
     setTimeout(() => setMessage(null), 5000)
   }
 
-  function handleTabSelect(key) {
-    setActiveTab(key)
-    if (key === 'private') setPrivateLoaded(true)
-  }
-
   function handleExploreNavigate(index) {
     setJumpIndex(index)
-    setActiveTab('popular')
     setActiveNav('home')
   }
 
-  const visibleTabs = TABS.filter(t => !t.requiresAuth || isLoggedIn)
+  const mobileNav = MOBILE_NAV.filter(t => !t.requiresAuth || isLoggedIn)
+  const mobileSplit = Math.ceil(mobileNav.length / 2)
+  const mobileTitle = activeNav === 'home' ? 'For You' : (SIDE_NAV.find(n => n.key === activeNav)?.label ?? 'For You')
+
+  function renderMobileNavItem(item) {
+    const active = activeNav === item.key
+    return (
+      <button
+        key={item.key}
+        className="mobile-nav-tab"
+        aria-current={active ? 'page' : undefined}
+        onClick={() => setActiveNav(item.key)}
+        style={{ color: active ? 'var(--accent-cyan)' : 'var(--text-muted)' }}
+      >
+        <span className="material-symbols-outlined" style={{
+          fontSize: 22,
+          fontVariationSettings: active ? "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" : undefined,
+        }}>
+          {item.icon}
+        </span>
+        {item.label}
+      </button>
+    )
+  }
 
   return (
     <>
@@ -139,23 +155,8 @@ export default function AppShell() {
           FUNNY MOVIES
         </div>
 
-        {/* Mobile title — active tab label centered (desktop hidden via CSS) */}
-        <span className="mobile-title">
-          {visibleTabs.find(t => t.key === activeTab)?.label ?? 'For You'}
-        </span>
-
-        {/* Center — tabs (hidden on mobile) */}
-        <nav className="topnav-tabs" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {visibleTabs.map(tab => (
-            <button
-              key={tab.key}
-              className={`topnav-tab${activeTab === tab.key ? ' active' : ''}`}
-              onClick={() => handleTabSelect(tab.key)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+        {/* Mobile title — current section centered (desktop hidden via CSS) */}
+        <span className="mobile-title">{mobileTitle}</span>
 
         {/* Right — auth controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 180, justifyContent: 'flex-end' }}>
@@ -325,47 +326,20 @@ export default function AppShell() {
         ) : activeNav !== 'home' ? (
           <ComingSoon page={activeNav} />
         ) : (
-          <>
-            {activeTab === 'popular' && (
-              <PublicFeed
-                key={`public-${feedKey}`}
-                category={null}
-                initialIndex={jumpIndex}
-                deepLinkId={deepLinkId}
-                onDeepLinkResolved={() => setDeepLinkId(null)}
-                muted={muted}
-                onMutedChange={setMuted}
-                mobileSearchOpen={mobileSearchOpen}
-                onCloseMobileSearch={() => setMobileSearchOpen(false)}
-                onShowComments={showComments}
-                onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
-                currentUser={user}
-              />
-            )}
-            {activeTab === 'funny' && (
-              <PublicFeed
-                category="funny"
-                muted={muted}
-                onMutedChange={setMuted}
-                mobileSearchOpen={mobileSearchOpen}
-                onCloseMobileSearch={() => setMobileSearchOpen(false)}
-                onShowComments={showComments}
-                onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
-                currentUser={user}
-              />
-            )}
-            {activeTab === 'private' && privateLoaded && (
-              <PrivateFeed
-                muted={muted}
-                onMutedChange={setMuted}
-                mobileSearchOpen={mobileSearchOpen}
-                onCloseMobileSearch={() => setMobileSearchOpen(false)}
-                onShowComments={showComments}
-                onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
-                currentUser={user}
-              />
-            )}
-          </>
+          <PublicFeed
+            key={`public-${feedKey}`}
+            category={null}
+            initialIndex={jumpIndex}
+            deepLinkId={deepLinkId}
+            onDeepLinkResolved={() => setDeepLinkId(null)}
+            muted={muted}
+            onMutedChange={setMuted}
+            mobileSearchOpen={mobileSearchOpen}
+            onCloseMobileSearch={() => setMobileSearchOpen(false)}
+            onShowComments={showComments}
+            onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
+            currentUser={user}
+          />
         )}
       </main>
 
@@ -379,25 +353,7 @@ export default function AppShell() {
         justifyContent: 'space-around',
         alignItems: 'center', padding: '0 8px',
       }}>
-        {/* Left tabs */}
-        {(isLoggedIn
-          ? visibleTabs.slice(0, Math.ceil(visibleTabs.length / 2))
-          : visibleTabs
-        ).map(tab => (
-          <button key={tab.key} onClick={() => handleTabSelect(tab.key)} className="mobile-nav-tab" style={{
-            color: activeTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-muted)',
-          }}>
-            <span className="material-symbols-outlined" style={{
-              fontSize: 22,
-              fontVariationSettings: activeTab === tab.key
-                ? "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24"
-                : undefined,
-            }}>
-              {tab.icon}
-            </span>
-            {tab.label}
-          </button>
-        ))}
+        {mobileNav.slice(0, mobileSplit).map(renderMobileNavItem)}
 
         {/* Center FAB — inline flex item (YouTube-style) */}
         {isLoggedIn && (
@@ -406,41 +362,7 @@ export default function AppShell() {
           </button>
         )}
 
-        {/* Right tabs (only when logged in) */}
-        {isLoggedIn && visibleTabs.slice(Math.ceil(visibleTabs.length / 2)).map(tab => (
-          <button key={tab.key} onClick={() => handleTabSelect(tab.key)} className="mobile-nav-tab" style={{
-            color: activeTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-muted)',
-          }}>
-            <span className="material-symbols-outlined" style={{
-              fontSize: 22,
-              fontVariationSettings: activeTab === tab.key
-                ? "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24"
-                : undefined,
-            }}>
-              {tab.icon}
-            </span>
-            {tab.label}
-          </button>
-        ))}
-
-        {/* Explore — 5th item to center the FAB */}
-        {(
-          <button
-            className="mobile-nav-tab"
-            onClick={() => setActiveNav(v => v === 'explore' ? 'home' : 'explore')}
-            style={{ color: activeNav === 'explore' ? 'var(--accent-cyan)' : 'var(--text-muted)' }}
-          >
-            <span className="material-symbols-outlined" style={{
-              fontSize: 22,
-              fontVariationSettings: activeNav === 'explore'
-                ? "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24"
-                : undefined,
-            }}>
-              explore
-            </span>
-            Explore
-          </button>
-        )}
+        {mobileNav.slice(mobileSplit).map(renderMobileNavItem)}
       </nav>
 
       {/* ── FAB (desktop only, hidden on mobile via CSS) ── */}

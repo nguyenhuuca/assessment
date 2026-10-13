@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import AppShell from '../AppShell.jsx'
 import { commentsApi } from '../../../api/comments.js'
@@ -31,9 +31,9 @@ vi.mock('../../modals/DeleteConfirmModal.jsx', () => ({ default: () => null }))
 vi.mock('../../explore/ExploreView.jsx', () => ({ default: () => null }))
 vi.mock('../../admin/AdminView.jsx', () => ({ default: () => null }))
 vi.mock('../../settings/SettingsPage.jsx', () => ({ default: () => null }))
+vi.mock('../../library/LibraryView.jsx', () => ({ default: () => <div data-testid="library" /> }))
 vi.mock('../../video/VideoFeed.jsx', () => ({
   PublicFeed: ({ deepLinkId }) => <div data-testid="public-feed" data-deeplink={deepLinkId ?? ''} />,
-  PrivateFeed: () => null,
 }))
 
 const at = (m) => new Date(Date.now() - m * 60000).toISOString()
@@ -100,5 +100,25 @@ describe('AppShell deep link ?v=&c=', () => {
     expect(row.classList.contains('comment-highlight')).toBe(true)
     expect(screen.getByTestId('public-feed').dataset.deeplink).toBe('9')
     expect(notificationsApi.markRead).toHaveBeenCalledWith('n1')
+  })
+})
+
+describe('AppShell navigation', () => {
+  it('has no Popular / Funny / Private feed tabs; Home shows the single feed', () => {
+    renderShell()
+    expect(screen.getByTestId('public-feed')).toBeTruthy()
+    for (const label of ['Popular', 'Funny', 'Private']) {
+      expect(screen.queryByRole('button', { name: label })).toBeNull()
+    }
+  })
+
+  it('mobile nav reaches Library and back to Home', () => {
+    renderShell()
+    const mobileNav = document.querySelector('.mobile-nav')
+    fireEvent.click(within(mobileNav).getByRole('button', { name: /Library/ }))
+    expect(screen.getByTestId('library')).toBeTruthy()
+    expect(within(mobileNav).getByRole('button', { name: /Library/ })).toHaveAttribute('aria-current', 'page')
+    fireEvent.click(within(mobileNav).getByRole('button', { name: /Home/ }))
+    expect(screen.getByTestId('public-feed')).toBeTruthy()
   })
 })
