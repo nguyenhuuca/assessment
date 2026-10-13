@@ -133,8 +133,8 @@ jobs:
             sudo apt-get install -y libxml2-utils
           fi
 
-      # Check coverage and enforce +1% increase rule
-      - name: Check coverage and enforce +1% increase
+      # Check coverage against the fixed minimum in api/.coverage-threshold (e.g. .90 = 90% LINE)
+      - name: Check coverage against minimum threshold
         run: |
           THRESHOLD_FILE="api/.coverage-threshold"
           REPORT="api/target/jacoco-report/jacoco.xml"
@@ -151,37 +151,15 @@ jobs:
 
           echo "📊 Actual LINE coverage: $(echo "$COVERAGE * 100" | bc)%"
 
-          if [ ! -f "$THRESHOLD_FILE" ]; then
-            echo "0.10" > "$THRESHOLD_FILE"
-          fi
-
-          OLD=$(cat "$THRESHOLD_FILE")
-          REQUIRED=$(echo "$OLD + 0.01" | bc)
-          echo "🔒 Required minimum: $(echo "$REQUIRED * 100" | bc)% (last was $(echo "$OLD * 100" | bc)%)"
+          REQUIRED=$(cat "$THRESHOLD_FILE" 2>/dev/null || echo "0.90")
+          echo "🔒 Required minimum: $(echo "$REQUIRED * 100" | bc)%"
 
           TOO_LOW=$(echo "$COVERAGE < $REQUIRED" | bc)
           if [ "$TOO_LOW" -eq 1 ]; then
-            echo "❌ Coverage not improved enough (got $COVERAGE, need at least $REQUIRED)"
+            echo "❌ Coverage too low (got $COVERAGE, need at least $REQUIRED)"
             exit 1
           fi
-
-          echo "$REQUIRED" > "$THRESHOLD_FILE"
-          echo "✅ Coverage threshold updated to $REQUIRED"
-
-      # Commit and push updated coverage threshold
-      - name: Commit updated coverage threshold
-        if: github.ref == 'refs/heads/main'
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}
-
-          git pull origin main
-          git add api/.coverage-threshold
-          git commit -m "[skip ci] ⬆️ Auto-increase coverage threshold to next level" || echo "No changes to commit"
-          git push origin main
+          echo "✅ Coverage OK"
 
       # Upload test reports
       - name: Upload JUnit test reports

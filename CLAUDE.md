@@ -173,7 +173,7 @@ ContractDSL.of(value).notNull().inRange(min, max);
 
 ## Testing & CI
 
-**Coverage:** Jacoco enforces +1% increase per commit, threshold in `api/.coverage-threshold`
+**Coverage:** CI requires LINE coverage >= the fixed minimum in `api/.coverage-threshold` (currently 90%)
 
 **CI Pipeline:** Build → Test → Coverage → Docker → Deploy
 - Version in `api/.funny-app.version` (auto-incremented)
