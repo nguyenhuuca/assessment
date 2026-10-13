@@ -49,5 +49,16 @@ class LimitedInputStreamTest {
         lis.read();
         assertTrue(lis.available() <= 1);
     }
-}
 
+    @Test
+    void testMarkResetRestartsLimitFromMark() throws IOException {
+        LimitedInputStream lis = new LimitedInputStream(new ByteArrayInputStream(new byte[]{1, 2, 3, 4}), 2, null);
+        assertTrue(lis.markSupported());
+        lis.mark(10);
+        assertEquals(1, lis.read());
+        assertEquals(2, lis.read());
+        assertEquals(-1, lis.read()); // limit reached
+        lis.reset();
+        assertEquals(1, lis.read()); // back at the mark with a fresh byte budget
+    }
+}
