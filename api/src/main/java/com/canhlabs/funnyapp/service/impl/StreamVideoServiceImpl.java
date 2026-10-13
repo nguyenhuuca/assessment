@@ -110,15 +110,6 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     }
 
     VideoDto toDto(VideoSource source) {
-        VideoDto dto = new VideoDto();
-        dto.setId(source.getId());
-        dto.setFileId(source.getSourceId());
-        dto.setUserShared("unknown"); // set nếu có user info
-        dto.setTitle(source.getTitle());
-        dto.setDesc(source.getDesc());
-        dto.setViewCount(source.getViewCount());
-        dto.setUrlLink("https://canh-labs.com/api/v1/funny-app/video-stream/stream/" + source.getSourceId());
-        dto.setEmbedLink("https://canh-labs.com/api/v1/funny-app/video-stream/stream/" + source.getSourceId());
-        return dto;
+        return Converter.toVideoDto(source);
     }
 }

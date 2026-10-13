@@ -4,10 +4,12 @@ import VideoPlayer from './VideoPlayer.jsx'
 import VoteButtons from './VoteButtons.jsx'
 import { buildStreamUrl } from '../../utils/videoModel.js'
 import SearchModal from '../modals/SearchModal.jsx'
+import AddToCollectionModal from '../library/AddToCollectionModal.jsx'
 
 export default function VideoSwiper({ videos = [], initialIndex = 0, muted = true, onMutedChange, mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const [index, setIndex] = useState(() => Math.min(initialIndex, Math.max(0, videos.length - 1)))
   const [direction, setDirection] = useState('next')
+  const [saveVideo, setSaveVideo] = useState(null)
   const total = videos.length
 
   const next = useCallback(() => {
@@ -154,6 +156,12 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, muted = tru
           <span className="label">Comment</span>
         </button>
 
+        {/* Save to collection */}
+        <button className="action-btn" onClick={() => setSaveVideo(video)} title="Lưu">
+          <span className="icon material-symbols-outlined">bookmark_add</span>
+          <span className="label">Lưu</span>
+        </button>
+
         {/* Share — generates ?v={id} deep-link URL */}
         <button
           className="action-btn"
@@ -219,6 +227,8 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, muted = tru
           />
         ) : null
       })}
+
+      {saveVideo && <AddToCollectionModal video={saveVideo} onClose={() => setSaveVideo(null)} />}
 
       <SearchModal
         show={mobileSearchOpen}

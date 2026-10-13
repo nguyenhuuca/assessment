@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.entity.ShareLink;
 import com.canhlabs.funnyapp.entity.User;
+import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.user.UserInfoDto;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
@@ -55,5 +56,19 @@ public class Converter {
                 .urlLink(link.getUrlLink())
                 .userShared(link.getUser().getUserName())
                 .build()).collect(Collectors.toList());
+    }
+
+    /** Feed-shaped DTO for a stored video; shared by the feed and collections. */
+    public static VideoDto toVideoDto(VideoSource source) {
+        VideoDto dto = new VideoDto();
+        dto.setId(source.getId());
+        dto.setFileId(source.getSourceId());
+        dto.setUserShared("unknown"); // set nếu có user info
+        dto.setTitle(source.getTitle());
+        dto.setDesc(source.getDesc());
+        dto.setViewCount(source.getViewCount());
+        dto.setUrlLink("https://canh-labs.com/api/v1/funny-app/video-stream/stream/" + source.getSourceId());
+        dto.setEmbedLink("https://canh-labs.com/api/v1/funny-app/video-stream/stream/" + source.getSourceId());
+        return dto;
     }
 }

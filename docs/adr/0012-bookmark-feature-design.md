@@ -235,8 +235,20 @@ Notes:
 
 ---
 
+## Amendment 2026-10-13 — Collections without a bookmarks table
+
+Approved by owner 2026-10-13. Details in [plan-library-collections](../plans/plan-library-collections.md).
+
+- Drop the `bookmarks` table. Collection items (`video_collection_items`) reference `video_sources` directly. "Bookmark / watch later" becomes a built-in default collection ("Xem sau").
+- `video_id` uses `ON DELETE CASCADE` (admin delete is a hard delete), which removes the need for `source_video_id` + `SET NULL`.
+- Bookmark state is fetched per video when the save modal opens (`GET /collections/membership?videoId=`). There is no global `/bookmarks/ids` preload. The feed cache is still untouched (Decision 1 driver kept).
+- New: collections have `visibility` PRIVATE/PUBLIC. Only ADMIN/SUPER_ADMIN can make a collection PUBLIC. Any admin can manage public collections. Everyone, including guests, can view them (optional-auth GETs). This reverses the PRD's "public lists out of scope" for admin-curated lists only.
+
+---
+
 ## Changelog
 
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-05-31 | nguyenhuuca | Initial draft |
+| 2026-10-13 | nguyenhuuca | Amendment approved: collections-first model + admin public collections |

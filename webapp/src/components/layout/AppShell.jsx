@@ -10,6 +10,7 @@ import DeleteConfirmModal from '../modals/DeleteConfirmModal.jsx'
 import { CommentPanel } from '../comments/index.js'
 import { PublicFeed, PrivateFeed } from '../video/VideoFeed.jsx'
 import ExploreView from '../explore/ExploreView.jsx'
+import LibraryView from '../library/LibraryView.jsx'
 import ComingSoon from './ComingSoon.jsx'
 import AdminView from '../admin/AdminView.jsx'
 import SettingsPage from '../settings/SettingsPage.jsx'
@@ -34,7 +35,6 @@ const SIDE_NAV = [
 export default function AppShell() {
   const { isLoggedIn, user, logout, sessionNotice, clearSessionNotice } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
-  const [activeNav,     setActiveNav]     = useState('home')
   const [activeTab,     setActiveTab]     = useState('popular')
   const [privateLoaded, setPrivateLoaded] = useState(false)
   const [message,       setMessage]       = useState(null)
@@ -42,14 +42,16 @@ export default function AppShell() {
   const [profileOpen,   setProfileOpen]   = useState(false)
   const [shareOpen,     setShareOpen]     = useState(false)
   const [deleteModal,   setDeleteModal]   = useState({ show: false, video: null })
-  // Deep link from the URL: ?v={videoId}[&c={commentId}] — read once, then strip from the address bar
+  // Deep link from the URL: ?v={videoId}[&c={commentId}] or ?l={collectionId} — read once, then strip from the address bar
   const [initialLink] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     const v = params.get('v')
     const c = params.get('c')
-    if (v) window.history.replaceState({}, document.title, window.location.pathname)
-    return { v: v || null, c: v && c ? c : null }
+    const l = params.get('l')
+    if (v || l) window.history.replaceState({}, document.title, window.location.pathname)
+    return { v: v || null, c: v && c ? c : null, l: !v && l ? l : null }
   })
+  const [activeNav,     setActiveNav]     = useState(() => (initialLink.l ? 'library' : 'home'))
   const [commentVideo,    setCommentVideo]    = useState(() => (initialLink.c ? { id: initialLink.v } : null))
   const [highlightCommentId, setHighlightCommentId] = useState(initialLink.c)
   const [feedKey,         setFeedKey]         = useState(0)
@@ -299,8 +301,8 @@ export default function AppShell() {
         marginLeft: 'var(--sidenav-w)',
         marginTop: 'var(--topnav-h)',
         height: 'calc(100vh - var(--topnav-h))',
-        overflow: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings') ? 'auto' : 'hidden',
-        display: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings') ? 'block' : 'flex',
+        overflow: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'library') ? 'auto' : 'hidden',
+        display: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'library') ? 'block' : 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--bg)',
@@ -313,6 +315,13 @@ export default function AppShell() {
           <SettingsPage />
         ) : activeNav === 'settings' && !isLoggedIn ? (
           <ComingSoon page="settings" />
+        ) : activeNav === 'library' ? (
+          <LibraryView
+            initialCollectionId={initialLink.l}
+            muted={muted}
+            onMutedChange={setMuted}
+            onShowComments={showComments}
+          />
         ) : activeNav !== 'home' ? (
           <ComingSoon page={activeNav} />
         ) : (
