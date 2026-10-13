@@ -13,6 +13,7 @@ vi.mock('../../../api/collections.js', () => ({
     videos: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), membership: vi.fn(),
   },
 }))
+vi.mock('../AddVideosModal.jsx', () => ({ default: ({ collection }) => <div data-testid="add-videos">{collection.name}</div> }))
 vi.mock('../../video/VideoSwiper.jsx', () => ({ default: () => <div data-testid="swiper" /> }))
 
 const pub = { id: 'p1', name: 'Hài tuyển chọn', visibility: 'PUBLIC', itemCount: 3, coverFileId: 'abc', canManage: false }
@@ -89,5 +90,18 @@ describe('LibraryView', () => {
     renderView()
     fireEvent.click(await screen.findByRole('button', { name: /Tạo collection/ }))
     expect(screen.getByRole('checkbox', { name: 'Công khai' })).toBeTruthy()
+  })
+
+  it('"Thêm video" opens the search modal only for collections the user can manage', async () => {
+    renderView({ initialCollectionId: 'p1' }) // public, guest: read-only
+    await screen.findByLabelText('Clip')
+    expect(screen.queryByRole('button', { name: /Thêm video/ })).toBeNull()
+  })
+
+  it('owner can open "Thêm video" from a collection', async () => {
+    auth = { isLoggedIn: true, user: { isAdmin: false } }
+    renderView({ initialCollectionId: 'o' })
+    fireEvent.click(await screen.findByRole('button', { name: /Thêm video/ }))
+    expect(screen.getByTestId('add-videos')).toHaveTextContent('Của tôi')
   })
 })

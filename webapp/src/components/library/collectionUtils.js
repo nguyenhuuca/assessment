@@ -17,3 +17,13 @@ export function isPublic(collection) {
 export function pinDefaultFirst(collections = []) {
   return [...collections.filter(c => c.isDefault), ...collections.filter(c => !c.isDefault)]
 }
+
+/** Accent- and case-insensitive ("hai huoc" matches "Hài hước"). */
+export function normalizeForSearch(value) {
+  return (value || '')
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLocaleLowerCase()
+}

@@ -10,6 +10,7 @@ import {
 } from '../../hooks/useCollections.js'
 import VideoSwiper from '../video/VideoSwiper.jsx'
 import CollectionFormModal from './CollectionFormModal.jsx'
+import AddVideosModal from './AddVideosModal.jsx'
 import { isPublic, pinDefaultFirst } from './collectionUtils.js'
 
 function coverUrl(fileId) {
@@ -79,6 +80,7 @@ function VideoTile({ video, onPlay, onRemove, removing }) {
 function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, deleting, muted, onMutedChange, onShowComments, currentUser }) {
   const [page, setPage] = useState(0)
   const [playIndex, setPlayIndex] = useState(null)
+  const [adding, setAdding] = useState(false)
   const { data, isLoading, error } = useCollectionVideos(collectionId, page)
   const toggle = useToggleCollectionItem()
   const videos = data?.videos ?? []
@@ -121,6 +123,11 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
           <button className="app-btn secondary" onClick={share}>
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>share</span> Chia sẻ
           </button>
+          {canManage && (
+            <button className="app-btn primary" onClick={() => setAdding(true)}>
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span> Thêm video
+            </button>
+          )}
           {canManage && !collection.isDefault && (
             <>
               <button className="app-btn secondary" onClick={onEdit}>Sửa</button>
@@ -136,7 +143,9 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
         {isLoading ? (
           <div className="vid-spinner" />
         ) : videos.length === 0 ? (
-          <p className="explore-empty-grid">Collection này chưa có video</p>
+          <p className="explore-empty-grid">
+            Collection này chưa có video{canManage && ' — bấm "Thêm video" để tìm và thêm'}
+          </p>
         ) : (
           <div className="explore-reels-grid">
             {videos.map((v, i) => (
@@ -158,6 +167,13 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
           </div>
         )}
       </section>
+      {adding && (
+        <AddVideosModal
+          collection={collection}
+          existingIds={videos.map(v => v.id)}
+          onClose={() => setAdding(false)}
+        />
+      )}
     </div>
   )
 }
