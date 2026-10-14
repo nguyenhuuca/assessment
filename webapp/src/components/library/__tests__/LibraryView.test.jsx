@@ -4,7 +4,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import LibraryView from '../LibraryView.jsx'
 import { collectionsApi } from '../../../api/collections.js'
-import { videosApi } from '../../../api/videos.js'
 
 let auth
 vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => auth }))
@@ -14,7 +13,6 @@ vi.mock('../../../api/collections.js', () => ({
     videos: vi.fn(), videoIds: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), membership: vi.fn(),
   },
 }))
-vi.mock('../../../api/videos.js', () => ({ videosApi: { privateList: vi.fn() } }))
 vi.mock('../AddVideosModal.jsx', () => ({ default: ({ collection }) => <div data-testid="add-videos">{collection.name}</div> }))
 vi.mock('../../video/VideoSwiper.jsx', () => ({ default: () => <div data-testid="swiper" /> }))
 
@@ -39,7 +37,6 @@ beforeEach(() => {
   collectionsApi.videos.mockResolvedValue({
     data: { content: [{ id: 1, title: 'Clip', embedLink: 'http://v', fileId: 'f' }], totalPages: 1, totalElements: 1 },
   })
-  videosApi.privateList.mockResolvedValue({ data: [] })
 })
 
 describe('LibraryView', () => {
@@ -99,24 +96,6 @@ describe('LibraryView', () => {
     renderView({ initialCollectionId: 'p1' }) // public, guest: read-only
     await screen.findByLabelText('Clip')
     expect(screen.queryByRole('button', { name: /Thêm video/ })).toBeNull()
-  })
-
-  it('logged-in users see and play their private videos; guests do not', async () => {
-    renderView()
-    await screen.findByLabelText('Hài tuyển chọn, 3 video')
-    expect(screen.queryByText('Video riêng tư của tôi')).toBeNull()
-    expect(videosApi.privateList).not.toHaveBeenCalled()
-  })
-
-  it('plays a private video from the Library', async () => {
-    auth = { isLoggedIn: true, user: { isAdmin: false } }
-    videosApi.privateList.mockResolvedValue({ data: [{ id: 9, title: 'Riêng', embedLink: 'http://p', fileId: 'pf' }] })
-    renderView()
-    expect(await screen.findByText('Video riêng tư của tôi')).toBeTruthy()
-    fireEvent.click(await screen.findByLabelText('Riêng'))
-    expect(await screen.findByTestId('swiper')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: /Quay lại/ }))
-    expect(await screen.findByText('Video riêng tư của tôi')).toBeTruthy()
   })
 
   it('steps back a page when the current page no longer exists', async () => {

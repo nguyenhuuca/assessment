@@ -15,15 +15,3 @@ export function useVideos(category) {
     staleTime: 5 * 60 * 1000,
   })
 }
-
-export function usePrivateVideos() {
-  return useQuery({
-    queryKey: ['videos', 'private'],
-    queryFn: async () => {
-      const res = await videosApi.privateList()
-      const items = res.data || res
-      return (Array.isArray(items) ? items : []).map(mapApiVideo)
-    },
-    staleTime: 2 * 60 * 1000,
-  })
-}

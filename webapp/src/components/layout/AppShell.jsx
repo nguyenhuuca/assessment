@@ -322,7 +322,6 @@ export default function AppShell() {
             muted={muted}
             onMutedChange={setMuted}
             onShowComments={showComments}
-            onDeleteVideo={v => setDeleteModal({ show: true, video: v })}
           />
         ) : activeNav !== 'home' ? (
           <ComingSoon page={activeNav} />

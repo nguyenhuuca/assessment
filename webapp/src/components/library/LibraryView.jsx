@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth.js'
-import { usePrivateVideos } from '../../hooks/useVideos.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import {
   useMyCollections,
@@ -76,7 +75,7 @@ function VideoTile({ video, onPlay, onRemove, removing }) {
 }
 
 /** Plays a list of videos in the swiper, with a back button to the grid it came from. */
-function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComments, onDeleteVideo, currentUser }) {
+function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComments, currentUser }) {
   return (
     <div style={{ position: 'relative', height: 'calc(100vh - var(--topnav-h))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <button className="app-btn secondary" style={{ position: 'absolute', top: 12, left: 12, zIndex: 5 }} onClick={onBack}>
@@ -88,32 +87,9 @@ function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComment
         muted={muted}
         onMutedChange={onMutedChange}
         onShowComments={onShowComments}
-        onDeleteVideo={onDeleteVideo}
         currentUser={currentUser}
       />
     </div>
-  )
-}
-
-/** The user's own private uploads: they never appear in the public feed or in collections. */
-function PrivateVideosSection({ onPlay }) {
-  const { data: videos = [], isLoading, error } = usePrivateVideos()
-  return (
-    <section className="explore-section">
-      <div className="explore-section-header">
-        <h2 className="explore-section-title">Video riêng tư của tôi</h2>
-      </div>
-      {error && <div className="app-alert error" role="alert">{error.message}</div>}
-      {isLoading ? (
-        <div className="vid-spinner" />
-      ) : videos.length === 0 ? (
-        <p className="explore-empty-grid">Bạn chưa có video riêng tư</p>
-      ) : (
-        <div className="explore-reels-grid">
-          {videos.map((v, i) => <VideoTile key={v.id} video={v} onPlay={() => onPlay(videos, i)} />)}
-        </div>
-      )}
-    </section>
   )
 }
 
@@ -218,7 +194,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
   )
 }
 
-export default function LibraryView({ initialCollectionId = null, muted, onMutedChange, onShowComments, onDeleteVideo }) {
+export default function LibraryView({ initialCollectionId = null, muted, onMutedChange, onShowComments }) {
   const { isLoggedIn, user } = useAuth()
   const [confirm, confirmDialog] = useConfirm()
   const publicQuery = usePublicCollections()
@@ -226,7 +202,6 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
   const remove = useDeleteCollection()
   const [openId, setOpenId] = useState(initialCollectionId)
   const [formState, setFormState] = useState(null) // { collection? }
-  const [playing, setPlaying] = useState(null) // { videos, index } for private videos
 
   const publicList = publicQuery.data ?? []
   // Admins also receive public collections in "mine"; keep this section to private ones
@@ -241,21 +216,6 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
       danger: true,
     })
     if (ok) remove.mutate(c.id, { onSuccess: () => setOpenId(null) })
-  }
-
-  if (playing) {
-    return (
-      <PlayerView
-        videos={playing.videos}
-        index={playing.index}
-        onBack={() => setPlaying(null)}
-        muted={muted}
-        onMutedChange={onMutedChange}
-        onShowComments={onShowComments}
-        onDeleteVideo={onDeleteVideo}
-        currentUser={user}
-      />
-    )
   }
 
   if (openId) {
@@ -337,8 +297,6 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
           </>
         )}
       </section>
-
-      {isLoggedIn && <PrivateVideosSection onPlay={(videos, index) => setPlaying({ videos, index })} />}
 
       {formState && <CollectionFormModal collection={formState.collection} onClose={() => setFormState(null)} />}
       {confirmDialog}

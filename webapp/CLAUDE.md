@@ -42,7 +42,7 @@ webapp/
 │   ├── api/
 │   │   ├── client.js              # Axios instance (baseURL from VITE_API_BASE_URL)
 │   │   ├── auth.js                # join, me, mfa.* endpoints
-│   │   ├── videos.js              # list, privateList, share, delete
+│   │   ├── videos.js              # list, share, delete
 │   │   ├── reactions.js           # get/set/remove per-user like/dislike (/videos/{id}/reaction)
 │   │   ├── comments.js            # list, add comments
 │   │   ├── guestToken.js          # guest token init/storage
@@ -53,7 +53,7 @@ webapp/
 │   ├── hooks/
 │   │   ├── useAuth.js             # consumes AuthContext
 │   │   ├── useTheme.js            # consumes ThemeContext
-│   │   └── useVideos.js           # React Query hooks: useVideos(category), usePrivateVideos()
+│   │   └── useVideos.js           # React Query hook: useVideos(category)
 │   ├── utils/
 │   │   └── videoModel.js          # mapApiVideo(), buildStreamUrl(), thumbnailUrl(), determineCategory()
 │   └── components/
@@ -129,7 +129,7 @@ Video streams use `buildStreamUrl()` from `videoModel.js`. Never put the JWT or 
 
 ## State Management
 
-- **Server state**: React Query (`useVideos`, `usePrivateVideos`) — cache invalidated on share/delete
+- **Server state**: React Query (`useVideos`) — cache invalidated on share/delete
 - **Auth state**: `AuthContext` → localStorage (`jwt`, `user`)
 - **Theme state**: `ThemeContext` → localStorage (`theme`)
 - **UI state**: local `useState` in components
