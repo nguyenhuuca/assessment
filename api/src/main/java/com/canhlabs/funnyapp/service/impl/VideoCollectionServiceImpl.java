@@ -52,7 +52,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
     static final int MAX_ITEMS_PER_COLLECTION = 500;
     static final int MAX_PAGE_SIZE = 50;
     private static final String PUBLIC_KEY = "public";
-    private static final String NAME_TAKEN = "A collection with this name already exists";
+    private static final String NAME_TAKEN = "error.collection.nameTaken";
 
     /**
      * Guest/user view of the public list (admins bypass it: they also see empty collections and counts).
@@ -110,7 +110,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         String name = normalizeName(request.getName());
         CollectionVisibility visibility = request.getVisibility() == null ? CollectionVisibility.PRIVATE : request.getVisibility();
         if (visibility == CollectionVisibility.PUBLIC && !isAdmin(userId)) {
-            throw error(HttpStatus.FORBIDDEN, "Only admins can create public collections");
+            throw error(HttpStatus.FORBIDDEN, "error.collection.adminOnlyCreatePublic");
         }
         requireCollectionSlot(userId);
         requireUniqueName(userId, name, visibility, null);
@@ -132,11 +132,11 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         boolean admin = isAdmin(user.getId());
         VideoCollection collection = requireManageable(id, user.getId(), admin);
         if (collection.isDefault()) {
-            throw error(HttpStatus.BAD_REQUEST, "The default collection cannot be changed");
+            throw error(HttpStatus.BAD_REQUEST, "error.collection.defaultImmutable");
         }
         CollectionVisibility visibility = request.getVisibility() == null ? collection.getVisibility() : request.getVisibility();
         if (visibility == CollectionVisibility.PUBLIC && !admin) {
-            throw error(HttpStatus.FORBIDDEN, "Only admins can make a collection public");
+            throw error(HttpStatus.FORBIDDEN, "error.collection.adminOnlyMakePublic");
         }
         boolean wasPublic = collection.getVisibility() == CollectionVisibility.PUBLIC;
         // Making another admin's public collection private would strand it in their private list,
@@ -169,7 +169,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         UserDetailDto user = requireUser();
         VideoCollection collection = requireManageable(id, user.getId(), isAdmin(user.getId()));
         if (collection.isDefault()) {
-            throw error(HttpStatus.BAD_REQUEST, "The default collection cannot be deleted");
+            throw error(HttpStatus.BAD_REQUEST, "error.collection.defaultUndeletable");
         }
         collectionRepository.delete(collection);
         evictPublicIf(collection);
@@ -203,10 +203,10 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         UserDetailDto user = requireUser();
         VideoCollection collection = requireManageable(id, user.getId(), isAdmin(user.getId()));
         if (videoId == null || !videoSourceRepository.existsByIdAndIsHideAndStatus(videoId, false, VideoStatus.PUBLISHED)) {
-            throw error(HttpStatus.NOT_FOUND, "Video not found");
+            throw error(HttpStatus.NOT_FOUND, "error.video.notFound");
         }
         if (itemRepository.countItems(collection.getId()) >= MAX_ITEMS_PER_COLLECTION) {
-            throw error(HttpStatus.CONFLICT, "Collection is full (" + MAX_ITEMS_PER_COLLECTION + " videos)");
+            throw error(HttpStatus.CONFLICT, "error.collection.full", MAX_ITEMS_PER_COLLECTION);
         }
         if (itemRepository.addItem(collection.getId(), videoId) > 0) {
             touch(collection);
@@ -273,7 +273,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
     private void requireCollectionSlot(Long ownerId) {
         collectionRepository.lockOwner(ownerId);
         if (collectionRepository.countByUserId(ownerId) >= MAX_COLLECTIONS_PER_USER) {
-            throw error(HttpStatus.CONFLICT, "Collection limit reached (" + MAX_COLLECTIONS_PER_USER + ")");
+            throw error(HttpStatus.CONFLICT, "error.collection.limitReached", MAX_COLLECTIONS_PER_USER);
         }
     }
 
@@ -313,10 +313,10 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
     static String normalizeName(String raw) {
         String name = raw == null ? "" : Normalizer.normalize(raw, Normalizer.Form.NFC).strip().replaceAll("\\s+", " ");
         if (name.chars().anyMatch(Character::isISOControl)) {
-            throw error(HttpStatus.BAD_REQUEST, "Collection name contains invalid characters");
+            throw error(HttpStatus.BAD_REQUEST, "error.collection.nameInvalidChars");
         }
         if (name.isEmpty() || name.length() > CollectionRequest.MAX_NAME) {
-            throw error(HttpStatus.BAD_REQUEST, "Collection name must be 1-" + CollectionRequest.MAX_NAME + " characters");
+            throw error(HttpStatus.BAD_REQUEST, "error.collection.nameLength", CollectionRequest.MAX_NAME);
         }
         return name;
     }
@@ -361,16 +361,16 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
     private UserDetailDto requireUser() {
         UserDetailDto user = AppUtils.getCurrentUser();
         if (user == null || user.getId() == null) {
-            throw error(HttpStatus.UNAUTHORIZED, "Authentication required");
+            throw error(HttpStatus.UNAUTHORIZED, "error.auth.required");
         }
         return user;
     }
 
     private CustomException notFound() {
-        return error(HttpStatus.NOT_FOUND, "Collection not found");
+        return error(HttpStatus.NOT_FOUND, "error.collection.notFound");
     }
 
-    private static CustomException error(HttpStatus status, String message) {
-        return CustomException.builder().status(status).subCode(status.value()).message(message).build();
+    private static CustomException error(HttpStatus status, String messageKey, Object... args) {
+        return CustomException.of(status, status.value(), messageKey, args);
     }
 }

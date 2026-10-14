@@ -117,7 +117,7 @@ class ShareServiceImplTest {
             appUtilsMockedStatic.when(AppUtils::getCurrentUser).thenReturn(null);
             assertThatThrownBy(() -> shareService.getALLShare())
                     .isInstanceOf(CustomException.class)
-                    .hasMessageContaining("User is not exist");
+                    .hasMessageContaining("error.user.notFound");
         }
     }
 
@@ -128,14 +128,14 @@ class ShareServiceImplTest {
         doReturn(null).when(spyService).getInfoFromYoutube(anyString());
 
         assertThatThrownBy(() -> spyService.shareLink(req))
-                .hasMessageContaining("Cannot get video info");
+                .hasMessageContaining("error.video.infoUnavailable");
     }
 
     @Test
     void getInfoFromYoutube_ExceptionOccurs() {
         ShareServiceImpl spyService = Mockito.spy(shareService);
         // Pass an invalid URL to trigger exception
-        assertThatThrownBy(() -> spyService.getInfoFromYoutube("invalid_url")).hasMessageContaining("Cannot get video info");
+        assertThatThrownBy(() -> spyService.getInfoFromYoutube("invalid_url")).hasMessageContaining("error.video.infoUnavailable");
 
     }
 

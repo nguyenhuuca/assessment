@@ -18,6 +18,8 @@ public class ResultErrorInfo implements Serializable {
     private static final long serialVersionUID = -6448620768602438445L;
     private transient Object error;
     private String message;
+    /** Stable i18n message key; null when the error has no key. */
+    private String code;
     private int status;
     private int subCode;
     private String timestamp;

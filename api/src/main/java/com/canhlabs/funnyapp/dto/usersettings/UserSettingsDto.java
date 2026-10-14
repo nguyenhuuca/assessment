@@ -24,6 +24,8 @@ public class UserSettingsDto {
     private String defaultQuality;
     private boolean incognitoEnabled;
     private boolean profilePrivate;
+    /** 'vi' | 'en', or null when the user has not chosen (follow the browser). */
+    private String locale;
     private AccountStatusDto accountStatus;
     private Instant updatedAt;
 }

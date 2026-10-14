@@ -149,7 +149,7 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> userService.enableMfa(userName, secret, otp))
                 .isInstanceOf(CustomException.class)
-                .hasMessage("Otp is incorrectly");
+                .hasMessage("error.otp.incorrect");
 
     }
 
@@ -193,7 +193,7 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> userService.verifyMfa(req))
                 .isInstanceOf(CustomException.class)
-                .hasMessage("Invalid or expired session");
+                .hasMessage("error.auth.sessionExpired");
     }
 
     @Test
@@ -211,7 +211,7 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> userService.verifyMfa(req))
                 .isInstanceOf(CustomException.class)
-                .hasMessage("Otp is incorrectly");
+                .hasMessage("error.otp.incorrect");
 
     }
 
@@ -257,7 +257,7 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> userService.joinSystemPaswordless("badtoken"))
                 .isInstanceOf(CustomException.class)
-                .hasMessage("Token in invalid");
+                .hasMessage("error.auth.tokenInvalid");
     }
 
     @Test
@@ -299,7 +299,7 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> userService.disableMfa("notfound", "otp"))
                 .isInstanceOf(CustomException.class)
-                .hasMessage("User not exist");
+                .hasMessage("error.user.notFound");
     }
 
     @Test
@@ -309,7 +309,7 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> userService.disableMfa("test@abc.com", "otp"))
                 .isInstanceOf(CustomException.class)
-                .hasMessage("Mfa already disabled");
+                .hasMessage("error.mfa.alreadyDisabled");
     }
 
     @Test
@@ -322,7 +322,7 @@ class UserServiceImplTest {
         when(totp.verify(mfaSecret, otp)).thenReturn(true);
         assertThatThrownBy(() -> userService.disableMfa(userName, otp))
                 .isInstanceOf(CustomException.class)
-                .hasMessage("Otp is invalid!");
+                .hasMessage("error.otp.incorrect");
 
     }
 

@@ -29,6 +29,9 @@ public class Error {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime timestamp;
     private String message;
+    /** Stable i18n message key for clients and tests; omitted when the error has no key. */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String code;
     // No exception detail (SQL, row values, class names) is ever serialized to clients (CWE-209).
     // Handlers log the full exception server-side instead.
     @JsonInclude(JsonInclude.Include.NON_NULL)

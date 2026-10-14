@@ -147,7 +147,7 @@ public class PasswordLoginServiceImpl implements PasswordLoginService {
 
     private void requireEnabled() {
         if (!appProperties.isPasswordLoginEnabled()) {
-            throw error(HttpStatus.NOT_FOUND, 404, "Not Found");
+            throw error(HttpStatus.NOT_FOUND, 404, "error.user.notFound");
         }
     }
 
@@ -155,10 +155,10 @@ public class PasswordLoginServiceImpl implements PasswordLoginService {
         UserDetailDto current = AppUtils.getCurrentUser();
         User user = current == null || current.getId() == null ? null : userRepo.findAllById(current.getId());
         if (user == null) {
-            throw error(HttpStatus.UNAUTHORIZED, 401, "TOKEN_INVALID");
+            throw error(HttpStatus.UNAUTHORIZED, 401, "error.auth.tokenInvalid");
         }
         if (user.getStatus() == UserStatus.DEACTIVATED) {
-            throw error(HttpStatus.FORBIDDEN, 403, "Account deactivated");
+            throw error(HttpStatus.FORBIDDEN, 403, "error.account.deactivated");
         }
         return user;
     }
@@ -223,8 +223,8 @@ public class PasswordLoginServiceImpl implements PasswordLoginService {
         return error(HttpStatus.UNAUTHORIZED, 401, INVALID_CREDENTIALS);
     }
 
-    private static CustomException error(HttpStatus status, int subCode, String message) {
-        return CustomException.builder().status(status).subCode(subCode).message(message).build();
+    private static CustomException error(HttpStatus status, int subCode, String messageKey) {
+        return CustomException.of(status, subCode, messageKey);
     }
 
     /**

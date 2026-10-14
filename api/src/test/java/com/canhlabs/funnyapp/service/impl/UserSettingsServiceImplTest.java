@@ -157,7 +157,7 @@ class UserSettingsServiceImplTest {
                 .satisfies(ex -> {
                     CustomException ce = (CustomException) ex;
                     assertThat(ce.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-                    assertThat(ce.getMessage()).isEqualTo("Empty update");
+                    assertThat(ce.getMessage()).isEqualTo("error.settings.emptyUpdate");
                 });
 
         verify(userSettingsRepository, never()).save(any());
@@ -174,10 +174,79 @@ class UserSettingsServiceImplTest {
                 .satisfies(ex -> {
                     CustomException ce = (CustomException) ex;
                     assertThat(ce.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-                    assertThat(ce.getMessage()).isEqualTo("Invalid value for field 'defaultQuality'");
+                    assertThat(ce.getMessage()).isEqualTo("error.settings.invalidQuality");
                 });
 
         verify(userSettingsRepository, never()).save(any());
+    }
+
+    // ── locale (ADR-0020 D5) ──────────────────────────────────────────────────
+
+    private UserSettings existingWithLocale(String locale) {
+        UserSettings existing = new UserSettings();
+        existing.setUserId(1L);
+        existing.setLocale(locale);
+        return existing;
+    }
+
+    private UserSettingsDto updateWith(UserSettings existing, UpdateUserSettingsRequest req) {
+        try (MockedStatic<AppUtils> ms = mockStatic(AppUtils.class)) {
+            ms.when(AppUtils::getCurrentUser).thenReturn(CURRENT_USER);
+            when(userSettingsRepository.findById(1L)).thenReturn(Optional.of(existing));
+            when(userSettingsRepository.save(any(UserSettings.class))).thenReturn(existing);
+            when(userRepo.findAllById(1L)).thenReturn(User.builder().id(1L).userName("a@b.com").build());
+            when(appProperties.isSubscriptionStatusEnabled()).thenReturn(false);
+            when(appProperties.isPasswordLoginEnabled()).thenReturn(true);
+            return userSettingsService.updateSettings(req);
+        }
+    }
+
+    @Test
+    void updateSettings_localeVi_isSavedAndReturned() {
+        UserSettingsDto dto = updateWith(existingWithLocale(null), UpdateUserSettingsRequest.builder().locale("vi").build());
+
+        assertThat(dto.getLocale()).isEqualTo("vi");
+    }
+
+    @Test
+    void updateSettings_explicitNullLocale_clearsPreference() {
+        UpdateUserSettingsRequest req = new UpdateUserSettingsRequest();
+        req.setLocale(null);
+
+        UserSettingsDto dto = updateWith(existingWithLocale("en"), req);
+
+        assertThat(dto.getLocale()).isNull();
+    }
+
+    @Test
+    void updateSettings_absentLocale_leavesPreferenceUnchanged() {
+        UserSettingsDto dto = updateWith(existingWithLocale("vi"), UpdateUserSettingsRequest.builder().notifyEmail(false).build());
+
+        assertThat(dto.getLocale()).isEqualTo("vi");
+    }
+
+    @Test
+    void updateSettings_unsupportedLocale_throws400_andSaveNeverCalled() {
+        UpdateUserSettingsRequest req = UpdateUserSettingsRequest.builder().locale("fr").build();
+
+        assertThatThrownBy(() -> userSettingsService.updateSettings(req))
+                .isInstanceOf(CustomException.class)
+                .satisfies(ex -> {
+                    CustomException ce = (CustomException) ex;
+                    assertThat(ce.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+                    assertThat(ce.getMessageKey()).isEqualTo("error.settings.invalidLocale");
+                });
+
+        verify(userSettingsRepository, never()).save(any());
+    }
+
+    @Test
+    void request_jsonNullVersusAbsentLocale() throws Exception {
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+        assertThat(mapper.readValue("{\"locale\":null}", UpdateUserSettingsRequest.class).isLocaleProvided()).isTrue();
+        assertThat(mapper.readValue("{\"locale\":\"vi\"}", UpdateUserSettingsRequest.class).isLocaleProvided()).isTrue();
+        assertThat(mapper.readValue("{\"notifyEmail\":true}", UpdateUserSettingsRequest.class).isLocaleProvided()).isFalse();
     }
 
     @Test
@@ -263,7 +332,7 @@ class UserSettingsServiceImplTest {
                         CustomException ce = (CustomException) ex;
                         assertThat(ce.getStatus()).isEqualTo(HttpStatus.CONFLICT);
                         assertThat(ce.getSubCode()).isEqualTo(409);
-                        assertThat(ce.getMessage()).isEqualTo("Account already deactivated");
+                        assertThat(ce.getMessage()).isEqualTo("error.account.alreadyDeactivated");
                     });
         }
     }
@@ -287,7 +356,7 @@ class UserSettingsServiceImplTest {
                         CustomException ce = (CustomException) ex;
                         assertThat(ce.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
                         assertThat(ce.getSubCode()).isEqualTo(403);
-                        assertThat(ce.getMessage()).isEqualTo("Invalid OTP");
+                        assertThat(ce.getMessage()).isEqualTo("error.otp.incorrect");
                     });
 
             verify(userRepo, never()).save(any());
@@ -338,7 +407,7 @@ class UserSettingsServiceImplTest {
                         CustomException ce = (CustomException) ex;
                         assertThat(ce.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
                         assertThat(ce.getSubCode()).isEqualTo(400);
-                        assertThat(ce.getMessage()).isEqualTo("Confirmation does not match");
+                        assertThat(ce.getMessage()).isEqualTo("error.account.confirmationMismatch");
                     });
 
             verify(userRepo, never()).save(any());

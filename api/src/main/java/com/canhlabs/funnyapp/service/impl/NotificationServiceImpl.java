@@ -44,7 +44,7 @@ public class NotificationServiceImpl implements NotificationService {
         Long userId = currentUserId();
         // Owner-scoped lookup: another user's id is indistinguishable from a missing one (CWE-639)
         repository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4041, "Notification not found"));
+                .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4041, "error.notification.notFound"));
         repository.markRead(id, userId, Instant.now());
         publisher.unreadChanged(userId);
     }
@@ -59,7 +59,7 @@ public class NotificationServiceImpl implements NotificationService {
     private static Long currentUserId() {
         UserDetailDto user = AppUtils.getCurrentUser();
         if (user == null || user.getId() == null) {
-            throw error(HttpStatus.UNAUTHORIZED, 4011, "Authentication required");
+            throw error(HttpStatus.UNAUTHORIZED, 4011, "error.auth.required");
         }
         return user.getId();
     }
@@ -84,7 +84,7 @@ public class NotificationServiceImpl implements NotificationService {
         return value == null ? null : value.toString();
     }
 
-    private static CustomException error(HttpStatus status, int subCode, String message) {
-        return CustomException.builder().status(status).subCode(subCode).message(message).build();
+    private static CustomException error(HttpStatus status, int subCode, String messageKey) {
+        return CustomException.of(status, subCode, messageKey);
     }
 }

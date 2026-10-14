@@ -16,7 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.canhlabs.funnyapp.exception.CustomException.raiseErr;
+import static com.canhlabs.funnyapp.exception.CustomException.raiseKey;
 
 @Slf4j
 @Service
@@ -32,7 +32,7 @@ public class InviteServiceImpl implements InviteService {
     @Override
     public void inviteUser(String email, Long invitedByUserId) {
         if (!AppUtils.isValidEmail(email)) {
-           raiseErr("Invalid email");
+           raiseKey("error.email.invalid");
         }
         String token = UUID.randomUUID().toString();
         Instant now = Instant.now();

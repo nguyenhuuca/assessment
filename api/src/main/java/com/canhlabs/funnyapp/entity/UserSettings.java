@@ -42,6 +42,10 @@ public class UserSettings {
     @Column(name = "profile_private", nullable = false)
     private boolean profilePrivate = false;
 
+    /** 'vi' | 'en'; NULL = not chosen, follow the browser (ADR-0020 D5). */
+    @Column(name = "locale", length = 5)
+    private String locale;
+
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;

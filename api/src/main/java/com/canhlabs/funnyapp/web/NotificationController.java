@@ -67,8 +67,7 @@ public class NotificationController {
     public ResponseEntity<SseEmitter> stream() {
         UserDetailDto user = AppUtils.getCurrentUser();
         if (user == null || user.getId() == null) {
-            throw CustomException.builder().status(HttpStatus.UNAUTHORIZED).subCode(4011)
-                    .message("Authentication required").build();
+            throw CustomException.of(HttpStatus.UNAUTHORIZED, 4011, "error.auth.required");
         }
         SseEmitter emitter = notificationStream.register(user.getId());
         return ResponseEntity.ok()

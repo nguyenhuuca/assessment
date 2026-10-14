@@ -73,11 +73,7 @@ public final class PasswordPolicy {
     }
 
     private static CustomException violation(String code) {
-        return CustomException.builder()
-                .status(HttpStatus.BAD_REQUEST)
-                .subCode(400)
-                .message(code)
-                .build();
+        return CustomException.of(HttpStatus.BAD_REQUEST, 400, code);
     }
 
     private static Set<String> loadCommonPasswords() {

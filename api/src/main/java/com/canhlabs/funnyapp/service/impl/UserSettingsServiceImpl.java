@@ -22,11 +22,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Set;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserSettingsServiceImpl implements UserSettingsService {
+
+    private static final Set<String> SUPPORTED_LOCALES = Set.of("vi", "en");
 
     private final UserSettingsRepository userSettingsRepository;
     private final UserRepo userRepo;
@@ -55,26 +58,23 @@ public class UserSettingsServiceImpl implements UserSettingsService {
                 || request.getNotifyEmail() != null
                 || request.getDefaultQuality() != null
                 || request.getIncognitoEnabled() != null
-                || request.getProfilePrivate() != null;
+                || request.getProfilePrivate() != null
+                || request.isLocaleProvided();
 
         if (!hasAnyField) {
-            throw CustomException.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .subCode(400)
-                    .message("Empty update")
-                    .build();
+            throw CustomException.of(HttpStatus.BAD_REQUEST, 400, "error.settings.emptyUpdate");
         }
 
         if (request.getDefaultQuality() != null) {
             try {
                 DefaultQuality.fromWireValue(request.getDefaultQuality());
             } catch (IllegalArgumentException e) {
-                throw CustomException.builder()
-                        .status(HttpStatus.BAD_REQUEST)
-                        .subCode(400)
-                        .message("Invalid value for field 'defaultQuality'")
-                        .build();
+                throw CustomException.of(HttpStatus.BAD_REQUEST, 400, "error.settings.invalidQuality");
             }
+        }
+
+        if (request.getLocale() != null && !SUPPORTED_LOCALES.contains(request.getLocale())) {
+            throw CustomException.of(HttpStatus.BAD_REQUEST, 400, "error.settings.invalidLocale");
         }
 
         // All validations passed — now apply
@@ -101,6 +101,10 @@ public class UserSettingsServiceImpl implements UserSettingsService {
             settings.setProfilePrivate(request.getProfilePrivate());
         }
 
+        if (request.isLocaleProvided()) {
+            settings.setLocale(request.getLocale());
+        }
+
         settings = userSettingsRepository.save(settings);
 
         User user = userRepo.findAllById(userId);
@@ -116,29 +120,17 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         User user = userRepo.findAllById(userId);
 
         if (user.getStatus() == UserStatus.DEACTIVATED) {
-            throw CustomException.builder()
-                    .status(HttpStatus.CONFLICT)
-                    .subCode(409)
-                    .message("Account already deactivated")
-                    .build();
+            throw CustomException.of(HttpStatus.CONFLICT, 409, "error.account.alreadyDeactivated");
         }
 
         if (user.isMfaEnabled()) {
             boolean valid = totp.verify(request.getOtp(), user.getMfaSecret());
             if (!valid) {
-                throw CustomException.builder()
-                        .status(HttpStatus.FORBIDDEN)
-                        .subCode(403)
-                        .message("Invalid OTP")
-                        .build();
+                throw CustomException.of(HttpStatus.FORBIDDEN, 403, "error.otp.incorrect");
             }
         } else {
             if (request.getConfirmation() == null || !request.getConfirmation().equals(user.getUserName())) {
-                throw CustomException.builder()
-                        .status(HttpStatus.BAD_REQUEST)
-                        .subCode(400)
-                        .message("Confirmation does not match")
-                        .build();
+                throw CustomException.of(HttpStatus.BAD_REQUEST, 400, "error.account.confirmationMismatch");
             }
         }
 
@@ -189,6 +181,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
                 .defaultQuality(settings.getDefaultQuality())
                 .incognitoEnabled(settings.isIncognitoEnabled())
                 .profilePrivate(settings.isProfilePrivate())
+                .locale(settings.getLocale())
                 .accountStatus(accountStatus)
                 .updatedAt(settings.getUpdatedAt())
                 .build();

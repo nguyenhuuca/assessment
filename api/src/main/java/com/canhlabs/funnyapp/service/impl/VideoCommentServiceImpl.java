@@ -138,15 +138,15 @@ public class VideoCommentServiceImpl {
         try {
             parentUuid = UUID.fromString(parentId.trim());
         } catch (IllegalArgumentException e) {
-            throw error(HttpStatus.BAD_REQUEST, 4003, "Invalid parentId");
+            throw error(HttpStatus.BAD_REQUEST, 4003, "error.comment.invalidParent");
         }
         VideoComment parent = repo.findById(parentUuid)
-                .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4042, "Parent comment not found"));
+                .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4042, "error.comment.parentNotFound"));
         if (!Objects.equals(videoId, parent.getVideoId())) {
-            throw error(HttpStatus.BAD_REQUEST, 4004, "Parent comment belongs to another video");
+            throw error(HttpStatus.BAD_REQUEST, 4004, "error.comment.parentOtherVideo");
         }
         if (parent.getStatus() != CommentStatus.VISIBLE) {
-            throw error(HttpStatus.BAD_REQUEST, 4005, "Cannot reply to a removed or deleted comment");
+            throw error(HttpStatus.BAD_REQUEST, 4005, "error.comment.replyToRemoved");
         }
         // Walk up to the top-level ancestor; bounded to guard against cycles in legacy data
         VideoComment root = parent;
@@ -168,8 +168,8 @@ public class VideoCommentServiceImpl {
         }
     }
 
-    private static CustomException error(HttpStatus status, int subCode, String message) {
-        return CustomException.builder().status(status).subCode(subCode).message(message).build();
+    private static CustomException error(HttpStatus status, int subCode, String messageKey) {
+        return CustomException.of(status, subCode, messageKey);
     }
 
     /**

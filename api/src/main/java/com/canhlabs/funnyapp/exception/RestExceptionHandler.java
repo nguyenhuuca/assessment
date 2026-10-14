@@ -6,6 +6,8 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -37,6 +39,31 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @ControllerAdvice
 @Slf4j
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
+    static final String KEY_VALIDATION = "error.validation.failed";
+    static final String KEY_MALFORMED_JSON = "error.request.malformedJson";
+    static final String KEY_MISSING_PARAM = "error.request.missingParameter";
+    static final String KEY_RATE_LIMIT = "error.rateLimit.exceeded";
+    static final String KEY_BAD_CREDENTIALS = "INVALID_CREDENTIALS";
+
+    private final MessageSource messageSource;
+
+    public RestExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
+    /** Resolves {@code key} for the current request locale; falls back to {@code fallback} when absent. */
+    private String resolve(String key, Object[] args, String fallback) {
+        return messageSource.getMessage(key, args, fallback, LocaleContextHolder.getLocale());
+    }
+
+    private Error localized(HttpStatus status, String key, String fallback, Object... args) {
+        Error error = new Error(status);
+        error.setCode(key);
+        error.setMessage(resolve(key, args, fallback));
+        return error;
+    }
+
     /**
      * Handle MissingServletRequestParameterException. Triggered when a 'required'
      * request parameter is missing.
@@ -45,7 +72,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(ex.getMessage(), ex);
-        return buildResponseEntity(new Error(BAD_REQUEST, ex.getParameterName() + " parameter is missing", ex));
+        return buildResponseEntity(localized(BAD_REQUEST, KEY_MISSING_PARAM,
+                ex.getParameterName() + " parameter is missing", ex.getParameterName()));
     }
 
     /**
@@ -69,8 +97,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        Error apiError = new Error(BAD_REQUEST);
-        apiError.setMessage("Validation error");
+        Error apiError = localized(BAD_REQUEST, KEY_VALIDATION, "Validation error");
         apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
         apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
         log.error(ex.getMessage(), ex);
@@ -113,7 +140,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @NonNull
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(ex.getMessage(), ex);
-        return buildResponseEntity(new Error(HttpStatus.BAD_REQUEST, "Malformed JSON request", ex));
+        return buildResponseEntity(localized(BAD_REQUEST, KEY_MALFORMED_JSON, "Malformed JSON request"));
     }
 
     @Override
@@ -189,8 +216,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
-        Error error = new Error(BAD_REQUEST);
-        error.setMessage("Invalid email address or password");
+        Error error = localized(BAD_REQUEST, KEY_BAD_CREDENTIALS, "Invalid email address or password");
         log.error(ex.getMessage(), ex);
         return buildResponseEntity(error);
     }
@@ -199,9 +225,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<Object> handleCustomException(CustomException ex) {
         HttpStatus httpStatus = (ex.getStatus() != null) ? ex.getStatus() : BAD_REQUEST;
-        Error error = new Error(httpStatus, ex.getSubCode(), ex.getMessage());
+        String message = ex.getMessageKey() != null
+                ? resolve(ex.getMessageKey(), ex.getArgs(), ex.getMessage())
+                : ex.getMessage();
+        Error error = new Error(httpStatus, ex.getSubCode(), message);
+        error.setCode(ex.getMessageKey());
         log.error(ex.getMessage());
         return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<Object> handleRateLimitExceeded(RateLimitExceededException ex) {
+        log.warn(ex.getMessage());
+        return buildResponseEntity(localized(HttpStatus.TOO_MANY_REQUESTS, KEY_RATE_LIMIT, ex.getMessage()));
     }
 
     @ExceptionHandler(UnauthorizedException.class)

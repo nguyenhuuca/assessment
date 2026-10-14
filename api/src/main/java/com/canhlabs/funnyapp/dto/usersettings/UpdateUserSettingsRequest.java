@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.dto.usersettings;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,4 +24,21 @@ public class UpdateUserSettingsRequest {
     private String defaultQuality;
     private Boolean incognitoEnabled;
     private Boolean profilePrivate;
+    /** 'vi' | 'en'. An explicit JSON null clears the preference; an absent field leaves it unchanged. */
+    private String locale;
+    @JsonIgnore
+    @Setter(AccessLevel.NONE)
+    private boolean localeSet;
+
+    /** Called by Jackson for both a value and an explicit null, so presence can be told from absence. */
+    public void setLocale(String locale) {
+        this.locale = locale;
+        this.localeSet = true;
+    }
+
+    /** True when the client sent the locale field at all (value or explicit null). */
+    @JsonIgnore
+    public boolean isLocaleProvided() {
+        return localeSet || locale != null;
+    }
 }

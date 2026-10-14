@@ -50,22 +50,14 @@ public class VideoReactionServiceImpl implements VideoReactionService {
     private UserDetailDto requireUser() {
         UserDetailDto user = AppUtils.getCurrentUser();
         if (user == null || user.getId() == null) {
-            throw CustomException.builder()
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .subCode(401)
-                    .message("Authentication required")
-                    .build();
+            throw CustomException.of(HttpStatus.UNAUTHORIZED, 401, "error.auth.required");
         }
         return user;
     }
 
     private void requireVideo(Long videoId) {
         if (videoId == null || !videoSourceRepository.existsByIdAndIsHideAndStatus(videoId, false, VideoStatus.PUBLISHED)) {
-            throw CustomException.builder()
-                    .status(HttpStatus.NOT_FOUND)
-                    .subCode(404)
-                    .message("Video not found")
-                    .build();
+            throw CustomException.of(HttpStatus.NOT_FOUND, 404, "error.video.notFound");
         }
     }
 

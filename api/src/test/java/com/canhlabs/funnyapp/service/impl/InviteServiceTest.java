@@ -68,7 +68,7 @@ class InviteServiceTest {
 
             assertThatThrownBy(() -> inviteService.inviteUser(email, invitedByUserId))
                     .isInstanceOf(CustomException.class)
-                    .hasMessageContaining("Invalid email");
+                    .hasMessageContaining("error.email.invalid");
         }
     }
 

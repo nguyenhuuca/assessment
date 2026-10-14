@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.canhlabs.funnyapp.service.impl.Converter.toUserInfo;
-import static com.canhlabs.funnyapp.exception.CustomException.raiseErr;
+import static com.canhlabs.funnyapp.exception.CustomException.raiseKey;
 
 @Slf4j
 @Service
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String enableMfa(String userName, String secret, String otp) {
         if (!totp.verify(otp, secret)) {
-            raiseErr("Otp is incorrectly");
+            raiseKey("error.otp.incorrect");
 
         }
         User user = userRepo.findAllByUserName(userName);
@@ -139,12 +139,12 @@ public class UserServiceImpl implements UserService {
         String sessionToken = mfaRequest.sessionToken();
         Optional<String> userIdOpt = mfaSessionStore.getUserId(sessionToken);
         if (userIdOpt.isEmpty()) {
-            raiseErr("Invalid or expired session");
+            raiseKey("error.auth.sessionExpired");
         }
         User user = userRepo.findAllByUserName(userIdOpt.get());
         requireActive(user);
         if (!totp.verify(mfaRequest.otp(), user.getMfaSecret())) {
-            raiseErr("Otp is incorrectly");
+            raiseKey("error.otp.incorrect");
         }
         return toUserInfo(user, getToken(user));
     }
@@ -153,7 +153,7 @@ public class UserServiceImpl implements UserService {
     public UserInfoDto joinSystemPaswordless(String token) {
         Optional<UserEmailRequest> userReq = inviteService.verifyToken(token);
         if (userReq.isEmpty()) {
-            raiseErr("Token in invalid");
+            raiseKey("error.auth.tokenInvalid");
         }
         log.info("Token was verified success for user {}", userReq.get().getEmail());
 
@@ -176,13 +176,13 @@ public class UserServiceImpl implements UserService {
     public String disableMfa(String userName, String otp) {
         User user = userRepo.findAllByUserName(userName);
         if (user == null) {
-            raiseErr("User not exist");
+            raiseKey("error.user.notFound");
         }
         if (!user.isMfaEnabled()) {
-            raiseErr("Mfa already disabled");
+            raiseKey("error.mfa.alreadyDisabled");
         }
         boolean isValid = totp.verify(otp, user.getMfaSecret());
-        if (!isValid) raiseErr("Otp is invalid!");
+        if (!isValid) raiseKey("error.otp.incorrect");
 
         user.setMfaEnabled(false);
         userRepo.save(user);
@@ -259,11 +259,7 @@ public class UserServiceImpl implements UserService {
      */
     private void requireActive(User user) {
         if (user != null && user.getStatus() == UserStatus.DEACTIVATED) {
-            throw CustomException.builder()
-                    .status(HttpStatus.FORBIDDEN)
-                    .subCode(403)
-                    .message("Account deactivated")
-                    .build();
+            throw CustomException.of(HttpStatus.FORBIDDEN, 403, "error.account.deactivated");
         }
     }
 

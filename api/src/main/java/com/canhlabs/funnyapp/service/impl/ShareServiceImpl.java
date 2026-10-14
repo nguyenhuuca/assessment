@@ -7,7 +7,6 @@ import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.service.ShareService;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.utils.AppUtils;
-import com.canhlabs.funnyapp.utils.Contract;
 import com.canhlabs.funnyapp.dto.video.ShareRequestDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
@@ -69,7 +68,9 @@ public class ShareServiceImpl implements ShareService {
             videoDto =  getInfoFromYoutube(shareRequestDto.getUrl());
         }
 
-        Contract.requireNonNull(videoDto, "Cannot get video info");
+        if (videoDto == null) {
+            CustomException.raiseKey("error.video.infoUnavailable");
+        }
 
         ShareLink shareLink = toEntity(videoDto);
         shareLink = shareLinkRepo.save(shareLink);
@@ -81,7 +82,9 @@ public class ShareServiceImpl implements ShareService {
     @Override
     public List<VideoDto> getALLShare() {
         UserDetailDto userDetail = AppUtils.getCurrentUser();
-        Contract.requireNonNull(userDetail, "User is not exist");
+        if (userDetail == null) {
+            CustomException.raiseKey("error.user.notFound");
+        }
 
         User  user = userRepo.findAllByUserName(userDetail.getEmail());
         List<ShareLink> shareLinks = shareLinkRepo.findAllByUser(user);
@@ -117,7 +120,7 @@ public class ShareServiceImpl implements ShareService {
             log.info(videoId);
         } catch (Exception ex) {
             log.error("Error get video info from youtube", ex);
-            CustomException.raiseErr("Cannot get video info");
+            CustomException.raiseKey("error.video.infoUnavailable");
         }
         return videoDto;
     }
