@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.event.VideoIngestedEvent;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.DriveVideoDownloader;
@@ -20,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -50,12 +53,14 @@ class VideoStorageServiceImplTest {
     @Mock VideoSourceRepository videoSourceRepository;
     @Mock ChatGptService chatGptService;
     @Mock Drive drive;
+    @Mock ApplicationEventPublisher eventPublisher;
 
     @InjectMocks VideoStorageServiceImpl service;
 
     @BeforeEach
     void setUp() {
         service.injectChatGptService(chatGptService);
+        service.injectEventPublisher(eventPublisher);
         service.injectVideoSourceRepository(videoSourceRepository);
         service.injectDrive(drive);
         service.injectDriveVideoDownloader(driveVideoDownloader);
@@ -139,6 +144,40 @@ class VideoStorageServiceImplTest {
 
         verify(videoSourceRepository, never()).save(any());
         verify(chatGptService, never()).makePoem(anyString());
+    }
+
+    @Test
+    void saveInfo_publishesVideoIngestedEventWithDriveFileAndSourceId() {
+        when(videoSourceRepository.existsBySourceId("file123")).thenReturn(false);
+        when(videoSourceRepository.save(any(VideoSource.class))).thenAnswer(inv -> {
+            VideoSource v = inv.getArgument(0);
+            v.setId(77L);
+            return v;
+        });
+
+        service.saveInfo("file123", "My Title", "thumb.jpg");
+
+        verify(eventPublisher).publishEvent(new VideoIngestedEvent("file123", 77L));
+    }
+
+    @Test
+    void saveInfo_publishFails_ingestStillSucceeds() {
+        when(videoSourceRepository.existsBySourceId("file123")).thenReturn(false);
+        when(videoSourceRepository.save(any(VideoSource.class))).thenAnswer(inv -> inv.getArgument(0));
+        doThrow(new IllegalStateException("listener boom")).when(eventPublisher).publishEvent(any(Object.class));
+
+        service.saveInfo("file123", "My Title", "thumb.jpg");
+
+        verify(videoSourceRepository).save(any(VideoSource.class));
+    }
+
+    @Test
+    void saveInfo_alreadyExists_publishesNothing() {
+        when(videoSourceRepository.existsBySourceId("existing123")).thenReturn(true);
+
+        service.saveInfo("existing123", "Some Title", "thumb.jpg");
+
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
     }
 
     // ── listFilesInFolder ───────────────────────────────────────────────────────

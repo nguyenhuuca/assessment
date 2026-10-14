@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.event.VideoIngestedEvent;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.DriveVideoDownloader;
@@ -15,6 +16,7 @@ import com.google.api.services.drive.model.FileList;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -46,6 +48,12 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     private Drive drive;
     private VideoSourceRepository videoSourceRepository;
     private ChatGptService chatGptService;
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    public void injectEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     @Autowired
     public void injectChatGptService(ChatGptService chatGptService) {
@@ -213,6 +221,16 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 entity.getThumbnailPath(), entity.getStatus(), entity.getPriority(), entity.isHide());
         videoSourceRepository.save(entity);
         log.info("Saved video source id={} videoId={} for Drive file {}", entity.getId(), entity.getVideoId(), fileId);
+        publishIngested(fileId, entity.getId());
+    }
+
+    /** Publish-only: a failing listener or publisher must never fail or change the ingest. */
+    private void publishIngested(String fileId, Long videoSourceId) {
+        try {
+            eventPublisher.publishEvent(new VideoIngestedEvent(fileId, videoSourceId));
+        } catch (RuntimeException e) {
+            log.warn("Could not publish VideoIngestedEvent for Drive file {}: {}", fileId, e.getMessage());
+        }
     }
 
     @WithSpan

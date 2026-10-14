@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -123,6 +124,11 @@ public class NotificationDigestService {
     }
 
     private String describe(Notification n, Locale locale) {
+        if (n.getType() == NotificationType.SUGGESTION_APPROVED
+                || n.getType() == NotificationType.SUGGESTION_REJECTED
+                || n.getType() == NotificationType.SUGGESTION_LIVE) {
+            return describeSuggestion(n, locale);
+        }
         if (n.getType() == NotificationType.COMMENT_REMOVED) {
             Object reason = n.getPayload() == null ? null : n.getPayload().get("reason");
             return reason == null ? msg("mail.digest.item.removed", locale)
@@ -135,6 +141,18 @@ public class NotificationDigestService {
         return snippet == null || snippet.toString().isBlank()
                 ? msg("mail.digest.item.reply", locale, who)
                 : msg("mail.digest.item.replySnippet", locale, who, snippet.toString());
+    }
+
+    private String describeSuggestion(Notification n, Locale locale) {
+        Map<String, Object> payload = n.getPayload() == null ? Map.of() : n.getPayload();
+        String title = payload.get("snippet") == null ? "" : payload.get("snippet").toString();
+        Object reason = payload.get("reason");
+        return switch (n.getType()) {
+            case SUGGESTION_APPROVED -> msg("mail.digest.item.suggestionApproved", locale, title);
+            case SUGGESTION_LIVE -> msg("mail.digest.item.suggestionLive", locale, title);
+            default -> reason == null ? msg("mail.digest.item.suggestionRejected", locale, title)
+                    : msg("mail.digest.item.suggestionRejectedReason", locale, title, reason.toString());
+        };
     }
 
     private String msg(String key, Locale locale, String... args) {

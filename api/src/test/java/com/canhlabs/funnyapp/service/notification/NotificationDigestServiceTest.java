@@ -88,6 +88,62 @@ class NotificationDigestServiceTest {
         return n;
     }
 
+    private static Notification suggestion(NotificationType type, String snippet, String reason) {
+        Notification n = new Notification();
+        n.setId(UUID.randomUUID());
+        n.setType(type);
+        java.util.HashMap<String, Object> payload = new java.util.HashMap<>();
+        if (snippet != null) {
+            payload.put("snippet", snippet);
+        }
+        if (reason != null) {
+            payload.put("reason", reason);
+        }
+        n.setPayload(payload);
+        return n;
+    }
+
+    private static List<Notification> suggestionNotifications() {
+        return List.of(
+                suggestion(NotificationType.SUGGESTION_APPROVED, "Funny cat", null),
+                suggestion(NotificationType.SUGGESTION_REJECTED, "Funny dog", null),
+                suggestion(NotificationType.SUGGESTION_REJECTED, "Funny cow", "COPYRIGHT"),
+                suggestion(NotificationType.SUGGESTION_LIVE, "Funny owl", null));
+    }
+
+    @Test
+    void body_suggestionTypesRenderInVietnamese() {
+        String body = service.body(suggestionNotifications(), I18nConfig.VI);
+
+        assertThat(body)
+                .contains("- Đề xuất \"Funny cat\" của bạn đã được duyệt\n")
+                .contains("- Đề xuất \"Funny dog\" của bạn đã bị từ chối\n")
+                .contains("- Đề xuất \"Funny cow\" của bạn đã bị từ chối (COPYRIGHT)\n")
+                .contains("- Video \"Funny owl\" bạn đề xuất đã lên app\n");
+    }
+
+    @Test
+    void body_suggestionTypesRenderInEnglish() {
+        String body = service.body(suggestionNotifications(), I18nConfig.EN);
+
+        assertThat(body)
+                .contains("- Your suggestion \"Funny cat\" was approved\n")
+                .contains("- Your suggestion \"Funny dog\" was rejected\n")
+                .contains("- Your suggestion \"Funny cow\" was rejected (COPYRIGHT)\n")
+                .contains("- Your suggested video \"Funny owl\" is now live\n");
+    }
+
+    @Test
+    void body_suggestionWithoutPayloadSnippet_rendersEmptyTitle() {
+        Notification noPayload = suggestion(NotificationType.SUGGESTION_APPROVED, null, null);
+        noPayload.setPayload(null);
+
+        String body = service.body(List.of(noPayload, suggestion(NotificationType.SUGGESTION_LIVE, null, null)),
+                I18nConfig.EN);
+
+        assertThat(body).contains("Your suggestion \"\" was approved").contains("Your suggested video \"\" is now live");
+    }
+
     // ── digest ────────────────────────────────────────────────────────────────
 
     @Test

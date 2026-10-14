@@ -133,6 +133,8 @@ app:
     min-free-disk-bytes: ${VIDEO_IMPORT_MIN_FREE_DISK_BYTES:2147483648}
     cookies-path: ${VIDEO_IMPORT_COOKIES_PATH:}
     bulk-max: ${VIDEO_IMPORT_BULK_MAX:20}
+  video-suggestion:
+    daily-limit: ${VIDEO_SUGGESTION_DAILY_LIMIT:5}
   google-oauth:
     client-id: ${GOOGLE_OAUTH_CLIENT_ID:}
     client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET:}

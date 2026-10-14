@@ -47,6 +47,7 @@ public class AppProperties {
     private Auth auth = new Auth();
     private VideoImport videoImport = new VideoImport();
     private GoogleOauth googleOauth = new GoogleOauth();
+    private VideoSuggestion videoSuggestion = new VideoSuggestion();
 
     @PostConstruct
     void warnDeprecatedKeys() {
@@ -74,6 +75,14 @@ public class AppProperties {
         private long minFreeDiskBytes = 2L * 1024 * 1024 * 1024;
         private String cookiesPath = "";
         private int bulkMax = 20;
+    }
+
+    /** User video suggestions: {@code app.video-suggestion.*}. */
+    @Getter
+    @Setter
+    public static class VideoSuggestion {
+        /** Max suggestions per user in any rolling 24 hours. */
+        private int dailyLimit = 5;
     }
 
     /** OAuth user credential of the Drive folder owner, used only for uploads (ADR-0019 D2). */
