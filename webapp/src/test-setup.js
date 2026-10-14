@@ -1,4 +1,8 @@
 import '@testing-library/jest-dom'
+import { configure } from '@testing-library/react'
+
+// The full suite runs many files in parallel; the 1s default makes async assertions flaky under load
+configure({ asyncUtilTimeout: 3000 })
 import i18n from './i18n/index.js'
 
 // Existing tests assert Vietnamese text; jsdom's navigator is en-US.

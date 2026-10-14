@@ -36,20 +36,19 @@ describe('useLocaleSync', () => {
     expect(settingsApi.patch).not.toHaveBeenCalled()
   })
 
-  it('keeps the local language when the server has none', async () => {
+  it('keeps the local language when the server has none, and saves it once', async () => {
     settingsApi.get.mockResolvedValue({ data: { locale: null } })
-    setup()
-    await waitFor(() => expect(settingsApi.get).toHaveBeenCalled())
-    await act(async () => {})
+    const { result } = setup()
+    await waitFor(() => expect(result.current).toBe(true))
+    await waitFor(() => expect(settingsApi.patch).toHaveBeenCalledTimes(1))
+    expect(settingsApi.patch.mock.calls[0][0]).toEqual({ locale: 'vi' })
     expect(i18n.language).toBe('vi')
-    expect(settingsApi.patch).not.toHaveBeenCalled()
   })
 
   it('PATCHes exactly once when the user switches language', async () => {
     settingsApi.get.mockResolvedValue({ data: { locale: 'vi' } })
-    setup()
-    await waitFor(() => expect(settingsApi.get).toHaveBeenCalled())
-    await act(async () => {})
+    const { result } = setup()
+    await waitFor(() => expect(result.current).toBe(true))
     await act(async () => { await i18n.changeLanguage('en') })
     await waitFor(() => expect(settingsApi.patch).toHaveBeenCalledTimes(1))
     expect(settingsApi.patch.mock.calls[0][0]).toEqual({ locale: 'en' })
