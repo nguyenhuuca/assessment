@@ -5,6 +5,7 @@ import {
   useMyCollections,
   usePublicCollections,
   useCollectionVideos,
+  useCollectionPlaylist,
   useDeleteCollection,
   useToggleCollectionItem,
 } from '../../hooks/useCollections.js'
@@ -14,29 +15,42 @@ import AddVideosModal from './AddVideosModal.jsx'
 import { thumbnailUrl } from '../../utils/videoModel.js'
 import { isPublic, pinDefaultFirst } from './collectionUtils.js'
 
-function CollectionCard({ collection, onOpen }) {
+function CollectionCard({ collection, onOpen, onPlay }) {
   const cover = thumbnailUrl(collection.coverFileId)
+  const empty = !collection.itemCount
   return (
-    <div
-      className="explore-reel"
-      role="button"
-      tabIndex={0}
-      title={collection.name}
-      aria-label={`${collection.name}, ${collection.itemCount ?? 0} video`}
-      onClick={() => onOpen(collection.id)}
-      onKeyDown={e => e.key === 'Enter' && onOpen(collection.id)}
-    >
-      {cover
-        ? <img src={cover} alt="" className="explore-reel-img" loading="lazy" />
-        : <div className="explore-reel-fallback"><span className="material-symbols-outlined" style={{ fontSize: 36 }}>video_library</span></div>}
-      <div className="explore-reel-scrim" />
-      <span className="explore-reel-views" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-        <strong>{collection.name}</strong>
-        <span style={{ fontSize: 12 }}>
-          {collection.itemCount ?? 0} video
-          {isPublic(collection) && ' · Công khai'}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div
+        className="explore-reel"
+        role="button"
+        tabIndex={0}
+        title={collection.name}
+        aria-label={`${collection.name}, ${collection.itemCount ?? 0} video`}
+        onClick={() => onOpen(collection.id)}
+        onKeyDown={e => e.key === 'Enter' && onOpen(collection.id)}
+      >
+        {cover
+          ? <img src={cover} alt="" className="explore-reel-img" loading="lazy" />
+          : <div className="explore-reel-fallback"><span className="material-symbols-outlined" style={{ fontSize: 36 }}>video_library</span></div>}
+        <div className="explore-reel-scrim" />
+        <span className="explore-reel-views" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+          <strong>{collection.name}</strong>
+          <span style={{ fontSize: 12 }}>
+            {collection.itemCount ?? 0} video
+            {isPublic(collection) && ' · Công khai'}
+          </span>
         </span>
-      </span>
+      </div>
+      <button
+        className="app-btn primary"
+        style={{ justifyContent: 'center' }}
+        aria-label={`Phát ${collection.name}`}
+        disabled={empty}
+        title={empty ? 'Collection chưa có video' : undefined}
+        onClick={() => onPlay(collection.id)}
+      >
+        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>play_arrow</span> Phát
+      </button>
     </div>
   )
 }
@@ -90,6 +104,35 @@ function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComment
         currentUser={currentUser}
       />
     </div>
+  )
+}
+
+/** "Phát" on a card: loads the whole collection and plays it from the first video. */
+function CollectionPlayer({ collectionId, onBack, muted, onMutedChange, onShowComments, currentUser }) {
+  const { data: videos = [], isLoading, error } = useCollectionPlaylist(collectionId)
+  if (isLoading) return <div className="vid-spinner" />
+  if (error || videos.length === 0) {
+    return (
+      <div className="explore-root">
+        <button className="app-btn secondary" onClick={onBack}>
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> Thư viện
+        </button>
+        {error
+          ? <div className="app-alert error" role="alert" style={{ marginTop: 12 }}>{error.message}</div>
+          : <p className="explore-empty-grid">Collection này chưa có video</p>}
+      </div>
+    )
+  }
+  return (
+    <PlayerView
+      videos={videos}
+      index={0}
+      onBack={onBack}
+      muted={muted}
+      onMutedChange={onMutedChange}
+      onShowComments={onShowComments}
+      currentUser={currentUser}
+    />
   )
 }
 
@@ -202,6 +245,7 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
   const remove = useDeleteCollection()
   const [openId, setOpenId] = useState(initialCollectionId)
   const [formState, setFormState] = useState(null) // { collection? }
+  const [playId, setPlayId] = useState(null)
 
   const publicList = publicQuery.data ?? []
   // Admins also receive public collections in "mine"; keep this section to private ones
@@ -216,6 +260,19 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
       danger: true,
     })
     if (ok) remove.mutate(c.id, { onSuccess: () => setOpenId(null) })
+  }
+
+  if (playId) {
+    return (
+      <CollectionPlayer
+        collectionId={playId}
+        onBack={() => setPlayId(null)}
+        muted={muted}
+        onMutedChange={onMutedChange}
+        onShowComments={onShowComments}
+        currentUser={user}
+      />
+    )
   }
 
   if (openId) {
@@ -252,7 +309,7 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
           <p className="explore-empty-grid">Chưa có collection công khai</p>
         ) : (
           <div className="explore-reels-grid">
-            {publicList.map(c => <CollectionCard key={c.id} collection={c} onOpen={setOpenId} />)}
+            {publicList.map(c => <CollectionCard key={c.id} collection={c} onOpen={setOpenId} onPlay={setPlayId} />)}
           </div>
         )}
       </section>
@@ -278,7 +335,7 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
               <div className="explore-reels-grid">
                 {mineList.map(c => (
                   <div key={c.id} style={{ position: 'relative' }}>
-                    <CollectionCard collection={c} onOpen={setOpenId} />
+                    <CollectionCard collection={c} onOpen={setOpenId} onPlay={setPlayId} />
                     {!c.isDefault && c.canManage && (
                       <button
                         className="app-btn secondary"

@@ -8,6 +8,7 @@ import {
   useCollectionVideos,
   useCollectionMembership,
   useCollectionVideoIds,
+  useCollectionPlaylist,
   useCreateCollection,
   useDeleteCollection,
   useToggleCollectionItem,
@@ -135,5 +136,16 @@ describe('useCollections hooks', () => {
     await act(async () => { await result.current.mutateAsync('x') })
     expect(client.getQueryData(['collections', 'x', 'videos', 0])).toBeUndefined()
     expect(client.getQueryData(['collections', 'y', 'videos', 0])).toBeTruthy()
+  })
+
+  it('playlist loads every page of a collection', async () => {
+    collectionsApi.videos.mockImplementation((_id, page) => Promise.resolve({
+      data: { content: [{ id: page + 1, title: `V${page}` }], totalPages: 3 },
+    }))
+    const { result } = renderHook(() => useCollectionPlaylist('c1'), { wrapper })
+    await waitFor(() => expect(result.current.data).toHaveLength(3))
+    expect(result.current.data.map(v => v.id)).toEqual([1, 2, 3])
+    expect(collectionsApi.videos).toHaveBeenCalledTimes(3)
+    expect(collectionsApi.videos).toHaveBeenLastCalledWith('c1', 2, 50)
   })
 })

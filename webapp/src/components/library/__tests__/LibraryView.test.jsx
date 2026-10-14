@@ -118,6 +118,21 @@ describe('LibraryView', () => {
     expect(screen.queryByText(/chưa có video/)).toBeNull()
   })
 
+  it('"Phát" plays the whole collection right from the card', async () => {
+    renderView()
+    fireEvent.click(await screen.findByRole('button', { name: 'Phát Hài tuyển chọn' }))
+    expect(await screen.findByTestId('swiper')).toBeTruthy()
+    expect(collectionsApi.videos).toHaveBeenCalledWith('p1', 0, 50)
+    fireEvent.click(screen.getByRole('button', { name: /Quay lại/ }))
+    expect(await screen.findByLabelText('Hài tuyển chọn, 3 video')).toBeTruthy()
+  })
+
+  it('"Phát" is disabled for an empty collection', async () => {
+    collectionsApi.publicList.mockResolvedValue({ data: [{ ...pub, itemCount: 0 }] })
+    renderView()
+    expect(await screen.findByRole('button', { name: 'Phát Hài tuyển chọn' })).toBeDisabled()
+  })
+
   it('owner can open "Thêm video" from a collection', async () => {
     auth = { isLoggedIn: true, user: { isAdmin: false } }
     renderView({ initialCollectionId: 'o' })

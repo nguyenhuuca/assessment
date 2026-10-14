@@ -43,6 +43,26 @@ export function useCollectionVideos(id, page = 0) {
   })
 }
 
+const PLAYLIST_PAGE_SIZE = 50 // server max page size
+const PLAYLIST_MAX_PAGES = 10 // 500 items, the per-collection cap
+
+/** Every visible video of a collection, in collection order, for "Phát" (play the whole list). */
+export function useCollectionPlaylist(id, enabled = true) {
+  return useQuery({
+    queryKey: ['collections', id, 'videos', 'all'],
+    enabled: enabled && !!id,
+    queryFn: async () => {
+      const videos = []
+      for (let page = 0; page < PLAYLIST_MAX_PAGES; page++) {
+        const data = unwrap(await collectionsApi.videos(id, page, PLAYLIST_PAGE_SIZE)) || {}
+        videos.push(...(Array.isArray(data.content) ? data.content : []).map(mapApiVideo))
+        if (page + 1 >= (data.totalPages ?? 0)) break
+      }
+      return videos
+    },
+  })
+}
+
 /** Every video id in a collection the caller manages (shares the 'videos' key prefix, so toggles refresh it). */
 export function useCollectionVideoIds(id, enabled = true) {
   return useQuery({
