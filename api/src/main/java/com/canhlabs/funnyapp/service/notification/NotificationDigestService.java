@@ -8,14 +8,17 @@ import com.canhlabs.funnyapp.enums.NotificationType;
 import com.canhlabs.funnyapp.enums.UserStatus;
 import com.canhlabs.funnyapp.repo.NotificationRepository;
 import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.service.EmailLocaleResolver;
 import com.canhlabs.funnyapp.service.MailService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -35,15 +38,20 @@ public class NotificationDigestService {
     private final MailService mailService;
     private final EmailCacheLimiter emailLimiter;
     private final AppProperties appProperties;
+    private final EmailLocaleResolver localeResolver;
+    private final MessageSource messageSource;
 
     public NotificationDigestService(NotificationRepository notificationRepository, UserRepo userRepo,
                                      MailService mailService, EmailCacheLimiter emailLimiter,
-                                     AppProperties appProperties) {
+                                     AppProperties appProperties, EmailLocaleResolver localeResolver,
+                                     MessageSource messageSource) {
         this.notificationRepository = notificationRepository;
         this.userRepo = userRepo;
         this.mailService = mailService;
         this.emailLimiter = emailLimiter;
         this.appProperties = appProperties;
+        this.localeResolver = localeResolver;
+        this.messageSource = messageSource;
     }
 
     /**
@@ -91,37 +99,45 @@ public class NotificationDigestService {
         if (pending.isEmpty()) {
             return false;
         }
-        mailService.sendSimpleMail(user.getUserName(), subject(pending.size()), body(pending));
+        Locale locale = localeResolver.forUser(userId);
+        mailService.sendSimpleMail(user.getUserName(), subject(pending.size(), locale), body(pending, locale));
         emailLimiter.incrementDailyCount(LocalDate.now());
         List<UUID> ids = pending.stream().map(Notification::getId).toList();
         notificationRepository.markEmailed(ids, Instant.now());
         return true;
     }
 
-    static String subject(int count) {
-        return "Bạn có " + count + " thông báo mới trên Funny Movies";
+    String subject(int count, Locale locale) {
+        return msg("mail.digest.subject", locale, String.valueOf(count));
     }
 
-    String body(List<Notification> pending) {
-        StringBuilder sb = new StringBuilder("Xin chào,\n\nBạn có thông báo mới:\n\n");
-        pending.stream().limit(MAX_LISTED).forEach(n -> sb.append("- ").append(describe(n)).append('\n'));
+    String body(List<Notification> pending, Locale locale) {
+        StringBuilder sb = new StringBuilder(msg("mail.digest.header", locale));
+        pending.stream().limit(MAX_LISTED).forEach(n -> sb.append("- ").append(describe(n, locale)).append('\n'));
         if (pending.size() > MAX_LISTED) {
-            sb.append("\nvà ").append(pending.size() - MAX_LISTED).append(" thông báo khác.\n");
+            sb.append(msg("mail.digest.more", locale, String.valueOf(pending.size() - MAX_LISTED)));
         }
-        sb.append("\nXem tại: ").append(appProperties.getDomain()).append('\n');
-        sb.append("\n--\nTắt email thông báo trong Cài đặt.\n");
+        sb.append(msg("mail.digest.view", locale, appProperties.getDomain()));
+        sb.append(msg("mail.digest.footer", locale));
         return sb.toString();
     }
 
-    private static String describe(Notification n) {
+    private String describe(Notification n, Locale locale) {
         if (n.getType() == NotificationType.COMMENT_REMOVED) {
             Object reason = n.getPayload() == null ? null : n.getPayload().get("reason");
-            return "Bình luận của bạn đã bị gỡ" + (reason == null ? "" : " (" + reason + ")");
+            return reason == null ? msg("mail.digest.item.removed", locale)
+                    : msg("mail.digest.item.removedReason", locale, reason.toString());
         }
-        String actor = n.getActorDisplay() == null ? "Ai đó" : n.getActorDisplay();
-        String who = n.getActorCount() > 1 ? actor + " và " + (n.getActorCount() - 1) + " người khác" : actor;
+        String actor = n.getActorDisplay() == null ? msg("mail.digest.item.someone", locale) : n.getActorDisplay();
+        String who = n.getActorCount() > 1
+                ? msg("mail.digest.item.actors", locale, actor, String.valueOf(n.getActorCount() - 1)) : actor;
         Object snippet = n.getPayload() == null ? null : n.getPayload().get("snippet");
-        String text = who + " đã trả lời bình luận của bạn";
-        return snippet == null || snippet.toString().isBlank() ? text : text + ": \"" + snippet + "\"";
+        return snippet == null || snippet.toString().isBlank()
+                ? msg("mail.digest.item.reply", locale, who)
+                : msg("mail.digest.item.replySnippet", locale, who, snippet.toString());
+    }
+
+    private String msg(String key, Locale locale, String... args) {
+        return messageSource.getMessage(key, args.length == 0 ? null : args, locale);
     }
 }

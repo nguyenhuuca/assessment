@@ -12,6 +12,7 @@ import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.UserStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.service.EmailLocaleResolver;
 import com.canhlabs.funnyapp.service.LoginAttemptService;
 import com.canhlabs.funnyapp.service.MailService;
 import com.canhlabs.funnyapp.service.PasswordLoginService;
@@ -20,6 +21,7 @@ import com.canhlabs.funnyapp.utils.AppUtils;
 import com.canhlabs.funnyapp.utils.PasswordPolicy;
 import com.canhlabs.funnyapp.utils.totp.Totp;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Locale;
 
 import static com.canhlabs.funnyapp.service.impl.Converter.toUserInfo;
 
@@ -57,13 +60,16 @@ public class PasswordLoginServiceImpl implements PasswordLoginService {
     private final MailService mailService;
     private final EmailCacheLimiter emailLimiter;
     private final AppProperties appProperties;
+    private final EmailLocaleResolver localeResolver;
+    private final MessageSource messageSource;
     /** Hash of a throw-away password; matched against on paths that have no real hash so timing stays equal. */
     private final String dummyHash;
 
     public PasswordLoginServiceImpl(UserRepo userRepo, PasswordEncoder bCrypt, UserService userService,
                                     LoginAttemptService loginAttempts, CredentialsVersionCache credentialsVersionCache,
                                     Totp totp, MailService mailService, EmailCacheLimiter emailLimiter,
-                                    AppProperties appProperties) {
+                                    AppProperties appProperties, EmailLocaleResolver localeResolver,
+                                    MessageSource messageSource) {
         this.userRepo = userRepo;
         this.bCrypt = bCrypt;
         this.userService = userService;
@@ -73,6 +79,8 @@ public class PasswordLoginServiceImpl implements PasswordLoginService {
         this.mailService = mailService;
         this.emailLimiter = emailLimiter;
         this.appProperties = appProperties;
+        this.localeResolver = localeResolver;
+        this.messageSource = messageSource;
         this.dummyHash = bCrypt.encode(DUMMY_PASSWORD);
     }
 
@@ -122,7 +130,7 @@ public class PasswordLoginServiceImpl implements PasswordLoginService {
         user.setPassword(bCrypt.encode(request.getNewPassword()));
         user.setPasswordSetAt(Instant.now());
         UserInfoDto result = persistCredentialChange(user, hadPassword ? "PASSWORD_CHANGED" : "PASSWORD_SET");
-        sendSecurityEmail(user, hadPassword ? "đã được thay đổi" : "đã được thiết lập");
+        sendSecurityEmail(user, hadPassword ? "mail.security.event.changed" : "mail.security.event.set");
         return result;
     }
 
@@ -139,7 +147,7 @@ public class PasswordLoginServiceImpl implements PasswordLoginService {
         user.setPassword(null);
         user.setPasswordSetAt(null);
         UserInfoDto result = persistCredentialChange(user, "PASSWORD_REMOVED");
-        sendSecurityEmail(user, "đã được gỡ bỏ");
+        sendSecurityEmail(user, "mail.security.event.removed");
         return result;
     }
 
@@ -231,21 +239,18 @@ public class PasswordLoginServiceImpl implements PasswordLoginService {
      * Plain-text security notice. Counts against the daily budget but is never blocked by it (nor by the
      * notification digest's 50% cap); a send failure is logged and never fails the request.
      */
-    private void sendSecurityEmail(User user, String event) {
+    private void sendSecurityEmail(User user, String eventKey) {
         try {
             LocalDate today = LocalDate.now();
             int max = appProperties.getEmailSetting() != null ? appProperties.getEmailSetting().getMaxDailyEmails() : 0;
             if (max > 0 && emailLimiter.getDailyCount(today) >= max) {
                 log.warn("Daily email budget exhausted; sending security mail to user id={} anyway", user.getId());
             }
+            Locale locale = localeResolver.forUser(user.getId());
+            String event = messageSource.getMessage(eventKey, null, locale);
             mailService.sendSimpleMail(user.getUserName(),
-                    "Mật khẩu của bạn vừa được thay đổi",
-                    "Xin chào,\n\n"
-                            + "Mật khẩu đăng nhập của tài khoản " + user.getUserName() + " " + event + ".\n"
-                            + "Các thiết bị khác đã bị đăng xuất.\n\n"
-                            + "Nếu bạn không thực hiện thay đổi này, hãy đăng nhập bằng link gửi qua email "
-                            + "và đổi hoặc gỡ mật khẩu ngay.\n\n"
-                            + "Canh Labs");
+                    messageSource.getMessage("mail.security.subject", null, locale),
+                    messageSource.getMessage("mail.security.body", new Object[]{user.getUserName(), event}, locale));
             emailLimiter.incrementDailyCount(today);
         } catch (Exception e) {
             log.error("Could not send password security email for user id={}: {}", user.getId(), e.getMessage());

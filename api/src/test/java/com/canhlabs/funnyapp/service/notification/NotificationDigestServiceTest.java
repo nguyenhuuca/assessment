@@ -2,6 +2,9 @@ package com.canhlabs.funnyapp.service.notification;
 
 import com.canhlabs.funnyapp.cache.EmailCacheLimiter;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.config.I18nConfig;
+import com.canhlabs.funnyapp.service.EmailLocaleResolver;
+import static org.mockito.ArgumentMatchers.anyLong;
 import com.canhlabs.funnyapp.entity.Notification;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.NotificationType;
@@ -32,6 +35,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -43,6 +47,7 @@ class NotificationDigestServiceTest {
     @Mock UserRepo userRepo;
     @Mock MailService mailService;
     @Mock EmailCacheLimiter emailLimiter;
+    @Mock EmailLocaleResolver localeResolver;
 
     AppProperties props;
     NotificationDigestService service;
@@ -52,7 +57,9 @@ class NotificationDigestServiceTest {
         props = new AppProperties();
         props.setDomain("https://app.example.com");
         props.getEmailSetting().setMaxDailyEmails(200);
-        service = new NotificationDigestService(notificationRepository, userRepo, mailService, emailLimiter, props);
+        lenient().when(localeResolver.forUser(anyLong())).thenReturn(I18nConfig.VI);
+        service = new NotificationDigestService(notificationRepository, userRepo, mailService, emailLimiter, props,
+                localeResolver, new I18nConfig().messageSource());
     }
 
     private static User user(long id, String email, UserStatus status) {
@@ -111,6 +118,50 @@ class NotificationDigestServiceTest {
                 .contains("https://app.example.com")
                 .contains("Tắt email thông báo trong Cài đặt")
                 .doesNotContain("khác.\n");
+    }
+
+    @Test
+    void sendDigests_usesEnglishWhenResolverSaysEnglish() {
+        when(notificationRepository.findUserIdsForDigest()).thenReturn(List.of(1L));
+        when(emailLimiter.getDailyCount(any(LocalDate.class))).thenReturn(0);
+        when(userRepo.findAllById(1L)).thenReturn(user(1L, "me@x.com", UserStatus.ACTIVE));
+        when(localeResolver.forUser(1L)).thenReturn(I18nConfig.EN);
+        when(notificationRepository.findByUserIdAndReadAtIsNullAndEmailedAtIsNullOrderByUpdatedAtDesc(1L))
+                .thenReturn(List.of(reply("bob", 3, "haha same"), removed("SPAM"), reply(null, 1, " ")));
+
+        service.sendDigests();
+
+        ArgumentCaptor<String> subject = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> body = ArgumentCaptor.forClass(String.class);
+        verify(mailService).sendSimpleMail(eq("me@x.com"), subject.capture(), body.capture());
+        assertThat(subject.getValue()).isEqualTo("You have 3 new notifications on Funny Movies");
+        assertThat(body.getValue())
+                .contains("bob and 2 others replied to your comment: \"haha same\"")
+                .contains("Your comment was removed (SPAM)")
+                .contains("- Someone replied to your comment\n")
+                .contains("View them at: https://app.example.com")
+                .contains("Turn off notification emails in Settings.");
+    }
+
+    @Test
+    void sendDigests_removedWithoutReason_andSummaryInEnglish() {
+        List<Notification> many = new java.util.ArrayList<>(java.util.stream.IntStream.range(0, 6)
+                .mapToObj(i -> reply("u" + i, 1, "s" + i)).toList());
+        Notification bare = new Notification();
+        bare.setId(UUID.randomUUID());
+        bare.setType(NotificationType.COMMENT_REMOVED);
+        many.set(0, bare);
+        when(notificationRepository.findUserIdsForDigest()).thenReturn(List.of(1L));
+        when(emailLimiter.getDailyCount(any(LocalDate.class))).thenReturn(0);
+        when(userRepo.findAllById(1L)).thenReturn(user(1L, "me@x.com", UserStatus.ACTIVE));
+        when(localeResolver.forUser(1L)).thenReturn(I18nConfig.EN);
+        when(notificationRepository.findByUserIdAndReadAtIsNullAndEmailedAtIsNullOrderByUpdatedAtDesc(1L)).thenReturn(many);
+
+        service.sendDigests();
+
+        ArgumentCaptor<String> body = ArgumentCaptor.forClass(String.class);
+        verify(mailService).sendSimpleMail(eq("me@x.com"), anyString(), body.capture());
+        assertThat(body.getValue()).contains("- Your comment was removed\n").contains("and 1 more.");
     }
 
     @Test

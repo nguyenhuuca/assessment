@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.entity.UserEmailRequest;
 import com.canhlabs.funnyapp.repo.UserEmailRequestRepository;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.service.EmailLocaleResolver;
 import com.canhlabs.funnyapp.service.InviteService;
 import com.canhlabs.funnyapp.service.MailService;
 import com.canhlabs.funnyapp.utils.AppUtils;
@@ -26,6 +27,7 @@ public class InviteServiceImpl implements InviteService {
     private final UserEmailRequestRepository requestRepo;
     private final MailService emailSender;
     private final AppProperties appProperties;
+    private final EmailLocaleResolver localeResolver;
     /**
      * Send link join system
      */
@@ -49,7 +51,8 @@ public class InviteServiceImpl implements InviteService {
         requestRepo.save(request);
         String magicLink = appProperties.getDomain() + "/join?token=" + token;
 
-        emailSender.sendInvitation(email, email, magicLink);
+        // Resolve here, on the request thread: the send itself is @Async
+        emailSender.sendInvitation(email, email, magicLink, localeResolver.forEmail(email));
         log.info("User join system via magic link with email: {}", email);
     }
 

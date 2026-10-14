@@ -2,20 +2,27 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.EmailCacheLimiter;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.config.I18nConfig;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
+import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -26,7 +33,7 @@ import static org.mockito.Mockito.*;
  * Unit tests for {@link MailServiceImpl}.
  *
  * Tests use {@link ReflectionTestUtils} to inject the {@code fromAddress} and
- * {@code htmlTemplate} fields that are normally set by {@code @Value} and
+ * {@code htmlTemplates} fields that are normally set by {@code @Value} and
  * {@code @PostConstruct} respectively.
  */
 @ExtendWith(MockitoExtension.class)
@@ -44,16 +51,21 @@ class MailServiceImplTest {
     @Mock
     private EmailCacheLimiter emailCacheLimiter;
 
-    @InjectMocks
     private MailServiceImpl mailService;
 
+    private static final Locale VI = I18nConfig.VI;
+    private static final Locale EN = I18nConfig.EN;
     private static final String FROM_ADDRESS = "noreply@canh-labs.com";
-    private static final String HTML_TEMPLATE = "<html>Dear {{username}}, click <a href='{{loginUrl}}'>here</a></html>";
+    private static final Map<String, String> TEMPLATES = Map.of(
+            "en", "<html>Dear {{username}}, click <a href='{{loginUrl}}'>here</a></html>",
+            "vi", "<html>Chao {{username}}, bam <a href='{{loginUrl}}'>day</a></html>");
 
     @BeforeEach
     void setUp() {
+        mailService = new MailServiceImpl(mailSender, appProperties, emailCacheLimiter,
+                new I18nConfig().messageSource());
         ReflectionTestUtils.setField(mailService, "fromAddress", FROM_ADDRESS);
-        ReflectionTestUtils.setField(mailService, "htmlTemplate", HTML_TEMPLATE);
+        ReflectionTestUtils.setField(mailService, "htmlTemplates", TEMPLATES);
     }
 
     // -----------------------------------------------------------------------
@@ -61,14 +73,104 @@ class MailServiceImplTest {
     // -----------------------------------------------------------------------
 
     @Test
-    void loadTemplate_readsHtmlTemplateFromClasspath() throws Exception {
-        when(appProperties.getInviteTemplate()).thenReturn("templates/email/invite-test.html");
-        MailServiceImpl service = new MailServiceImpl(mailSender, appProperties, emailCacheLimiter);
+    void loadTemplate_readsOneTemplatePerLanguageFromClasspath() throws Exception {
+        when(appProperties.getInviteTemplate()).thenReturn("templates/email/invite-test");
+        MailServiceImpl service = new MailServiceImpl(mailSender, appProperties, emailCacheLimiter,
+                new I18nConfig().messageSource());
 
         service.loadTemplate();
 
-        String loaded = (String) ReflectionTestUtils.getField(service, "htmlTemplate");
-        assertThat(loaded).isEqualTo("Hello, {{username}}!");
+        assertThat(service.templateFor(EN)).isEqualTo("Hello, {{username}}!");
+        assertThat(service.templateFor(VI)).isEqualTo("Xin chào, {{username}}!");
+    }
+
+    @Test
+    void templateFor_fallsBackToEnglish_forUnknownOrMissingLocale() {
+        assertThat(mailService.templateFor(Locale.FRENCH)).isEqualTo(TEMPLATES.get("en"));
+        assertThat(mailService.templateFor(null)).isEqualTo(TEMPLATES.get("en"));
+    }
+
+    @Test
+    void realInviteTemplates_existForEveryLanguage_withPlaceholders() throws Exception {
+        when(appProperties.getInviteTemplate()).thenReturn("templates/email/invite");
+        MailServiceImpl service = new MailServiceImpl(mailSender, appProperties, emailCacheLimiter,
+                new I18nConfig().messageSource());
+
+        service.loadTemplate();
+
+        assertThat(service.templateFor(EN)).contains("{{username}}", "{{loginUrl}}", "Sign In to Canh Labs");
+        assertThat(service.templateFor(VI)).contains("{{username}}", "{{loginUrl}}", "Đăng nhập Canh Labs")
+                .contains("lang=\"vi\"");
+    }
+
+    // -----------------------------------------------------------------------
+    // sendInvitation – localized subject and body
+    // -----------------------------------------------------------------------
+
+    private MimeMessage realMessage() {
+        MimeMessage message = new MimeMessage(Session.getInstance(new Properties()));
+        when(mailSender.createMimeMessage()).thenReturn(message);
+        when(appProperties.getEmailSetting()).thenReturn(emailSetting);
+        when(emailSetting.getWhitelistAsList()).thenReturn(List.of("@example.com"));
+        return message;
+    }
+
+    private static String htmlOf(Part part) throws Exception {
+        Object content = part.getContent();
+        if (content instanceof String text) {
+            return part.getDataHandler().getContentType().startsWith("text/html") ? text : "";
+        }
+        if (content instanceof Multipart multipart) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < multipart.getCount(); i++) {
+                sb.append(htmlOf(multipart.getBodyPart(i)));
+            }
+            return sb.toString();
+        }
+        return "";
+    }
+
+    @Test
+    void sendInvitation_vietnamese_usesViSubjectAndTemplate() throws Exception {
+        MimeMessage message = realMessage();
+
+        mailService.sendInvitation("a@example.com", "Alice", "http://magic", VI);
+
+        assertThat(message.getSubject()).isEqualTo("Kích hoạt tài khoản của bạn");
+        assertThat(htmlOf(message)).isEqualTo("<html>Chao Alice, bam <a href='http://magic'>day</a></html>");
+    }
+
+    @Test
+    void sendInvitation_english_usesEnSubjectAndTemplate() throws Exception {
+        MimeMessage message = realMessage();
+
+        mailService.sendInvitation("a@example.com", "Alice", "http://magic", EN);
+
+        assertThat(message.getSubject()).isEqualTo("Enable Your Account");
+        assertThat(htmlOf(message)).isEqualTo("<html>Dear Alice, click <a href='http://magic'>here</a></html>");
+    }
+
+    @Test
+    void sendInvitation_unsupportedOrNullLocale_fallsBackToEnglish() throws Exception {
+        MimeMessage message = realMessage();
+
+        mailService.sendInvitation("a@example.com", "Alice", "http://magic", Locale.FRENCH);
+
+        assertThat(message.getSubject()).isEqualTo("Enable Your Account");
+        assertThat(htmlOf(message)).startsWith("<html>Dear Alice");
+    }
+
+    @Test
+    void sendInvitation_ignoresLocaleContextHolder_usesExplicitLocale() throws Exception {
+        MimeMessage message = realMessage();
+        LocaleContextHolder.setLocale(EN);
+        try {
+            mailService.sendInvitation("a@example.com", "Alice", "http://magic", VI);
+        } finally {
+            LocaleContextHolder.resetLocaleContext();
+        }
+
+        assertThat(message.getSubject()).isEqualTo("Kích hoạt tài khoản của bạn");
     }
 
     // -----------------------------------------------------------------------
@@ -110,7 +212,7 @@ class MailServiceImplTest {
         when(appProperties.getEmailSetting()).thenReturn(emailSetting);
         when(emailSetting.getWhitelistAsList()).thenReturn(List.of("vip@example.com"));
 
-        mailService.sendInvitation("vip@example.com", "vipuser", "http://verify.link");
+        mailService.sendInvitation("vip@example.com", "vipuser", "http://verify.link", EN);
 
         verify(mailSender).send(any(MimeMessage.class));
         verify(emailCacheLimiter).incrementDailyCount(any(LocalDate.class));
@@ -127,7 +229,7 @@ class MailServiceImplTest {
         when(appProperties.getEmailSetting()).thenReturn(emailSetting);
         when(emailSetting.getWhitelistAsList()).thenReturn(List.of("@trusted.org"));
 
-        mailService.sendInvitation("anyone@trusted.org", "domainuser", "http://verify.link");
+        mailService.sendInvitation("anyone@trusted.org", "domainuser", "http://verify.link", EN);
 
         verify(mailSender).send(any(MimeMessage.class));
         verify(emailCacheLimiter).incrementDailyCount(any(LocalDate.class));
@@ -144,7 +246,7 @@ class MailServiceImplTest {
         when(emailSetting.getMaxDailyEmails()).thenReturn(5);
         when(emailCacheLimiter.getDailyCount(any(LocalDate.class))).thenReturn(5); // at limit
 
-        mailService.sendInvitation("user@external.com", "someuser", "http://verify.link");
+        mailService.sendInvitation("user@external.com", "someuser", "http://verify.link", EN);
 
         verify(mailSender, never()).createMimeMessage();
         verify(emailCacheLimiter, never()).incrementDailyCount(any(LocalDate.class));
@@ -157,7 +259,7 @@ class MailServiceImplTest {
         when(emailSetting.getMaxDailyEmails()).thenReturn(10);
         when(emailCacheLimiter.getDailyCount(any(LocalDate.class))).thenReturn(100); // far above limit
 
-        mailService.sendInvitation("user@external.com", "someuser", "http://verify.link");
+        mailService.sendInvitation("user@external.com", "someuser", "http://verify.link", EN);
 
         verify(mailSender, never()).createMimeMessage();
     }
@@ -176,7 +278,7 @@ class MailServiceImplTest {
         when(emailCacheLimiter.getDailyCount(any(LocalDate.class))).thenReturn(0);
         when(emailSetting.isEnablePreviewMode()).thenReturn(false);
 
-        mailService.sendInvitation("regular@external.com", "user", "http://verify.link");
+        mailService.sendInvitation("regular@external.com", "user", "http://verify.link", EN);
 
         verify(mailSender).send(any(MimeMessage.class));
         verify(emailCacheLimiter).incrementDailyCount(any(LocalDate.class));
@@ -195,7 +297,7 @@ class MailServiceImplTest {
 
         // Capture via a real MimeMessage-backed approach is complex; instead verify
         // that send is called exactly once and counter is incremented.
-        mailService.sendInvitation("target@example.com", "Alice", "http://magic-link");
+        mailService.sendInvitation("target@example.com", "Alice", "http://magic-link", EN);
 
         verify(mailSender, times(1)).send(any(MimeMessage.class));
     }

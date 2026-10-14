@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.EmailCacheLimiter;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.config.I18nConfig;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -30,14 +33,16 @@ class MailServiceTest {
     @Mock
     EmailCacheLimiter emailCacheLimiter;
 
-    @InjectMocks
     private MailServiceImpl mailService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        mailService = new MailServiceImpl(mailSender, appProperties, emailCacheLimiter,
+                new I18nConfig().messageSource());
         ReflectionTestUtils.setField(mailService, "fromAddress", "noreply@canh-labs.com");
-        ReflectionTestUtils.setField(mailService, "htmlTemplate", "<html>{{username}} {{loginUrl}}</html>");
+        ReflectionTestUtils.setField(mailService, "htmlTemplates",
+                Map.of("en", "<html>{{username}} {{loginUrl}}</html>"));
     }
 
     @Test
@@ -58,7 +63,7 @@ class MailServiceTest {
         when(emailSetting.getWhitelistAsList()).thenReturn(List.of("ceo@abc.com","@trusted.com"));
 
 
-        mailService.sendInvitation("ceo@abc.com", "testuser", "http://verify.url");
+        mailService.sendInvitation("ceo@abc.com", "testuser", "http://verify.url", Locale.ENGLISH);
 
         verify(mailSender).send(any(MimeMessage.class));
     }
@@ -77,15 +82,16 @@ class MailServiceTest {
     @Test
     void loadTemplate_readsTemplateFile() throws Exception {
         // Arrange
-        when(appProperties.getInviteTemplate()).thenReturn("templates/email/invite-test.html");
-        // Place a file named invite-test.html in src/test/resources with content: "Hello, {{username}}!"
-        MailServiceImpl mailService = new MailServiceImpl(mailSender, appProperties , emailCacheLimiter);
+        when(appProperties.getInviteTemplate()).thenReturn("templates/email/invite-test");
+        // src/test/resources holds invite-test_en.html ("Hello, {{username}}!") and invite-test_vi.html
+        MailServiceImpl mailService = new MailServiceImpl(mailSender, appProperties , emailCacheLimiter,
+                new I18nConfig().messageSource());
 
         // Act
         mailService.loadTemplate();
 
         // Assert
-        String template = (String) ReflectionTestUtils.getField(mailService, "htmlTemplate");
+        String template = mailService.templateFor(Locale.ENGLISH);
         assertThat(template).isEqualTo("Hello, {{username}}!");
     }
 }

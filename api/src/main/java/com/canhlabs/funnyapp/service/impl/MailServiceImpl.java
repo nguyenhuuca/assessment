@@ -2,12 +2,14 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.EmailCacheLimiter;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.config.I18nConfig;
 import com.canhlabs.funnyapp.service.MailService;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,7 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
@@ -27,25 +32,39 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
-    private String htmlTemplate;
+    private Map<String, String> htmlTemplates = Map.of();
     @Value("${spring.mail.username}")
     private String fromAddress;
     private final AppProperties appProperties;
     private final EmailCacheLimiter  emailLimiter;
+    private final MessageSource messageSource;
 
-    public MailServiceImpl(JavaMailSender mailSender, AppProperties appProperties, EmailCacheLimiter emailCacheLimiter) {
+    public MailServiceImpl(JavaMailSender mailSender, AppProperties appProperties, EmailCacheLimiter emailCacheLimiter,
+                           MessageSource messageSource) {
         this.mailSender = mailSender;
         this.appProperties = appProperties;
         this.emailLimiter = emailCacheLimiter;
+        this.messageSource = messageSource;
     }
 
     @PostConstruct
     public void loadTemplate() throws IOException {
-        // Load HTML template once at startup
-        ClassPathResource resource = new ClassPathResource(appProperties.getInviteTemplate());
-        try (InputStream is = resource.getInputStream()) {
-            htmlTemplate = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        // Load one HTML template per supported language once at startup: <inviteTemplate>_<lang>.html
+        Map<String, String> loaded = new HashMap<>();
+        for (Locale locale : I18nConfig.SUPPORTED) {
+            ClassPathResource resource = new ClassPathResource(
+                    appProperties.getInviteTemplate() + "_" + locale.getLanguage() + ".html");
+            try (InputStream is = resource.getInputStream()) {
+                loaded.put(locale.getLanguage(), new String(is.readAllBytes(), StandardCharsets.UTF_8));
+            }
         }
+        htmlTemplates = Map.copyOf(loaded);
+    }
+
+    /** Template for the language, falling back to English. */
+    String templateFor(Locale locale) {
+        String template = locale == null ? null : htmlTemplates.get(locale.getLanguage());
+        return template != null ? template : htmlTemplates.get(I18nConfig.EN.getLanguage());
     }
 
     @Override
@@ -60,14 +79,15 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendInvitation(String to, String username, String verifyUrl) {
+    public void sendInvitation(String to, String username, String verifyUrl, Locale locale) {
         if(!shouldSend(to)) {
             log.warn("Email to {} is not sent due to preview settings", to);
             return;
         }
-        String subject = "Enable Your Account";
+        Locale target = locale == null ? I18nConfig.EN : locale;
+        String subject = messageSource.getMessage("mail.invite.subject", null, target);
         // Replace placeholders
-        String content = htmlTemplate
+        String content = templateFor(target)
                 .replace("{{username}}", username)
                 .replace("{{loginUrl}}", verifyUrl);
 

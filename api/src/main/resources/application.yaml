@@ -113,7 +113,7 @@ app:
   auth:
     password-login-enabled: ${PASSWORD_LOGIN_ENABLED:true}
   domain: 'https://funnyapp.canh-labs.com'
-  invite-template: 'templates/email/invite.html'
+  invite-template: 'templates/email/invite'
   chatgpt-url: 'https://api.openai.com/v1/chat/completions'
   youtube-url: 'https://www.googleapis.com/youtube/v3/videos'
   image-url: 'https://images.canh-labs.com'

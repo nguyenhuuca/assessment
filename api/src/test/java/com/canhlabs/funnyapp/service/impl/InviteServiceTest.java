@@ -4,6 +4,8 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.entity.UserEmailRequest;
 import com.canhlabs.funnyapp.repo.UserEmailRequestRepository;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.config.I18nConfig;
+import com.canhlabs.funnyapp.service.EmailLocaleResolver;
 import com.canhlabs.funnyapp.utils.AppUtils;
 import com.canhlabs.funnyapp.enums.Status;
 import com.canhlabs.funnyapp.exception.CustomException;
@@ -16,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +38,8 @@ class InviteServiceTest {
     private MailServiceImpl emailSender;
     @Mock
     private AppProperties appProperties;
+    @Mock
+    private EmailLocaleResolver localeResolver;
 
     @InjectMocks
     private InviteServiceImpl inviteService;
@@ -49,13 +54,28 @@ class InviteServiceTest {
         String email = "test@abc.com";
         Long invitedByUserId = 1L;
         when(appProperties.getDomain()).thenReturn("http://localhost");
+        when(localeResolver.forEmail(email)).thenReturn(Locale.ENGLISH);
         try (MockedStatic<AppUtils> utils = mockStatic(AppUtils.class)) {
             utils.when(() -> AppUtils.isValidEmail(email)).thenReturn(true);
 
             inviteService.inviteUser(email, invitedByUserId);
 
             verify(requestRepo).save(any(UserEmailRequest.class));
-            verify(emailSender).sendInvitation(eq(email), eq(email), contains("/join?token="));
+            verify(emailSender).sendInvitation(eq(email), eq(email), contains("/join?token="), eq(Locale.ENGLISH));
+        }
+    }
+
+    @Test
+    void inviteUser_passesResolvedLocaleExplicitly_toTheAsyncSend() {
+        String email = "vi@abc.com";
+        when(appProperties.getDomain()).thenReturn("http://localhost");
+        when(localeResolver.forEmail(email)).thenReturn(I18nConfig.VI);
+        try (MockedStatic<AppUtils> utils = mockStatic(AppUtils.class)) {
+            utils.when(() -> AppUtils.isValidEmail(email)).thenReturn(true);
+
+            inviteService.inviteUser(email, null);
+
+            verify(emailSender).sendInvitation(eq(email), eq(email), contains("/join?token="), eq(I18nConfig.VI));
         }
     }
 

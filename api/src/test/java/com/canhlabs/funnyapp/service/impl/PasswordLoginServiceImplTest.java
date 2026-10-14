@@ -12,6 +12,10 @@ import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.UserStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.config.I18nConfig;
+import com.canhlabs.funnyapp.entity.UserSettings;
+import com.canhlabs.funnyapp.repo.UserSettingsRepository;
+import com.canhlabs.funnyapp.service.EmailLocaleResolver;
 import com.canhlabs.funnyapp.service.LoginAttemptService;
 import com.canhlabs.funnyapp.service.MailService;
 import com.canhlabs.funnyapp.service.UserService;
@@ -25,6 +29,8 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -66,6 +72,11 @@ class PasswordLoginServiceImplTest {
     private EmailCacheLimiter emailLimiter;
     @Mock
     private AppProperties appProperties;
+    @Mock
+    private EmailLocaleResolver localeResolver;
+    @Mock
+    private UserSettingsRepository settingsRepository;
+    private final MessageSource messageSource = new I18nConfig().messageSource();
 
     /** Plain encoder for building fixtures: calling the spy inside when(...) would corrupt Mockito stubbing. */
     private final BCryptPasswordEncoder fixtureEncoder = new BCryptPasswordEncoder(4);
@@ -82,7 +93,8 @@ class PasswordLoginServiceImplTest {
         emailSetting.setMaxDailyEmails(200);
         when(appProperties.getEmailSetting()).thenReturn(emailSetting);
         service = new PasswordLoginServiceImpl(userRepo, encoder, userService, loginAttempts,
-                credentialsVersionCache, totp, mailService, emailLimiter, appProperties);
+                credentialsVersionCache, totp, mailService, emailLimiter, appProperties, localeResolver, messageSource);
+        when(localeResolver.forUser(anyLong())).thenReturn(I18nConfig.VI);
         Mockito.clearInvocations(encoder); // ignore the dummy-hash encode done in the constructor
         when(userService.completeLogin(any(User.class))).thenAnswer(inv ->
                 UserInfoDto.builder().jwt("jwt-login").build());
@@ -341,6 +353,77 @@ class PasswordLoginServiceImplTest {
         assertThat(subject.getValue()).isEqualTo("Mật khẩu của bạn vừa được thay đổi");
         assertThat(body.getValue()).doesNotContain(NEW_PASSWORD).contains("đã bị đăng xuất");
         verify(emailLimiter).incrementDailyCount(any());
+    }
+
+    private ArgumentCaptor<String> sentBody() {
+        ArgumentCaptor<String> body = ArgumentCaptor.forClass(String.class);
+        verify(mailService).sendSimpleMail(eq(EMAIL), anyString(), body.capture());
+        return body;
+    }
+
+    /** Service wired with the real resolver: stored locale decides, whatever the thread-local says. */
+    private PasswordLoginServiceImpl serviceWithRealResolver() {
+        return new PasswordLoginServiceImpl(userRepo, encoder, userService, loginAttempts,
+                credentialsVersionCache, totp, mailService, emailLimiter, appProperties,
+                new EmailLocaleResolver(settingsRepository, userRepo), messageSource);
+    }
+
+    @Test
+    void setPassword_storedEnglish_sendsEnglishEmail_evenWhenThreadLocaleIsVietnamese() {
+        User user = User.builder().id(1L).userName(EMAIL).credentialsVersion(2).build();
+        currentUser(user);
+        when(settingsRepository.findById(1L)).thenReturn(java.util.Optional.of(
+                UserSettings.builder().userId(1L).locale("en").build()));
+        LocaleContextHolder.setLocale(I18nConfig.VI);
+        try {
+            serviceWithRealResolver().setPassword(set(null, NEW_PASSWORD, null));
+        } finally {
+            LocaleContextHolder.resetLocaleContext();
+        }
+
+        ArgumentCaptor<String> subject = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> body = ArgumentCaptor.forClass(String.class);
+        verify(mailService).sendSimpleMail(eq(EMAIL), subject.capture(), body.capture());
+        assertThat(subject.getValue()).isEqualTo("Your password was changed");
+        assertThat(body.getValue()).contains("Hello,").contains(EMAIL + " has been set")
+                .doesNotContain(NEW_PASSWORD);
+    }
+
+    @Test
+    void setPassword_storedVietnamese_sendsVietnameseEmail_evenWhenThreadLocaleIsEnglish() {
+        User user = User.builder().id(1L).userName(EMAIL).credentialsVersion(2).build();
+        currentUser(user);
+        when(settingsRepository.findById(1L)).thenReturn(java.util.Optional.of(
+                UserSettings.builder().userId(1L).locale("vi").build()));
+        LocaleContextHolder.setLocale(I18nConfig.EN);
+        try {
+            serviceWithRealResolver().setPassword(set(null, NEW_PASSWORD, null));
+        } finally {
+            LocaleContextHolder.resetLocaleContext();
+        }
+
+        assertThat(sentBody().getValue()).contains("Xin chào,").contains(EMAIL + " đã được thiết lập");
+    }
+
+    @Test
+    void setPassword_change_usesChangedWording() {
+        User user = userWithPassword();
+        currentUser(user);
+
+        service.setPassword(set(GOOD_PASSWORD, NEW_PASSWORD, null));
+
+        assertThat(sentBody().getValue()).contains("đã được thay đổi");
+    }
+
+    @Test
+    void removePassword_wordingIsRemoved_inEnglishWhenResolverSaysEnglish() {
+        User user = userWithPassword();
+        currentUser(user);
+        when(localeResolver.forUser(1L)).thenReturn(I18nConfig.EN);
+
+        service.removePassword(remove(GOOD_PASSWORD, null));
+
+        assertThat(sentBody().getValue()).contains(EMAIL + " has been removed");
     }
 
     @Test
