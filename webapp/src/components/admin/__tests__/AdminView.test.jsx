@@ -6,16 +6,21 @@ import AdminView from '../AdminView.jsx'
 import i18n from '../../../i18n/index.js'
 
 vi.mock('../../../hooks/useAdmin.js', () => ({ useAdminStats: () => ({ data: { data: {} } }) }))
+const mockCount = vi.hoisted(() => ({ value: 0 }))
+vi.mock('../../../hooks/useAdminSuggestions.js', () => ({
+  useSuggestionPendingCount: () => ({ data: { data: mockCount.value } }),
+}))
+vi.mock('../AdminSuggestionTable.jsx', () => ({ default: () => <div>suggestions</div> }))
 vi.mock('../AdminVideoTable.jsx', () => ({ default: () => <div>videos</div> }))
 vi.mock('../AdminAccountTable.jsx', () => ({ default: () => <div>accounts</div> }))
 vi.mock('../AdminCommentTable.jsx', () => ({ default: () => <div>comments</div> }))
 vi.mock('../AdminImportPanel.jsx', () => ({ default: () => <div>imports</div> }))
 vi.mock('../DriveSyncPanel.jsx', () => ({ default: () => <div>drive sync</div> }))
 
-function renderView() {
+function renderView(props = {}) {
   const qc = new QueryClient()
   const spy = vi.spyOn(qc, 'invalidateQueries')
-  render(<QueryClientProvider client={qc}><AdminView /></QueryClientProvider>)
+  render(<QueryClientProvider client={qc}><AdminView {...props} /></QueryClientProvider>)
   return spy
 }
 
@@ -40,6 +45,32 @@ describe('AdminView refresh', () => {
     fireEvent.change(screen.getByLabelText('Mục quản trị'), { target: { value: 'COMMENTS' } })
     expect(screen.getByText('comments')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'BÌNH LUẬN' })).toHaveClass('active')
+  })
+})
+
+describe('AdminView suggestions tab', () => {
+  it('shows the pending count badge on the tab', () => {
+    mockCount.value = 3
+    renderView()
+    expect(screen.getByLabelText('3 đề xuất chờ duyệt')).toHaveTextContent('3')
+    mockCount.value = 0
+  })
+
+  it('hides the badge when nothing is pending', () => {
+    mockCount.value = 0
+    renderView()
+    expect(screen.queryByLabelText(/đề xuất chờ duyệt/)).toBeNull()
+  })
+
+  it('initialTab preselects a tab', () => {
+    renderView({ initialTab: 'IMPORT_VIDEO' })
+    expect(screen.getByText('imports')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'NHẬP VIDEO' })).toHaveClass('active')
+  })
+
+  it('opens the suggestions tab', () => {
+    renderView({ initialTab: 'SUGGESTIONS' })
+    expect(screen.getByText('suggestions')).toBeInTheDocument()
   })
 })
 

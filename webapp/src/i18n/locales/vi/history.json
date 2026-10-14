@@ -1,0 +1,16 @@
+{
+  "title": "Lịch sử",
+  "mySuggestions": "Đề xuất của tôi",
+  "tabsLabel": "Lọc theo trạng thái",
+  "tabAll": "Tất cả",
+  "tabPending": "Chờ duyệt",
+  "tabApproved": "Đã duyệt",
+  "tabRejected": "Bị từ chối",
+  "tabLive": "Đã lên app",
+  "loadMore": "Xem thêm",
+  "empty": "Bạn chưa đề xuất video nào. Nhấn nút + để gửi đề xuất đầu tiên.",
+  "emptyFiltered": "Không có đề xuất nào ở trạng thái này.",
+  "loadFailed": "Không tải được danh sách đề xuất",
+  "signIn": "Đăng nhập để xem các video bạn đã đề xuất",
+  "openLink": "Mở liên kết gốc"
+}

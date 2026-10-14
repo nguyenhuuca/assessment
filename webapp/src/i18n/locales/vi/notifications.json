@@ -7,5 +7,9 @@
   "someone": "Ai đó",
   "replyOne": "{{actor}} đã trả lời bình luận của bạn",
   "replyMany_other": "{{actor}} và {{count}} người khác đã trả lời bình luận của bạn",
-  "removed": "Bình luận của bạn đã bị gỡ: {{reason}}"
+  "removed": "Bình luận của bạn đã bị gỡ: {{reason}}",
+  "suggestionApproved": "Đề xuất của bạn đã được duyệt: {{title}}",
+  "suggestionRejected": "Đề xuất của bạn bị từ chối: {{title}} ({{reason}})",
+  "suggestionLive": "Video bạn đề xuất đã lên app: {{title}}",
+  "suggestionUntitled": "video"
 }

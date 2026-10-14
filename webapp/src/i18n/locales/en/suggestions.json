@@ -1,0 +1,36 @@
+{
+  "title": "Suggest a video",
+  "intro": "Send a YouTube or Facebook link and an admin will review it and add it to the app.",
+  "urlLabel": "Video link *",
+  "urlPlaceholder": "https://www.youtube.com/watch?v=...",
+  "titleLabel": "Title",
+  "titlePlaceholder": "Video title (optional)",
+  "noteLabel": "Note",
+  "notePlaceholder": "Why should this video be added? (optional)",
+  "submit": "Send suggestion",
+  "submitted": "Suggestion sent. We will notify you once it is reviewed.",
+  "urlRequired": "Please enter a video link.",
+  "urlInvalid": "Only https links from YouTube or Facebook are supported.",
+  "errorDuplicate": "This video has already been suggested or is already on the app.",
+  "errorDailyLimit": "You have reached today's suggestion limit. Please try again tomorrow.",
+  "recent": "Recent suggestions",
+  "recentEmpty": "You have no suggestions yet.",
+  "viewAll": "View all",
+  "view": "Watch",
+  "viewAria": "Watch video {{title}}",
+  "untitled": "Untitled",
+  "status": {
+    "PENDING": "Pending",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "LIVE": "Live on app"
+  },
+  "rejectedBecause": "Reason: {{reason}}",
+  "rejectReason": {
+    "DUPLICATE": "Duplicate of an existing video",
+    "INAPPROPRIATE": "Inappropriate content",
+    "LOW_QUALITY": "Low quality",
+    "COPYRIGHT": "Copyright issue",
+    "OTHER": "Other reason"
+  }
+}

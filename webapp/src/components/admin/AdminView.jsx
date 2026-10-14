@@ -7,8 +7,10 @@ import AdminAccountTable from './AdminAccountTable.jsx'
 import AdminCommentTable from './AdminCommentTable.jsx'
 import AdminImportPanel from './AdminImportPanel.jsx'
 import DriveSyncPanel from './DriveSyncPanel.jsx'
+import AdminSuggestionTable from './AdminSuggestionTable.jsx'
+import { useSuggestionPendingCount } from '../../hooks/useAdminSuggestions.js'
 
-const TABS = ['VIDEO_VAULT', 'USER_ACCOUNTS', 'FLAGGED_LOGS', 'COMMENTS', 'IMPORT_VIDEO', 'DRIVE_SYNC']
+const TABS = ['VIDEO_VAULT', 'USER_ACCOUNTS', 'FLAGGED_LOGS', 'COMMENTS', 'SUGGESTIONS', 'IMPORT_VIDEO', 'DRIVE_SYNC']
 
 // Query key prefix (see hooks/useAdmin.js) that each tab reads from
 const TAB_QUERY = {
@@ -16,13 +18,14 @@ const TAB_QUERY = {
   FLAGGED_LOGS:  ['admin', 'videos'],
   USER_ACCOUNTS: ['admin', 'accounts'],
   COMMENTS:      ['admin', 'comments'],
+  SUGGESTIONS:   ['admin', 'suggestions'],
   IMPORT_VIDEO:  ['admin', 'imports'],
   DRIVE_SYNC:    ['admin', 'drive-sync'],
 }
 
-export default function AdminView() {
+export default function AdminView({ initialTab }) {
   const { t } = useTranslation('admin')
-  const [activeTab, setActiveTab] = useState('VIDEO_VAULT')
+  const [activeTab, setActiveTab] = useState(TABS.includes(initialTab) ? initialTab : 'VIDEO_VAULT')
   const qc = useQueryClient()
   const refreshing = useIsFetching({ queryKey: TAB_QUERY[activeTab] }) > 0
 
@@ -30,6 +33,8 @@ export default function AdminView() {
     qc.invalidateQueries({ queryKey: TAB_QUERY[activeTab] })
     qc.invalidateQueries({ queryKey: ['admin', 'stats'] })
   }
+  const { data: countData } = useSuggestionPendingCount()
+  const pending = Number(countData?.data ?? countData ?? 0) || 0
   const { data: statsData } = useAdminStats()
   const stats = statsData?.data ?? statsData ?? {}
 
@@ -75,7 +80,11 @@ export default function AdminView() {
           value={activeTab}
           onChange={e => setActiveTab(e.target.value)}
         >
-          {TABS.map(key => <option key={key} value={key}>{t(`tabs.${key}`)}</option>)}
+          {TABS.map(key => (
+            <option key={key} value={key}>
+              {t(`tabs.${key}`)}{key === 'SUGGESTIONS' && pending > 0 ? ` (${pending})` : ''}
+            </option>
+          ))}
         </select>
         {TABS.map(key => (
           <button
@@ -84,6 +93,9 @@ export default function AdminView() {
             onClick={() => setActiveTab(key)}
           >
             {t(`tabs.${key}`)}
+            {key === 'SUGGESTIONS' && pending > 0 && (
+              <span className="admin-badge pending" style={{ marginLeft: 6 }} aria-label={t('sugg.pendingBadge', { count: pending })}>{pending}</span>
+            )}
           </button>
         ))}
         <button
@@ -103,6 +115,7 @@ export default function AdminView() {
         {activeTab === 'FLAGGED_LOGS'  && <AdminVideoTable statusFilter="FLAGGED" />}
         {activeTab === 'USER_ACCOUNTS' && <AdminAccountTable />}
         {activeTab === 'COMMENTS'      && <AdminCommentTable />}
+        {activeTab === 'SUGGESTIONS'   && <AdminSuggestionTable />}
         {activeTab === 'IMPORT_VIDEO'  && <AdminImportPanel />}
         {activeTab === 'DRIVE_SYNC'    && <DriveSyncPanel />}
       </div>

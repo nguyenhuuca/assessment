@@ -16,6 +16,7 @@
     "USER_ACCOUNTS": "USER_ACCOUNTS",
     "FLAGGED_LOGS": "FLAGGED_LOGS",
     "COMMENTS": "COMMENTS",
+    "SUGGESTIONS": "SUGGESTIONS",
     "IMPORT_VIDEO": "IMPORT_VIDEO",
     "DRIVE_SYNC": "DRIVE_SYNC"
   },
@@ -35,7 +36,9 @@
     "DONE": "DONE",
     "FAILED": "FAILED",
     "CANCELLED": "CANCELLED",
-    "SYNCED": "SYNCED"
+    "SYNCED": "SYNCED",
+    "APPROVED": "APPROVED",
+    "REJECTED": "REJECTED"
   },
   "roleSuper": "SA",
   "colEmail": "EMAIL",
@@ -199,5 +202,35 @@
   "pickSchedule": "Please choose a scheduled time",
   "minuteStep": "Minutes must be a multiple of {{count}} (e.g. 09:00, 09:05, 09:10)",
   "scheduleFuture": "The scheduled time must be in the future",
-  "scheduleMaxDays": "You can schedule at most {{count}} days ahead"
+  "scheduleMaxDays": "You can schedule at most {{count}} days ahead",
+  "sugg": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveDialog": "Approve suggestion",
+    "rejectDialog": "Reject suggestion",
+    "titleOverride": "Title (optional, keep as is to use the original)",
+    "colLink": "LINK",
+    "colTitle": "TITLE",
+    "colNote": "NOTE",
+    "colSuggester": "SUGGESTED BY",
+    "live": "LIVE",
+    "importJob": "Job #{{id}}",
+    "empty": "No suggestions",
+    "pendingBadge": "{{count}} pending suggestions",
+    "importDisabled": "Import is disabled (VIDEO_IMPORT_ENABLED)",
+    "notPending": "This suggestion has already been reviewed",
+    "filters": {
+      "PENDING": "PENDING",
+      "APPROVED": "APPROVED",
+      "REJECTED": "REJECTED",
+      "LIVE": "LIVE"
+    },
+    "reasons": {
+      "DUPLICATE": "Duplicate",
+      "INAPPROPRIATE": "Inappropriate",
+      "LOW_QUALITY": "Low quality",
+      "COPYRIGHT": "Copyright",
+      "OTHER": "Other"
+    }
+  }
 }

@@ -1,0 +1,36 @@
+{
+  "title": "Đề xuất video",
+  "intro": "Gửi link YouTube hoặc Facebook, quản trị viên sẽ xem và đưa lên app.",
+  "urlLabel": "Liên kết video *",
+  "urlPlaceholder": "https://www.youtube.com/watch?v=...",
+  "titleLabel": "Tiêu đề",
+  "titlePlaceholder": "Tiêu đề video (không bắt buộc)",
+  "noteLabel": "Ghi chú",
+  "notePlaceholder": "Vì sao nên đưa video này lên? (không bắt buộc)",
+  "submit": "Gửi đề xuất",
+  "submitted": "Đã gửi đề xuất. Chúng tôi sẽ thông báo khi có kết quả.",
+  "urlRequired": "Vui lòng nhập liên kết video.",
+  "urlInvalid": "Chỉ hỗ trợ liên kết https của YouTube hoặc Facebook.",
+  "errorDuplicate": "Video này đã được đề xuất hoặc đã có trên app.",
+  "errorDailyLimit": "Bạn đã đạt giới hạn đề xuất hôm nay. Vui lòng thử lại ngày mai.",
+  "recent": "Đề xuất gần đây",
+  "recentEmpty": "Bạn chưa có đề xuất nào.",
+  "viewAll": "Xem tất cả",
+  "view": "Xem",
+  "viewAria": "Xem video {{title}}",
+  "untitled": "Chưa có tiêu đề",
+  "status": {
+    "PENDING": "Chờ duyệt",
+    "APPROVED": "Đã duyệt",
+    "REJECTED": "Bị từ chối",
+    "LIVE": "Đã lên app"
+  },
+  "rejectedBecause": "Lý do: {{reason}}",
+  "rejectReason": {
+    "DUPLICATE": "Trùng với video đã có",
+    "INAPPROPRIATE": "Nội dung không phù hợp",
+    "LOW_QUALITY": "Chất lượng thấp",
+    "COPYRIGHT": "Vi phạm bản quyền",
+    "OTHER": "Lý do khác"
+  }
+}

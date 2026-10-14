@@ -8,5 +8,9 @@
   "replyOne": "{{actor}} replied to your comment",
   "replyMany_one": "{{actor}} and {{count}} other replied to your comment",
   "replyMany_other": "{{actor}} and {{count}} others replied to your comment",
-  "removed": "Your comment was removed: {{reason}}"
+  "removed": "Your comment was removed: {{reason}}",
+  "suggestionApproved": "Your suggestion was approved: {{title}}",
+  "suggestionRejected": "Your suggestion was rejected: {{title}} ({{reason}})",
+  "suggestionLive": "The video you suggested is now live: {{title}}",
+  "suggestionUntitled": "video"
 }

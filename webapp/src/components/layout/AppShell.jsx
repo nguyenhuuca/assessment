@@ -6,7 +6,8 @@ import LoginForm from '../auth/LoginForm.jsx'
 import MagicLinkHandler from '../auth/MagicLinkHandler.jsx'
 import MFALoginModal from '../auth/MFALoginModal.jsx'
 import ProfileModal from '../auth/ProfileModal.jsx'
-import ShareModal from '../modals/ShareModal.jsx'
+import SuggestVideoModal from '../suggestions/SuggestVideoModal.jsx'
+import HistoryView from '../history/HistoryView.jsx'
 import DeleteConfirmModal from '../modals/DeleteConfirmModal.jsx'
 import { CommentPanel } from '../comments/index.js'
 import { PublicFeed } from '../video/VideoFeed.jsx'
@@ -44,7 +45,9 @@ export default function AppShell() {
   const [message,       setMessage]       = useState(null)
   const [mfaModal,      setMfaModal]      = useState({ show: false, pendingData: null })
   const [profileOpen,   setProfileOpen]   = useState(false)
-  const [shareOpen,     setShareOpen]     = useState(false)
+  const [suggestOpen,   setSuggestOpen]   = useState(false)
+  const [adminTab,       setAdminTab]       = useState(null)
+  const [adminNonce,     setAdminNonce]     = useState(0)
   const [deleteModal,   setDeleteModal]   = useState({ show: false, video: null })
   // Deep link from the URL: ?v={videoId}[&c={commentId}] or ?l={collectionId} — read once, then strip from the address bar
   const [initialLink] = useState(() => {
@@ -88,12 +91,44 @@ export default function AppShell() {
 
   // Notification click: jump to the video, open its comments and highlight the comment
   function openNotification(n) {
+    if (n?.type === 'SUGGESTION_APPROVED' || n?.type === 'SUGGESTION_REJECTED') {
+      goNav('history')
+      return
+    }
     if (!n?.videoId) return
+    if (n.type === 'SUGGESTION_LIVE') {
+      playVideo(n.videoId)
+      return
+    }
     setActiveNav('home')
     setDeepLinkId(String(n.videoId))
     setFeedKey(k => k + 1)
     setHighlightCommentId(n.commentId ? String(n.commentId) : null)
     setCommentVideo({ id: String(n.videoId) })
+  }
+
+  // Jump to a video in the home feed (no comment panel)
+  function playVideo(id) {
+    setSuggestOpen(false)
+    setActiveNav('home')
+    setDeepLinkId(String(id))
+    setFeedKey(k => k + 1)
+  }
+
+  function goNav(key) {
+    setAdminTab(null)
+    setActiveNav(key)
+  }
+
+  // "+" button: users suggest a video; admins go straight to the Import tab
+  function handleFab() {
+    if (user?.isAdmin) {
+      setAdminTab('IMPORT_VIDEO')
+      setAdminNonce(n => n + 1)
+      setActiveNav('admin')
+    } else {
+      setSuggestOpen(true)
+    }
   }
 
   function showMsg(text, type = 'error') {
@@ -117,7 +152,7 @@ export default function AppShell() {
         key={item.key}
         className="mobile-nav-tab"
         aria-current={active ? 'page' : undefined}
-        onClick={() => setActiveNav(item.key)}
+        onClick={() => goNav(item.key)}
         style={{ color: active ? 'var(--accent-cyan)' : 'var(--text-muted)' }}
       >
         <span className="material-symbols-outlined" style={{
@@ -186,9 +221,6 @@ export default function AppShell() {
                 {user?.email?.split('@')[0]}
               </span>
               <NotificationBell onOpenNotification={openNotification} />
-              <button className="icon-btn" onClick={() => setShareOpen(true)} title={t('shareVideo')}>
-                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>upload</span>
-              </button>
               <button className="icon-btn" onClick={() => setProfileOpen(true)} title={t('profile')}>
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person</span>
               </button>
@@ -264,7 +296,7 @@ export default function AppShell() {
           <button
             key={item.key}
             className={`sidenav-item${activeNav === item.key ? ' active' : ''}`}
-            onClick={() => setActiveNav(item.key)}
+            onClick={() => goNav(item.key)}
           >
             <span className="material-symbols-outlined" style={{
               fontSize: 22,
@@ -280,7 +312,7 @@ export default function AppShell() {
         <button
           className={`sidenav-item${activeNav === 'settings' ? ' active' : ''}`}
           style={{ marginTop: 'auto' }}
-          onClick={() => setActiveNav('settings')}
+          onClick={() => goNav('settings')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 22 }}>settings</span>
           <span>{t('navSettings')}</span>
@@ -308,8 +340,8 @@ export default function AppShell() {
         marginLeft: 'var(--sidenav-w)',
         marginTop: 'var(--topnav-h)',
         height: 'calc(100vh - var(--topnav-h))',
-        overflow: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'library') ? 'auto' : 'hidden',
-        display: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'library') ? 'block' : 'flex',
+        overflow: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'library' || activeNav === 'history') ? 'auto' : 'hidden',
+        display: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'library' || activeNav === 'history') ? 'block' : 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--bg)',
@@ -317,7 +349,7 @@ export default function AppShell() {
         {activeNav === 'explore' ? (
           <ExploreView onNavigateToVideo={handleExploreNavigate} />
         ) : activeNav === 'admin' && user?.isAdmin ? (
-          <AdminView />
+          <AdminView key={`admin-${adminNonce}`} initialTab={adminTab ?? undefined} />
         ) : activeNav === 'settings' && isLoggedIn ? (
           <SettingsPage />
         ) : activeNav === 'settings' && !isLoggedIn ? (
@@ -329,6 +361,8 @@ export default function AppShell() {
             onMutedChange={setMuted}
             onShowComments={showComments}
           />
+        ) : activeNav === 'history' ? (
+          <HistoryView onPlayVideo={playVideo} />
         ) : activeNav !== 'home' ? (
           <ComingSoon page={activeNav} />
         ) : (
@@ -363,7 +397,7 @@ export default function AppShell() {
 
         {/* Center FAB — inline flex item (YouTube-style) */}
         {isLoggedIn && (
-          <button className="mobile-nav-fab" onClick={() => setShareOpen(true)} title={t('shareAVideo')}>
+          <button className="mobile-nav-fab" onClick={handleFab} title={t('suggestVideo')}>
             <span className="material-symbols-outlined" style={{ fontSize: 24 }}>add</span>
           </button>
         )}
@@ -373,7 +407,7 @@ export default function AppShell() {
 
       {/* ── FAB (desktop only, hidden on mobile via CSS) ── */}
       {isLoggedIn && (
-        <button className="fab" onClick={() => setShareOpen(true)} title={t('shareAVideo')}>
+        <button className="fab" onClick={handleFab} title={t('suggestVideo')}>
           <span className="material-symbols-outlined" style={{ fontSize: 26 }}>add</span>
         </button>
       )}
@@ -385,7 +419,13 @@ export default function AppShell() {
         onHide={() => setMfaModal({ show: false, pendingData: null })}
       />
       <ProfileModal    show={profileOpen}  onHide={() => setProfileOpen(false)} />
-      <ShareModal      show={shareOpen}    onHide={() => setShareOpen(false)} />
+      {suggestOpen && (
+        <SuggestVideoModal
+          onClose={() => setSuggestOpen(false)}
+          onPlayVideo={playVideo}
+          onOpenHistory={() => { setSuggestOpen(false); goNav('history') }}
+        />
+      )}
       <DeleteConfirmModal
         show={deleteModal.show}
         video={deleteModal.video}

@@ -1,0 +1,16 @@
+{
+  "title": "History",
+  "mySuggestions": "My suggestions",
+  "tabsLabel": "Filter by status",
+  "tabAll": "All",
+  "tabPending": "Pending",
+  "tabApproved": "Approved",
+  "tabRejected": "Rejected",
+  "tabLive": "Live on app",
+  "loadMore": "Load more",
+  "empty": "You have not suggested any videos yet. Tap the + button to send your first one.",
+  "emptyFiltered": "No suggestions with this status.",
+  "loadFailed": "Couldn't load your suggestions",
+  "signIn": "Sign in to see the videos you suggested",
+  "openLink": "Open original link"
+}

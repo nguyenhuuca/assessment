@@ -16,6 +16,7 @@
     "USER_ACCOUNTS": "TÀI KHOẢN",
     "FLAGGED_LOGS": "VIDEO BỊ BÁO CÁO",
     "COMMENTS": "BÌNH LUẬN",
+    "SUGGESTIONS": "ĐỀ XUẤT",
     "IMPORT_VIDEO": "NHẬP VIDEO",
     "DRIVE_SYNC": "ĐỒNG BỘ DRIVE"
   },
@@ -35,7 +36,9 @@
     "DONE": "HOÀN TẤT",
     "FAILED": "THẤT BẠI",
     "CANCELLED": "ĐÃ HUỶ",
-    "SYNCED": "ĐÃ SYNC"
+    "SYNCED": "ĐÃ SYNC",
+    "APPROVED": "ĐÃ DUYỆT",
+    "REJECTED": "BỊ TỪ CHỐI"
   },
   "roleSuper": "SA",
   "colEmail": "EMAIL",
@@ -190,5 +193,35 @@
   "pickSchedule": "Vui lòng chọn thời gian hẹn giờ",
   "minuteStep": "Phút phải chia hết cho {{count}} (vd 09:00, 09:05, 09:10)",
   "scheduleFuture": "Thời gian hẹn giờ phải ở tương lai",
-  "scheduleMaxDays": "Chỉ được hẹn tối đa {{count}} ngày"
+  "scheduleMaxDays": "Chỉ được hẹn tối đa {{count}} ngày",
+  "sugg": {
+    "approve": "Duyệt",
+    "reject": "Từ chối",
+    "approveDialog": "Duyệt đề xuất",
+    "rejectDialog": "Từ chối đề xuất",
+    "titleOverride": "Tiêu đề (tuỳ chọn, giữ nguyên để dùng tiêu đề gốc)",
+    "colLink": "LIÊN KẾT",
+    "colTitle": "TIÊU ĐỀ",
+    "colNote": "GHI CHÚ",
+    "colSuggester": "NGƯỜI ĐỀ XUẤT",
+    "live": "ĐÃ LÊN",
+    "importJob": "Job #{{id}}",
+    "empty": "Không có đề xuất nào",
+    "pendingBadge": "{{count}} đề xuất chờ duyệt",
+    "importDisabled": "Import đang tắt (VIDEO_IMPORT_ENABLED)",
+    "notPending": "Đề xuất này đã được xử lý",
+    "filters": {
+      "PENDING": "CHỜ DUYỆT",
+      "APPROVED": "ĐÃ DUYỆT",
+      "REJECTED": "BỊ TỪ CHỐI",
+      "LIVE": "ĐÃ LÊN"
+    },
+    "reasons": {
+      "DUPLICATE": "Trùng lặp",
+      "INAPPROPRIATE": "Không phù hợp",
+      "LOW_QUALITY": "Chất lượng thấp",
+      "COPYRIGHT": "Bản quyền",
+      "OTHER": "Khác"
+    }
+  }
 }

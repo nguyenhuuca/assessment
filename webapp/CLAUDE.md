@@ -47,7 +47,7 @@ webapp/
 │   ├── api/
 │   │   ├── client.js              # Axios instance (baseURL from VITE_API_BASE_URL)
 │   │   ├── auth.js                # join, me, mfa.* endpoints
-│   │   ├── videos.js              # list, share, delete
+│   │   ├── videos.js              # list, delete
 │   │   ├── reactions.js           # get/set/remove per-user like/dislike (/videos/{id}/reaction)
 │   │   ├── comments.js            # list, add comments
 │   │   ├── guestToken.js          # guest token init/storage
@@ -78,8 +78,9 @@ webapp/
 │       │   ├── CommentPanel.jsx   # Slide-in comment panel
 │       │   └── index.js
 │       └── modals/
-│           ├── ShareModal.jsx     # Share video form (custom styled, no Bootstrap)
 │           └── DeleteConfirmModal.jsx
+│       ├── suggestions/           # SuggestVideoModal ("+" button for users), status chip, url validation
+│       └── history/               # HistoryView + MySuggestionsSection (nav key 'history')
 ```
 
 ## Design System (`src/styles/index.css`)
