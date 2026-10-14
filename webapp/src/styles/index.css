@@ -97,6 +97,13 @@
   background: var(--primary);
   border-left-color: var(--primary-dim);
 }
+/* Explore filter bar: the dark glass is hard-coded, so dark light-theme text vanished on it */
+[data-theme="light"] .explore-filter-bar {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: var(--border-subtle);
+}
+[data-theme="light"] .explore-filter-divider { background: var(--border-subtle); }
+[data-theme="light"] .explore-filter-opt.active { color: var(--primary-dim); }
 [data-theme="light"] .explore-btn-primary {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dim) 100%);
   color: #ffffff;
@@ -114,6 +121,19 @@
   --accent-cyan: #93ccff;  /* secondary-fixed-dim */
   --bg-high:     #2e3132;  /* inverse-surface */
   color: var(--text);
+}
+
+/* Explore hero is also text over a dark image scrim in both themes */
+[data-theme="light"] .explore-hero-scrim {
+  --text:        #ffffff;
+  --text-muted:  #e1e3e4;
+  --bg-elevated: rgba(255, 255, 255, 0.16);
+  --bg-high:     #2e3132;
+  color: var(--text);
+}
+[data-theme="light"] .explore-hero-scrim .explore-hero-badge {
+  background: rgba(225, 29, 72, 0.28);
+  color: #ffb3b8;
 }
 
 [data-theme="light"] body {
