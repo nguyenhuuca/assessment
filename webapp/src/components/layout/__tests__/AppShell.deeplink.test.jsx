@@ -21,6 +21,7 @@ vi.mock('../../../api/notifications.js', () => ({
 vi.mock('../../../hooks/useAuth.js', () => ({
   useAuth: () => ({ user: { email: 'me@x.com' }, jwt: 'jwt-1', isLoggedIn: true, logout: vi.fn() }),
 }))
+vi.mock('../../../hooks/useLocaleSync.js', () => ({ useLocaleSync: () => {} }))
 vi.mock('../../../hooks/useTheme.js', () => ({ useTheme: () => ({ theme: 'dark', toggle: vi.fn() }) }))
 
 vi.mock('../../auth/LoginForm.jsx', () => ({ default: () => null }))

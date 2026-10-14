@@ -19,6 +19,7 @@ import ActivityBar from '../common/ActivityBar.jsx'
 import LanguageSwitcher from '../common/LanguageSwitcher.jsx'
 import NotificationBell from '../notifications/NotificationBell.jsx'
 import { useNotificationStream } from '../../hooks/useNotifications.js'
+import { useLocaleSync } from '../../hooks/useLocaleSync.js'
 
 // Mobile bottom nav (no side nav on mobile). Settings is only useful once logged in.
 const MOBILE_NAV = [
@@ -65,6 +66,7 @@ export default function AppShell() {
   const [deepLinkId,      setDeepLinkId]      = useState(initialLink.v)
 
   useNotificationStream()
+  useLocaleSync()
 
   useEffect(() => {
     if (!sessionNotice) return

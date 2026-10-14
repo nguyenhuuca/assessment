@@ -33,7 +33,7 @@ async function request(method, path, body) {
       localStorage.removeItem('user')
       window.dispatchEvent(new Event(AUTH_REVOKED_EVENT))
     }
-    throw { message: msg, status: res.status }
+    throw { message: msg, status: res.status, code: data?.error?.code }
   }
   return data
 }

@@ -4,6 +4,7 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import LoginForm from '../LoginForm.jsx'
 import { authApi } from '../../../api/auth.js'
+import i18n from '../../../i18n/index.js'
 
 vi.mock('../../../api/auth.js', () => ({
   authApi: { authOptions: vi.fn(), join: vi.fn(), login: vi.fn() },
@@ -76,7 +77,7 @@ describe('LoginForm password entry point', () => {
   it('closes the modal on cancel', async () => {
     renderForm()
     await openPasswordModal()
-    fireEvent.click(screen.getByRole('button', { name: 'Huỷ' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Hủy' }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 })
@@ -131,7 +132,7 @@ describe('LoginForm password login (modal)', () => {
     fireEvent.click(within(dialog).getByRole('button', { name: /Quên mật khẩu\? Gửi link đăng nhập/ }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Email')).toHaveValue('a@b.com')
-    expect(screen.getByText(/Bấm Login để nhận link/)).toBeInTheDocument()
+    expect(screen.getByText(/Bấm Đăng nhập để nhận link/)).toBeInTheDocument()
   })
 })
 
@@ -141,8 +142,33 @@ describe('LoginForm magic link (unchanged)', () => {
     authApi.join.mockResolvedValue({ data: { action: 'INVITED_SEND' } })
     renderForm()
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Login' }))
-    expect(await screen.findByText(/Check your inbox!/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }))
+    expect(await screen.findByText(/Hãy kiểm tra hộp thư của bạn!/)).toBeInTheDocument()
     expect(authApi.join).toHaveBeenCalledWith('a@b.com')
+  })
+})
+
+describe('LoginForm in English', () => {
+  beforeEach(() => { i18n.changeLanguage('en') })
+
+  it('renders English labels and the invalid-credentials message for code INVALID_CREDENTIALS', async () => {
+    authApi.login.mockRejectedValue({ message: 'Email hoặc mật khẩu không đúng', code: 'INVALID_CREDENTIALS', status: 401 })
+    renderForm()
+    expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument()
+    fireEvent.click(await screen.findByRole('button', { name: 'Sign in with password' }))
+    const dialog = screen.getByRole('dialog')
+    fireEvent.change(within(dialog).getByLabelText('Email'), { target: { value: 'a@b.com' } })
+    fireEvent.change(within(dialog).getByLabelText('Password'), { target: { value: 'wrong' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Log in' }))
+    expect(await screen.findByText('Incorrect email or password')).toBeInTheDocument()
+  })
+
+  it('confirms the magic link in English', async () => {
+    authApi.authOptions.mockResolvedValue({ data: { passwordLoginAvailable: false } })
+    authApi.join.mockResolvedValue({ data: { action: 'INVITED_SEND' } })
+    renderForm()
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+    expect(await screen.findByText(/Check your inbox!/)).toBeInTheDocument()
   })
 })

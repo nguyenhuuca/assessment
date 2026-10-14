@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { settingsApi } from '../api/settings.js'
 
-export function useSettings() {
+export function useSettings({ enabled = true } = {}) {
   return useQuery({
     queryKey: ['settings'],
+    enabled,
     queryFn: async () => {
       const res = await settingsApi.get()
       return res.data || res

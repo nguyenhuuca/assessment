@@ -83,7 +83,7 @@ describe('DeleteAccountModal', () => {
 
     it('renders the modal when show=true', () => {
       renderModal({ settings: { mfaEnabled: false } })
-      expect(screen.getByText('Delete Account')).toBeInTheDocument()
+      expect(screen.getByText('Xóa tài khoản')).toBeInTheDocument()
     })
   })
 
@@ -91,17 +91,17 @@ describe('DeleteAccountModal', () => {
     it('renders OTP input when mfaEnabled=true', () => {
       renderModal({ settings: { mfaEnabled: true } })
       expect(screen.getByPlaceholderText('000000')).toBeInTheDocument()
-      expect(screen.getByText(/6-digit authenticator code/i)).toBeInTheDocument()
+      expect(screen.getByText(/mã xác thực gồm 6 chữ số/i)).toBeInTheDocument()
     })
 
     it('shows validation error when OTP is incomplete', async () => {
       renderModal({ settings: { mfaEnabled: true } })
 
       // Leave OTP blank, click confirm
-      fireEvent.click(screen.getByRole('button', { name: /delete my account/i }))
+      fireEvent.click(screen.getByRole('button', { name: /xóa tài khoản của tôi/i }))
 
       await waitFor(() => {
-        expect(screen.getByText(/valid 6-digit otp/i)).toBeInTheDocument()
+        expect(screen.getByText(/mã OTP gồm 6 chữ số hợp lệ/i)).toBeInTheDocument()
       })
     })
 
@@ -120,7 +120,7 @@ describe('DeleteAccountModal', () => {
 
       const otpInput = screen.getByPlaceholderText('000000')
       fireEvent.change(otpInput, { target: { value: '123456' } })
-      fireEvent.click(screen.getByRole('button', { name: /delete my account/i }))
+      fireEvent.click(screen.getByRole('button', { name: /xóa tài khoản của tôi/i }))
 
       expect(mutateMock).toHaveBeenCalledTimes(1)
       expect(mutateMock).toHaveBeenCalledWith(
@@ -155,7 +155,7 @@ describe('DeleteAccountModal', () => {
       renderModal({ settings: { mfaEnabled: true } })
 
       fireEvent.change(screen.getByPlaceholderText('000000'), { target: { value: '654321' } })
-      fireEvent.click(screen.getByRole('button', { name: /delete my account/i }))
+      fireEvent.click(screen.getByRole('button', { name: /xóa tài khoản của tôi/i }))
 
       act(() => {
         capturedCallbacks.onSuccess()
@@ -175,7 +175,7 @@ describe('DeleteAccountModal', () => {
     it('renders email-confirmation input when mfaEnabled=false', () => {
       renderModal({ settings: { mfaEnabled: false } })
       expect(screen.getByPlaceholderText('user@example.com')).toBeInTheDocument()
-      expect(screen.getByText(/type your email address to confirm/i)).toBeInTheDocument()
+      expect(screen.getByText(/nhập địa chỉ email của bạn để xác nhận/i)).toBeInTheDocument()
     })
 
     it('shows validation error when confirmation email does not match', async () => {
@@ -183,10 +183,10 @@ describe('DeleteAccountModal', () => {
 
       const emailInput = screen.getByPlaceholderText('user@example.com')
       fireEvent.change(emailInput, { target: { value: 'wrong@example.com' } })
-      fireEvent.click(screen.getByRole('button', { name: /delete my account/i }))
+      fireEvent.click(screen.getByRole('button', { name: /xóa tài khoản của tôi/i }))
 
       await waitFor(() => {
-        expect(screen.getByText(/does not match/i)).toBeInTheDocument()
+        expect(screen.getByText(/không khớp/i)).toBeInTheDocument()
       })
     })
 
@@ -205,7 +205,7 @@ describe('DeleteAccountModal', () => {
 
       const emailInput = screen.getByPlaceholderText('user@example.com')
       fireEvent.change(emailInput, { target: { value: 'user@example.com' } })
-      fireEvent.click(screen.getByRole('button', { name: /delete my account/i }))
+      fireEvent.click(screen.getByRole('button', { name: /xóa tài khoản của tôi/i }))
 
       expect(mutateMock).toHaveBeenCalledTimes(1)
       expect(mutateMock).toHaveBeenCalledWith(
@@ -240,7 +240,7 @@ describe('DeleteAccountModal', () => {
       fireEvent.change(screen.getByPlaceholderText('user@example.com'), {
         target: { value: 'user@example.com' },
       })
-      fireEvent.click(screen.getByRole('button', { name: /delete my account/i }))
+      fireEvent.click(screen.getByRole('button', { name: /xóa tài khoản của tôi/i }))
 
       act(() => {
         capturedCallbacks.onSuccess()
@@ -272,7 +272,7 @@ describe('DeleteAccountModal', () => {
       fireEvent.change(screen.getByPlaceholderText('user@example.com'), {
         target: { value: 'user@example.com' },
       })
-      fireEvent.click(screen.getByRole('button', { name: /delete my account/i }))
+      fireEvent.click(screen.getByRole('button', { name: /xóa tài khoản của tôi/i }))
 
       act(() => {
         capturedCallbacks.onError({ message: 'Account deletion failed' })
@@ -299,14 +299,14 @@ describe('DeleteAccountModal', () => {
       fireEvent.change(screen.getByPlaceholderText('user@example.com'), {
         target: { value: 'user@example.com' },
       })
-      fireEvent.click(screen.getByRole('button', { name: /delete my account/i }))
+      fireEvent.click(screen.getByRole('button', { name: /xóa tài khoản của tôi/i }))
 
       act(() => {
         capturedCallbacks.onError({})
       })
 
       await waitFor(() => {
-        expect(screen.getByText(/failed to delete account/i)).toBeInTheDocument()
+        expect(screen.getByText(/không thể xóa tài khoản/i)).toBeInTheDocument()
       })
     })
 
@@ -340,7 +340,7 @@ describe('DeleteAccountModal', () => {
       const onHide = vi.fn()
       renderModal({ settings: { mfaEnabled: false }, onHide })
 
-      fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
+      fireEvent.click(screen.getByRole('button', { name: /hủy/i }))
       expect(onHide).toHaveBeenCalledTimes(1)
     })
 
@@ -356,8 +356,8 @@ describe('DeleteAccountModal', () => {
 
       renderModal({ settings: { mfaEnabled: false } })
 
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled()
-      expect(screen.getByRole('button', { name: /deleting/i })).toBeDisabled()
+      expect(screen.getByRole('button', { name: /hủy/i })).toBeDisabled()
+      expect(screen.getByRole('button', { name: /đang xóa/i })).toBeDisabled()
     })
   })
 })

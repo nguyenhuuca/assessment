@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button, Form, Modal, Spinner, Alert } from 'react-bootstrap'
 import { authApi } from '../../api/auth.js'
 import { useAuth } from '../../hooks/useAuth.js'
 
 export default function MFALoginModal({ show, pendingData, onHide }) {
+  const { t } = useTranslation(['auth', 'common'])
   const { login } = useAuth()
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
@@ -11,7 +13,7 @@ export default function MFALoginModal({ show, pendingData, onHide }) {
 
   async function handleVerify() {
     if (!code || code.length !== 6) {
-      setError('Please enter a valid 6-digit code')
+      setError(t('mfaCodeInvalid'))
       return
     }
     setLoading(true)
@@ -25,7 +27,7 @@ export default function MFALoginModal({ show, pendingData, onHide }) {
       login(res.data.jwt, res.data.user)
       handleClose()
     } catch (err) {
-      setError(err.message || 'Verification failed')
+      setError(err.message || t('verifyFailed'))
     } finally {
       setLoading(false)
     }
@@ -39,13 +41,13 @@ export default function MFALoginModal({ show, pendingData, onHide }) {
 
   return (
     <Modal show={show} onHide={handleClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Two-Factor Authentication</Modal.Title>
+      <Modal.Header closeButton closeLabel={t('common:close')}>
+        <Modal.Title>{t('mfaTitle')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form.Group>
-          <Form.Label>Enter 6-digit verification code</Form.Label>
+          <Form.Label>{t('mfaCodeLabel')}</Form.Label>
           <Form.Control
             type="text"
             maxLength={6}
@@ -57,9 +59,9 @@ export default function MFALoginModal({ show, pendingData, onHide }) {
         </Form.Group>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+        <Button variant="secondary" onClick={handleClose}>{t('common:cancel')}</Button>
         <Button variant="primary" onClick={handleVerify} disabled={loading}>
-          {loading ? <Spinner size="sm" animation="border" /> : 'Verify'}
+          {loading ? <Spinner size="sm" animation="border" /> : t('verify')}
         </Button>
       </Modal.Footer>
     </Modal>

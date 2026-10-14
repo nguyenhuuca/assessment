@@ -1,4 +1,5 @@
 import React, { useId, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function PasswordInput({
   label,
@@ -11,6 +12,7 @@ export default function PasswordInput({
   ariaLabel,
   style,
 }) {
+  const { t } = useTranslation('auth')
   const autoId = useId()
   const inputId = id || autoId
   const [visible, setVisible] = useState(false)
@@ -35,7 +37,7 @@ export default function PasswordInput({
           type="button"
           onClick={() => setVisible(v => !v)}
           aria-pressed={visible}
-          aria-label={visible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+          aria-label={visible ? t('hidePassword') : t('showPassword')}
           style={{
             position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)',
             background: 'none', border: 'none', cursor: 'pointer',

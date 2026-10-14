@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { authApi } from '../../api/auth.js'
 import { useAuth } from '../../hooks/useAuth.js'
@@ -8,39 +9,37 @@ import PasswordInput from '../common/PasswordInput.jsx'
 const MIN_LENGTH = 10
 const MAX_BYTES = 72
 
-const ERROR_MESSAGES = {
-  CURRENT_PASSWORD_INVALID: 'Mật khẩu hiện tại không đúng',
-  PASSWORD_TOO_SHORT: `Mật khẩu phải có ít nhất ${MIN_LENGTH} ký tự`,
-  PASSWORD_TOO_LONG: `Mật khẩu quá dài (tối đa ${MAX_BYTES} byte)`,
-  PASSWORD_CONTAINS_EMAIL: 'Mật khẩu không được chứa phần tên của email',
-  PASSWORD_TOO_COMMON: 'Mật khẩu quá phổ biến, vui lòng chọn mật khẩu khác',
-}
-
-function mapPasswordError(err) {
-  return ERROR_MESSAGES[err?.message] || err?.message || 'Đã có lỗi xảy ra, vui lòng thử lại'
+// Server error code (or legacy code-in-message) -> translated text; falls back to the server text.
+function mapPasswordError(err, t, i18n) {
+  const code = err?.code || err?.message
+  if (code && i18n.exists(`auth:errCodes.${code}`)) {
+    return t(`errCodes.${code}`, { min: MIN_LENGTH, max: MAX_BYTES })
+  }
+  return err?.message || t('genericError')
 }
 
 function byteLength(s) {
   return new TextEncoder().encode(s).length
 }
 
-function passwordHints(password, email) {
+function passwordHints(password, email, t) {
   const local = (email || '').split('@')[0].toLowerCase()
   return [
-    { key: 'len', text: `Ít nhất ${MIN_LENGTH} ký tự`, ok: password.length >= MIN_LENGTH },
-    { key: 'max', text: `Tối đa ${MAX_BYTES} byte`, ok: byteLength(password) <= MAX_BYTES },
+    { key: 'len', text: t('hintMinLength', { min: MIN_LENGTH }), ok: password.length >= MIN_LENGTH },
+    { key: 'max', text: t('hintMaxBytes', { max: MAX_BYTES }), ok: byteLength(password) <= MAX_BYTES },
     {
       key: 'email',
-      text: 'Không chứa phần tên của email',
+      text: t('hintNoEmail'),
       ok: !local || !password.toLowerCase().includes(local),
     },
   ]
 }
 
 function OtpField({ value, onChange, id }) {
+  const { t } = useTranslation('auth')
   return (
     <div className="app-field" style={{ marginBottom: 0 }}>
-      <label className="app-label" htmlFor={id}>Mã xác thực MFA (6 chữ số)</label>
+      <label className="app-label" htmlFor={id}>{t('otpLabel')}</label>
       <input
         id={id}
         className="app-input"
@@ -58,10 +57,11 @@ function OtpField({ value, onChange, id }) {
 }
 
 function Hints({ password, email }) {
+  const { t } = useTranslation('auth')
   if (!password) return null
   return (
     <ul style={{ listStyle: 'none', margin: 0, padding: 0, fontSize: 12 }}>
-      {passwordHints(password, email).map(h => (
+      {passwordHints(password, email, t).map(h => (
         <li key={h.key} style={{ color: h.ok ? 'var(--accent-cyan)' : 'var(--text-muted)' }}>
           {h.ok ? '✓' : '•'} {h.text}
         </li>
@@ -71,6 +71,7 @@ function Hints({ password, email }) {
 }
 
 export default function SignInPanel() {
+  const { t, i18n } = useTranslation('auth')
   const { user, login, updateUser } = useAuth()
   const { data: settings } = useSettings()
   const queryClient = useQueryClient()
@@ -98,19 +99,19 @@ export default function SignInPanel() {
     e.preventDefault()
     setMsg(null)
     if (passwordEnabled && !currentPassword) {
-      setMsg({ text: 'Vui lòng nhập mật khẩu hiện tại', type: 'error' })
+      setMsg({ text: t('currentRequired'), type: 'error' })
       return
     }
     if (!newPassword) {
-      setMsg({ text: 'Vui lòng nhập mật khẩu mới', type: 'error' })
+      setMsg({ text: t('newRequired'), type: 'error' })
       return
     }
     if (newPassword !== confirmPassword) {
-      setMsg({ text: 'Mật khẩu xác nhận không khớp', type: 'error' })
+      setMsg({ text: t('confirmMismatch'), type: 'error' })
       return
     }
     if (mfaEnabled && otp.length !== 6) {
-      setMsg({ text: 'Vui lòng nhập mã xác thực gồm 6 chữ số', type: 'error' })
+      setMsg({ text: t('otpRequired'), type: 'error' })
       return
     }
     const body = { newPassword }
@@ -128,9 +129,9 @@ export default function SignInPanel() {
       setNewPassword('')
       setConfirmPassword('')
       setOtp('')
-      setMsg({ text: 'Đã cập nhật mật khẩu. Các thiết bị khác đã được đăng xuất.', type: 'success' })
+      setMsg({ text: t('passwordUpdated'), type: 'success' })
     } catch (err) {
-      setMsg({ text: mapPasswordError(err), type: 'error' })
+      setMsg({ text: mapPasswordError(err, t, i18n), type: 'error' })
     } finally {
       setLoading(false)
     }
@@ -140,11 +141,11 @@ export default function SignInPanel() {
     e.preventDefault()
     setMsg(null)
     if (!removeCurrent) {
-      setMsg({ text: 'Vui lòng nhập mật khẩu hiện tại', type: 'error' })
+      setMsg({ text: t('currentRequired'), type: 'error' })
       return
     }
     if (mfaEnabled && removeOtp.length !== 6) {
-      setMsg({ text: 'Vui lòng nhập mã xác thực gồm 6 chữ số', type: 'error' })
+      setMsg({ text: t('otpRequired'), type: 'error' })
       return
     }
     const body = { currentPassword: removeCurrent }
@@ -161,9 +162,9 @@ export default function SignInPanel() {
       patchSettings(false)
       setRemoveCurrent('')
       setRemoveOtp('')
-      setMsg({ text: 'Đã gỡ mật khẩu. Bạn vẫn có thể đăng nhập bằng link.', type: 'success' })
+      setMsg({ text: t('passwordRemoved'), type: 'success' })
     } catch (err) {
-      setMsg({ text: mapPasswordError(err), type: 'error' })
+      setMsg({ text: mapPasswordError(err, t, i18n), type: 'error' })
     } finally {
       setLoading(false)
     }
@@ -172,7 +173,7 @@ export default function SignInPanel() {
   if (featureDisabled) {
     return (
       <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-        Đăng nhập bằng mật khẩu hiện chưa được bật.
+        {t('featureDisabled')}
       </p>
     )
   }
@@ -183,50 +184,50 @@ export default function SignInPanel() {
 
       <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <h3 style={{ fontSize: 14, margin: 0 }}>
-          {passwordEnabled ? 'Đổi mật khẩu' : 'Đặt mật khẩu'}
+          {passwordEnabled ? t('changePassword') : t('setPassword')}
         </h3>
         {passwordEnabled && (
           <PasswordInput
-            label="Mật khẩu hiện tại"
+            label={t('currentPassword')}
             value={currentPassword}
             onChange={e => setCurrentPassword(e.target.value)}
             autoComplete="current-password"
           />
         )}
         <PasswordInput
-          label="Mật khẩu mới"
+          label={t('newPassword')}
           value={newPassword}
           onChange={e => setNewPassword(e.target.value)}
           autoComplete="new-password"
         />
         <Hints password={newPassword} email={email} />
         <PasswordInput
-          label="Nhập lại mật khẩu mới"
+          label={t('confirmPassword')}
           value={confirmPassword}
           onChange={e => setConfirmPassword(e.target.value)}
           autoComplete="new-password"
         />
         {mfaEnabled && <OtpField id="pw-save-otp" value={otp} onChange={setOtp} />}
         <button type="submit" className="app-btn primary" disabled={loading} aria-busy={loading} style={{ alignSelf: 'flex-start' }}>
-          {passwordEnabled ? 'Đổi mật khẩu' : 'Đặt mật khẩu'}
+          {passwordEnabled ? t('changePassword') : t('setPassword')}
         </button>
       </form>
 
       {passwordEnabled && (
         <form onSubmit={handleRemove} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <h3 style={{ fontSize: 14, margin: 0 }}>Gỡ mật khẩu</h3>
+          <h3 style={{ fontSize: 14, margin: 0 }}>{t('removePassword')}</h3>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
-            Sau khi gỡ, bạn chỉ đăng nhập bằng link gửi qua email.
+            {t('removeHint')}
           </p>
           <PasswordInput
-            label="Mật khẩu hiện tại để gỡ"
+            label={t('currentToRemove')}
             value={removeCurrent}
             onChange={e => setRemoveCurrent(e.target.value)}
             autoComplete="current-password"
           />
           {mfaEnabled && <OtpField id="pw-remove-otp" value={removeOtp} onChange={setRemoveOtp} />}
           <button type="submit" className="app-btn danger" disabled={loading} aria-busy={loading} style={{ alignSelf: 'flex-start' }}>
-            Gỡ mật khẩu
+            {t('removePassword')}
           </button>
         </form>
       )}

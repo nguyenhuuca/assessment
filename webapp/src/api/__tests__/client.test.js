@@ -64,6 +64,25 @@ describe('API client', () => {
   })
 })
 
+describe('API client error shape', () => {
+  it('exposes the stable error code next to the localized message', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false, status: 401,
+      json: async () => ({ error: { message: 'Email hoặc mật khẩu không đúng', status: 401, code: 'INVALID_CREDENTIALS' } }),
+    })
+    const { api } = await import('../client.js')
+    await expect(api.post('/auth/login', {})).rejects.toEqual({
+      message: 'Email hoặc mật khẩu không đúng', status: 401, code: 'INVALID_CREDENTIALS',
+    })
+  })
+
+  it('leaves code undefined when the server sends none', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({ error: { message: 'boom' } }) })
+    const { api } = await import('../client.js')
+    await expect(api.get('/x')).rejects.toMatchObject({ message: 'boom', status: 500, code: undefined })
+  })
+})
+
 describe('API client TOKEN_REVOKED handling', () => {
   it('clears the session and dispatches auth:revoked on 401 TOKEN_REVOKED', async () => {
     localStorage.setItem('jwt', 'old')

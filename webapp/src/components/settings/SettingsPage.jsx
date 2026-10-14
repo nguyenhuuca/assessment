@@ -1,16 +1,21 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { formatDate } from '../../i18n/format.js'
+import LanguageSwitcher from '../common/LanguageSwitcher.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useSettings, useUpdateSettings } from '../../hooks/useSettings.js'
 import ProfileModal from '../auth/ProfileModal.jsx'
 import DeleteAccountModal from './DeleteAccountModal.jsx'
 
 const QUALITY_OPTIONS = [
-  { value: 'AUTO',  label: 'Auto' },
+  { value: 'AUTO',  labelKey: 'qualityAuto' },
   { value: '1080P', label: '1080p' },
   { value: '4K',    label: '4K' },
 ]
 
-const Spinner = () => (
+const Spinner = () => {
+  const { t } = useTranslation('settings')
+  return (
   <div style={{
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     height: 200, color: 'var(--text-muted)', fontSize: 14,
@@ -24,9 +29,10 @@ const Spinner = () => (
       display: 'inline-block',
       animation: 'spin 0.75s linear infinite',
     }} />
-    Loading settings…
+    {t('loading')}
   </div>
-)
+  )
+}
 
 function Toggle({ value, onChange, disabled }) {
   return (
@@ -44,6 +50,7 @@ function Toggle({ value, onChange, disabled }) {
 }
 
 export default function SettingsPage() {
+  const { t } = useTranslation('settings')
   const { user } = useAuth()
   const { data: settings, isLoading, isError, error: loadError } = useSettings()
   const updateSettings = useUpdateSettings()
@@ -64,7 +71,7 @@ export default function SettingsPage() {
       { [field]: value },
       {
         onError: (err) => {
-          setPatchError(err?.message || 'Failed to save setting. Please try again.')
+          setPatchError(err?.message || t('saveFailed'))
         },
       }
     )
@@ -76,7 +83,7 @@ export default function SettingsPage() {
       { defaultQuality: value },
       {
         onError: (err) => {
-          setPatchError(err?.message || 'Failed to save quality setting.')
+          setPatchError(err?.message || t('saveQualityFailed'))
         },
       }
     )
@@ -88,7 +95,7 @@ export default function SettingsPage() {
     return (
       <div className="settings-root">
         <div className="app-alert error" style={{ marginTop: 20 }}>
-          {loadError?.message || 'Failed to load settings.'}
+          {loadError?.message || t('loadFailed')}
         </div>
       </div>
     )
@@ -110,8 +117,8 @@ export default function SettingsPage() {
     <div className="settings-root">
       {/* Header */}
       <div className="settings-header">
-        <h1 className="settings-title">Settings</h1>
-        <p className="settings-subtitle">Manage your cinematic experience and account preferences.</p>
+        <h1 className="settings-title">{t('title')}</h1>
+        <p className="settings-subtitle">{t('subtitle')}</p>
       </div>
 
       {/* Global patch error */}
@@ -129,12 +136,12 @@ export default function SettingsPage() {
             <div className="settings-card-icon pink">
               <span className="material-symbols-outlined" style={{ fontSize: 24 }}>account_circle</span>
             </div>
-            <h2 className="settings-card-title">Account Identity</h2>
+            <h2 className="settings-card-title">{t('accountIdentity')}</h2>
           </div>
 
           <div className="settings-identity-fields">
             <div>
-              <label className="app-label">Email Address</label>
+              <label className="app-label">{t('emailAddress')}</label>
               <input
                 className="app-input readonly"
                 type="email"
@@ -146,7 +153,7 @@ export default function SettingsPage() {
 
             <div>
               <label className="app-label">
-                {passwordEnabled ? 'Password' : 'Sign-in Method'}
+                {passwordEnabled ? t('password') : t('signInMethod')}
               </label>
               {passwordEnabled ? (
                 <div style={{ position: 'relative' }}>
@@ -171,7 +178,7 @@ export default function SettingsPage() {
                   gap: 6,
                 }}>
                   <span className="material-symbols-outlined" style={{ fontSize: 16 }}>link</span>
-                  Magic Link (passwordless)
+                  {t('magicLink')}
                 </div>
               )}
             </div>
@@ -184,7 +191,7 @@ export default function SettingsPage() {
                 onClick={() => openProfile('signin')}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>lock</span>
-                Change Password
+                {t('changePassword')}
               </button>
             )}
             {!passwordEnabled && (
@@ -193,7 +200,7 @@ export default function SettingsPage() {
                 onClick={() => openProfile('signin')}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>link</span>
-                Manage Sign-in
+                {t('manageSignIn')}
               </button>
             )}
             <button
@@ -203,7 +210,7 @@ export default function SettingsPage() {
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
                 {mfaEnabled ? 'gpp_good' : 'gpp_maybe'}
               </span>
-              {mfaEnabled ? 'MFA Enabled' : 'Set Up MFA'}
+              {mfaEnabled ? t('mfaEnabled') : t('setUpMfa')}
             </button>
           </div>
         </section>
@@ -211,20 +218,20 @@ export default function SettingsPage() {
         {/* ── Account Status (conditional) ── */}
         {accountStatus ? (
           <aside className="settings-status-card settings-col-4">
-            <p className="settings-status-label">Account Status</p>
+            <p className="settings-status-label">{t('accountStatus')}</p>
             <div className="settings-status-plan">
               <span className="settings-status-dot" />
-              {accountStatus.plan || 'Free'}
+              {accountStatus.plan || t('planFree')}
             </div>
             {accountStatus.renewsAt ? (
               <p className="settings-status-renew">
-                Your subscription renews on{' '}
+                {t('renewsOn')}{' '}
                 <strong style={{ color: 'var(--text)' }}>
-                  {new Date(accountStatus.renewsAt).toLocaleDateString()}
+                  {formatDate(accountStatus.renewsAt)}
                 </strong>.
               </p>
             ) : (
-              <p className="settings-status-renew">Free plan — no renewal date.</p>
+              <p className="settings-status-renew">{t('noRenewal')}</p>
             )}
           </aside>
         ) : (
@@ -238,13 +245,13 @@ export default function SettingsPage() {
             <div className="settings-card-icon cyan">
               <span className="material-symbols-outlined" style={{ fontSize: 22 }}>notifications_active</span>
             </div>
-            <h2 className="settings-card-title">Notifications</h2>
+            <h2 className="settings-card-title">{t('notifications')}</h2>
           </div>
 
           <div className="settings-row">
             <div>
-              <p className="settings-row-label">New Content Alerts</p>
-              <p className="settings-row-desc">Get notified when new videos are posted</p>
+              <p className="settings-row-label">{t('newContentAlerts')}</p>
+              <p className="settings-row-desc">{t('newContentDesc')}</p>
             </div>
             <Toggle
               value={notifyNewContent}
@@ -255,8 +262,8 @@ export default function SettingsPage() {
 
           <div className="settings-row">
             <div>
-              <p className="settings-row-label">Email Notifications</p>
-              <p className="settings-row-desc">Receive updates and alerts via email</p>
+              <p className="settings-row-label">{t('emailNotifications')}</p>
+              <p className="settings-row-desc">{t('emailNotificationsDesc')}</p>
             </div>
             <Toggle
               value={notifyEmail}
@@ -272,11 +279,11 @@ export default function SettingsPage() {
             <div className="settings-card-icon cyan">
               <span className="material-symbols-outlined" style={{ fontSize: 22 }}>speed</span>
             </div>
-            <h2 className="settings-card-title">Playback</h2>
+            <h2 className="settings-card-title">{t('playback')}</h2>
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <label className="app-label" style={{ marginBottom: 10 }}>Default Quality</label>
+            <label className="app-label" style={{ marginBottom: 10 }}>{t('defaultQuality')}</label>
             <div className="settings-segment">
               {QUALITY_OPTIONS.map(opt => (
                 <button
@@ -286,10 +293,27 @@ export default function SettingsPage() {
                   onClick={() => handleQuality(opt.value)}
                   disabled={isMutating}
                 >
-                  {opt.label}
+                  {opt.labelKey ? t(opt.labelKey) : opt.label}
                 </button>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ── Language ── */}
+        <section className="settings-card settings-col-12">
+          <div className="settings-card-header">
+            <div className="settings-card-icon cyan">
+              <span className="material-symbols-outlined" style={{ fontSize: 22 }}>language</span>
+            </div>
+            <h2 className="settings-card-title">{t('language')}</h2>
+          </div>
+          <div className="settings-row">
+            <div>
+              <p className="settings-row-label">{t('languageRow')}</p>
+              <p className="settings-row-desc">{t('languageDesc')}</p>
+            </div>
+            <LanguageSwitcher />
           </div>
         </section>
 
@@ -299,14 +323,14 @@ export default function SettingsPage() {
             <div className="settings-card-icon cyan">
               <span className="material-symbols-outlined" style={{ fontSize: 22 }}>security</span>
             </div>
-            <h2 className="settings-card-title">Privacy &amp; Visibility</h2>
+            <h2 className="settings-card-title">{t('privacy')}</h2>
           </div>
 
           <div className="settings-privacy-cards">
             <div className="settings-privacy-item">
               <div>
-                <p className="settings-privacy-item-label">Incognito Mode</p>
-                <p className="settings-privacy-item-desc">Watch history won&apos;t be recorded while active</p>
+                <p className="settings-privacy-item-label">{t('incognito')}</p>
+                <p className="settings-privacy-item-desc">{t('incognitoDesc')}</p>
               </div>
               <Toggle
                 value={incognitoEnabled}
@@ -317,8 +341,8 @@ export default function SettingsPage() {
 
             <div className="settings-privacy-item">
               <div>
-                <p className="settings-privacy-item-label">Private Profile</p>
-                <p className="settings-privacy-item-desc">Control who can see your activity and liked videos</p>
+                <p className="settings-privacy-item-label">{t('privateProfile')}</p>
+                <p className="settings-privacy-item-desc">{t('privateProfileDesc')}</p>
               </div>
               <Toggle
                 value={profilePrivate}
@@ -333,9 +357,9 @@ export default function SettingsPage() {
         <div className="settings-col-12">
           <div className="settings-danger-zone">
             <div>
-              <p className="settings-danger-title">Danger Zone</p>
+              <p className="settings-danger-title">{t('dangerZone')}</p>
               <p className="settings-danger-desc">
-                Deleting your account is permanent. Your data will be anonymized and you will be logged out.
+                {t('dangerDesc')}
               </p>
             </div>
             <button
@@ -344,7 +368,7 @@ export default function SettingsPage() {
               style={{ whiteSpace: 'nowrap' }}
             >
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete_forever</span>
-              Delete Account
+              {t('deleteAccount')}
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useDeleteAccount } from '../../hooks/useSettings.js'
 
@@ -14,6 +15,7 @@ const Spinner = () => (
 )
 
 export default function DeleteAccountModal({ show, onHide, settings }) {
+  const { t } = useTranslation(['settings', 'common'])
   const { user, logout } = useAuth()
   const deleteAccount = useDeleteAccount()
 
@@ -35,12 +37,12 @@ export default function DeleteAccountModal({ show, onHide, settings }) {
 
     if (mfaEnabled) {
       if (!otp || otp.length !== 6) {
-        setError('Please enter a valid 6-digit OTP code.')
+        setError(t('otpInvalid'))
         return
       }
     } else {
       if (!confirmation || confirmation !== user?.email) {
-        setError('The email you entered does not match your account email.')
+        setError(t('emailMismatch'))
         return
       }
     }
@@ -53,7 +55,7 @@ export default function DeleteAccountModal({ show, onHide, settings }) {
         window.location.href = '/'
       },
       onError: (err) => {
-        setError(err?.message || 'Failed to delete account. Please try again.')
+        setError(err?.message || t('deleteFailed'))
       },
     })
   }
@@ -68,27 +70,27 @@ export default function DeleteAccountModal({ show, onHide, settings }) {
       <div className="app-modal">
         <div className="app-modal-header">
           <span className="app-modal-title" style={{ color: 'var(--danger)' }}>
-            Delete Account
+            {t('deleteAccount')}
           </span>
-          <button className="app-modal-close" onClick={handleClose}>
+          <button className="app-modal-close" onClick={handleClose} aria-label={t('common:close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
 
         <div className="app-modal-body">
           <div className="app-alert error" style={{ marginBottom: 20 }}>
-            <strong>This action is irreversible.</strong> Your account will be deactivated and your personal data will be anonymized.
+            <strong>{t('deleteIrreversible')}</strong> {t('deleteWarning')}
           </div>
 
           {(error || deleteAccount.isError) && (
             <div className="app-alert error">
-              {error || deleteAccount.error?.message || 'An error occurred.'}
+              {error || deleteAccount.error?.message || t('errorOccurred')}
             </div>
           )}
 
           {mfaEnabled ? (
             <div className="app-field">
-              <label className="app-label">Enter your 6-digit authenticator code</label>
+              <label className="app-label">{t('enterOtp')}</label>
               <input
                 className="app-input"
                 type="text"
@@ -104,7 +106,7 @@ export default function DeleteAccountModal({ show, onHide, settings }) {
           ) : (
             <div className="app-field">
               <label className="app-label">
-                Type your email address to confirm: <strong style={{ color: 'var(--text)' }}>{user?.email}</strong>
+                {t('typeEmailToConfirm')} <strong style={{ color: 'var(--text)' }}>{user?.email}</strong>
               </label>
               <input
                 className="app-input"
@@ -124,7 +126,7 @@ export default function DeleteAccountModal({ show, onHide, settings }) {
             onClick={handleClose}
             disabled={deleteAccount.isPending}
           >
-            Cancel
+            {t('common:cancel')}
           </button>
           <button
             className="app-btn danger"
@@ -132,8 +134,8 @@ export default function DeleteAccountModal({ show, onHide, settings }) {
             disabled={deleteAccount.isPending}
           >
             {deleteAccount.isPending
-              ? <><Spinner />Deleting…</>
-              : 'Delete My Account'}
+              ? <><Spinner />{t('deleting')}</>
+              : t('deleteMyAccount')}
           </button>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import SettingsPage from '../SettingsPage.jsx'
+import i18n from '../../../i18n/index.js'
 
 // ── Mock external deps ──────────────────────────────────────────────────────
 
@@ -86,21 +87,39 @@ beforeEach(async () => {
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
+describe('SettingsPage language', () => {
+  it('renders in English and offers the language row', () => {
+    i18n.changeLanguage('en')
+    renderSettings()
+    expect(screen.getByText('Account Identity')).toBeInTheDocument()
+    expect(screen.getByText('Language / Ngôn ngữ')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'EN' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('switches the UI language from the settings row', () => {
+    renderSettings()
+    expect(screen.getByText('Ngôn ngữ / Language')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'EN' }))
+    expect(i18n.language).toBe('en')
+    expect(screen.getByText('Account Identity')).toBeInTheDocument()
+  })
+})
+
 describe('SettingsPage', () => {
   describe('section rendering', () => {
     it('renders all 5 main sections', () => {
       renderSettings()
 
       // Account Identity section
-      expect(screen.getByText('Account Identity')).toBeInTheDocument()
+      expect(screen.getByText('Danh tính tài khoản')).toBeInTheDocument()
       // Notifications section
-      expect(screen.getByText('Notifications')).toBeInTheDocument()
+      expect(screen.getByText('Thông báo')).toBeInTheDocument()
       // Playback section
-      expect(screen.getByText('Playback')).toBeInTheDocument()
+      expect(screen.getByText('Phát video')).toBeInTheDocument()
       // Privacy & Visibility section
-      expect(screen.getByText('Privacy & Visibility')).toBeInTheDocument()
+      expect(screen.getByText('Quyền riêng tư & hiển thị')).toBeInTheDocument()
       // Danger Zone section
-      expect(screen.getByText('Danger Zone')).toBeInTheDocument()
+      expect(screen.getByText('Vùng nguy hiểm')).toBeInTheDocument()
     })
 
     it('shows a loading spinner while settings are loading', async () => {
@@ -119,7 +138,7 @@ describe('SettingsPage', () => {
       })
 
       renderSettings()
-      expect(screen.getByText(/loading settings/i)).toBeInTheDocument()
+      expect(screen.getByText(/đang tải cài đặt/i)).toBeInTheDocument()
     })
 
     it('renders an error alert when the query fails', async () => {
@@ -139,7 +158,7 @@ describe('SettingsPage', () => {
   describe('Account Identity section', () => {
     it('shows Change Password button when passwordEnabled=true', () => {
       renderSettings()
-      expect(screen.getByRole('button', { name: /change password/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /đổi mật khẩu/i })).toBeInTheDocument()
     })
 
     it('hides Change Password and shows magic-link text when passwordEnabled=false', async () => {
@@ -153,7 +172,7 @@ describe('SettingsPage', () => {
 
       renderSettings()
 
-      expect(screen.queryByRole('button', { name: /change password/i })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /đổi mật khẩu/i })).not.toBeInTheDocument()
       expect(screen.getByText(/magic link/i)).toBeInTheDocument()
     })
 
@@ -167,14 +186,14 @@ describe('SettingsPage', () => {
       })
 
       renderSettings()
-      expect(screen.getByRole('button', { name: /manage sign-in/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /quản lý đăng nhập/i })).toBeInTheDocument()
     })
   })
 
   describe('Account Status panel', () => {
     it('does not render Account Status when accountStatus is null', () => {
       renderSettings()
-      expect(screen.queryByText('Account Status')).not.toBeInTheDocument()
+      expect(screen.queryByText('Trạng thái tài khoản')).not.toBeInTheDocument()
     })
 
     it('renders Account Status panel when accountStatus is present', async () => {
@@ -190,7 +209,7 @@ describe('SettingsPage', () => {
       })
 
       renderSettings()
-      expect(screen.getByText('Account Status')).toBeInTheDocument()
+      expect(screen.getByText('Trạng thái tài khoản')).toBeInTheDocument()
       expect(screen.getByText('Pro')).toBeInTheDocument()
     })
 
@@ -207,7 +226,7 @@ describe('SettingsPage', () => {
       })
 
       renderSettings()
-      expect(screen.getByText(/free plan/i)).toBeInTheDocument()
+      expect(screen.getByText(/gói miễn phí/i)).toBeInTheDocument()
     })
   })
 
@@ -279,7 +298,7 @@ describe('SettingsPage', () => {
   describe('Playback section', () => {
     it('renders quality segment with AUTO selected by default', () => {
       renderSettings()
-      const autoBtn = screen.getByRole('button', { name: 'Auto' })
+      const autoBtn = screen.getByRole('button', { name: 'Tự động' })
       expect(autoBtn).toHaveClass('active')
     })
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { authApi } from '../../api/auth.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import PasswordLoginModal from './PasswordLoginModal.jsx'
@@ -23,6 +24,7 @@ const inputStyle = {
 }
 
 export default function LoginForm({ onMfaRequired }) {
+  const { t } = useTranslation(['auth', 'common'])
   const { login } = useAuth()
   const [email,    setEmail]    = useState('')
   const [pwOpen,   setPwOpen]   = useState(false)
@@ -53,7 +55,7 @@ export default function LoginForm({ onMfaRequired }) {
     const res = await authApi.join(email.trim())
     const data = res.data
     if (data.action === STATUS.INVITED_SEND) {
-      setMessage({ text: 'Check your inbox!', type: 'success' })
+      setMessage({ text: t('checkInbox'), type: 'success' })
     } else {
       handleAuthResult(data)
     }
@@ -67,7 +69,7 @@ export default function LoginForm({ onMfaRequired }) {
     try {
       await handleLinkSubmit()
     } catch (err) {
-      setMessage({ text: err.message || 'Login failed', type: 'error' })
+      setMessage({ text: err.message || t('loginFailed'), type: 'error' })
     } finally {
       setLoading(false)
     }
@@ -81,7 +83,7 @@ export default function LoginForm({ onMfaRequired }) {
   function handleForgot(typedEmail) {
     setPwOpen(false)
     if (typedEmail) setEmail(typedEmail)
-    setMessage({ text: 'Bấm Login để nhận link đăng nhập qua email', type: 'success' })
+    setMessage({ text: t('forgotSent'), type: 'success' })
   }
 
   return (
@@ -89,8 +91,8 @@ export default function LoginForm({ onMfaRequired }) {
       <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <input
           type="email"
-          placeholder="Enter your email"
-          aria-label="Email"
+          placeholder={t('emailPlaceholder')}
+          aria-label={t('emailLabel')}
           autoComplete="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -112,7 +114,7 @@ export default function LoginForm({ onMfaRequired }) {
             fontSize: 13,
             fontWeight: 700,
             padding: '6px 16px',
-            width: 70,
+            minWidth: 70,
             justifyContent: 'center',
             cursor: loading ? 'not-allowed' : 'pointer',
             opacity: loading ? 0.7 : 1,
@@ -125,14 +127,14 @@ export default function LoginForm({ onMfaRequired }) {
         >
           {loading
             ? <span style={{ width: 14, height: 14, border: '2px solid rgba(0,48,53,0.3)', borderTopColor: '#003035', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
-            : 'Login'}
+            : t('common:login')}
         </button>
         {passwordAvailable && (
           <button
             type="button"
             className="icon-btn"
-            title="Đăng nhập bằng mật khẩu"
-            aria-label="Đăng nhập bằng mật khẩu"
+            title={t('passwordLogin')}
+            aria-label={t('passwordLogin')}
             onClick={() => { setMessage(null); setPwOpen(true) }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>key</span>

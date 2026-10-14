@@ -1,11 +1,13 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { authApi } from '../../api/auth.js'
 import { useAuth } from '../../hooks/useAuth.js'
 
 // This component checks for ?token= on mount and handles magic link verification.
 // Renders nothing — side-effects only.
 export default function MagicLinkHandler({ onMfaRequired, onError }) {
+  const { t } = useTranslation('auth')
   const { login } = useAuth()
   const navigate = useNavigate()
 
@@ -29,7 +31,7 @@ export default function MagicLinkHandler({ onMfaRequired, onError }) {
         }
       })
       .catch((err) => {
-        onError?.(err.message || 'Magic link verification failed')
+        onError?.(err.message || t('magicLinkFailed'))
       })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 

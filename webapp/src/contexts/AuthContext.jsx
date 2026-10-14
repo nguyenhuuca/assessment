@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { authApi } from '../api/auth.js'
+import i18n from '../i18n/index.js'
 import { AUTH_REVOKED_EVENT } from '../api/client.js'
 import { isAdminRole } from '../utils/roles.js'
 
@@ -32,7 +33,7 @@ export function AuthProvider({ children }) {
       localStorage.removeItem('user')
       setJwt(null)
       setUser(null)
-      setSessionNotice('Phiên đăng nhập đã hết hiệu lực, vui lòng đăng nhập lại')
+      setSessionNotice(i18n.t('auth:sessionRevoked'))
     }
     window.addEventListener(AUTH_REVOKED_EVENT, onRevoked)
     return () => window.removeEventListener(AUTH_REVOKED_EVENT, onRevoked)

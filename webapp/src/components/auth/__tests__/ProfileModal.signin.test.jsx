@@ -4,6 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ProfileModal from '../ProfileModal.jsx'
 import { authApi } from '../../../api/auth.js'
+import i18n from '../../../i18n/index.js'
 
 vi.mock('../../../api/auth.js', () => ({
   authApi: {
@@ -173,5 +174,35 @@ describe('ProfileModal sign-in tab: change and remove', () => {
     await waitFor(() => expect(authApi.removePassword).toHaveBeenCalledWith({
       currentPassword: 'old-password-1', otp: '654321',
     }))
+  })
+})
+
+describe('ProfileModal sign-in tab: error code mapping', () => {
+  async function submitWithError(err) {
+    authApi.setPassword.mockRejectedValue(err)
+    renderModal()
+    type('Mật khẩu mới', 'password-123456')
+    type('Nhập lại mật khẩu mới', 'password-123456')
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt mật khẩu' }))
+  }
+
+  it('translates err.code in Vietnamese and ignores the human message', async () => {
+    await submitWithError({ message: 'Some server text', code: 'PASSWORD_TOO_SHORT', status: 400 })
+    expect(await screen.findByText('Mật khẩu phải có ít nhất 10 ký tự')).toBeInTheDocument()
+  })
+
+  it('translates err.code in English', async () => {
+    i18n.changeLanguage('en')
+    authApi.setPassword.mockRejectedValue({ message: 'x', code: 'PASSWORD_TOO_COMMON', status: 400 })
+    renderModal()
+    type('New password', 'password-123456')
+    type('Confirm new password', 'password-123456')
+    fireEvent.click(screen.getByRole('button', { name: 'Set password' }))
+    expect(await screen.findByText('Password is too common, please choose another')).toBeInTheDocument()
+  })
+
+  it('falls back to the server message for unknown codes', async () => {
+    await submitWithError({ message: 'Máy chủ bận', code: 'SOMETHING_NEW', status: 500 })
+    expect(await screen.findByText('Máy chủ bận')).toBeInTheDocument()
   })
 })

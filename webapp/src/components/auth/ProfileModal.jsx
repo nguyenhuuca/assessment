@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { formatDate } from '../../i18n/format.js'
 import { authApi } from '../../api/auth.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import SignInPanel from './SignInPanel.jsx'
@@ -15,6 +17,7 @@ const Spinner = () => (
 )
 
 export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
+  const { t } = useTranslation(['auth', 'common'])
   const { user, updateUser } = useAuth()
   const [activeTab, setActiveTab] = useState(initialTab)
   const [prevShow, setPrevShow] = useState(show)
@@ -45,7 +48,7 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
 
   async function handleEnableMFA() {
     if (!setupCode || setupCode.length !== 6) {
-      setMfaMsg({ text: 'Please enter a valid 6-digit code', type: 'error' })
+      setMfaMsg({ text: t('mfaCodeInvalid'), type: 'error' })
       return
     }
     setMfaLoading(true)
@@ -53,7 +56,7 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
     try {
       await authApi.mfa.enable(setupCode, user?.email, secret)
       updateUser({ ...user, mfaEnabled: true })
-      setMfaMsg({ text: 'MFA enabled successfully!', type: 'success' })
+      setMfaMsg({ text: t('mfaEnabledOk'), type: 'success' })
       setQrCode(null)
       setSetupCode('')
     } catch (err) {
@@ -65,7 +68,7 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
 
   async function handleDisableMFA() {
     if (!disableCode || disableCode.length !== 6) {
-      setMfaMsg({ text: 'Please enter a valid 6-digit code', type: 'error' })
+      setMfaMsg({ text: t('mfaCodeInvalid'), type: 'error' })
       return
     }
     setMfaLoading(true)
@@ -73,7 +76,7 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
     try {
       await authApi.mfa.disable(disableCode, user?.email)
       updateUser({ ...user, mfaEnabled: false })
-      setMfaMsg({ text: 'MFA disabled successfully!', type: 'success' })
+      setMfaMsg({ text: t('mfaDisabledOk'), type: 'success' })
       setDisableCode('')
     } catch (err) {
       setMfaMsg({ text: err.message, type: 'error' })
@@ -97,8 +100,8 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
     <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) handleClose() }}>
       <div className="app-modal lg">
         <div className="app-modal-header">
-          <span className="app-modal-title">Profile</span>
-          <button className="app-modal-close" onClick={handleClose}>
+          <span className="app-modal-title">{t('profile')}</span>
+          <button className="app-modal-close" onClick={handleClose} aria-label={t('common:close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
@@ -110,19 +113,19 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
               className={`app-tab${activeTab === 'info' ? ' active' : ''}`}
               onClick={() => setActiveTab('info')}
             >
-              User Info
+              {t('tabInfo')}
             </button>
             <button
               className={`app-tab${activeTab === 'mfa' ? ' active' : ''}`}
               onClick={() => setActiveTab('mfa')}
             >
-              MFA Settings
+              {t('tabMfa')}
             </button>
             <button
               className={`app-tab${activeTab === 'signin' ? ' active' : ''}`}
               onClick={() => setActiveTab('signin')}
             >
-              Đăng nhập
+              {t('tabSignIn')}
             </button>
           </div>
 
@@ -132,9 +135,9 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
           {/* User Info tab */}
           {activeTab === 'info' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <InfoRow label="Email" value={user?.email} />
-              <InfoRow label="Member Since" value={new Date().toLocaleDateString()} />
-              <InfoRow label="Last Login" value={new Date().toLocaleDateString()} />
+              <InfoRow label={t('emailLabel')} value={user?.email} />
+              <InfoRow label={t('memberSince')} value={formatDate(new Date())} />
+              <InfoRow label={t('lastLogin')} value={formatDate(new Date())} />
             </div>
           )}
 
@@ -157,9 +160,9 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
                   {user?.mfaEnabled ? 'gpp_good' : 'gpp_maybe'}
                 </span>
                 <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                  MFA Status:{' '}
+                  {t('mfaStatus')}{' '}
                   <strong style={{ color: user?.mfaEnabled ? 'var(--accent-cyan)' : 'var(--text)' }}>
-                    {user?.mfaEnabled ? 'Enabled' : 'Disabled'}
+                    {user?.mfaEnabled ? t('enabled') : t('disabled')}
                   </strong>
                 </span>
               </div>
@@ -167,20 +170,20 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
               {!user?.mfaEnabled ? (
                 !qrCode ? (
                   <button className="app-btn primary" onClick={handleSetupMFA} disabled={mfaLoading}>
-                    {mfaLoading ? <><Spinner />Setting up…</> : 'Setup MFA'}
+                    {mfaLoading ? <><Spinner />{t('settingUp')}</> : t('setupMfa')}
                   </button>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                      Scan this QR code with your authenticator app:
+                      {t('scanQr')}
                     </p>
                     <img
                       src={`data:image/png;base64,${qrCode}`}
-                      alt="MFA QR Code"
+                      alt={t('qrAlt')}
                       style={{ borderRadius: 8, maxWidth: 180 }}
                     />
                     <div className="app-field" style={{ marginBottom: 0 }}>
-                      <label className="app-label">Verification code</label>
+                      <label className="app-label">{t('verificationCode')}</label>
                       <input
                         className="app-input"
                         type="text"
@@ -192,14 +195,14 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
                       />
                     </div>
                     <button className="app-btn success" onClick={handleEnableMFA} disabled={mfaLoading}>
-                      {mfaLoading ? <><Spinner />Enabling…</> : 'Enable MFA'}
+                      {mfaLoading ? <><Spinner />{t('enabling')}</> : t('enableMfa')}
                     </button>
                   </div>
                 )
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <div className="app-field" style={{ marginBottom: 0 }}>
-                    <label className="app-label">Enter code to disable MFA</label>
+                    <label className="app-label">{t('disableCodeLabel')}</label>
                     <input
                       className="app-input"
                       type="text"
@@ -211,7 +214,7 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
                     />
                   </div>
                   <button className="app-btn danger" onClick={handleDisableMFA} disabled={mfaLoading}>
-                    {mfaLoading ? <><Spinner />Disabling…</> : 'Disable MFA'}
+                    {mfaLoading ? <><Spinner />{t('disabling')}</> : t('disableMfa')}
                   </button>
                 </div>
               )}
@@ -220,7 +223,7 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
         </div>
 
         <div className="app-modal-footer">
-          <button className="app-btn secondary" onClick={handleClose}>Close</button>
+          <button className="app-btn secondary" onClick={handleClose}>{t('common:close')}</button>
         </div>
       </div>
     </div>

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { authApi } from '../../api/auth.js'
 import PasswordInput from '../common/PasswordInput.jsx'
-
-const MSG_INVALID = 'Email hoặc mật khẩu không đúng'
-const MSG_RATE_LIMIT = 'Bạn thử quá nhiều lần, vui lòng đợi'
 
 /**
  * Email + password sign-in dialog. Rendered through a portal so it is not clipped by the
@@ -12,6 +10,7 @@ const MSG_RATE_LIMIT = 'Bạn thử quá nhiều lần, vui lòng đợi'
  * `onForgot(email)` hands the typed email back to the magic-link form.
  */
 export default function PasswordLoginModal({ show, initialEmail = '', onHide, onSuccess, onForgot }) {
+  const { t } = useTranslation(['auth', 'common'])
   const [email,    setEmail]    = useState(initialEmail)
   const [password, setPassword] = useState('')
   const [loading,  setLoading]  = useState(false)
@@ -45,7 +44,7 @@ export default function PasswordLoginModal({ show, initialEmail = '', onHide, on
       onSuccess(res.data)
     } catch (err) {
       // Never reveal whether the email exists or the password was wrong
-      setError(err?.status === 429 ? MSG_RATE_LIMIT : MSG_INVALID)
+      setError(err?.status === 429 ? t('rateLimited') : t('invalidCredentials'))
     } finally {
       setLoading(false)
     }
@@ -55,8 +54,8 @@ export default function PasswordLoginModal({ show, initialEmail = '', onHide, on
     <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onHide() }}>
       <div className="app-modal" role="dialog" aria-modal="true" aria-labelledby="pw-login-title" style={{ width: 400 }}>
         <div className="app-modal-header">
-          <span className="app-modal-title" id="pw-login-title">Đăng nhập bằng mật khẩu</span>
-          <button type="button" className="app-modal-close" onClick={onHide} aria-label="Đóng">
+          <span className="app-modal-title" id="pw-login-title">{t('passwordLogin')}</span>
+          <button type="button" className="app-modal-close" onClick={onHide} aria-label={t('common:close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
@@ -65,7 +64,7 @@ export default function PasswordLoginModal({ show, initialEmail = '', onHide, on
           <div className="app-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {error && <div className="app-alert error" role="alert">{error}</div>}
             <div className="app-field" style={{ marginBottom: 0 }}>
-              <label className="app-label" htmlFor="pw-login-email">Email</label>
+              <label className="app-label" htmlFor="pw-login-email">{t('emailLabel')}</label>
               <input
                 id="pw-login-email"
                 className="app-input"
@@ -79,7 +78,7 @@ export default function PasswordLoginModal({ show, initialEmail = '', onHide, on
               />
             </div>
             <PasswordInput
-              label="Mật khẩu"
+              label={t('passwordLabel')}
               value={password}
               onChange={e => setPassword(e.target.value)}
               autoComplete="current-password"
@@ -93,17 +92,17 @@ export default function PasswordLoginModal({ show, initialEmail = '', onHide, on
                 color: 'var(--accent-cyan)', fontSize: 12, fontWeight: 600,
               }}
             >
-              Quên mật khẩu? Gửi link đăng nhập
+              {t('forgotPassword')}
             </button>
             <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)' }}>
-              Chưa có mật khẩu? Đăng nhập bằng link rồi đặt mật khẩu trong Cài đặt.
+              {t('noPasswordYet')}
             </p>
           </div>
 
           <div className="app-modal-footer">
-            <button type="button" className="app-btn secondary" onClick={onHide}>Huỷ</button>
+            <button type="button" className="app-btn secondary" onClick={onHide}>{t('common:cancel')}</button>
             <button type="submit" className="app-btn primary" disabled={loading}>
-              {loading ? 'Đang đăng nhập…' : 'Đăng nhập'}
+              {loading ? t('loggingIn') : t('common:login')}
             </button>
           </div>
         </form>
