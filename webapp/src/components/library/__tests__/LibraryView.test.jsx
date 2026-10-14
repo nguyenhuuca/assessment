@@ -121,6 +121,7 @@ describe('LibraryView', () => {
   it('"Phát" plays the whole collection right from the card', async () => {
     renderView()
     fireEvent.click(await screen.findByRole('button', { name: 'Phát Hài tuyển chọn' }))
+    expect(screen.getByRole('status', { name: 'Đang tải' })).toBeTruthy()
     expect(await screen.findByTestId('swiper')).toBeTruthy()
     expect(collectionsApi.videos).toHaveBeenCalledWith('p1', 0, 50)
     fireEvent.click(screen.getByRole('button', { name: /Quay lại/ }))

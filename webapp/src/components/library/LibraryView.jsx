@@ -88,10 +88,12 @@ function VideoTile({ video, onPlay, onRemove, removing }) {
   )
 }
 
+const PLAYER_BOX = { position: 'relative', height: 'calc(100vh - var(--topnav-h))', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+
 /** Plays a list of videos in the swiper, with a back button to the grid it came from. */
 function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComments, currentUser }) {
   return (
-    <div style={{ position: 'relative', height: 'calc(100vh - var(--topnav-h))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={PLAYER_BOX}>
       <button className="app-btn secondary" style={{ position: 'absolute', top: 12, left: 12, zIndex: 5 }} onClick={onBack}>
         <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> Quay lại
       </button>
@@ -110,7 +112,8 @@ function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComment
 /** "Phát" on a card: loads the whole collection and plays it from the first video. */
 function CollectionPlayer({ collectionId, onBack, muted, onMutedChange, onShowComments, currentUser }) {
   const { data: videos = [], isLoading, error } = useCollectionPlaylist(collectionId)
-  if (isLoading) return <div className="vid-spinner" />
+  // Same box as the player, so the spinner sits where the video will appear
+  if (isLoading) return <div style={PLAYER_BOX} role="status" aria-label="Đang tải"><div className="vid-spinner" /></div>
   if (error || videos.length === 0) {
     return (
       <div className="explore-root">
