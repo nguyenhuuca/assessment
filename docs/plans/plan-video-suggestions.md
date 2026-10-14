@@ -181,3 +181,4 @@ bd create --title="[QA-1] E2E + prod smoke" --type=task
 |------|------|
 | 2026-10-15 | Owner asked for a "My suggestions" section in History, so FE-4 was added. The `history` nav item becomes a real page instead of the ComingSoon placeholder. |
 | 2026-10-15 | Plan created from a parallel exploration of the import pipeline, the notifications system and the FE "+" and admin UI. |
+| 2026-10-15 | BE-1..3 and FE-1..4 were implemented with 3 parallel workers. BE: 1220 tests, coverage 96.49%. FE: 345 tests. The listener is named `SuggestionNotificationListener`, and the ingest event uses `fallbackExecution` because `saveInfo` has no outer transaction. `videosApi.delete` is kept because `DeleteConfirmModal` still uses it (legacy share_link); remove it together with share_link. The queries were parsed by Hibernate but have not run on a real Postgres, so QA-1 on prod is the first DB check. |
