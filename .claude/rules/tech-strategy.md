@@ -44,6 +44,7 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 | UI Library | Bootstrap 5 + React-Bootstrap 2 |
 | Icons | FontAwesome (react-fontawesome) |
 | HTTP Client | Fetch API (via React Query) |
+| i18n | i18next + react-i18next (ADR-0020) |
 | Testing | Vitest + Testing Library |
 | Location | `webapp/` directory |
 | Architecture | SPA with component-based rendering |

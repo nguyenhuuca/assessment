@@ -25,6 +25,19 @@ describe('API client', () => {
     expect(options.headers['Authorization']).toBe('test-jwt-token')
   })
 
+  it('sends Accept-Language matching the current i18n language', async () => {
+    const i18n = (await import('../../i18n/index.js')).default
+    const { api } = await import('../client.js')
+    mockFetch.mockResolvedValue({ ok: true, json: async () => ({ data: {} }) })
+
+    await api.get('/test')
+    expect(mockFetch.mock.calls[0][1].headers['Accept-Language']).toBe('vi')
+
+    await i18n.changeLanguage('en')
+    await api.get('/test')
+    expect(mockFetch.mock.calls[1][1].headers['Accept-Language']).toBe('en')
+  })
+
   it('injects X-Guest-Token header when guestToken present', async () => {
     localStorage.setItem('guestToken', 'guest-abc')
     mockFetch.mockResolvedValueOnce({

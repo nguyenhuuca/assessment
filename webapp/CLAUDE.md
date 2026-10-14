@@ -13,6 +13,7 @@ This file provides guidance to Claude Code when working with the `webapp/` direc
 | Swipe         | react-swipeable                     |
 | Icons         | Material Symbols Outlined (CDN)     |
 | Fonts         | Bebas Neue (brand), DM Sans (body)  |
+| i18n          | i18next + react-i18next (vi/en, ADR-0020) |
 | Testing       | Vitest + @testing-library/react     |
 | HTTP Client   | Axios (via `src/api/client.js`)     |
 
@@ -39,6 +40,10 @@ webapp/
 │   ├── App.jsx                    # Router + AppShell
 │   ├── styles/
 │   │   └── index.css              # Design system: CSS tokens, all component classes
+│   ├── i18n/
+│   │   ├── index.js               # i18next init; auto-loads locales/{vi,en}/<namespace>.json; setLanguage()
+│   │   ├── format.js              # relativeTime, compactNumber, formatDate (Intl, current language)
+│   │   └── locales/{vi,en}/*.json # one file per namespace (common, feed, library, ...)
 │   ├── api/
 │   │   ├── client.js              # Axios instance (baseURL from VITE_API_BASE_URL)
 │   │   ├── auth.js                # join, me, mfa.* endpoints

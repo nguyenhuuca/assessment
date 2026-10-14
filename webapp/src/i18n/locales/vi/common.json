@@ -1,0 +1,22 @@
+{
+  "language": "Ngôn ngữ",
+  "vietnamese": "Tiếng Việt",
+  "english": "English",
+  "langShortVi": "VI",
+  "langShortEn": "EN",
+  "back": "Quay lại",
+  "close": "Đóng",
+  "cancel": "Hủy",
+  "save": "Lưu",
+  "delete": "Xóa",
+  "edit": "Sửa",
+  "add": "Thêm",
+  "done": "Xong",
+  "loading": "Đang tải...",
+  "retry": "Thử lại",
+  "share": "Chia sẻ",
+  "play": "Phát",
+  "login": "Đăng nhập",
+  "logout": "Đăng xuất",
+  "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại."
+}

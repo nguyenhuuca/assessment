@@ -15,6 +15,7 @@ import ComingSoon from './ComingSoon.jsx'
 import AdminView from '../admin/AdminView.jsx'
 import SettingsPage from '../settings/SettingsPage.jsx'
 import ActivityBar from '../common/ActivityBar.jsx'
+import LanguageSwitcher from '../common/LanguageSwitcher.jsx'
 import NotificationBell from '../notifications/NotificationBell.jsx'
 import { useNotificationStream } from '../../hooks/useNotifications.js'
 
@@ -192,6 +193,7 @@ export default function AppShell() {
               </button>
             </>
           )}
+          <LanguageSwitcher />
           <button className="icon-btn" onClick={toggleTheme} title="Toggle theme">
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
               {theme === 'dark' ? 'dark_mode' : 'light_mode'}

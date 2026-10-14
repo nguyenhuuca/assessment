@@ -1,0 +1,22 @@
+{
+  "language": "Language",
+  "vietnamese": "Tiếng Việt",
+  "english": "English",
+  "langShortVi": "VI",
+  "langShortEn": "EN",
+  "back": "Back",
+  "close": "Close",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "add": "Add",
+  "done": "Done",
+  "loading": "Loading...",
+  "retry": "Retry",
+  "share": "Share",
+  "play": "Play",
+  "login": "Log in",
+  "logout": "Log out",
+  "errorGeneric": "Something went wrong. Please try again."
+}

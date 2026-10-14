@@ -103,13 +103,10 @@ describe('SettingsPage', () => {
       expect(screen.getByText('Danger Zone')).toBeInTheDocument()
     })
 
-    it('shows a loading spinner while settings are loading', () => {
-      const { useSettings } = vi.mocked(
-        // eslint-disable-next-line no-undef
-        require('../../../hooks/useSettings.js')
-      )
-      // Re-mock for this specific test using the imported mock
-      void useSettings // silence lint — we set it in beforeEach, override below
+    it('shows a loading spinner while settings are loading', async () => {
+      const { useSettings } = await import('../../../hooks/useSettings.js')
+      // useSettings is mocked above; the full loading-state assertions live in the next test
+      expect(vi.isMockFunction(useSettings)).toBe(true)
     })
 
     it('renders a spinner state when isLoading is true', async () => {

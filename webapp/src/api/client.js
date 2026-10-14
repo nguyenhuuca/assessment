@@ -1,9 +1,15 @@
+import i18n from '../i18n/index.js'
+
 export const getBaseUrl = () => import.meta.env.VITE_API_BASE_URL || 'https://canh-labs.com/api/v1/funny-app'
 
 export const AUTH_REVOKED_EVENT = 'auth:revoked'
 
 function createHeaders(extra = {}) {
-  const headers = { 'Content-Type': 'application/json', ...extra }
+  const headers = {
+    'Content-Type': 'application/json',
+    'Accept-Language': i18n.language || 'en',
+    ...extra,
+  }
   const jwt = localStorage.getItem('jwt')
   const guestToken = localStorage.getItem('guestToken')
   if (jwt) headers['Authorization'] = jwt

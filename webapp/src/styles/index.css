@@ -2433,3 +2433,26 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 @media (prefers-reduced-motion: reduce) {
   .activity-bar::before { animation-duration: 3s; }
 }
+
+/* ── Language switcher (VI | EN) ── */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.lang-switch-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 5px 8px;
+  line-height: 1;
+  transition: background var(--transition), color var(--transition);
+}
+.lang-switch-btn:hover { color: var(--text); }
+.lang-switch-btn.active { color: var(--accent-cyan); background: var(--accent-cyan-dim); }
