@@ -1,5 +1,12 @@
 export const FUNNY_KEYWORDS = ['funny', 'hài', 'hài hước', 'comedy', 'vui', 'cười']
 
+const THUMBNAIL_BASE = 'https://images.canh-labs.com'
+
+/** Poster image for a Drive-backed video, or '' when it has no file id. */
+export function thumbnailUrl(fileId) {
+  return fileId ? `${THUMBNAIL_BASE}/${fileId}.jpg` : ''
+}
+
 /**
  * Stream URL for <video src>. Never put the JWT or guest token in the URL: the stream endpoint
  * does not read them, and query strings end up in nginx/Cloudflare logs (token leak, CWE-598)
@@ -33,6 +40,6 @@ export function mapApiVideo(raw) {
     isPrivate: raw.isPrivate || raw.is_private || false,
     fileId: raw.fileId || raw.file_id || null,
     category: determineCategory(raw.title, raw.desc || raw.description),
-    poster: raw.fileId ? `https://images.canh-labs.com/${raw.fileId}.jpg` : '',
+    poster: thumbnailUrl(raw.fileId),
   }
 }

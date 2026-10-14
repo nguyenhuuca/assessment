@@ -44,7 +44,9 @@ import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -105,6 +107,7 @@ class VideoCollectionServiceImplTest {
         c.setVisibility(visibility);
         c.setDefault(isDefault);
         when(collectionRepository.findById(c.getId())).thenReturn(Optional.of(c));
+        when(collectionRepository.findByIdForUpdate(c.getId())).thenReturn(Optional.of(c));
         return c;
     }
 
@@ -158,7 +161,7 @@ class VideoCollectionServiceImplTest {
     void getPublic_guestSeesNonEmptyOnly_andNoUnavailableCount() {
         VideoCollection full = stored(OTHER, CollectionVisibility.PUBLIC, false);
         VideoCollection empty = stored(OTHER, CollectionVisibility.PUBLIC, false);
-        when(collectionRepository.findByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC))
+        when(collectionRepository.findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC))
                 .thenReturn(List.of(full, empty));
         when(itemRepository.countByCollection(anyCollection())).thenReturn(List.of(counts(full.getId(), 3, 2)));
         when(itemRepository.findCovers(anyCollection())).thenReturn(List.of(cover(full.getId(), 5L, "f5")));
@@ -181,7 +184,7 @@ class VideoCollectionServiceImplTest {
         role(USER, UserRole.SUPER_ADMIN);
         VideoCollection full = stored(OTHER, CollectionVisibility.PUBLIC, false);
         VideoCollection empty = stored(OTHER, CollectionVisibility.PUBLIC, false);
-        when(collectionRepository.findByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC))
+        when(collectionRepository.findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC))
                 .thenReturn(List.of(full, empty));
         when(itemRepository.countByCollection(anyCollection())).thenReturn(List.of(counts(full.getId(), 3, 2)));
 
@@ -216,7 +219,98 @@ class VideoCollectionServiceImplTest {
         assertThat(service.getVideos(mine.getId(), 0, 10)).isEmpty();
     }
 
+    @Test
+    void getVideos_deepPageIsClamped_toTheItemCap() {
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+        when(itemRepository.findVisibleVideos(eq(mine.getId()), any(Pageable.class))).thenReturn(Page.empty());
+
+        service.getVideos(mine.getId(), 1_000_000, 0);
+
+        verify(itemRepository).findVisibleVideos(mine.getId(),
+                PageRequest.of(VideoCollectionServiceImpl.MAX_ITEMS_PER_COLLECTION, 1));
+    }
+
+    @Test
+    void getPublic_guestListIsCached_untilAPublicCollectionChanges() {
+        VideoCollection pub = stored(OTHER, CollectionVisibility.PUBLIC, false);
+        when(collectionRepository.findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC)).thenReturn(List.of(pub));
+        when(itemRepository.countByCollection(anyCollection())).thenReturn(List.of(counts(pub.getId(), 1, 0)));
+
+        service.getPublic();
+        service.getPublic();
+        verify(collectionRepository, times(1)).findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC);
+
+        login(USER);
+        role(USER, UserRole.ADMIN);
+        when(videoSourceRepository.existsByIdAndIsHideAndStatus(5L, false, VideoStatus.PUBLISHED)).thenReturn(true);
+        when(itemRepository.addItem(pub.getId(), 5L)).thenReturn(1);
+        service.addVideo(pub.getId(), 5L);
+        SecurityContextHolder.clearContext();
+
+        service.getPublic();
+        verify(collectionRepository, times(2)).findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC);
+    }
+
+    @Test
+    void getPublic_privateWrites_doNotEvictTheCache() {
+        when(collectionRepository.findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC)).thenReturn(List.of());
+        service.getPublic();
+
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+        when(itemRepository.removeItem(mine.getId(), 5L)).thenReturn(1);
+        service.removeVideo(mine.getId(), 5L);
+        SecurityContextHolder.clearContext();
+
+        service.getPublic();
+        verify(collectionRepository, times(1)).findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC);
+    }
+
+    @Test
+    void getVideoIds_managerOnly() {
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+        VideoCollection other = stored(OTHER, CollectionVisibility.PRIVATE, false);
+        when(itemRepository.findVideoIds(mine.getId())).thenReturn(List.of(5L, 6L));
+
+        assertThat(service.getVideoIds(mine.getId())).containsExactly(5L, 6L);
+        assertStatus(() -> service.getVideoIds(other.getId()), HttpStatus.NOT_FOUND);
+        verify(collectionRepository, never()).findByIdForUpdate(any());
+    }
+
+    @Test
+    void getVideoIds_requiresLogin() {
+        assertStatus(() -> service.getVideoIds(UUID.randomUUID()), HttpStatus.UNAUTHORIZED);
+    }
+
     // ---- create ----
+
+    @Test
+    void create_locksOwnerBeforeCountingTheCap() {
+        login(USER);
+
+        service.create(req("x", null));
+
+        var order = inOrder(collectionRepository);
+        order.verify(collectionRepository).lockOwner(USER);
+        order.verify(collectionRepository).countByUserId(USER);
+        order.verify(collectionRepository).saveAndFlush(any());
+    }
+
+    @Test
+    void normalizeName_collapsesWhitespace_andUsesNfc() {
+        String decomposed = "Ha\u0300i"; // "Hài" with a combining grave accent
+        assertThat(VideoCollectionServiceImpl.normalizeName(" a \t  b ")).isEqualTo("a b");
+        assertThat(VideoCollectionServiceImpl.normalizeName(decomposed)).isEqualTo("H\u00e0i");
+    }
+
+    @Test
+    void normalizeName_rejectsTooLongAndControlCharacters() {
+        assertStatus(() -> VideoCollectionServiceImpl.normalizeName("x".repeat(CollectionRequest.MAX_NAME + 1)), HttpStatus.BAD_REQUEST);
+        assertStatus(() -> VideoCollectionServiceImpl.normalizeName("bad\u0000name"), HttpStatus.BAD_REQUEST);
+        assertThat(VideoCollectionServiceImpl.normalizeName("x".repeat(CollectionRequest.MAX_NAME))).hasSize(CollectionRequest.MAX_NAME);
+    }
 
     @Test
     void create_privateTrimsName() {
@@ -312,6 +406,63 @@ class VideoCollectionServiceImplTest {
     }
 
     @Test
+    void update_renameOwnPrivate_andNullNameKeepsIt() {
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+
+        assertThat(service.update(mine.getId(), req(" Mới  tên ", null)).getName()).isEqualTo("Mới tên");
+        assertThat(service.update(mine.getId(), req(null, null)).getName()).isEqualTo("Mới tên");
+        verify(collectionRepository, never()).lockOwner(anyLong());
+    }
+
+    @Test
+    void update_nameClash_is409() {
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+        when(collectionRepository.existsByUserIdAndNameIgnoreCaseAndIdNot(USER, "Dup", mine.getId())).thenReturn(true);
+
+        assertStatus(() -> service.update(mine.getId(), req("Dup", null)), HttpStatus.CONFLICT);
+        assertThat(mine.getName()).isEqualTo("C-" + USER);
+    }
+
+    @Test
+    void update_makingAnotherAdminsPublicCollectionPrivate_transfersItToTheActor() {
+        login(USER);
+        role(USER, UserRole.ADMIN);
+        VideoCollection pub = stored(OTHER, CollectionVisibility.PUBLIC, false);
+
+        CollectionDto dto = service.update(pub.getId(), req(null, CollectionVisibility.PRIVATE));
+
+        assertThat(dto.getVisibility()).isEqualTo(CollectionVisibility.PRIVATE);
+        assertThat(pub.getUserId()).isEqualTo(USER);
+        verify(collectionRepository).lockOwner(USER);
+        verify(collectionRepository).existsByUserIdAndNameIgnoreCaseAndIdNot(USER, pub.getName(), pub.getId());
+    }
+
+    @Test
+    void update_takeOver_respectsTheActorsCollectionCap() {
+        login(USER);
+        role(USER, UserRole.ADMIN);
+        VideoCollection pub = stored(OTHER, CollectionVisibility.PUBLIC, false);
+        when(collectionRepository.countByUserId(USER)).thenReturn((long) VideoCollectionServiceImpl.MAX_COLLECTIONS_PER_USER);
+
+        assertStatus(() -> service.update(pub.getId(), req(null, CollectionVisibility.PRIVATE)), HttpStatus.CONFLICT);
+        assertThat(pub.getUserId()).isEqualTo(OTHER);
+    }
+
+    @Test
+    void update_ownPublicToPrivate_keepsTheOwner() {
+        login(USER);
+        role(USER, UserRole.ADMIN);
+        VideoCollection pub = stored(USER, CollectionVisibility.PUBLIC, false);
+
+        service.update(pub.getId(), req(null, CollectionVisibility.PRIVATE));
+
+        assertThat(pub.getUserId()).isEqualTo(USER);
+        verify(collectionRepository, never()).lockOwner(anyLong());
+    }
+
+    @Test
     void publicCollection_isNotManageableByNonAdmins_evenItsDemotedOwner() {
         login(USER);
         VideoCollection pub = stored(USER, CollectionVisibility.PUBLIC, false);
@@ -337,6 +488,13 @@ class VideoCollectionServiceImplTest {
 
         assertStatus(() -> service.addVideo(mine.getId(), 5L), HttpStatus.NOT_FOUND);
         verify(itemRepository, never()).addItem(any(), any());
+    }
+
+    @Test
+    void addVideo_nullVideo_is404() {
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+        assertStatus(() -> service.addVideo(mine.getId(), null), HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -396,6 +554,15 @@ class VideoCollectionServiceImplTest {
 
         assertThat(service.getMembership(5L)).containsExactly(b.getId());
         assertThat(service.getMembership(null)).isEmpty();
+    }
+
+    @Test
+    void membership_noManageableCollections_isEmpty() {
+        login(USER);
+        when(collectionRepository.findManageable(USER, false)).thenReturn(List.of());
+
+        assertThat(service.getMembership(5L)).isEmpty();
+        verify(itemRepository, never()).findCollectionIdsContaining(anyLong(), anyCollection());
     }
 
     @Test

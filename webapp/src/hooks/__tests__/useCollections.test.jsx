@@ -7,7 +7,9 @@ import {
   usePublicCollections,
   useCollectionVideos,
   useCollectionMembership,
+  useCollectionVideoIds,
   useCreateCollection,
+  useDeleteCollection,
   useToggleCollectionItem,
 } from '../useCollections.js'
 import { collectionsApi } from '../../api/collections.js'
@@ -15,7 +17,7 @@ import { collectionsApi } from '../../api/collections.js'
 vi.mock('../../api/collections.js', () => ({
   collectionsApi: {
     mine: vi.fn(), publicList: vi.fn(), create: vi.fn(), update: vi.fn(), remove: vi.fn(),
-    videos: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), membership: vi.fn(),
+    videos: vi.fn(), videoIds: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), membership: vi.fn(),
   },
 }))
 
@@ -71,7 +73,7 @@ describe('useCollections hooks', () => {
     expect(collectionsApi.addVideo).toHaveBeenCalledWith('new', 7)
     const keys = spy.mock.calls.map(c => JSON.stringify(c[0].queryKey))
     expect(keys).toContain(JSON.stringify(['collections', 'mine']))
-    expect(keys).toContain(JSON.stringify(['collections', 'public']))
+    expect(keys).not.toContain(JSON.stringify(['collections', 'public'])) // private by default
     expect(keys).toContain(JSON.stringify(['collections', 'membership', 7]))
   })
 
@@ -87,5 +89,51 @@ describe('useCollections hooks', () => {
     const keys = spy.mock.calls.map(c => JSON.stringify(c[0].queryKey))
     expect(keys).toContain(JSON.stringify(['collections', 'membership', 3]))
     expect(keys).toContain(JSON.stringify(['collections', 'c', 'videos']))
+  })
+
+  it('loads every video id of a collection', async () => {
+    collectionsApi.videoIds.mockResolvedValue({ data: [4, 5] })
+    const { result } = renderHook(() => useCollectionVideoIds('c1'), { wrapper })
+    await waitFor(() => expect(result.current.data).toEqual([4, 5]))
+    expect(collectionsApi.videoIds).toHaveBeenCalledWith('c1')
+  })
+
+  it('toggling in a private collection does not refetch the public list', async () => {
+    collectionsApi.addVideo.mockResolvedValue(null)
+    const spy = vi.spyOn(client, 'invalidateQueries')
+    const { result } = renderHook(() => useToggleCollectionItem(), { wrapper })
+    await act(async () => { await result.current.mutateAsync({ id: 'c', videoId: 3, inCollection: false, visibility: 'PRIVATE' }) })
+    const keys = spy.mock.calls.map(c => JSON.stringify(c[0].queryKey))
+    expect(keys).toContain(JSON.stringify(['collections', 'mine']))
+    expect(keys).not.toContain(JSON.stringify(['collections', 'public']))
+  })
+
+  it('toggling in a public (or unknown) collection refetches the public list', async () => {
+    collectionsApi.addVideo.mockResolvedValue(null)
+    const spy = vi.spyOn(client, 'invalidateQueries')
+    const { result } = renderHook(() => useToggleCollectionItem(), { wrapper })
+    await act(async () => { await result.current.mutateAsync({ id: 'c', videoId: 3, inCollection: false, visibility: 'PUBLIC' }) })
+    await act(async () => { await result.current.mutateAsync({ id: 'c', videoId: 4, inCollection: false }) })
+    const publicCalls = spy.mock.calls.filter(c => JSON.stringify(c[0].queryKey) === JSON.stringify(['collections', 'public']))
+    expect(publicCalls).toHaveLength(2)
+  })
+
+  it('creating a private collection skips the public list', async () => {
+    collectionsApi.create.mockResolvedValue({ data: { id: 'new' } })
+    const spy = vi.spyOn(client, 'invalidateQueries')
+    const { result } = renderHook(() => useCreateCollection(), { wrapper })
+    await act(async () => { await result.current.mutateAsync({ name: 'Riêng', visibility: 'PRIVATE' }) })
+    const keys = spy.mock.calls.map(c => JSON.stringify(c[0].queryKey))
+    expect(keys).not.toContain(JSON.stringify(['collections', 'public']))
+  })
+
+  it('deleting drops the cached pages of that collection', async () => {
+    collectionsApi.remove.mockResolvedValue(null)
+    client.setQueryData(['collections', 'x', 'videos', 0], { videos: [] })
+    client.setQueryData(['collections', 'y', 'videos', 0], { videos: [] })
+    const { result } = renderHook(() => useDeleteCollection(), { wrapper })
+    await act(async () => { await result.current.mutateAsync('x') })
+    expect(client.getQueryData(['collections', 'x', 'videos', 0])).toBeUndefined()
+    expect(client.getQueryData(['collections', 'y', 'videos', 0])).toBeTruthy()
   })
 })

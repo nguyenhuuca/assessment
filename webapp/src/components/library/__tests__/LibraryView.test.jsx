@@ -4,15 +4,17 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import LibraryView from '../LibraryView.jsx'
 import { collectionsApi } from '../../../api/collections.js'
+import { videosApi } from '../../../api/videos.js'
 
 let auth
 vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => auth }))
 vi.mock('../../../api/collections.js', () => ({
   collectionsApi: {
     mine: vi.fn(), publicList: vi.fn(), create: vi.fn(), update: vi.fn(), remove: vi.fn(),
-    videos: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), membership: vi.fn(),
+    videos: vi.fn(), videoIds: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), membership: vi.fn(),
   },
 }))
+vi.mock('../../../api/videos.js', () => ({ videosApi: { privateList: vi.fn() } }))
 vi.mock('../AddVideosModal.jsx', () => ({ default: ({ collection }) => <div data-testid="add-videos">{collection.name}</div> }))
 vi.mock('../../video/VideoSwiper.jsx', () => ({ default: () => <div data-testid="swiper" /> }))
 
@@ -37,6 +39,7 @@ beforeEach(() => {
   collectionsApi.videos.mockResolvedValue({
     data: { content: [{ id: 1, title: 'Clip', embedLink: 'http://v', fileId: 'f' }], totalPages: 1, totalElements: 1 },
   })
+  videosApi.privateList.mockResolvedValue({ data: [] })
 })
 
 describe('LibraryView', () => {
@@ -96,6 +99,44 @@ describe('LibraryView', () => {
     renderView({ initialCollectionId: 'p1' }) // public, guest: read-only
     await screen.findByLabelText('Clip')
     expect(screen.queryByRole('button', { name: /Thêm video/ })).toBeNull()
+  })
+
+  it('logged-in users see and play their private videos; guests do not', async () => {
+    renderView()
+    await screen.findByLabelText('Hài tuyển chọn, 3 video')
+    expect(screen.queryByText('Video riêng tư của tôi')).toBeNull()
+    expect(videosApi.privateList).not.toHaveBeenCalled()
+  })
+
+  it('plays a private video from the Library', async () => {
+    auth = { isLoggedIn: true, user: { isAdmin: false } }
+    videosApi.privateList.mockResolvedValue({ data: [{ id: 9, title: 'Riêng', embedLink: 'http://p', fileId: 'pf' }] })
+    renderView()
+    expect(await screen.findByText('Video riêng tư của tôi')).toBeTruthy()
+    fireEvent.click(await screen.findByLabelText('Riêng'))
+    expect(await screen.findByTestId('swiper')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /Quay lại/ }))
+    expect(await screen.findByText('Video riêng tư của tôi')).toBeTruthy()
+  })
+
+  it('steps back a page when the current page no longer exists', async () => {
+    auth = { isLoggedIn: true, user: { isAdmin: false } }
+    // Page 1 emptied out (e.g. its last video was removed elsewhere): the server now reports one page
+    let totalPages = 2
+    collectionsApi.videos.mockImplementation((_id, page) => {
+      if (page === 1) totalPages = 1
+      return Promise.resolve({
+        data: page === 0
+          ? { content: [{ id: 1, title: 'Clip', fileId: 'f' }], totalPages, totalElements: 24 }
+          : { content: [], totalPages: 1, totalElements: 24 },
+      })
+    })
+    renderView({ initialCollectionId: 'o' })
+    fireEvent.click(await screen.findByRole('button', { name: 'Sau' }))
+    await waitFor(() => expect(collectionsApi.videos).toHaveBeenCalledWith('o', 1, expect.any(Number)))
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Sau' })).toBeNull())
+    expect(await screen.findByLabelText('Clip')).toBeTruthy()
+    expect(screen.queryByText(/chưa có video/)).toBeNull()
   })
 
   it('owner can open "Thêm video" from a collection', async () => {

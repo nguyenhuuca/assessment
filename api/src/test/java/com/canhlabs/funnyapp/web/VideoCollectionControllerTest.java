@@ -251,4 +251,20 @@ class VideoCollectionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0]").value(ID.toString()));
     }
+
+    @Test
+    void videoIds_returnsIds() throws Exception {
+        String url = BASE + "/" + ID + "/video-ids";
+        when(collectionService.getVideoIds(ID)).thenReturn(List.of(5L, 6L));
+
+        mockMvc.perform(get(url).servletPath(url).header("Authorization", TOKEN))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[1]").value(6));
+    }
+
+    @Test
+    void videoIds_withoutToken_returns401() throws Exception {
+        String url = BASE + "/" + ID + "/video-ids";
+        mockMvc.perform(get(url).servletPath(url)).andExpect(status().isUnauthorized());
+    }
 }

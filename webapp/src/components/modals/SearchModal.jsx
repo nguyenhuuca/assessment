@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { thumbnailUrl } from '../../utils/videoModel.js'
 
 export default function SearchModal({ show, videos = [], currentIndex = 0, onSelect, onClose }) {
   const [searchTerm, setSearchTerm] = useState('')
@@ -82,9 +83,7 @@ export default function SearchModal({ show, videos = [], currentIndex = 0, onSel
         <div className="mobile-search-modal-list">
           {filteredVideos.map(item => {
             const itemIndex = videos.findIndex(v => v.id === item.id)
-            const thumbnail = item?.fileId
-              ? `https://images.canh-labs.com/${item.fileId}.jpg`
-              : item?.poster || ''
+            const thumbnail = thumbnailUrl(item?.fileId) || item?.poster || ''
             return (
               <button
                 key={item.id}

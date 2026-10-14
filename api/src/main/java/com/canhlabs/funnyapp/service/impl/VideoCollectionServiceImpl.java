@@ -19,6 +19,8 @@ import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.VideoCollectionService;
 import com.canhlabs.funnyapp.utils.AppUtils;
 import com.canhlabs.funnyapp.utils.NotificationText;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,6 +30,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.Normalizer;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -47,6 +51,17 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
     static final int MAX_COLLECTIONS_PER_USER = 50;
     static final int MAX_ITEMS_PER_COLLECTION = 500;
     static final int MAX_PAGE_SIZE = 50;
+    private static final String PUBLIC_KEY = "public";
+    private static final String NAME_TAKEN = "A collection with this name already exists";
+
+    /**
+     * Guest/user view of the public list (admins bypass it: they also see empty collections and counts).
+     * Evicted on every write that touches a public collection; the TTL bounds staleness from video hide/unpublish.
+     */
+    private final Cache<String, List<CollectionDto>> publicCache = CacheBuilder.newBuilder()
+            .maximumSize(1)
+            .expireAfterWrite(Duration.ofSeconds(30))
+            .build();
 
     private final VideoCollectionRepository collectionRepository;
     private final VideoCollectionItemRepository itemRepository;
@@ -67,7 +82,20 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
     public List<CollectionDto> getPublic() {
         UserDetailDto user = AppUtils.getCurrentUser();
         boolean admin = user != null && user.getId() != null && isAdmin(user.getId());
-        return toDtos(collectionRepository.findByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC), c -> admin)
+        if (admin) {
+            return loadPublic(true);
+        }
+        List<CollectionDto> cached = publicCache.getIfPresent(PUBLIC_KEY);
+        if (cached != null) {
+            return cached;
+        }
+        List<CollectionDto> fresh = loadPublic(false);
+        publicCache.put(PUBLIC_KEY, fresh);
+        return fresh;
+    }
+
+    private List<CollectionDto> loadPublic(boolean admin) {
+        return toDtos(collectionRepository.findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC), c -> admin)
                 .stream()
                 .filter(dto -> admin || dto.getItemCount() > 0)
                 .toList();
@@ -84,9 +112,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         if (visibility == CollectionVisibility.PUBLIC && !isAdmin(userId)) {
             throw error(HttpStatus.FORBIDDEN, "Only admins can create public collections");
         }
-        if (collectionRepository.countByUserId(userId) >= MAX_COLLECTIONS_PER_USER) {
-            throw error(HttpStatus.CONFLICT, "Collection limit reached (" + MAX_COLLECTIONS_PER_USER + ")");
-        }
+        requireCollectionSlot(userId);
         requireUniqueName(userId, name, visibility, null);
 
         VideoCollection collection = new VideoCollection();
@@ -94,6 +120,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         collection.setName(name);
         collection.setVisibility(visibility);
         VideoCollection saved = saveUnique(collection);
+        evictPublicIf(saved);
         log.info("Collection {} created by user {} ({})", saved.getId(), userId, visibility);
         return toDtos(List.of(saved), c -> true).getFirst();
     }
@@ -111,12 +138,28 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         if (visibility == CollectionVisibility.PUBLIC && !admin) {
             throw error(HttpStatus.FORBIDDEN, "Only admins can make a collection public");
         }
+        boolean wasPublic = collection.getVisibility() == CollectionVisibility.PUBLIC;
+        // Making another admin's public collection private would strand it in their private list,
+        // out of reach of the admin who made the change: the actor takes it over instead.
+        Long ownerId = collection.getUserId();
+        if (wasPublic && visibility == CollectionVisibility.PRIVATE && !Objects.equals(ownerId, user.getId())) {
+            ownerId = user.getId();
+            requireCollectionSlot(ownerId);
+        }
         String name = request.getName() == null ? collection.getName() : normalizeName(request.getName());
-        requireUniqueName(collection.getUserId(), name, visibility, collection.getId());
+        requireUniqueName(ownerId, name, visibility, collection.getId());
 
+        if (!Objects.equals(ownerId, collection.getUserId())) {
+            log.info("Collection {} taken over by user {} from user {} (made private)", id, ownerId, collection.getUserId());
+            collection.setUserId(ownerId);
+        }
         collection.setName(name);
         collection.setVisibility(visibility);
         VideoCollection saved = saveUnique(collection);
+        if (wasPublic) {
+            publicCache.invalidateAll();
+        }
+        evictPublicIf(saved);
         return toDtos(List.of(saved), c -> true).getFirst();
     }
 
@@ -129,6 +172,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
             throw error(HttpStatus.BAD_REQUEST, "The default collection cannot be deleted");
         }
         collectionRepository.delete(collection);
+        evictPublicIf(collection);
         log.info("Collection {} deleted by user {}", id, user.getId());
     }
 
@@ -140,8 +184,17 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         VideoCollection collection = collectionRepository.findById(id)
                 .filter(c -> c.getVisibility() == CollectionVisibility.PUBLIC || Objects.equals(c.getUserId(), userId))
                 .orElseThrow(this::notFound);
-        PageRequest pageable = PageRequest.of(Math.max(page, 0), Math.clamp(size, 1, MAX_PAGE_SIZE));
+        // A collection never holds more than MAX_ITEMS_PER_COLLECTION rows, so deeper pages are always empty
+        PageRequest pageable = PageRequest.of(Math.clamp(page, 0, MAX_ITEMS_PER_COLLECTION), Math.clamp(size, 1, MAX_PAGE_SIZE));
         return itemRepository.findVisibleVideos(collection.getId(), pageable).map(Converter::toVideoDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getVideoIds(UUID id) {
+        UserDetailDto user = requireUser();
+        VideoCollection collection = requireManageable(id, user.getId(), isAdmin(user.getId()), false);
+        return itemRepository.findVideoIds(collection.getId());
     }
 
     @Override
@@ -157,6 +210,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         }
         if (itemRepository.addItem(collection.getId(), videoId) > 0) {
             touch(collection);
+            evictPublicIf(collection);
         }
     }
 
@@ -167,6 +221,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         VideoCollection collection = requireManageable(id, user.getId(), isAdmin(user.getId()));
         if (itemRepository.removeItem(collection.getId(), videoId) > 0) {
             touch(collection);
+            evictPublicIf(collection);
         }
     }
 
@@ -200,13 +255,32 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
                 .orElse(false);
     }
 
+    private VideoCollection requireManageable(UUID id, Long userId, boolean admin) {
+        return requireManageable(id, userId, admin, true);
+    }
+
     /**
      * PUBLIC: any admin manages it. PRIVATE: owner only. Anything else answers 404 so ids cannot be probed.
+     * Writes lock the row ({@code forUpdate}) so concurrent adds cannot overshoot the item cap.
      */
-    private VideoCollection requireManageable(UUID id, Long userId, boolean admin) {
-        return collectionRepository.findById(id)
+    private VideoCollection requireManageable(UUID id, Long userId, boolean admin, boolean forUpdate) {
+        return (forUpdate ? collectionRepository.findByIdForUpdate(id) : collectionRepository.findById(id))
                 .filter(c -> c.getVisibility() == CollectionVisibility.PUBLIC ? admin : Objects.equals(c.getUserId(), userId))
                 .orElseThrow(this::notFound);
+    }
+
+    /** Locks the owner row first: two concurrent creates would otherwise both pass the count check. */
+    private void requireCollectionSlot(Long ownerId) {
+        collectionRepository.lockOwner(ownerId);
+        if (collectionRepository.countByUserId(ownerId) >= MAX_COLLECTIONS_PER_USER) {
+            throw error(HttpStatus.CONFLICT, "Collection limit reached (" + MAX_COLLECTIONS_PER_USER + ")");
+        }
+    }
+
+    private void evictPublicIf(VideoCollection collection) {
+        if (collection.getVisibility() == CollectionVisibility.PUBLIC) {
+            publicCache.invalidateAll();
+        }
     }
 
     private void requireUniqueName(Long ownerId, String name, CollectionVisibility visibility, UUID excludeId) {
@@ -217,7 +291,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
                 ? collectionRepository.existsByVisibilityAndNameIgnoreCase(CollectionVisibility.PUBLIC, name)
                 : collectionRepository.existsByVisibilityAndNameIgnoreCaseAndIdNot(CollectionVisibility.PUBLIC, name, excludeId));
         if (ownerClash || publicClash) {
-            throw error(HttpStatus.CONFLICT, "A collection named \"" + name + "\" already exists");
+            throw error(HttpStatus.CONFLICT, NAME_TAKEN);
         }
     }
 
@@ -226,7 +300,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         try {
             return collectionRepository.saveAndFlush(collection);
         } catch (DataIntegrityViolationException e) {
-            throw error(HttpStatus.CONFLICT, "A collection named \"" + collection.getName() + "\" already exists");
+            throw error(HttpStatus.CONFLICT, NAME_TAKEN);
         }
     }
 
@@ -235,8 +309,12 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         collectionRepository.save(collection);
     }
 
+    /** NFC so composed and decomposed Vietnamese spell the same name; whitespace runs collapse to one space. */
     static String normalizeName(String raw) {
-        String name = raw == null ? "" : raw.strip().replaceAll("\\s+", " ");
+        String name = raw == null ? "" : Normalizer.normalize(raw, Normalizer.Form.NFC).strip().replaceAll("\\s+", " ");
+        if (name.chars().anyMatch(Character::isISOControl)) {
+            throw error(HttpStatus.BAD_REQUEST, "Collection name contains invalid characters");
+        }
         if (name.isEmpty() || name.length() > CollectionRequest.MAX_NAME) {
             throw error(HttpStatus.BAD_REQUEST, "Collection name must be 1-" + CollectionRequest.MAX_NAME + " characters");
         }

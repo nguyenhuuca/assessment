@@ -25,6 +25,9 @@ public interface VideoCollectionService {
     /** Visible videos, newest added first. PUBLIC: anyone; PRIVATE: owner only (404 otherwise). */
     Page<VideoDto> getVideos(UUID id, int page, int size);
 
+    /** Every video id in a collection the caller manages (404 otherwise). */
+    List<Long> getVideoIds(UUID id);
+
     void addVideo(UUID id, Long videoId);
 
     void removeVideo(UUID id, Long videoId);

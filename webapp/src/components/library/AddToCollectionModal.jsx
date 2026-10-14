@@ -33,7 +33,7 @@ export default function AddToCollectionModal({ video, onClose }) {
   const apiError = toggle.error?.message || create.error?.message || ''
 
   function handleToggle(c) {
-    toggle.mutate({ id: c.id, videoId, inCollection: savedIds.has(String(c.id)) })
+    toggle.mutate({ id: c.id, videoId, inCollection: savedIds.has(String(c.id)), visibility: c.visibility })
   }
 
   function handleCreate(e) {

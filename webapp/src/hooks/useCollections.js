@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { collectionsApi } from '../api/collections.js'
 import { mapApiVideo } from '../utils/videoModel.js'
 
@@ -31,6 +31,7 @@ export function useCollectionVideos(id, page = 0) {
   return useQuery({
     queryKey: ['collections', id, 'videos', page],
     enabled: !!id,
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const data = unwrap(await collectionsApi.videos(id, page, COLLECTION_PAGE_SIZE)) || {}
       return {
@@ -39,6 +40,15 @@ export function useCollectionVideos(id, page = 0) {
         totalElements: data.totalElements ?? 0,
       }
     },
+  })
+}
+
+/** Every video id in a collection the caller manages (shares the 'videos' key prefix, so toggles refresh it). */
+export function useCollectionVideoIds(id, enabled = true) {
+  return useQuery({
+    queryKey: ['collections', id, 'videos', 'ids'],
+    enabled: enabled && !!id,
+    queryFn: async () => asList(await collectionsApi.videoIds(id)),
   })
 }
 
@@ -51,11 +61,12 @@ export function useCollectionMembership(videoId, enabled = true) {
   })
 }
 
+/** The public list is only refetched when the change can show up there (unknown visibility counts as public). */
 function useInvalidateLists() {
   const qc = useQueryClient()
-  return () => Promise.all([
+  return ({ includePublic = true } = {}) => Promise.all([
     qc.invalidateQueries({ queryKey: ['collections', 'mine'] }),
-    qc.invalidateQueries({ queryKey: ['collections', 'public'] }),
+    includePublic && qc.invalidateQueries({ queryKey: ['collections', 'public'] }),
   ])
 }
 
@@ -72,7 +83,7 @@ export function useCreateCollection() {
     },
     onSuccess: (_created, vars) => {
       if (vars.videoId) qc.invalidateQueries({ queryKey: ['collections', 'membership', vars.videoId] })
-      return invalidateLists()
+      return invalidateLists({ includePublic: vars.visibility === 'PUBLIC' })
     },
   })
 }
@@ -86,27 +97,34 @@ export function useUpdateCollection() {
         ...(name !== undefined ? { name } : {}),
         ...(visibility !== undefined ? { visibility } : {}),
       }),
-    onSuccess: invalidateLists,
+    onSuccess: () => invalidateLists(),
   })
 }
 
 export function useDeleteCollection() {
+  const qc = useQueryClient()
   const invalidateLists = useInvalidateLists()
   return useMutation({
     mutationFn: (id) => collectionsApi.remove(id),
-    onSuccess: invalidateLists,
+    onSuccess: (_res, id) => {
+      qc.removeQueries({ queryKey: ['collections', id] })
+      return invalidateLists()
+    },
   })
 }
 
-/** Add (`inCollection` false) or remove (true) a video from a collection. Variables: { id, videoId, inCollection }. */
+/**
+ * Add (`inCollection` false) or remove (true) a video from a collection.
+ * Variables: { id, videoId, inCollection, visibility? } — pass the collection's visibility so private toggles skip the public list.
+ */
 export function useToggleCollectionItem() {
   const qc = useQueryClient()
   const invalidateLists = useInvalidateLists()
   return useMutation({
     mutationFn: ({ id, videoId, inCollection }) =>
       (inCollection ? collectionsApi.removeVideo(id, videoId) : collectionsApi.addVideo(id, videoId)),
-    onSuccess: (_res, { id, videoId }) => Promise.all([
-      invalidateLists(),
+    onSuccess: (_res, { id, videoId, visibility }) => Promise.all([
+      invalidateLists({ includePublic: visibility !== 'PRIVATE' }),
       qc.invalidateQueries({ queryKey: ['collections', id, 'videos'] }),
       qc.invalidateQueries({ queryKey: ['collections', 'membership', videoId] }),
     ]),

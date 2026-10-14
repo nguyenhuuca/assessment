@@ -41,6 +41,7 @@ public class VideoCollectionController {
 
     @Operation(summary = "My collections", description = "Creates the default \"Xem sau\" collection on first call. Admins also get every public collection.")
     @GetMapping
+    @RateLimited(permit = 60)
     public ResponseEntity<ResultListInfo<CollectionDto>> getMine() {
         return list(collectionService.getMine());
     }
@@ -54,6 +55,7 @@ public class VideoCollectionController {
 
     @Operation(summary = "Collection membership of a video", description = "Ids of the caller's manageable collections containing the video.")
     @GetMapping("/membership")
+    @RateLimited(permit = 60)
     public ResponseEntity<ResultListInfo<UUID>> getMembership(@RequestParam Long videoId) {
         return list(collectionService.getMembership(videoId));
     }
@@ -90,6 +92,13 @@ public class VideoCollectionController {
                                                                       @RequestParam(defaultValue = "0") int page,
                                                                       @RequestParam(defaultValue = "24") int size) {
         return object(collectionService.getVideos(id, page, size), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Video ids in a collection", description = "Managers only; used to mark videos already added.")
+    @GetMapping("/{id}/video-ids")
+    @RateLimited(permit = 60)
+    public ResponseEntity<ResultListInfo<Long>> getVideoIds(@PathVariable UUID id) {
+        return list(collectionService.getVideoIds(id));
     }
 
     @PutMapping("/{id}/videos/{videoId}")

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { useVideos, usePrivateVideos } from '../../hooks/useVideos.js'
+import { useVideos } from '../../hooks/useVideos.js'
 import VideoSwiper from './VideoSwiper.jsx'
 
 export function PublicFeed({ category, initialIndex, deepLinkId, onDeepLinkResolved, muted, onMutedChange, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
@@ -18,25 +18,6 @@ export function PublicFeed({ category, initialIndex, deepLinkId, onDeepLinkResol
     <VideoSwiper
       videos={videos}
       initialIndex={resolvedIndex}
-      muted={muted}
-      onMutedChange={onMutedChange}
-      mobileSearchOpen={mobileSearchOpen}
-      onCloseMobileSearch={onCloseMobileSearch}
-      onShowComments={onShowComments}
-      onDeleteVideo={onDeleteVideo}
-      currentUser={currentUser}
-    />
-  )
-}
-
-export function PrivateFeed({ muted, onMutedChange, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
-  const { data: videos = [], isLoading, error } = usePrivateVideos()
-
-  if (isLoading) return <LoadingState />
-  if (error) return <ErrorState message={error.message} />
-  return (
-    <VideoSwiper
-      videos={videos}
       muted={muted}
       onMutedChange={onMutedChange}
       mobileSearchOpen={mobileSearchOpen}

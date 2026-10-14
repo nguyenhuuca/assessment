@@ -1,21 +1,29 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useVideos } from '../../hooks/useVideos.js'
-import { useToggleCollectionItem } from '../../hooks/useCollections.js'
+import { useCollectionVideoIds, useToggleCollectionItem } from '../../hooks/useCollections.js'
 import { isBusyFor } from '../../utils/mutationBusy.js'
+import { thumbnailUrl } from '../../utils/videoModel.js'
 import { normalizeForSearch } from './collectionUtils.js'
 
 const MAX_RESULTS = 50
 
 /**
  * Search the public video list and add/remove videos to a collection without leaving the Library.
- * `existingIds` are the videos already known to be in the collection (current page); anything the
- * user toggles here is tracked locally on top of that. Adding twice is harmless (the API is idempotent).
+ * Membership comes from the collection's full id list (not just the page on screen); toggles made here
+ * are applied locally on top so the button flips immediately. Adding twice is harmless (the API is idempotent).
  */
-export default function AddVideosModal({ collection, existingIds = [], onClose }) {
+export default function AddVideosModal({ collection, onClose }) {
   const { data: videos = [], isLoading, error } = useVideos(null)
+  const idsQuery = useCollectionVideoIds(collection.id)
   const toggle = useToggleCollectionItem()
   const [term, setTerm] = useState('')
-  const [added, setAdded] = useState(() => new Set(existingIds.map(String)))
+  const [overrides, setOverrides] = useState(() => new Map())
+
+  const serverIds = useMemo(() => new Set((idsQuery.data ?? []).map(String)), [idsQuery.data])
+  const isInCollection = (id) => {
+    const key = String(id)
+    return overrides.has(key) ? overrides.get(key) : serverIds.has(key)
+  }
 
   useEffect(() => {
     const onKey = e => { if (e.key === 'Escape') onClose() }
@@ -36,19 +44,14 @@ export default function AddVideosModal({ collection, existingIds = [], onClose }
 
   function handleToggle(video) {
     const key = String(video.id)
-    const inCollection = added.has(key)
+    const inCollection = isInCollection(video.id)
     toggle.mutate(
-      { id: collection.id, videoId: video.id, inCollection },
-      {
-        onSuccess: () => setAdded(prev => {
-          const next = new Set(prev)
-          if (inCollection) next.delete(key)
-          else next.add(key)
-          return next
-        }),
-      },
+      { id: collection.id, videoId: video.id, inCollection, visibility: collection.visibility },
+      { onSuccess: () => setOverrides(prev => new Map(prev).set(key, !inCollection)) },
     )
   }
+
+  const loadError = error || idsQuery.error
 
   return (
     <div className="app-modal-backdrop" onClick={onClose}>
@@ -76,20 +79,20 @@ export default function AddVideosModal({ collection, existingIds = [], onClose }
             onChange={e => setTerm(e.target.value)}
             autoFocus
           />
-          {error && <div className="app-alert error" role="alert" style={{ marginTop: 12 }}>{error.message}</div>}
+          {loadError && <div className="app-alert error" role="alert" style={{ marginTop: 12 }}>{loadError.message}</div>}
           {toggle.error && <div className="app-alert error" role="alert" style={{ marginTop: 12 }}>{toggle.error.message}</div>}
           <div style={{ marginTop: 12, maxHeight: '55vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {isLoading ? (
+            {isLoading || idsQuery.isLoading ? (
               <div className="vid-spinner" />
             ) : results.length === 0 ? (
               <p className="admin-cell-muted" role="status">Không tìm thấy video nào</p>
             ) : results.map(v => {
-              const inCollection = added.has(String(v.id))
+              const inCollection = isInCollection(v.id)
               const busy = isBusyFor(toggle, v.id, vars => vars.videoId)
               return (
                 <div key={v.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   {v.fileId
-                    ? <img src={`https://images.canh-labs.com/${v.fileId}.jpg`} alt="" loading="lazy"
+                    ? <img src={thumbnailUrl(v.fileId)} alt="" loading="lazy"
                         style={{ width: 40, height: 64, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
                     : <span className="material-symbols-outlined" style={{ width: 40, textAlign: 'center' }}>movie</span>}
                   <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

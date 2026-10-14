@@ -11,7 +11,7 @@ vi.mock('../../../hooks/useVideos.js', () => ({ useVideos: vi.fn() }))
 vi.mock('../../../api/collections.js', () => ({
   collectionsApi: {
     mine: vi.fn(), publicList: vi.fn(), create: vi.fn(), update: vi.fn(), remove: vi.fn(),
-    videos: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), membership: vi.fn(),
+    videos: vi.fn(), videoIds: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), membership: vi.fn(),
   },
 }))
 
@@ -20,7 +20,7 @@ const VIDEOS = [
   { id: 2, title: 'Chó chạy', fileId: 'f2' },
   { id: 3, title: 'Hài kịch Tết', fileId: 'f3' },
 ]
-const collection = { id: 'c1', name: 'Tuyển tập' }
+const collection = { id: 'c1', name: 'Tuyển tập', visibility: 'PRIVATE' }
 
 function renderModal(props = {}) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
@@ -38,6 +38,7 @@ beforeEach(() => {
   useVideos.mockReturnValue({ data: VIDEOS, isLoading: false })
   collectionsApi.addVideo.mockResolvedValue(null)
   collectionsApi.removeVideo.mockResolvedValue(null)
+  collectionsApi.videoIds.mockResolvedValue({ data: [] })
 })
 
 describe('AddVideosModal', () => {
@@ -45,8 +46,9 @@ describe('AddVideosModal', () => {
     expect(normalizeForSearch('Hài Hước Đà Nẵng')).toBe('hai huoc da nang')
   })
 
-  it('filters by title without accents, all words must match', () => {
+  it('filters by title without accents, all words must match', async () => {
     renderModal()
+    await screen.findByText('Chó chạy')
     fireEvent.change(screen.getByLabelText('Tìm video'), { target: { value: 'hai' } })
     expect(screen.getByText('Mèo hài hước')).toBeInTheDocument()
     expect(screen.getByText('Hài kịch Tết')).toBeInTheDocument()
@@ -62,7 +64,7 @@ describe('AddVideosModal', () => {
 
   it('adds a video, then removing it again calls the remove API', async () => {
     renderModal()
-    fireEvent.click(screen.getByRole('button', { name: 'Thêm "Chó chạy"' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Thêm "Chó chạy"' }))
     await waitFor(() => expect(collectionsApi.addVideo).toHaveBeenCalledWith('c1', 2))
     const added = await screen.findByRole('button', { name: 'Bỏ "Chó chạy"' })
     expect(added).toHaveAttribute('aria-pressed', 'true')
@@ -72,16 +74,18 @@ describe('AddVideosModal', () => {
     expect(await screen.findByRole('button', { name: 'Thêm "Chó chạy"' })).toBeInTheDocument()
   })
 
-  it('marks videos already in the collection', () => {
-    renderModal({ existingIds: [1] })
-    expect(screen.getByRole('button', { name: 'Bỏ "Mèo hài hước"' })).toHaveAttribute('aria-pressed', 'true')
+  it('marks every video already in the collection, not just the page on screen', async () => {
+    collectionsApi.videoIds.mockResolvedValue({ data: [1] })
+    renderModal()
+    expect(await screen.findByRole('button', { name: 'Bỏ "Mèo hài hước"' })).toHaveAttribute('aria-pressed', 'true')
+    expect(collectionsApi.videoIds).toHaveBeenCalledWith('c1')
     expect(screen.getByRole('button', { name: 'Thêm "Hài kịch Tết"' })).toHaveAttribute('aria-pressed', 'false')
   })
 
   it('shows the API error and keeps the video un-added', async () => {
     collectionsApi.addVideo.mockRejectedValue({ message: 'Collection is full (500 videos)', status: 409 })
     renderModal()
-    fireEvent.click(screen.getByRole('button', { name: 'Thêm "Chó chạy"' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Thêm "Chó chạy"' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Collection is full')
     expect(screen.getByRole('button', { name: 'Thêm "Chó chạy"' })).toBeInTheDocument()
   })

@@ -143,15 +143,26 @@ jobs:
             echo "❌ Coverage report not found!"
             exit 1
           fi
+          if [ ! -f "$THRESHOLD_FILE" ]; then
+            echo "❌ $THRESHOLD_FILE not found"
+            exit 1
+          fi
+          REQUIRED=$(tr -d ' \r\n' < "$THRESHOLD_FILE")
+          if ! echo "$REQUIRED" | grep -Eq '^0?\.[0-9]+$'; then
+            echo "❌ Invalid threshold '$REQUIRED' in $THRESHOLD_FILE (expected e.g. .90)"
+            exit 1
+          fi
 
           COVERED=$(xmllint --xpath "string(//report/counter[@type='LINE']/@covered)" "$REPORT")
           MISSED=$(xmllint --xpath "string(//report/counter[@type='LINE']/@missed)" "$REPORT")
           TOTAL=$((COVERED + MISSED))
+          if [ "$TOTAL" -le 0 ]; then
+            echo "❌ No LINE counters in $REPORT"
+            exit 1
+          fi
           COVERAGE=$(echo "scale=4; $COVERED / $TOTAL" | bc)
 
           echo "📊 Actual LINE coverage: $(echo "$COVERAGE * 100" | bc)%"
-
-          REQUIRED=$(cat "$THRESHOLD_FILE" 2>/dev/null || echo "0.90")
           echo "🔒 Required minimum: $(echo "$REQUIRED * 100" | bc)%"
 
           TOO_LOW=$(echo "$COVERAGE < $REQUIRED" | bc)

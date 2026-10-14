@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { buildStreamUrl } from '../../utils/videoModel.js'
+import { buildStreamUrl, thumbnailUrl } from '../../utils/videoModel.js'
 import { viewsApi } from '../../api/views.js'
 
 /** Seconds actually played (not seeked) while visible before a view counts; server dedupes per viewer per video for 30 min. */
@@ -92,9 +92,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
     setProgress(ratio * 100)
   }
 
-  const poster = video?.fileId
-    ? `https://images.canh-labs.com/${video.fileId}.jpg`
-    : undefined
+  const poster = thumbnailUrl(video?.fileId) || undefined
 
   const handle = video?.userShared?.split('@')[0] || 'anonymous'
 

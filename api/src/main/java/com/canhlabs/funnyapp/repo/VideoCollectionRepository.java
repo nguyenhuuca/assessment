@@ -2,7 +2,9 @@ package com.canhlabs.funnyapp.repo;
 
 import com.canhlabs.funnyapp.entity.VideoCollection;
 import com.canhlabs.funnyapp.enums.CollectionVisibility;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,7 +21,16 @@ public interface VideoCollectionRepository extends JpaRepository<VideoCollection
             + "ORDER BY c.isDefault DESC, c.updatedAt DESC")
     List<VideoCollection> findManageable(@Param("userId") Long userId, @Param("includePublic") boolean includePublic);
 
-    List<VideoCollection> findByVisibilityOrderByUpdatedAtDesc(CollectionVisibility visibility);
+    /** Row lock for writes: serializes concurrent adds so the per-collection item cap holds. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT c FROM VideoCollection c WHERE c.id = :id")
+    Optional<VideoCollection> findByIdForUpdate(@Param("id") UUID id);
+
+    /** Locks the owner's users row so concurrent creates cannot both pass the per-user collection cap. */
+    @Query(value = "SELECT id FROM users WHERE id = :userId FOR UPDATE", nativeQuery = true)
+    Optional<Long> lockOwner(@Param("userId") Long userId);
+
+    List<VideoCollection> findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility visibility);
 
     Optional<VideoCollection> findByUserIdAndIsDefaultTrue(Long userId);
 

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { useVideos } from '../../hooks/useVideos.js'
+import { thumbnailUrl } from '../../utils/videoModel.js'
 
 const CATEGORIES = [
   { key: 'all',     label: 'All',    icon: 'whatshot',                 gradient: 'linear-gradient(135deg,#ff8d89 0%,#c10023 100%)' },
@@ -15,9 +16,7 @@ const SORT_OPTIONS = [
 
 function getThumbnail(video) {
   if (!video) return ''
-  return video.fileId
-    ? `https://images.canh-labs.com/${video.fileId}.jpg`
-    : video.poster || ''
+  return thumbnailUrl(video.fileId) || video.poster || ''
 }
 
 const compactCount = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })

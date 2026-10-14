@@ -55,7 +55,7 @@ webapp/
 │   │   ├── useTheme.js            # consumes ThemeContext
 │   │   └── useVideos.js           # React Query hooks: useVideos(category), usePrivateVideos()
 │   ├── utils/
-│   │   └── videoModel.js          # mapApiVideo(), buildStreamUrl(), determineCategory()
+│   │   └── videoModel.js          # mapApiVideo(), buildStreamUrl(), thumbnailUrl(), determineCategory()
 │   └── components/
 │       ├── layout/
 │       │   └── AppShell.jsx       # Fixed header, desktop side nav, mobile bottom nav, modals
@@ -65,7 +65,7 @@ webapp/
 │       │   ├── MFALoginModal.jsx
 │       │   └── ProfileModal.jsx   # User info + MFA setup/disable tabs
 │       ├── video/
-│       │   ├── VideoFeed.jsx      # PublicFeed / PrivateFeed (React Query → VideoSwiper)
+│       │   ├── VideoFeed.jsx      # PublicFeed (React Query → VideoSwiper)
 │       │   ├── VideoSwiper.jsx    # Index state, swipe/keyboard nav, action column, preloader
 │       │   ├── VideoPlayer.jsx    # <video> element, progress bar, mute, metadata overlay
 │       │   └── VoteButtons.jsx    # Like / Dislike with heartbeat animation

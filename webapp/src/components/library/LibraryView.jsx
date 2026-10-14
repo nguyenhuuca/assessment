@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth.js'
+import { usePrivateVideos } from '../../hooks/useVideos.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import {
   useMyCollections,
@@ -11,14 +12,11 @@ import {
 import VideoSwiper from '../video/VideoSwiper.jsx'
 import CollectionFormModal from './CollectionFormModal.jsx'
 import AddVideosModal from './AddVideosModal.jsx'
+import { thumbnailUrl } from '../../utils/videoModel.js'
 import { isPublic, pinDefaultFirst } from './collectionUtils.js'
 
-function coverUrl(fileId) {
-  return fileId ? `https://images.canh-labs.com/${fileId}.jpg` : ''
-}
-
 function CollectionCard({ collection, onOpen }) {
-  const cover = coverUrl(collection.coverFileId)
+  const cover = thumbnailUrl(collection.coverFileId)
   return (
     <div
       className="explore-reel"
@@ -45,7 +43,7 @@ function CollectionCard({ collection, onOpen }) {
 }
 
 function VideoTile({ video, onPlay, onRemove, removing }) {
-  const thumb = video.fileId ? coverUrl(video.fileId) : video.poster
+  const thumb = thumbnailUrl(video.fileId) || video.poster
   const title = video.title || 'Untitled'
   return (
     <div
@@ -77,6 +75,48 @@ function VideoTile({ video, onPlay, onRemove, removing }) {
   )
 }
 
+/** Plays a list of videos in the swiper, with a back button to the grid it came from. */
+function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComments, onDeleteVideo, currentUser }) {
+  return (
+    <div style={{ position: 'relative', height: 'calc(100vh - var(--topnav-h))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <button className="app-btn secondary" style={{ position: 'absolute', top: 12, left: 12, zIndex: 5 }} onClick={onBack}>
+        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> Quay lại
+      </button>
+      <VideoSwiper
+        videos={videos}
+        initialIndex={index}
+        muted={muted}
+        onMutedChange={onMutedChange}
+        onShowComments={onShowComments}
+        onDeleteVideo={onDeleteVideo}
+        currentUser={currentUser}
+      />
+    </div>
+  )
+}
+
+/** The user's own private uploads: they never appear in the public feed or in collections. */
+function PrivateVideosSection({ onPlay }) {
+  const { data: videos = [], isLoading, error } = usePrivateVideos()
+  return (
+    <section className="explore-section">
+      <div className="explore-section-header">
+        <h2 className="explore-section-title">Video riêng tư của tôi</h2>
+      </div>
+      {error && <div className="app-alert error" role="alert">{error.message}</div>}
+      {isLoading ? (
+        <div className="vid-spinner" />
+      ) : videos.length === 0 ? (
+        <p className="explore-empty-grid">Bạn chưa có video riêng tư</p>
+      ) : (
+        <div className="explore-reels-grid">
+          {videos.map((v, i) => <VideoTile key={v.id} video={v} onPlay={() => onPlay(videos, i)} />)}
+        </div>
+      )}
+    </section>
+  )
+}
+
 function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, deleting, muted, onMutedChange, onShowComments, currentUser }) {
   const [page, setPage] = useState(0)
   const [playIndex, setPlayIndex] = useState(null)
@@ -87,22 +127,23 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
   const totalPages = data?.totalPages ?? 0
   const canManage = !!collection?.canManage
 
+  // Removing the last video of the last page would leave an empty page behind: step back
+  useEffect(() => {
+    if (totalPages > 0 && page > totalPages - 1) setPage(totalPages - 1)
+  }, [page, totalPages])
+
   // Play inside the collection itself: the swiper runs over this page's videos
   if (playIndex !== null && videos.length > 0) {
     return (
-      <div style={{ position: 'relative', height: 'calc(100vh - var(--topnav-h))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <button className="app-btn secondary" style={{ position: 'absolute', top: 12, left: 12, zIndex: 5 }} onClick={() => setPlayIndex(null)}>
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> Quay lại
-        </button>
-        <VideoSwiper
-          videos={videos}
-          initialIndex={playIndex}
-          muted={muted}
-          onMutedChange={onMutedChange}
-          onShowComments={onShowComments}
-          currentUser={currentUser}
-        />
-      </div>
+      <PlayerView
+        videos={videos}
+        index={playIndex}
+        onBack={() => setPlayIndex(null)}
+        muted={muted}
+        onMutedChange={onMutedChange}
+        onShowComments={onShowComments}
+        currentUser={currentUser}
+      />
     )
   }
 
@@ -153,7 +194,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
                 key={v.id}
                 video={v}
                 onPlay={() => setPlayIndex(i)}
-                onRemove={canManage ? () => toggle.mutate({ id: collectionId, videoId: v.id, inCollection: true }) : null}
+                onRemove={canManage ? () => toggle.mutate({ id: collectionId, videoId: v.id, inCollection: true, visibility: collection?.visibility }) : null}
                 removing={toggle.isPending && toggle.variables?.videoId === v.id}
               />
             ))}
@@ -170,7 +211,6 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
       {adding && (
         <AddVideosModal
           collection={collection}
-          existingIds={videos.map(v => v.id)}
           onClose={() => setAdding(false)}
         />
       )}
@@ -178,7 +218,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
   )
 }
 
-export default function LibraryView({ initialCollectionId = null, muted, onMutedChange, onShowComments }) {
+export default function LibraryView({ initialCollectionId = null, muted, onMutedChange, onShowComments, onDeleteVideo }) {
   const { isLoggedIn, user } = useAuth()
   const [confirm, confirmDialog] = useConfirm()
   const publicQuery = usePublicCollections()
@@ -186,6 +226,7 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
   const remove = useDeleteCollection()
   const [openId, setOpenId] = useState(initialCollectionId)
   const [formState, setFormState] = useState(null) // { collection? }
+  const [playing, setPlaying] = useState(null) // { videos, index } for private videos
 
   const publicList = publicQuery.data ?? []
   // Admins also receive public collections in "mine"; keep this section to private ones
@@ -200,6 +241,21 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
       danger: true,
     })
     if (ok) remove.mutate(c.id, { onSuccess: () => setOpenId(null) })
+  }
+
+  if (playing) {
+    return (
+      <PlayerView
+        videos={playing.videos}
+        index={playing.index}
+        onBack={() => setPlaying(null)}
+        muted={muted}
+        onMutedChange={onMutedChange}
+        onShowComments={onShowComments}
+        onDeleteVideo={onDeleteVideo}
+        currentUser={user}
+      />
+    )
   }
 
   if (openId) {
@@ -281,6 +337,8 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
           </>
         )}
       </section>
+
+      {isLoggedIn && <PrivateVideosSection onPlay={(videos, index) => setPlaying({ videos, index })} />}
 
       {formState && <CollectionFormModal collection={formState.collection} onClose={() => setFormState(null)} />}
       {confirmDialog}
