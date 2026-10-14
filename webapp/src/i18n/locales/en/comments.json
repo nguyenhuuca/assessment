@@ -1,0 +1,23 @@
+{
+  "title": "Comments",
+  "count_one": "{{count}} comment",
+  "count_other": "{{count}} comments",
+  "empty": "No comments yet",
+  "placeholder": "Add a comment… (Enter to send)",
+  "loginToComment": "Sign in to comment",
+  "postFailed": "Couldn't post your comment, please try again later",
+  "replyFailed": "Couldn't post your reply, please try again later",
+  "removed": "This comment was removed for violating our policy",
+  "deleted": "This comment was deleted",
+  "reply": "Reply",
+  "delete": "Delete",
+  "confirmDelete": "Confirm delete",
+  "cancel": "Cancel",
+  "replyAria": "Reply",
+  "replyPlaceholder": "Write a reply… (Enter to send, Esc to close)",
+  "sendReply": "Send reply",
+  "send": "Send",
+  "showMore_one": "View {{count}} more reply ▾",
+  "showMore_other": "View {{count}} more replies ▾",
+  "hideReplies": "Hide replies ▴"
+}

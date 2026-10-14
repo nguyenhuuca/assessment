@@ -1,20 +1,14 @@
 import React, { useState } from 'react'
 import { useIsFetching, useQueryClient } from '@tanstack/react-query'
 import { useAdminStats } from '../../hooks/useAdmin.js'
+import { useTranslation } from 'react-i18next'
 import AdminVideoTable from './AdminVideoTable.jsx'
 import AdminAccountTable from './AdminAccountTable.jsx'
 import AdminCommentTable from './AdminCommentTable.jsx'
 import AdminImportPanel from './AdminImportPanel.jsx'
 import DriveSyncPanel from './DriveSyncPanel.jsx'
 
-const TABS = [
-  { key: 'VIDEO_VAULT',   label: 'VIDEO_VAULT'   },
-  { key: 'USER_ACCOUNTS', label: 'USER_ACCOUNTS' },
-  { key: 'FLAGGED_LOGS',  label: 'FLAGGED_LOGS'  },
-  { key: 'COMMENTS',      label: 'COMMENTS'      },
-  { key: 'IMPORT_VIDEO',  label: 'IMPORT_VIDEO'  },
-  { key: 'DRIVE_SYNC',    label: 'DRIVE_SYNC'    },
-]
+const TABS = ['VIDEO_VAULT', 'USER_ACCOUNTS', 'FLAGGED_LOGS', 'COMMENTS', 'IMPORT_VIDEO', 'DRIVE_SYNC']
 
 // Query key prefix (see hooks/useAdmin.js) that each tab reads from
 const TAB_QUERY = {
@@ -27,6 +21,7 @@ const TAB_QUERY = {
 }
 
 export default function AdminView() {
+  const { t } = useTranslation('admin')
   const [activeTab, setActiveTab] = useState('VIDEO_VAULT')
   const qc = useQueryClient()
   const refreshing = useIsFetching({ queryKey: TAB_QUERY[activeTab] }) > 0
@@ -42,32 +37,32 @@ export default function AdminView() {
     <div className="admin-root">
       <div className="admin-header">
         <div>
-          <h1 className="admin-title">CONTENT_MANAGER</h1>
-          <p className="admin-subtitle">Reviewing {stats.totalVideos?.toLocaleString() ?? '—'} total cinematic assets</p>
+          <h1 className="admin-title">{t('pageTitle')}</h1>
+          <p className="admin-subtitle">{t('subtitle', { total: stats.totalVideos?.toLocaleString() ?? '—' })}</p>
         </div>
       </div>
 
       <div className="admin-stat-cards">
         <div className="admin-stat-card">
-          <span className="admin-stat-label">TOTAL_VIDEOS</span>
+          <span className="admin-stat-label">{t('statTotalVideos')}</span>
           <span className="admin-stat-value">{stats.totalVideos?.toLocaleString() ?? '—'}</span>
         </div>
         <div className="admin-stat-card">
-          <span className="admin-stat-label">PENDING_REVIEW</span>
+          <span className="admin-stat-label">{t('statPendingReview')}</span>
           <span className="admin-stat-value" style={{ color: '#ffd600' }}>{stats.pendingCount ?? '—'}</span>
         </div>
         <div className="admin-stat-card">
-          <span className="admin-stat-label">SECURITY_STATUS</span>
+          <span className="admin-stat-label">{t('statSecurityStatus')}</span>
           <span className="admin-stat-value" style={{ color: '#ff1744' }}>
-            {stats.flaggedCount ?? '—'} <span style={{ fontSize: 11 }}>FLAGGED</span>
+            {stats.flaggedCount ?? '—'} <span style={{ fontSize: 11 }}>{t('statFlagged')}</span>
           </span>
         </div>
         <div className="admin-stat-card">
-          <span className="admin-stat-label">REMOVED_COMMENTS</span>
+          <span className="admin-stat-label">{t('statRemovedComments')}</span>
           <span className="admin-stat-value" style={{ color: '#ff1744' }}>{stats.removedComments?.toLocaleString() ?? '—'}</span>
         </div>
         <div className="admin-stat-card">
-          <span className="admin-stat-label">USER_GROWTH</span>
+          <span className="admin-stat-label">{t('statUserGrowth')}</span>
           <span className="admin-stat-value" style={{ color: 'var(--accent-cyan)' }}>{stats.totalUsers?.toLocaleString() ?? '—'}</span>
         </div>
       </div>
@@ -76,30 +71,30 @@ export default function AdminView() {
         {/* Narrow screens: the tab row collapses into this menu (see .admin-tab-select in index.css) */}
         <select
           className="admin-tab-select"
-          aria-label="Admin section"
+          aria-label={t('sectionLabel')}
           value={activeTab}
           onChange={e => setActiveTab(e.target.value)}
         >
-          {TABS.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
+          {TABS.map(key => <option key={key} value={key}>{t(`tabs.${key}`)}</option>)}
         </select>
-        {TABS.map(t => (
+        {TABS.map(key => (
           <button
-            key={t.key}
-            className={`admin-tab${activeTab === t.key ? ' active' : ''}`}
-            onClick={() => setActiveTab(t.key)}
+            key={key}
+            className={`admin-tab${activeTab === key ? ' active' : ''}`}
+            onClick={() => setActiveTab(key)}
           >
-            {t.label}
+            {t(`tabs.${key}`)}
           </button>
         ))}
         <button
           className="admin-refresh-btn"
           onClick={refresh}
           disabled={refreshing}
-          title="Lấy dữ liệu mới nhất"
-          aria-label="Refresh"
+          title={t('refreshTitle')}
+          aria-label={t('refreshAria')}
         >
           <span className={`material-symbols-outlined${refreshing ? ' spinning' : ''}`} style={{ fontSize: 18 }}>refresh</span>
-          REFRESH
+          {t('refresh')}
         </button>
       </div>
 

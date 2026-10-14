@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { buildStreamUrl, thumbnailUrl } from '../../utils/videoModel.js'
 import { viewsApi } from '../../api/views.js'
 
@@ -8,6 +9,7 @@ const VIEW_THRESHOLD_SEC = 3
 const MAX_PLAY_STEP_SEC = 1.5
 
 export default function VideoPlayer({ video, onEnded, active, muted = true, onMutedChange, showMuteButton = true }) {
+  const { t } = useTranslation('feed')
   const videoRef = useRef(null)
   const trackRef = useRef(null)
   const [loading,      setLoading]      = useState(true)
@@ -94,7 +96,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
 
   const poster = thumbnailUrl(video?.fileId) || undefined
 
-  const handle = video?.userShared?.split('@')[0] || 'anonymous'
+  const handle = video?.userShared?.split('@')[0] || t('anonymous')
 
   return (
     <div
@@ -134,7 +136,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
           className="video-mute-btn"
           data-no-toggle
           onClick={toggleMute}
-          title={muted ? 'Unmute' : 'Mute'}
+          title={muted ? t('unmute') : t('mute')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>
             {muted ? 'volume_off' : 'volume_up'}
@@ -201,7 +203,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
               fontSize: 10, color: 'var(--accent-cyan)',
               fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
             }}>
-              {video?.category || 'video'}
+              {video?.category || t('videoFallback')}
             </div>
           </div>
         </div>
@@ -232,7 +234,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
           >
             {video.desc}
             {!descExpanded && video.desc.length > 60 && (
-              <span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}> …more</span>
+              <span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}> … {t('more')}</span>
             )}
           </p>
         )}

@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useCreateCollection, useUpdateCollection } from '../../hooks/useCollections.js'
 import { validateName, isPublic, NAME_MAX } from './collectionUtils.js'
 
 /** Create (collection omitted) or rename / change visibility (collection given). */
 export default function CollectionFormModal({ collection, onClose }) {
+  const { t } = useTranslation(['library', 'common'])
   const { user } = useAuth()
   const isAdmin = !!user?.isAdmin
   const editing = !!collection
@@ -26,7 +28,7 @@ export default function CollectionFormModal({ collection, onClose }) {
     else create.mutate({ name: trimmed, ...(visibility === 'PUBLIC' ? { visibility } : {}) }, done)
   }
 
-  const title = editing ? 'Sửa collection' : 'Tạo collection'
+  const title = editing ? t('formEditTitle') : t('formCreateTitle')
   const apiError = mutation.error?.message
 
   return (
@@ -34,13 +36,13 @@ export default function CollectionFormModal({ collection, onClose }) {
       <form className="app-modal" role="dialog" aria-modal="true" aria-label={title} onSubmit={handleSubmit}>
         <div className="app-modal-header">
           <span className="app-modal-title">{title}</span>
-          <button type="button" className="app-modal-close" onClick={onClose} aria-label="Close">
+          <button type="button" className="app-modal-close" onClick={onClose} aria-label={t('common:close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
         <div className="app-modal-body">
           {(formError || apiError) && <div className="app-alert error" role="alert">{formError || apiError}</div>}
-          <label className="app-label" htmlFor="collection-name">Tên collection</label>
+          <label className="app-label" htmlFor="collection-name">{t('nameLabel')}</label>
           <input
             id="collection-name"
             className="app-input"
@@ -52,14 +54,14 @@ export default function CollectionFormModal({ collection, onClose }) {
           {isAdmin && (
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, fontSize: 13 }}>
               <input type="checkbox" checked={makePublic} onChange={e => setMakePublic(e.target.checked)} />
-              Công khai
+              {t('public')}
             </label>
           )}
         </div>
         <div className="app-modal-footer">
-          <button type="button" className="app-btn secondary" onClick={onClose} disabled={mutation.isPending}>Huỷ</button>
+          <button type="button" className="app-btn secondary" onClick={onClose} disabled={mutation.isPending}>{t('cancel')}</button>
           <button type="submit" className="app-btn primary" disabled={mutation.isPending} aria-busy={mutation.isPending}>
-            {editing ? 'Lưu' : 'Tạo'}
+            {editing ? t('save') : t('createShort')}
           </button>
         </div>
       </form>

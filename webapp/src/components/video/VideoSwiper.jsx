@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useSwipeable } from 'react-swipeable'
+import { useTranslation } from 'react-i18next'
 import VideoPlayer from './VideoPlayer.jsx'
 import VoteButtons from './VoteButtons.jsx'
 import { buildStreamUrl } from '../../utils/videoModel.js'
@@ -7,6 +8,7 @@ import SearchModal from '../modals/SearchModal.jsx'
 import AddToCollectionModal from '../library/AddToCollectionModal.jsx'
 
 export default function VideoSwiper({ videos = [], initialIndex = 0, muted = true, onMutedChange, mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
+  const { t } = useTranslation('feed')
   const [index, setIndex] = useState(() => Math.min(initialIndex, Math.max(0, videos.length - 1)))
   const [direction, setDirection] = useState('next')
   const [saveVideo, setSaveVideo] = useState(null)
@@ -74,7 +76,7 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, muted = tru
         <span className="material-symbols-outlined" style={{ fontSize: 64, opacity: 0.25 }}>
           video_library
         </span>
-        <p style={{ fontSize: 14, fontWeight: 500 }}>No videos available</p>
+        <p style={{ fontSize: 14, fontWeight: 500 }}>{t('noVideos')}</p>
       </div>
     )
   }
@@ -133,7 +135,7 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, muted = tru
           className="video-mute-btn"
           data-no-toggle
           onClick={e => { e.stopPropagation(); onMutedChange?.(!muted) }}
-          title={muted ? 'Unmute' : 'Mute'}
+          title={muted ? t('unmute') : t('mute')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>
             {muted ? 'volume_off' : 'volume_up'}
@@ -151,21 +153,21 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, muted = tru
         <VoteButtons video={video} />
 
         {/* Comments */}
-        <button className="action-btn" onClick={() => onShowComments?.(video)} title="Comments">
+        <button className="action-btn" onClick={() => onShowComments?.(video)} title={t('comment')}>
           <span className="icon material-symbols-outlined">comment</span>
-          <span className="label">Comment</span>
+          <span className="label">{t('comment')}</span>
         </button>
 
         {/* Save to collection */}
-        <button className="action-btn" onClick={() => setSaveVideo(video)} title="Lưu">
+        <button className="action-btn" onClick={() => setSaveVideo(video)} title={t('save')}>
           <span className="icon material-symbols-outlined">bookmark_add</span>
-          <span className="label">Lưu</span>
+          <span className="label">{t('save')}</span>
         </button>
 
         {/* Share — generates ?v={id} deep-link URL */}
         <button
           className="action-btn"
-          title="Share"
+          title={t('share')}
           onClick={() => {
             const shareUrl = `${window.location.origin}${window.location.pathname}?v=${video?.id}`
             if (navigator.share) {
@@ -176,7 +178,7 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, muted = tru
           }}
         >
           <span className="icon material-symbols-outlined">share</span>
-          <span className="label">Share</span>
+          <span className="label">{t('share')}</span>
         </button>
 
         {/* Delete — only for private videos owned by current user */}
@@ -185,19 +187,19 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, muted = tru
             className="action-btn"
             style={{ color: '#ff6b6b' }}
             onClick={() => onDeleteVideo?.(video)}
-            title="Delete"
+            title={t('delete')}
           >
             <span className="icon material-symbols-outlined">delete</span>
-            <span className="label">Delete</span>
+            <span className="label">{t('delete')}</span>
           </button>
         )}
 
         {/* Navigate up / down — grouped together */}
         <div className="nav-arrows">
-          <button className="action-btn" onClick={prev} disabled={index === 0} title="Previous">
+          <button className="action-btn" onClick={prev} disabled={index === 0} title={t('previous')}>
             <span className="icon material-symbols-outlined">keyboard_arrow_up</span>
           </button>
-          <button className="action-btn" onClick={next} disabled={index === total - 1} title="Next">
+          <button className="action-btn" onClick={next} disabled={index === total - 1} title={t('next')}>
             <span className="icon material-symbols-outlined">keyboard_arrow_down</span>
           </button>
         </div>

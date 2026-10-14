@@ -1,0 +1,9 @@
+{
+  "SPAM": "Spam, advertising, repeated links",
+  "HARASSMENT": "Insults, bullying, personal attacks",
+  "HATE_SPEECH": "Hate speech (race, religion, gender…)",
+  "SEXUAL": "Sexual content / NSFW",
+  "VIOLENCE": "Threats, incitement to violence",
+  "PERSONAL_INFO": "Exposes personal info (phone, address…)",
+  "OTHER": "Other (note required)"
+}

@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import CommentItem from './CommentItem.jsx'
 import { authorName, flattenReplies } from './commentUtils.js'
 
 const COLLAPSED_COUNT = 2
 
 function ReplyBox({ prefill, submitting, error, onSubmit, onClose }) {
+  const { t } = useTranslation('comments')
   const [text, setText] = useState(prefill)
   const ref = useRef(null)
 
@@ -32,23 +34,23 @@ function ReplyBox({ prefill, submitting, error, onSubmit, onClose }) {
         <textarea
           ref={ref}
           className="app-input"
-          aria-label="Reply"
+          aria-label={t('replyAria')}
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Trả lời… (Enter để gửi, Esc để đóng)"
+          placeholder={t('replyPlaceholder')}
           rows={2}
           style={{ flex: 1, resize: 'none', fontSize: 13 }}
         />
         <button
           className="app-btn primary"
-          aria-label="Send reply"
+          aria-label={t('sendReply')}
           onClick={send}
           disabled={submitting || !text.trim()}
           aria-busy={submitting}
           style={{ padding: '8px 12px', flexShrink: 0 }}
         >
-          Gửi
+          {t('send')}
         </button>
       </div>
     </div>
@@ -72,6 +74,7 @@ export default function CommentThread({
   replyError,
   highlightId,
 }) {
+  const { t } = useTranslation('comments')
   const replies = flattenReplies(root)
   const highlightIdx = highlightId ? replies.findIndex(r => String(r.id) === String(highlightId)) : -1
   const [expanded, setExpanded] = useState(highlightIdx >= COLLAPSED_COUNT)
@@ -118,7 +121,7 @@ export default function CommentThread({
               style={{ marginBottom: 10 }}
               onClick={() => setExpanded(v => !v)}
             >
-              {expanded ? 'Ẩn phản hồi ▴' : `Xem thêm ${hidden} phản hồi ▾`}
+              {expanded ? t('hideReplies') : t('showMore', { count: hidden })}
             </button>
           )}
           {boxOpen && (

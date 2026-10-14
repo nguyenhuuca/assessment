@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useVideos } from '../../hooks/useVideos.js'
 import { useCollectionVideoIds, useToggleCollectionItem } from '../../hooks/useCollections.js'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { thumbnailUrl } from '../../utils/videoModel.js'
-import { normalizeForSearch } from './collectionUtils.js'
+import { normalizeForSearch, collectionName } from './collectionUtils.js'
 
 const MAX_RESULTS = 50
 
@@ -13,6 +14,7 @@ const MAX_RESULTS = 50
  * are applied locally on top so the button flips immediately. Adding twice is harmless (the API is idempotent).
  */
 export default function AddVideosModal({ collection, onClose }) {
+  const { t } = useTranslation(['library', 'common'])
   const { data: videos = [], isLoading, error } = useVideos(null)
   const idsQuery = useCollectionVideoIds(collection.id)
   const toggle = useToggleCollectionItem()
@@ -59,13 +61,13 @@ export default function AddVideosModal({ collection, onClose }) {
         className="app-modal"
         role="dialog"
         aria-modal="true"
-        aria-label={`Thêm video vào ${collection.name}`}
+        aria-label={t('addVideosToAria', { name: collectionName(collection) })}
         onClick={e => e.stopPropagation()}
         style={{ maxWidth: 560, width: '100%' }}
       >
         <div className="app-modal-header">
-          <span className="app-modal-title">Thêm video vào "{collection.name}"</span>
-          <button className="app-modal-close" onClick={onClose} aria-label="Close">
+          <span className="app-modal-title">{t('addVideosTo', { name: collectionName(collection) })}</span>
+          <button className="app-modal-close" onClick={onClose} aria-label={t('common:close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
@@ -73,8 +75,8 @@ export default function AddVideosModal({ collection, onClose }) {
           <input
             className="app-input"
             type="search"
-            placeholder="Tìm theo tiêu đề..."
-            aria-label="Tìm video"
+            placeholder={t('searchPlaceholder')}
+            aria-label={t('searchAria')}
             value={term}
             onChange={e => setTerm(e.target.value)}
             autoFocus
@@ -85,7 +87,7 @@ export default function AddVideosModal({ collection, onClose }) {
             {isLoading || idsQuery.isLoading ? (
               <div className="vid-spinner" />
             ) : results.length === 0 ? (
-              <p className="admin-cell-muted" role="status">Không tìm thấy video nào</p>
+              <p className="admin-cell-muted" role="status">{t('noVideosFound')}</p>
             ) : results.map(v => {
               const inCollection = isInCollection(v.id)
               const busy = isBusyFor(toggle, v.id, vars => vars.videoId)
@@ -96,18 +98,18 @@ export default function AddVideosModal({ collection, onClose }) {
                         style={{ width: 40, height: 64, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
                     : <span className="material-symbols-outlined" style={{ width: 40, textAlign: 'center' }}>movie</span>}
                   <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {v.title || 'Untitled'}
+                    {v.title || t('untitled')}
                   </span>
                   <button
                     className={`app-btn ${inCollection ? 'secondary' : 'primary'}`}
-                    aria-label={`${inCollection ? 'Bỏ' : 'Thêm'} "${v.title || 'Untitled'}"`}
+                    aria-label={t(inCollection ? 'removeAria' : 'addAria', { title: v.title || t('untitled') })}
                     aria-pressed={inCollection}
                     aria-busy={busy}
                     disabled={busy}
                     onClick={() => handleToggle(v)}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{inCollection ? 'check' : 'add'}</span>
-                    {inCollection ? 'Đã thêm' : 'Thêm'}
+                    {inCollection ? t('added') : t('add')}
                   </button>
                 </div>
               )
@@ -115,7 +117,7 @@ export default function AddVideosModal({ collection, onClose }) {
           </div>
         </div>
         <div className="app-modal-footer">
-          <button className="app-btn secondary" onClick={onClose}>Xong</button>
+          <button className="app-btn secondary" onClick={onClose}>{t('common:done')}</button>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import i18n from '../../../i18n/index.js'
 import LibraryView from '../LibraryView.jsx'
 import { collectionsApi } from '../../../api/collections.js'
 
@@ -139,5 +140,18 @@ describe('LibraryView', () => {
     renderView({ initialCollectionId: 'o' })
     fireEvent.click(await screen.findByRole('button', { name: /Thêm video/ }))
     expect(screen.getByTestId('add-videos')).toHaveTextContent('Của tôi')
+  })
+})
+
+describe('LibraryView (English)', () => {
+  it('pluralizes video counts and shows the default collection as "Watch later"', async () => {
+    await i18n.changeLanguage('en')
+    auth = { isLoggedIn: true, user: { email: 'a@b.c' } }
+    renderView()
+    expect(await screen.findByLabelText('Hài tuyển chọn, 3 videos')).toBeTruthy()
+    expect(await screen.findByLabelText('Watch later, 1 video')).toBeTruthy()
+    expect(screen.getByLabelText('Của tôi, 2 videos')).toBeTruthy()
+    expect(screen.getByText('Featured')).toBeTruthy()
+    expect(screen.queryByLabelText(/Xem sau/)).toBeNull()
   })
 })

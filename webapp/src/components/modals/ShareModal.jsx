@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { videosApi } from '../../api/videos.js'
 
@@ -16,6 +17,7 @@ const Spinner = () => (
 )
 
 export default function ShareModal({ show, onHide }) {
+  const { t } = useTranslation(['shell', 'common'])
   const queryClient = useQueryClient()
   const [form, setForm] = useState(EMPTY_FORM)
   const [loading, setLoading] = useState(false)
@@ -41,7 +43,7 @@ export default function ShareModal({ show, onHide }) {
       queryClient.invalidateQueries({ queryKey: ['videos'] })
       handleClose()
     } catch (err) {
-      setError(err.message || 'Failed to share video')
+      setError(err.message || t('shareFailed'))
     } finally {
       setLoading(false)
     }
@@ -59,8 +61,8 @@ export default function ShareModal({ show, onHide }) {
     <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) handleClose() }}>
       <div className="app-modal">
         <div className="app-modal-header">
-          <span className="app-modal-title">Share a Video</span>
-          <button className="app-modal-close" onClick={handleClose}>
+          <span className="app-modal-title">{t('shareTitle')}</span>
+          <button className="app-modal-close" onClick={handleClose} aria-label={t('common:close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
@@ -70,7 +72,7 @@ export default function ShareModal({ show, onHide }) {
             {error && <div className="app-alert error">{error}</div>}
 
             <div className="app-field">
-              <label className="app-label">YouTube URL *</label>
+              <label className="app-label">{t('youtubeUrl')}</label>
               <input
                 className="app-input"
                 type="url"
@@ -83,26 +85,26 @@ export default function ShareModal({ show, onHide }) {
             </div>
 
             <div className="app-field">
-              <label className="app-label">Title</label>
+              <label className="app-label">{t('titleLabel')}</label>
               <input
                 className="app-input"
                 type="text"
                 name="title"
                 value={form.title}
                 onChange={handleChange}
-                placeholder="Video title"
+                placeholder={t('titlePlaceholder')}
               />
             </div>
 
             <div className="app-field">
-              <label className="app-label">Description</label>
+              <label className="app-label">{t('descLabel')}</label>
               <textarea
                 className="app-input"
                 rows={3}
                 name="description"
                 value={form.description}
                 onChange={handleChange}
-                placeholder="Optional description"
+                placeholder={t('descPlaceholder')}
               />
             </div>
 
@@ -113,16 +115,16 @@ export default function ShareModal({ show, onHide }) {
                 checked={form.isPrivate}
                 onChange={handleChange}
               />
-              <span>Private video</span>
+              <span>{t('privateVideo')}</span>
             </label>
           </div>
 
           <div className="app-modal-footer">
             <button type="button" className="app-btn secondary" onClick={handleClose} disabled={loading}>
-              Cancel
+              {t('common:cancel')}
             </button>
             <button type="submit" className="app-btn primary" disabled={loading}>
-              {loading ? <><Spinner />Sharing…</> : 'Share'}
+              {loading ? <><Spinner />{t('sharing')}</> : t('common:share')}
             </button>
           </div>
         </form>

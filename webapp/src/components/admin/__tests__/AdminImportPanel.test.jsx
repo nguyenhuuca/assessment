@@ -126,7 +126,7 @@ describe('ImportTable', () => {
   it('passes the status filter to the API', async () => {
     renderPanel()
     await waitFor(() => expect(adminApi.listImports).toHaveBeenCalled())
-    fireEvent.change(screen.getByLabelText('Status filter'), { target: { value: 'FAILED' } })
+    fireEvent.change(screen.getByLabelText('Lọc theo trạng thái'), { target: { value: 'FAILED' } })
     await waitFor(() => expect(adminApi.listImports).toHaveBeenLastCalledWith(expect.objectContaining({ status: 'FAILED' })))
   })
 })

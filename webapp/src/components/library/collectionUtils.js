@@ -1,12 +1,20 @@
+import i18n from '../../i18n/index.js'
+
 export const NAME_MAX = 60
 export const WATCH_LATER_NAME = 'Xem sau'
 
-/** Trimmed name or an error message (1–60 chars). */
+/** Trimmed name or a localized error message (1–60 chars). */
 export function validateName(raw) {
   const name = (raw || '').trim()
-  if (!name) return { name, error: 'Vui lòng nhập tên collection' }
-  if (name.length > NAME_MAX) return { name, error: `Tên tối đa ${NAME_MAX} ký tự` }
+  if (!name) return { name, error: i18n.t('library:nameRequired') }
+  if (name.length > NAME_MAX) return { name, error: i18n.t('library:nameTooLong', { max: NAME_MAX }) }
   return { name, error: '' }
+}
+
+/** Display name: the default collection is shown in the current language; others as stored. */
+export function collectionName(collection) {
+  if (!collection) return ''
+  return collection.isDefault ? i18n.t('library:watchLater') : collection.name
 }
 
 export function isPublic(collection) {

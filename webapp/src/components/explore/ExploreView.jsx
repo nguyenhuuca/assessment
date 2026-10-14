@@ -1,17 +1,19 @@
 import React, { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+import { compactNumber } from '../../i18n/format.js'
 import { useVideos } from '../../hooks/useVideos.js'
 import { thumbnailUrl } from '../../utils/videoModel.js'
 
 const CATEGORIES = [
-  { key: 'all',     label: 'All',    icon: 'whatshot',                 gradient: 'linear-gradient(135deg,#ff8d89 0%,#c10023 100%)' },
-  { key: 'funny',   label: 'Funny',  icon: 'sentiment_very_satisfied', gradient: 'linear-gradient(135deg,#00eefc 0%,#006970 100%)' },
-  { key: 'regular', label: 'Drama',  icon: 'movie',                    gradient: 'linear-gradient(135deg,#cb9cff 0%,#460e7a 100%)' },
+  { key: 'all',     labelKey: 'catAll',    icon: 'whatshot',                 gradient: 'linear-gradient(135deg,#ff8d89 0%,#c10023 100%)' },
+  { key: 'funny',   labelKey: 'catFunny',  icon: 'sentiment_very_satisfied', gradient: 'linear-gradient(135deg,#00eefc 0%,#006970 100%)' },
+  { key: 'regular', labelKey: 'catDrama',  icon: 'movie',                    gradient: 'linear-gradient(135deg,#cb9cff 0%,#460e7a 100%)' },
 ]
 
 const SORT_OPTIONS = [
-  { key: 'popular', label: 'Most Liked' },
-  { key: 'views',   label: 'Most Viewed' },
-  { key: 'recent',  label: 'Recently Added' },
+  { key: 'popular', labelKey: 'sortPopular' },
+  { key: 'views',   labelKey: 'sortViews' },
+  { key: 'recent',  labelKey: 'sortRecent' },
 ]
 
 function getThumbnail(video) {
@@ -19,15 +21,12 @@ function getThumbnail(video) {
   return thumbnailUrl(video.fileId) || video.poster || ''
 }
 
-const compactCount = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
-
-function formatViews(n) {
-  return compactCount.format(n || 0)
-}
+const formatViews = n => compactNumber(n || 0)
 
 function ReelTile({ video, onClick }) {
+  const { t } = useTranslation('feed')
   const thumb = getThumbnail(video)
-  const title = video.title || 'Untitled'
+  const title = video.title || t('untitled')
   return (
     <div
       className="explore-reel"
@@ -35,7 +34,7 @@ function ReelTile({ video, onClick }) {
       role="button"
       tabIndex={0}
       title={title}
-      aria-label={`${title}, ${formatViews(video.viewCount)} views`}
+      aria-label={t('tileAria', { title, views: formatViews(video.viewCount) })}
       onKeyDown={e => e.key === 'Enter' && onClick?.()}
     >
       {thumb
@@ -52,6 +51,7 @@ function ReelTile({ video, onClick }) {
 }
 
 export default function ExploreView({ onNavigateToVideo }) {
+  const { t } = useTranslation('feed')
   const { data: allVideos = [], isLoading } = useVideos(null)
   const [activeCategory, setActiveCategory] = useState('all')
   const [sortBy, setSortBy] = useState('popular')
@@ -97,9 +97,9 @@ export default function ExploreView({ onNavigateToVideo }) {
             <div className="explore-hero-content">
               <span className="explore-hero-badge">
                 <span className="explore-hero-badge-dot" />
-                Trending Now
+                {t('trendingNow')}
               </span>
-              <h1 className="explore-hero-title">{heroVideo.title || 'Featured Video'}</h1>
+              <h1 className="explore-hero-title">{heroVideo.title || t('featuredVideo')}</h1>
               {heroVideo.desc && (
                 <p className="explore-hero-desc">{heroVideo.desc}</p>
               )}
@@ -109,14 +109,14 @@ export default function ExploreView({ onNavigateToVideo }) {
                   onClick={e => { e.stopPropagation(); navigateTo(heroVideo) }}
                 >
                   <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1", fontSize: 20 }}>play_arrow</span>
-                  Watch Now
+                  {t('watchNow')}
                 </button>
                 <button
                   className="explore-btn-secondary"
                   onClick={e => e.stopPropagation()}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: 20 }}>add</span>
-                  Watchlist
+                  {t('watchlist')}
                 </button>
               </div>
               <div className="explore-hero-meta">
@@ -139,7 +139,7 @@ export default function ExploreView({ onNavigateToVideo }) {
       {/* ── Categories ── */}
       <section className="explore-section">
         <div className="explore-section-header">
-          <h2 className="explore-section-title">Categories</h2>
+          <h2 className="explore-section-title">{t('categories')}</h2>
         </div>
         <div className="explore-cats-scroll">
           {CATEGORIES.map(cat => (
@@ -151,7 +151,7 @@ export default function ExploreView({ onNavigateToVideo }) {
               <div className="explore-cat-bg" style={{ background: cat.gradient }} />
               <div className="explore-cat-overlay">
                 <span className="material-symbols-outlined" style={{ fontSize: 26 }}>{cat.icon}</span>
-                <span className="explore-cat-label">{cat.label}</span>
+                <span className="explore-cat-label">{t(cat.labelKey)}</span>
               </div>
             </button>
           ))}
@@ -161,11 +161,11 @@ export default function ExploreView({ onNavigateToVideo }) {
       {/* ── Recommended Grid ── */}
       <section className="explore-section">
         <div className="explore-section-header">
-          <h2 className="explore-section-title explore-section-title-xl">RECOMMENDED FOR YOU</h2>
+          <h2 className="explore-section-title explore-section-title-xl">{t('recommended').toLocaleUpperCase()}</h2>
         </div>
 
         {reelVideos.length === 0 ? (
-          <p className="explore-empty-grid">No videos in this category</p>
+          <p className="explore-empty-grid">{t('noVideosInCategory')}</p>
         ) : (
           <div className="explore-reels-grid">
             {reelVideos.map(v => (
@@ -179,7 +179,7 @@ export default function ExploreView({ onNavigateToVideo }) {
       <div className="explore-filter-bar">
         <button className="explore-filter-refine">
           <span className="material-symbols-outlined" style={{ fontSize: 18 }}>filter_list</span>
-          Refine
+          {t('refine')}
         </button>
         <div className="explore-filter-divider" />
         <div className="explore-filter-opts">
@@ -189,7 +189,7 @@ export default function ExploreView({ onNavigateToVideo }) {
               className={`explore-filter-opt${sortBy === opt.key ? ' active' : ''}`}
               onClick={() => setSortBy(opt.key)}
             >
-              {opt.label}
+              {t(opt.labelKey)}
             </button>
           ))}
         </div>

@@ -1,4 +1,5 @@
 import React from 'react'
+import i18n from '../../../i18n/index.js'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import ExploreView from '../ExploreView.jsx'
@@ -20,20 +21,20 @@ function renderView(onNavigateToVideo = vi.fn()) {
   return onNavigateToVideo
 }
 
-const tiles = () => screen.getAllByRole('button', { name: /views$/ })
+const tiles = () => screen.getAllByRole('button', { name: /, .* lượt xem$/ })
 
 describe('ExploreView reels grid', () => {
   it('renders a portrait tile per video (except the hero) with a compact view count', () => {
     renderView()
     expect(tiles()).toHaveLength(3)
-    expect(within(tiles()[0]).getByText('1.2K')).toBeInTheDocument()
-    expect(within(tiles()[1]).getByText('28K')).toBeInTheDocument()
+    expect(within(tiles()[0]).getByText('1,2 N')).toBeInTheDocument()
+    expect(within(tiles()[1]).getByText('28 N')).toBeInTheDocument()
     expect(within(tiles()[2]).getByText('5')).toBeInTheDocument()
   })
 
   it('Most Viewed sorts tiles by view count', () => {
     renderView()
-    fireEvent.click(screen.getByText('Most Viewed'))
+    fireEvent.click(screen.getByText('Nhiều lượt xem'))
     expect(tiles().map(t => t.getAttribute('title'))).toEqual(['Clip 2', 'Clip 4', 'Clip 1'])
   })
 
@@ -41,5 +42,15 @@ describe('ExploreView reels grid', () => {
     const nav = renderView()
     fireEvent.click(tiles()[1])
     expect(nav).toHaveBeenCalledWith(2) // index of Clip 3 in the feed list
+  })
+})
+
+describe('ExploreView in English', () => {
+  it('shows English chrome and English compact counts', async () => {
+    await i18n.changeLanguage('en')
+    renderView()
+    expect(screen.getByText('Trending Now')).toBeInTheDocument()
+    expect(screen.getByText('Most Viewed')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Clip 3, 28K views' })).toBeInTheDocument()
   })
 })

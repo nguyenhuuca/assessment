@@ -1,0 +1,12 @@
+{
+  "title": "Notifications",
+  "bellLabel": "Notifications, {{count}} unread",
+  "markAllRead": "Mark all as read",
+  "loadFailed": "Couldn't load notifications",
+  "empty": "No notifications yet",
+  "someone": "Someone",
+  "replyOne": "{{actor}} replied to your comment",
+  "replyMany_one": "{{actor}} and {{count}} other replied to your comment",
+  "replyMany_other": "{{actor}} and {{count}} others replied to your comment",
+  "removed": "Your comment was removed: {{reason}}"
+}

@@ -1,4 +1,5 @@
 import React from 'react'
+import i18n from '../../../i18n/index.js'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -28,8 +29,8 @@ function renderButtons(video) {
   return { ...result, rerenderVideo: (v) => result.rerender(ui(v)) }
 }
 
-const likeBtn = () => screen.getByTitle('Like')
-const dislikeBtn = () => screen.getByTitle('Dislike')
+const likeBtn = () => screen.getByTitle('Thích')
+const dislikeBtn = () => screen.getByTitle('Không thích')
 
 describe('VoteButtons', () => {
   beforeEach(() => {
@@ -163,5 +164,18 @@ describe('VoteButtons', () => {
     rerenderVideo({ id: 'v2' })
     expect(await screen.findByText('10')).toBeInTheDocument()
     expect(likeBtn()).not.toHaveClass('voted')
+  })
+})
+
+describe('VoteButtons in English', () => {
+  it('shows the English login hint and titles', async () => {
+    await i18n.changeLanguage('en')
+    mockLoggedIn = false
+    reactionsApi.get.mockResolvedValue(summary(5, 2, null))
+    renderButtons({ id: 'v1' })
+    await screen.findByText('5')
+    fireEvent.click(screen.getByTitle('Like'))
+    expect(screen.getByText('Log in to like videos')).toBeInTheDocument()
+    expect(screen.getByTitle('Dislike')).toBeInTheDocument()
   })
 })

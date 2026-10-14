@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const PAGE_ICONS = {
   explore:  { icon: 'explore',       color: 'var(--accent-cyan)' },
@@ -8,6 +9,7 @@ const PAGE_ICONS = {
 }
 
 export default function ComingSoon({ page = 'explore' }) {
+  const { t } = useTranslation('shell')
   const { icon, color } = PAGE_ICONS[page] ?? PAGE_ICONS.explore
 
   return (
@@ -30,10 +32,10 @@ export default function ComingSoon({ page = 'explore' }) {
           fontSize: 28, letterSpacing: 4,
           color: 'var(--text)', marginBottom: 8,
         }}>
-          Coming Soon
+          {t('comingSoon')}
         </p>
         <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-          This section is under construction.
+          {t('underConstruction')}
         </p>
       </div>
     </div>

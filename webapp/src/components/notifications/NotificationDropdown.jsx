@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useMarkAllRead, useMarkRead, useNotificationList } from '../../hooks/useNotifications.js'
 import { notificationTitle } from '../../utils/notificationText.js'
 import { formatTime } from '../comments/commentUtils.js'
@@ -6,6 +7,7 @@ import { formatTime } from '../comments/commentUtils.js'
 const MAX_ITEMS = 10
 
 export default function NotificationDropdown({ onClose, onOpenNotification, anchorRef }) {
+  const { t } = useTranslation('notifications')
   const rootRef = useRef(null)
   const { data, isLoading, isError } = useNotificationList(0)
   const markRead = useMarkRead()
@@ -39,9 +41,9 @@ export default function NotificationDropdown({ onClose, onOpenNotification, anch
   }
 
   return (
-    <div className="notif-dropdown" ref={rootRef} role="dialog" aria-label="Thông báo">
+    <div className="notif-dropdown" ref={rootRef} role="dialog" aria-label={t('title')}>
       <div className="notif-dropdown-header">
-        <span className="notif-dropdown-title">Thông báo</span>
+        <span className="notif-dropdown-title">{t('title')}</span>
         <button
           type="button"
           className="comment-action-link"
@@ -49,7 +51,7 @@ export default function NotificationDropdown({ onClose, onOpenNotification, anch
           disabled={!hasUnread || markAllRead.isPending}
           aria-busy={markAllRead.isPending}
         >
-          Đánh dấu đã đọc tất cả
+          {t('markAllRead')}
         </button>
       </div>
 
@@ -59,9 +61,9 @@ export default function NotificationDropdown({ onClose, onOpenNotification, anch
             <div className="vid-spinner" />
           </div>
         ) : isError ? (
-          <div className="notif-empty" role="alert">Không tải được thông báo</div>
+          <div className="notif-empty" role="alert">{t('loadFailed')}</div>
         ) : items.length === 0 ? (
-          <div className="notif-empty">Chưa có thông báo</div>
+          <div className="notif-empty">{t('empty')}</div>
         ) : (
           <ul className="notif-list">
             {items.map(n => (

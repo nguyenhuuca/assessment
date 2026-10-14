@@ -1,15 +1,16 @@
+import i18n from '../i18n/index.js'
 import { reasonLabel } from './moderationReasons.js'
 
 /** Plain-text title for a notification (rendered as React text, never HTML). */
 export function notificationTitle(n) {
   if (n.type === 'COMMENT_REMOVED') {
-    return `Bình luận của bạn đã bị gỡ: ${reasonLabel(n.reason)}`
+    return i18n.t('notifications:removed', { reason: reasonLabel(n.reason) })
   }
-  const actor = n.actorDisplay || 'Ai đó'
+  const actor = n.actorDisplay || i18n.t('notifications:someone')
   const others = (n.actorCount ?? 1) - 1
   return others > 0
-    ? `${actor} và ${others} người khác đã trả lời bình luận của bạn`
-    : `${actor} đã trả lời bình luận của bạn`
+    ? i18n.t('notifications:replyMany', { actor, count: others })
+    : i18n.t('notifications:replyOne', { actor })
 }
 
 export function badgeLabel(count) {

@@ -1,0 +1,11 @@
+{
+  "title": "Thông báo",
+  "bellLabel": "Thông báo, {{count}} chưa đọc",
+  "markAllRead": "Đánh dấu đã đọc tất cả",
+  "loadFailed": "Không tải được thông báo",
+  "empty": "Chưa có thông báo",
+  "someone": "Ai đó",
+  "replyOne": "{{actor}} đã trả lời bình luận của bạn",
+  "replyMany_other": "{{actor}} và {{count}} người khác đã trả lời bình luận của bạn",
+  "removed": "Bình luận của bạn đã bị gỡ: {{reason}}"
+}

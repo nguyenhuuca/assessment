@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 
 // App-styled replacement for window.confirm (native dialogs ignore the theme and
 // Chrome can silently suppress them, which turns the action into a no-op).
@@ -6,14 +7,15 @@ export default function ConfirmModal({
   title,
   message,
   children,
-  confirmLabel = 'Xác nhận',
-  cancelLabel = 'Huỷ',
+  confirmLabel,
+  cancelLabel,
   danger = false,
   pending = false,
   ariaLabel,
   onCancel,
   onConfirm,
 }) {
+  const { t } = useTranslation(['shell', 'common'])
   const confirmRef = useRef(null)
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function ConfirmModal({
       >
         <div className="app-modal-header">
           <span className="app-modal-title">{title}</span>
-          <button className="app-modal-close" onClick={onCancel} disabled={pending} aria-label="Close">
+          <button className="app-modal-close" onClick={onCancel} disabled={pending} aria-label={t('common:close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
@@ -43,7 +45,7 @@ export default function ConfirmModal({
           {children}
         </div>
         <div className="app-modal-footer">
-          <button className="app-btn secondary" onClick={onCancel} disabled={pending}>{cancelLabel}</button>
+          <button className="app-btn secondary" onClick={onCancel} disabled={pending}>{cancelLabel ?? t('common:cancel')}</button>
           <button
             ref={confirmRef}
             className={`app-btn ${danger ? 'danger' : 'primary'}`}
@@ -51,7 +53,7 @@ export default function ConfirmModal({
             disabled={pending}
             aria-busy={pending}
           >
-            {confirmLabel}
+            {confirmLabel ?? t('shell:confirm')}
           </button>
         </div>
       </div>

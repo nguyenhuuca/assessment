@@ -1,14 +1,17 @@
-export const REASONS = [
-  { code: 'SPAM',          label: 'Spam, quảng cáo, link lặp lại' },
-  { code: 'HARASSMENT',    label: 'Xúc phạm, bắt nạt, công kích cá nhân' },
-  { code: 'HATE_SPEECH',   label: 'Thù ghét (chủng tộc, tôn giáo, giới tính…)' },
-  { code: 'SEXUAL',        label: 'Nội dung tình dục / NSFW' },
-  { code: 'VIOLENCE',      label: 'Đe dọa, kích động bạo lực' },
-  { code: 'PERSONAL_INFO', label: 'Lộ thông tin cá nhân (SĐT, địa chỉ…)' },
-  { code: 'OTHER',         label: 'Khác (cần ghi chú)' },
-]
+import i18n from '../i18n/index.js'
 
-/** Vietnamese label for a moderation reason code; falls back to the raw code. */
+const CODES = ['SPAM', 'HARASSMENT', 'HATE_SPEECH', 'SEXUAL', 'VIOLENCE', 'PERSONAL_INFO', 'OTHER']
+
+/** Translated label for a known reason code (resolved at call time, so it follows the current language). */
+const translate = (code) => i18n.t(`moderation:${code}`)
+
+/** `label` is a getter: it is looked up each time it is read, in the current language. */
+export const REASONS = CODES.map(code => ({
+  code,
+  get label() { return translate(code) },
+}))
+
+/** Localized label for a moderation reason code; falls back to the raw code. */
 export function reasonLabel(code) {
-  return REASONS.find(r => r.code === code)?.label ?? code ?? ''
+  return CODES.includes(code) ? translate(code) : (code ?? '')
 }

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useVideos } from '../../hooks/useVideos.js'
 import VideoSwiper from './VideoSwiper.jsx'
 
@@ -38,9 +39,10 @@ function LoadingState() {
 }
 
 function ErrorState({ message }) {
+  const { t } = useTranslation('feed')
   return (
     <div style={{ textAlign: 'center', padding: 40, color: '#ff6b6b' }}>
-      Failed to load videos: {message}
+      {t('loadFailed', { message })}
     </div>
   )
 }

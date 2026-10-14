@@ -2,6 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import i18n from '../../../i18n/index.js'
 import NotificationBell from '../NotificationBell.jsx'
 import { useNotificationStream } from '../../../hooks/useNotifications.js'
 import { notificationsApi } from '../../../api/notifications.js'
@@ -169,5 +170,27 @@ describe('NotificationDropdown', () => {
     expect(await screen.findByRole('dialog')).toBeTruthy()
     fireEvent.mouseDown(document.body)
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+})
+
+describe('NotificationDropdown (English)', () => {
+  it('renders titles in English with plurals', async () => {
+    await i18n.changeLanguage('en')
+    notificationsApi.list.mockResolvedValue({
+      data: {
+        content: [
+          reply({ actorDisplay: null }),
+          reply({ id: 'n3', actorDisplay: 'amy', actorCount: 3 }),
+          reply({ id: 'n4', actorDisplay: 'zed', actorCount: 2 }),
+          removed(),
+        ],
+      },
+    })
+    renderBell()
+    fireEvent.click(await screen.findByRole('button', { name: /Notifications/ }))
+    expect(await screen.findByText('Someone replied to your comment')).toBeTruthy()
+    expect(screen.getByText('amy and 2 others replied to your comment')).toBeTruthy()
+    expect(screen.getByText('zed and 1 other replied to your comment')).toBeTruthy()
+    expect(screen.getByText('Your comment was removed: Spam, advertising, repeated links')).toBeTruthy()
   })
 })

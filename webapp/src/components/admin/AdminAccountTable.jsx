@@ -3,12 +3,15 @@ import { useAdminAccounts, useUpdateAccountRole, useDeleteAccount } from '../../
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useAuth } from '../../hooks/useAuth.js'
+import { useTranslation } from 'react-i18next'
+import { formatDate } from '../../i18n/format.js'
 
 // Mirrors the server: you can only manage accounts, and assign roles, strictly below your own
 const ROLE_RANK = { USER: 0, ADMIN: 1, SUPER_ADMIN: 2 }
 const rank = (role) => ROLE_RANK[role] ?? 0
 
 export default function AdminAccountTable() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(0)
   const { user } = useAuth()
   const myRank = rank(user?.role)
@@ -28,15 +31,15 @@ export default function AdminAccountTable() {
   return (
     <div className="admin-table-wrap">
       {confirmDialog}
-      <div className="admin-table-meta">SHOWING {accounts.length} OF {totalElements.toLocaleString()} ENTRIES</div>
+      <div className="admin-table-meta">{t('showing', { shown: accounts.length, total: totalElements.toLocaleString() })}</div>
       <table className="admin-table">
         <thead>
           <tr>
-            <th>EMAIL</th>
-            <th>ROLE</th>
-            <th>MFA</th>
-            <th>JOINED</th>
-            <th>ACTIONS</th>
+            <th>{t('colEmail')}</th>
+            <th>{t('colRole')}</th>
+            <th>{t('colMfa')}</th>
+            <th>{t('colJoined')}</th>
+            <th>{t('colActions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -46,8 +49,8 @@ export default function AdminAccountTable() {
             const outranked = myRank <= rank(a.role)
             const nextRole = a.role === 'ADMIN' ? 'USER' : 'ADMIN'
             const lockReason = isSelf ? null
-              : outranked ? 'Can only manage accounts with a lower role'
-              : myRank <= rank(nextRole) ? 'Can only assign a role lower than yours' : null
+              : outranked ? t('lockLowerRole')
+              : myRank <= rank(nextRole) ? t('lockAssignLower') : null
             const roleLocked = isSelf || lockReason !== null
             const deleteLocked = isSelf || outranked
             return (
@@ -55,18 +58,18 @@ export default function AdminAccountTable() {
                 <td>{a.email}</td>
                 <td>
                   <span className={`admin-badge ${isSuper ? 'admin-badge-super' : a.role === 'ADMIN' ? 'admin-badge-admin' : 'admin-badge-user'}`}>
-                    {isSuper ? 'SA' : a.role}
+                    {isSuper ? t('roleSuper') : a.role}
                   </span>
                 </td>
-                <td className="admin-cell-muted">{a.mfaEnabled ? 'ON' : 'OFF'}</td>
-                <td className="admin-cell-muted">{a.createdAt ? new Date(a.createdAt).toLocaleDateString() : '—'}</td>
+                <td className="admin-cell-muted">{a.mfaEnabled ? t('mfaOn') : t('mfaOff')}</td>
+                <td className="admin-cell-muted">{a.createdAt ? formatDate(a.createdAt) : '—'}</td>
                 <td>
                   <div className="admin-actions">
                     <button
                       className="admin-action-btn"
                       disabled={roleLocked}
                       aria-busy={isBusyFor(updateRole, a.id, x => x?.id)}
-                      title={isSelf ? 'Cannot change own role' : (lockReason ?? (a.role === 'ADMIN' ? 'Demote to USER' : 'Promote to ADMIN'))}
+                      title={isSelf ? t('cannotChangeOwnRole') : (lockReason ?? (a.role === 'ADMIN' ? t('demote') : t('promote')))}
                       onClick={() => updateRole.mutate({ id: a.id, role: nextRole })}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
@@ -77,9 +80,9 @@ export default function AdminAccountTable() {
                       className="admin-action-btn danger"
                       disabled={deleteLocked}
                       aria-busy={isBusyFor(deleteAccount, a.id)}
-                      title={isSelf ? 'Cannot delete own account' : outranked ? 'Can only manage accounts with a lower role' : 'Delete account'}
+                      title={isSelf ? t('cannotDeleteSelf') : outranked ? t('lockLowerRole') : t('deleteAccount')}
                       onClick={async () => {
-                        if (await confirm({ title: 'Xoá tài khoản', message: `Xoá tài khoản ${a.email}? Thao tác này không thể hoàn tác.`, confirmLabel: 'Xoá', danger: true })) deleteAccount.mutate(a.id)
+                        if (await confirm({ title: t('deleteAccount'), message: t('deleteAccountMessage', { email: a.email }), confirmLabel: t('delete'), danger: true })) deleteAccount.mutate(a.id)
                       }}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>

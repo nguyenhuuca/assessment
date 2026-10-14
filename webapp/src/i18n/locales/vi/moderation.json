@@ -1,0 +1,9 @@
+{
+  "SPAM": "Spam, quảng cáo, link lặp lại",
+  "HARASSMENT": "Xúc phạm, bắt nạt, công kích cá nhân",
+  "HATE_SPEECH": "Thù ghét (chủng tộc, tôn giáo, giới tính…)",
+  "SEXUAL": "Nội dung tình dục / NSFW",
+  "VIOLENCE": "Đe dọa, kích động bạo lực",
+  "PERSONAL_INFO": "Lộ thông tin cá nhân (SĐT, địa chỉ…)",
+  "OTHER": "Khác (cần ghi chú)"
+}

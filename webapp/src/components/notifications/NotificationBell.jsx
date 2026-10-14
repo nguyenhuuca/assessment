@@ -1,9 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useUnreadCount } from '../../hooks/useNotifications.js'
 import { badgeLabel } from '../../utils/notificationText.js'
 import NotificationDropdown from './NotificationDropdown.jsx'
 
 export default function NotificationBell({ onOpenNotification, overlay = false }) {
+  const { t } = useTranslation('notifications')
   const [open, setOpen] = useState(false)
   const btnRef = useRef(null)
   const { data } = useUnreadCount()
@@ -19,10 +21,10 @@ export default function NotificationBell({ onOpenNotification, overlay = false }
         type="button"
         ref={btnRef}
         className={`icon-btn notif-bell${overlay ? " mobile-overlay-icon" : ""}${open ? " active" : ""}`}
-        aria-label={`Thông báo, ${count} chưa đọc`}
+        aria-label={t('bellLabel', { count })}
         aria-haspopup="dialog"
         aria-expanded={open}
-        title="Thông báo"
+        title={t('title')}
         onClick={() => setOpen(v => !v)}
       >
         <span className="material-symbols-outlined" style={{ fontSize: 20 }}>notifications</span>

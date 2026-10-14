@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
+import i18n from '../../i18n/index.js'
 import {
-  parseLines, validateSchedule, localToIso, hasActive, errorText, GENERIC_ERROR, isSupportedUrl, MAX_LINES,
+  parseLines, validateSchedule, localToIso, hasActive, errorText, isSupportedUrl, MAX_LINES,
 } from '../importUtils.js'
 
 describe('parseLines', () => {
@@ -61,7 +62,16 @@ describe('errorText', () => {
   it('maps known codes and falls back', () => {
     expect(errorText('LOGIN_REQUIRED')).toMatch(/đăng nhập/)
     expect(errorText('INVALID_URL')).toMatch(/không hợp lệ/)
-    expect(errorText('WHATEVER')).toBe(GENERIC_ERROR)
-    expect(errorText(undefined)).toBe(GENERIC_ERROR)
+    expect(errorText('WHATEVER')).toBe(i18n.t('admin:importError.generic'))
+    expect(errorText(undefined)).toBe(i18n.t('admin:importError.generic'))
+  })
+})
+
+describe('localized messages', () => {
+  it('returns English messages when the language is en', async () => {
+    await i18n.changeLanguage('en')
+    expect(errorText('INVALID_URL')).toBe('Invalid URL')
+    expect(validateSchedule('', Date.now())).toBe('Please choose a scheduled time')
+    expect(parseLines('http://x.com/a').errors[0].message).toMatch(/https/)
   })
 })

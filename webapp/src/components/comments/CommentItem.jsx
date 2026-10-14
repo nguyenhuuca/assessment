@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { authorEmail, authorName, formatTime, getAvatarColor, getInitials } from './commentUtils.js'
 
 /**
@@ -17,6 +18,7 @@ export default function CommentItem({
   onReply,
   highlightId,
 }) {
+  const { t } = useTranslation('comments')
   const rowRef = useRef(null)
   const highlighted = !!highlightId && String(highlightId) === String(c.id)
 
@@ -36,7 +38,7 @@ export default function CommentItem({
         className={highlighted ? 'comment-highlight' : undefined}
         style={{ marginBottom: isReply ? 12 : 18, fontSize: 13, fontStyle: 'italic', color: 'var(--text-muted)' }}
       >
-        {c.removed ? 'Bình luận đã bị gỡ do vi phạm chính sách' : 'Bình luận đã bị xoá'}
+        {c.removed ? t('removed') : t('deleted')}
       </div>
     )
   }
@@ -75,22 +77,22 @@ export default function CommentItem({
         <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
           {isLoggedIn && (
             <button className="comment-action-link" onClick={() => onReply(c)}>
-              Trả lời
+              {t('reply')}
             </button>
           )}
           {mine && (
             confirmId === c.id ? (
               <>
                 <button className="comment-action-link danger" onClick={() => onDelete(c.id)}>
-                  Confirm delete
+                  {t('confirmDelete')}
                 </button>
                 <button className="comment-action-link" onClick={onCancelDelete}>
-                  Cancel
+                  {t('cancel')}
                 </button>
               </>
             ) : (
               <button className="comment-action-link" onClick={() => onAskDelete(c.id)}>
-                Delete
+                {t('delete')}
               </button>
             )
           )}

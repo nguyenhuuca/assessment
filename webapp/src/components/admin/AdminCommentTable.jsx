@@ -3,52 +3,49 @@ import { REASONS } from '../../utils/moderationReasons.js'
 import { useAdminComments, useBulkModerateComments, useHardDeleteComments, useModerateComment } from '../../hooks/useAdmin.js'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
+import { useTranslation } from 'react-i18next'
+import { formatDate as formatDateI18n } from '../../i18n/format.js'
 
 const NOTE_MAX = 500
 const BULK_MAX = 100
 
 function formatDate(s) {
-  return s ? new Date(s).toLocaleString() : '—'
-}
-
-function authorLabel(c) {
-  const guest = c.isGuest ?? c.guest
-  if (guest) return `Guest · ${c.guestName || 'Anonymous'}`
-  return c.authorEmail || '—'
+  return s ? formatDateI18n(s, { dateStyle: 'medium', timeStyle: 'short' }) : '—'
 }
 
 function RemoveModal({ comment, count, onClose, onSubmit, saving, error }) {
+  const { t } = useTranslation('admin')
   const [reason, setReason] = useState('')
   const [note, setNote] = useState('')
   const [validation, setValidation] = useState('')
 
   function submit() {
-    if (!reason) { setValidation('Vui lòng chọn lý do'); return }
-    if (reason === 'OTHER' && !note.trim()) { setValidation('Lý do "Khác" cần có ghi chú'); return }
+    if (!reason) { setValidation(t('chooseReasonError')); return }
+    if (reason === 'OTHER' && !note.trim()) { setValidation(t('otherNeedsNote')); return }
     setValidation('')
     onSubmit({ action: 'REMOVE', reason, ...(note.trim() ? { note: note.trim() } : {}) })
   }
 
   return (
     <div className="app-modal-backdrop" onClick={onClose}>
-      <div className="app-modal" role="dialog" aria-label="Remove comment" onClick={e => e.stopPropagation()}>
+      <div className="app-modal" role="dialog" aria-label={t('removeDialog')} onClick={e => e.stopPropagation()}>
         <div className="app-modal-header">
-          <span className="app-modal-title">Gỡ bình luận</span>
-          <button className="app-modal-close" onClick={onClose} aria-label="Close">
+          <span className="app-modal-title">{t('removeDialog')}</span>
+          <button className="app-modal-close" onClick={onClose} aria-label={t('close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
         <div className="app-modal-body">
           <p className="admin-cell-muted" style={{ marginTop: 0 }}>
-            {count ? `${count} bình luận đã chọn` : comment.content}
+            {count ? t('selectedCount', { count }) : comment?.content}
           </p>
-          <label className="app-label" htmlFor="mod-reason">Lý do</label>
+          <label className="app-label" htmlFor="mod-reason">{t('reason')}</label>
           <select id="mod-reason" className="app-input" value={reason} onChange={e => setReason(e.target.value)}>
-            <option value="">— Chọn lý do —</option>
+            <option value="">{t('chooseReason')}</option>
             {REASONS.map(r => <option key={r.code} value={r.code}>{r.label}</option>)}
           </select>
           <label className="app-label" htmlFor="mod-note" style={{ marginTop: 12 }}>
-            Ghi chú{reason === 'OTHER' ? ' (bắt buộc)' : ''}
+            {reason === 'OTHER' ? t('noteRequired') : t('note')}
           </label>
           <textarea
             id="mod-note"
@@ -63,8 +60,8 @@ function RemoveModal({ comment, count, onClose, onSubmit, saving, error }) {
           )}
         </div>
         <div className="app-modal-footer">
-          <button className="app-btn secondary" onClick={onClose}>Cancel</button>
-          <button className="app-btn danger" onClick={submit} disabled={saving} aria-busy={saving}>Remove</button>
+          <button className="app-btn secondary" onClick={onClose}>{t('cancel')}</button>
+          <button className="app-btn danger" onClick={submit} disabled={saving} aria-busy={saving}>{t('remove')}</button>
         </div>
       </div>
     </div>
@@ -72,6 +69,14 @@ function RemoveModal({ comment, count, onClose, onSubmit, saving, error }) {
 }
 
 export default function AdminCommentTable() {
+  const { t } = useTranslation('admin')
+
+  function authorLabel(c) {
+    const guest = c.isGuest ?? c.guest
+    if (guest) return t('guest', { name: c.guestName || t('anonymous') })
+    return c.authorEmail || '—'
+  }
+
   const [page, setPage] = useState(0)
   const [status, setStatus] = useState('ALL')
   const [search, setSearch] = useState('')
@@ -141,37 +146,37 @@ export default function AdminCommentTable() {
     bulkModerate.mutate({ ids: [...selected], ...body }, {
       onSuccess: res => {
         const r = res?.data ?? res ?? {}
-        const verb = body.action === 'REMOVE' ? 'Đã gỡ' : 'Đã khôi phục'
+        const verb = body.action === 'REMOVE' ? t('verbRemoved') : t('verbRestored')
         const extra = [
-          r.unchanged ? `${r.unchanged} không thay đổi` : null,
-          r.notFound?.length ? `${r.notFound.length} không tìm thấy` : null,
+          r.unchanged ? t('unchanged', { count: r.unchanged }) : null,
+          r.notFound?.length ? t('notFound', { count: r.notFound.length }) : null,
         ].filter(Boolean).join(', ')
-        setNotice(`${verb} ${r.updated ?? 0} bình luận${extra ? ` (${extra})` : ''}`)
+        setNotice(t('bulkResult', { verb, count: r.updated ?? 0, extra: extra ? ` (${extra})` : '' }))
         setSelected(new Set())
         onDone?.()
       },
-      onError: e => setError(e?.message || 'Thao tác thất bại'),
+      onError: e => setError(e?.message || t('actionFailed')),
     })
   }
 
   async function restoreSelected() {
-    if (await confirm({ title: 'Khôi phục bình luận', message: `Khôi phục ${selected.size} bình luận đã chọn?`, confirmLabel: 'Khôi phục' })) runBulk({ action: 'RESTORE' })
+    if (await confirm({ title: t('restoreTitle'), message: t('restoreSelectedMessage', { count: selected.size }), confirmLabel: t('restore') })) runBulk({ action: 'RESTORE' })
   }
 
   function run(id, body, onDone) {
     setError('')
     moderate.mutate({ id, body }, {
       onSuccess: () => onDone?.(),
-      onError: e => setError(e?.message || 'Thao tác thất bại'),
+      onError: e => setError(e?.message || t('actionFailed')),
     })
   }
 
   // Permanent: also removes replies. "Gỡ" (REMOVE) is the reversible option.
   async function hardDeleteIds(ids, label) {
     const ok = await confirm({
-      title: 'Xoá vĩnh viễn',
-      message: `Xoá vĩnh viễn ${label} và toàn bộ reply? Không thể khôi phục.`,
-      confirmLabel: 'Xoá vĩnh viễn',
+      title: t('deletePermTitle'),
+      message: t('deletePermMessage', { label }),
+      confirmLabel: t('deletePermTitle'),
       danger: true,
     })
     if (!ok) return
@@ -180,20 +185,20 @@ export default function AdminCommentTable() {
     hardDelete.mutate(ids, {
       onSuccess: res => {
         const r = res?.data ?? {}
-        const replies = r.repliesDeleted ? ` (+${r.repliesDeleted} reply)` : ''
-        setNotice(`Đã xoá vĩnh viễn ${r.deleted ?? 0} bình luận${replies}`)
+        const replies = r.repliesDeleted ? t('repliesSuffix', { count: r.repliesDeleted }) : ''
+        setNotice(t('deletedPerm', { count: r.deleted ?? 0, replies }))
         setSelected(prev => {
           const next = new Set(prev)
           ids.forEach(id => next.delete(id))
           return next
         })
       },
-      onError: e => setError(e?.message || 'Thao tác thất bại'),
+      onError: e => setError(e?.message || t('actionFailed')),
     })
   }
 
   async function restore(c) {
-    if (await confirm({ title: 'Khôi phục bình luận', message: 'Khôi phục bình luận này?', confirmLabel: 'Khôi phục' })) run(c.id, { action: 'RESTORE' })
+    if (await confirm({ title: t('restoreTitle'), message: t('restoreMessage'), confirmLabel: t('restore') })) run(c.id, { action: 'RESTORE' })
   }
 
   return (
@@ -202,20 +207,18 @@ export default function AdminCommentTable() {
       <div className="admin-filters">
         <select
           className="admin-status-select"
-          aria-label="Status filter"
+          aria-label={t('statusFilter')}
           value={status}
           onChange={e => { setStatus(e.target.value); goToPage(0) }}
         >
-          <option value="ALL">ALL</option>
-          <option value="VISIBLE">VISIBLE</option>
-          <option value="REMOVED">REMOVED</option>
-          <option value="DELETED">DELETED</option>
+          <option value="ALL">{t('all')}</option>
+          {['VISIBLE', 'REMOVED', 'DELETED'].map(s => <option key={s} value={s}>{t(`status.${s}`)}</option>)}
         </select>
         <input
           className="app-input"
           style={{ maxWidth: 260 }}
-          placeholder="Search comments…"
-          aria-label="Search comments"
+          placeholder={t('searchPlaceholder')}
+          aria-label={t('searchComments')}
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -224,15 +227,15 @@ export default function AdminCommentTable() {
       {notice && <div className="app-alert success" role="status" style={{ marginBottom: 12 }}>{notice}</div>}
 
       {selected.size > 0 && (
-        <div className="admin-bulk-bar" role="toolbar" aria-label="Bulk actions">
-          <span>Đã chọn {selected.size}</span>
+        <div className="admin-bulk-bar" role="toolbar" aria-label={t('bulkActions')}>
+          <span>{t('selectedBar', { count: selected.size })}</span>
           <button
             className="app-btn danger"
             onClick={() => { setError(''); setTarget('BULK') }}
             disabled={bulkModerate.isPending}
             aria-busy={bulkModerate.isPending && bulkModerate.variables?.action === 'REMOVE'}
           >
-            Gỡ đã chọn
+            {t('removeSelected')}
           </button>
           <button
             className="app-btn secondary"
@@ -240,17 +243,17 @@ export default function AdminCommentTable() {
             disabled={bulkModerate.isPending}
             aria-busy={bulkModerate.isPending && bulkModerate.variables?.action === 'RESTORE'}
           >
-            Khôi phục đã chọn
+            {t('restoreSelected')}
           </button>
           <button
             className="app-btn danger-outline"
-            onClick={() => hardDeleteIds([...selected], `${selected.size} bình luận đã chọn`)}
+            onClick={() => hardDeleteIds([...selected], t('selectedLabel', { count: selected.size }))}
             disabled={hardDelete.isPending}
             aria-busy={hardDelete.isPending && hardDelete.variables?.length > 1}
           >
-            Xoá vĩnh viễn
+            {t('deletePermanently')}
           </button>
-          <button className="app-btn secondary" onClick={() => setSelected(new Set())}>Bỏ chọn</button>
+          <button className="app-btn secondary" onClick={() => setSelected(new Set())}>{t('clearSelection')}</button>
         </div>
       )}
 
@@ -258,7 +261,7 @@ export default function AdminCommentTable() {
         <div className="admin-loading"><div className="vid-spinner" /></div>
       ) : (
         <>
-          <div className="admin-table-meta">SHOWING {comments.length} OF {totalElements.toLocaleString()} ENTRIES</div>
+          <div className="admin-table-meta">{t('showing', { shown: comments.length, total: totalElements.toLocaleString() })}</div>
           <table className="admin-table">
             <thead>
               <tr>
@@ -266,17 +269,17 @@ export default function AdminCommentTable() {
                   <input
                     ref={headerBox}
                     type="checkbox"
-                    aria-label="Select all on page"
+                    aria-label={t('selectAll')}
                     checked={allSelected}
                     onChange={toggleAll}
                   />
                 </th>
-                <th>COMMENT</th>
-                <th>AUTHOR</th>
-                <th>VIDEO</th>
-                <th>CREATED</th>
-                <th>STATUS</th>
-                <th>ACTIONS</th>
+                <th>{t('colComment')}</th>
+                <th>{t('colAuthor')}</th>
+                <th>{t('colVideo')}</th>
+                <th>{t('colCreated')}</th>
+                <th>{t('colStatus')}</th>
+                <th>{t('colActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -285,7 +288,7 @@ export default function AdminCommentTable() {
                 const deleted = c.status === 'DELETED'
                 const badgeClass = removed ? 'removed' : deleted ? 'deleted' : 'visible'
                 const tip = removed
-                  ? [c.moderationReason, c.moderationNote, c.moderatedBy && `by ${c.moderatedBy}`, c.moderatedAt && formatDate(c.moderatedAt)]
+                  ? [c.moderationReason, c.moderationNote, c.moderatedBy && t('moderatedBy', { name: c.moderatedBy }), c.moderatedAt && formatDate(c.moderatedAt)]
                       .filter(Boolean).join(' · ')
                   : undefined
                 return (
@@ -293,13 +296,13 @@ export default function AdminCommentTable() {
                     <td>
                       <input
                         type="checkbox"
-                        aria-label={`Select comment ${c.id}`}
+                        aria-label={t('selectComment', { id: c.id })}
                         checked={selected.has(c.id)}
                         onChange={() => toggleOne(c.id)}
                       />
                     </td>
                     <td>
-                      {c.parentId && <span className="admin-reply-tag">↳ Reply</span>}
+                      {c.parentId && <span className="admin-reply-tag">{t('reply')}</span>}
                       <div
                         className={`admin-comment-text${expanded[c.id] ? ' expanded' : ''}`}
                         onClick={() => setExpanded(prev => ({ ...prev, [c.id]: !prev[c.id] }))}
@@ -315,7 +318,7 @@ export default function AdminCommentTable() {
                     <td className="admin-cell-muted">{formatDate(c.createdAt)}</td>
                     <td>
                       <span className={`admin-badge ${badgeClass}`} title={tip}>
-                        {c.status}
+                        {t(`status.${c.status}`, { defaultValue: c.status })}
                       </span>
                       {removed && c.moderationReason && (
                         <div className="admin-cell-muted" title={tip}>{c.moderationReason}</div>
@@ -327,7 +330,7 @@ export default function AdminCommentTable() {
                           <button
                             className="admin-action-btn"
                             onClick={() => restore(c)}
-                            title="Restore"
+                            title={t('restore')}
                             aria-busy={isBusyFor(moderate, c.id, x => x?.id)}
                           >
                             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>restore</span>
@@ -336,17 +339,17 @@ export default function AdminCommentTable() {
                           <button
                             className="admin-action-btn danger"
                             onClick={() => { setError(''); setTarget(c) }}
-                            title="Remove"
+                            title={t('remove')}
                           >
                             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>block</span>
                           </button>
                         )}
                         <button
                           className="admin-action-btn danger"
-                          onClick={() => hardDeleteIds([c.id], 'bình luận này')}
+                          onClick={() => hardDeleteIds([c.id], t('thisComment'))}
                           disabled={hardDelete.isPending}
                           aria-busy={isBusyFor(hardDelete, c.id)}
-                          title="Delete permanently"
+                          title={t('deletePermTitle')}
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete_forever</span>
                         </button>

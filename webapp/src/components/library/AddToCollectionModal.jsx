@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth.js'
 import {
   useMyCollections,
@@ -7,9 +8,10 @@ import {
   useCreateCollection,
 } from '../../hooks/useCollections.js'
 import { isBusyFor } from '../../utils/mutationBusy.js'
-import { isPublic, validateName, NAME_MAX } from './collectionUtils.js'
+import { isPublic, validateName, collectionName, NAME_MAX } from './collectionUtils.js'
 
 export default function AddToCollectionModal({ video, onClose }) {
+  const { t } = useTranslation(['library', 'common'])
   const { isLoggedIn, user } = useAuth()
   const isAdmin = !!user?.isAdmin
   const videoId = video?.id
@@ -49,17 +51,17 @@ export default function AddToCollectionModal({ video, onClose }) {
 
   return (
     <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="app-modal" role="dialog" aria-modal="true" aria-label="Lưu vào collection">
+      <div className="app-modal" role="dialog" aria-modal="true" aria-label={t('saveToCollection')}>
         <div className="app-modal-header">
-          <span className="app-modal-title">Lưu vào collection</span>
-          <button className="app-modal-close" onClick={onClose} aria-label="Close">
+          <span className="app-modal-title">{t('saveToCollection')}</span>
+          <button className="app-modal-close" onClick={onClose} aria-label={t('common:close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
         <div className="app-modal-body">
           {!isLoggedIn ? (
             <p className="admin-cell-muted" role="status" style={{ margin: 0 }}>
-              Đăng nhập để lưu video vào collection
+              {t('loginToSave')}
             </p>
           ) : (
             <>
@@ -82,12 +84,12 @@ export default function AddToCollectionModal({ video, onClose }) {
                           disabled={membership.isLoading || isBusyFor(toggle, c.id, v => v?.id)}
                           onChange={() => handleToggle(c)}
                         />
-                        <span style={{ flex: 1 }}>{c.name}</span>
+                        <span style={{ flex: 1 }}>{collectionName(c)}</span>
                         {isAdmin && isPublic(c) && (
                           <span
                             className="material-symbols-outlined"
-                            title="Công khai"
-                            aria-label="Công khai"
+                            title={t('public')}
+                            aria-label={t('public')}
                             style={{ fontSize: 18, color: 'var(--accent-cyan)' }}
                           >
                             public
@@ -100,19 +102,19 @@ export default function AddToCollectionModal({ video, onClose }) {
               )}
 
               <form onSubmit={handleCreate} style={{ marginTop: 16 }}>
-                <label className="app-label" htmlFor="new-collection-name">Tạo collection mới</label>
+                <label className="app-label" htmlFor="new-collection-name">{t('createNew')}</label>
                 <input
                   id="new-collection-name"
                   className="app-input"
                   value={name}
                   maxLength={NAME_MAX}
-                  placeholder="Tên collection"
+                  placeholder={t('nameLabel')}
                   onChange={e => setName(e.target.value)}
                 />
                 {isAdmin && (
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, fontSize: 13 }}>
                     <input type="checkbox" checked={makePublic} onChange={e => setMakePublic(e.target.checked)} />
-                    Công khai
+                    {t('public')}
                   </label>
                 )}
                 {formError && <div className="app-alert error" role="alert" style={{ marginTop: 8 }}>{formError}</div>}
@@ -123,14 +125,14 @@ export default function AddToCollectionModal({ video, onClose }) {
                   disabled={create.isPending}
                   aria-busy={create.isPending}
                 >
-                  Tạo và lưu
+                  {t('createAndSave')}
                 </button>
               </form>
             </>
           )}
         </div>
         <div className="app-modal-footer">
-          <button className="app-btn secondary" onClick={onClose}>Đóng</button>
+          <button className="app-btn secondary" onClick={onClose}>{t('common:close')}</button>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import CommentPanel from '../CommentPanel.jsx'
+import i18n from '../../../i18n/index.js'
 import { commentsApi } from '../../../api/comments.js'
 
 vi.mock('../../../api/comments.js', () => ({
@@ -40,7 +41,7 @@ describe('CommentPanel', () => {
     renderPanel()
     expect(await screen.findByText('Bình luận đã bị gỡ do vi phạm chính sách')).toBeTruthy()
     expect(screen.getByText('visible one')).toBeTruthy()
-    expect(screen.getAllByText('Delete')).toHaveLength(1)
+    expect(screen.getAllByText('Xoá')).toHaveLength(1)
   })
 
   it('renders replies under their root and counts them in the header', async () => {
@@ -50,7 +51,7 @@ describe('CommentPanel', () => {
     renderPanel()
     expect(await screen.findByText('root text')).toBeTruthy()
     expect(screen.getByText('reply text')).toBeTruthy()
-    expect(screen.getByText('2 comments')).toBeTruthy()
+    expect(screen.getByText('2 bình luận')).toBeTruthy()
   })
 
   it('collapses after 2 replies and expands on demand', async () => {
@@ -83,7 +84,7 @@ describe('CommentPanel', () => {
     renderPanel()
     await screen.findByText('root text')
     fireEvent.click(screen.getAllByText('Trả lời')[0])
-    const box = screen.getByLabelText('Reply')
+    const box = screen.getByLabelText('Phản hồi')
     expect(box.value).toBe('')
     fireEvent.change(box, { target: { value: 'hello' } })
 
@@ -94,7 +95,7 @@ describe('CommentPanel', () => {
     await waitFor(() => expect(commentsApi.post).toHaveBeenCalledWith('1', 'hello', 'a'))
     expect(await screen.findByText('hello')).toBeTruthy()
     expect(screen.getByText('reply 3')).toBeTruthy() // still expanded
-    expect(screen.queryByLabelText('Reply')).toBeNull() // box closed
+    expect(screen.queryByLabelText('Phản hồi')).toBeNull() // box closed
   })
 
   it('replying to a reply prefills @name and posts the replied comment id (server notifies its author)', async () => {
@@ -105,14 +106,14 @@ describe('CommentPanel', () => {
     await screen.findByText('bob says')
     // actions order: root Trả lời, reply Trả lời
     fireEvent.click(screen.getAllByText('Trả lời')[1])
-    const box = screen.getByLabelText('Reply')
+    const box = screen.getByLabelText('Phản hồi')
     expect(box.value).toBe('@bob ')
     fireEvent.change(box, { target: { value: '@bob thanks' } })
-    fireEvent.click(screen.getByLabelText('Send reply'))
+    fireEvent.click(screen.getByLabelText('Gửi phản hồi'))
     // 'b' (bob's reply), not root 'a' — otherwise bob is never notified (regression)
     await waitFor(() => expect(commentsApi.post).toHaveBeenCalledWith('1', '@bob thanks', 'b'))
     // the reply box still lives in the root's thread
-    await waitFor(() => expect(screen.queryByLabelText('Reply')).toBeNull())
+    await waitFor(() => expect(screen.queryByLabelText('Phản hồi')).toBeNull())
   })
 
   it('Shift+Enter does not send and Esc closes the box; only one box is open', async () => {
@@ -126,13 +127,13 @@ describe('CommentPanel', () => {
     await screen.findByText('first root')
     fireEvent.click(screen.getAllByText('Trả lời')[0])
     fireEvent.click(screen.getAllByText('Trả lời')[1])
-    expect(screen.getAllByLabelText('Reply')).toHaveLength(1)
-    const box = screen.getByLabelText('Reply')
+    expect(screen.getAllByLabelText('Phản hồi')).toHaveLength(1)
+    const box = screen.getByLabelText('Phản hồi')
     fireEvent.change(box, { target: { value: 'draft' } })
     fireEvent.keyDown(box, { key: 'Enter', shiftKey: true })
     expect(commentsApi.post).not.toHaveBeenCalled()
     fireEvent.keyDown(box, { key: 'Escape' })
-    expect(screen.queryByLabelText('Reply')).toBeNull()
+    expect(screen.queryByLabelText('Phản hồi')).toBeNull()
   })
 
   it('shows the server error inline and keeps the reply text', async () => {
@@ -141,11 +142,11 @@ describe('CommentPanel', () => {
     renderPanel()
     await screen.findByText('root text')
     fireEvent.click(screen.getByText('Trả lời'))
-    const box = screen.getByLabelText('Reply')
+    const box = screen.getByLabelText('Phản hồi')
     fireEvent.change(box, { target: { value: 'oops' } })
     fireEvent.keyDown(box, { key: 'Enter' })
     expect((await screen.findByRole('alert')).textContent).toContain('Parent comment not visible')
-    expect(screen.getByLabelText('Reply').value).toBe('oops')
+    expect(screen.getByLabelText('Phản hồi').value).toBe('oops')
   })
 
   it('renders removed and deleted placeholders in a thread without actions', async () => {
@@ -165,8 +166,8 @@ describe('CommentPanel', () => {
     expect(screen.getByText('Bình luận đã bị gỡ do vi phạm chính sách')).toBeTruthy()
     expect(screen.getByText('still here')).toBeTruthy()
     expect(screen.getAllByText('Trả lời')).toHaveLength(1) // only the visible reply
-    expect(screen.queryByText('Delete')).toBeNull()
-    expect(screen.getByText('1 comment')).toBeTruthy()
+    expect(screen.queryByText('Xoá')).toBeNull()
+    expect(screen.getByText('1 bình luận')).toBeTruthy()
   })
 
   it('guests see no Reply action', async () => {
@@ -184,10 +185,25 @@ describe('CommentPanel', () => {
     commentsApi.delete.mockResolvedValue({})
     renderPanel()
     await screen.findByText('mine')
-    fireEvent.click(screen.getByText('Delete'))
+    fireEvent.click(screen.getByText('Xoá'))
     commentsApi.list.mockResolvedValue({ data: [] })
-    fireEvent.click(screen.getByText('Confirm delete'))
+    fireEvent.click(screen.getByText('Xác nhận xoá'))
     await waitFor(() => expect(commentsApi.delete).toHaveBeenCalledWith('1', 'a'))
-    expect(await screen.findByText('No comments yet')).toBeTruthy()
+    expect(await screen.findByText('Chưa có bình luận')).toBeTruthy()
+  })
+})
+
+describe('CommentPanel (English)', () => {
+  it('renders relative time, count and actions in English', async () => {
+    await i18n.changeLanguage('en')
+    commentsApi.list.mockResolvedValue({
+      data: [node('a', 'alice@x.com', 'root text', 2, { replies: [node('b', 'bob@x.com', 'r1', 1), node('c', 'bob@x.com', 'r2', 1), node('d', 'bob@x.com', 'r3', 1)] })],
+    })
+    renderPanel()
+    await screen.findByText('root text')
+    expect(screen.getByText('2 minutes ago')).toBeTruthy()
+    expect(screen.getByText('4 comments')).toBeTruthy()
+    expect(screen.getByText('View 1 more reply ▾')).toBeTruthy()
+    expect(screen.getAllByText('Reply').length).toBeGreaterThan(0)
   })
 })

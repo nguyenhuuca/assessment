@@ -1,0 +1,21 @@
+{
+  "title": "Bình luận",
+  "count_other": "{{count}} bình luận",
+  "empty": "Chưa có bình luận",
+  "placeholder": "Viết bình luận… (Enter để gửi)",
+  "loginToComment": "Đăng nhập để bình luận",
+  "postFailed": "Không gửi được bình luận, thử lại sau",
+  "replyFailed": "Không gửi được phản hồi, thử lại sau",
+  "removed": "Bình luận đã bị gỡ do vi phạm chính sách",
+  "deleted": "Bình luận đã bị xoá",
+  "reply": "Trả lời",
+  "delete": "Xoá",
+  "confirmDelete": "Xác nhận xoá",
+  "cancel": "Huỷ",
+  "replyAria": "Phản hồi",
+  "replyPlaceholder": "Trả lời… (Enter để gửi, Esc để đóng)",
+  "sendReply": "Gửi phản hồi",
+  "send": "Gửi",
+  "showMore_other": "Xem thêm {{count}} phản hồi ▾",
+  "hideReplies": "Ẩn phản hồi ▴"
+}

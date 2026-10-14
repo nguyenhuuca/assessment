@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { thumbnailUrl } from '../../utils/videoModel.js'
 
 export default function SearchModal({ show, videos = [], currentIndex = 0, onSelect, onClose }) {
+  const { t } = useTranslation(['shell', 'common'])
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
@@ -73,10 +75,10 @@ export default function SearchModal({ show, videos = [], currentIndex = 0, onSel
               className="mobile-search-modal-input"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Search in video list"
+              placeholder={t('searchPlaceholder')}
             />
           </div>
-          <button className="icon-btn" onClick={() => onClose?.()} title="Close">
+          <button className="icon-btn" onClick={() => onClose?.()} title={t('common:close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
@@ -92,7 +94,7 @@ export default function SearchModal({ show, videos = [], currentIndex = 0, onSel
               >
                 <div className="mobile-search-modal-thumb-wrap">
                   {thumbnail ? (
-                    <img src={thumbnail} alt={item.title || 'Video thumbnail'} className="mobile-search-modal-thumb" />
+                    <img src={thumbnail} alt={item.title || t('videoThumbnail')} className="mobile-search-modal-thumb" />
                   ) : (
                     <div className="mobile-search-modal-thumb-fallback">
                       <span className="material-symbols-outlined" style={{ fontSize: 20 }}>movie</span>
@@ -100,9 +102,9 @@ export default function SearchModal({ show, videos = [], currentIndex = 0, onSel
                   )}
                 </div>
                 <div className="mobile-search-modal-item-text">
-                  <div className="mobile-search-modal-item-title">{item.title || 'Untitled'}</div>
+                  <div className="mobile-search-modal-item-title">{item.title || t('untitled')}</div>
                   <div className="mobile-search-modal-item-sub">
-                    @{item?.userShared?.split('@')[0] || 'anonymous'} • {item?.category || 'video'}
+                    @{item?.userShared?.split('@')[0] || t('anonymous')} • {item?.category || t('videoFallback')}
                   </div>
                 </div>
                 {itemIndex === currentIndex && (
@@ -114,7 +116,7 @@ export default function SearchModal({ show, videos = [], currentIndex = 0, onSel
             )
           })}
           {filteredVideos.length === 0 && (
-            <div className="mobile-search-modal-empty">No videos found</div>
+            <div className="mobile-search-modal-empty">{t('noVideosFound')}</div>
           )}
         </div>
       </div>

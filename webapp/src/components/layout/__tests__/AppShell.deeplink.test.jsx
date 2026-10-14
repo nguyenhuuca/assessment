@@ -1,4 +1,5 @@
 import React from 'react'
+import i18n from '../../../i18n/index.js'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -115,10 +116,21 @@ describe('AppShell navigation', () => {
   it('mobile nav reaches Library and back to Home', () => {
     renderShell()
     const mobileNav = document.querySelector('.mobile-nav')
-    fireEvent.click(within(mobileNav).getByRole('button', { name: /Library/ }))
+    fireEvent.click(within(mobileNav).getByRole('button', { name: /Thư viện/ }))
     expect(screen.getByTestId('library')).toBeTruthy()
-    expect(within(mobileNav).getByRole('button', { name: /Library/ })).toHaveAttribute('aria-current', 'page')
-    fireEvent.click(within(mobileNav).getByRole('button', { name: /Home/ }))
+    expect(within(mobileNav).getByRole('button', { name: /Thư viện/ })).toHaveAttribute('aria-current', 'page')
+    fireEvent.click(within(mobileNav).getByRole('button', { name: /Trang chủ/ }))
     expect(screen.getByTestId('public-feed')).toBeTruthy()
+  })
+})
+
+describe('AppShell navigation in English', () => {
+  it('shows English nav labels after switching language', async () => {
+    await i18n.changeLanguage('en')
+    renderShell()
+    const mobileNav = document.querySelector('.mobile-nav')
+    expect(within(mobileNav).getByRole('button', { name: /Home/ })).toBeTruthy()
+    expect(within(mobileNav).getByRole('button', { name: /Library/ })).toBeTruthy()
+    expect(document.querySelector('.desktop-sidenav')).toHaveTextContent('Explore')
   })
 })

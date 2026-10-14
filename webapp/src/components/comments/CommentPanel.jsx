@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { commentsApi } from '../../api/comments.js'
 import { useAuth } from '../../hooks/useAuth.js'
 
@@ -6,6 +7,7 @@ import CommentThread from './CommentThread.jsx'
 import { countVisible } from './commentUtils.js'
 
 export default function CommentPanel({ video, onClose, highlightCommentId = null }) {
+  const { t } = useTranslation(['comments', 'common'])
   const { user, isLoggedIn } = useAuth()
   const [comments, setComments]     = useState([])
   const [loading, setLoading]       = useState(true)
@@ -45,7 +47,7 @@ export default function CommentPanel({ video, onClose, highlightCommentId = null
       setText('')
       await loadComments(video.id)
     } catch (e) {
-      setError(e?.message || 'Không gửi được bình luận, thử lại sau')
+      setError(e?.message || t('postFailed'))
     }
     finally { setSubmitting(false) }
   }
@@ -62,7 +64,7 @@ export default function CommentPanel({ video, onClose, highlightCommentId = null
       setReplyTo(null)
       return true
     } catch (e) {
-      setReplyError(e?.message || 'Không gửi được phản hồi, thử lại sau')
+      setReplyError(e?.message || t('replyFailed'))
       return false
     } finally { setSubmitting(false) }
   }
@@ -120,14 +122,14 @@ export default function CommentPanel({ video, onClose, highlightCommentId = null
           flexShrink: 0,
         }}>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>Comments</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>{t('title')}</div>
             {!loading && (
               <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                {total} comment{total !== 1 ? 's' : ''}
+                {t('count', { count: total })}
               </div>
             )}
           </div>
-          <button className="app-modal-close" onClick={onClose}>
+          <button className="app-modal-close" onClick={onClose} aria-label={t('common:close')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
@@ -144,7 +146,7 @@ export default function CommentPanel({ video, onClose, highlightCommentId = null
               gap: 10, padding: '48px 0', color: 'var(--text-muted)',
             }}>
               <span className="material-symbols-outlined" style={{ fontSize: 40, opacity: 0.3 }}>chat_bubble</span>
-              <span style={{ fontSize: 13 }}>No comments yet</span>
+              <span style={{ fontSize: 13 }}>{t('empty')}</span>
             </div>
           ) : (
             comments.map(c => (
@@ -180,7 +182,7 @@ export default function CommentPanel({ video, onClose, highlightCommentId = null
                 value={text}
                 onChange={e => setText(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Add a comment… (Enter to send)"
+                placeholder={t('placeholder')}
                 rows={2}
                 style={{ flex: 1, resize: 'none', fontSize: 13 }}
               />
@@ -202,7 +204,7 @@ export default function CommentPanel({ video, onClose, highlightCommentId = null
               fontSize: 13, color: 'var(--text-muted)',
             }}>
               <span className="material-symbols-outlined" style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 6 }}>lock</span>
-              Login to comment
+              {t('loginToComment')}
             </div>
           )}
         </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useTheme } from '../../hooks/useTheme.js'
 import LoginForm from '../auth/LoginForm.jsx'
@@ -21,21 +22,22 @@ import { useNotificationStream } from '../../hooks/useNotifications.js'
 
 // Mobile bottom nav (no side nav on mobile). Settings is only useful once logged in.
 const MOBILE_NAV = [
-  { key: 'home',     icon: 'home',          label: 'Home'     },
-  { key: 'library',  icon: 'video_library', label: 'Library'  },
-  { key: 'explore',  icon: 'explore',       label: 'Explore'  },
-  { key: 'settings', icon: 'settings',      label: 'Settings', requiresAuth: true },
+  { key: 'home',     icon: 'home',          labelKey: 'navHome'     },
+  { key: 'library',  icon: 'video_library', labelKey: 'navLibrary'  },
+  { key: 'explore',  icon: 'explore',       labelKey: 'navExplore'  },
+  { key: 'settings', icon: 'settings',      labelKey: 'navSettings', requiresAuth: true },
 ]
 
 const SIDE_NAV = [
-  { key: 'home',     icon: 'home',                label: 'Home'    },
-  { key: 'explore',  icon: 'explore',             label: 'Explore' },
-  { key: 'library',  icon: 'video_library',       label: 'Library' },
-  { key: 'history',  icon: 'history',             label: 'History' },
-  { key: 'admin',    icon: 'admin_panel_settings', label: 'Admin',  requiresAdmin: true },
+  { key: 'home',     icon: 'home',                labelKey: 'navHome'    },
+  { key: 'explore',  icon: 'explore',             labelKey: 'navExplore' },
+  { key: 'library',  icon: 'video_library',       labelKey: 'navLibrary' },
+  { key: 'history',  icon: 'history',             labelKey: 'navHistory' },
+  { key: 'admin',    icon: 'admin_panel_settings', labelKey: 'navAdmin',  requiresAdmin: true },
 ]
 
 export default function AppShell() {
+  const { t } = useTranslation(['shell', 'common'])
   const { isLoggedIn, user, logout, sessionNotice, clearSessionNotice } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
   const [message,       setMessage]       = useState(null)
@@ -68,8 +70,8 @@ export default function AppShell() {
     if (!sessionNotice) return
     setMessage({ text: sessionNotice, type: 'error' })
     clearSessionNotice()
-    const t = setTimeout(() => setMessage(null), 5000)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setMessage(null), 5000)
+    return () => clearTimeout(timer)
   }, [sessionNotice, clearSessionNotice])
 
   function showComments(video) {
@@ -102,9 +104,9 @@ export default function AppShell() {
     setActiveNav('home')
   }
 
-  const mobileNav = MOBILE_NAV.filter(t => !t.requiresAuth || isLoggedIn)
+  const mobileNav = MOBILE_NAV.filter(n => !n.requiresAuth || isLoggedIn)
   const mobileSplit = Math.ceil(mobileNav.length / 2)
-  const mobileTitle = activeNav === 'home' ? 'For You' : (SIDE_NAV.find(n => n.key === activeNav)?.label ?? 'For You')
+  const mobileTitle = activeNav === 'home' ? t('forYou') : t(SIDE_NAV.find(n => n.key === activeNav)?.labelKey ?? 'forYou')
 
   function renderMobileNavItem(item) {
     const active = activeNav === item.key
@@ -122,7 +124,7 @@ export default function AppShell() {
         }}>
           {item.icon}
         </span>
-        {item.label}
+        {t(item.labelKey)}
       </button>
     )
   }
@@ -165,7 +167,7 @@ export default function AppShell() {
             <button
               className={`icon-btn${mobileSearchOpen ? ' active' : ''}`}
               onClick={() => setMobileSearchOpen(v => !v)}
-              title="Search videos"
+              title={t('searchVideos')}
               style={mobileSearchOpen ? { color: 'var(--accent-cyan)', background: 'var(--accent-cyan-dim)' } : undefined}
             >
               <span className="material-symbols-outlined" style={{ fontSize: 20 }}>search</span>
@@ -182,19 +184,19 @@ export default function AppShell() {
                 {user?.email?.split('@')[0]}
               </span>
               <NotificationBell onOpenNotification={openNotification} />
-              <button className="icon-btn" onClick={() => setShareOpen(true)} title="Share video">
+              <button className="icon-btn" onClick={() => setShareOpen(true)} title={t('shareVideo')}>
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>upload</span>
               </button>
-              <button className="icon-btn" onClick={() => setProfileOpen(true)} title="Profile">
+              <button className="icon-btn" onClick={() => setProfileOpen(true)} title={t('profile')}>
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person</span>
               </button>
-              <button className="icon-btn" onClick={logout} title="Logout" style={{ color: '#ff6b6b' }}>
+              <button className="icon-btn" onClick={logout} title={t('common:logout')} style={{ color: '#ff6b6b' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>logout</span>
               </button>
             </>
           )}
           <LanguageSwitcher />
-          <button className="icon-btn" onClick={toggleTheme} title="Toggle theme">
+          <button className="icon-btn" onClick={toggleTheme} title={t('toggleTheme')}>
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
               {theme === 'dark' ? 'dark_mode' : 'light_mode'}
             </span>
@@ -206,7 +208,7 @@ export default function AppShell() {
         <button
           className={`icon-btn mobile-overlay-icon${mobileSearchOpen ? ' active' : ''}`}
           onClick={() => setMobileSearchOpen(v => !v)}
-          title="Search"
+          title={t('search')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>search</span>
         </button>
@@ -215,7 +217,7 @@ export default function AppShell() {
             <button
               className={`icon-btn mobile-overlay-icon${mobileLoginOpen ? ' active' : ''}`}
               onClick={() => setMobileLoginOpen(v => !v)}
-              title="Login"
+              title={t('common:login')}
             >
               <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person</span>
             </button>
@@ -233,12 +235,12 @@ export default function AppShell() {
                   <button
                     className="icon-btn mobile-overlay-icon"
                     onClick={() => setProfileOpen(true)}
-                    title="Profile"
+                    title={t('profile')}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person</span>
                   </button>
 
-                <button className="icon-btn" onClick={logout} title="Logout" style={{ color: '#ff6b6b' }}>
+                <button className="icon-btn" onClick={logout} title={t('common:logout')} style={{ color: '#ff6b6b' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: 20 }}>logout</span>
                 </button>
             </>
@@ -270,7 +272,7 @@ export default function AppShell() {
             }}>
               {item.icon}
             </span>
-            <span>{item.label}</span>
+            <span>{t(item.labelKey)}</span>
           </button>
         ))}
         <button
@@ -279,7 +281,7 @@ export default function AppShell() {
           onClick={() => setActiveNav('settings')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 22 }}>settings</span>
-          <span>Settings</span>
+          <span>{t('navSettings')}</span>
         </button>
       </aside>
 
@@ -359,7 +361,7 @@ export default function AppShell() {
 
         {/* Center FAB — inline flex item (YouTube-style) */}
         {isLoggedIn && (
-          <button className="mobile-nav-fab" onClick={() => setShareOpen(true)} title="Share a video">
+          <button className="mobile-nav-fab" onClick={() => setShareOpen(true)} title={t('shareAVideo')}>
             <span className="material-symbols-outlined" style={{ fontSize: 24 }}>add</span>
           </button>
         )}
@@ -369,7 +371,7 @@ export default function AppShell() {
 
       {/* ── FAB (desktop only, hidden on mobile via CSS) ── */}
       {isLoggedIn && (
-        <button className="fab" onClick={() => setShareOpen(true)} title="Share a video">
+        <button className="fab" onClick={() => setShareOpen(true)} title={t('shareAVideo')}>
           <span className="material-symbols-outlined" style={{ fontSize: 26 }}>add</span>
         </button>
       )}

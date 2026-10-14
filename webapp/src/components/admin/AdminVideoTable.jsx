@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useUpdateVideoVisibility, useDeleteVideo } from '../../hooks/useAdmin.js'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
+import { useTranslation } from 'react-i18next'
 
 const STATUS_COLORS = {
   PUBLISHED: '#00c853',
@@ -15,16 +16,17 @@ const STATUSES = ['PUBLISHED', 'PENDING', 'FLAGGED']
 // Reserves a fixed-size slot at all times so the icon appearing/disappearing
 // doesn't resize the surrounding cell/table.
 function SaveIndicator({ state }) {
+  const { t } = useTranslation('admin')
   let icon = null
   let color = 'transparent'
   let title
   let spin = false
   if (state === 'saving') {
-    icon = 'sync'; color = '#adaaaa'; title = 'Saving…'; spin = true
+    icon = 'sync'; color = '#adaaaa'; title = t('saving'); spin = true
   } else if (state === 'saved') {
-    icon = 'check_circle'; color = '#00c853'; title = 'Saved'
+    icon = 'check_circle'; color = '#00c853'; title = t('saved')
   } else if (state === 'error') {
-    icon = 'error'; color = '#ff1744'; title = 'Failed to save'
+    icon = 'error'; color = '#ff1744'; title = t('saveFailed')
   }
 
   return (
@@ -52,6 +54,7 @@ function SaveIndicator({ state }) {
 }
 
 export default function AdminVideoTable({ statusFilter }) {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(0)
   const [saveState, setSaveState] = useState({}) // { [`${id}:${field}`]: 'saving' | 'saved' | 'error' }
   const { data, isLoading } = useAdminVideos(page, statusFilter)
@@ -87,17 +90,17 @@ export default function AdminVideoTable({ statusFilter }) {
   return (
     <div className="admin-table-wrap">
       {confirmDialog}
-      <div className="admin-table-meta">SHOWING {videos.length} OF {totalElements.toLocaleString()} ENTRIES</div>
+      <div className="admin-table-meta">{t('showing', { shown: videos.length, total: totalElements.toLocaleString() })}</div>
       <table className="admin-table">
         <thead>
           <tr>
-            <th>ASSET</th>
-            <th>CREATOR</th>
-            <th>STATUS</th>
-            <th title="Ẩn video khỏi feed công khai">HIDDEN</th>
-            <th>PRIORITY</th>
-            <th>METRICS</th>
-            <th>ACTIONS</th>
+            <th>{t('colAsset')}</th>
+            <th>{t('colCreator')}</th>
+            <th>{t('colStatus')}</th>
+            <th title={t('hiddenHeaderTitle')}>{t('colHidden')}</th>
+            <th>{t('colPriority')}</th>
+            <th>{t('colMetrics')}</th>
+            <th>{t('colActions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -108,7 +111,7 @@ export default function AdminVideoTable({ statusFilter }) {
                   {v.thumbnailPath && (
                     <img src={v.thumbnailPath} alt="" className="admin-thumb" />
                   )}
-                  <span className="admin-asset-title">{v.title || 'Untitled'}</span>
+                  <span className="admin-asset-title">{v.title || t('untitled')}</span>
                 </div>
               </td>
               <td className="admin-cell-muted">{v.creatorEmail || '—'}</td>
@@ -121,18 +124,18 @@ export default function AdminVideoTable({ statusFilter }) {
                     border: `1px solid ${STATUS_COLORS[v.status] ?? '#888'}`,
                   }}
                 >
-                  {v.status}
+                  {t(`status.${v.status}`, { defaultValue: v.status })}
                 </span>
               </td>
               <td>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <label title={v.hidden ? 'Đang ẩn khỏi feed' : 'Đang hiện trên feed'}>
+                  <label title={v.hidden ? t('hiddenNow') : t('visibleNow')}>
                     <input
                       type="checkbox"
                       className="admin-hide-toggle"
                       aria-busy={isBusyFor(updateVisibility, v.id, x => x?.id)}
                       disabled={isBusyFor(updateVisibility, v.id, x => x?.id)}
-                      aria-label={`Ẩn ${v.title || 'video'}`}
+                      aria-label={t('hideAria', { title: v.title || t('videoFallback') })}
                       checked={!!v.hidden}
                       onChange={e => {
                         const key = `${v.id}:hidden`
@@ -157,7 +160,7 @@ export default function AdminVideoTable({ statusFilter }) {
                     max={9999}
                     key={`${v.id}-${v.priority ?? 0}`}
                     defaultValue={v.priority ?? 0}
-                    title="Higher number shows first in the public feed"
+                    title={t('priorityTitle')}
                     onBlur={e => {
                       const next = Number(e.target.value)
                       if (!Number.isFinite(next) || next === (v.priority ?? 0)) return
@@ -172,7 +175,7 @@ export default function AdminVideoTable({ statusFilter }) {
                   <SaveIndicator state={saveState[`${v.id}:priority`]} />
                 </div>
               </td>
-              <td className="admin-cell-muted">{v.viewCount?.toLocaleString() ?? 0} views</td>
+              <td className="admin-cell-muted">{t('views', { count: v.viewCount ?? 0 })}</td>
               <td>
                 <div className="admin-actions">
                   <select
@@ -187,16 +190,16 @@ export default function AdminVideoTable({ statusFilter }) {
                       })
                     }}
                   >
-                    {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                    {STATUSES.map(s => <option key={s} value={s}>{t(`status.${s}`)}</option>)}
                   </select>
                   <SaveIndicator state={saveState[`${v.id}:status`]} />
                   <button
                     className="admin-action-btn danger"
                     aria-busy={isBusyFor(deleteVideo, v.id)}
                     onClick={async () => {
-                      if (await confirm({ title: 'Xoá video', message: `Xoá "${v.title}"? Thao tác này không thể hoàn tác.`, confirmLabel: 'Xoá', danger: true })) deleteVideo.mutate(v.id)
+                      if (await confirm({ title: t('deleteVideoTitle'), message: t('deleteVideoMessage', { title: v.title }), confirmLabel: t('delete'), danger: true })) deleteVideo.mutate(v.id)
                     }}
-                    title="Delete"
+                    title={t('delete')}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
                   </button>

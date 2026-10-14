@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   useCancelImport, useRetryImport, useRunImportNow, useVideoImports,
 } from '../../hooks/useAdmin.js'
@@ -10,10 +11,11 @@ import {
 const STATUSES = ['PENDING', 'DOWNLOADING', 'UPLOADING', 'DONE', 'FAILED', 'CANCELLED']
 
 function Progress({ job }) {
+  const { t } = useTranslation('admin')
   const pct = Math.max(0, Math.min(100, Math.round(job.progressPct ?? 0)))
   return (
     <div>
-      <div>{job.status === 'UPLOADING' ? 'Đang upload lên Drive' : 'Đang tải về'}</div>
+      <div>{job.status === 'UPLOADING' ? t('uploadingToDrive') : t('downloading')}</div>
       <div className="import-progress" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
         <div className="import-progress-fill" style={{ width: `${pct}%` }} />
       </div>
@@ -23,9 +25,10 @@ function Progress({ job }) {
 }
 
 function StateCell({ job }) {
+  const { t } = useTranslation('admin')
   if (isRunning(job)) return <Progress job={job} />
   if (job.status === 'DONE') {
-    return <span className="admin-cell-muted">{job.ingested ? 'Đã lên app' : 'Chờ đồng bộ (≤15 phút)'}</span>
+    return <span className="admin-cell-muted">{job.ingested ? t('ingested') : t('awaitingSync')}</span>
   }
   if (job.status === 'FAILED' || job.status === 'CANCELLED') {
     return <span className="import-error">{errorText(job.errorCode || (job.status === 'CANCELLED' ? 'CANCELLED' : undefined))}</span>
@@ -34,6 +37,7 @@ function StateCell({ job }) {
 }
 
 export default function ImportTable() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(0)
   const [status, setStatus] = useState('ALL')
   const [error, setError] = useState('')
@@ -49,7 +53,7 @@ export default function ImportTable() {
 
   function act(mutation, id) {
     setError('')
-    mutation.mutate(id, { onError: e => setError(e?.message || 'Thao tác thất bại') })
+    mutation.mutate(id, { onError: e => setError(e?.message || t('actionFailed')) })
   }
 
   return (
@@ -57,12 +61,12 @@ export default function ImportTable() {
       <div className="admin-filters">
         <select
           className="admin-status-select"
-          aria-label="Status filter"
+          aria-label={t('statusFilter')}
           value={status}
           onChange={e => { setStatus(e.target.value); setPage(0) }}
         >
-          <option value="ALL">ALL</option>
-          {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+          <option value="ALL">{t('all')}</option>
+          {STATUSES.map(s => <option key={s} value={s}>{t(`status.${s}`)}</option>)}
         </select>
       </div>
       {error && <div className="app-alert error" role="alert" style={{ marginBottom: 12 }}>{error}</div>}
@@ -70,7 +74,7 @@ export default function ImportTable() {
         <div className="admin-loading"><div className="vid-spinner" /></div>
       ) : (
         <>
-          <div className="admin-table-meta">SHOWING {jobs.length} OF {totalElements.toLocaleString()} ENTRIES</div>
+          <div className="admin-table-meta">{t('showing', { shown: jobs.length, total: totalElements.toLocaleString() })}</div>
           <div className="import-scroll">
             {/* Fixed column widths: cell content changes with every status update and must not resize the table */}
             <table className="admin-table import-table">
@@ -84,7 +88,7 @@ export default function ImportTable() {
               </colgroup>
               <thead>
                 <tr>
-                  <th>TIÊU ĐỀ</th><th>NỀN TẢNG</th><th>TRẠNG THÁI</th><th>TIẾN ĐỘ</th><th>THỜI GIAN</th><th>ACTIONS</th>
+                  <th>{t('colTitle')}</th><th>{t('colPlatform')}</th><th>{t('colStatus')}</th><th>{t('colProgress')}</th><th>{t('colTime')}</th><th>{t('colActions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -92,19 +96,19 @@ export default function ImportTable() {
                   <tr key={j.id} className="admin-table-row">
                     <td><div className="import-cell-title" title={j.title || j.sourceUrl}>{j.title || j.sourceUrl}</div></td>
                     <td className="admin-cell-muted">{platformLabel(j.platform)}</td>
-                    <td><span className={`admin-badge ${String(j.status).toLowerCase()}`}>{j.status}</span></td>
+                    <td><span className={`admin-badge ${String(j.status).toLowerCase()}`}>{t(`status.${j.status}`, { defaultValue: j.status })}</span></td>
                     <td><StateCell job={j} /></td>
                     <td className="admin-cell-muted">{formatTime(j.startedAt || j.scheduledAt || j.createdAt)}</td>
                     <td>
                       <div className="admin-actions">
                         {canRunNow(j) && (
-                          <button className="app-btn secondary" onClick={() => act(runNow, j.id)} disabled={runNow.isPending} aria-busy={isBusyFor(runNow, j.id)}>Chạy ngay</button>
+                          <button className="app-btn secondary" onClick={() => act(runNow, j.id)} disabled={runNow.isPending} aria-busy={isBusyFor(runNow, j.id)}>{t('runNow')}</button>
                         )}
                         {canCancel(j) && (
-                          <button className="app-btn danger" onClick={() => act(cancel, j.id)} disabled={cancel.isPending} aria-busy={isBusyFor(cancel, j.id)}>Huỷ</button>
+                          <button className="app-btn danger" onClick={() => act(cancel, j.id)} disabled={cancel.isPending} aria-busy={isBusyFor(cancel, j.id)}>{t('cancelJob')}</button>
                         )}
                         {canRetry(j) && (
-                          <button className="app-btn secondary" onClick={() => act(retry, j.id)} disabled={retry.isPending} aria-busy={isBusyFor(retry, j.id)}>Thử lại</button>
+                          <button className="app-btn secondary" onClick={() => act(retry, j.id)} disabled={retry.isPending} aria-busy={isBusyFor(retry, j.id)}>{t('retry')}</button>
                         )}
                       </div>
                     </td>

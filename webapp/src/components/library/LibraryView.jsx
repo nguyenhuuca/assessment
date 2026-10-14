@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import {
@@ -13,9 +14,12 @@ import VideoSwiper from '../video/VideoSwiper.jsx'
 import CollectionFormModal from './CollectionFormModal.jsx'
 import AddVideosModal from './AddVideosModal.jsx'
 import { thumbnailUrl } from '../../utils/videoModel.js'
-import { isPublic, pinDefaultFirst } from './collectionUtils.js'
+import { isPublic, pinDefaultFirst, collectionName } from './collectionUtils.js'
 
 function CollectionCard({ collection, onOpen, onPlay }) {
+  const { t } = useTranslation('library')
+  const name = collectionName(collection)
+  const count = collection.itemCount ?? 0
   const cover = thumbnailUrl(collection.coverFileId)
   const empty = !collection.itemCount
   return (
@@ -24,8 +28,8 @@ function CollectionCard({ collection, onOpen, onPlay }) {
         className="explore-reel"
         role="button"
         tabIndex={0}
-        title={collection.name}
-        aria-label={`${collection.name}, ${collection.itemCount ?? 0} video`}
+        title={name}
+        aria-label={t('cardLabel', { name, count })}
         onClick={() => onOpen(collection.id)}
         onKeyDown={e => e.key === 'Enter' && onOpen(collection.id)}
       >
@@ -34,30 +38,31 @@ function CollectionCard({ collection, onOpen, onPlay }) {
           : <div className="explore-reel-fallback"><span className="material-symbols-outlined" style={{ fontSize: 36 }}>video_library</span></div>}
         <div className="explore-reel-scrim" />
         <span className="explore-reel-views" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-          <strong>{collection.name}</strong>
+          <strong>{name}</strong>
           <span style={{ fontSize: 12 }}>
-            {collection.itemCount ?? 0} video
-            {isPublic(collection) && ' · Công khai'}
+            {t('videoCount', { count })}
+            {isPublic(collection) && ` · ${t('public')}`}
           </span>
         </span>
       </div>
       <button
         className="app-btn primary"
         style={{ justifyContent: 'center' }}
-        aria-label={`Phát ${collection.name}`}
+        aria-label={t('playCollection', { name })}
         disabled={empty}
-        title={empty ? 'Collection chưa có video' : undefined}
+        title={empty ? t('emptyCannotPlay') : undefined}
         onClick={() => onPlay(collection.id)}
       >
-        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>play_arrow</span> Phát
+        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>play_arrow</span> {t('play')}
       </button>
     </div>
   )
 }
 
 function VideoTile({ video, onPlay, onRemove, removing }) {
+  const { t } = useTranslation('library')
   const thumb = thumbnailUrl(video.fileId) || video.poster
-  const title = video.title || 'Untitled'
+  const title = video.title || t('untitled')
   return (
     <div
       className="explore-reel"
@@ -76,7 +81,7 @@ function VideoTile({ video, onPlay, onRemove, removing }) {
         <button
           className="app-btn secondary"
           style={{ position: 'absolute', top: 8, right: 8, padding: '4px 8px' }}
-          aria-label={`Bỏ "${title}" khỏi collection`}
+          aria-label={t('removeVideoAria', { title })}
           aria-busy={removing}
           disabled={removing}
           onClick={e => { e.stopPropagation(); onRemove() }}
@@ -92,10 +97,11 @@ const PLAYER_BOX = { position: 'relative', height: 'calc(100vh - var(--topnav-h)
 
 /** Plays a list of videos in the swiper, with a back button to the grid it came from. */
 function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComments, currentUser }) {
+  const { t } = useTranslation('common')
   return (
     <div style={PLAYER_BOX}>
       <button className="app-btn secondary" style={{ position: 'absolute', top: 12, left: 12, zIndex: 5 }} onClick={onBack}>
-        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> Quay lại
+        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> {t('back')}
       </button>
       <VideoSwiper
         videos={videos}
@@ -111,18 +117,19 @@ function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComment
 
 /** "Phát" on a card: loads the whole collection and plays it from the first video. */
 function CollectionPlayer({ collectionId, onBack, muted, onMutedChange, onShowComments, currentUser }) {
+  const { t } = useTranslation('library')
   const { data: videos = [], isLoading, error } = useCollectionPlaylist(collectionId)
   // Same box as the player, so the spinner sits where the video will appear
-  if (isLoading) return <div style={PLAYER_BOX} role="status" aria-label="Đang tải"><div className="vid-spinner" /></div>
+  if (isLoading) return <div style={PLAYER_BOX} role="status" aria-label={t('loadingAria')}><div className="vid-spinner" /></div>
   if (error || videos.length === 0) {
     return (
       <div className="explore-root">
         <button className="app-btn secondary" onClick={onBack}>
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> Thư viện
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> {t('library')}
         </button>
         {error
           ? <div className="app-alert error" role="alert" style={{ marginTop: 12 }}>{error.message}</div>
-          : <p className="explore-empty-grid">Collection này chưa có video</p>}
+          : <p className="explore-empty-grid">{t('emptyCollection')}</p>}
       </div>
     )
   }
@@ -140,6 +147,7 @@ function CollectionPlayer({ collectionId, onBack, muted, onMutedChange, onShowCo
 }
 
 function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, deleting, muted, onMutedChange, onShowComments, currentUser }) {
+  const { t } = useTranslation(['library', 'common'])
   const [page, setPage] = useState(0)
   const [playIndex, setPlayIndex] = useState(null)
   const [adding, setAdding] = useState(false)
@@ -171,7 +179,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
 
   function share() {
     const url = `${window.location.origin}${window.location.pathname}?l=${collectionId}`
-    if (navigator.share) navigator.share({ title: collection?.name, url }).catch(() => {})
+    if (navigator.share) navigator.share({ title: collection ? collectionName(collection) : undefined, url }).catch(() => {})
     else navigator.clipboard?.writeText(url).catch(() => {})
   }
 
@@ -180,26 +188,26 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
       <section className="explore-section">
         <div className="explore-section-header" style={{ gap: 8, flexWrap: 'wrap' }}>
           <button className="app-btn secondary" onClick={onBack}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> Thư viện
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> {t('library')}
           </button>
-          <h2 className="explore-section-title">{collection?.name ?? 'Collection'}</h2>
+          <h2 className="explore-section-title">{collection ? collectionName(collection) : t('collectionFallback')}</h2>
           <button className="app-btn secondary" onClick={share}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>share</span> Chia sẻ
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>share</span> {t('common:share')}
           </button>
           {canManage && (
             <button className="app-btn primary" onClick={() => setAdding(true)}>
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span> Thêm video
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span> {t('addVideo')}
             </button>
           )}
           {canManage && !collection.isDefault && (
             <>
-              <button className="app-btn secondary" onClick={onEdit}>Sửa</button>
-              <button className="app-btn danger" onClick={onDelete} disabled={deleting} aria-busy={deleting}>Xoá</button>
+              <button className="app-btn secondary" onClick={onEdit}>{t('edit')}</button>
+              <button className="app-btn danger" onClick={onDelete} disabled={deleting} aria-busy={deleting}>{t('delete')}</button>
             </>
           )}
         </div>
         {canManage && collection.unavailableCount > 0 && (
-          <p className="admin-cell-muted">{collection.unavailableCount} video không còn khả dụng</p>
+          <p className="admin-cell-muted">{t('unavailableVideos', { count: collection.unavailableCount })}</p>
         )}
         {error && <div className="app-alert error" role="alert">{error.message}</div>}
         {toggle.error && <div className="app-alert error" role="alert">{toggle.error.message}</div>}
@@ -207,7 +215,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
           <div className="vid-spinner" />
         ) : videos.length === 0 ? (
           <p className="explore-empty-grid">
-            Collection này chưa có video{canManage && ' — bấm "Thêm video" để tìm và thêm'}
+            {canManage ? t('emptyCollectionHint') : t('emptyCollection')}
           </p>
         ) : (
           <div className="explore-reels-grid">
@@ -224,9 +232,9 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
         )}
         {totalPages > 1 && (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16 }}>
-            <button className="app-btn secondary" disabled={page === 0} onClick={() => setPage(p => p - 1)}>Trước</button>
+            <button className="app-btn secondary" disabled={page === 0} onClick={() => setPage(p => p - 1)}>{t('prev')}</button>
             <span className="admin-cell-muted">{page + 1}/{totalPages}</span>
-            <button className="app-btn secondary" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>Sau</button>
+            <button className="app-btn secondary" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>{t('next')}</button>
           </div>
         )}
       </section>
@@ -241,6 +249,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
 }
 
 export default function LibraryView({ initialCollectionId = null, muted, onMutedChange, onShowComments }) {
+  const { t } = useTranslation(['library', 'common'])
   const { isLoggedIn, user } = useAuth()
   const [confirm, confirmDialog] = useConfirm()
   const publicQuery = usePublicCollections()
@@ -257,9 +266,9 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
 
   async function handleDelete(c) {
     const ok = await confirm({
-      title: 'Xoá collection',
-      message: `Xoá "${c.name}"? Video trong collection sẽ không bị xoá.`,
-      confirmLabel: 'Xoá',
+      title: t('deleteTitle'),
+      message: t('deleteMessage', { name: collectionName(c) }),
+      confirmLabel: t('delete'),
       danger: true,
     })
     if (ok) remove.mutate(c.id, { onSuccess: () => setOpenId(null) })
@@ -303,13 +312,13 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
     <div className="explore-root">
       <section className="explore-section">
         <div className="explore-section-header">
-          <h2 className="explore-section-title">Nổi bật</h2>
+          <h2 className="explore-section-title">{t('featured')}</h2>
         </div>
         {publicQuery.error && <div className="app-alert error" role="alert">{publicQuery.error.message}</div>}
         {publicQuery.isLoading ? (
           <div className="vid-spinner" />
         ) : publicList.length === 0 ? (
-          <p className="explore-empty-grid">Chưa có collection công khai</p>
+          <p className="explore-empty-grid">{t('noPublic')}</p>
         ) : (
           <div className="explore-reels-grid">
             {publicList.map(c => <CollectionCard key={c.id} collection={c} onOpen={setOpenId} onPlay={setPlayId} />)}
@@ -319,15 +328,15 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
 
       <section className="explore-section">
         <div className="explore-section-header" style={{ gap: 8 }}>
-          <h2 className="explore-section-title">Collection của tôi</h2>
+          <h2 className="explore-section-title">{t('mine')}</h2>
           {isLoggedIn && (
             <button className="app-btn primary" onClick={() => setFormState({})}>
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span> Tạo collection
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span> {t('create')}
             </button>
           )}
         </div>
         {!isLoggedIn ? (
-          <p className="explore-empty-grid" role="status">Đăng nhập để tạo và lưu video vào collection của bạn</p>
+          <p className="explore-empty-grid" role="status">{t('loginToCreate')}</p>
         ) : (
           <>
             {mine.error && <div className="app-alert error" role="alert">{mine.error.message}</div>}
@@ -343,7 +352,7 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
                       <button
                         className="app-btn secondary"
                         style={{ position: 'absolute', top: 8, right: 8, padding: '4px 8px' }}
-                        aria-label={`Xoá collection ${c.name}`}
+                        aria-label={t('deleteCollectionAria', { name: collectionName(c) })}
                         aria-busy={remove.isPending && remove.variables === c.id}
                         onClick={() => handleDelete(c)}
                       >

@@ -66,7 +66,7 @@ describe('DriveSyncPanel', () => {
     renderPanel()
     fireEvent.click(await screen.findByLabelText('Chọn one.mp4'))
     fireEvent.click(screen.getByText('FORCE_SYNC (1)'))
-    fireEvent.click(within(screen.getByRole('dialog')).getByText('Huỷ'))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /^(Hủy|Huỷ)$/ }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(adminApi.startDriveSyncRun).not.toHaveBeenCalled()
   })
