@@ -7729,6 +7729,10 @@ Handoff to: Builder, QA Engineer
 <td>2026-10-14</td>
 <td>Adversarial review fixes. Removing the feed tabs left private videos with nowhere to appear, so Library gets a "Video riêng tư của tôi" section and the dead <code>VideoTabs</code> and <code>PrivateFeed</code> are removed. When an admin makes another admin's public collection private, the actor takes ownership. Row locks stop concurrent requests from exceeding the 500-item and 50-collection caps. <code>/public</code> is capped at 100, cached for 30s for non-admins and invalidated on public writes. Covers use a LATERAL query backed by the new index <code>idx_video_collection_items_recent</code>. New <code>GET /{id}/video-ids</code> lets AddVideosModal mark every video already in the collection, not just the current page. Names are NFC-normalized and control characters are rejected. Toggling a private collection no longer refetches <code>/public</code>. <code>thumbnailUrl()</code> is shared. The CI coverage step fails on a missing or invalid threshold file.</td>
 </tr>
+<tr>
+<td>2026-10-14</td>
+<td>Removed the "Video riêng tư của tôi" section. <code>/private-videos</code> actually returns the user's legacy <code>share_link</code> rows, not private videos, and share_link is being retired. Dropped <code>usePrivateVideos</code> and <code>videosApi.privateList</code>.</td>
+</tr>
 </tbody>
 </table>
 
