@@ -81,6 +81,7 @@ yt-dlp --ignore-config --no-playlist --use-extractors youtube,facebook
 ```
 
 - URL validated before it is stored: `https` only, host allowlist (`youtube.com`, `www.youtube.com`, `m.youtube.com`, `youtu.be`, `facebook.com`, `www.facebook.com`, `m.facebook.com`, `fb.watch`), length ≤ 2048. `--use-extractors` disables the generic extractor (no fetching arbitrary hosts → SSRF guard); `--` stops option injection.
+- Facebook short links (`facebook.com/share/v|r/<token>`, `fb.watch/<token>`) have no yt-dlp extractor. The server rebuilds the canonical link from the validated token, sends one `HEAD` with redirects disabled (`HttpRedirectProbe`), and runs the `Location` through the same allowlist; the result is stored as the normalized reel/watch URL (`ImportUrlResolver`). A redirect never makes the server fetch a non-Facebook host. Added 2026-10-15.
 - Progress parsed from stdout lines; stderr kept in a bounded ring buffer (last 20 lines) for the log, mapped to an `error_code` for the UI.
 - Timeouts: metadata 60 s, download 30 min → `destroyForcibly()`. Cancel destroys the process.
 - Disk guard: refuse to start if free space in `app.video-import.work-dir` (default `/opt/data/imports`) < 2 GB.

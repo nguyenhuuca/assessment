@@ -27,13 +27,65 @@ public class ImportUrlValidator {
     private static final Pattern YT_ID = Pattern.compile("[A-Za-z0-9_-]{11}");
     private static final Pattern DIGITS = Pattern.compile("\\d{5,30}");
     private static final Pattern TOKEN = Pattern.compile("[A-Za-z0-9_-]{3,64}");
-    private static final Pattern UNSAFE_CHARS = Pattern.compile("[\\p{Cntrl}\\s\\\\]");
+    private static final Pattern FB_SHARE = Pattern.compile("^/share/([vr])/([A-Za-z0-9_-]{3,64})/?$");
+    private static final Pattern UNSAFE_CHARS =Pattern.compile("[\\p{Cntrl}\\s\\\\]");
 
     /** Result of a successful validation. */
     public record ImportUrl(String sourceUrl, String normalizedUrl, ImportPlatform platform, String videoId) {
     }
 
     public Optional<ImportUrl> parse(String raw) {
+        Optional<URI> safe = safeUri(raw);
+        if (safe.isEmpty()) {
+            return Optional.empty();
+        }
+        URI uri = safe.get();
+        String url = raw.trim();
+        String host = uri.getHost().toLowerCase();
+        String path = uri.getRawPath() == null ? "" : uri.getRawPath();
+
+        if (YOUTUBE_HOSTS.contains(host)) {
+            return youtubeWatchOrShorts(url, path, uri.getRawQuery());
+        }
+        if (SHORT_YOUTUBE_HOST.equals(host)) {
+            return youtubeShortLink(url, path);
+        }
+        if (FACEBOOK_HOSTS.contains(host)) {
+            return facebook(url, path, uri.getRawQuery());
+        }
+        if (SHORT_FACEBOOK_HOST.equals(host)) {
+            return facebookShortLink(url, path);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Facebook short links ({@code facebook.com/share/v|r/<token>}, {@code fb.watch/<token>}) that yt-dlp cannot
+     * extract and that only reveal the video id through Facebook's redirect. Returns the canonical link to probe,
+     * rebuilt from the validated token so the probe never requests a caller-controlled URL.
+     */
+    public Optional<String> expandableShortLink(String raw) {
+        return safeUri(raw).flatMap(uri -> {
+            String host = uri.getHost().toLowerCase();
+            String path = uri.getRawPath() == null ? "" : uri.getRawPath();
+            if (FACEBOOK_HOSTS.contains(host)) {
+                Matcher m = FB_SHARE.matcher(path);
+                return m.matches()
+                        ? Optional.of("https://www.facebook.com/share/" + m.group(1) + "/" + m.group(2) + "/")
+                        : Optional.empty();
+            }
+            if (SHORT_FACEBOOK_HOST.equals(host)) {
+                String token = firstGroup("^/([^/]+)/?$", path);
+                return token != null && TOKEN.matcher(token).matches()
+                        ? Optional.of("https://fb.watch/" + token + "/")
+                        : Optional.empty();
+            }
+            return Optional.empty();
+        });
+    }
+
+    /** https, allowlist-ready URI: no user info, no odd port, no control characters, bounded length. */
+    private static Optional<URI> safeUri(String raw) {
         if (raw == null) {
             return Optional.empty();
         }
@@ -55,22 +107,7 @@ public class ImportUrlValidator {
                 || (uri.getPort() != -1 && uri.getPort() != 443)) {
             return Optional.empty();
         }
-        String host = uri.getHost().toLowerCase();
-        String path = uri.getRawPath() == null ? "" : uri.getRawPath();
-
-        if (YOUTUBE_HOSTS.contains(host)) {
-            return youtubeWatchOrShorts(url, path, uri.getRawQuery());
-        }
-        if (SHORT_YOUTUBE_HOST.equals(host)) {
-            return youtubeShortLink(url, path);
-        }
-        if (FACEBOOK_HOSTS.contains(host)) {
-            return facebook(url, path, uri.getRawQuery());
-        }
-        if (SHORT_FACEBOOK_HOST.equals(host)) {
-            return facebookShortLink(url, path);
-        }
-        return Optional.empty();
+        return Optional.of(uri);
     }
 
     private Optional<ImportUrl> youtubeWatchOrShorts(String source, String path, String query) {

@@ -70,10 +70,38 @@ class ImportUrlValidatorTest {
         assertThat(parsed.platform()).isEqualTo(ImportPlatform.FACEBOOK);
     }
 
+    @Test
+    void facebookShareLink_isNotDirectlyParseable_butExpandable() {
+        String share = "https://m.facebook.com/share/v/1HLVN1zZ6T?mibextid=x";
+
+        assertThat(validator.parse(share)).isEmpty();
+        assertThat(validator.expandableShortLink(share)).contains("https://www.facebook.com/share/v/1HLVN1zZ6T/");
+        assertThat(validator.expandableShortLink("https://www.facebook.com/share/r/Ab_c-1/"))
+                .contains("https://www.facebook.com/share/r/Ab_c-1/");
+        assertThat(validator.expandableShortLink("https://fb.watch/abcDEF_12-x/?mibextid=1"))
+                .contains("https://fb.watch/abcDEF_12-x/");
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {
+            "http://www.facebook.com/share/v/1HLVN1zZ6T/",
+            "https://evil.com/share/v/1HLVN1zZ6T/",
+            "https://www.facebook.com/share/p/1HLVN1zZ6T/",
+            "https://www.facebook.com/reel/1234567890123",
+            "https://youtu.be/dQw4w9WgXcQ",
+            "https://fb.watch/a",
+            "https://www.facebook.com:8443/share/v/1HLVN1zZ6T/"
+    })
+    void notExpandable(String raw) {
+        assertThat(validator.expandableShortLink(raw)).isEmpty();
+    }
+
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {
             "   ",
+            "https://www.facebook.com/share/v/1HLVN1zZ6T/",
             "javascript:alert(1)",
             "file:///etc/passwd",
             "http://www.youtube.com/watch?v=dQw4w9WgXcQ",

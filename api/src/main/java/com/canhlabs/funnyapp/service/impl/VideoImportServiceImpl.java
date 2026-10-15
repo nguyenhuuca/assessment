@@ -15,6 +15,7 @@ import com.canhlabs.funnyapp.exception.ImportException;
 import com.canhlabs.funnyapp.repo.VideoImportJobRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.VideoImportService;
+import com.canhlabs.funnyapp.utils.ImportUrlResolver;
 import com.canhlabs.funnyapp.utils.ImportUrlValidator;
 import com.canhlabs.funnyapp.utils.TitleSanitizer;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class VideoImportServiceImpl implements VideoImportService {
 
     private final VideoImportJobRepository jobRepository;
     private final VideoSourceRepository videoSourceRepository;
-    private final ImportUrlValidator urlValidator;
+    private final ImportUrlResolver urlResolver;
     private final YtDlpClient ytDlpClient;
     private final VideoImportWorker worker;
     private final AppProperties appProps;
@@ -88,7 +89,7 @@ public class VideoImportServiceImpl implements VideoImportService {
 
     private CreateVideoImportResultDto.LineResult createOne(int line, CreateVideoImportRequest.Item item,
                                                             Instant scheduledAt, Long adminId) {
-        Optional<ImportUrlValidator.ImportUrl> parsed = item == null ? Optional.empty() : urlValidator.parse(item.getUrl());
+        Optional<ImportUrlValidator.ImportUrl> parsed = item == null ? Optional.empty() : urlResolver.resolve(item.getUrl());
         if (parsed.isEmpty()) {
             return lineError(line, INVALID_URL);
         }
@@ -158,7 +159,7 @@ public class VideoImportServiceImpl implements VideoImportService {
 
     @Override
     public ImportPreviewDto preview(String url) {
-        ImportUrlValidator.ImportUrl parsed = urlValidator.parse(url)
+        ImportUrlValidator.ImportUrl parsed = urlResolver.resolve(url)
                 .orElseThrow(() -> error(HttpStatus.BAD_REQUEST, 4001, INVALID_URL));
         try {
             VideoMetadata meta = ytDlpClient.fetchMetadata(parsed.normalizedUrl());

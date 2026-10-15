@@ -18,6 +18,7 @@ import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoImportJobRepository;
 import com.canhlabs.funnyapp.repo.VideoSuggestionRepository;
 import com.canhlabs.funnyapp.service.VideoImportService;
+import com.canhlabs.funnyapp.utils.ImportUrlResolver;
 import com.canhlabs.funnyapp.utils.ImportUrlValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,7 +77,7 @@ class VideoSuggestionServiceImplTest {
         props = new AppProperties();
         props.getVideoImport().setEnabled(true);
         service = new VideoSuggestionServiceImpl(repository, jobRepository, importService, importWorker,
-                new ImportUrlValidator(), userRepo, props, eventPublisher, transactionManager);
+                new ImportUrlResolver(new ImportUrlValidator(), url -> Optional.empty()), userRepo, props, eventPublisher, transactionManager);
         when(repository.saveAndFlush(any(VideoSuggestion.class))).thenAnswer(inv -> {
             VideoSuggestion s = inv.getArgument(0);
             s.setId(55L);

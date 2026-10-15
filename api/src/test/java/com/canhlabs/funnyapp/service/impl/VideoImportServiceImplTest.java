@@ -15,6 +15,7 @@ import com.canhlabs.funnyapp.exception.ImportErrorCode;
 import com.canhlabs.funnyapp.exception.ImportException;
 import com.canhlabs.funnyapp.repo.VideoImportJobRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
+import com.canhlabs.funnyapp.utils.ImportUrlResolver;
 import com.canhlabs.funnyapp.utils.ImportUrlValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,7 @@ class VideoImportServiceImplTest {
     void setUp() {
         props = new AppProperties();
         props.getVideoImport().setEnabled(true);
-        service = new VideoImportServiceImpl(jobRepository, videoSourceRepository, new ImportUrlValidator(),
+        service = new VideoImportServiceImpl(jobRepository, videoSourceRepository, new ImportUrlResolver(new ImportUrlValidator(), url -> Optional.empty()),
                 ytDlpClient, worker, props);
         when(jobRepository.save(any(VideoImportJob.class))).thenAnswer(inv -> {
             VideoImportJob j = inv.getArgument(0);

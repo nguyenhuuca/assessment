@@ -18,6 +18,7 @@ import com.canhlabs.funnyapp.repo.VideoImportJobRepository;
 import com.canhlabs.funnyapp.repo.VideoSuggestionRepository;
 import com.canhlabs.funnyapp.service.VideoImportService;
 import com.canhlabs.funnyapp.service.VideoSuggestionService;
+import com.canhlabs.funnyapp.utils.ImportUrlResolver;
 import com.canhlabs.funnyapp.utils.ImportUrlValidator;
 import com.canhlabs.funnyapp.utils.NotificationText;
 import com.canhlabs.funnyapp.utils.TitleSanitizer;
@@ -68,7 +69,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
     private final VideoImportJobRepository jobRepository;
     private final VideoImportService importService;
     private final VideoImportWorker importWorker;
-    private final ImportUrlValidator urlValidator;
+    private final ImportUrlResolver urlResolver;
     private final UserRepo userRepo;
     private final AppProperties appProps;
     private final ApplicationEventPublisher eventPublisher;
@@ -78,7 +79,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
                                       VideoImportJobRepository jobRepository,
                                       VideoImportService importService,
                                       VideoImportWorker importWorker,
-                                      ImportUrlValidator urlValidator,
+                                      ImportUrlResolver urlResolver,
                                       UserRepo userRepo,
                                       AppProperties appProps,
                                       ApplicationEventPublisher eventPublisher,
@@ -87,7 +88,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         this.jobRepository = jobRepository;
         this.importService = importService;
         this.importWorker = importWorker;
-        this.urlValidator = urlValidator;
+        this.urlResolver = urlResolver;
         this.userRepo = userRepo;
         this.appProps = appProps;
         this.eventPublisher = eventPublisher;
@@ -104,7 +105,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
 
     @Override
     public SuggestionDto submit(Long userId, String url, String title, String note) {
-        ImportUrlValidator.ImportUrl parsed = urlValidator.parse(url)
+        ImportUrlValidator.ImportUrl parsed = urlResolver.resolve(url)
                 .orElseThrow(() -> error(HttpStatus.BAD_REQUEST, 4301, KEY_INVALID_URL));
 
         int limit = appProps.getVideoSuggestion().getDailyLimit();
@@ -229,10 +230,13 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         s.setReviewedAt(Instant.now());
     }
 
-    /** Exactly one job, scheduled now; a rejected import line (e.g. a racing active job) becomes a 409. */
+    /**
+     * Exactly one job, scheduled now; a rejected import line (e.g. a racing active job) becomes a 409.
+     * Passes the normalized URL: a share link was already expanded at submit, so no second redirect probe.
+     */
     private Long createImportJob(VideoSuggestion s, Long adminId) {
         CreateVideoImportRequest request = new CreateVideoImportRequest(
-                List.of(new CreateVideoImportRequest.Item(s.getSourceUrl(), s.getTitle())), null);
+                List.of(new CreateVideoImportRequest.Item(s.getNormalizedUrl(), s.getTitle())), null);
         CreateVideoImportResultDto.LineResult line = importService.create(request, adminId).getResults().get(0);
         if (line.getJobId() == null) {
             throw error(HttpStatus.CONFLICT, 4094, importErrorKey(line.getErrorCode()));
