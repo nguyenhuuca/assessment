@@ -4,7 +4,7 @@
 
 ## Metadata
 
-**Status:** Proposed · **Date:** 2026-06-01 · **Deciders:** nguyenhuuca · **Tags:** watch-history, schema, api-design, concurrency, frontend-state  
+**Status:** Superseded by [ADR-0021](0021-watch-history.md) (2026-10-15) · **Date:** 2026-06-01 · **Deciders:** nguyenhuuca · **Tags:** watch-history, schema, api-design, concurrency, frontend-state  
 **Related PRD:** [PRD-watch-history-opus](../prd/PRD-watch-history-opus.md) · **Supersedes:** N/A · **Superseded By:** N/A
 
 **Tech Strategy:** ✅ Follows Golden Path — PostgreSQL + JPA/Liquibase + Spring Boot + React. No new infrastructure (no Redis — see ADR-0003).

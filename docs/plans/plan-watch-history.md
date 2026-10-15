@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status:** Approved
+**Status:** Superseded by [plan-watch-history-v2](plan-watch-history-v2.md) (2026-10-15)
 **Author:** nguyenhuuca
 **Date:** 2026-05-31
 **Related PRD:** [PRD-watch-history](../prd/PRD-watch-history.md)

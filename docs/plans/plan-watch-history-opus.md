@@ -4,7 +4,7 @@
 
 ## Overview
 
-**Status:** Draft
+**Status:** Superseded by [plan-watch-history-v2](plan-watch-history-v2.md) (2026-10-15)
 **Author:** nguyenhuuca
 **Date:** 2026-06-01
 **Beads Issue:** N/A

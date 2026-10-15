@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status:** Draft
+**Status:** Superseded by [PRD-watch-history-v2](PRD-watch-history-v2.md) (2026-10-15)
 **Author:** nguyenhuuca
 **Date:** 2026-05-31
 **Version:** 1.0

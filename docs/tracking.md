@@ -12,6 +12,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 📋 | Ready — plan approved, ready to implement |
 | 📝 | Draft — still being scoped or planned |
 | 💡 | Proposed — decision made, not yet started |
+| ⛔ | Superseded — replaced by a newer document |
 
 ---
 
@@ -34,8 +35,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Hot Score Migration** | — | — | — | [Plan 📋](plans/plan-vid2-hot-score-migration.md) | — | 🔍 | |
 | **File-based Hooks** | — | — | — | [Plan A 📋](plans/plan-a-file-based-hooks.md) · [Plan B 📋](plans/plan-b-direct-cli-spawn.md) | — | 🔍 | |
 | **Bookmark Feature** | [PRD 📝](prd/PRD-bookmark-feature.md) | [0012 💡](adr/0012-bookmark-feature-design.md) | — | [Plan 📋](plans/plan-bookmark-feature.md) · [Library Collections ✅](plans/plan-library-collections.md) | — | 🔍 | ADR amended 2026-10-13: collections-first, no bookmarks table; admin public collections |
-| **Watch History (Opus)** | [PRD 📝](prd/PRD-watch-history-opus.md) | [0014 💡](adr/0014-watch-history-design-opus.md) | [Spec 📋](specs/spec-watch-history-opus.md) | [Plan 📝](plans/plan-watch-history-opus.md) | — | 🔍 | Active branch · [comparison](comparison-watch-history-models.md) |
-| **Watch History (baseline)** | [PRD 📝](prd/PRD-watch-history.md) | [0013 💡](adr/0013-watch-history-design.md) | [Spec 📋](specs/spec-watch-history.md) | [Plan 📋](plans/plan-watch-history.md) | [Spec deck 🎤](specs/spec-watch-history.html) | 🔍 | 🗄️ Archived — model-comparison baseline |
+| **Watch History (v2)** | [PRD ✅](prd/PRD-watch-history-v2.md) | [0021 ✅](adr/0021-watch-history.md) | — | [Plan 📋](plans/plan-watch-history-v2.md) | — | — | Supersedes the June Opus/baseline drafts (ADR-0013/0014, never implemented) |
 | **User Settings** | [PRD ✅](prd/PRD-user-settings.md) | [0016 ✅](adr/0016-user-settings-design.md) | [Spec ✅](specs/spec-user-settings.md) | [Plan ✅](plans/plan-user-settings.md) | — | ✅ | Pushed to main `dd45fc0`; coverage 95.91% |
 | **Video Reactions (like / unlike / dislike)** | — | — | — | [Plan ✅](plans/plan-video-reactions.md) | — | ✅ | `28cc167`; fixes 404 on `/video/like`; per-user reactions, optional-auth GET |
 | **Admin Comment Moderation** | — | — | — | [Plan ✅](plans/plan-admin-comment-moderation.md) | — | ✅ | `acfc953` soft remove/restore with policy reasons; `6f66b15` bulk (≤100) |
@@ -81,7 +81,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Hot Score Migration](plans/plan-vid2-hot-score-migration.md)
 - [File-based Hooks](plans/plan-a-file-based-hooks.md)
 - [Bookmark Feature](plans/plan-bookmark-feature.md)
-- [Watch History (Opus)](plans/plan-watch-history-opus.md) · baseline archived
+- [Watch History (v2)](plans/plan-watch-history-v2.md)
 
 ### 💡 Proposed / No Plan Yet (0)
 - —
@@ -104,14 +104,15 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0010 | Trivy Container Scanning | ✅ Accepted |
 | 0011 | Hot Video Priority | ✅ Accepted |
 | 0012 | Bookmark Feature Design | 💡 Proposed |
-| 0013 | Watch History Design (baseline, archived) | 💡 Proposed |
-| 0014 | Watch History Design (Opus) | 💡 Proposed |
+| 0013 | Watch History Design (baseline) | ⛔ Superseded by 0021 |
+| 0014 | Watch History Design (Opus) | ⛔ Superseded by 0021 |
 | 0015 | Bitwise Permission System | ✅ Accepted |
 | 0016 | User Settings Design | ✅ Accepted |
 | 0017 | User Notifications | ✅ Accepted |
 | 0018 | Password Login Option | ✅ Accepted |
 | 0019 | Admin Video Import | ✅ Accepted |
 | 0020 | i18n Vietnamese + English | ✅ Accepted |
+| 0021 | Watch History | ✅ Accepted |
 
 ---
 
