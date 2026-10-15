@@ -2476,3 +2476,158 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 }
 .lang-switch-btn:hover { color: var(--text); }
 .lang-switch-btn.active { color: var(--accent-cyan); background: var(--accent-cyan-dim); }
+
+/* ── History page (Stitch "History & My Suggestions") ── */
+.hist-page { padding: 32px 24px 48px; max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+.hist-title { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; }
+.hist-subtitle { color: var(--text-muted); margin: 0; max-width: 520px; line-height: 1.5; }
+
+.hist-submit-card {
+  position: relative; overflow: hidden; padding: 24px; border-radius: 16px;
+  background: linear-gradient(90deg, var(--bg-surface), var(--bg-elevated));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.hist-submit-glow {
+  position: absolute; right: -48px; top: -48px; width: 192px; height: 192px; border-radius: 50%;
+  background: rgba(255, 141, 137, 0.12); filter: blur(48px); pointer-events: none;
+}
+.hist-submit-row { position: relative; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; }
+.hist-submit-copy { flex: 1 1 320px; max-width: 520px; }
+.hist-kicker {
+  display: flex; align-items: center; gap: 8px; color: var(--primary);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px;
+}
+.hist-kicker .material-symbols-outlined { font-size: 18px; }
+.hist-submit-heading { font-size: 20px; font-weight: 700; margin: 0 0 6px; }
+.hist-submit-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0; }
+.hist-submit-form { flex: 1 1 360px; max-width: 480px; display: flex; gap: 8px; }
+.hist-url-field { position: relative; flex: 1; min-width: 0; }
+.hist-url-field .material-symbols-outlined {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted);
+}
+.hist-url-input {
+  width: 100%; padding: 11px 12px 11px 38px; border-radius: 12px; font-size: 13px;
+  background: var(--bg); color: var(--text); border: 1px solid rgba(255, 255, 255, 0.12); outline: none;
+  font-family: var(--font-body); transition: box-shadow var(--transition), border-color var(--transition);
+}
+.hist-url-input:focus { border-color: transparent; box-shadow: 0 0 0 2px var(--accent-cyan); }
+.hist-submit-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; padding: 10px 18px;
+  border: none; border-radius: 12px; background: var(--accent-cyan); color: #000; font-size: 13px; font-weight: 700;
+  box-shadow: 0 0 12px rgba(0, 238, 252, 0.4); transition: transform var(--transition), opacity var(--transition);
+}
+.hist-submit-btn:active { transform: scale(0.96); }
+.hist-submit-btn:disabled { opacity: 0.6; cursor: default; }
+.hist-submit-btn .material-symbols-outlined { font-size: 18px; }
+.hist-more-toggle {
+  position: relative; display: inline-flex; align-items: center; gap: 4px; margin-top: 14px; padding: 0;
+  background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600;
+}
+.hist-more-toggle:hover { color: var(--text); }
+.hist-more-toggle .material-symbols-outlined { font-size: 18px; }
+.hist-more-fields { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.hist-submit-alert { position: relative; margin-top: 12px; margin-bottom: 0; }
+
+.hist-section-head {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--border);
+}
+.hist-section-title {
+  display: flex; align-items: center; gap: 8px; margin: 0; color: var(--primary);
+  font-size: 14px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.hist-section-title .material-symbols-outlined { font-size: 18px; }
+.hist-count { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--bg-elevated); padding: 2px 10px; border-radius: 999px; }
+
+.hist-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; }
+.hist-pill {
+  display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; padding: 8px 16px; border-radius: 999px;
+  background: var(--bg-surface); color: var(--text-muted); border: 1px solid transparent;
+  font-size: 13px; font-weight: 700; transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+.hist-pill .material-symbols-outlined { font-size: 16px; }
+.hist-pill:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.12); }
+.hist-pill.active { color: var(--text); background: var(--bg-elevated); border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(0, 238, 252, 0.3); }
+.hist-pill.active .material-symbols-outlined { color: var(--accent-cyan); }
+
+.hist-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.hist-empty { color: var(--text-muted); margin: 0; }
+.hist-card {
+  display: flex; align-items: center; gap: 20px; padding: 16px; border-radius: 12px;
+  background: var(--bg-surface); border: 1px solid rgba(255, 255, 255, 0.06); transition: border-color var(--transition);
+}
+.hist-card:hover { border-color: rgba(0, 238, 252, 0.35); }
+.hist-card.status-live:hover { border-color: rgba(255, 141, 137, 0.4); }
+.hist-card.status-rejected { opacity: 0.85; }
+.hist-thumb {
+  position: relative; flex-shrink: 0; width: 176px; aspect-ratio: 16 / 9; border-radius: 8px; padding: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-muted);
+}
+.hist-thumb:disabled { cursor: default; }
+.hist-thumb .material-symbols-outlined { font-size: 28px; }
+.hist-thumb-label { font-size: 10px; font-weight: 700; }
+.status-approved .hist-thumb { color: var(--accent-cyan); }
+.status-live .hist-thumb { color: var(--primary); background: rgba(255, 141, 137, 0.08); }
+.status-live .hist-thumb:hover { background: rgba(255, 141, 137, 0.16); }
+.status-rejected .hist-thumb { color: #ff7351; }
+.hist-spin { animation: histSpin 2s linear infinite; }
+@keyframes histSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .hist-spin { animation: none; } }
+
+.hist-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.hist-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.hist-platform {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;
+}
+.hist-platform .material-symbols-outlined { font-size: 12px; }
+.hist-platform.youtube { background: rgba(255, 0, 0, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
+.hist-platform.facebook { background: rgba(24, 119, 242, 0.15); color: #4599ff; border: 1px solid rgba(24, 119, 242, 0.3); }
+.hist-card-time { font-size: 11px; color: var(--text-muted); }
+.hist-card-title { margin: 0; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hist-card-url {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; color: var(--text-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; text-decoration: none;
+}
+.hist-card-url:hover { color: var(--accent-cyan); text-decoration: underline; }
+.hist-card-note { margin: 0; font-size: 12px; color: var(--text-muted); font-style: italic; overflow-wrap: anywhere; }
+.hist-card-hint { margin: 0; font-size: 11px; color: var(--accent-cyan); }
+
+.hist-card-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.hist-action {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px;
+  background: none; border: 1px solid transparent; color: var(--text-muted); font-size: 12px; font-weight: 600;
+  transition: background var(--transition), color var(--transition);
+}
+.hist-action .material-symbols-outlined { font-size: 16px; }
+.hist-action:hover { color: var(--text); background: var(--bg-elevated); }
+.hist-action.primary { color: var(--primary); background: rgba(255, 141, 137, 0.15); border-color: rgba(255, 141, 137, 0.3); }
+.hist-action.primary:hover { background: rgba(255, 141, 137, 0.25); }
+
+@media (max-width: 768px) {
+  .hist-page { padding: 20px 16px 96px; gap: 24px; }
+  .hist-title { font-size: 28px; }
+  .hist-submit-card { padding: 18px; }
+  .hist-submit-form { flex-direction: column; max-width: none; }
+  .hist-more-fields { grid-template-columns: 1fr; }
+  .hist-card { flex-direction: column; align-items: stretch; gap: 12px; }
+  .hist-thumb { width: 100%; aspect-ratio: auto; height: 72px; flex-direction: row; gap: 8px; }
+  .hist-card-actions { flex-direction: row; justify-content: flex-end; padding-top: 8px; border-top: 1px solid var(--border); }
+}
+
+[data-theme="light"] .hist-submit-card { border-color: rgba(25, 28, 29, 0.08); }
+[data-theme="light"] .hist-submit-glow { background: rgba(184, 0, 53, 0.08); }
+[data-theme="light"] .hist-kicker,
+[data-theme="light"] .hist-section-title,
+[data-theme="light"] .status-live .hist-thumb,
+[data-theme="light"] .hist-action.primary { color: var(--primary-dim); }
+[data-theme="light"] .hist-action.primary { background: rgba(184, 0, 53, 0.08); border-color: rgba(184, 0, 53, 0.25); }
+[data-theme="light"] .hist-url-input { background: #fff; border-color: rgba(25, 28, 29, 0.15); }
+[data-theme="light"] .hist-submit-btn { color: #fff; box-shadow: none; }
+[data-theme="light"] .hist-pill:hover { border-color: rgba(25, 28, 29, 0.15); }
+[data-theme="light"] .hist-pill.active { box-shadow: none; }
+[data-theme="light"] .hist-card { border-color: rgba(25, 28, 29, 0.08); }
+[data-theme="light"] .hist-thumb { background: var(--bg-elevated); border-color: rgba(25, 28, 29, 0.08); }
+[data-theme="light"] .hist-platform.youtube { color: #c4001a; }
+[data-theme="light"] .hist-platform.facebook { color: #1259c3; }
+[data-theme="light"] .status-rejected .hist-thumb { color: #b92902; }

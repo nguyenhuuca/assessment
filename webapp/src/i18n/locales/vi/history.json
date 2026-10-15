@@ -12,5 +12,18 @@
   "emptyFiltered": "Không có đề xuất nào ở trạng thái này.",
   "loadFailed": "Không tải được danh sách đề xuất",
   "signIn": "Đăng nhập để xem các video bạn đã đề xuất",
-  "openLink": "Mở liên kết gốc"
+  "openLink": "Mở liên kết gốc",
+  "subtitle": "Theo dõi các video bạn đã đề xuất và trạng thái duyệt của chúng.",
+  "submitKicker": "Đề xuất video mới",
+  "submitHeading": "Góp video cho cộng đồng",
+  "submitDesc": "Dán link YouTube hoặc Facebook. Quản trị viên duyệt xong, video sẽ được tải về và đưa lên app, bạn sẽ nhận thông báo ở mỗi bước.",
+  "submitPlaceholder": "https://youtube.com/shorts/... hoặc fb.watch/...",
+  "submitButton": "Gửi link",
+  "moreOptions": "Thêm tiêu đề và ghi chú",
+  "count_other": "{{count}} đề xuất",
+  "submittedAgo": "Đã gửi {{time}}",
+  "approvedHint": "Đang tải về và xử lý, video sẽ sớm lên app.",
+  "watchOnApp": "Xem trên app",
+  "copyLink": "Sao chép link",
+  "copied": "Đã sao chép"
 }

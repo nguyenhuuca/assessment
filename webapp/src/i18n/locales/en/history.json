@@ -12,5 +12,19 @@
   "emptyFiltered": "No suggestions with this status.",
   "loadFailed": "Couldn't load your suggestions",
   "signIn": "Sign in to see the videos you suggested",
-  "openLink": "Open original link"
+  "openLink": "Open original link",
+  "subtitle": "Track the videos you suggested and their review status.",
+  "submitKicker": "Suggest a new video",
+  "submitHeading": "Add a video for everyone",
+  "submitDesc": "Paste a YouTube or Facebook link. Once an admin approves it, the video is downloaded and published to the app, and you get notified at each step.",
+  "submitPlaceholder": "https://youtube.com/shorts/... or fb.watch/...",
+  "submitButton": "Submit link",
+  "moreOptions": "Add a title and note",
+  "count_one": "{{count}} suggestion",
+  "count_other": "{{count}} suggestions",
+  "submittedAgo": "Submitted {{time}}",
+  "approvedHint": "Downloading and processing, it will be on the app soon.",
+  "watchOnApp": "Watch on app",
+  "copyLink": "Copy link",
+  "copied": "Copied"
 }

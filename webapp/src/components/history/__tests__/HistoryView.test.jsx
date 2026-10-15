@@ -8,7 +8,7 @@ import { suggestionsApi } from '../../../api/suggestions.js'
 
 let auth
 vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => auth }))
-vi.mock('../../../api/suggestions.js', () => ({ suggestionsApi: { mine: vi.fn() } }))
+vi.mock('../../../api/suggestions.js', () => ({ suggestionsApi: { mine: vi.fn(), submit: vi.fn() } }))
 
 const row = (id, over = {}) => ({
   id, sourceUrl: `https://youtu.be/${id}`, title: `Video ${id}`, note: null, status: 'PENDING', live: false,
@@ -53,7 +53,8 @@ describe('HistoryView', () => {
     const onPlayVideo = vi.fn()
     renderView({ onPlayVideo })
 
-    const link = await screen.findByRole('link', { name: 'Video 1' })
+    expect(await screen.findByText('Video 1')).toBeInTheDocument()
+    const link = screen.getByRole('link', { name: 'https://youtu.be/1' })
     expect(link).toHaveAttribute('href', 'https://youtu.be/1')
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'))
@@ -61,8 +62,40 @@ describe('HistoryView', () => {
     expect(screen.getByText('Chờ duyệt', { selector: '.admin-badge' })).toBeInTheDocument()
     expect(screen.getByText(/Lý do: Trùng với video đã có/)).toBeInTheDocument()
 
+    expect(screen.getByText('3 đề xuất')).toBeInTheDocument()
+
     fireEvent.click(screen.getByRole('button', { name: 'Xem video Video 3' }))
     expect(onPlayVideo).toHaveBeenCalledWith(77)
+    expect(screen.getAllByRole('button', { name: /Xem trên app/ })).toHaveLength(1)
+    fireEvent.click(screen.getByRole('button', { name: /Xem trên app/ }))
+    expect(onPlayVideo).toHaveBeenCalledTimes(2)
+  })
+
+  it('inline card validates the link, then submits and clears it', async () => {
+    suggestionsApi.submit.mockResolvedValue({ data: row(9) })
+    renderView()
+    const input = screen.getByRole('textbox', { name: 'Liên kết video *' })
+    fireEvent.change(input, { target: { value: 'http://example.com/x' } })
+    fireEvent.click(screen.getByRole('button', { name: /Gửi link/ }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Chỉ hỗ trợ liên kết https')
+    expect(suggestionsApi.submit).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: /Thêm tiêu đề và ghi chú/ }))
+    fireEvent.change(screen.getByRole('textbox', { name: 'Tiêu đề' }), { target: { value: ' Mèo ' } })
+    fireEvent.change(input, { target: { value: 'https://youtu.be/abc' } })
+    fireEvent.click(screen.getByRole('button', { name: /Gửi link/ }))
+    await waitFor(() => expect(suggestionsApi.submit).toHaveBeenCalledWith(
+      expect.objectContaining({ url: 'https://youtu.be/abc', title: 'Mèo', note: '' })))
+    expect(await screen.findByText(/Đã gửi đề xuất/)).toBeInTheDocument()
+    expect(input).toHaveValue('')
+  })
+
+  it('inline card shows the duplicate error from the API', async () => {
+    suggestionsApi.submit.mockRejectedValue(Object.assign(new Error('dup'), { code: 'error.suggestion.duplicate' }))
+    renderView()
+    fireEvent.change(screen.getByRole('textbox', { name: 'Liên kết video *' }), { target: { value: 'https://youtu.be/abc' } })
+    fireEvent.click(screen.getByRole('button', { name: /Gửi link/ }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Video này đã được đề xuất')
   })
 
   it('filter tabs request the matching status (LIVE included)', async () => {
