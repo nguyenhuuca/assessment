@@ -135,6 +135,8 @@ app:
     bulk-max: ${VIDEO_IMPORT_BULK_MAX:20}
   video-suggestion:
     daily-limit: ${VIDEO_SUGGESTION_DAILY_LIMIT:5}
+  watch-history:
+    max-entries: ${WATCH_HISTORY_MAX_ENTRIES:500}
   google-oauth:
     client-id: ${GOOGLE_OAUTH_CLIENT_ID:}
     client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET:}

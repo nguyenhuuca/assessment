@@ -11,6 +11,7 @@ import com.canhlabs.funnyapp.enums.UserStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.UserSettingsRepository;
+import com.canhlabs.funnyapp.repo.WatchHistoryRepository;
 import com.canhlabs.funnyapp.utils.AppUtils;
 import com.canhlabs.funnyapp.utils.totp.Totp;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,9 @@ class UserSettingsServiceImplTest {
 
     @Mock
     private Totp totp;
+
+    @Mock
+    private WatchHistoryRepository watchHistoryRepository;
 
     @InjectMocks
     private UserSettingsServiceImpl userSettingsService;
@@ -360,6 +364,7 @@ class UserSettingsServiceImplTest {
                     });
 
             verify(userRepo, never()).save(any());
+            verify(watchHistoryRepository, never()).deleteAll(any(Long.class));
         }
     }
 
@@ -386,6 +391,7 @@ class UserSettingsServiceImplTest {
             assertThat(user.getMfaSecret()).isNull();
             assertThat(user.isMfaEnabled()).isFalse();
             verify(userRepo).save(user);
+            verify(watchHistoryRepository).deleteAll(1L);
         }
     }
 

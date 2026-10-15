@@ -12,6 +12,7 @@ import com.canhlabs.funnyapp.enums.UserStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.UserSettingsRepository;
+import com.canhlabs.funnyapp.repo.WatchHistoryRepository;
 import com.canhlabs.funnyapp.service.UserSettingsService;
 import com.canhlabs.funnyapp.utils.AppUtils;
 import com.canhlabs.funnyapp.utils.totp.Totp;
@@ -35,6 +36,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     private final UserRepo userRepo;
     private final AppProperties appProperties;
     private final Totp totp;
+    private final WatchHistoryRepository watchHistoryRepository;
 
     @Override
     @Transactional
@@ -142,6 +144,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         user.setMfaSecret(null);
         user.setMfaEnabled(false);
         userRepo.save(user);
+        watchHistoryRepository.deleteAll(userId);
         log.info("Account deactivated and anonymized for user id={}", userId);
     }
 

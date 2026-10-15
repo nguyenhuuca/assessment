@@ -48,6 +48,7 @@ public class AppProperties {
     private VideoImport videoImport = new VideoImport();
     private GoogleOauth googleOauth = new GoogleOauth();
     private VideoSuggestion videoSuggestion = new VideoSuggestion();
+    private WatchHistory watchHistory = new WatchHistory();
 
     @PostConstruct
     void warnDeprecatedKeys() {
@@ -83,6 +84,14 @@ public class AppProperties {
     public static class VideoSuggestion {
         /** Max suggestions per user in any rolling 24 hours. */
         private int dailyLimit = 5;
+    }
+
+    /** Watch history (ADR-0021): {@code app.watch-history.*}. */
+    @Getter
+    @Setter
+    public static class WatchHistory {
+        /** Entries kept per user; the oldest are evicted on write. */
+        private int maxEntries = 500;
     }
 
     /** OAuth user credential of the Drive folder owner, used only for uploads (ADR-0019 D2). */

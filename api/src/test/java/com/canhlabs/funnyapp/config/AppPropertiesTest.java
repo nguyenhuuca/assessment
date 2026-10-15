@@ -8,6 +8,11 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 class AppPropertiesTest {
 
     @Test
+    void watchHistoryMaxEntries_defaultsTo500() {
+        assertThat(new AppProperties().getWatchHistory().getMaxEntries()).isEqualTo(500);
+    }
+
+    @Test
     void passwordLoginEnabled_defaultsToTrue() {
         assertThat(new AppProperties().isPasswordLoginEnabled()).isTrue();
     }
