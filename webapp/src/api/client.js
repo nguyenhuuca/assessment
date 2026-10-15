@@ -17,11 +17,12 @@ function createHeaders(extra = {}) {
   return headers
 }
 
-async function request(method, path, body) {
+async function request(method, path, body, { keepalive = false } = {}) {
   const res = await fetch(`${getBaseUrl()}${path}`, {
     method,
     headers: createHeaders(),
     body: body ? JSON.stringify(body) : undefined,
+    ...(keepalive ? { keepalive: true } : {}),
   })
   // 204 No Content (e.g. PATCH .../read) has an empty body
   if (res.status === 204) return null
@@ -41,7 +42,7 @@ async function request(method, path, body) {
 export const api = {
   get: (path) => request('GET', path),
   post: (path, body) => request('POST', path, body),
-  put: (path, body) => request('PUT', path, body),
+  put: (path, body, opts) => request('PUT', path, body, opts),
   patch: (path, body) => request('PATCH', path, body),
   delete: (path, body) => request('DELETE', path, body),
 }

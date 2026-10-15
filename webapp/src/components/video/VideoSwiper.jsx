@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useSwipeable } from 'react-swipeable'
 import { useTranslation } from 'react-i18next'
 import VideoPlayer from './VideoPlayer.jsx'
@@ -7,12 +7,18 @@ import { buildStreamUrl } from '../../utils/videoModel.js'
 import SearchModal from '../modals/SearchModal.jsx'
 import AddToCollectionModal from '../library/AddToCollectionModal.jsx'
 
-export default function VideoSwiper({ videos = [], initialIndex = 0, muted = true, onMutedChange, mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
+export default function VideoSwiper({ videos = [], initialIndex = 0, resume = null, muted = true, onMutedChange, mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const { t } = useTranslation('feed')
   const [index, setIndex] = useState(() => Math.min(initialIndex, Math.max(0, videos.length - 1)))
   const [direction, setDirection] = useState('next')
   const [saveVideo, setSaveVideo] = useState(null)
   const total = videos.length
+  // Resume point applies to the deep-linked video only, and is dropped once the user moves to another slide
+  const resumeRef = useRef(resume)
+  const startIndexRef = useRef(index)
+  useEffect(() => {
+    if (index !== startIndexRef.current) resumeRef.current = null
+  }, [index])
 
   const next = useCallback(() => {
     setDirection('next')
@@ -128,6 +134,7 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, muted = tru
             muted={muted}
             onMutedChange={onMutedChange}
             showMuteButton={false}
+            startAt={resumeRef.current && String(video?.id) === resumeRef.current.videoId ? resumeRef.current.startAt : undefined}
           />
         </div>
         <button

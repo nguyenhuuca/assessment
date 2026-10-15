@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { compactNumber } from '../../i18n/format.js'
 import { useVideos } from '../../hooks/useVideos.js'
 import { thumbnailUrl } from '../../utils/videoModel.js'
+import WatchedBadge from '../video/WatchedBadge.jsx'
 
 const CATEGORIES = [
   { key: 'all',     labelKey: 'catAll',    icon: 'whatshot',                 gradient: 'linear-gradient(135deg,#ff8d89 0%,#c10023 100%)' },
@@ -42,6 +43,7 @@ function ReelTile({ video, onClick }) {
         : <div className="explore-reel-fallback"><span className="material-symbols-outlined" style={{ fontSize: 36 }}>movie</span></div>
       }
       <div className="explore-reel-scrim" />
+      <WatchedBadge videoId={video.id} />
       <span className="explore-reel-views">
         <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>visibility</span>
         {formatViews(video.viewCount)}

@@ -1,14 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { buildStreamUrl, thumbnailUrl } from '../../utils/videoModel.js'
+import { useQueryClient } from '@tanstack/react-query'
 import { viewsApi } from '../../api/views.js'
+import { watchHistoryApi } from '../../api/watchHistory.js'
+import { useAuth } from '../../hooks/useAuth.js'
+import WatchedBadge from './WatchedBadge.jsx'
 
 /** Seconds actually played (not seeked) while visible before a view counts; server dedupes per viewer per video for 30 min. */
 const VIEW_THRESHOLD_SEC = 3
 /** timeupdate fires every ~250 ms; a bigger jump between two updates is a seek, not playback. */
 const MAX_PLAY_STEP_SEC = 1.5
+/** Resume point is reported at most this often while playing (pause / unmount are always sent). */
+const PROGRESS_MIN_INTERVAL_MS = 10_000
+const PROGRESS_TICK_MS = 30_000
+/** startAt is only honoured when it is worth resuming and not at the very end. */
+const MIN_RESUME_SEC = 5
+const END_MARGIN_SEC = 10
 
-export default function VideoPlayer({ video, onEnded, active, muted = true, onMutedChange, showMuteButton = true }) {
+export default function VideoPlayer({ video, onEnded, active, muted = true, onMutedChange, showMuteButton = true, startAt }) {
   const { t } = useTranslation('feed')
   const videoRef = useRef(null)
   const trackRef = useRef(null)
@@ -19,6 +29,30 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
   const viewSentRef = useRef(false)
   const watchedRef  = useRef(0)
   const lastTimeRef = useRef(0)
+  const durationRef = useRef(0)
+  const playingRef = useRef(false)
+  const lastProgressAtRef = useRef(0)
+  const startAppliedRef = useRef(false)
+  const queryClient = useQueryClient()
+  const { isLoggedIn } = useAuth()
+  const loggedInRef = useRef(isLoggedIn)
+  loggedInRef.current = isLoggedIn
+
+  /** Best-effort resume point. Only after the view counted (so history has the row), logged-in users only. */
+  function reportProgress(videoId, force, fromRefs = false) {
+    if (!loggedInRef.current || !viewSentRef.current || videoId == null) return
+    // On switch/unmount the <video> may already point at the next source, so use the last tracked values
+    const v = fromRefs ? null : videoRef.current
+    const pos = v ? v.currentTime : lastTimeRef.current
+    const dur = v ? v.duration : durationRef.current
+    if (!Number.isFinite(pos) || !Number.isFinite(dur) || dur <= 0) return
+    const now = Date.now()
+    if (!force && now - lastProgressAtRef.current < PROGRESS_MIN_INTERVAL_MS) return
+    lastProgressAtRef.current = now
+    watchHistoryApi.progress(videoId, Math.round(pos), Math.round(dur))?.catch?.(() => {})
+  }
+  const reportRef = useRef(reportProgress)
+  reportRef.current = reportProgress
 
   // Play / pause driven by `active` prop
   useEffect(() => {
@@ -35,6 +69,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
 
   // Reset overlay state when video changes
   useEffect(() => {
+    const id = video?.id
     setDescExpanded(false)
     setProgress(0)
     setPaused(false)
@@ -42,15 +77,51 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
     viewSentRef.current = false
     watchedRef.current = 0
     lastTimeRef.current = 0
+    durationRef.current = 0
+    playingRef.current = false
+    lastProgressAtRef.current = 0
+    startAppliedRef.current = false
+    // Switching video or unmounting: flush the resume point of the video that was playing
+    return () => reportRef.current(id, true, true)
   }, [video?.id])
+
+  // Periodic resume point while playing, and when the tab is hidden / the slide becomes inactive
+  useEffect(() => {
+    const id = video?.id
+    const timer = setInterval(() => { if (playingRef.current) reportRef.current(id, false) }, PROGRESS_TICK_MS)
+    const onVisibility = () => { if (document.visibilityState === 'hidden') reportRef.current(id, false) }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [video?.id])
+
+  const prevActiveRef = useRef(active)
+  useEffect(() => {
+    if (prevActiveRef.current && !active) reportRef.current(video?.id, false)
+    prevActiveRef.current = active
+  }, [active, video?.id])
 
   function handleLoadStart() { setLoading(true) }
   function handleCanPlay()   { setLoading(false) }
   function handleWaiting()   { setLoading(true) }
-  function handlePlaying()   { setLoading(false); setPaused(false) }
-  function handlePause()     { setPaused(true) }
+  function handlePlaying()   { setLoading(false); setPaused(false); playingRef.current = true }
+  function handlePause()     { setPaused(true); playingRef.current = false; reportProgress(video?.id, true) }
+  function handleEnded()     { playingRef.current = false; reportProgress(video?.id, true); onEnded?.() }
+  function handleLoadedMetadata() {
+    const v = videoRef.current
+    if (!v || startAppliedRef.current) return
+    startAppliedRef.current = true
+    const dur = v.duration
+    if (startAt > MIN_RESUME_SEC && Number.isFinite(dur) && startAt < dur - END_MARGIN_SEC) {
+      v.currentTime = startAt
+      lastTimeRef.current = startAt
+    }
+  }
   function handleTimeUpdate() {
     const v = videoRef.current
+    if (v && Number.isFinite(v.duration)) durationRef.current = v.duration
     if (v?.duration) setProgress((v.currentTime / v.duration) * 100)
     trackView(v)
   }
@@ -66,7 +137,11 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
     }
     if (!viewSentRef.current && video?.id != null && watchedRef.current >= VIEW_THRESHOLD_SEC) {
       viewSentRef.current = true
-      viewsApi.record(video.id).catch(() => {}) // best effort: a lost view must never disturb playback
+      const id = video.id
+      // best effort: a lost view must never disturb playback
+      viewsApi.record(id)
+        .then(() => { if (loggedInRef.current) queryClient.invalidateQueries({ queryKey: ['watchHistory'] }) })
+        .catch(() => {})
     }
   }
 
@@ -125,8 +200,9 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
         onWaiting={handleWaiting}
         onPlaying={handlePlaying}
         onPause={handlePause}
+        onLoadedMetadata={handleLoadedMetadata}
         onTimeUpdate={handleTimeUpdate}
-        onEnded={onEnded}
+        onEnded={handleEnded}
       />
 
       {/* ── Mute / unmute (optional: parent renders stable control outside slide layer) ── */}
@@ -207,6 +283,8 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
             </div>
           </div>
         </div>
+
+        <WatchedBadge videoId={video?.id} />
 
         {/* Title */}
         <p style={{

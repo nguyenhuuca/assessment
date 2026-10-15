@@ -67,6 +67,7 @@ export default function AppShell() {
   const [jumpIndex,       setJumpIndex]       = useState(0)
   const [muted,           setMuted]           = useState(true)
   const [deepLinkId,      setDeepLinkId]      = useState(initialLink.v)
+  const [deepLinkStartAt, setDeepLinkStartAt] = useState(null)
 
   useNotificationStream()
   useLocaleSync()
@@ -102,16 +103,18 @@ export default function AppShell() {
     }
     setActiveNav('home')
     setDeepLinkId(String(n.videoId))
+    setDeepLinkStartAt(null)
     setFeedKey(k => k + 1)
     setHighlightCommentId(n.commentId ? String(n.commentId) : null)
     setCommentVideo({ id: String(n.videoId) })
   }
 
   // Jump to a video in the home feed (no comment panel)
-  function playVideo(id) {
+  function playVideo(id, opts) {
     setSuggestOpen(false)
     setActiveNav('home')
     setDeepLinkId(String(id))
+    setDeepLinkStartAt(opts?.startAt > 0 ? opts.startAt : null)
     setFeedKey(k => k + 1)
   }
 
@@ -371,7 +374,8 @@ export default function AppShell() {
             category={null}
             initialIndex={jumpIndex}
             deepLinkId={deepLinkId}
-            onDeepLinkResolved={() => setDeepLinkId(null)}
+            deepLinkStartAt={deepLinkStartAt}
+            onDeepLinkResolved={() => { setDeepLinkId(null); setDeepLinkStartAt(null) }}
             muted={muted}
             onMutedChange={setMuted}
             mobileSearchOpen={mobileSearchOpen}

@@ -1,15 +1,22 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useVideos } from '../../hooks/useVideos.js'
 import VideoSwiper from './VideoSwiper.jsx'
 
-export function PublicFeed({ category, initialIndex, deepLinkId, onDeepLinkResolved, muted, onMutedChange, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
+export function PublicFeed({ category, initialIndex, deepLinkId, deepLinkStartAt, onDeepLinkResolved, muted, onMutedChange, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const { data: videos = [], isLoading, error } = useVideos(category)
+
+  // Resume point of the deep-linked video, captured when it resolves (the shell clears deepLinkId right after)
+  const resumeRef = useRef(null)
 
   const resolvedIndex = useMemo(() => {
     if (!deepLinkId || !videos.length) return initialIndex ?? 0
     const idx = videos.findIndex(v => String(v.id) === String(deepLinkId))
-    if (idx >= 0) { onDeepLinkResolved?.(); return idx }
+    if (idx >= 0) {
+      resumeRef.current = deepLinkStartAt > 0 ? { videoId: String(deepLinkId), startAt: deepLinkStartAt } : null
+      onDeepLinkResolved?.()
+      return idx
+    }
     return initialIndex ?? 0
   }, [deepLinkId, videos]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -19,6 +26,7 @@ export function PublicFeed({ category, initialIndex, deepLinkId, onDeepLinkResol
     <VideoSwiper
       videos={videos}
       initialIndex={resolvedIndex}
+      resume={resumeRef.current}
       muted={muted}
       onMutedChange={onMutedChange}
       mobileSearchOpen={mobileSearchOpen}

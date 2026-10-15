@@ -1,7 +1,18 @@
 import React from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
+import { render as rtlRender, fireEvent } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import VideoPlayer from '../VideoPlayer.jsx'
+
+vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => ({ isLoggedIn: false }) }))
+vi.mock('../../../api/watchHistory.js', () => ({ watchHistoryApi: { progress: vi.fn(), summary: vi.fn() } }))
+
+function render(ui) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const wrap = (node) => <QueryClientProvider client={client}>{node}</QueryClientProvider>
+  const res = rtlRender(wrap(ui))
+  return { ...res, rerender: (next) => res.rerender(wrap(next)) }
+}
 
 vi.mock('../../../api/views.js', () => ({
   viewsApi: { record: vi.fn(() => Promise.resolve(null)) },

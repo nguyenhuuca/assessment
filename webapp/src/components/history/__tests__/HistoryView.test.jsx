@@ -5,10 +5,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import i18n from '../../../i18n/index.js'
 import HistoryView from '../HistoryView.jsx'
 import { suggestionsApi } from '../../../api/suggestions.js'
+import { watchHistoryApi } from '../../../api/watchHistory.js'
 
 let auth
 vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => auth }))
 vi.mock('../../../api/suggestions.js', () => ({ suggestionsApi: { mine: vi.fn(), submit: vi.fn() } }))
+vi.mock('../../../api/watchHistory.js', () => ({
+  watchHistoryApi: { list: vi.fn(), summary: vi.fn(), remove: vi.fn(), clear: vi.fn(), progress: vi.fn() },
+}))
+vi.mock('../../../api/settings.js', () => ({ settingsApi: { get: vi.fn(), patch: vi.fn() } }))
 
 const row = (id, over = {}) => ({
   id, sourceUrl: `https://youtu.be/${id}`, title: `Video ${id}`, note: null, status: 'PENDING', live: false,
@@ -25,22 +30,71 @@ function renderView(props = {}) {
   )
 }
 
+/** The suggestions section lives on the second tab; the watch history tab is the default. */
+function renderSuggestions(props = {}) {
+  renderView(props)
+  fireEvent.click(screen.getByRole('tab', { name: /Đề xuất của tôi/ }))
+}
+
 beforeEach(() => {
   vi.clearAllMocks()
+  localStorage.removeItem('historyTab')
   auth = { isLoggedIn: true, user: { email: 'me@x.com' } }
   suggestionsApi.mine.mockResolvedValue(page([], 0, 0))
+  watchHistoryApi.list.mockResolvedValue(page([], 0, 0))
+})
+
+describe('HistoryView tabs', () => {
+  it('opens on "Lịch sử xem" with counts on both pills and no suggestions request', async () => {
+    watchHistoryApi.list.mockResolvedValue({ data: { content: [], totalPages: 1, totalElements: 4 } })
+    suggestionsApi.mine.mockResolvedValue({ data: { content: [], totalPages: 1, totalElements: 2 } })
+    renderView()
+    const watch = screen.getByRole('tab', { name: /Lịch sử xem/ })
+    expect(watch).toHaveAttribute('aria-selected', 'true')
+    expect(await screen.findByText('4')).toBeInTheDocument()
+    expect(await screen.findByText('2')).toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Liên kết video *' })).toBeNull()
+  })
+
+  it('remembers the chosen tab in localStorage', async () => {
+    renderView()
+    fireEvent.click(screen.getByRole('tab', { name: /Đề xuất của tôi/ }))
+    expect(localStorage.getItem('historyTab')).toBe('suggestions')
+    expect(await screen.findByRole('textbox', { name: 'Liên kết video *' })).toBeInTheDocument()
+  })
+
+  it('restores the remembered tab', () => {
+    localStorage.setItem('historyTab', 'suggestions')
+    renderView()
+    expect(screen.getByRole('tab', { name: /Đề xuất của tôi/ })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('survives a localStorage that throws', () => {
+    const get = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('denied') })
+    const set = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('denied') })
+    try {
+      renderView()
+      expect(screen.getByRole('tab', { name: /Lịch sử xem/ })).toHaveAttribute('aria-selected', 'true')
+      fireEvent.click(screen.getByRole('tab', { name: /Đề xuất của tôi/ }))
+      expect(screen.getByRole('tab', { name: /Đề xuất của tôi/ })).toHaveAttribute('aria-selected', 'true')
+    } finally {
+      get.mockRestore()
+      set.mockRestore()
+    }
+  })
 })
 
 describe('HistoryView', () => {
   it('guest sees a sign-in hint and no request is made', () => {
     auth = { isLoggedIn: false, user: null }
     renderView()
-    expect(screen.getByText('Đăng nhập để xem các video bạn đã đề xuất')).toBeInTheDocument()
+    expect(screen.getByText('Đăng nhập để xem lịch sử xem và các video bạn đã đề xuất')).toBeInTheDocument()
     expect(suggestionsApi.mine).not.toHaveBeenCalled()
+    expect(watchHistoryApi.list).not.toHaveBeenCalled()
   })
 
   it('shows the empty state', async () => {
-    renderView()
+    renderSuggestions()
     expect(await screen.findByText(/Bạn chưa đề xuất video nào/)).toBeInTheDocument()
   })
 
@@ -51,7 +105,7 @@ describe('HistoryView', () => {
       row(3, { status: 'APPROVED', live: true, liveVideoId: 77 }),
     ], 0, 1))
     const onPlayVideo = vi.fn()
-    renderView({ onPlayVideo })
+    renderSuggestions({ onPlayVideo })
 
     expect(await screen.findByText('Video 1')).toBeInTheDocument()
     const link = screen.getByRole('link', { name: 'https://youtu.be/1' })
@@ -73,7 +127,7 @@ describe('HistoryView', () => {
 
   it('inline card validates the link, then submits and clears it', async () => {
     suggestionsApi.submit.mockResolvedValue({ data: row(9) })
-    renderView()
+    renderSuggestions()
     const input = screen.getByRole('textbox', { name: 'Liên kết video *' })
     fireEvent.change(input, { target: { value: 'http://example.com/x' } })
     fireEvent.click(screen.getByRole('button', { name: /Gửi link/ }))
@@ -92,14 +146,14 @@ describe('HistoryView', () => {
 
   it('inline card shows the duplicate error from the API', async () => {
     suggestionsApi.submit.mockRejectedValue(Object.assign(new Error('dup'), { code: 'error.suggestion.duplicate' }))
-    renderView()
+    renderSuggestions()
     fireEvent.change(screen.getByRole('textbox', { name: 'Liên kết video *' }), { target: { value: 'https://youtu.be/abc' } })
     fireEvent.click(screen.getByRole('button', { name: /Gửi link/ }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Video này đã được đề xuất')
   })
 
   it('filter tabs request the matching status (LIVE included)', async () => {
-    renderView()
+    renderSuggestions()
     await waitFor(() => expect(suggestionsApi.mine).toHaveBeenCalledWith('', 0, 20))
     for (const [name, status] of [['Chờ duyệt', 'PENDING'], ['Đã duyệt', 'APPROVED'], ['Bị từ chối', 'REJECTED'], ['Đã lên app', 'LIVE']]) {
       fireEvent.click(screen.getByRole('tab', { name }))
@@ -113,7 +167,7 @@ describe('HistoryView', () => {
     suggestionsApi.mine
       .mockResolvedValueOnce(page([row(1)], 0, 2))
       .mockResolvedValueOnce(page([row(2)], 1, 2))
-    renderView()
+    renderSuggestions()
     await screen.findByText('Video 1')
     fireEvent.click(screen.getByRole('button', { name: 'Xem thêm' }))
     expect(await screen.findByText('Video 2')).toBeInTheDocument()
@@ -126,7 +180,8 @@ describe('HistoryView', () => {
     await i18n.changeLanguage('en')
     suggestionsApi.mine.mockResolvedValue(page([row(1, { status: 'REJECTED', rejectReason: 'COPYRIGHT' })], 0, 1))
     renderView()
-    expect(await screen.findByText('My suggestions')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab', { name: /My suggestions/ }))
+    expect(await screen.findByRole('heading', { name: 'My suggestions' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Pending' })).toBeInTheDocument()
     expect(await screen.findByText(/Reason: Copyright issue/)).toBeInTheDocument()
   })

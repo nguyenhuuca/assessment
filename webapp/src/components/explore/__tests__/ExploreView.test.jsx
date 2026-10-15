@@ -6,6 +6,7 @@ import ExploreView from '../ExploreView.jsx'
 import { useVideos } from '../../../hooks/useVideos.js'
 
 vi.mock('../../../hooks/useVideos.js', () => ({ useVideos: vi.fn() }))
+vi.mock('../../../hooks/useWatchHistory.js', () => ({ useWatchHistorySummary: () => new Map() }))
 
 const v = (id, o) => ({ id, title: `Clip ${id}`, fileId: `f${id}`, upvotes: 0, viewCount: 0, category: 'regular', ...o })
 const VIDEOS = [

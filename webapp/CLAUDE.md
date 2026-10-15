@@ -80,7 +80,7 @@ webapp/
 │       └── modals/
 │           └── DeleteConfirmModal.jsx
 │       ├── suggestions/           # SuggestVideoModal ("+" button for users), status chip, url validation
-│       └── history/               # HistoryView + MySuggestionsSection (nav key 'history')
+│       └── history/               # HistoryView (tabs: watch history | my suggestions), WatchHistorySection/Card, MySuggestionsSection (nav key 'history')
 ```
 
 ## Design System (`src/styles/index.css`)
