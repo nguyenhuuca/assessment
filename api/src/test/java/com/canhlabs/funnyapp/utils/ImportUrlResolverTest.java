@@ -93,6 +93,43 @@ class ImportUrlResolverTest {
         assertThat(probed).isEmpty();
     }
 
+    @Test
+    void expansions_areCachedPerShortLink_includingFailures() {
+        ImportUrlResolver r = resolver(Map.of(SHARE, REEL_REDIRECT));
+
+        assertThat(r.resolve(SHARE)).isPresent();
+        assertThat(r.resolve("https://m.facebook.com/share/v/1HLVN1zZ6T?x=1")).isPresent();
+        assertThat(r.resolve("https://www.facebook.com/share/v/nope123/")).isEmpty();
+        assertThat(r.resolve("https://www.facebook.com/share/v/nope123/")).isEmpty();
+
+        assertThat(probed).containsExactly(SHARE, "https://www.facebook.com/share/v/nope123/");
+    }
+
+    @Test
+    void unavailableProbe_isNotCached_soTheNextSubmitRetries() {
+        int[] calls = {0};
+        RedirectProbe flaky = url -> {
+            if (calls[0]++ == 0) {
+                throw new RedirectProbe.Unavailable("busy");
+            }
+            return Optional.of(REEL_REDIRECT);
+        };
+        ImportUrlResolver r = new ImportUrlResolver(new ImportUrlValidator(), flaky);
+
+        assertThat(r.resolve(SHARE)).isEmpty();
+        assertThat(r.resolve(SHARE)).isPresent();
+        assertThat(calls[0]).isEqualTo(2);
+    }
+
+    @Test
+    void unavailableProbe_onFbWatch_keepsTheShortLink() {
+        ImportUrlResolver r = new ImportUrlResolver(new ImportUrlValidator(), url -> {
+            throw new RedirectProbe.Unavailable("io");
+        });
+
+        assertThat(r.resolve("https://fb.watch/abcDEF_12").orElseThrow().normalizedUrl()).isEqualTo("https://fb.watch/abcDEF_12");
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
             "http://www.facebook.com/share/v/1HLVN1zZ6T/",

@@ -22,30 +22,39 @@ import java.util.concurrent.TimeUnit;
 public class HttpRedirectProbe implements RedirectProbe {
 
     static final Duration TIMEOUT = Duration.ofSeconds(8);
+    /** Short wait for a permit: under load, fail fast instead of piling up blocked request threads. */
+    static final Duration PERMIT_WAIT = Duration.ofSeconds(2);
+    static final int MAX_CONCURRENT = 4;
     /** Probes run on request threads: cap concurrent outbound calls (CWE-770). */
-    private final Semaphore permits = new Semaphore(4);
+    private final Semaphore permits;
     private final HttpClient client;
 
     public HttpRedirectProbe() {
         this(HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.NEVER)
                 .connectTimeout(Duration.ofSeconds(5))
-                .build());
+                .build(), new Semaphore(MAX_CONCURRENT));
     }
 
-    HttpRedirectProbe(HttpClient client) {
+    HttpRedirectProbe(HttpClient client, Semaphore permits) {
         this.client = client;
+        this.permits = permits;
     }
 
     @Override
     public Optional<String> location(String url) {
+        URI uri;
+        try {
+            uri = URI.create(url);
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
         boolean acquired = false;
         try {
-            acquired = permits.tryAcquire(TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
+            acquired = permits.tryAcquire(PERMIT_WAIT.toMillis(), TimeUnit.MILLISECONDS);
             if (!acquired) {
-                return Optional.empty();
+                throw new Unavailable("busy");
             }
-            URI uri = URI.create(url);
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .method("HEAD", HttpRequest.BodyPublishers.noBody())
                     .timeout(TIMEOUT)
@@ -56,17 +65,25 @@ public class HttpRedirectProbe implements RedirectProbe {
                 log.info("Short link probe got HTTP {}", status);
                 return Optional.empty();
             }
-            return response.headers().firstValue("location").map(loc -> uri.resolve(loc.trim()).toString());
+            return response.headers().firstValue("location").flatMap(loc -> resolve(uri, loc));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return Optional.empty();
-        } catch (IOException | IllegalArgumentException e) {
+            throw new Unavailable("interrupted");
+        } catch (IOException e) {
             log.info("Short link probe failed: {}", e.getClass().getSimpleName());
-            return Optional.empty();
+            throw new Unavailable("io");
         } finally {
             if (acquired) {
                 permits.release();
             }
+        }
+    }
+
+    private static Optional<String> resolve(URI base, String location) {
+        try {
+            return Optional.of(base.resolve(location.trim()).toString());
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
         }
     }
 }

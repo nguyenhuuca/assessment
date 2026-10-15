@@ -135,6 +135,76 @@ class VideoImportServiceImplTest {
         verify(worker).wakeUp();
     }
 
+    private static final String FB_SHARE = "https://www.facebook.com/share/v/1HLVN1zZ6T/";
+    private static final String FB_REEL = "https://www.facebook.com/reel/1987308575243562";
+
+    private VideoImportServiceImpl serviceResolvingShareLinks() {
+        return new VideoImportServiceImpl(jobRepository, videoSourceRepository,
+                new ImportUrlResolver(new ImportUrlValidator(),
+                        url -> FB_SHARE.equals(url) ? Optional.of(FB_REEL + "/?rdid=x") : Optional.empty()),
+                ytDlpClient, worker, props);
+    }
+
+    @Test
+    void create_facebookShareLink_storesTheReel_andKeepsTheOriginalAsSource() {
+        CreateVideoImportResultDto result = serviceResolvingShareLinks().create(request(null, FB_SHARE), 5L);
+
+        assertThat(result.getResults().get(0).getJobId()).isNotNull();
+        ArgumentCaptor<VideoImportJob> saved = ArgumentCaptor.forClass(VideoImportJob.class);
+        verify(jobRepository).save(saved.capture());
+        assertThat(saved.getValue().getNormalizedUrl()).isEqualTo(FB_REEL);
+        assertThat(saved.getValue().getSourceUrl()).isEqualTo(FB_SHARE);
+        assertThat(saved.getValue().getPlatform()).isEqualTo(ImportPlatform.FACEBOOK);
+    }
+
+    @Test
+    void create_unresolvableShareLink_isAnInvalidUrlLine() {
+        CreateVideoImportResultDto result = serviceResolvingShareLinks()
+                .create(request(null, "https://www.facebook.com/share/v/unknown1/"), 5L);
+
+        assertThat(result.getResults().get(0).getErrorCode()).isEqualTo("INVALID_URL");
+        verify(jobRepository, never()).save(any());
+    }
+
+    @Test
+    void createResolved_savesAJobNow_withTheGivenUrls_andDoesNotWakeTheWorker() {
+        var url = new ImportUrlValidator.ImportUrl(FB_SHARE, FB_REEL, ImportPlatform.FACEBOOK, null);
+
+        CreateVideoImportResultDto.LineResult line = service.createResolved(url, " Cat: video ", 7L);
+
+        assertThat(line.getLine()).isEqualTo(1);
+        assertThat(line.getJobId()).isNotNull();
+        ArgumentCaptor<VideoImportJob> saved = ArgumentCaptor.forClass(VideoImportJob.class);
+        verify(jobRepository).save(saved.capture());
+        assertThat(saved.getValue().getSourceUrl()).isEqualTo(FB_SHARE);
+        assertThat(saved.getValue().getNormalizedUrl()).isEqualTo(FB_REEL);
+        assertThat(saved.getValue().getRequestedTitle()).isEqualTo("Cat video");
+        assertThat(saved.getValue().getCreatedBy()).isEqualTo(7L);
+        assertThat(saved.getValue().getScheduledAt()).isBeforeOrEqualTo(Instant.now());
+        verify(worker, never()).wakeUp();
+    }
+
+    @Test
+    void createResolved_activeDuplicate_isRejectedLine() {
+        when(jobRepository.existsByNormalizedUrlAndStatusIn(eq(FB_REEL), anyCollection())).thenReturn(true);
+
+        CreateVideoImportResultDto.LineResult line = service.createResolved(
+                new ImportUrlValidator.ImportUrl(FB_SHARE, FB_REEL, ImportPlatform.FACEBOOK, null), null, 7L);
+
+        assertThat(line.getErrorCode()).isEqualTo("DUPLICATE_ACTIVE");
+        verify(jobRepository, never()).save(any());
+    }
+
+    @Test
+    void preview_facebookShareLink_runsYtDlpOnTheResolvedReel() {
+        when(ytDlpClient.fetchMetadata(FB_REEL)).thenReturn(new VideoMetadata("1987308575243562", "Cat", 244L));
+
+        ImportPreviewDto dto = serviceResolvingShareLinks().preview(FB_SHARE);
+
+        assertThat(dto.getPlatform()).isEqualTo(ImportPlatform.FACEBOOK);
+        assertThat(dto.getDurationSec()).isEqualTo(244L);
+    }
+
     @Test
     void create_perLineErrors_doNotFailTheBatch() {
         when(jobRepository.existsByNormalizedUrlAndStatusIn(eq(YT2), anyCollection())).thenReturn(true);

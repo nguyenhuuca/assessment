@@ -93,11 +93,21 @@ public class VideoImportServiceImpl implements VideoImportService {
         if (parsed.isEmpty()) {
             return lineError(line, INVALID_URL);
         }
-        ImportUrlValidator.ImportUrl url = parsed.get();
+        return createJob(line, parsed.get(), item.getTitle(), scheduledAt, adminId);
+    }
+
+    @Override
+    public CreateVideoImportResultDto.LineResult createResolved(ImportUrlValidator.ImportUrl url, String title, Long adminId) {
+        // no URL resolution here: callers run inside a transaction and must not make network calls
+        return createJob(1, url, title, Instant.now(), adminId);
+    }
+
+    private CreateVideoImportResultDto.LineResult createJob(int line, ImportUrlValidator.ImportUrl url, String rawTitle,
+                                                            Instant scheduledAt, Long adminId) {
         if (jobRepository.existsByNormalizedUrlAndStatusIn(url.normalizedUrl(), ImportStatus.ACTIVE)) {
             return lineError(line, DUPLICATE_ACTIVE);
         }
-        String title = TitleSanitizer.sanitize(item.getTitle());
+        String title = TitleSanitizer.sanitize(rawTitle);
         VideoImportJob job = VideoImportJob.builder()
                 .sourceUrl(url.sourceUrl())
                 .normalizedUrl(url.normalizedUrl())

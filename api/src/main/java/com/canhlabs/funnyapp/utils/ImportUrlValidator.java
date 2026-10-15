@@ -28,7 +28,7 @@ public class ImportUrlValidator {
     private static final Pattern DIGITS = Pattern.compile("\\d{5,30}");
     private static final Pattern TOKEN = Pattern.compile("[A-Za-z0-9_-]{3,64}");
     private static final Pattern FB_SHARE = Pattern.compile("^/share/([vr])/([A-Za-z0-9_-]{3,64})/?$");
-    private static final Pattern UNSAFE_CHARS =Pattern.compile("[\\p{Cntrl}\\s\\\\]");
+    private static final Pattern UNSAFE_CHARS = Pattern.compile("[\\p{Cntrl}\\s\\\\]");
 
     /** Result of a successful validation. */
     public record ImportUrl(String sourceUrl, String normalizedUrl, ImportPlatform platform, String videoId) {

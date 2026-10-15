@@ -8,9 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.http.HttpClient;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class HttpRedirectProbeTest {
 
@@ -30,6 +32,11 @@ class HttpRedirectProbeTest {
         server.createContext("/rel", ex -> {
             ex.getResponseHeaders().add("Location", "/reel/123/");
             ex.sendResponseHeaders(301, -1);
+            ex.close();
+        });
+        server.createContext("/badloc", ex -> {
+            ex.getResponseHeaders().add("Location", "https://bad host/x");
+            ex.sendResponseHeaders(302, -1);
             ex.close();
         });
         server.createContext("/noloc", ex -> {
@@ -63,27 +70,56 @@ class HttpRedirectProbeTest {
 
     @Test
     void emptyWhenNotARedirect() {
-        HttpRedirectProbe probe = new HttpRedirectProbe(HttpClient.newHttpClient());
+        HttpRedirectProbe probe = new HttpRedirectProbe(HttpClient.newHttpClient(), new Semaphore(1));
 
         assertThat(probe.location(base + "/ok")).isEmpty();
         assertThat(probe.location(base + "/noloc")).isEmpty();
+        assertThat(probe.location(base + "/badloc")).isEmpty();
     }
 
     @Test
-    void emptyOnConnectionErrorOrBadUrl() {
-        server.stop(0);
-
-        assertThat(new HttpRedirectProbe().location(base + "/abs")).isEmpty();
+    void emptyForAnUnparseableUrl() {
         assertThat(new HttpRedirectProbe().location("not a url")).isEmpty();
     }
 
     @Test
-    void emptyWhenInterrupted() {
+    void connectionError_isUnavailable() {
+        server.stop(0);
+
+        assertThatThrownBy(() -> new HttpRedirectProbe().location(base + "/abs"))
+                .isInstanceOf(RedirectProbe.Unavailable.class)
+                .hasMessage("io");
+    }
+
+    @Test
+    void noFreePermit_isUnavailable_withoutCallingTheServer() {
+        HttpRedirectProbe probe = new HttpRedirectProbe(HttpClient.newHttpClient(), new Semaphore(0));
+
+        assertThatThrownBy(() -> probe.location(base + "/abs"))
+                .isInstanceOf(RedirectProbe.Unavailable.class)
+                .hasMessage("busy");
+        assertThat(method.get()).isNull();
+    }
+
+    @Test
+    void interrupted_isUnavailable_andKeepsTheInterruptFlag() {
         Thread.currentThread().interrupt();
         try {
-            assertThat(new HttpRedirectProbe().location(base + "/abs")).isEmpty();
+            assertThatThrownBy(() -> new HttpRedirectProbe().location(base + "/abs"))
+                    .isInstanceOf(RedirectProbe.Unavailable.class);
         } finally {
             assertThat(Thread.interrupted()).isTrue();
         }
+    }
+
+    @Test
+    void permitIsReleasedAfterEachProbe() {
+        Semaphore permits = new Semaphore(1);
+        HttpRedirectProbe probe = new HttpRedirectProbe(HttpClient.newHttpClient(), permits);
+
+        probe.location(base + "/abs");
+        probe.location(base + "/ok");
+
+        assertThat(permits.availablePermits()).isEqualTo(1);
     }
 }

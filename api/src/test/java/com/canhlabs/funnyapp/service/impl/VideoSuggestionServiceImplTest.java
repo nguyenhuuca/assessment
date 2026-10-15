@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.client.RedirectProbe;
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.canhlabs.funnyapp.dto.admin.CreateVideoImportRequest;
 import com.canhlabs.funnyapp.dto.admin.CreateVideoImportResultDto;
 import com.canhlabs.funnyapp.dto.suggestion.SuggestionDto;
 import com.canhlabs.funnyapp.entity.User;
@@ -37,6 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,6 +87,11 @@ class VideoSuggestionServiceImplTest {
         when(repository.save(any(VideoSuggestion.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
+    private VideoSuggestionServiceImpl serviceWithProbe(RedirectProbe probe) {
+        return new VideoSuggestionServiceImpl(repository, jobRepository, importService, importWorker,
+                new ImportUrlResolver(new ImportUrlValidator(), probe), userRepo, props, eventPublisher, transactionManager);
+    }
+
     private static VideoSuggestion pending(long id) {
         return VideoSuggestion.builder().id(id).userId(USER).sourceUrl(YT).normalizedUrl(YT)
                 .platform(ImportPlatform.YOUTUBE).title("Funny cat").build();
@@ -106,9 +112,8 @@ class VideoSuggestionServiceImplTest {
     }
 
     private void importCreates(long jobId) {
-        when(importService.create(any(), eq(ADMIN))).thenReturn(CreateVideoImportResultDto.builder()
-                .results(List.of(CreateVideoImportResultDto.LineResult.builder().line(1).jobId(jobId).build()))
-                .build());
+        when(importService.createResolved(any(), any(), eq(ADMIN)))
+                .thenReturn(CreateVideoImportResultDto.LineResult.builder().line(1).jobId(jobId).build());
     }
 
     // ── submit ──────────────────────────────────────────────────────────────────
@@ -333,6 +338,63 @@ class VideoSuggestionServiceImplTest {
         assertThat(service.pendingCount()).isEqualTo(4L);
     }
 
+    @Test
+    void submit_facebookShareLink_storesResolvedReel_andKeepsTheOriginalLink() {
+        String share = "https://www.facebook.com/share/v/1HLVN1zZ6T/";
+        List<String> probed = new ArrayList<>();
+        VideoSuggestionServiceImpl withProbe = serviceWithProbe(u -> {
+            probed.add(u);
+            return Optional.of("https://www.facebook.com/reel/1987308575243562/?rdid=x");
+        });
+
+        withProbe.submit(USER, share, null, null);
+
+        ArgumentCaptor<VideoSuggestion> captor = ArgumentCaptor.forClass(VideoSuggestion.class);
+        verify(repository).saveAndFlush(captor.capture());
+        assertThat(captor.getValue().getSourceUrl()).isEqualTo(share);
+        assertThat(captor.getValue().getNormalizedUrl()).isEqualTo("https://www.facebook.com/reel/1987308575243562");
+        assertThat(captor.getValue().getPlatform()).isEqualTo(ImportPlatform.FACEBOOK);
+        assertThat(probed).containsExactly(share);
+    }
+
+    @Test
+    void submit_overDailyLimit_rejectsBeforeProbingTheShareLink() {
+        when(repository.countByUserIdAndCreatedAtAfter(eq(USER), any())).thenReturn(5L);
+        List<String> probed = new ArrayList<>();
+        VideoSuggestionServiceImpl withProbe = serviceWithProbe(u -> {
+            probed.add(u);
+            return Optional.empty();
+        });
+
+        assertError(() -> withProbe.submit(USER, "https://www.facebook.com/share/v/1HLVN1zZ6T/", null, null),
+                HttpStatus.TOO_MANY_REQUESTS, "error.suggestion.dailyLimit");
+        assertThat(probed).isEmpty();
+    }
+
+    @Test
+    void approve_unexpandableFbWatch_importsTheStoredUrls_withoutAnyProbe() {
+        VideoSuggestion s = pending(5);
+        s.setSourceUrl("https://fb.watch/abcDEF_12/?mibextid=1");
+        s.setNormalizedUrl("https://fb.watch/abcDEF_12");
+        s.setPlatform(ImportPlatform.FACEBOOK);
+        when(repository.findByIdForUpdate(5L)).thenReturn(Optional.of(s));
+        importCreates(9L);
+        List<String> probed = new ArrayList<>();
+        VideoSuggestionServiceImpl withProbe = serviceWithProbe(u -> {
+            probed.add(u);
+            return Optional.empty();
+        });
+
+        withProbe.approve(5L, null, ADMIN);
+
+        ArgumentCaptor<ImportUrlValidator.ImportUrl> url = ArgumentCaptor.forClass(ImportUrlValidator.ImportUrl.class);
+        verify(importService).createResolved(url.capture(), any(), eq(ADMIN));
+        assertThat(url.getValue().sourceUrl()).isEqualTo("https://fb.watch/abcDEF_12/?mibextid=1");
+        assertThat(url.getValue().normalizedUrl()).isEqualTo("https://fb.watch/abcDEF_12");
+        assertThat(url.getValue().platform()).isEqualTo(ImportPlatform.FACEBOOK);
+        assertThat(probed).isEmpty();
+    }
+
     // ── approve ─────────────────────────────────────────────────────────────────
 
     @Test
@@ -344,12 +406,11 @@ class VideoSuggestionServiceImplTest {
 
         SuggestionDto dto = service.approve(5L, "  New / title ", ADMIN);
 
-        ArgumentCaptor<CreateVideoImportRequest> req = ArgumentCaptor.forClass(CreateVideoImportRequest.class);
-        verify(importService, times(1)).create(req.capture(), eq(ADMIN));
-        assertThat(req.getValue().getItems()).hasSize(1);
-        assertThat(req.getValue().getItems().get(0).getUrl()).isEqualTo(YT);
-        assertThat(req.getValue().getItems().get(0).getTitle()).isEqualTo("New title");
-        assertThat(req.getValue().getScheduledAt()).isNull(); // null = now
+        ArgumentCaptor<ImportUrlValidator.ImportUrl> url = ArgumentCaptor.forClass(ImportUrlValidator.ImportUrl.class);
+        verify(importService, times(1)).createResolved(url.capture(), eq("New title"), eq(ADMIN));
+        assertThat(url.getValue().normalizedUrl()).isEqualTo(YT);
+        assertThat(url.getValue().platform()).isEqualTo(s.getPlatform());
+        verify(importService, never()).create(any(), any());
 
         assertThat(s.getStatus()).isEqualTo(SuggestionStatus.APPROVED);
         assertThat(s.getImportJobId()).isEqualTo(321L);
@@ -374,9 +435,7 @@ class VideoSuggestionServiceImplTest {
 
         service.approve(5L, null, ADMIN);
 
-        ArgumentCaptor<CreateVideoImportRequest> req = ArgumentCaptor.forClass(CreateVideoImportRequest.class);
-        verify(importService).create(req.capture(), eq(ADMIN));
-        assertThat(req.getValue().getItems().get(0).getTitle()).isEqualTo("Funny cat");
+        verify(importService).createResolved(any(), eq("Funny cat"), eq(ADMIN));
         assertThat(s.getTitle()).isEqualTo("Funny cat");
     }
 
@@ -426,9 +485,8 @@ class VideoSuggestionServiceImplTest {
     void approve_importLineRejected_409WithImportKey_andSuggestionStaysPending() {
         VideoSuggestion s = pending(5);
         when(repository.findByIdForUpdate(5L)).thenReturn(Optional.of(s));
-        when(importService.create(any(), eq(ADMIN))).thenReturn(CreateVideoImportResultDto.builder()
-                .results(List.of(CreateVideoImportResultDto.LineResult.builder().line(1)
-                        .errorCode("DUPLICATE_ACTIVE").build())).build());
+        when(importService.createResolved(any(), any(), eq(ADMIN)))
+                .thenReturn(CreateVideoImportResultDto.LineResult.builder().line(1).errorCode("DUPLICATE_ACTIVE").build());
 
         assertError(() -> service.approve(5L, null, ADMIN), HttpStatus.CONFLICT, "error.import.duplicateActive");
 
@@ -444,9 +502,8 @@ class VideoSuggestionServiceImplTest {
         for (String[] pair : new String[][]{{"INVALID_URL", "error.import.invalidUrl"}, {"WHATEVER", "error.import.failed"}}) {
             VideoSuggestion s = pending(5);
             when(repository.findByIdForUpdate(5L)).thenReturn(Optional.of(s));
-            when(importService.create(any(), eq(ADMIN))).thenReturn(CreateVideoImportResultDto.builder()
-                    .results(List.of(CreateVideoImportResultDto.LineResult.builder().line(1)
-                            .errorCode(pair[0]).build())).build());
+            when(importService.createResolved(any(), any(), eq(ADMIN)))
+                    .thenReturn(CreateVideoImportResultDto.LineResult.builder().line(1).errorCode(pair[0]).build());
 
             assertError(() -> service.approve(5L, null, ADMIN), HttpStatus.CONFLICT, pair[1]);
         }

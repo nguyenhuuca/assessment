@@ -1,7 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.canhlabs.funnyapp.dto.admin.CreateVideoImportRequest;
 import com.canhlabs.funnyapp.dto.admin.CreateVideoImportResultDto;
 import com.canhlabs.funnyapp.dto.suggestion.SuggestionDto;
 import com.canhlabs.funnyapp.entity.User;
@@ -105,13 +104,13 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
 
     @Override
     public SuggestionDto submit(Long userId, String url, String title, String note) {
-        ImportUrlValidator.ImportUrl parsed = urlResolver.resolve(url)
-                .orElseThrow(() -> error(HttpStatus.BAD_REQUEST, 4301, KEY_INVALID_URL));
-
+        // quota first: resolving a share link calls Facebook, which an over-quota user must not trigger
         int limit = appProps.getVideoSuggestion().getDailyLimit();
         if (repository.countByUserIdAndCreatedAtAfter(userId, Instant.now().minus(LIMIT_WINDOW)) >= limit) {
             throw CustomException.of(HttpStatus.TOO_MANY_REQUESTS, 4291, KEY_DAILY_LIMIT, limit);
         }
+        ImportUrlValidator.ImportUrl parsed = urlResolver.resolve(url)
+                .orElseThrow(() -> error(HttpStatus.BAD_REQUEST, 4301, KEY_INVALID_URL));
         if (repository.existsByNormalizedUrlAndStatus(parsed.normalizedUrl(), SuggestionStatus.PENDING)
                 || jobRepository.existsByNormalizedUrlAndStatusIn(parsed.normalizedUrl(), BLOCKING_IMPORT_STATUSES)) {
             throw duplicate();
@@ -232,12 +231,12 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
 
     /**
      * Exactly one job, scheduled now; a rejected import line (e.g. a racing active job) becomes a 409.
-     * Passes the normalized URL: a share link was already expanded at submit, so no second redirect probe.
+     * Runs under the suggestion's row lock: uses the URL resolved at submit, never a network call.
      */
     private Long createImportJob(VideoSuggestion s, Long adminId) {
-        CreateVideoImportRequest request = new CreateVideoImportRequest(
-                List.of(new CreateVideoImportRequest.Item(s.getNormalizedUrl(), s.getTitle())), null);
-        CreateVideoImportResultDto.LineResult line = importService.create(request, adminId).getResults().get(0);
+        ImportUrlValidator.ImportUrl url =
+                new ImportUrlValidator.ImportUrl(s.getSourceUrl(), s.getNormalizedUrl(), s.getPlatform(), null);
+        CreateVideoImportResultDto.LineResult line = importService.createResolved(url, s.getTitle(), adminId);
         if (line.getJobId() == null) {
             throw error(HttpStatus.CONFLICT, 4094, importErrorKey(line.getErrorCode()));
         }
