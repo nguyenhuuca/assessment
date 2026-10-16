@@ -33,6 +33,7 @@ vi.mock('../../explore/ExploreView.jsx', () => ({ default: () => null }))
 vi.mock('../../admin/AdminView.jsx', () => ({ default: () => null }))
 vi.mock('../../settings/SettingsPage.jsx', () => ({ default: () => null }))
 vi.mock('../../library/LibraryView.jsx', () => ({ default: () => <div data-testid="library" /> }))
+vi.mock('../../history/HistoryView.jsx', () => ({ default: () => <div data-testid="history" /> }))
 vi.mock('../../video/VideoFeed.jsx', () => ({
   PublicFeed: ({ deepLinkId }) => <div data-testid="public-feed" data-deeplink={deepLinkId ?? ''} />,
 }))
@@ -121,6 +122,14 @@ describe('AppShell navigation', () => {
     expect(within(mobileNav).getByRole('button', { name: /Thư viện/ })).toHaveAttribute('aria-current', 'page')
     fireEvent.click(within(mobileNav).getByRole('button', { name: /Trang chủ/ }))
     expect(screen.getByTestId('public-feed')).toBeTruthy()
+  })
+
+  it('mobile nav reaches History', () => {
+    renderShell()
+    const mobileNav = document.querySelector('.mobile-nav')
+    fireEvent.click(within(mobileNav).getByRole('button', { name: /Lịch sử/ }))
+    expect(screen.getByTestId('history')).toBeTruthy()
+    expect(within(mobileNav).getByRole('button', { name: /Lịch sử/ })).toHaveAttribute('aria-current', 'page')
   })
 })
 

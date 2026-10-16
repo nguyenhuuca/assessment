@@ -27,6 +27,7 @@ const MOBILE_NAV = [
   { key: 'home',     icon: 'home',          labelKey: 'navHome'     },
   { key: 'library',  icon: 'video_library', labelKey: 'navLibrary'  },
   { key: 'explore',  icon: 'explore',       labelKey: 'navExplore'  },
+  { key: 'history',  icon: 'history',       labelKey: 'navHistory'  },
   { key: 'settings', icon: 'settings',      labelKey: 'navSettings', requiresAuth: true },
 ]
 

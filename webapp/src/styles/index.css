@@ -429,8 +429,15 @@ body {
   font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 8px 16px;
+  padding: 8px 2px;
   flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* 5 tabs + FAB on narrow phones: tighten the label so it never overflows */
+@media (max-width: 380px) {
+  .mobile-nav-tab { font-size: 9px; letter-spacing: 0.02em; }
 }
 
 /* Center FAB — inline flex item inside mobile nav (YouTube-style) */
