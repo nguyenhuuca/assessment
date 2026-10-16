@@ -185,60 +185,62 @@ export default function AdminSuggestionTable() {
       ) : (
         <>
           <div className="admin-table-meta">{t('showing', { shown: items.length, total: totalElements.toLocaleString() })}</div>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>{t('sugg.colLink')}</th>
-                <th>{t('sugg.colTitle')}</th>
-                <th>{t('sugg.colNote')}</th>
-                <th>{t('sugg.colSuggester')}</th>
-                <th>{t('colCreated')}</th>
-                <th>{t('colStatus')}</th>
-                <th>{t('colActions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(s => (
-                <tr key={s.id} className="admin-table-row">
-                  <td className="admin-cell-muted" style={{ maxWidth: 220, wordBreak: 'break-all' }}>
-                    <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer">{s.sourceUrl}</a>
-                    <div style={{ opacity: 0.6 }}>{s.platform}</div>
-                  </td>
-                  <td>{s.title || '—'}</td>
-                  <td className="admin-cell-muted">{s.note || '—'}</td>
-                  <td className="admin-cell-muted">{s.suggesterName || '—'}</td>
-                  <td className="admin-cell-muted">{formatDate(s.createdAt)}</td>
-                  <td><StatusCell s={s} /></td>
-                  <td>
-                    <div className="admin-actions">
-                      {s.status === 'PENDING' && (
-                        <>
-                          <button
-                            className="admin-action-btn"
-                            onClick={() => open('approve', s)}
-                            title={t('sugg.approve')}
-                            aria-label={t('sugg.approve')}
-                            aria-busy={isBusyFor(approve, s.id, v => v?.id)}
-                          >
-                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>check_circle</span>
-                          </button>
-                          <button
-                            className="admin-action-btn danger"
-                            onClick={() => open('reject', s)}
-                            title={t('sugg.reject')}
-                            aria-label={t('sugg.reject')}
-                            aria-busy={isBusyFor(reject, s.id, v => v?.id)}
-                          >
-                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>block</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
+          <div className="admin-table-scroll">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>{t('sugg.colLink')}</th>
+                  <th>{t('sugg.colTitle')}</th>
+                  <th>{t('sugg.colNote')}</th>
+                  <th>{t('sugg.colSuggester')}</th>
+                  <th>{t('colCreated')}</th>
+                  <th>{t('colStatus')}</th>
+                  <th>{t('colActions')}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {items.map(s => (
+                  <tr key={s.id} className="admin-table-row">
+                    <td className="admin-cell-muted" style={{ maxWidth: 220, wordBreak: 'break-all' }}>
+                      <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer">{s.sourceUrl}</a>
+                      <div style={{ opacity: 0.6 }}>{s.platform}</div>
+                    </td>
+                    <td>{s.title || '—'}</td>
+                    <td className="admin-cell-muted">{s.note || '—'}</td>
+                    <td className="admin-cell-muted">{s.suggesterName || '—'}</td>
+                    <td className="admin-cell-muted">{formatDate(s.createdAt)}</td>
+                    <td><StatusCell s={s} /></td>
+                    <td>
+                      <div className="admin-actions">
+                        {s.status === 'PENDING' && (
+                          <>
+                            <button
+                              className="admin-action-btn"
+                              onClick={() => open('approve', s)}
+                              title={t('sugg.approve')}
+                              aria-label={t('sugg.approve')}
+                              aria-busy={isBusyFor(approve, s.id, v => v?.id)}
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>check_circle</span>
+                            </button>
+                            <button
+                              className="admin-action-btn danger"
+                              onClick={() => open('reject', s)}
+                              title={t('sugg.reject')}
+                              aria-label={t('sugg.reject')}
+                              aria-busy={isBusyFor(reject, s.id, v => v?.id)}
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>block</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {items.length === 0 && <div className="admin-cell-muted" style={{ padding: 16 }}>{t('sugg.empty')}</div>}
           {totalPages > 1 && (
             <div className="admin-pagination">

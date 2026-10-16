@@ -262,104 +262,106 @@ export default function AdminCommentTable() {
       ) : (
         <>
           <div className="admin-table-meta">{t('showing', { shown: comments.length, total: totalElements.toLocaleString() })}</div>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th style={{ width: 36 }}>
-                  <input
-                    ref={headerBox}
-                    type="checkbox"
-                    aria-label={t('selectAll')}
-                    checked={allSelected}
-                    onChange={toggleAll}
-                  />
-                </th>
-                <th>{t('colComment')}</th>
-                <th>{t('colAuthor')}</th>
-                <th>{t('colVideo')}</th>
-                <th>{t('colCreated')}</th>
-                <th>{t('colStatus')}</th>
-                <th>{t('colActions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {comments.map(c => {
-                const removed = c.status === 'REMOVED'
-                const deleted = c.status === 'DELETED'
-                const badgeClass = removed ? 'removed' : deleted ? 'deleted' : 'visible'
-                const tip = removed
-                  ? [c.moderationReason, c.moderationNote, c.moderatedBy && t('moderatedBy', { name: c.moderatedBy }), c.moderatedAt && formatDate(c.moderatedAt)]
-                      .filter(Boolean).join(' · ')
-                  : undefined
-                return (
-                  <tr key={c.id} className={`admin-table-row${selected.has(c.id) ? ' selected' : ''}`}>
-                    <td>
-                      <input
-                        type="checkbox"
-                        aria-label={t('selectComment', { id: c.id })}
-                        checked={selected.has(c.id)}
-                        onChange={() => toggleOne(c.id)}
-                      />
-                    </td>
-                    <td>
-                      {c.parentId && <span className="admin-reply-tag">{t('reply')}</span>}
-                      <div
-                        className={`admin-comment-text${expanded[c.id] ? ' expanded' : ''}`}
-                        onClick={() => setExpanded(prev => ({ ...prev, [c.id]: !prev[c.id] }))}
-                      >
-                        {c.content}
-                      </div>
-                    </td>
-                    <td className="admin-cell-muted">{authorLabel(c)}</td>
-                    <td className="admin-cell-muted">
-                      {c.videoTitle || '—'}<br />
-                      <span style={{ opacity: 0.6 }}>#{c.videoId}</span>
-                    </td>
-                    <td className="admin-cell-muted">{formatDate(c.createdAt)}</td>
-                    <td>
-                      <span className={`admin-badge ${badgeClass}`} title={tip}>
-                        {t(`status.${c.status}`, { defaultValue: c.status })}
-                      </span>
-                      {removed && c.moderationReason && (
-                        <div className="admin-cell-muted" title={tip}>{c.moderationReason}</div>
-                      )}
-                    </td>
-                    <td>
-                      <div className="admin-actions">
-                        {deleted ? null : removed ? (
-                          <button
-                            className="admin-action-btn"
-                            onClick={() => restore(c)}
-                            title={t('restore')}
-                            aria-busy={isBusyFor(moderate, c.id, x => x?.id)}
-                          >
-                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>restore</span>
-                          </button>
-                        ) : (
+          <div className="admin-table-scroll">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th style={{ width: 36 }}>
+                    <input
+                      ref={headerBox}
+                      type="checkbox"
+                      aria-label={t('selectAll')}
+                      checked={allSelected}
+                      onChange={toggleAll}
+                    />
+                  </th>
+                  <th>{t('colComment')}</th>
+                  <th>{t('colAuthor')}</th>
+                  <th>{t('colVideo')}</th>
+                  <th>{t('colCreated')}</th>
+                  <th>{t('colStatus')}</th>
+                  <th>{t('colActions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comments.map(c => {
+                  const removed = c.status === 'REMOVED'
+                  const deleted = c.status === 'DELETED'
+                  const badgeClass = removed ? 'removed' : deleted ? 'deleted' : 'visible'
+                  const tip = removed
+                    ? [c.moderationReason, c.moderationNote, c.moderatedBy && t('moderatedBy', { name: c.moderatedBy }), c.moderatedAt && formatDate(c.moderatedAt)]
+                        .filter(Boolean).join(' · ')
+                    : undefined
+                  return (
+                    <tr key={c.id} className={`admin-table-row${selected.has(c.id) ? ' selected' : ''}`}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          aria-label={t('selectComment', { id: c.id })}
+                          checked={selected.has(c.id)}
+                          onChange={() => toggleOne(c.id)}
+                        />
+                      </td>
+                      <td>
+                        {c.parentId && <span className="admin-reply-tag">{t('reply')}</span>}
+                        <div
+                          className={`admin-comment-text${expanded[c.id] ? ' expanded' : ''}`}
+                          onClick={() => setExpanded(prev => ({ ...prev, [c.id]: !prev[c.id] }))}
+                        >
+                          {c.content}
+                        </div>
+                      </td>
+                      <td className="admin-cell-muted">{authorLabel(c)}</td>
+                      <td className="admin-cell-muted">
+                        {c.videoTitle || '—'}<br />
+                        <span style={{ opacity: 0.6 }}>#{c.videoId}</span>
+                      </td>
+                      <td className="admin-cell-muted">{formatDate(c.createdAt)}</td>
+                      <td>
+                        <span className={`admin-badge ${badgeClass}`} title={tip}>
+                          {t(`status.${c.status}`, { defaultValue: c.status })}
+                        </span>
+                        {removed && c.moderationReason && (
+                          <div className="admin-cell-muted" title={tip}>{c.moderationReason}</div>
+                        )}
+                      </td>
+                      <td>
+                        <div className="admin-actions">
+                          {deleted ? null : removed ? (
+                            <button
+                              className="admin-action-btn"
+                              onClick={() => restore(c)}
+                              title={t('restore')}
+                              aria-busy={isBusyFor(moderate, c.id, x => x?.id)}
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>restore</span>
+                            </button>
+                          ) : (
+                            <button
+                              className="admin-action-btn danger"
+                              onClick={() => { setError(''); setTarget(c) }}
+                              title={t('remove')}
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>block</span>
+                            </button>
+                          )}
                           <button
                             className="admin-action-btn danger"
-                            onClick={() => { setError(''); setTarget(c) }}
-                            title={t('remove')}
+                            onClick={() => hardDeleteIds([c.id], t('thisComment'))}
+                            disabled={hardDelete.isPending}
+                            aria-busy={isBusyFor(hardDelete, c.id)}
+                            title={t('deletePermTitle')}
                           >
-                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>block</span>
+                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete_forever</span>
                           </button>
-                        )}
-                        <button
-                          className="admin-action-btn danger"
-                          onClick={() => hardDeleteIds([c.id], t('thisComment'))}
-                          disabled={hardDelete.isPending}
-                          aria-busy={isBusyFor(hardDelete, c.id)}
-                          title={t('deletePermTitle')}
-                        >
-                          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete_forever</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
           {totalPages > 1 && (
             <div className="admin-pagination">
               <button className="admin-page-btn" disabled={page === 0} onClick={() => goToPage(page - 1)}>‹</button>

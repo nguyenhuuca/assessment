@@ -152,32 +152,34 @@ export default function DriveSyncPanel() {
           <>
             <div className="admin-table-meta">{t('showingFiles', { shown: files.length, total: allFiles.length })}</div>
             <div className="import-scroll">
-              <table className="admin-table">
-                <thead>
-                  <tr><th></th><th>{t('colFileName')}</th><th>{t('colSize')}</th><th>{t('colCreatedAt')}</th><th>{t('colState')}</th><th>{t('colDbTitle')}</th></tr>
-                </thead>
-                <tbody>
-                  {files.map(f => (
-                    <tr key={f.fileId} className="admin-table-row">
-                      <td>
-                        <input
-                          type="checkbox"
-                          aria-label={t('selectFile', { name: f.name })}
-                          checked={selected.has(f.fileId)}
-                          disabled={locked || (atCap && !selected.has(f.fileId))}
-                          title={lockReason}
-                          onChange={() => toggle(f.fileId)}
-                        />
-                      </td>
-                      <td>{f.name}</td>
-                      <td className="admin-cell-muted">{formatSize(f.sizeBytes)}</td>
-                      <td className="admin-cell-muted">{formatTime(f.createdAt)}</td>
-                      <td><span className={`admin-badge ${String(f.state).toLowerCase()}`}>{t(`status.${f.state}`, { defaultValue: f.state })}</span></td>
-                      <td className="admin-cell-muted">{f.dbTitle || '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="admin-table-scroll">
+                <table className="admin-table">
+                  <thead>
+                    <tr><th></th><th>{t('colFileName')}</th><th>{t('colSize')}</th><th>{t('colCreatedAt')}</th><th>{t('colState')}</th><th>{t('colDbTitle')}</th></tr>
+                  </thead>
+                  <tbody>
+                    {files.map(f => (
+                      <tr key={f.fileId} className="admin-table-row">
+                        <td>
+                          <input
+                            type="checkbox"
+                            aria-label={t('selectFile', { name: f.name })}
+                            checked={selected.has(f.fileId)}
+                            disabled={locked || (atCap && !selected.has(f.fileId))}
+                            title={lockReason}
+                            onChange={() => toggle(f.fileId)}
+                          />
+                        </td>
+                        <td>{f.name}</td>
+                        <td className="admin-cell-muted">{formatSize(f.sizeBytes)}</td>
+                        <td className="admin-cell-muted">{formatTime(f.createdAt)}</td>
+                        <td><span className={`admin-badge ${String(f.state).toLowerCase()}`}>{t(`status.${f.state}`, { defaultValue: f.state })}</span></td>
+                        <td className="admin-cell-muted">{f.dbTitle || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </>
         )}

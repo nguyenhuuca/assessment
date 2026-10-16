@@ -1548,6 +1548,12 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+/* Wide tables scroll sideways inside the clipped .admin-table-wrap (phones) */
+.admin-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
@@ -1753,6 +1759,8 @@ body {
   .admin-root { padding: 12px 16px; }
   .admin-title { font-size: 20px; }
   .admin-table th, .admin-table-row td { padding: 8px 10px; }
+  /* Keep columns readable; the wrapper scrolls instead of squashing them */
+  .admin-table-scroll > .admin-table { min-width: 640px; }
   .admin-stat-cards { grid-template-columns: repeat(2, 1fr); }
 }
 
