@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { relativeTime } from '../../i18n/format.js'
 import SuggestionStatusChip from '../suggestions/SuggestionStatusChip.jsx'
 import { displayStatus } from '../suggestions/suggestionUtils.js'
+import { thumbnailUrl } from '../../utils/videoModel.js'
 
-// Thumbnail placeholder per status: no thumbnail exists until the video is ingested.
+// Thumbnail placeholder per status: no thumbnail exists until the video is ingested
+// (a LIVE video shows its real thumbnail, falling back to this icon if it fails to load).
 const THUMB_ICON = { PENDING: 'hourglass_empty', APPROVED: 'sync', LIVE: 'play_arrow', REJECTED: 'block' }
 
 const PLATFORM = {
@@ -16,10 +18,12 @@ const PLATFORM = {
 export default function SuggestionCard({ suggestion: s, onPlayVideo }) {
   const { t } = useTranslation(['history', 'suggestions'])
   const [copied, setCopied] = useState(false)
+  const [thumbFailed, setThumbFailed] = useState(false)
   const status = displayStatus(s)
   const heading = s.title || t('suggestions:untitled')
   const platform = PLATFORM[s.platform]
   const canPlay = status === 'LIVE' && s.liveVideoId != null
+  const thumb = canPlay && !thumbFailed ? thumbnailUrl(s.liveFileId) : ''
 
   function copyLink() {
     navigator.clipboard?.writeText(s.sourceUrl)
@@ -31,15 +35,24 @@ export default function SuggestionCard({ suggestion: s, onPlayVideo }) {
     <li className={`hist-card status-${status.toLowerCase()}`}>
       <button
         type="button"
-        className="hist-thumb"
+        className={`hist-thumb${thumb ? ' has-img' : ''}`}
         disabled={!canPlay}
         aria-label={canPlay ? t('suggestions:viewAria', { title: heading }) : undefined}
         aria-hidden={canPlay ? undefined : true}
         tabIndex={canPlay ? 0 : -1}
         onClick={() => canPlay && onPlayVideo?.(s.liveVideoId)}
       >
-        <span className={`material-symbols-outlined${status === 'APPROVED' ? ' hist-spin' : ''}`}>{THUMB_ICON[status]}</span>
-        <span className="hist-thumb-label">{t(`suggestions:status.${status}`)}</span>
+        {thumb ? (
+          <>
+            <img src={thumb} alt="" className="hist-thumb-img" loading="lazy" onError={() => setThumbFailed(true)} />
+            <span className="hist-thumb-play material-symbols-outlined" aria-hidden="true">play_arrow</span>
+          </>
+        ) : (
+          <>
+            <span className={`material-symbols-outlined${status === 'APPROVED' ? ' hist-spin' : ''}`}>{THUMB_ICON[status]}</span>
+            <span className="hist-thumb-label">{t(`suggestions:status.${status}`)}</span>
+          </>
+        )}
       </button>
 
       <div className="hist-card-body">

@@ -27,6 +27,8 @@ public class SuggestionDto {
     private boolean live;
     /** video_sources.id, same id as VideoDto.id. */
     private Long liveVideoId;
+    /** video_sources.source_id of the live video (thumbnail), null until live. */
+    private String liveFileId;
     private SuggestionRejectReason rejectReason;
     private String rejectNote;
     private Instant createdAt;

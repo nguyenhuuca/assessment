@@ -102,7 +102,7 @@ describe('HistoryView', () => {
     suggestionsApi.mine.mockResolvedValue(page([
       row(1, { note: 'ghi chú 1' }),
       row(2, { status: 'REJECTED', rejectReason: 'DUPLICATE', rejectNote: 'đã có' }),
-      row(3, { status: 'APPROVED', live: true, liveVideoId: 77 }),
+      row(3, { status: 'APPROVED', live: true, liveVideoId: 77, liveFileId: 'drive-77' }),
     ], 0, 1))
     const onPlayVideo = vi.fn()
     renderSuggestions({ onPlayVideo })
@@ -118,7 +118,13 @@ describe('HistoryView', () => {
 
     expect(screen.getByText('3 đề xuất')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Xem video Video 3' }))
+    const liveThumb = screen.getByRole('button', { name: 'Xem video Video 3' })
+    // A live video shows its real thumbnail instead of the status placeholder
+    expect(liveThumb.querySelector('img')).toHaveAttribute('src', expect.stringContaining('drive-77'))
+    fireEvent.error(liveThumb.querySelector('img'))
+    expect(liveThumb.querySelector('img')).toBeNull()
+    expect(liveThumb).toHaveTextContent('Đã lên app')
+    fireEvent.click(liveThumb)
     expect(onPlayVideo).toHaveBeenCalledWith(77)
     expect(screen.getAllByRole('button', { name: /Xem trên app/ })).toHaveLength(1)
     fireEvent.click(screen.getByRole('button', { name: /Xem trên app/ }))

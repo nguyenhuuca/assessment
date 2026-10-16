@@ -143,7 +143,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         } else {
             result = repository.findByUserIdAndStatus(userId, SuggestionStatus.valueOf(filter.name()), newestFirst);
         }
-        Map<Long, Long> live = liveVideoIds(result.getContent());
+        Map<Long, SuggestionLiveRef> live = liveRefs(result.getContent());
         return result.map(s -> toDto(s, live.get(s.getId()), null, false));
     }
 
@@ -160,7 +160,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         } else {
             result = repository.findAllByStatusNewest(SuggestionStatus.valueOf(filter.name()), unsorted);
         }
-        Map<Long, Long> live = liveVideoIds(result.getContent());
+        Map<Long, SuggestionLiveRef> live = liveRefs(result.getContent());
         Map<Long, String> names = suggesterNames(result.getContent());
         return result.map(s -> toDto(s, live.get(s.getId()), names.get(s.getUserId()), true));
     }
@@ -257,20 +257,20 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         return tx.execute(status -> work.get());
     }
 
-    /** video_sources id per suggestion id, for the suggestions of this page, in one query. */
-    private Map<Long, Long> liveVideoIds(Collection<VideoSuggestion> suggestions) {
+    /** video_sources row per suggestion id, for the suggestions of this page, in one query. */
+    private Map<Long, SuggestionLiveRef> liveRefs(Collection<VideoSuggestion> suggestions) {
         Set<Long> ids = new HashSet<>();
         for (VideoSuggestion s : suggestions) {
             if (s.getStatus() == SuggestionStatus.APPROVED && s.getImportJobId() != null) {
                 ids.add(s.getId());
             }
         }
-        Map<Long, Long> byId = new HashMap<>();
+        Map<Long, SuggestionLiveRef> byId = new HashMap<>();
         if (ids.isEmpty()) {
             return byId;
         }
         for (SuggestionLiveRef ref : repository.findLiveRefs(ids)) {
-            byId.putIfAbsent(ref.suggestionId(), ref.videoSourceId());
+            byId.putIfAbsent(ref.suggestionId(), ref);
         }
         return byId;
     }
@@ -288,7 +288,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         return names;
     }
 
-    private static SuggestionDto toDto(VideoSuggestion s, Long liveVideoId, String suggesterName, boolean admin) {
+    private static SuggestionDto toDto(VideoSuggestion s, SuggestionLiveRef live, String suggesterName, boolean admin) {
         return SuggestionDto.builder()
                 .id(s.getId())
                 .sourceUrl(s.getSourceUrl())
@@ -296,8 +296,9 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
                 .title(s.getTitle())
                 .note(s.getNote())
                 .status(s.getStatus())
-                .live(liveVideoId != null)
-                .liveVideoId(liveVideoId)
+                .live(live != null)
+                .liveVideoId(live != null ? live.videoSourceId() : null)
+                .liveFileId(live != null ? live.fileId() : null)
                 .rejectReason(s.getRejectReason())
                 .rejectNote(s.getRejectNote())
                 .createdAt(s.getCreatedAt())

@@ -245,15 +245,17 @@ class VideoSuggestionServiceImplTest {
         VideoSuggestion waiting = pending(3);
         when(repository.findByUserId(eq(USER), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(live, notYet, waiting)));
-        when(repository.findLiveRefs(anyCollection())).thenReturn(List.of(new SuggestionLiveRef(1L, 501L)));
+        when(repository.findLiveRefs(anyCollection())).thenReturn(List.of(new SuggestionLiveRef(1L, 501L, "drive-501")));
 
         Page<SuggestionDto> page = service.mine(USER, null, 0, 20);
 
         assertThat(page.getContent()).extracting(SuggestionDto::getId).containsExactly(1L, 2L, 3L);
         assertThat(page.getContent().get(0).isLive()).isTrue();
         assertThat(page.getContent().get(0).getLiveVideoId()).isEqualTo(501L);
+        assertThat(page.getContent().get(0).getLiveFileId()).isEqualTo("drive-501");
         assertThat(page.getContent().get(1).isLive()).isFalse();
         assertThat(page.getContent().get(1).getLiveVideoId()).isNull();
+        assertThat(page.getContent().get(1).getLiveFileId()).isNull();
         assertThat(page.getContent().get(2).isLive()).isFalse();
         // user endpoints never expose admin fields
         assertThat(page.getContent().get(0).getImportJobId()).isNull();
@@ -307,7 +309,7 @@ class VideoSuggestionServiceImplTest {
     void list_noFilter_pendingFirstQuery_withSuggesterNameMaskedAndJobId() {
         VideoSuggestion live = approved(1, 10L);
         when(repository.findAllPendingFirst(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(pending(2), live)));
-        when(repository.findLiveRefs(anyCollection())).thenReturn(List.of(new SuggestionLiveRef(1L, 501L)));
+        when(repository.findLiveRefs(anyCollection())).thenReturn(List.of(new SuggestionLiveRef(1L, 501L, "drive-501")));
         when(userRepo.findAllById(any(Iterable.class))).thenReturn(List.of(user(USER, "bob@example.com")));
 
         Page<SuggestionDto> page = service.list(null, 0, 20);

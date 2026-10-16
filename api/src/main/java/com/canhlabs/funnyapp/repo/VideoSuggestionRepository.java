@@ -84,7 +84,7 @@ public interface VideoSuggestionRepository extends JpaRepository<VideoSuggestion
 
     /** One batch lookup for a whole page: which suggestions already have a video_sources row. */
     @Query("""
-            select new com.canhlabs.funnyapp.repo.SuggestionLiveRef(s.id, v.id)
+            select new com.canhlabs.funnyapp.repo.SuggestionLiveRef(s.id, v.id, v.sourceId)
               from VideoSuggestion s, VideoImportJob j, VideoSource v
              where s.id in :ids and j.id = s.importJobId and v.sourceId = j.driveFileId
             """)
