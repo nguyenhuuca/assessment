@@ -157,15 +157,16 @@ export default function AppShell() {
         className="mobile-nav-tab"
         aria-current={active ? 'page' : undefined}
         onClick={() => goNav(item.key)}
+        aria-label={t(item.labelKey)}
+        title={t(item.labelKey)}
         style={{ color: active ? 'var(--accent-cyan)' : 'var(--text-muted)' }}
       >
-        <span className="material-symbols-outlined" style={{
-          fontSize: 22,
+        <span className="material-symbols-outlined" aria-hidden="true" style={{
+          fontSize: 26,
           fontVariationSettings: active ? "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" : undefined,
         }}>
           {item.icon}
         </span>
-        {t(item.labelKey)}
       </button>
     )
   }
