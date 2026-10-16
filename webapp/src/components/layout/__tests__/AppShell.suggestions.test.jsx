@@ -75,11 +75,34 @@ describe('AppShell "+" button', () => {
     expect(screen.queryByTestId('admin')).toBeNull()
   })
 
-  it('mobile FAB opens the suggestion modal too, and there is no header upload button', () => {
+  it('mobile settings menu opens the suggestion modal too, and there is no header upload button', () => {
     renderShell()
-    fireEvent.click(within(document.querySelector('.mobile-nav')).getByTitle('Đề xuất video'))
+    fireEvent.click(within(document.querySelector('.mobile-nav')).getByRole('button', { name: 'Menu' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: /Đề xuất video/ }))
     expect(screen.getByRole('dialog', { name: 'Đề xuất video' })).toBeInTheDocument()
+    expect(screen.queryByRole('menu')).toBeNull()
     expect(screen.queryByText('upload')).toBeNull()
+  })
+
+  it('mobile settings menu lists Settings, Admin only for admins, and closes on Escape', () => {
+    renderShell()
+    const menuBtn = within(document.querySelector('.mobile-nav')).getByRole('button', { name: 'Menu' })
+    fireEvent.click(menuBtn)
+    expect(screen.queryByRole('menuitem', { name: /Quản trị/ })).toBeNull()
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.queryByRole('menu')).toBeNull()
+    fireEvent.click(menuBtn)
+    fireEvent.click(screen.getByRole('menuitem', { name: /Cài đặt/ }))
+    expect(menuBtn).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByTestId('public-feed')).toBeNull()
+  })
+
+  it('mobile settings menu shows Admin for admins', () => {
+    auth = { ...auth, user: { email: 'a@x.com', isAdmin: true } }
+    renderShell()
+    fireEvent.click(within(document.querySelector('.mobile-nav')).getByRole('button', { name: 'Menu' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: /Quản trị/ }))
+    expect(screen.getByTestId('admin').dataset.tab).toBe('')
   })
 
   it('admin FAB navigates to Admin with the Import tab preselected', () => {
@@ -94,6 +117,7 @@ describe('AppShell "+" button', () => {
     auth = { user: null, jwt: null, isLoggedIn: false, logout: vi.fn() }
     renderShell()
     expect(document.querySelector('.fab')).toBeNull()
+    expect(within(document.querySelector('.mobile-nav')).queryByRole('button', { name: 'Menu' })).toBeNull()
   })
 
   it('"Xem tất cả" in the modal opens History', () => {

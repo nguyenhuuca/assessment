@@ -429,36 +429,47 @@ body {
   min-width: 0;
 }
 
-/* Center FAB — inline flex item inside mobile nav (YouTube-style) */
-.mobile-nav-fab {
-  flex: 1;
+/* Settings menu above the mobile nav (MobileNavMenu) */
+.mobile-nav-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+}
+
+.mobile-nav-menu {
+  position: fixed;
+  right: 8px;
+  bottom: 72px;
+  z-index: 51;
+  min-width: 200px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--bg-surface);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.mobile-nav-menu-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: none;
+  gap: 12px;
+  padding: 12px;
   border: none;
-  padding: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
 }
 
-.mobile-nav-fab::before {
-  content: '';
-  display: none; /* placeholder, actual button content below */
-}
+.mobile-nav-menu-item:hover,
+.mobile-nav-menu-item:focus-visible { background: var(--bg-elevated); }
 
-.mobile-nav-fab span {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dim) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 16px var(--primary-glow);
-  transition: transform var(--transition), box-shadow var(--transition);
-}
-
-.mobile-nav-fab:hover  span { transform: scale(1.08); box-shadow: 0 6px 24px var(--primary-glow); }
-.mobile-nav-fab:active span { transform: scale(0.92); }
+.mobile-nav-menu-item .material-symbols-outlined { font-size: 22px; color: var(--accent-cyan); }
 
 /* ── Mobile title (active tab label, centered in header) ── */
 .mobile-title {
@@ -570,7 +581,7 @@ body {
     left: 0 !important;
   }
 
-  /* FAB hidden on mobile — replaced by .mobile-nav-fab inside the bottom nav */
+  /* FAB hidden on mobile — "Suggest video" lives in the bottom-nav settings menu */
   .fab { display: none !important; }
 
   /* Main content: fixed between topnav and mobile-nav — no 100vh math needed */

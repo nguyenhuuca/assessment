@@ -14,6 +14,7 @@ import { PublicFeed } from '../video/VideoFeed.jsx'
 import ExploreView from '../explore/ExploreView.jsx'
 import LibraryView from '../library/LibraryView.jsx'
 import ComingSoon from './ComingSoon.jsx'
+import MobileNavMenu from './MobileNavMenu.jsx'
 import AdminView from '../admin/AdminView.jsx'
 import SettingsPage from '../settings/SettingsPage.jsx'
 import ActivityBar from '../common/ActivityBar.jsx'
@@ -22,13 +23,13 @@ import NotificationBell from '../notifications/NotificationBell.jsx'
 import { useNotificationStream } from '../../hooks/useNotifications.js'
 import { useLocaleSync } from '../../hooks/useLocaleSync.js'
 
-// Mobile bottom nav (no side nav on mobile). Settings is only useful once logged in.
+// Mobile bottom nav (no side nav on mobile). Secondary actions live in the
+// settings menu (MobileNavMenu), shown once logged in.
 const MOBILE_NAV = [
   { key: 'home',     icon: 'home',          labelKey: 'navHome'     },
   { key: 'library',  icon: 'video_library', labelKey: 'navLibrary'  },
   { key: 'explore',  icon: 'explore',       labelKey: 'navExplore'  },
   { key: 'history',  icon: 'history',       labelKey: 'navHistory'  },
-  { key: 'settings', icon: 'settings',      labelKey: 'navSettings', requiresAuth: true },
 ]
 
 const SIDE_NAV = [
@@ -145,8 +146,11 @@ export default function AppShell() {
     setActiveNav('home')
   }
 
-  const mobileNav = MOBILE_NAV.filter(n => !n.requiresAuth || isLoggedIn)
-  const mobileSplit = Math.ceil(mobileNav.length / 2)
+  const mobileMenu = [
+    { key: 'suggest',  icon: 'add',                  labelKey: 'suggestVideo', onSelect: handleFab },
+    ...(user?.isAdmin ? [{ key: 'admin', icon: 'admin_panel_settings', labelKey: 'navAdmin', onSelect: () => goNav('admin') }] : []),
+    { key: 'settings', icon: 'settings',             labelKey: 'navSettings',  onSelect: () => goNav('settings') },
+  ]
   const mobileTitle = activeNav === 'home' ? t('forYou') : t(SIDE_NAV.find(n => n.key === activeNav)?.labelKey ?? 'forYou')
 
   function renderMobileNavItem(item) {
@@ -399,16 +403,10 @@ export default function AppShell() {
         justifyContent: 'space-around',
         alignItems: 'center', padding: '0 8px',
       }}>
-        {mobileNav.slice(0, mobileSplit).map(renderMobileNavItem)}
-
-        {/* Center FAB — inline flex item (YouTube-style) */}
+        {MOBILE_NAV.map(renderMobileNavItem)}
         {isLoggedIn && (
-          <button className="mobile-nav-fab" onClick={handleFab} title={t('suggestVideo')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 24 }}>add</span>
-          </button>
+          <MobileNavMenu items={mobileMenu} active={activeNav === 'settings' || activeNav === 'admin'} />
         )}
-
-        {mobileNav.slice(mobileSplit).map(renderMobileNavItem)}
       </nav>
 
       {/* ── FAB (desktop only, hidden on mobile via CSS) ── */}
