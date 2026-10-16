@@ -77,7 +77,7 @@ function VideoTile({ video, onPlay, onRemove, removing }) {
         ? <img src={thumb} alt="" className="explore-reel-img" loading="lazy" />
         : <div className="explore-reel-fallback"><span className="material-symbols-outlined" style={{ fontSize: 36 }}>movie</span></div>}
       <div className="explore-reel-scrim" />
-      <span className="lib-reel-title">{title}</span>
+      <span className="explore-reel-title">{title}</span>
       {onRemove && (
         <button
           className="app-btn secondary"

@@ -1336,8 +1336,8 @@ body {
   pointer-events: none;
 }
 
-/* Library collection tiles: visible title over the scrim, 2 lines max */
-.lib-reel-title {
+/* Reel tiles (Explore, Library): visible title over the scrim, 2 lines max */
+.explore-reel-title {
   position: absolute;
   left: 10px;
   right: 10px;
@@ -1354,6 +1354,9 @@ body {
   overflow-wrap: anywhere;
   pointer-events: none;
 }
+
+/* Explore tiles also show the view counter at the bottom: sit the title above it */
+.explore-reel-title.above-views { bottom: 36px; }
 
 /* ── Floating Filter Bar ── */
 .explore-filter-bar {
@@ -1423,6 +1426,8 @@ body {
 
   .explore-reels-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
   .explore-reel-views { font-size: 12px; left: 8px; bottom: 8px; }
+  .explore-reel-title { font-size: 12px; left: 8px; right: 8px; bottom: 8px; }
+  .explore-reel-title.above-views { bottom: 30px; }
 
   .explore-filter-bar {
     bottom: 76px; /* above mobile nav */

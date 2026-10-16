@@ -44,6 +44,7 @@ function ReelTile({ video, onClick }) {
       }
       <div className="explore-reel-scrim" />
       <WatchedBadge videoId={video.id} />
+      <span className="explore-reel-title above-views">{title}</span>
       <span className="explore-reel-views">
         <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>visibility</span>
         {formatViews(video.viewCount)}
