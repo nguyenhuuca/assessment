@@ -53,6 +53,8 @@ describe('LibraryView', () => {
   it('guest can open a collection from a deep link', async () => {
     renderView({ initialCollectionId: 'p1' })
     expect(await screen.findByLabelText('Clip')).toBeTruthy()
+    // The title is visible on the tile, not only in the tooltip
+    expect(screen.getByText('Clip')).toHaveClass('lib-reel-title')
     expect(collectionsApi.videos).toHaveBeenCalledWith('p1', 0, expect.any(Number))
     expect(screen.queryByText('Xoá')).toBeNull()
     fireEvent.click(screen.getByLabelText('Clip'))
