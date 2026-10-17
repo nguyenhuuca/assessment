@@ -7,7 +7,7 @@
 | Status | Draft / In Review / Approved |
 | Owner | [Name] |
 | Reviewers | [Names] |
-| Related PRD | `./docs/prd/prd_[feature].md` |
+| Related PRD | `docs/prd_[feature].md` |
 
 ## Executive Summary
 

@@ -7,10 +7,13 @@ description: >-
   "present this doc", "export to html", or "show this on screen". INPUT is
   ONE markdown file (a PRD, Spec, ADR, or Plan). OUTPUT is ONE .html slideshow
   that opens directly in a browser. Render only — do not invent content.
+argument-hint: "<path/to/prd-or-spec-or-adr-or-plan.md>"
 allowed-tools: Read, Write, Glob, Grep
 ---
 
 # Presentation — HTML tab-bar deck from PRD / Spec / ADR / Plan
+
+Input doc: `$ARGUMENTS`. If empty, ask for the path (defaults live in `docs/prd/`, `docs/specs/`, `docs/adr/`, `docs/plans/`).
 
 You receive ONE markdown file — a **PRD** (Product Requirements Document), a
 **Feature Specification**, an **ADR** (Architecture Decision Record), or an

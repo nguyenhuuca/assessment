@@ -61,6 +61,35 @@ This file provides guidance to Claude Code when working with this repository.
 - After completing each task, update TASKS.md with status and notes
 - Format: [ ] pending, [x] done, [~] in progress
 
+## Core Principles
+
+Distilled from `.claude/rules/` (auto-loaded); the rules and skills refer to these by number.
+
+1. **Understand First** — read before writing; grep before creating; verify APIs via docs (Context7) before trusting training data.
+2. **Prove It Works** — tests first, run quality gates before every commit, a regression test for every bug fix.
+3. **Keep It Safe** — no secrets in code, validate input, parameterized queries, least privilege, flag vulnerabilities immediately.
+4. **Keep It Simple** — single responsibility, no premature abstraction, delete dead code, fix warnings before committing.
+5. **Don't Repeat Yourself** — check `.claude/skills/` before ad-hoc solutions; one source of truth for business logic.
+6. **Ship It** — commit on `main`, **ask before every `git push`** (CI deploys from `main`), then watch CI and smoke-test prod. Protocol: AGENTS.md "Landing the Plane".
+7. **Leave a Trail** — artifacts in `docs/` (table below), status in `docs/tracking.md`, decisions in ADRs.
+
+## Workflow & Artifacts
+
+**Planning flow**: PRD → ADR → Spec → Plan → implementation; ceremony scales with scope (`core-directives.md` Rule 6). This table overrides the `adr_[topic].md`-style names used in skill templates:
+
+| Type | Location | Example |
+|------|----------|---------|
+| ADR | `docs/adr/NNNN-<topic>.md` | `docs/adr/0021-watch-history.md` |
+| PRD | `docs/prd/PRD-<feature>.md` | `docs/prd/PRD-watch-history-v2.md` |
+| Spec | `docs/specs/spec-<feature>.md` | `docs/specs/spec-user-settings.md` |
+| Plan | `docs/plans/plan-<feature>.md` | `docs/plans/plan-watch-history-v2.md` |
+| Security audit / postmortem / design spec | `docs/<type>/<name>.md` | `docs/reports/...` |
+| Feature status | `docs/tracking.md` | — |
+
+Ephemeral notes go to `./scratchpad/` (gitignored). `./artifacts/` holds design images (Stitch exports), not planning docs.
+
+**User-invoked skills**: `/swarm-plan`, `/swarm-execute`, `/swarm-review`, `/swarm-research`, `/architect`, `/builder`, `/qa-engineer`, `/security-auditor`, `/ui-ux-designer`, `/code-check`, `/land-the-plane`, `/tailor`, `/scope` (idea → PRD), `/spec` (PRD + ADR → spec), `/presentation` (doc → HTML deck).
+
 ## Project Overview
 
 **Funny Movies** - Java 24 video streaming app with Spring Boot 3.x, PostgreSQL, Virtual Threads (Loom), YouTube API integration, and passwordless auth.
@@ -132,7 +161,7 @@ api/
 └── pom.xml
 webapp/         # Frontend (React 19 + Vite)
 helm/           # Kubernetes charts
-doc/adr/        # Architecture decisions
+docs/adr/       # Architecture decisions
 ```
 
 ## Key Architecture
@@ -202,4 +231,4 @@ ContractDSL.of(value).notNull().inRange(min, max);
 
 **View logs:** Check AOP audit logs (sensitive fields auto-masked)
 
-**Architecture docs:** See `doc/adr/` for decisions, `doc/` for diagrams
+**Architecture docs:** See `docs/adr/` for decisions, `docs/architecture/` and `docs/puml/` for diagrams

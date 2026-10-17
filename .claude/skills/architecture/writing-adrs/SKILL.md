@@ -1,7 +1,6 @@
 ---
 name: writing-adrs
 description: Document architectural decisions. Use when making significant technical decisions that should be recorded. Covers ADR format and decision documentation.
-allowed-tools: Read, Write, Glob, Grep
 ---
 
 # Writing Architecture Decision Records
