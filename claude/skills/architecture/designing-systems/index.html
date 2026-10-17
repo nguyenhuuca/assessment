@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Design scalable, reliable software systems. Use when planning new systems, major features, or architecture changes. Covers C4 diagrams, trade-off analysis, and system decomposition.">
+        <meta name="description" content="Produces this framework's ADR and system-design artifacts from bundled templates with trade-off analysis. Use when designing a system or component, choosing between architectures, or recording an architecture decision in the planning flow.">
       
       
         <meta name="author" content="nguyenhuuca">
       
       
       
-        <link rel="prev" href="../../../rules/tech-strategy/">
+        <link rel="prev" href="../../workflows/tailor/">
       
       
-        <link rel="next" href="../designing-apis/">
+        <link rel="next" href="../writing-adrs/">
       
       
         
@@ -3658,6 +3658,8 @@
       
         
       
+        
+      
     
     
     
@@ -3721,8 +3723,40 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../../agents-md/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AGENTS.md (Landing the Plane)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
+      
+        
+      
+        
       
         
       
@@ -3766,17 +3800,17 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_2" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_3" >
         
           
-          <label class="md-nav__link" for="__nav_12_2" id="__nav_12_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_12_3" id="__nav_12_3_label" tabindex="">
             
   
   
   <span class="md-ellipsis">
     
   
-    Commands
+    Skills — Workflows (user-invoked)
   
 
     
@@ -3787,12 +3821,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_2">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_3">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Commands
+    Skills — Workflows (user-invoked)
   
 
           </label>
@@ -3805,14 +3839,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/scope/" class="md-nav__link">
+      <a href="../../workflows/scope/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Scope (PRD Generator)
+    /scope
   
 
     
@@ -3833,14 +3867,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/spec/" class="md-nav__link">
+      <a href="../../workflows/spec/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Spec (Specification)
+    /spec
   
 
     
@@ -3861,7 +3895,787 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/presentation/" class="md-nav__link">
+      <a href="../../workflows/architect/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /architect
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /builder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/qa-engineer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /qa-engineer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/security-auditor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /security-auditor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/ui-ux-designer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /ui-ux-designer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/code-check/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /code-check
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/swarm-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /swarm-plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/swarm-execute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /swarm-execute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/swarm-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /swarm-review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/swarm-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /swarm-research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/land-the-plane/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /land-the-plane
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/tailor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /tailor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_12_4" id="__nav_12_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_12_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Designing Systems
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Designing Systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#artifact-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artifact Selection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#design-validation-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design-Validation Loop
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing-adrs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing ADRs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_12_5" id="__nav_12_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Core Engineering
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Core Engineering
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core-engineering/dependency-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core-engineering/review-steering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Review Steering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core-engineering/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_12_6" id="__nav_12_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/presentation/" class="md-nav__link">
         
   
   
@@ -3882,6 +4696,77 @@
 
               
             
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_12_7" id="__nav_12_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
               
                 
   
@@ -3889,14 +4774,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/builder/" class="md-nav__link">
+      <a href="../../operations/postmortem/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Builder
+    Postmortem
   
 
     
@@ -3917,14 +4802,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/architect/" class="md-nav__link">
+      <a href="../../operations/swarm-coordination/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Architect
+    Swarm Coordination
   
 
     
@@ -3938,6 +4823,75 @@
 
               
             
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_12_8" id="__nav_12_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Product
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Product
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
               
                 
   
@@ -3945,14 +4899,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/qa-engineer/" class="md-nav__link">
+      <a href="../../product/planning-artifacts/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    QA Engineer
+    Planning Artifacts (PR-FAQ, PRD, Roadmap)
   
 
     
@@ -3966,29 +4920,9 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../commands/code-check/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Code Check
-  
-
-    
-  </span>
-  
-  
-
-      </a>
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -4000,15 +4934,40 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../../commands/security-auditor/" class="md-nav__link">
+    
+    
+      
         
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_12_9" id="__nav_12_9_label" tabindex="">
+            
   
   
   <span class="md-ellipsis">
     
   
-    Security Auditor
+    Skills — Security
   
 
     
@@ -4016,11 +4975,19 @@
   
   
 
-      </a>
-    </li>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Security
   
 
-              
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -4029,98 +4996,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commands/ui-ux-designer/" class="md-nav__link">
+      <a href="../../security/threat-modeling/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    UI/UX Designer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../commands/swarm-execute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Swarm Execute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../commands/swarm-plan/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Swarm Plan
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../commands/swarm-review/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Swarm Review
+    Threat Modeling
   
 
     
@@ -4179,10 +5062,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_10" >
         
           
-          <label class="md-nav__link" for="__nav_12_3" id="__nav_12_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_12_10" id="__nav_12_10_label" tabindex="">
             
   
   
@@ -4200,8 +5083,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_3">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4218,14 +5101,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../agents/worker-builder/" class="md-nav__link">
+      <a href="../../../agents/worker-architect/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Worker Builder
+    Worker Architect
   
 
     
@@ -4246,14 +5129,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../agents/worker-architect/" class="md-nav__link">
+      <a href="../../../agents/worker-builder/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Worker Architect
+    Worker Builder
   
 
     
@@ -4302,14 +5185,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../agents/worker-researcher/" class="md-nav__link">
+      <a href="../../../agents/worker-research/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Worker Researcher
+    Worker Research
   
 
     
@@ -4378,6 +5261,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -4396,10 +5283,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_11" >
         
           
-          <label class="md-nav__link" for="__nav_12_4" id="__nav_12_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_12_11" id="__nav_12_11_label" tabindex="">
             
   
   
@@ -4417,8 +5304,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_4">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4519,34 +5406,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../rules/swarm-workers/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Swarm Workers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../rules/tech-strategy/" class="md-nav__link">
         
   
@@ -4568,289 +5427,6 @@
 
               
             
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12_5" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_12_5" id="__nav_12_5_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Skills — Architecture
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_5_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_12_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Skills — Architecture
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Designing Systems
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Designing Systems
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#workflows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Workflows
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#feedback-loops" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Feedback Loops
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#blueprint-template" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Blueprint Template
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#c4-model-levels" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        C4 Model Levels
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="C4 Model Levels">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#level-1-context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Level 1: Context
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#level-2-container" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Level 2: Container
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#level-3-component" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Level 3: Component
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#level-4-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Level 4: Code
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#trade-off-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Trade-off Analysis
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#non-functional-requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Non-Functional Requirements
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#resources" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Resources
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
               
                 
   
@@ -4858,14 +5434,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../designing-apis/" class="md-nav__link">
+      <a href="../../../rules/debugging-protocol/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Designing APIs
+    Debugging Protocol
   
 
     
@@ -4886,14 +5462,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../writing-adrs/" class="md-nav__link">
+      <a href="../../../rules/agent-constraints/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Writing ADRs
+    Agent Constraints
   
 
     
@@ -4914,98 +5490,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../domain-driven-design/" class="md-nav__link">
+      <a href="../../../rules/hooks-conventions/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Domain Driven Design
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../cloud-native-patterns/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Cloud Native Patterns
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../capacity-planning/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Capacity Planning
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../defense-in-depth/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Defense in Depth
+    Hooks Conventions (scoped)
   
 
     
@@ -5035,1740 +5527,6 @@
   
     
     
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_12_6" id="__nav_12_6_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Skills — Core Engineering
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_6">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Skills — Core Engineering
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../core-engineering/implementing-code/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Implementing Code
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../core-engineering/debugging/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Debugging
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../core-engineering/testing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Testing
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../core-engineering/test-driven-development/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Test Driven Development
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../core-engineering/refactoring-code/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Refactoring Code
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../core-engineering/optimizing-code/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimizing Code
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../core-engineering/data-to-ui/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Data to UI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../core-engineering/data-management/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Data Management
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../core-engineering/dependency-management/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency Management
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_12_7" id="__nav_12_7_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Skills — Design
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_7">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Skills — Design
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../design/interface-design/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Interface Design
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../design/design-systems/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Design Systems
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../design/component-recipes/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Component Recipes
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../design/accessibility/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Accessibility
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../design/visual-assets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Visual Assets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../design/demo-design-tokens/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Design Tokens (Demo)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_12_8" id="__nav_12_8_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Skills — Languages
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Skills — Languages
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../languages/java/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Java
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../languages/typescript/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    TypeScript
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../languages/python/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Python
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../languages/bash/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Bash
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../languages/terraform/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Terraform
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_9" >
-        
-          
-          <label class="md-nav__link" for="__nav_12_9" id="__nav_12_9_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Skills — Operations
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_9">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Skills — Operations
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/infrastructure/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Infrastructure
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/observability/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Observability
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/incident-management/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Incident Management
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/chaos-engineering/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Chaos Engineering
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/beads-workflow/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Beads Workflow
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/deploy-aws-ecs/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Deploy AWS ECS
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/deploy-cloudflare/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Deploy Cloudflare
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/deploy-railway/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Deploy Railway
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_10" >
-        
-          
-          <label class="md-nav__link" for="__nav_12_10" id="__nav_12_10_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Skills — Product
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_10">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Skills — Product
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/requirements-analysis/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Requirements Analysis
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/writing-prds/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Writing PRDs
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/writing-pr-faqs/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Writing PR FAQs
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/decomposing-tasks/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Decomposing Tasks
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/estimating-work/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Estimating Work
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/agile-methodology/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Agile Methodology
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/brainstorming/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Brainstorming
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/reaching-consensus/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reaching Consensus
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/documentation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Documentation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/context-management/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Context Management
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../product/execution-roadmaps/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Execution Roadmaps
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_11" >
-        
-          
-          <label class="md-nav__link" for="__nav_12_11" id="__nav_12_11_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Skills — Security
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_11">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Skills — Security
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../security/security-review/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Security Review
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../security/application-security/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Application Security
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../security/threat-modeling/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Threat Modeling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../security/identity-access/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Identity & Access
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../security/compliance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Compliance
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
       
         
       
@@ -6806,7 +5564,7 @@
   <span class="md-ellipsis">
     
   
-    Templates — Artifacts
+    Hooks
   
 
     
@@ -6819,6 +5577,205 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_12_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_12_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Hooks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hooks/dangerous-command-guard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    dangerous-command-guard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hooks/pre-tool-use-validator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pre-tool-use-validator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hooks/session-start-loader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    session-start-loader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../hooks/stop-validator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    stop-validator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_12_13" id="__nav_12_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templates — Artifacts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7151,10 +6108,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_13" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12_14" >
         
           
-          <label class="md-nav__link" for="__nav_12_13" id="__nav_12_13_label" tabindex="">
+          <label class="md-nav__link" for="__nav_12_14" id="__nav_12_14_label" tabindex="">
             
   
   
@@ -7172,8 +6129,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7337,10 +6294,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#workflows" class="md-nav__link">
+  <a href="#artifact-selection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Workflows
+        Artifact Selection
       
     </span>
   </a>
@@ -7348,10 +6305,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#feedback-loops" class="md-nav__link">
+  <a href="#workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Feedback Loops
+        Workflow
       
     </span>
   </a>
@@ -7359,93 +6316,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#blueprint-template" class="md-nav__link">
+  <a href="#design-validation-loop" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Blueprint Template
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#c4-model-levels" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        C4 Model Levels
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="C4 Model Levels">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#level-1-context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Level 1: Context
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#level-2-container" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Level 2: Container
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#level-3-component" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Level 3: Component
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#level-4-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Level 4: Code
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#trade-off-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Trade-off Analysis
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#non-functional-requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Non-Functional Requirements
+        Design-Validation Loop
       
     </span>
   </a>
@@ -7489,80 +6363,34 @@
 
 
 <h1 id="designing-systems">Designing Systems<a class="headerlink" href="#designing-systems" title="Permanent link">&para;</a></h1>
-<h2 id="workflows">Workflows<a class="headerlink" href="#workflows" title="Permanent link">&para;</a></h2>
+<h2 id="artifact-selection">Artifact Selection<a class="headerlink" href="#artifact-selection" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>ADR</strong> (<code>docs/adr_[topic].md</code>, <a href="../resources/adr.template/">template</a>): one decision — a choice among alternatives with rationale and consequences.</li>
+<li><strong>System Design Doc</strong> (<code>docs/system_design_[component].md</code>, <a href="../resources/system-design.template/">template</a>): a whole system or component — architecture, data model, API, NFRs, phased plan.</li>
+</ul>
+<p>A new system usually needs both: the system design doc for the overall shape, plus an ADR for each decision worth justifying independently (e.g., "why Postgres over DynamoDB").</p>
+<h2 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Permanent link">&para;</a></h2>
 <ul>
 <li>[ ] <strong>Requirements</strong>: Gather functional and non-functional requirements</li>
-<li>[ ] <strong>Diagrams</strong>: Create C4 diagrams (Context, Container)</li>
-<li>[ ] <strong>Data</strong>: Define data model and storage strategy</li>
-<li>[ ] <strong>API</strong>: Define interfaces and contracts</li>
+<li>[ ] <strong>Diagram</strong>: Draft a Mermaid diagram showing components and their boundaries</li>
+<li>[ ] <strong>Data &amp; API</strong>: Define the data model, storage strategy, and interface contracts</li>
+<li>[ ] <strong>Trade-offs</strong>: For each major decision, table Option A vs Option B — pros, cons, when to choose</li>
 <li>[ ] <strong>Risks</strong>: Identify single points of failure</li>
-<li>[ ] <strong>Document</strong>: Save to <code>./docs/adr/[topic].md</code></li>
+<li>[ ] <strong>Tech Strategy</strong>: Confirm every technology choice matches <code>.claude/rules/tech-strategy.md</code> — no deviation without explicit instruction</li>
+<li>[ ] <strong>Document</strong>: Fill in the matching template and save under <code>docs/</code></li>
 </ul>
-<h2 id="feedback-loops">Feedback Loops<a class="headerlink" href="#feedback-loops" title="Permanent link">&para;</a></h2>
+<h2 id="design-validation-loop">Design-Validation Loop<a class="headerlink" href="#design-validation-loop" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Draft design document</li>
+<li>Draft the artifact from the template</li>
 <li>Review with stakeholders</li>
-<li>Create POC for risky components</li>
-<li>Refine design based on POC</li>
-<li>Finalize ADR</li>
+<li>Build a POC for the riskiest component</li>
+<li>Refine the design from POC findings</li>
+<li>Finalize the artifact</li>
 </ol>
-<h2 id="blueprint-template">Blueprint Template<a class="headerlink" href="#blueprint-template" title="Permanent link">&para;</a></h2>
-<p>Every system design should include:</p>
-<ol>
-<li><strong>High-Level Diagram</strong>: Mermaid graph showing components</li>
-<li><strong>Component Boundaries</strong>: Clear responsibility definitions</li>
-<li><strong>API Definitions</strong>: OpenAPI or GraphQL specs</li>
-<li><strong>Data Models</strong>: Schema definitions</li>
-<li><strong>Trade-off Analysis</strong>: Rationale for key decisions</li>
-</ol>
-<h2 id="c4-model-levels">C4 Model Levels<a class="headerlink" href="#c4-model-levels" title="Permanent link">&para;</a></h2>
-<h3 id="level-1-context">Level 1: Context<a class="headerlink" href="#level-1-context" title="Permanent link">&para;</a></h3>
-<p>Who uses the system? What external systems does it interact with?</p>
-<h3 id="level-2-container">Level 2: Container<a class="headerlink" href="#level-2-container" title="Permanent link">&para;</a></h3>
-<p>What are the major deployable units? (APIs, databases, queues)</p>
-<h3 id="level-3-component">Level 3: Component<a class="headerlink" href="#level-3-component" title="Permanent link">&para;</a></h3>
-<p>What are the major building blocks within each container?</p>
-<h3 id="level-4-code">Level 4: Code<a class="headerlink" href="#level-4-code" title="Permanent link">&para;</a></h3>
-<p>Class/function level (usually not needed in architecture docs)</p>
-<h2 id="trade-off-analysis">Trade-off Analysis<a class="headerlink" href="#trade-off-analysis" title="Permanent link">&para;</a></h2>
-<p>For major decisions, explicitly document:</p>
-<table>
-<thead>
-<tr>
-<th>Decision</th>
-<th>Option A</th>
-<th>Option B</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Pros</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr>
-<td>Cons</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr>
-<td>When to Choose</td>
-<td>...</td>
-<td>...</td>
-</tr>
-</tbody>
-</table>
-<h2 id="non-functional-requirements">Non-Functional Requirements<a class="headerlink" href="#non-functional-requirements" title="Permanent link">&para;</a></h2>
-<p>Always consider:
-- <strong>Scalability</strong>: Expected load, growth rate
-- <strong>Availability</strong>: SLA targets, failure modes
-- <strong>Latency</strong>: P50, P95, P99 requirements
-- <strong>Security</strong>: Authentication, authorization, data protection
-- <strong>Cost</strong>: Infrastructure, operational overhead</p>
 <h2 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="./resources/system-design.template.md">System Design Template</a></li>
-<li><a href="./resources/adr.template.md">ADR Template</a></li>
+<li><a href="../resources/system-design.template/">System Design Template</a></li>
+<li><a href="../resources/adr.template/">ADR Template</a></li>
 </ul>
 
 
