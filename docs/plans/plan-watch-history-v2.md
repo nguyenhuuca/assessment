@@ -9,7 +9,7 @@ Handoff to: Builder, QA Engineer
 
 ## Overview
 
-**Status:** Approved (2026-10-15). Defaults are accepted: 30 s progress heartbeat, accent-sensitive search, and the feed only shows a badge.
+**Status:** Done (2026-10-18, QA-1 verified on prod). Approved 2026-10-15. Defaults are accepted: 30 s progress heartbeat, accent-sensitive search, and the feed only shows a badge.
 **Author:** nguyenhuuca
 **Date:** 2026-10-15
 **Related PRD:** [PRD-watch-history-v2](../prd/PRD-watch-history-v2.md)
@@ -178,3 +178,5 @@ BE-3 and FE-4 can run in parallel with the main chain. FE-1 can start from the c
 |------|--------|
 | 2026-10-15 | Plan created (`/swarm-plan history`). Scope chosen by the owner: list with day groups, progress and resume, clear-all and pause, search and badges. Recording piggybacks on the view call. New docs supersede the June drafts. |
 | 2026-10-15 | `/swarm-execute`: BE-1..3 and FE-1..4 implemented. `mvn verify`: 1305 tests, LINE coverage 96.63 %. Vitest: 401 tests; eslint 0 errors; build OK. Previewed at desktop and 390 px in dark and light themes (fixed mobile top padding under the floating header). Native SQL not yet run against a real Postgres (no local DB); covered by QA-1. |
+| 2026-10-16 | Pushed and deployed (`0a2a365` BE, `4c46791` FE). Liquibase changeset `202610160001-create-watch-history` ran on prod; endpoints return 401 for guests. |
+| 2026-10-18 | QA-1 passed on prod, logged in (owner): recording, resume, pause history, remove/clear, badges. |

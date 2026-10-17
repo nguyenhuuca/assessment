@@ -35,7 +35,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Hot Score Migration** | — | — | — | [Plan 📋](plans/plan-vid2-hot-score-migration.md) | — | 🔍 | |
 | **File-based Hooks** | — | — | — | [Plan A 📋](plans/plan-a-file-based-hooks.md) · [Plan B 📋](plans/plan-b-direct-cli-spawn.md) | — | 🔍 | |
 | **Bookmark Feature** | [PRD 📝](prd/PRD-bookmark-feature.md) | [0012 💡](adr/0012-bookmark-feature-design.md) | — | [Plan 📋](plans/plan-bookmark-feature.md) · [Library Collections ✅](plans/plan-library-collections.md) | — | 🔍 | ADR amended 2026-10-13: collections-first, no bookmarks table; admin public collections |
-| **Watch History (v2)** | [PRD ✅](prd/PRD-watch-history-v2.md) | [0021 ✅](adr/0021-watch-history.md) | — | [Plan 📋](plans/plan-watch-history-v2.md) | — | — | Supersedes the June Opus/baseline drafts (ADR-0013/0014, never implemented) |
+| **Watch History (v2)** | [PRD ✅](prd/PRD-watch-history-v2.md) | [0021 ✅](adr/0021-watch-history.md) | — | [Plan ✅](plans/plan-watch-history-v2.md) | — | ✅ | `0a2a365` BE (table, API, recording on the view call) + `4c46791` FE (History tab, progress/resume, badges); QA-1 verified on prod 2026-10-18. Supersedes ADR-0013/0014 |
 | **User Settings** | [PRD ✅](prd/PRD-user-settings.md) | [0016 ✅](adr/0016-user-settings-design.md) | [Spec ✅](specs/spec-user-settings.md) | [Plan ✅](plans/plan-user-settings.md) | — | ✅ | Pushed to main `dd45fc0`; coverage 95.91% |
 | **Video Reactions (like / unlike / dislike)** | — | — | — | [Plan ✅](plans/plan-video-reactions.md) | — | ✅ | `28cc167`; fixes 404 on `/video/like`; per-user reactions, optional-auth GET |
 | **Admin Comment Moderation** | — | — | — | [Plan ✅](plans/plan-admin-comment-moderation.md) | — | ✅ | `acfc953` soft remove/restore with policy reasons; `6f66b15` bulk (≤100) |
@@ -51,7 +51,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 
 ## Status Summary
 
-### ✅ Done (15)
+### ✅ Done (16)
 - [Use RDBMS](adr/0001-use-relational-database.md)
 - [Backend Architecture](adr/0002-backend-architecture.md)
 - [Cache Strategy](adr/0003-use-cache.md)
@@ -67,12 +67,13 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [User Notifications](adr/0017-user-notifications.md)
 - [Password Login](adr/0018-password-login-option.md)
 - [Admin Video Import](adr/0019-admin-video-import.md)
+- [Watch History (v2)](adr/0021-watch-history.md)
 
 ### 🔄 In Progress (2)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
 - [Admin Drive Force Sync](plans/plan-admin-drive-force-sync.md)
 
-### 🔍 In Review (8)
+### 🔍 In Review (7)
 - [Video Suggestions](plans/plan-video-suggestions.md)
 - [i18n Vietnamese + English](plans/plan-i18n.md)
 - [HLS Video Streaming](plans/plan-hls-migration.md)
@@ -81,7 +82,6 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Hot Score Migration](plans/plan-vid2-hot-score-migration.md)
 - [File-based Hooks](plans/plan-a-file-based-hooks.md)
 - [Bookmark Feature](plans/plan-bookmark-feature.md)
-- [Watch History (v2)](plans/plan-watch-history-v2.md)
 
 ### 💡 Proposed / No Plan Yet (0)
 - —
