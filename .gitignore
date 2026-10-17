@@ -54,3 +54,4 @@ client_secret*.json
 scratchpad/
 .claude/worktrees/
 .claude/hooks/.state/
+.claude/hooks/.locks/
