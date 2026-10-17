@@ -50,3 +50,30 @@ All of these must pass before committing:
 - **Hat 2: Optimization** - Improve performance, NOT behavior. Benchmarks required.
 
 When switching hats, commit first, then switch context.
+
+## Naming Conventions (suggested defaults)
+
+Suggested defaults — customize per project.
+
+- **Files**: camelCase (e.g., `userService.ts`, `authMiddleware.py`)
+- **Components**: PascalCase (e.g., `UserProfile.tsx`, `LoginForm.vue`)
+- **Directories**: kebab-case for multi-word (e.g., `api-utils/`, `auth-handlers/`)
+- **Constants**: UPPER_SNAKE_CASE
+- **Variables/functions**: camelCase (JS/TS), snake_case (Python/Go/Rust)
+
+## Structured Logging
+
+- Use a structured logger instead of raw console/print calls
+- Include correlation IDs for request tracing
+- Log levels: ERROR (failures), WARN (degraded), INFO (key events), DEBUG (troubleshooting)
+- Never log secrets, tokens, or PII
+
+## Automated Quality Suite
+
+Generic categories — configure with the tools appropriate for your stack.
+
+| Phase | Checks |
+|-------|--------|
+| Pre-commit | Lint + format + type check + secret scan |
+| CI pipeline | Lint + secret scan + vulnerability scan + tests |
+| Continuous | Dependency updates + security advisories |

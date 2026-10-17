@@ -44,6 +44,7 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 | UI Library | Bootstrap 5 + React-Bootstrap 2 |
 | Icons | FontAwesome (react-fontawesome) |
 | HTTP Client | Fetch API (via React Query) |
+| i18n | i18next + react-i18next (ADR-0020) |
 | Testing | Vitest + Testing Library |
 | Location | `webapp/` directory |
 | Architecture | SPA with component-based rendering |
@@ -105,7 +106,7 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 | Build | Maven package with JDK 24 |
 | Testing | Maven test with coverage |
 | Coverage Reporting | Codecov + SonarCloud |
-| Quality Gate | +1% coverage per commit |
+| Quality Gate | LINE coverage >= 90% (fixed minimum) |
 | Version Management | Auto-increment in `.funny-app.version` |
 | Docker Build | Automatic on successful tests |
 | Registry | Docker Hub with version tags |
@@ -123,7 +124,7 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 | Component | Choice |
 |-----------|--------|
 | Coverage Tool | Jacoco |
-| Coverage Threshold | Progressive (+1% per commit) |
+| Coverage Threshold | Fixed minimum 90% |
 | Threshold File | `api/.coverage-threshold` |
 | Excluded from Coverage | DTOs, entities, exceptions, config classes |
 | Code Analysis | SonarCloud |

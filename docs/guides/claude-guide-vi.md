@@ -6,26 +6,33 @@
 
 ## 📚 Mục lục
 
-1. [Giới thiệu](#giới-thiệu)
-2. [Cấu hình có sẵn](#cấu-hình-có-sẵn)
-3. [Personas - 12 commands](#personas---12-commands)
-4. [Skills - 90+ workflows tự động](#skills---90-workflows-tự-động)
-5. [Swarm - Multi-agent parallel execution](#swarm---multi-agent-parallel-execution)
-6. [Workflows thực tế](#workflows-thực-tế)
-7. [Templates có sẵn](#templates-có-sẵn)
-8. [Tips & Tricks](#tips--tricks)
+1. [Giới thiệu](#gioi-thieu)
+2. [Cấu hình có sẵn](#cau-hinh-co-san)
+3. [Workflow skills - 14 lệnh](#workflow-skills-14-lenh)
+4. [Library skills - tự động load](#library-skills-tu-ong-load)
+5. [Swarm - Multi-agent parallel execution](#swarm-multi-agent-parallel-execution)
+6. [Hooks & permissions](#hooks-permissions)
+7. [Workflows thực tế](#workflows-thuc-te)
+8. [Templates có sẵn](#templates-co-san)
+9. [Tips & Tricks](#tips-tricks)
 
 ---
 
 ## Giới thiệu
 
-Project này đã được config sẵn với **Claude Code Framework** - một hệ thống AI assistant mạnh mẽ giúp:
+Project này dùng **[Claude Agentic Framework](https://github.com/dralgorhythm/claude-agentic-framework) v5**, đã chỉnh cho Funny Movies (xem [Claude Workspace](../claude/index.md)):
 
-- ✅ **Tự động load skills** phù hợp với context
-- ✅ **12 commands chuyên môn** (scope, spec, architect, builder, security, QA, presentation...)
-- ✅ **90+ workflows** cho mọi task development
-- ✅ **Multi-agent swarm** để execute task song song
-- ✅ **Templates** cho ADR, PRD, design docs...
+- ✅ **14 workflow skills** gọi bằng `/tên` (scope, spec, architect, builder, swarm…)
+- ✅ **10 library skills** Claude tự load khi task phù hợp (testing, ADR, threat modeling…)
+- ✅ **5 worker agents** cho swarm, mỗi agent có model, `maxTurns` và tools cố định
+- ✅ **Rules** nạp vào mọi session: core directives, code quality, security, tech strategy, debugging protocol
+- ✅ **4 safety hooks** + permission deny cho secrets
+- ✅ **Templates** cho PRD, ADR, spec, plan…
+
+Hai quy ước riêng của repo này cần nhớ:
+
+1. **Tài liệu planning nằm trong `docs/`**: `docs/adr/`, `docs/prd/`, `docs/specs/`, `docs/plans/`, trạng thái ở `docs/tracking.md`.
+2. **Commit trên `main`, và Claude luôn hỏi trước mỗi lần `git push`**, vì CI deploy từ `main`.
 
 ---
 
@@ -35,346 +42,95 @@ Project này đã được config sẵn với **Claude Code Framework** - một 
 
 ```
 .claude/
-├── commands/          # 9 personas (architect, builder, QA...)
-├── agents/            # 5 worker agents cho swarm execution
-├── skills/            # 90+ skill workflows (auto-triggered)
-│   ├── architecture/  # System design, API design, DDD...
-│   ├── core-engineering/  # Coding, testing, debugging...
-│   ├── languages/     # TypeScript, Python, Go, Rust, Java...
-│   ├── operations/    # Infrastructure, observability, incident...
-│   ├── product/       # PRD, roadmap, requirements...
-│   ├── security/      # Security audit, threat modeling...
-│   └── design/        # UI/UX, accessibility, design systems...
-├── rules/             # Code quality, security, tech strategy
-└── settings.json      # Permissions (200+ commands allowed)
+├── skills/
+│   ├── <name>/SKILL.md          # 14 workflow skills: gọi bằng /name
+│   ├── architecture/            # designing-systems, writing-adrs
+│   ├── core-engineering/        # testing, dependency-upgrade, review-steering
+│   ├── design/                  # presentation
+│   ├── operations/              # postmortem, swarm-coordination
+│   ├── product/                 # planning-artifacts (PR-FAQ, PRD, roadmap)
+│   └── security/                # threat-modeling
+├── agents/                      # 5 worker agents cho swarm
+├── rules/                       # Nạp vào mọi session
+├── hooks/                       # 4 safety hooks (bash)
+├── templates/                   # Template của framework
+└── settings.json                # Permissions allow/deny + đăng ký hooks
 
+AGENTS.md                        # "Landing the Plane": cách kết thúc một phiên làm việc
 templates/
-├── artifacts/         # ADR, PRD, design spec, postmortem...
-└── claude_mechanisms/ # Agent, command, skill, rule templates
+├── artifacts/                   # PRD, ADR, spec, plan, design spec, postmortem...
+└── claude_mechanisms/           # Agent, command, skill, rule templates
 ```
+
+> **Từ v5 không còn `.claude/commands/`.** Các lệnh cũ đã thành skill, tên lệnh giữ nguyên.
 
 ---
 
-## Personas - 12 commands
+## Workflow skills - 14 lệnh
 
-### 1. 📋 `/scope` - PRD Generator
+Workflow skills chỉ chạy khi bạn gõ `/tên`; Claude không tự gọi chúng.
 
-**Dùng khi:** Biến ý tưởng feature thô thành PRD có cấu trúc
+| Lệnh | Vai trò | Dùng khi | Output |
+|------|---------|----------|--------|
+| `/scope <ý tưởng>` | PRD Generator | Ý tưởng còn mơ hồ: hỏi lại cho rõ rồi viết PRD | `docs/prd/PRD-{slug}.md` |
+| `/spec <PRD> <ADR>` | Spec Generator | Biến PRD + ADR đã duyệt thành behavior contract | `docs/specs/spec-{slug}.md` |
+| `/architect <chủ đề>` | Principal Architect | Thiết kế hệ thống, ghi quyết định thành ADR | `docs/adr/NNNN-{slug}.md` |
+| `/builder <task>` | Builder | Implement, debug, refactor có test | Code + tests |
+| `/qa-engineer <component>` | QA Engineer | Test strategy, E2E, accessibility gate | Test plan / tests |
+| `/security-auditor <scope>` | Security Auditor | OWASP/STRIDE audit, data-flow tracing | Audit report |
+| `/ui-ux-designer <flow>` | UI/UX Designer | Thiết kế giao diện, kiểm tra WCAG bằng DevTools | Design spec |
+| `/code-check <scope>` | Codebase Auditor | Audit SOLID, DRY, consistency, scope adherence | Quality report |
+| `/swarm-plan <feature>` | Planning Orchestrator | Chia feature lớn thành task 200–400 LOC | `docs/plans/plan-{slug}.md` |
+| `/swarm-execute <plan>` | Execution Orchestrator | Chạy plan với nhiều worker song song | Code đã commit |
+| `/swarm-review <scope>` | Adversarial Reviewer | Review nhiều góc: security, performance, scope… | Review report |
+| `/swarm-research <topic>` | Research Orchestrator | Nghiên cứu sâu, so sánh công nghệ | Research report |
+| `/land-the-plane` | Finish-Line Protocol | Chạy gates → commit → (hỏi) push → kiểm CI | Commit đã push |
+| `/tailor` | Configuration Tailor | Phát hiện stack, đề xuất chỉnh cấu hình (chỉ đề xuất) | `scratchpad/tailor-proposal.md` |
 
-**Capabilities:**
-- Hỏi từng câu một để làm rõ yêu cầu (problem, users, success metrics, scope)
-- Đọc codebase hiện có trước khi viết
-- Tạo PRD đầy đủ theo template chính thức
+Ví dụ:
 
-**Example:**
+```bash
+/scope add a trending videos section to the homepage
+/spec docs/prd/PRD-bookmark-feature.md docs/adr/0012-bookmark-feature-design.md
+/swarm-plan docs/specs/spec-video-recommendation.md
+/swarm-execute docs/plans/plan-watch-history-v2.md
+/swarm-review commit 0bf86a71
+/presentation docs/adr/0021-watch-history.md
 ```
-/scope add watch history feature
-/scope add comment section to video pages
-```
 
-**Output:** `docs/prd/PRD-{slug}.md`
+> `/presentation` là library skill nhưng vẫn gọi được bằng `/presentation <đường dẫn>`. Nó render một PRD/Spec/ADR/Plan thành một file `.html` mở thẳng trong browser.
 
 ---
 
-### 2. 📐 `/spec` - Feature Specification Generator
-
-**Dùng khi:** Dịch PRD + ADR đã được duyệt thành specification chính xác, có thể implement ngay
-
-**Capabilities:**
-- Đọc PRD và ADR để extract những gì đã biết
-- Hỏi từng câu một (business rules, error cases, edge cases, performance targets)
-- Verify entity/API names trong codebase thực tế
-- Tạo Spec với API contract, DB schema, edge cases, và acceptance criteria đầy đủ
-
-**Example:**
-```
-/spec docs/prd/PRD-watch-history.md docs/adr/0013-watch-history-design.md
-```
-
-**Output:** `docs/specs/spec-{slug}.md`
-
----
-
-### 3. 🏛️ `/architect` - Principal Architect
-
-**Dùng khi:** Design system, API, viết ADR
-
-**Capabilities:**
-- System design với trade-off analysis
-- API design với OpenAPI spec
-- Architecture Decision Records (ADR)
-- Sequential Thinking (structured reasoning)
-- Không viết implementation code
-
-**Example:**
-```
-/architect design api to get list video titles
-/architect design microservices architecture for video streaming
-/architect should we use Redis or Guava cache?
-```
-
-**Output:** ADR document, system design doc, API specification
-
----
-
-### 4. 🔨 `/builder` - Builder
-
-**Dùng khi:** Implement feature, fix bug, refactor code
-
-**Capabilities:**
-- Write production code (Java, TypeScript, Python...)
-- Implement features theo spec
-- Refactor existing code
-- Fix bugs systematically
-- Viết code SOLID, DRY, clean
-
-**Example:**
-```
-/builder implement JWT authentication
-/builder fix login bug in UserService
-/builder refactor UserController to use DTO pattern
-```
-
-**Output:** Working code + tests
-
----
-
-### 5. 🧪 `/qa-engineer` - QA Engineer
-
-**Dùng khi:** Write tests, test strategy, increase coverage
-
-**Capabilities:**
-- Write unit tests (JUnit, Mockito, Vitest)
-- Write integration tests (TestContainers)
-- Test strategy cho project
-- Increase code coverage
-- Performance testing
-
-**Example:**
-```
-/qa-engineer write tests for UserService
-/qa-engineer create test strategy for authentication module
-/qa-engineer increase coverage for service layer to 80%
-```
-
-**Output:** Test files, test plan, coverage report
-
----
-
-### 6. 🔒 `/security-auditor` - Security Auditor
-
-**Dùng khi:** Security review, vulnerability scan, compliance
-
-**Capabilities:**
-- OWASP Top 10 audit
-- Security code review
-- Vulnerability detection (SQL injection, XSS...)
-- Threat modeling (STRIDE)
-- Compliance check (GDPR, SOC2...)
-
-**Example:**
-```
-/security-auditor review authentication flow
-/security-auditor scan for SQL injection vulnerabilities
-/security-auditor check OWASP compliance
-```
-
-**Output:** Security audit report with severity levels (Critical/High/Medium/Low)
-
----
-
-### 7. 🎨 `/ui-ux-designer` - UI/UX Designer
-
-**Dùng khi:** Design UI, improve UX, accessibility
-
-**Capabilities:**
-- UI/UX design
-- Interface design
-- Accessibility (WCAG compliance)
-- Design systems
-- Visual assets
-
-**Example:**
-```
-/ui-ux-designer design video list page
-/ui-ux-designer improve accessibility for login form
-/ui-ux-designer create design system for buttons
-```
-
-**Output:** Design mockups, component specs, accessibility report
-
----
-
-### 8. 🔍 `/code-check` - Code Quality Reviewer
-
-**Dùng khi:** Code review, check code quality
-
-**Capabilities:**
-- SOLID principles check
-- DRY violations detection
-- Code smell detection
-- Naming consistency
-- Best practices verification
-
-**Example:**
-```
-/code-check review UserService
-/code-check check SOLID violations in entire codebase
-```
-
-**Output:** Code quality report với recommendations
-
----
-
-### 9. 🧩 `/swarm-plan` - Swarm Planner
-
-**Dùng khi:** Plan complex task với nhiều subtasks
-
-**Capabilities:**
-- Decompose task thành subtasks
-- Create execution plan
-- Identify dependencies
-- Estimate effort
-
-**Example:**
-```
-/swarm-plan implement user authentication system
-```
-
-**Output:** Task breakdown plan cho swarm execution
-
----
-
-### 10. ⚡ `/swarm-execute` - Swarm Executor
-
-**Dùng khi:** Execute task với multiple agents song song
-
-**Capabilities:**
-- Launch 4-8 worker agents in parallel
-- Coordinate work via Beads
-- Aggregate results
-- Handle failures
-
-**Example:**
-```
-/swarm-execute implement video recommendation feature
-```
-
-**Output:** Completed feature với multiple agents working together
-
----
-
-### 11. 🔬 `/swarm-review` - Swarm Reviewer
-
-**Dùng khi:** Multi-perspective code review
-
-**Capabilities:**
-- Launch multiple reviewer agents
-- Quality review
-- Security review
-- Performance review
-- Aggregate findings
-
-**Example:**
-```
-/swarm-review security audit entire codebase
-```
-
-**Output:** Comprehensive review report từ multiple perspectives
-
----
-
-### 12. 🎤 `/presentation` - Presentation Renderer
-
-**Dùng khi:** Biến một tài liệu thành slide deck để present cho stakeholder
-
-**Capabilities:**
-- Render MỘT file markdown (PRD / Spec / ADR / Plan) thành MỘT file `.html` deck self-contained
-- Tự động detect document type và map các section thành tabs
-- Render-only — giữ nguyên wording, tables, code, diagrams (không thêm nội dung mới)
-- Mở trực tiếp trong browser, không cần build step
-
-**Example:**
-```
-/presentation docs/prd/PRD-hot-video-priority.md
-/presentation docs/adr/0006-hls-video-streaming.md
-```
-
-**Output:** `<doc-name>.html` (cạnh file source) — xem [Presentation command](../claude/commands/presentation.md)
-
----
-
-## Skills - 90+ workflows tự động
-
-### 🎯 Auto-triggered skills
-
-Skills tự động load khi:
-1. Bạn dùng **keywords** trong câu hỏi
-2. Bạn mở **file có extension** phù hợp
-3. Bạn dùng **intent patterns** phù hợp
-
-### 📦 Core Engineering Skills
-
-| Skill | Auto-trigger | Example |
-|-------|-------------|---------|
-| **implementing-code** | "implement", "code", "feature" | `implement user login` |
-| **debugging** | "debug", "fix", "bug", "error" | `fix NPE in UserService` |
-| **testing** | "test", "unit test", "coverage" | `write tests for UserService` |
-| **refactoring** | "refactor", "cleanup", "improve" | `refactor UserController` |
-| **optimizing** | "optimize", "performance", "slow" | `optimize database queries` |
-| **data-management** | "database", "schema", "migration" | `design database schema` |
-
-### 🏗️ Architecture Skills
-
-| Skill | Auto-trigger | Example |
-|-------|-------------|---------|
-| **designing-systems** | "architecture", "design", "diagram" | `design video streaming system` |
-| **designing-apis** | "api", "endpoint", "rest" | `design REST API for users` |
-| **domain-driven-design** | "ddd", "domain", "aggregate" | `apply DDD to user module` |
-| **cloud-native-patterns** | "cloud", "microservice", "k8s" | `design microservices architecture` |
-| **writing-adrs** | "adr", "decision record" | `document Redis migration decision` |
-
-### 🔒 Security Skills
-
-| Skill | Auto-trigger | Example |
-|-------|-------------|---------|
-| **application-security** | "security", "vulnerability", "owasp" | `security review for login` |
-| **threat-modeling** | "threat", "attack", "risk" | `threat model for payment flow` |
-| **security-review** | "security review", "audit" | `audit authentication code` |
-| **identity-access** | "auth", "oauth", "jwt" | `implement OAuth2 authentication` |
-| **compliance** | "compliance", "gdpr", "hipaa" | `check GDPR compliance` |
-
-### 💻 Language Skills
-
-| Language | Auto-trigger | File patterns |
-|----------|-------------|---------------|
-| **java** | "java", "spring boot", "maven" | `*.java`, `pom.xml` |
-| **typescript** | "typescript", "ts" | `*.ts`, `*.tsx` |
-| **python** | "python", "py" | `*.py`, `requirements.txt` |
-| **go** | "golang", "go" | `*.go`, `go.mod` |
-| **rust** | "rust", "cargo" | `*.rs`, `Cargo.toml` |
-| **swift** | "swift", "ios" | `*.swift`, `*.xcodeproj` |
-| **kotlin** | "kotlin", "android" | `*.kt`, `build.gradle.kts` |
-
-### 🚀 Operations Skills
-
-| Skill | Auto-trigger | Example |
-|-------|-------------|---------|
-| **infrastructure** | "infrastructure", "terraform", "iac" | `setup AWS infrastructure` |
-| **observability** | "logging", "metrics", "tracing" | `add Prometheus metrics` |
-| **incident-management** | "incident", "outage", "postmortem" | `investigate production outage` |
-| **deploy-railway** | "railway", "deploy" | `deploy to Railway` |
-| **chaos-engineering** | "chaos", "resilience" | `test system resilience` |
-
-### 📋 Product Skills
-
-| Skill | Auto-trigger | Example |
-|-------|-------------|---------|
-| **writing-prds** | "prd", "requirements" | `write PRD for video search` |
-| **writing-pr-faqs** | "pr-faq", "vision" | `write PR-FAQ for new feature` |
-| **decomposing-tasks** | "break down", "decompose" | `break down authentication task` |
-| **execution-roadmaps** | "roadmap", "milestone" | `create Q1 roadmap` |
-| **estimating-work** | "estimate", "story points" | `estimate video recommendation effort` |
+## Library skills - tự động load
+
+Claude đọc tên và mô tả của mọi skill khi khởi động, rồi tự nạp nội dung skill khi task khớp với mô tả. Không cần keyword cố định hay file đăng ký.
+
+| Skill | Nhóm | Tự load khi |
+|-------|------|-------------|
+| **testing** | core-engineering | Viết test, sửa bug (regression test), tăng coverage |
+| **dependency-upgrade** | core-engineering | Nâng version thư viện/action: pin đã kiểm chứng, rollout từng bước |
+| **review-steering** | core-engineering | Tạo/cập nhật `REVIEW.md` để định hướng code review |
+| **designing-systems** | architecture | Thiết kế hệ thống, so sánh kiến trúc |
+| **writing-adrs** | architecture | Ghi lại một quyết định kỹ thuật |
+| **threat-modeling** | security | Feature có rủi ro bảo mật (STRIDE, prompt injection…) |
+| **planning-artifacts** | product | Viết PR-FAQ, PRD, roadmap |
+| **postmortem** | operations | Viết postmortem sau sự cố |
+| **swarm-coordination** | operations | Điều phối nhiều agent, handoff, budget token |
+| **presentation** | design | Biến tài liệu thành slide HTML |
+
+**Vì sao chỉ còn 24 skill (trước khoảng 65)?** Tên và mô tả của mọi skill được nạp vào context ở mỗi session. Quá nhiều skill thì vượt ngân sách, mô tả bị cắt và Claude chọn sai skill. Các skill chỉ lặp lại kiến thức model đã biết (java, python, terraform, deploy-*…) đã bị bỏ. Thông tin version cụ thể thì tra bằng Context7.
+
+Những kỷ luật trước đây nằm trong skill nay nằm trong **rules** (nạp vào mọi session):
+
+| Rule | Nội dung |
+|------|----------|
+| `core-directives.md` | Quy trình planning, nơi lưu tài liệu, quy ước commit/push |
+| `debugging-protocol.md` | Đưa ra ít nhất 3 giả thuyết trước khi chọn một; bắt buộc tìm root cause; đọc lại file trước khi sửa |
+| `code-quality.md` | SOLID, DRY, Two Hats, quality gates |
+| `security.md` | Checklist (ghi rõ mức enforce thật), prompt injection, OWASP |
+| `tech-strategy.md` | Golden path của project (Java 24, Spring Boot 3, React 19…) |
+| `agent-constraints.md` | Luật cho swarm workers |
 
 ---
 
@@ -382,78 +138,76 @@ Skills tự động load khi:
 
 ### 🐝 5 Worker Agents
 
-| Worker | Model | Tools | Use case |
-|--------|-------|-------|----------|
-| **worker-explorer** | Haiku | Read, Glob, Grep | Fast codebase search |
-| **worker-builder** | Sonnet | All | Implementation, testing, refactoring |
-| **worker-reviewer** | Sonnet | Read, Grep | Code review, security audit |
-| **worker-researcher** | Sonnet | Read, WebFetch | External research, docs |
-| **worker-architect** | Opus | All | Complex design decisions |
+| Worker | Model | Tools | maxTurns | Use case |
+|--------|-------|-------|----------|----------|
+| **worker-explorer** | Haiku | Read, Grep, Glob, WebFetch, WebSearch | 30 | Tìm code nhanh, tra cứu API/docs |
+| **worker-builder** | Sonnet | Read, Write, Edit, Bash, Glob, Grep | 90 | Implement, test, refactor (chạy trong git worktree riêng) |
+| **worker-reviewer** | Sonnet | Read, Grep, Glob, Bash | 60 | Review code, security, performance |
+| **worker-research** | Sonnet | Read, Grep, Glob, WebFetch, WebSearch, Write | 80 | Nghiên cứu sâu nhiều nguồn |
+| **worker-architect** | Opus | Read, Grep, Glob, Write | 40 | Quyết định thiết kế phức tạp |
+
+> `worker-researcher` cũ đã tách thành `worker-explorer` (tra nhanh) và `worker-research` (nghiên cứu sâu).
 
 ### 🎯 Swarm Workflow
 
 ```
 1. /swarm-plan "implement user authentication"
-   → Decompose task thành subtasks
-   → Create execution plan
+   → Workers explore song song → plan trong docs/plans/
+   → Task 200–400 LOC, có acceptance criteria và dependency
 
-2. /swarm-execute
-   → Launch 4-8 workers in parallel
-   → Each worker handles 1 subtask
-   → Workers coordinate via Beads
+2. /swarm-execute docs/plans/plan-<feature>.md
+   → Orchestrator tạo task list, chạy tối đa 8 workers
+   → worker-builder commit trong worktree riêng, orchestrator merge vào main
+   → Quality gates chạy lại sau merge; push chỉ khi bạn đồng ý
 
 3. /swarm-review
-   → Multi-perspective review
-   → Aggregate findings
-   → Report completion
+   → Review nhiều góc: security, performance, architecture, tests, scope adherence
+   → Diff nhỏ, rủi ro thấp → lite review (một góc)
 ```
+
+Task tracking dùng **task list có sẵn của Claude Code** (trong phiên) + `TASKS.md` / `docs/tracking.md` / GitHub Issues (lâu dài). Framework không còn dùng Beads (`bd`).
 
 ### 📊 Swarm Patterns
 
 #### Pattern 1: Parallel Implementation
 ```
-Task: Implement video recommendation feature
-
-Swarm breakdown:
-├── Worker 1: YouTubeApiClient (fetch metadata)
-├── Worker 2: ChatGptService (get recommendations)
-├── Worker 3: RecommendationController (REST API)
-├── Worker 4: RecommendationService (business logic)
-└── Worker 5: Tests (unit + integration)
-
-All workers execute in parallel → 5x faster
+/swarm-plan docs/specs/spec-<feature>.md
+→ Task BE, FE, test độc lập
+/swarm-execute docs/plans/plan-<feature>.md
+→ BE và FE workers chạy song song, orchestrator merge và chạy gates
 ```
 
 #### Pattern 2: Security Sweep
 ```
-Task: Security audit entire codebase
-
-Swarm breakdown:
-├── Worker 1: Scan authentication module
-├── Worker 2: Scan API endpoints
-├── Worker 3: Scan database layer
-├── Worker 4: Scan file operations
-├── Worker 5: Scan external integrations
-├── Worker 6: Check OWASP Top 10
-├── Worker 7: Dependency vulnerability scan
-└── Worker 8: Configuration security check
-
-Aggregate findings → Comprehensive security report
+/swarm-review security audit api/
+→ worker-reviewer (focus: security) quét từng module song song
+→ Findings phân loại Critical/High/Medium/Low kèm CWE
+/builder fix the Critical/High findings
 ```
 
 #### Pattern 3: Parallel Exploration
 ```
-Task: Find all usages of deprecated API
-
-Swarm breakdown:
-├── Worker 1: Search controllers/
-├── Worker 2: Search services/
-├── Worker 3: Search repositories/
-├── Worker 4: Search utils/
-└── Worker 5: Search tests/
-
-Fast parallel search → Complete results
+/swarm-research compare HLS vs chunked MP4 streaming for 1 vCPU
+→ worker-explorer / worker-research tìm từng khía cạnh
+→ Tổng hợp thành report có trích dẫn
 ```
+
+---
+
+## Hooks & permissions
+
+Hooks là script bash trong `.claude/hooks/`, đăng ký trong `.claude/settings.json`. Chúng **fail-open**: thiếu `jq` thì bỏ qua. Trên Windows chúng chạy qua Git Bash.
+
+| Hook | Khi nào | Làm gì |
+|------|---------|--------|
+| `pre-tool-use-validator.sh` | Trước Write/Edit/Bash | Hỏi lại khi nội dung trông giống secret (kể cả heredoc trong Bash); chặn sửa `.env`, `.git/`, `.mcp.json`; hỏi lại khi sửa `.claude/settings.json`, `.claude/rules/*`, `CLAUDE.md`; khoá file 120 s nếu một session khác đang sửa |
+| `dangerous-command-guard.sh` | Trước Bash | Cảnh báo lệnh phá huỷ (`terraform destroy`, `kubectl delete`…) |
+| `session-start-loader.sh` | Bắt đầu / sau compact | Nhắc đọc lại task list và plan sau khi context bị nén |
+| `stop-validator.sh` | Kết thúc lượt | Nhả lock của session, nhắc file chưa commit / commit chưa push |
+
+**Permission deny** (không allow rule nào ghi đè được): đọc `.env*`, `*.pem`, `~/.ssh`, `~/.aws`, credential; `rm -rf`, `sudo`, `git push --force`, `git reset --hard`; `curl … | bash`.
+
+> Bản `pre-tool-use-validator.sh` của repo có **vá cho đường dẫn Windows**. Bản gốc của framework chặn mọi Write/Edit trên Windows.
 
 ---
 
@@ -477,37 +231,29 @@ Fast parallel search → Complete results
 # Step 5: Execute (Swarm)
 /swarm-execute docs/plans/plan-video-recommendation.md
 
-# Step 6: Test (QA)
-/qa-engineer write tests for RecommendationService
+# Step 6: Review
+/swarm-review the recommendation feature
 
-# Step 7: Security (Security Auditor)
-/security-auditor review recommendation feature
-
-# Step 8: Review (Code Check)
-/code-check review recommendation module
+# Step 7: Land — gates, commit, hỏi push, kiểm CI + smoke prod
+/land-the-plane
 ```
+
+Ceremony theo độ lớn: thay đổi mô tả được trong một câu thì không cần PRD/ADR, chỉ cần plan hoặc làm luôn.
 
 ---
 
 ### 🐛 Workflow 2: Debug Production Issue
 
 ```bash
-# Step 1: Investigate
-"debug login timeout issue"
-→ Auto-load: debugging skill
+# Step 1: Investigate — debugging-protocol (rule) luôn áp dụng:
+#   ≥ 3 giả thuyết, tìm root cause, đọc log/code trước khi sửa
+"prod báo CORS error, kiểm tra xem"
 
-# Step 2: Analyze
-/architect analyze authentication flow
+# Step 2: Fix + regression test (testing skill tự load)
+/builder fix the hang in VideoImportServiceImpl
 
-# Step 3: Fix
-/builder fix timeout in UserService
-
-# Step 4: Test
-/qa-engineer write regression tests
-
-# Step 5: Postmortem
-"write postmortem for login timeout"
-→ Auto-load: incident-management skill
+# Step 3: Postmortem (postmortem skill tự load)
+"viết postmortem cho sự cố virtual-thread deadlock"
 ```
 
 ---
@@ -520,14 +266,12 @@ Fast parallel search → Complete results
 
 # Step 2: Fix critical issues
 /builder fix SQL injection in UserRepo
-/builder fix hardcoded credentials in Helm values
 
 # Step 3: Verify
 /security-auditor verify security fixes
 
 # Step 4: Document
-"document security improvements"
-→ Save to security_audit_YYYY-MM-DD.md
+→ docs/reports/security-audit-YYYY-MM-DD.md
 ```
 
 ---
@@ -535,21 +279,16 @@ Fast parallel search → Complete results
 ### ⚡ Workflow 4: Performance Optimization
 
 ```bash
-# Step 1: Profile
-"analyze slow API endpoints"
-→ Auto-load: optimizing-code skill
+# Step 1: Profile — đo trước, đoán sau
+"phân tích endpoint /videos chậm, dùng EXPLAIN và log thời gian"
 
 # Step 2: Design solution
-/architect design Redis caching strategy
+/architect design caching strategy for the video list
 
-# Step 3: Implement
-/swarm-execute implement Redis cache
+# Step 3: Implement (Two Hats: refactor và optimize ở hai commit riêng)
+/builder implement the cache from docs/adr/NNNN-video-list-cache.md
 
-# Step 4: Test performance
-/qa-engineer write performance tests
-
-# Step 5: Verify
-"benchmark before/after caching"
+# Step 4: Verify — benchmark before/after
 ```
 
 ---
@@ -558,31 +297,33 @@ Fast parallel search → Complete results
 
 ### 📄 Artifacts Templates
 
-Located in `templates/artifacts/`:
+Nằm trong `templates/artifacts/` (dùng bởi `/scope`, `/spec`, `/swarm-plan`):
 
-| Template | Use case | Command |
+| Template | Use case | Lưu vào |
 |----------|----------|---------|
-| **prd.template.md** | Product Requirements Document | `/scope ...` |
-| **adr.template.md** | Architecture Decision Record | `/architect ...` |
-| **spec.template.md** | Feature Specification | `/spec ...` |
-| **plan.template.md** | Implementation plan | `/swarm-plan ...` |
-| **design_spec.template.md** | Design specification | `/architect design ...` |
-| **pr_faq.template.md** | Press Release FAQ | Write PR-FAQ for ... |
-| **roadmap.template.md** | Execution roadmap | Create roadmap for ... |
-| **postmortem.template.md** | Incident postmortem | Write postmortem for ... |
-| **security_audit.template.md** | Security audit report | `/security-auditor review ...` |
-| **system_design.template.md** | System design doc | `/architect design system ...` |
+| **prd.template.md** | Product Requirements Document | `docs/prd/PRD-{slug}.md` |
+| **adr.template.md** | Architecture Decision Record | `docs/adr/NNNN-{slug}.md` |
+| **spec.template.md** | Feature Specification | `docs/specs/spec-{slug}.md` |
+| **plan.template.md** | Implementation plan | `docs/plans/plan-{slug}.md` |
+| **design_spec.template.md** | Design specification | `docs/` |
+| **pr_faq.template.md** | Press Release FAQ | `docs/` |
+| **roadmap.template.md** | Execution roadmap | `docs/` |
+| **postmortem.template.md** | Incident postmortem | `docs/reports/` |
+| **security_audit.template.md** | Security audit report | `docs/reports/` |
+| **system_design.template.md** | System design doc | `docs/architecture/` |
+
+Skill cũng mang template riêng trong `resources/` (ví dụ `designing-systems`, `planning-artifacts`, `postmortem`). Khi tên file trong template (`adr_[topic].md`) khác quy ước của repo, **bảng Artifacts trong `CLAUDE.md` thắng**.
 
 ### 🔧 Claude Mechanisms Templates
 
-Located in `templates/claude_mechanisms/`:
+Nằm trong `templates/claude_mechanisms/` và `.claude/templates/`:
 
 | Template | Use case |
 |----------|----------|
-| **agent.template.md** | Create custom worker agent |
-| **command.template.md** | Create custom persona command |
-| **skill.template.md** | Create custom skill workflow |
-| **rule.template.md** | Create custom rule |
+| **skill.template.md** | Tạo skill mới (workflow hoặc library) |
+| **agent.template.md** | Tạo worker agent (bắt buộc có `maxTurns`) |
+| **rule.template.md** | Tạo rule |
+| **hook.template.sh** | Tạo hook (`.claude/templates/`) |
 
 ---
 
@@ -598,70 +339,48 @@ Located in `templates/claude_mechanisms/`:
 # ✅ Good
 /architect design video recommendation API
 # Review design → Approve
-/swarm-execute implement video recommendation
+/swarm-plan docs/adr/NNNN-video-recommendation.md
 ```
 
-#### 2. Dùng swarm cho complex tasks
+#### 2. Dùng swarm cho task lớn
 ```bash
-# ❌ Bad: Single agent for large task
+# ❌ Bad: một agent cho cả hệ thống
 /builder implement entire authentication system
 
-# ✅ Good: Swarm for parallel execution
+# ✅ Good: chia nhỏ rồi chạy song song
 /swarm-plan implement authentication system
-/swarm-execute
+/swarm-execute docs/plans/plan-authentication.md
 ```
 
 #### 3. Security-first mindset
 ```bash
-# After implementing any feature:
 /security-auditor review [feature-name]
 ```
 
-#### 4. Test coverage luôn > 80%
+#### 4. Coverage ≥ 90% (CI gate)
 ```bash
-# After implementing:
-/qa-engineer write tests for [service-name]
-# Check coverage:
-mvn verify
+cd api && mvn verify    # LINE coverage >= api/.coverage-threshold
 ```
 
-#### 5. Document important decisions
+#### 5. Ghi lại quyết định quan trọng
 ```bash
-# Any major decision → Write ADR
 /architect document decision to use Redis cache
+# Sau đó cập nhật docs/tracking.md
 ```
 
 ---
 
 ### 🚀 Shortcuts
 
-#### Auto-triggered skills
-
 ```bash
-# No need to call skill manually, just use keywords:
+# Kết thúc công việc đúng quy trình
+/land-the-plane
 
-"implement user login" → auto-load implementing-code skill
-"fix bug in UserService" → auto-load debugging skill
-"write tests" → auto-load testing skill
-"design API" → auto-load designing-apis skill
-"security review" → auto-load application-security skill
-"optimize queries" → auto-load optimizing-code skill
-```
+# Kiểm tra chất lượng toàn repo
+/code-check all
 
-#### Quick commands
-
-```bash
-# Git operations
-"create commit"          → Auto git add, commit with message
-"create pull request"    → Auto git push, gh pr create
-
-# Code quality
-"check code quality"     → SOLID, DRY analysis
-"increase coverage"      → Generate missing tests
-
-# Documentation
-"explain this code"      → Code explanation
-"document this API"      → OpenAPI/Swagger docs
+# Render tài liệu để trình bày
+/presentation docs/prd/PRD-watch-history-v2.md
 ```
 
 ---
@@ -669,20 +388,18 @@ mvn verify
 ### 🎓 Learning Path
 
 #### Beginner
-1. Scope ý tưởng feature: `/scope add a feature`
-2. Dùng core personas: `/builder`, `/qa-engineer`
-3. Tạo commit và PR với Claude
+1. Scope ý tưởng: `/scope add a feature`
+2. Code với `/builder`, kết thúc bằng `/land-the-plane`
 
 #### Intermediate
-4. Full planning flow: `/scope` → `/architect` → `/spec` → `/swarm-plan`
-5. Execute với swarm: `/swarm-execute`
-6. Security audit với `/security-auditor`
-7. System design và ADR với `/architect`
+3. Full planning flow: `/scope` → `/architect` → `/spec` → `/swarm-plan`
+4. Execute với `/swarm-execute`, review với `/swarm-review`
+5. Security audit với `/security-auditor`
 
 #### Advanced
-8. Tạo custom skills trong `.claude/skills/`
-9. Configure permissions trong `.claude/settings.json`
-10. Build multi-agent workflows với swarm
+6. Tạo skill mới trong `.claude/skills/` (từ `skill.template.md`)
+7. Viết hook mới (xem rule `hooks-conventions.md`)
+8. `/tailor` để đề xuất chỉnh cấu hình theo stack
 
 ---
 
@@ -691,19 +408,19 @@ mvn verify
 ### Getting Help
 
 ```bash
-# Claude Code help
-/help
-
-# Feedback/Issues
-https://github.com/anthropics/claude-code/issues
+/help                       # Claude Code help
+/doctor                     # Kiểm tra skill/settings có lỗi không
+/context                    # Xem skill listing chiếm bao nhiêu context
 ```
 
 ### Customize cho team
 
-1. **Add custom skills**: `.claude/skills/custom/`
-2. **Add custom commands**: `.claude/commands/`
-3. **Update tech strategy**: `.claude/rules/tech-strategy.md`
-4. **Configure permissions**: `.claude/settings.json`
+1. **Thêm skill**: `.claude/skills/<name>/SKILL.md` (workflow: thêm `disable-model-invocation: true`)
+2. **Sửa tech strategy**: `.claude/rules/tech-strategy.md`
+3. **Permissions & hooks**: `.claude/settings.json` (máy riêng: `.claude/settings.local.json`, không commit)
+4. **Quy ước làm việc cho mọi agent**: `AGENTS.md`
+
+Sửa `CLAUDE.md`, `.claude/settings.json` hoặc `.claude/rules/*` sẽ có hook hỏi xác nhận; đó là hành vi mong muốn.
 
 ---
 
@@ -717,23 +434,25 @@ https://github.com/anthropics/claude-code/issues
 | `/architect ...` | Quyết định kiến trúc | `docs/adr/NNNN-{slug}.md` |
 | `/spec ...` | Feature specification | `docs/specs/spec-{slug}.md` |
 | `/swarm-plan ...` | Chia task breakdown | `docs/plans/plan-{slug}.md` |
-| `/builder implement ...` | Implement code | Working code |
-| `/qa-engineer test ...` | Viết tests | Test files |
-| `/security-auditor review ...` | Security audit | Audit report |
-| `/code-check review ...` | Code quality | Quality report |
 | `/swarm-execute ...` | Parallel execution | Feature complete |
+| `/swarm-review ...` | Multi-perspective review | Review report |
+| `/builder ...` | Implement code | Working code |
+| `/qa-engineer ...` | Viết tests | Test files |
+| `/security-auditor ...` | Security audit | Audit report |
+| `/code-check ...` | Code quality | Quality report |
+| `/land-the-plane` | Gates → commit → push (hỏi trước) | Commit đã push |
 | `/presentation ...` | Render doc thành HTML deck | `<doc-name>.html` |
 
-### Common Skills
+### Library skills hay dùng
 
-| Keywords | Skill loaded | Use case |
-|----------|--------------|----------|
-| implement, code | implementing-code | Write feature |
-| debug, fix, bug | debugging | Fix issues |
-| test, coverage | testing | Write tests |
-| design, api | designing-apis | API design |
-| security, audit | application-security | Security check |
-| optimize, performance | optimizing-code | Speed up code |
+| Khi bạn… | Skill tự load |
+|----------|---------------|
+| viết test, sửa bug | testing |
+| ghi quyết định kiến trúc | writing-adrs, designing-systems |
+| feature liên quan bảo mật | threat-modeling |
+| nâng version dependency | dependency-upgrade |
+| viết PRD / PR-FAQ / roadmap | planning-artifacts |
+| viết postmortem | postmortem |
 
 ---
 
@@ -742,20 +461,11 @@ https://github.com/anthropics/claude-code/issues
 ### Funny Movies Architecture
 
 - **Language**: Java 24 with Virtual Threads
-- **Framework**: Spring Boot 3.5.0
+- **Framework**: Spring Boot 3.x
 - **Database**: PostgreSQL + Liquibase
-- **Cache**: Guava (migrate to Redis planned)
-- **CI/CD**: GitHub Actions
-- **Deployment**: Docker + Kubernetes (Helm)
-
-### Key Technologies
-
-- Virtual Threads for concurrency
-- StructuredTaskScope for coordinated tasks
-- JWT authentication
-- Magic link passwordless auth
-- YouTube API integration
-- ChatGPT API for recommendations
+- **Cache**: Guava LRU (Redis khi cần scale ngang)
+- **Frontend**: React 19 + Vite (`webapp/`)
+- **CI/CD**: GitHub Actions, deploy từ `main` (VM qua SSH + Helm chart)
 
 ### Project-Specific Commands
 
@@ -763,11 +473,11 @@ https://github.com/anthropics/claude-code/issues
 # Build & Run
 cd api && ./startLocal.sh
 
-# Run tests
-cd api && ./unittest.sh
-
-# Check coverage (current: 35%)
+# Run tests + coverage (gate: api/.coverage-threshold, hiện 90%)
 cd api && mvn verify
+
+# Webapp
+cd webapp && npm run lint && npx vitest run --root . && npm run build
 
 # Docker build
 cd api && docker build -t funny-app .
@@ -777,13 +487,14 @@ cd api && docker build -t funny-app .
 
 ## 🔗 Related Documentation
 
-- **CLAUDE.md**: Project documentation and development guide
-- **README.md**: Project setup and installation
-- **doc/adr/**: Architecture Decision Records
-- **.claude/rules/**: Code quality, security, tech strategy rules
+- **CLAUDE.md**: Project guide, Core Principles, bảng Artifacts
+- **AGENTS.md**: Landing the Plane, quality gates
+- **[Claude Workspace](../claude/index.md)**: Toàn bộ skills, agents, rules, hooks
+- **docs/adr/**: Architecture Decision Records
+- **docs/tracking.md**: Trạng thái feature
 
 ---
 
 **Happy coding with Claude! 🚀**
 
-*Last updated: 2026-05-31*
+*Last updated: 2026-10-18 (framework v5)*
