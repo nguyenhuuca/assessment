@@ -173,8 +173,26 @@ class JWTAuthenticationFilterTest {
     }
 
     @Test
-    void doFilterInternal_commentPost_withoutToken_continuesAsGuest() throws ServletException, IOException {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/v1/funny-app/videos/42/comments");
+    void doFilterInternal_commentPostAndDelete_withoutToken_returns401() throws ServletException, IOException {
+        // Only logged-in users may comment: these paths are no longer optional-auth
+        when(jwtProvider.verifyToken(null)).thenThrow(new UnauthorizedException("TOKEN_INVALID", 601));
+        for (String[] call : new String[][]{
+                {"POST", "/v1/funny-app/videos/42/comments"},
+                {"DELETE", "/v1/funny-app/videos/42/comments/" + java.util.UUID.randomUUID()}}) {
+            MockHttpServletRequest request = new MockHttpServletRequest(call[0], call[1]);
+            request.setServletPath(call[1]);
+            MockHttpServletResponse response = new MockHttpServletResponse();
+
+            filter.doFilterInternal(request, response, filterChain);
+
+            assertEquals(401, response.getStatus(), call[0]);
+            verify(filterChain, never()).doFilter(request, response);
+        }
+    }
+
+    @Test
+    void doFilterInternal_commentGet_withoutToken_continuesAsGuest() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/funny-app/videos/42/comments");
         request.setServletPath("/v1/funny-app/videos/42/comments");
         MockHttpServletResponse response = new MockHttpServletResponse();
 

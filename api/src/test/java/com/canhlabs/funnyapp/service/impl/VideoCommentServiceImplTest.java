@@ -172,56 +172,14 @@ class VideoCommentServiceImplTest {
     // -------------------------------------------------------------------------
 
     @Test
-    void createComment_guest_noUserId_noGuestToken_generatesNewToken() {
-        UUID savedId = UUID.randomUUID();
-        VideoComment saved = buildComment(savedId, "vid1", null, "", "generated-token", "hello");
+    void createComment_guest_isRejected() {
+        CreateCommentRequest req = CreateCommentRequest.builder().content("hello").build();
 
-        when(repo.save(any(VideoComment.class))).thenReturn(saved);
-
-        CreateCommentRequest req = CreateCommentRequest.builder()
-                .guestName("Alice")
-                .content("hello")
-                .build();
-
-        CreateCommentResponse response = service.createComment("vid1", req, null);
-
-        assertThat(response.getId()).isEqualTo(savedId);
-        // A token must have been generated and returned
-        assertThat(response.getGuestToken()).isNotNull().isNotBlank();
-
-        ArgumentCaptor<VideoComment> captor = ArgumentCaptor.forClass(VideoComment.class);
-        verify(repo).save(captor.capture());
-        VideoComment persisted = captor.getValue();
-        assertThat(persisted.getUserId()).isEmpty();
-        assertThat(persisted.getGuestName()).isEqualTo("Alice");
-        assertThat(persisted.getGuestTokenHash()).isNotNull().isNotBlank();
-    }
-
-    @Test
-    void createComment_guest_withExistingGuestToken_reusesToken() {
-        String existingToken = "existing-token-abc";
-        UUID savedId = UUID.randomUUID();
-        VideoComment saved = buildComment(savedId, "vid1", null, "", existingToken, "hello again");
-
-        when(repo.save(any(VideoComment.class))).thenReturn(saved);
-
-        CreateCommentRequest req = CreateCommentRequest.builder()
-                .guestName("Bob")
-                .content("hello again")
-                .build();
-
-        CreateCommentResponse response = service.createComment("vid1", req, existingToken);
-
-        assertThat(response.getId()).isEqualTo(savedId);
-        assertThat(response.getGuestToken()).isEqualTo(existingToken);
-
-        ArgumentCaptor<VideoComment> captor = ArgumentCaptor.forClass(VideoComment.class);
-        verify(repo).save(captor.capture());
-        // Only the SHA-256 of the token is stored, never the token itself
-        assertThat(captor.getValue().getGuestTokenHash())
-                .isEqualTo(VideoCommentServiceImpl.hashGuestToken(existingToken))
-                .hasSize(64)
-                .isNotEqualTo(existingToken);
+        // Only logged-in users may comment (the filter requires a JWT; the service checks again)
+        assertThatThrownBy(() -> service.createComment("vid1", req))
+                .isInstanceOfSatisfying(CustomException.class,
+                        e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED));
+        verify(repo, never()).save(any());
     }
 
     @Test
@@ -236,12 +194,9 @@ class VideoCommentServiceImplTest {
                 .content("user comment")
                 .build();
 
-        // A stale guest token from before login must not turn an authenticated user into a guest
-        CreateCommentResponse response = service.createComment("vid1", req, "old-guest-token");
+        CreateCommentResponse response = service.createComment("vid1", req);
 
         assertThat(response.getId()).isEqualTo(savedId);
-        // Authenticated users do not receive a guest token
-        assertThat(response.getGuestToken()).isNull();
 
         ArgumentCaptor<VideoComment> captor = ArgumentCaptor.forClass(VideoComment.class);
         verify(repo).save(captor.capture());
@@ -260,7 +215,7 @@ class VideoCommentServiceImplTest {
         UUID missingId = UUID.randomUUID();
         when(repo.findById(missingId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.deleteComment(missingId, null))
+        assertThatThrownBy(() -> service.deleteComment(missingId))
                 .isInstanceOfSatisfying(CustomException.class, e -> {
                     assertThat(e.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
                     assertThat(e.getMessageKey()).isEqualTo("error.comment.notFound");
@@ -284,7 +239,7 @@ class VideoCommentServiceImplTest {
                 new UsernamePasswordAuthenticationToken("user-42", null, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        service.deleteComment(commentId, null);
+        service.deleteComment(commentId);
 
         verify(repo, never()).deleteById(any());
         ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
@@ -301,7 +256,7 @@ class VideoCommentServiceImplTest {
         when(repo.findByParentId(commentId.toString())).thenReturn(Collections.emptyList());
         authenticateAs("user-42");
 
-        service.deleteComment(commentId, null);
+        service.deleteComment(commentId);
 
         verify(repo).deleteById(commentId);
         verify(repo, never()).save(any());
@@ -318,7 +273,7 @@ class VideoCommentServiceImplTest {
                 new UsernamePasswordAuthenticationToken("user-99", null, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        assertThatThrownBy(() -> service.deleteComment(commentId, null))
+        assertThatThrownBy(() -> service.deleteComment(commentId))
                 .isInstanceOfSatisfying(CustomException.class, e -> {
                     assertThat(e.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
                     assertThat(e.getMessageKey()).isEqualTo("error.comment.deleteForbidden");
@@ -328,52 +283,15 @@ class VideoCommentServiceImplTest {
     }
 
     @Test
-    void deleteComment_guestWithCorrectToken_deletesComment() {
+    void deleteComment_oldGuestComment_cannotBeDeletedByAnyUser() {
         UUID commentId = UUID.randomUUID();
-        String plainToken = "plain-guest-token";
-
-        VideoComment comment = buildComment(commentId, "vid1", null, "",
-                VideoCommentServiceImpl.hashGuestToken(plainToken), "guest comment");
-
+        VideoComment comment = buildComment(commentId, "vid1", null, "", "some-hash", "guest comment");
         when(repo.findById(commentId)).thenReturn(Optional.of(comment));
-        when(repo.findByParentId(commentId.toString())).thenReturn(Collections.emptyList());
+        authenticateAs("user-42");
 
-        // No authentication set — guest path
-        service.deleteComment(commentId, plainToken);
-
-        verify(repo).deleteById(commentId);
-    }
-
-    @Test
-    void deleteComment_guestWithWrongToken_throws403() {
-        UUID commentId = UUID.randomUUID();
-        String storedToken = "correct-token";
-        String wrongToken = "wrong-token";
-
-        VideoComment comment = buildComment(commentId, "vid1", null, "",
-                VideoCommentServiceImpl.hashGuestToken(storedToken), "guest comment");
-
-        when(repo.findById(commentId)).thenReturn(Optional.of(comment));
-
-        assertThatThrownBy(() -> service.deleteComment(commentId, wrongToken))
-                .isInstanceOfSatisfying(CustomException.class, e -> {
-                    assertThat(e.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
-                    assertThat(e.getMessageKey()).isEqualTo("error.comment.deleteForbidden");
-                });
-
-        verify(repo, never()).deleteById(any());
-    }
-
-    @Test
-    void deleteComment_guestSendingTheStoredHash_isRejected() {
-        UUID commentId = UUID.randomUUID();
-        String stored = VideoCommentServiceImpl.hashGuestToken("real-token");
-        VideoComment comment = buildComment(commentId, "vid1", null, "", stored, "guest comment");
-        when(repo.findById(commentId)).thenReturn(Optional.of(comment));
-
-        // A leaked DB value is not a usable token
-        assertThatThrownBy(() -> service.deleteComment(commentId, stored))
-                .isInstanceOf(CustomException.class);
+        assertThatThrownBy(() -> service.deleteComment(commentId))
+                .isInstanceOfSatisfying(CustomException.class,
+                        e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.FORBIDDEN));
         verify(repo, never()).deleteById(any());
     }
 
@@ -389,7 +307,7 @@ class VideoCommentServiceImplTest {
         when(repo.findByParentId(rootId.toString())).thenReturn(List.of(child1));
         authenticateAs("user-1");
 
-        service.deleteComment(rootId, null);
+        service.deleteComment(rootId);
 
         verify(repo, never()).deleteById(any());
         verify(repo, times(1)).save(any(VideoComment.class));
@@ -485,7 +403,7 @@ class VideoCommentServiceImplTest {
         CreateCommentRequest req = CreateCommentRequest.builder()
                 .content("  hello \n\n  world ").parentId(leafId.toString()).build();
 
-        CreateCommentResponse res = service.createComment("v", req, null);
+        CreateCommentResponse res = service.createComment("v", req);
 
         ArgumentCaptor<CommentRepliedEvent> cap = ArgumentCaptor.forClass(CommentRepliedEvent.class);
         verify(eventPublisher).publishEvent(cap.capture());
@@ -503,22 +421,9 @@ class VideoCommentServiceImplTest {
         authenticateAs("u@x.com");
         stubSave();
 
-        service.createComment("v", reply(null), null);
+        service.createComment("v", reply(null));
 
         verify(eventPublisher, never()).publishEvent(any(Object.class));
-    }
-
-    @Test
-    void createComment_guestReply_publishesEventWithNullActor() {
-        UUID rootId = UUID.randomUUID();
-        when(repo.findById(rootId)).thenReturn(Optional.of(buildComment(rootId, "v", null, "a@x.com", null, "root")));
-        stubSave();
-
-        service.createComment("v", reply(rootId.toString()), null);
-
-        ArgumentCaptor<CommentRepliedEvent> cap = ArgumentCaptor.forClass(CommentRepliedEvent.class);
-        verify(eventPublisher).publishEvent(cap.capture());
-        assertThat(cap.getValue().actorEmail()).isNull();
     }
 
     @Test
@@ -527,7 +432,7 @@ class VideoCommentServiceImplTest {
         UUID id = UUID.randomUUID();
         when(repo.findById(id)).thenReturn(Optional.of(buildComment(id, "other", null, "a@x.com", null, "p")));
 
-        assertThatThrownBy(() -> service.createComment("v", reply(id.toString()), null))
+        assertThatThrownBy(() -> service.createComment("v", reply(id.toString())))
                 .isInstanceOf(com.canhlabs.funnyapp.exception.CustomException.class);
 
         verify(eventPublisher, never()).publishEvent(any(Object.class));
@@ -540,7 +445,7 @@ class VideoCommentServiceImplTest {
         when(repo.findById(rootId)).thenReturn(Optional.of(buildComment(rootId, "v", null, "a@x.com", null, "root")));
         stubSave();
 
-        service.createComment("v", reply(rootId.toString()), null);
+        service.createComment("v", reply(rootId.toString()));
 
         ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
         verify(repo).save(cap.capture());
@@ -558,7 +463,7 @@ class VideoCommentServiceImplTest {
         when(repo.findById(rootId)).thenReturn(Optional.of(buildComment(rootId, "v", null, "a@x.com", null, "root")));
         stubSave();
 
-        service.createComment("v", reply(leafId.toString()), null);
+        service.createComment("v", reply(leafId.toString()));
 
         ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
         verify(repo).save(cap.capture());
@@ -574,7 +479,7 @@ class VideoCommentServiceImplTest {
         when(repo.findById(b)).thenReturn(Optional.of(buildComment(b, "v", a.toString(), "b@x.com", null, "b")));
         stubSave();
 
-        service.createComment("v", reply(a.toString()), null);
+        service.createComment("v", reply(a.toString()));
 
         verify(repo, times(51)).findById(any(UUID.class));
         verify(repo).save(any(VideoComment.class));
@@ -589,7 +494,7 @@ class VideoCommentServiceImplTest {
         when(repo.findById(gone)).thenReturn(Optional.empty());
         stubSave();
 
-        service.createComment("v", reply(a.toString()), null);
+        service.createComment("v", reply(a.toString()));
 
         ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
         verify(repo).save(cap.capture());
@@ -603,7 +508,7 @@ class VideoCommentServiceImplTest {
         when(repo.findById(a)).thenReturn(Optional.of(buildComment(a, "v", "not-a-uuid", "a@x.com", null, "a")));
         stubSave();
 
-        service.createComment("v", reply(a.toString()), null);
+        service.createComment("v", reply(a.toString()));
 
         ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
         verify(repo).save(cap.capture());
@@ -615,7 +520,7 @@ class VideoCommentServiceImplTest {
         authenticateAs("u@x.com");
         stubSave();
 
-        service.createComment("v", reply("  "), null);
+        service.createComment("v", reply("  "));
 
         ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
         verify(repo).save(cap.capture());
@@ -626,7 +531,7 @@ class VideoCommentServiceImplTest {
     void createComment_invalidParentUuid_returns400() {
         authenticateAs("u@x.com");
 
-        assertThatThrownBy(() -> service.createComment("v", reply("nope"), null))
+        assertThatThrownBy(() -> service.createComment("v", reply("nope")))
                 .satisfies(t -> assertHttp(t, org.springframework.http.HttpStatus.BAD_REQUEST));
         verify(repo, never()).save(any());
     }
@@ -637,7 +542,7 @@ class VideoCommentServiceImplTest {
         UUID id = UUID.randomUUID();
         when(repo.findById(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.createComment("v", reply(id.toString()), null))
+        assertThatThrownBy(() -> service.createComment("v", reply(id.toString())))
                 .satisfies(t -> assertHttp(t, org.springframework.http.HttpStatus.NOT_FOUND));
         verify(repo, never()).save(any());
     }
@@ -648,7 +553,7 @@ class VideoCommentServiceImplTest {
         UUID id = UUID.randomUUID();
         when(repo.findById(id)).thenReturn(Optional.of(buildComment(id, "other", null, "a@x.com", null, "p")));
 
-        assertThatThrownBy(() -> service.createComment("v", reply(id.toString()), null))
+        assertThatThrownBy(() -> service.createComment("v", reply(id.toString())))
                 .satisfies(t -> assertHttp(t, org.springframework.http.HttpStatus.BAD_REQUEST));
         verify(repo, never()).save(any());
     }
@@ -660,7 +565,7 @@ class VideoCommentServiceImplTest {
         when(repo.findById(id)).thenReturn(Optional.of(
                 removed(buildComment(id, "v", null, "a@x.com", null, "p"))));
 
-        assertThatThrownBy(() -> service.createComment("v", reply(id.toString()), null))
+        assertThatThrownBy(() -> service.createComment("v", reply(id.toString())))
                 .satisfies(t -> assertHttp(t, org.springframework.http.HttpStatus.BAD_REQUEST));
         verify(repo, never()).save(any());
     }
@@ -672,7 +577,7 @@ class VideoCommentServiceImplTest {
         when(repo.findById(id)).thenReturn(Optional.of(
                 withStatus(buildComment(id, "v", null, "a@x.com", null, ""), CommentStatus.DELETED)));
 
-        assertThatThrownBy(() -> service.createComment("v", reply(id.toString()), null))
+        assertThatThrownBy(() -> service.createComment("v", reply(id.toString())))
                 .satisfies(t -> assertHttp(t, org.springframework.http.HttpStatus.BAD_REQUEST));
         verify(repo, never()).save(any());
     }
@@ -775,7 +680,7 @@ class VideoCommentServiceImplTest {
         CreateCommentRequest req = new CreateCommentRequest();
         req.setContent("hi");
 
-        service.createComment("v", req, null);
+        service.createComment("v", req);
 
         ArgumentCaptor<VideoComment> cap = ArgumentCaptor.forClass(VideoComment.class);
         verify(repo).save(cap.capture());

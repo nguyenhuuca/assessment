@@ -15,5 +15,4 @@ import java.util.UUID;
 @Builder
 public class CreateCommentResponse {
     private UUID id;
-    private String guestToken;         // only returned for guests; null otherwise
 }

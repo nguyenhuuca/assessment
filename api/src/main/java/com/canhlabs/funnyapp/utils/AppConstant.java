@@ -61,8 +61,6 @@ public class AppConstant {
         public static final List<PathObject> OPTIONAL_AUTH_PATH = List.of(
                 PathObject.builder().path("/videos/*/reaction").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().path("/videos/*/comments").method(HttpMethod.GET.name()).build(),
-                PathObject.builder().path("/videos/*/comments").method(HttpMethod.POST.name()).build(),
-                PathObject.builder().path("/videos/*/comments/*").method(HttpMethod.DELETE.name()).build(),
                 PathObject.builder().path("/videos/*/view").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().path("/collections/public").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().path("/collections/*/videos").method(HttpMethod.GET.name()).build()

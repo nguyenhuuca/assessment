@@ -130,9 +130,8 @@ class CommentControllerTest {
         UUID commentId = UUID.randomUUID();
         CreateCommentResponse response = CreateCommentResponse.builder()
                 .id(commentId)
-                .guestToken(null)
                 .build();
-        when(videoCommentService.createComment(eq("vid-1"), any(), eq(null))).thenReturn(response);
+        when(videoCommentService.createComment(eq("vid-1"), any())).thenReturn(response);
 
         String body = """
                 {
@@ -161,7 +160,7 @@ class CommentControllerTest {
 
     @Test
     void createComment_content2000Chars_isAccepted() throws Exception {
-        when(videoCommentService.createComment(eq("vid-1"), any(), eq(null)))
+        when(videoCommentService.createComment(eq("vid-1"), any()))
                 .thenReturn(CreateCommentResponse.builder().id(UUID.randomUUID()).build());
         String body = "{\"content\": \"" + "a".repeat(2000) + "\"}";
 
@@ -169,57 +168,6 @@ class CommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void createComment_asGuest_withGuestTokenHeader_returnsOkWithToken() throws Exception {
-        UUID commentId = UUID.randomUUID();
-        String existingToken = UUID.randomUUID().toString();
-        CreateCommentResponse response = CreateCommentResponse.builder()
-                .id(commentId)
-                .guestToken(existingToken)
-                .build();
-        when(videoCommentService.createComment(eq("vid-1"), any(), eq(existingToken))).thenReturn(response);
-
-        String body = """
-                {
-                  "guestName": "GuestUser",
-                  "content": "Nice video!"
-                }
-                """;
-
-        mockMvc.perform(post(BASE_URL, "vid-1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Guest-Token", existingToken)
-                        .content(body))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("SUCCESS"))
-                .andExpect(jsonPath("$.data.guestToken").value(existingToken));
-    }
-
-    @Test
-    void createComment_asGuest_withoutGuestTokenHeader_returnsOk() throws Exception {
-        UUID commentId = UUID.randomUUID();
-        String newToken = UUID.randomUUID().toString();
-        CreateCommentResponse response = CreateCommentResponse.builder()
-                .id(commentId)
-                .guestToken(newToken)
-                .build();
-        when(videoCommentService.createComment(eq("vid-2"), any(), eq(null))).thenReturn(response);
-
-        String body = """
-                {
-                  "guestName": "Anonymous",
-                  "content": "Interesting!"
-                }
-                """;
-
-        mockMvc.perform(post(BASE_URL, "vid-2")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("SUCCESS"))
-                .andExpect(jsonPath("$.data.guestToken").value(newToken));
     }
 
     @Test
@@ -243,22 +191,9 @@ class CommentControllerTest {
     @Test
     void deleteComment_happyPath_returnsOkWithMessage() throws Exception {
         UUID commentId = UUID.randomUUID();
-        doNothing().when(videoCommentService).deleteComment(eq(commentId), eq(null));
+        doNothing().when(videoCommentService).deleteComment(eq(commentId));
 
         mockMvc.perform(delete(DELETE_URL, "vid-1", commentId.toString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("SUCCESS"))
-                .andExpect(jsonPath("$.data").value("Comment deleted"));
-    }
-
-    @Test
-    void deleteComment_withGuestToken_returnsOk() throws Exception {
-        UUID commentId = UUID.randomUUID();
-        String guestToken = UUID.randomUUID().toString();
-        doNothing().when(videoCommentService).deleteComment(eq(commentId), eq(guestToken));
-
-        mockMvc.perform(delete(DELETE_URL, "vid-1", commentId.toString())
-                        .header("X-Guest-Token", guestToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SUCCESS"))
                 .andExpect(jsonPath("$.data").value("Comment deleted"));
@@ -268,7 +203,7 @@ class CommentControllerTest {
     void deleteComment_commentNotFound_returns404() throws Exception {
         UUID commentId = UUID.randomUUID();
         doThrow(CustomException.of(HttpStatus.NOT_FOUND, 4043, "error.comment.notFound"))
-                .when(videoCommentService).deleteComment(eq(commentId), any());
+                .when(videoCommentService).deleteComment(eq(commentId));
 
         mockMvc.perform(delete(DELETE_URL, "vid-1", commentId.toString()))
                 .andExpect(status().isNotFound())
@@ -279,7 +214,7 @@ class CommentControllerTest {
     void deleteComment_notAuthorized_returns403() throws Exception {
         UUID commentId = UUID.randomUUID();
         doThrow(CustomException.of(HttpStatus.FORBIDDEN, 4031, "error.comment.deleteForbidden"))
-                .when(videoCommentService).deleteComment(eq(commentId), any());
+                .when(videoCommentService).deleteComment(eq(commentId));
 
         mockMvc.perform(delete(DELETE_URL, "vid-1", commentId.toString()))
                 .andExpect(status().isForbidden())

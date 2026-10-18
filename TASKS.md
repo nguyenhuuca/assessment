@@ -257,4 +257,5 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **CH-3** Remove public debug `ThreadController` (`/thread/**`) — `40fe60b`
 - [x] **CH-4** Guest comment tokens stored as SHA-256 + migration `202610180002` — `40fe60b`
 - [x] **CH-5** webapp admin PATCH via shared `client.js` — `40fe60b`
-- [ ] **QA-1** Prod after deploy: `./api/mock-test.sh`; guest comment create + delete still works
+- [x] **CH-6** Comments are login-only in the backend too (POST/DELETE need a JWT; guest token path removed)
+- [ ] **QA-1** Prod after deploy: `./api/mock-test.sh`; logged-in comment create + delete works, anonymous POST gets 401

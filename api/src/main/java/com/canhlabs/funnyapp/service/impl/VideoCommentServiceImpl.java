@@ -28,10 +28,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 import java.util.UUID;
 
 @Service
@@ -92,25 +88,19 @@ public class VideoCommentServiceImpl {
     }
 
     @Transactional
-    public CreateCommentResponse createComment(String videoId, CreateCommentRequest req, String guestToken) {
-        // Author comes from the JWT only — a client-supplied user id would allow impersonation
+    public CreateCommentResponse createComment(String videoId, CreateCommentRequest req) {
+        // Author comes from the JWT only — a client-supplied user id would allow impersonation.
+        // Only logged-in users may comment; the filter already requires a JWT on this path.
         UserDetailDto currentUser = AppUtils.getCurrentUser();
-        boolean isGuest = currentUser == null || StringUtils.isBlank(currentUser.getEmail());
-
-        // same guest token must be used for subsequent comments and new comment
-        String token = guestToken;
-
-        if (isGuest && guestToken == null) {
-            token = UUID.randomUUID().toString();
+        if (currentUser == null || StringUtils.isBlank(currentUser.getEmail())) {
+            throw error(HttpStatus.UNAUTHORIZED, 4011, "error.auth.required");
         }
 
         ReplyTarget target = resolveReplyTarget(videoId, req.getParentId());
 
         VideoComment saved = repo.save(VideoComment.builder()
                 .videoId(videoId)
-                .userId(isGuest ? "" : currentUser.getEmail())
-                .guestName(isGuest ? req.getGuestName() : null)
-                .guestTokenHash(isGuest ? hashGuestToken(token) : null)
+                .userId(currentUser.getEmail())
                 .content(req.getContent())
                 .parentId(target == null ? null : target.rootId())
                 .status(CommentStatus.VISIBLE)
@@ -119,14 +109,11 @@ public class VideoCommentServiceImpl {
         if (target != null) {
             // Delivered by NotificationEventListener only after this transaction commits
             eventPublisher.publishEvent(new CommentRepliedEvent(videoId, target.rootId(), target.parentId(),
-                    saved.getId(), isGuest ? null : currentUser.getEmail(),
+                    saved.getId(), currentUser.getEmail(),
                     NotificationText.snippet(req.getContent())));
         }
 
-        return CreateCommentResponse.builder()
-                .id(saved.getId())
-                .guestToken(isGuest ? token : null) // return once for guests
-                .build();
+        return CreateCommentResponse.builder().id(saved.getId()).build();
     }
 
     /**
@@ -171,49 +158,31 @@ public class VideoCommentServiceImpl {
         }
     }
 
-    /** Guest tokens are random UUIDs, so an unsalted SHA-256 is enough to keep them out of the DB in plain text. */
-    static String hashGuestToken(String token) {
-        try {
-            byte[] digest = MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(digest);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 not available", e);
-        }
-    }
-
     private static CustomException error(HttpStatus status, int subCode, String messageKey) {
         return CustomException.of(status, subCode, messageKey);
     }
 
     /**
-     * Delete policy:
-     * - If authenticated user: may delete own comment or any comment when has ROLE_ADMIN.
-     * - If guest: must provide the plain token; its SHA-256 is compared with the stored hash.
+     * Only the author may delete a comment (admins moderate through /admin/comments).
+     * Old guest comments have no author and can no longer be deleted here.
      */
     @Transactional
-    public void deleteComment(UUID commentId, String guestTokenIfAny) {
+    public void deleteComment(UUID commentId) {
         VideoComment c = repo.findById(commentId)
                 .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4043, "error.comment.notFound"));
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAuthed = (auth != null && auth.isAuthenticated());
         boolean isOwnerUser = false;
-        log.info("Delete comment request: isAuthed={}, userId={}, commentUserId={}, guestTokenIfAny={}",
-                isAuthed, auth != null ? auth.getName() : null, c.getUserId(), guestTokenIfAny != null ? "[PROVIDED]" : "[NOT_PROVIDED]");
+        log.info("Delete comment request: isAuthed={}, userId={}, commentUserId={}",
+                isAuthed, auth != null ? auth.getName() : null, c.getUserId());
 
-        if (isAuthed && c.getUserId() != null) {
+        if (isAuthed && StringUtils.isNotEmpty(c.getUserId())) {
             String principalName = auth.getName();
             isOwnerUser = principalName != null && principalName.equals(c.getUserId());
         }
 
-        boolean guestOk = false;
-        if (StringUtils.isEmpty(c.getUserId()) && c.getGuestTokenHash() != null && guestTokenIfAny != null) {
-            guestOk = MessageDigest.isEqual(
-                    hashGuestToken(guestTokenIfAny).getBytes(StandardCharsets.UTF_8),
-                    c.getGuestTokenHash().getBytes(StandardCharsets.UTF_8));
-        }
-
-        if (!(isOwnerUser || guestOk)) {
+        if (!isOwnerUser) {
             throw error(HttpStatus.FORBIDDEN, 4031, "error.comment.deleteForbidden");
         }
 

@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Author identity is never taken from the body: it comes from the JWT (logged-in user)
- * or the X-Guest-Token header (guest).
+ * Author identity is never taken from the body: it comes from the JWT. Only logged-in users may comment.
  */
 @Getter
 @Setter
@@ -18,7 +17,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class CreateCommentRequest {
-    private String guestName;          // optional
     @NotBlank
     @Size(max = 2000)
     private String content;
