@@ -1,3 +1,6 @@
 
 # Use bd merge for beads JSONL files
 .beads/issues.jsonl merge=beads
+
+# Shell scripts must stay LF: with CRLF, bash fails after a Windows checkout
+*.sh text eol=lf
