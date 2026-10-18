@@ -31,6 +31,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -48,6 +50,8 @@ import java.util.stream.Collectors;
 public class DriveSyncServiceImpl implements DriveSyncService {
 
     static final String SOURCE_TYPE = "google_drive";
+    /** Max ids per source_id IN lookup. */
+    static final int DB_CHUNK = 1000;
 
     private final Drive drive;
     private final VideoSourceRepository videoSourceRepository;
@@ -84,9 +88,11 @@ public class DriveSyncServiceImpl implements DriveSyncService {
     }
 
     @Override
-    public DriveSyncListingDto listFolder() {
-        List<File> driveFiles = listDriveFolder();
-        Map<String, VideoSource> rows = videoSourceRepository.findAllBySourceType(SOURCE_TYPE).stream()
+    public DriveSyncListingDto listFolder(Instant from, Instant to) {
+        boolean ranged = from != null || to != null;
+        List<File> driveFiles = listDriveFolder(from, to);
+        List<VideoSource> dbRows = ranged ? rowsOf(driveFiles) : videoSourceRepository.findAllBySourceType(SOURCE_TYPE);
+        Map<String, VideoSource> rows = dbRows.stream()
                 .collect(Collectors.toMap(VideoSource::getSourceId, Function.identity(), (a, b) -> a));
 
         List<DriveSyncFileDto> files = new ArrayList<>(driveFiles.size());
@@ -104,12 +110,25 @@ public class DriveSyncServiceImpl implements DriveSyncService {
                     .state(stateOf(f, localSize, row != null))
                     .build());
         }
-        // rows left over have no file in the Drive folder any more
-        List<DriveSyncOrphanDto> orphans = rows.values().stream()
+        // rows left over have no file in the Drive folder any more; a range loads only the rows of its own
+        // files, so every other row would look like an orphan: only the whole-folder listing checks them
+        List<DriveSyncOrphanDto> orphans = ranged ? List.of() : rows.values().stream()
                 .map(r -> DriveSyncOrphanDto.builder()
                         .videoSourceId(r.getId()).sourceId(r.getSourceId()).title(r.getTitle()).build())
                 .toList();
-        return DriveSyncListingDto.builder().files(files).orphans(orphans).maxBatch(MAX_BATCH).build();
+        return DriveSyncListingDto.builder().files(files).orphans(orphans).orphansChecked(!ranged)
+                .maxBatch(MAX_BATCH).build();
+    }
+
+    /** DB rows of the listed Drive files only, looked up in chunks; no call when there are no files. */
+    private List<VideoSource> rowsOf(List<File> driveFiles) {
+        List<String> ids = driveFiles.stream().map(File::getId).toList();
+        List<VideoSource> rows = new ArrayList<>();
+        for (int i = 0; i < ids.size(); i += DB_CHUNK) {
+            rows.addAll(videoSourceRepository.findAllBySourceTypeAndSourceIdIn(
+                    SOURCE_TYPE, ids.subList(i, Math.min(i + DB_CHUNK, ids.size()))));
+        }
+        return rows;
     }
 
     @Override
@@ -127,7 +146,7 @@ public class DriveSyncServiceImpl implements DriveSyncService {
         }
 
         // only files of the video folder: the Drive account can read far more than this folder
-        Map<String, File> inFolder = listDriveFolder().stream()
+        Map<String, File> inFolder = listDriveFolder(null, null).stream()
                 .collect(Collectors.toMap(File::getId, Function.identity(), (a, b) -> a));
         if (!inFolder.keySet().containsAll(ids)) {
             throw error(HttpStatus.BAD_REQUEST, 4203, "NOT_IN_FOLDER");
@@ -214,11 +233,16 @@ public class DriveSyncServiceImpl implements DriveSyncService {
         }
     }
 
-    private List<File> listDriveFolder() {
+    /** Lists the folder; {@code from} (inclusive) and {@code to} (exclusive) filter on the Drive created time. */
+    private List<File> listDriveFolder(Instant from, Instant to) {
         try {
             List<File> files = new ArrayList<>();
+            // bounds come from typed Instants (RFC 3339, UTC, whole seconds): no user text reaches the query
+            String q = String.format("'%s' in parents and trashed = false", folderId)
+                    + (from == null ? "" : " and createdTime >= '" + rfc3339(from) + "'")
+                    + (to == null ? "" : " and createdTime < '" + rfc3339(to) + "'");
             Drive.Files.List request = drive.files().list()
-                    .setQ(String.format("'%s' in parents and trashed = false", folderId))
+                    .setQ(q)
                     .setFields("nextPageToken, files(id, name, size, createdTime)")
                     .setPageSize(1000);
             do {
@@ -231,6 +255,10 @@ public class DriveSyncServiceImpl implements DriveSyncService {
             log.error("Listing Drive folder failed: {}", e.getMessage());
             throw error(HttpStatus.BAD_GATEWAY, 5021, "DRIVE_UNAVAILABLE");
         }
+    }
+
+    private static String rfc3339(Instant instant) {
+        return DateTimeFormatter.ISO_INSTANT.format(instant.truncatedTo(ChronoUnit.SECONDS));
     }
 
     private static CustomException error(HttpStatus status, int subCode, String message) {

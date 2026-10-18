@@ -26,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +38,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,12 +75,18 @@ class DriveSyncServiceImplTest {
         return f;
     }
 
+    private static final String BASE_Q = "'folder' in parents and trashed = false";
+
     private void folderHas(File... files) throws IOException {
+        folderHas(BASE_Q, files);
+    }
+
+    private void folderHas(String q, File... files) throws IOException {
         Drive.Files driveFiles = mock(Drive.Files.class);
         Drive.Files.List list = mock(Drive.Files.List.class);
         when(drive.files()).thenReturn(driveFiles);
         when(driveFiles.list()).thenReturn(list);
-        when(list.setQ("'folder' in parents and trashed = false")).thenReturn(list);
+        when(list.setQ(q)).thenReturn(list);
         when(list.setFields(anyString())).thenReturn(list);
         when(list.setPageSize(any())).thenReturn(list);
         when(list.execute()).thenReturn(new FileList().setFiles(List.of(files)));
@@ -110,7 +120,7 @@ class DriveSyncServiceImplTest {
                 row(1, "synced"), row(2, "noLocal"), row(5, "partial"), row(9, "gone")));
         locks.tryClaim("busy");
 
-        DriveSyncListingDto listing = service.listFolder();
+        DriveSyncListingDto listing = service.listFolder(null, null);
 
         Map<String, DriveSyncFileDto> byId = listing.getFiles().stream()
                 .collect(Collectors.toMap(DriveSyncFileDto::getFileId, Function.identity()));
@@ -134,9 +144,84 @@ class DriveSyncServiceImplTest {
         when(drive.files()).thenReturn(driveFiles);
         when(driveFiles.list()).thenThrow(new IOException("down"));
 
-        assertThatThrownBy(() -> service.listFolder())
+        assertThatThrownBy(() -> service.listFolder(null, null))
                 .isInstanceOfSatisfying(CustomException.class,
                         e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.BAD_GATEWAY));
+    }
+
+    @Test
+    void listFolder_noRange_computesOrphansAndLoadsWholeTable() throws IOException {
+        folderHas(driveFile("a", "a.mp4", 5L));
+        when(repo.findAllBySourceType("google_drive")).thenReturn(List.of(row(1, "a"), row(9, "gone")));
+
+        DriveSyncListingDto listing = service.listFolder(null, null);
+
+        assertThat(listing.isOrphansChecked()).isTrue();
+        assertThat(listing.getOrphans()).extracting(o -> o.getSourceId()).containsExactly("gone");
+        verify(repo, never()).findAllBySourceTypeAndSourceIdIn(anyString(), any());
+    }
+
+    private static final Instant FROM = Instant.parse("2026-10-18T00:00:00.789Z");
+    private static final Instant TO = Instant.parse("2026-10-18T12:01:00Z");
+
+    @Test
+    void listFolder_fromOnly_filtersByCreatedTimeAndSkipsOrphans() throws IOException {
+        folderHas(BASE_Q + " and createdTime >= '2026-10-18T00:00:00Z'", driveFile("a", "a.mp4", 5L));
+        when(repo.findAllBySourceTypeAndSourceIdIn("google_drive", List.of("a"))).thenReturn(List.of(row(1, "a")));
+
+        DriveSyncListingDto listing = service.listFolder(FROM, null);
+
+        assertThat(listing.isOrphansChecked()).isFalse();
+        assertThat(listing.getOrphans()).isEmpty();
+        assertThat(listing.getFiles()).singleElement().satisfies(f -> {
+            assertThat(f.getVideoSourceId()).isEqualTo(1L);
+            assertThat(f.getState()).isEqualTo(DriveSyncState.MISSING_LOCAL);
+        });
+        verify(repo, never()).findAllBySourceType(anyString());
+    }
+
+    @Test
+    void listFolder_toOnly_usesExclusiveUpperBound() throws IOException {
+        folderHas(BASE_Q + " and createdTime < '2026-10-18T12:01:00Z'", driveFile("a", "a.mp4", 5L));
+        when(repo.findAllBySourceTypeAndSourceIdIn(anyString(), any())).thenReturn(List.of());
+
+        DriveSyncListingDto listing = service.listFolder(null, TO);
+
+        assertThat(listing.getFiles()).singleElement()
+                .satisfies(f -> assertThat(f.getState()).isEqualTo(DriveSyncState.MISSING_BOTH));
+        assertThat(listing.isOrphansChecked()).isFalse();
+    }
+
+    @Test
+    void listFolder_fromAndTo_bothBoundsInQuery() throws IOException {
+        folderHas(BASE_Q + " and createdTime >= '2026-10-18T00:00:00Z' and createdTime < '2026-10-18T12:01:00Z'",
+                driveFile("a", "a.mp4", 5L));
+        when(repo.findAllBySourceTypeAndSourceIdIn(anyString(), any())).thenReturn(List.of());
+
+        assertThat(service.listFolder(FROM, TO).getFiles()).hasSize(1);
+    }
+
+    @Test
+    void listFolder_rangeWithNoFiles_makesNoDbCall() throws IOException {
+        folderHas(BASE_Q + " and createdTime >= '2026-10-18T00:00:00Z'");
+
+        DriveSyncListingDto listing = service.listFolder(FROM, null);
+
+        assertThat(listing.getFiles()).isEmpty();
+        assertThat(listing.isOrphansChecked()).isFalse();
+        verifyNoInteractions(repo);
+    }
+
+    @Test
+    void listFolder_rangeWithManyFiles_looksUpRowsInChunksOf1000() throws IOException {
+        File[] many = IntStream.range(0, 2500).mapToObj(i -> driveFile("f" + i, "n" + i, 5L)).toArray(File[]::new);
+        folderHas(BASE_Q + " and createdTime >= '2026-10-18T00:00:00Z'", many);
+        when(repo.findAllBySourceTypeAndSourceIdIn(anyString(), any())).thenReturn(List.of());
+
+        service.listFolder(FROM, null);
+
+        verify(repo, times(2)).findAllBySourceTypeAndSourceIdIn(eq("google_drive"), argThat(c -> c.size() == 1000));
+        verify(repo).findAllBySourceTypeAndSourceIdIn(eq("google_drive"), argThat(c -> c.size() == 500));
     }
 
     // ── validation ───────────────────────────────────────────────────────────

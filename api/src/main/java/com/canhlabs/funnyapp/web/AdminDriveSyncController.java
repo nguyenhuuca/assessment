@@ -9,9 +9,11 @@ import com.canhlabs.funnyapp.dto.admin.StartDriveSyncRequest;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.ResultStatus;
+import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.service.DriveSyncService;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +21,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Instant;
 
 /** ADMIN can view the Drive sync state; only SUPER_ADMIN can start a force sync. */
 @RestController
@@ -36,8 +41,13 @@ public class AdminDriveSyncController {
 
     @GetMapping("/files")
     @HasPermission(perm = Permission.ADMIN)
-    public ResponseEntity<ResultObjectInfo<DriveSyncListingDto>> files() {
-        return ResponseEntity.ok(wrap(driveSyncService.listFolder()));
+    public ResponseEntity<ResultObjectInfo<DriveSyncListingDto>> files(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to) {
+        if (from != null && to != null && from.isAfter(to)) {
+            throw CustomException.of(HttpStatus.BAD_REQUEST, 400, "error.driveSync.invalidRange");
+        }
+        return ResponseEntity.ok(wrap(driveSyncService.listFolder(from, to)));
     }
 
     @PostMapping("/runs")

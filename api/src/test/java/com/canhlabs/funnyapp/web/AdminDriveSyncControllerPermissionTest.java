@@ -35,6 +35,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -105,7 +106,7 @@ class AdminDriveSyncControllerPermissionTest {
             return null;
         }).when(jwtFilter).doFilter(any(), any(), any());
         when(featureFlagService.isEnabled(eq(AppConstant.Flags.PERMISSION_ENFORCEMENT), anyBoolean())).thenReturn(false);
-        when(driveSyncService.listFolder()).thenReturn(DriveSyncListingDto.builder().files(List.of()).orphans(List.of()).build());
+        when(driveSyncService.listFolder(any(), any())).thenReturn(DriveSyncListingDto.builder().files(List.of()).orphans(List.of()).build());
         when(driveSyncService.startRun(any())).thenReturn(DriveSyncRunDto.builder().runId("r1").active(true).build());
     }
 
@@ -121,6 +122,37 @@ class AdminDriveSyncControllerPermissionTest {
     void files_superAdmin_returns200() throws Exception {
         mockMvc.perform(get(BASE + "/files").with(authentication(principal(UserRole.SUPER_ADMIN))))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void files_rangeParams_bindAsIsoInstants() throws Exception {
+        mockMvc.perform(get(BASE + "/files").param("from", "2026-10-18T00:00:00Z").param("to", "2026-10-18T12:01:00Z")
+                        .with(authentication(principal(UserRole.ADMIN))))
+                .andExpect(status().isOk());
+        verify(driveSyncService).listFolder(Instant.parse("2026-10-18T00:00:00Z"), Instant.parse("2026-10-18T12:01:00Z"));
+    }
+
+    @Test
+    void files_noParams_passesNulls() throws Exception {
+        mockMvc.perform(get(BASE + "/files").with(authentication(principal(UserRole.ADMIN))))
+                .andExpect(status().isOk());
+        verify(driveSyncService).listFolder(null, null);
+    }
+
+    @Test
+    void files_fromAfterTo_returns400() throws Exception {
+        mockMvc.perform(get(BASE + "/files").param("from", "2026-10-18T12:00:00Z").param("to", "2026-10-18T00:00:00Z")
+                        .with(authentication(principal(UserRole.ADMIN))))
+                .andExpect(status().isBadRequest());
+        verify(driveSyncService, never()).listFolder(any(), any());
+    }
+
+    @Test
+    void files_malformedInstant_returns400() throws Exception {
+        mockMvc.perform(get(BASE + "/files").param("from", "yesterday")
+                        .with(authentication(principal(UserRole.ADMIN))))
+                .andExpect(status().isBadRequest());
+        verify(driveSyncService, never()).listFolder(any(), any());
     }
 
     @Test

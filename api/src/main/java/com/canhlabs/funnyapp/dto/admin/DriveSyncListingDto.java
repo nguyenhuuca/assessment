@@ -16,6 +16,8 @@ import java.util.List;
 public class DriveSyncListingDto {
     private List<DriveSyncFileDto> files;
     private List<DriveSyncOrphanDto> orphans;
+    /** False when a time range was given: orphans need the whole folder, so the list is empty and not meaningful. */
+    private boolean orphansChecked;
     /** Max file ids accepted by one force sync run. */
     private int maxBatch;
 }

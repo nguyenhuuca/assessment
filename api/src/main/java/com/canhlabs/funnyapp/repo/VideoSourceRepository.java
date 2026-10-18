@@ -46,6 +46,8 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
 
     List<VideoSource> findAllBySourceType(String sourceType);
 
+    List<VideoSource> findAllBySourceTypeAndSourceIdIn(String sourceType, Collection<String> sourceIds);
+
     /**
      * Force sync: insert the Drive video, or refresh title + thumbnail of the existing row.
      * Moderation (is_hide, status, priority), view_count and an existing description are kept.
