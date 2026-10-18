@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import DriveSyncPanel from '../DriveSyncPanel.jsx'
+import { TIME_PRESETS } from '../../../utils/timeRange.js'
 import * as adminApi from '../../../api/admin.js'
 import { useAuth } from '../../../hooks/useAuth.js'
 
@@ -128,5 +129,70 @@ describe('DriveSyncPanel', () => {
     adminApi.getDriveSyncFiles.mockResolvedValue({ data: { files: FILES, orphans: [{ videoSourceId: 9, sourceId: 'x.mp4', title: 'Lost' }], maxBatch: 50 } })
     renderPanel()
     expect(await screen.findByText(/Lost/)).toBeInTheDocument()
+  })
+  describe('time filter', () => {
+    const lastCall = () => adminApi.getDriveSyncFiles.mock.calls.at(-1)[0]
+    const fromAgo = (params) => Date.now() - Date.parse(params.from)
+    const pick = (value) => fireEvent.change(screen.getByLabelText('Thời gian tạo'), { target: { value } })
+
+    it('loads the last 12 hours by default', async () => {
+      renderPanel()
+      await screen.findByText('one.mp4')
+      expect(adminApi.getDriveSyncFiles).toHaveBeenCalledTimes(1)
+      const params = lastCall()
+      expect(params.to).toBeUndefined()
+      expect(Math.abs(fromAgo(params) - TIME_PRESETS['12h'])).toBeLessThan(5000)
+      expect(screen.getByLabelText('Thời gian tạo')).toHaveValue('12h')
+    })
+
+    it('refetches with the new window when a preset changes', async () => {
+      renderPanel()
+      await screen.findByText('one.mp4')
+      pick('7d')
+      await waitFor(() => expect(adminApi.getDriveSyncFiles).toHaveBeenCalledTimes(2))
+      expect(Math.abs(fromAgo(lastCall()) - TIME_PRESETS['7d'])).toBeLessThan(5000)
+    })
+
+    it('"All" sends no range and shows orphans', async () => {
+      adminApi.getDriveSyncFiles.mockImplementation((params) => Promise.resolve({ data: params.from
+        ? { files: FILES, orphans: [], orphansChecked: false, maxBatch: 50 }
+        : { files: FILES, orphans: [{ videoSourceId: 9, sourceId: 'x.mp4', title: 'Lost' }], orphansChecked: true, maxBatch: 50 } }))
+      renderPanel()
+      expect(await screen.findByText(/Chọn "Tất cả" để xem orphan/)).toBeInTheDocument()
+      expect(screen.queryByText(/Lost/)).not.toBeInTheDocument()
+      pick('all')
+      expect(await screen.findByText(/Lost/)).toBeInTheDocument()
+      expect(lastCall()).toEqual({})
+      expect(screen.queryByText(/Chọn "Tất cả" để xem orphan/)).not.toBeInTheDocument()
+    })
+
+    it('custom range sends both bounds in UTC, to including its minute', async () => {
+      renderPanel()
+      await screen.findByText('one.mp4')
+      pick('custom')
+      fireEvent.change(screen.getByLabelText('Từ'), { target: { value: '2026-10-18T07:00' } })
+      fireEvent.change(screen.getByLabelText('Đến'), { target: { value: '2026-10-18T19:00' } })
+      await waitFor(() => expect(lastCall()).toEqual({ from: '2026-10-18T00:00:00.000Z', to: '2026-10-18T12:01:00.000Z' }))
+    })
+
+    it('custom from after to shows an error and does not call the server', async () => {
+      renderPanel()
+      await screen.findByText('one.mp4')
+      pick('custom')
+      fireEvent.change(screen.getByLabelText('Từ'), { target: { value: '2026-10-18T19:00' } })
+      await waitFor(() => expect(lastCall()).toEqual({ from: '2026-10-18T12:00:00.000Z' }))
+      const calls = adminApi.getDriveSyncFiles.mock.calls.length
+      fireEvent.change(screen.getByLabelText('Đến'), { target: { value: '2026-10-18T07:00' } })
+      expect(await screen.findByRole('alert')).toHaveTextContent('Thời gian bắt đầu phải trước thời gian kết thúc')
+      expect(adminApi.getDriveSyncFiles).toHaveBeenCalledTimes(calls)
+    })
+
+    it('changing the filter clears the selection', async () => {
+      renderPanel()
+      fireEvent.click(await screen.findByLabelText('Chọn one.mp4'))
+      expect(screen.getByText('FORCE_SYNC (1)')).toBeInTheDocument()
+      pick('24h')
+      expect(screen.getByText('FORCE_SYNC (0)')).toBeInTheDocument()
+    })
   })
 })

@@ -2402,6 +2402,9 @@ body {
 .drive-sync-panel { display: flex; flex-direction: column; gap: 20px; }
 .drive-sync-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .drive-sync-toolbar label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.drive-time-filter { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.drive-time-filter .app-input { width: auto; max-width: 220px; }
+.drive-time-filter .app-alert { margin: 0; padding: 4px 10px; }
 .drive-sync-run-item { display: grid; grid-template-columns: minmax(120px, 2fr) 110px minmax(120px, 2fr) auto; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
 .drive-sync-run-item .import-progress { width: 100%; margin-top: 0; }
 .admin-badge.synced        { background: rgba(0, 200, 83, 0.13); color: #00c853; border: 1px solid #00c853; }

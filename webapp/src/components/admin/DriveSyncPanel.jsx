@@ -4,6 +4,8 @@ import { useAuth } from '../../hooks/useAuth.js'
 import { isSuperAdmin } from '../../utils/roles.js'
 import { formatTime } from '../../utils/importUtils.js'
 import ConfirmModal from '../common/ConfirmModal.jsx'
+import DriveTimeFilter from './DriveTimeFilter.jsx'
+import { DEFAULT_TIME_FILTER } from '../../utils/timeRange.js'
 import { useTranslation } from 'react-i18next'
 
 const DEFAULT_MAX_BATCH = 50
@@ -86,7 +88,8 @@ export default function DriveSyncPanel() {
   const { t } = useTranslation('admin')
   const { user } = useAuth()
   const canSync = isSuperAdmin(user?.role)
-  const { data, isLoading } = useDriveSyncFiles()
+  const [timeFilter, setTimeFilter] = useState(DEFAULT_TIME_FILTER)
+  const { data, isLoading, isFetching } = useDriveSyncFiles(timeFilter)
   const { run, active } = useDriveSyncRun()
   const start = useStartDriveSyncRun()
   const [selected, setSelected] = useState(() => new Set())
@@ -97,6 +100,8 @@ export default function DriveSyncPanel() {
   const payload = data?.data ?? data ?? {}
   const allFiles = payload.files ?? []
   const orphans = payload.orphans ?? []
+  // false when a time range was sent: orphans need the whole folder, so the server skips them
+  const orphansChecked = payload.orphansChecked !== false
   const maxBatch = payload.maxBatch ?? DEFAULT_MAX_BATCH
   const files = onlyUnsynced ? allFiles.filter(f => f.state !== 'SYNCED') : allFiles
 
@@ -118,6 +123,12 @@ export default function DriveSyncPanel() {
     setSelected(new Set(ids))
   }
 
+  // the new list may not hold the selected files, and the confirm modal lists the current list
+  function changeTimeFilter(next) {
+    setTimeFilter(next)
+    setSelected(new Set())
+  }
+
   function forceSync() {
     setError('')
     start.mutate([...selected], {
@@ -131,6 +142,7 @@ export default function DriveSyncPanel() {
     <div className="drive-sync-panel">
       <div className="admin-table-wrap">
         <div className="drive-sync-toolbar">
+          <DriveTimeFilter value={timeFilter} onChange={changeTimeFilter} />
           <label>
             <input type="checkbox" checked={onlyUnsynced} onChange={e => setOnlyUnsynced(e.target.checked)} />
             {t('onlyUnsynced')}
@@ -150,7 +162,10 @@ export default function DriveSyncPanel() {
           <div className="admin-loading"><div className="vid-spinner" /></div>
         ) : (
           <>
-            <div className="admin-table-meta">{t('showingFiles', { shown: files.length, total: allFiles.length })}</div>
+            <div className="admin-table-meta" aria-busy={isFetching}>
+              {t('showingFiles', { shown: files.length, total: allFiles.length })}
+              {isFetching && <span className="admin-cell-muted"> · {t('common:loading')}</span>}
+            </div>
             <div className="import-scroll">
               <div className="admin-table-scroll">
                 <table className="admin-table">
@@ -196,7 +211,12 @@ export default function DriveSyncPanel() {
 
       {run && <RunProgress run={run} />}
 
-      {orphans.length > 0 && (
+      {!orphansChecked && (
+        <div className="admin-table-wrap">
+          <div className="admin-cell-muted">{t('orphansOnlyInAll')}</div>
+        </div>
+      )}
+      {orphansChecked && orphans.length > 0 && (
         <div className="admin-table-wrap">
           <div className="admin-table-meta">{t('orphans', { count: orphans.length })}</div>
           <ul className="import-line-list">
