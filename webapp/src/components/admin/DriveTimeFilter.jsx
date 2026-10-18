@@ -18,7 +18,7 @@ export default function DriveTimeFilter({ value, onChange }) {
     <div className="drive-time-filter">
       <label>
         {t('timeFilter')}
-        <select className="app-input" value={toSelect(value)} onChange={e => onChange(fromSelect(e.target.value))}>
+        <select className="admin-status-select" value={toSelect(value)} onChange={e => onChange(fromSelect(e.target.value))}>
           {Object.keys(TIME_PRESETS).map(p => <option key={p} value={p}>{t(PRESET_LABEL[p])}</option>)}
           <option value="all">{t('timeAll')}</option>
           <option value="custom">{t('timeCustom')}</option>
@@ -28,12 +28,12 @@ export default function DriveTimeFilter({ value, onChange }) {
         <>
           <label>
             {t('timeFrom')}
-            <input type="datetime-local" className="app-input" value={value.from}
+            <input type="datetime-local" className="admin-status-select" value={value.from}
               onChange={e => onChange({ ...value, from: e.target.value })} />
           </label>
           <label>
             {t('timeTo')}
-            <input type="datetime-local" className="app-input" value={value.to}
+            <input type="datetime-local" className="admin-status-select" value={value.to}
               onChange={e => onChange({ ...value, to: e.target.value })} />
           </label>
         </>

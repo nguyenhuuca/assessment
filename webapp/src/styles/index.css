@@ -5,6 +5,8 @@
 
 /* ── Tokens ── */
 :root {
+  /* native controls (checkbox, select list, date picker, scrollbars) follow the theme */
+  color-scheme: dark;
   --bg:               #0e0e0e;
   --bg-surface:       #131313;
   --bg-elevated:      #1a1919;
@@ -46,6 +48,7 @@
    Source of truth: Stitch "Shorts Feed - Web View" light screens (Material 3 light palette).
    surface #f8f9fa · on-surface #191c1d · primary #b80035 / #e11d48 · secondary #006398 */
 [data-theme="light"] {
+  color-scheme: light;
   --bg:               #f8f9fa;  /* surface */
   --bg-surface:       #ffffff;  /* surface-container-lowest */
   --bg-elevated:      #f3f4f5;  /* surface-container-low */
@@ -895,6 +898,7 @@ body {
 .app-field { margin-bottom: 16px; }
 
 /* ── App checkbox ── */
+input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); }
 .app-checkbox-wrap {
   display: flex;
   align-items: center;
@@ -2356,7 +2360,7 @@ body {
   gap: 8px;
 }
 .import-radios { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin: 4px 0; }
-.import-radios label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.import-radios label { display: flex; gap: 6px; align-items: center; cursor: pointer; font-size: 13px; }
 .import-title-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .import-title-row .app-input { flex: 1; min-width: 180px; }
 .import-line-list { margin: 0; padding-left: 18px; font-size: 13px; }
@@ -2401,13 +2405,10 @@ body {
 /* Drive force sync */
 .drive-sync-panel { display: flex; flex-direction: column; gap: 20px; }
 .drive-sync-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.drive-sync-toolbar label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.drive-sync-toolbar label { display: flex; gap: 6px; align-items: center; cursor: pointer; font-size: 13px; color: var(--text-muted); }
 .drive-time-filter { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.drive-time-filter .app-input { width: auto; max-width: 220px; }
+.drive-time-filter .admin-status-select { max-width: 220px; }
 .drive-time-filter .app-alert { margin: 0; padding: 4px 10px; }
-/* native date/time pickers: match the theme so the calendar icon stays visible */
-input[type="datetime-local"], input[type="date"], input[type="time"] { color-scheme: dark; }
-[data-theme="light"] input[type="datetime-local"], [data-theme="light"] input[type="date"], [data-theme="light"] input[type="time"] { color-scheme: light; }
 .drive-sync-run-item { display: grid; grid-template-columns: minmax(120px, 2fr) 110px minmax(120px, 2fr) auto; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
 .drive-sync-run-item .import-progress { width: 100%; margin-top: 0; }
 .admin-badge.synced        { background: rgba(0, 200, 83, 0.13); color: #00c853; border: 1px solid #00c853; }
