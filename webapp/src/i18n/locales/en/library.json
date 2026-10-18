@@ -50,5 +50,15 @@
   "removeAria": "Remove \"{{title}}\"",
   "addAria": "Add \"{{title}}\"",
   "added": "Added",
-  "add": "Add"
+  "add": "Add",
+  "reorder": "Reorder",
+  "reorderDone": "Done",
+  "reorderHint": "Drag the handle on a video to change the order it plays in.",
+  "dragHandleAria": "Drag to reorder \"{{title}}\"",
+  "moveError": "Could not save the new order. Please try again.",
+  "dragInstructions": "To pick up a video, press Space on its handle. Use the arrow keys to move it, Space to drop it, Escape to cancel.",
+  "dragStart": "Picked up \"{{title}}\", position {{position}} of {{total}}.",
+  "dragOver": "\"{{title}}\" is now at position {{position}} of {{total}}.",
+  "dragDrop": "Dropped \"{{title}}\" at position {{position}} of {{total}}.",
+  "dragCancel": "Move cancelled. \"{{title}}\" returned to its place."
 }

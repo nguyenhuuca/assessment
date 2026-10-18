@@ -43,6 +43,7 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 | Server State | TanStack React Query 5 |
 | UI Library | Bootstrap 5 + React-Bootstrap 2 |
 | Icons | FontAwesome (react-fontawesome) |
+| Drag & Drop | @dnd-kit (core + sortable) |
 | HTTP Client | Fetch API (via React Query) |
 | i18n | i18next + react-i18next (ADR-0020) |
 | Testing | Vitest + Testing Library |

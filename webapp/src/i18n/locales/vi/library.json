@@ -47,5 +47,15 @@
   "removeAria": "Bỏ \"{{title}}\"",
   "addAria": "Thêm \"{{title}}\"",
   "added": "Đã thêm",
-  "add": "Thêm"
+  "add": "Thêm",
+  "reorder": "Sắp xếp",
+  "reorderDone": "Xong",
+  "reorderHint": "Kéo biểu tượng tay cầm trên video để đổi thứ tự phát.",
+  "dragHandleAria": "Kéo để sắp xếp \"{{title}}\"",
+  "moveError": "Không lưu được thứ tự mới. Vui lòng thử lại.",
+  "dragInstructions": "Để nhấc một video, nhấn Space trên tay cầm. Dùng phím mũi tên để di chuyển, Space để thả, Escape để huỷ.",
+  "dragStart": "Đã nhấc \"{{title}}\", vị trí {{position}}/{{total}}.",
+  "dragOver": "\"{{title}}\" hiện ở vị trí {{position}}/{{total}}.",
+  "dragDrop": "Đã thả \"{{title}}\" ở vị trí {{position}}/{{total}}.",
+  "dragCancel": "Đã huỷ di chuyển. \"{{title}}\" trở về chỗ cũ."
 }

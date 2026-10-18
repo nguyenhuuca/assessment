@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import i18n from '../../../i18n/index.js'
 import LibraryView from '../LibraryView.jsx'
@@ -11,9 +11,15 @@ vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => auth }))
 vi.mock('../../../api/collections.js', () => ({
   collectionsApi: {
     mine: vi.fn(), publicList: vi.fn(), create: vi.fn(), update: vi.fn(), remove: vi.fn(),
-    videos: vi.fn(), videoIds: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), membership: vi.fn(),
+    videos: vi.fn(), videoIds: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), moveVideo: vi.fn(), membership: vi.fn(),
   },
 }))
+// Capture DndContext's props so a drop can be simulated without real pointer events
+let dnd
+vi.mock('@dnd-kit/core', async (importOriginal) => {
+  const actual = await importOriginal()
+  return { ...actual, DndContext: (props) => { dnd = props; return <actual.DndContext {...props} /> } }
+})
 vi.mock('../AddVideosModal.jsx', () => ({ default: ({ collection }) => <div data-testid="add-videos">{collection.name}</div> }))
 vi.mock('../../video/VideoSwiper.jsx', () => ({ default: () => <div data-testid="swiper" /> }))
 
@@ -142,6 +148,56 @@ describe('LibraryView', () => {
     renderView({ initialCollectionId: 'o' })
     fireEvent.click(await screen.findByRole('button', { name: /Thêm video/ }))
     expect(screen.getByTestId('add-videos')).toHaveTextContent('Của tôi')
+  })
+})
+
+describe('LibraryView reorder mode', () => {
+  const three = {
+    data: { content: [1, 2, 3].map(id => ({ id, title: `V${id}`, fileId: `f${id}` })), totalPages: 1, totalElements: 3 },
+  }
+
+  it('hides "Sắp xếp" from guests and from viewers of a public collection', async () => {
+    renderView({ initialCollectionId: 'p1' })
+    await screen.findByLabelText('Clip')
+    expect(screen.queryByRole('button', { name: /Sắp xếp/ })).toBeNull()
+  })
+
+  it('shows a handle per video in sort mode and "Xong" leaves it', async () => {
+    auth = { isLoggedIn: true, user: { isAdmin: false } }
+    collectionsApi.videos.mockResolvedValue(three)
+    renderView({ initialCollectionId: 'o' })
+    fireEvent.click(await screen.findByRole('button', { name: /Sắp xếp/ }))
+    expect(await screen.findByLabelText('Kéo để sắp xếp "V2"')).toBeTruthy()
+    expect(screen.getAllByLabelText(/^Kéo để sắp xếp/)).toHaveLength(3)
+    expect(screen.queryByLabelText('V1')).toBeNull() // tiles are inert while sorting
+    fireEvent.click(screen.getByRole('button', { name: /Xong/ }))
+    expect(await screen.findByLabelText('V1')).toBeTruthy()
+  })
+
+  it('a drop saves the position relative to the new neighbour', async () => {
+    auth = { isLoggedIn: true, user: { isAdmin: false } }
+    collectionsApi.videos.mockResolvedValue(three)
+    collectionsApi.moveVideo.mockResolvedValue(null)
+    renderView({ initialCollectionId: 'o' })
+    fireEvent.click(await screen.findByRole('button', { name: /Sắp xếp/ }))
+    await screen.findByLabelText('Kéo để sắp xếp "V1"')
+    act(() => { dnd.onDragEnd({ active: { id: 1 }, over: { id: 3 } }) })
+    await waitFor(() => expect(collectionsApi.moveVideo).toHaveBeenCalledWith('o', 1, 3))
+    act(() => { dnd.onDragEnd({ active: { id: 3 }, over: { id: 3 } }) }) // dropped in place
+    expect(collectionsApi.moveVideo).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows an error and restores the order when saving fails', async () => {
+    auth = { isLoggedIn: true, user: { isAdmin: false } }
+    collectionsApi.videos.mockResolvedValue(three)
+    collectionsApi.moveVideo.mockRejectedValue(new Error('boom'))
+    renderView({ initialCollectionId: 'o' })
+    fireEvent.click(await screen.findByRole('button', { name: /Sắp xếp/ }))
+    await screen.findByLabelText('Kéo để sắp xếp "V1"')
+    act(() => { dnd.onDragEnd({ active: { id: 3 }, over: { id: 1 } }) })
+    expect(await screen.findByText('Không lưu được thứ tự mới. Vui lòng thử lại.')).toBeTruthy()
+    const handles = screen.getAllByLabelText(/^Kéo để sắp xếp/).map(h => h.getAttribute('aria-label'))
+    expect(handles).toEqual(['Kéo để sắp xếp "V1"', 'Kéo để sắp xếp "V2"', 'Kéo để sắp xếp "V3"'])
   })
 })
 

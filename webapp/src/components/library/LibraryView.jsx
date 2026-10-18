@@ -1,4 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useMemo, useState } from 'react'
+import {
+  DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors,
+} from '@dnd-kit/core'
+import {
+  SortableContext, rectSortingStrategy, sortableKeyboardCoordinates, useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
@@ -9,12 +16,13 @@ import {
   useCollectionPlaylist,
   useDeleteCollection,
   useToggleCollectionItem,
+  useMoveCollectionItem,
 } from '../../hooks/useCollections.js'
 import VideoSwiper from '../video/VideoSwiper.jsx'
 import CollectionFormModal from './CollectionFormModal.jsx'
 import AddVideosModal from './AddVideosModal.jsx'
 import { thumbnailUrl } from '../../utils/videoModel.js'
-import { isPublic, pinDefaultFirst, collectionName } from './collectionUtils.js'
+import { isPublic, pinDefaultFirst, collectionName, moveAfterId } from './collectionUtils.js'
 
 function CollectionCard({ collection, onOpen, onPlay }) {
   const { t } = useTranslation('library')
@@ -59,19 +67,21 @@ function CollectionCard({ collection, onOpen, onPlay }) {
   )
 }
 
-function VideoTile({ video, onPlay, onRemove, removing }) {
+/** Thumbnail tile. Without `onPlay` it is inert (sort mode); `children` render on top, e.g. a drag handle. */
+function VideoTile({ video, onPlay, onRemove, removing, children }) {
   const { t } = useTranslation('library')
   const thumb = thumbnailUrl(video.fileId) || video.poster
   const title = video.title || t('untitled')
   return (
     <div
       className="explore-reel"
-      role="button"
-      tabIndex={0}
+      role={onPlay ? 'button' : undefined}
+      tabIndex={onPlay ? 0 : undefined}
       title={title}
-      aria-label={title}
+      aria-label={onPlay ? title : undefined}
       onClick={onPlay}
-      onKeyDown={e => e.key === 'Enter' && onPlay()}
+      onKeyDown={onPlay ? e => e.key === 'Enter' && onPlay() : undefined}
+      style={onPlay ? undefined : { cursor: 'default' }}
     >
       {thumb
         ? <img src={thumb} alt="" className="explore-reel-img" loading="lazy" />
@@ -90,7 +100,90 @@ function VideoTile({ video, onPlay, onRemove, removing }) {
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>close</span>
         </button>
       )}
+      {children}
     </div>
+  )
+}
+
+const HANDLE_STYLE = { position: 'absolute', top: 8, left: 8, padding: '6px 8px', cursor: 'grab', touchAction: 'none' }
+
+/** A tile that can be dragged by its handle only, so the rest of the page still scrolls and swipes on touch. */
+const SortableTile = memo(function SortableTile({ video }) {
+  const { t } = useTranslation('library')
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: video.id })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+    zIndex: isDragging ? 2 : undefined,
+    position: 'relative',
+  }
+  return (
+    <div ref={setNodeRef} style={style}>
+      <VideoTile video={video}>
+        <button
+          ref={setActivatorNodeRef}
+          className="app-btn secondary"
+          style={HANDLE_STYLE}
+          aria-label={t('dragHandleAria', { title: video.title || t('untitled') })}
+          {...attributes}
+          {...listeners}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>drag_indicator</span>
+        </button>
+      </VideoTile>
+    </div>
+  )
+})
+
+/** "Sắp xếp" mode: the whole list (not one page) as a sortable grid; a drop saves the new position. */
+function ReorderGrid({ collectionId, visibility }) {
+  const { t } = useTranslation('library')
+  const { data: videos = [], isLoading, error } = useCollectionPlaylist(collectionId)
+  const move = useMoveCollectionItem()
+  const ids = useMemo(() => videos.map(v => v.id), [videos])
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  const titleOf = id => videos.find(v => v.id === id)?.title || t('untitled')
+  const infoOf = id => ({ title: titleOf(id), position: ids.indexOf(id) + 1, total: ids.length })
+  const announcements = {
+    onDragStart: ({ active }) => t('dragStart', infoOf(active.id)),
+    onDragOver: ({ active, over }) => (over ? t('dragOver', { ...infoOf(active.id), position: ids.indexOf(over.id) + 1 }) : undefined),
+    onDragEnd: ({ active, over }) => t('dragDrop', { ...infoOf(active.id), position: ids.indexOf(over?.id ?? active.id) + 1 }),
+    onDragCancel: ({ active }) => t('dragCancel', infoOf(active.id)),
+  }
+
+  function handleDragEnd({ active, over }) {
+    if (!over || active.id === over.id) return
+    const from = ids.indexOf(active.id)
+    const to = ids.indexOf(over.id)
+    if (from < 0 || to < 0) return
+    move.mutate({ id: collectionId, videoId: active.id, afterVideoId: moveAfterId(ids, from, to), visibility })
+  }
+
+  if (isLoading) return <div className="vid-spinner" />
+  return (
+    <>
+      <p className="admin-cell-muted">{t('reorderHint')}</p>
+      {error && <div className="app-alert error" role="alert">{error.message}</div>}
+      {move.isError && <div className="app-alert error" role="alert">{t('moveError')}</div>}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        accessibility={{ announcements, screenReaderInstructions: { draggable: t('dragInstructions') } }}
+      >
+        <SortableContext items={ids} strategy={rectSortingStrategy}>
+          <div className="explore-reels-grid">
+            {videos.map(v => <SortableTile key={v.id} video={v} />)}
+          </div>
+        </SortableContext>
+      </DndContext>
+    </>
   )
 }
 
@@ -152,6 +245,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
   const [page, setPage] = useState(0)
   const [playIndex, setPlayIndex] = useState(null)
   const [adding, setAdding] = useState(false)
+  const [sorting, setSorting] = useState(false)
   const { data, isLoading, error } = useCollectionVideos(collectionId, page)
   const toggle = useToggleCollectionItem()
   const videos = data?.videos ?? []
@@ -200,6 +294,11 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span> {t('addVideo')}
             </button>
           )}
+          {canManage && (
+            <button className="app-btn secondary" aria-pressed={sorting} onClick={() => setSorting(s => !s)}>
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{sorting ? 'check' : 'swap_vert'}</span> {sorting ? t('reorderDone') : t('reorder')}
+            </button>
+          )}
           {canManage && !collection.isDefault && (
             <>
               <button className="app-btn secondary" onClick={onEdit}>{t('edit')}</button>
@@ -212,7 +311,9 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
         )}
         {error && <div className="app-alert error" role="alert">{error.message}</div>}
         {toggle.error && <div className="app-alert error" role="alert">{toggle.error.message}</div>}
-        {isLoading ? (
+        {canManage && sorting ? (
+          <ReorderGrid collectionId={collectionId} visibility={collection?.visibility} />
+        ) : isLoading ? (
           <div className="vid-spinner" />
         ) : videos.length === 0 ? (
           <p className="explore-empty-grid">
@@ -231,7 +332,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
             ))}
           </div>
         )}
-        {totalPages > 1 && (
+        {totalPages > 1 && !sorting && (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16 }}>
             <button className="app-btn secondary" disabled={page === 0} onClick={() => setPage(p => p - 1)}>{t('prev')}</button>
             <span className="admin-cell-muted">{page + 1}/{totalPages}</span>
