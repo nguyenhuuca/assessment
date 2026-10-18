@@ -119,7 +119,7 @@ $NOTE
         PROGRESS=${PROGRESS:-0}
         [ "$PROGRESS" -gt 100 ] && PROGRESS=100
         FILLED=$((PROGRESS / 10))
-        BAR="$(printf '%*s' "$FILLED" '' | tr ' ' '#')$(printf '%*s' $((10 - FILLED)) '' | tr ' ' '-')"
+        BAR="$(printf '%*s' "$FILLED" '' | sed 's/ /█/g')$(printf '%*s' $((10 - FILLED)) '' | sed 's/ /░/g')"
         # Two-column table: label | value. "sep" rows become ├──┼──┤ lines between groups.
         LC_ALL=C.UTF-8
         LABELS=() VALUES=() COMMITS=() SEP=0
