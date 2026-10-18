@@ -65,6 +65,14 @@ export function useUpdateAccountRole() {
   })
 }
 
+export function useUpdateAccountPermissions() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, permissions }) => adminApi.updateAccountPermissions(id, permissions),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'accounts'] }),
+  })
+}
+
 export function useDeleteAccount() {
   const qc = useQueryClient()
   return useMutation({

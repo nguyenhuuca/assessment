@@ -151,6 +151,21 @@ public class AdminController {
                 .build());
     }
 
+    @PatchMapping("/accounts/{id}/permissions")
+    public ResponseEntity<ResultObjectInfo<AdminAccountDto>> updateAccountPermissions(
+            @PathVariable Long id,
+            @RequestBody Map<String, Integer> body) {
+        Integer permissions = body.get("permissions");
+        if (permissions == null) {
+            throw new IllegalArgumentException("permissions is required");
+        }
+        UserDetailDto current = AppUtils.getCurrentUser();
+        return ResponseEntity.ok(ResultObjectInfo.<AdminAccountDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(adminAccountService.updatePermissions(id, current.getId(), permissions))
+                .build());
+    }
+
     @DeleteMapping("/accounts/{id}")
     public ResponseEntity<ResultObjectInfo<String>> deleteAccount(@PathVariable Long id) {
         UserDetailDto current = AppUtils.getCurrentUser();

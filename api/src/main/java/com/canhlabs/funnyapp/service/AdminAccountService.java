@@ -9,4 +9,7 @@ public interface AdminAccountService {
     Page<AdminAccountDto> getAccounts(Pageable pageable);
     void updateRole(Long targetId, Long currentUserId, UserRole role);
     void deleteAccount(Long targetId, Long currentUserId);
+
+    /** Sets the target's permission bitmask and revokes their sessions so the new bits apply at next login. */
+    AdminAccountDto updatePermissions(Long targetId, Long currentUserId, int permissions);
 }

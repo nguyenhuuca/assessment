@@ -19,5 +19,7 @@ public class AdminAccountDto {
     private String email;
     private UserRole role;
     private boolean mfaEnabled;
+    /** Bitmask of {@link com.canhlabs.funnyapp.enums.Permission} bits. */
+    private int permissions;
     private Instant createdAt;
 }

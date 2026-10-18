@@ -259,3 +259,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **CH-5** webapp admin PATCH via shared `client.js` — `40fe60b`
 - [x] **CH-6** Comments are login-only in the backend too (POST/DELETE need a JWT; guest token path removed)
 - [ ] **QA-1** Prod after deploy: `./api/mock-test.sh`; logged-in comment create + delete works, anonymous POST gets 401
+
+## Admin: account permissions (2026-10-18)
+
+- [x] **AP-1** `permissions` in `AdminAccountDto` + `PATCH /admin/accounts/{id}/permissions` (rank rules as role change, revokes the target's JWTs)
+- [x] **AP-2** Accounts tab "Permissions" column: one toggle chip per bit; `Mock-Test.http` checks the field

@@ -1663,6 +1663,18 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   border: 1px solid #ffc107;
 }
 
+/* Account permission bits: one toggle chip per bit */
+.perm-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.perm-chip {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 999px; cursor: pointer;
+  background: transparent; color: var(--text-muted); border: 1px dashed currentColor; opacity: 0.5;
+}
+.perm-chip.on { background: rgba(0, 238, 252, 0.12); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); opacity: 1; }
+.perm-chip:disabled { cursor: not-allowed; }
+.perm-chip.on:disabled { opacity: 0.6; }
+.perm-chip:not(.on):disabled { opacity: 0.3; }
+.perm-chip:not(:disabled):hover { border-color: var(--accent-cyan); }
+
 .admin-badge-user {
   background: rgba(173, 170, 170, 0.1);
   color: var(--text-muted);

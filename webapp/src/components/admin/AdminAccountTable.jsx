@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { useAdminAccounts, useUpdateAccountRole, useDeleteAccount } from '../../hooks/useAdmin.js'
+import { useAdminAccounts, useUpdateAccountRole, useUpdateAccountPermissions, useDeleteAccount } from '../../hooks/useAdmin.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useTranslation } from 'react-i18next'
 import { formatDate } from '../../i18n/format.js'
+import { PERMISSIONS, hasPermission, togglePermission } from '../../utils/permissions.js'
 
 // Mirrors the server: you can only manage accounts, and assign roles, strictly below your own
 const ROLE_RANK = { USER: 0, ADMIN: 1, SUPER_ADMIN: 2 }
@@ -17,6 +18,7 @@ export default function AdminAccountTable() {
   const myRank = rank(user?.role)
   const { data, isLoading } = useAdminAccounts(page)
   const updateRole    = useUpdateAccountRole()
+  const updatePerms   = useUpdateAccountPermissions()
   const deleteAccount = useDeleteAccount()
 
   const pageData      = data?.data ?? data ?? {}
@@ -31,6 +33,7 @@ export default function AdminAccountTable() {
   return (
     <div className="admin-table-wrap">
       {confirmDialog}
+      {updatePerms.isError && <div className="app-alert error" role="alert" style={{ margin: 12 }}>{t('permissionsUpdateFailed')}</div>}
       <div className="admin-table-meta">{t('showing', { shown: accounts.length, total: totalElements.toLocaleString() })}</div>
       <div className="admin-table-scroll">
         <table className="admin-table">
@@ -38,6 +41,7 @@ export default function AdminAccountTable() {
             <tr>
               <th>{t('colEmail')}</th>
               <th>{t('colRole')}</th>
+              <th>{t('colPermissions')}</th>
               <th>{t('colMfa')}</th>
               <th>{t('colJoined')}</th>
               <th>{t('colActions')}</th>
@@ -54,6 +58,9 @@ export default function AdminAccountTable() {
                 : myRank <= rank(nextRole) ? t('lockAssignLower') : null
               const roleLocked = isSelf || lockReason !== null
               const deleteLocked = isSelf || outranked
+              // Same rule as the server: never yourself, only accounts ranked below you
+              const permsLocked = isSelf || outranked
+              const permsTitle = isSelf ? t('cannotChangeOwnPermissions') : outranked ? t('lockLowerRole') : t('permissionsHint')
               return (
                 <tr key={a.id} className="admin-table-row">
                   <td>{a.email}</td>
@@ -61,6 +68,26 @@ export default function AdminAccountTable() {
                     <span className={`admin-badge ${isSuper ? 'admin-badge-super' : a.role === 'ADMIN' ? 'admin-badge-admin' : 'admin-badge-user'}`}>
                       {isSuper ? t('roleSuper') : a.role}
                     </span>
+                  </td>
+                  <td>
+                    <div className="perm-chips" role="group" aria-label={`${t('colPermissions')} ${a.email}`}>
+                      {PERMISSIONS.map(p => {
+                        const on = hasPermission(a.permissions, p.bit)
+                        return (
+                          <button
+                            key={p.key}
+                            type="button"
+                            className={`perm-chip${on ? ' on' : ''}`}
+                            aria-pressed={on}
+                            disabled={permsLocked || updatePerms.isPending}
+                            title={permsTitle}
+                            onClick={() => updatePerms.mutate({ id: a.id, permissions: togglePermission(a.permissions, p.bit) })}
+                          >
+                            {p.key}
+                          </button>
+                        )
+                      })}
+                    </div>
                   </td>
                   <td className="admin-cell-muted">{a.mfaEnabled ? t('mfaOn') : t('mfaOff')}</td>
                   <td className="admin-cell-muted">{a.createdAt ? formatDate(a.createdAt) : '—'}</td>

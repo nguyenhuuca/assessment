@@ -176,6 +176,29 @@ class AdminControllerTest {
     }
 
     @Test
+    void updateAccountPermissions_returnsUpdatedAccount() {
+        UserDetailDto currentUser = UserDetailDto.builder().id(99L).email("admin@example.com").build();
+        AdminAccountDto updated = AdminAccountDto.builder().id(10L).permissions(17).build();
+        try (MockedStatic<AppUtils> mocked = mockStatic(AppUtils.class)) {
+            mocked.when(AppUtils::getCurrentUser).thenReturn(currentUser);
+            when(adminAccountService.updatePermissions(10L, 99L, 17)).thenReturn(updated);
+
+            ResponseEntity<ResultObjectInfo<AdminAccountDto>> response =
+                    controller.updateAccountPermissions(10L, Map.of("permissions", 17));
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(17, response.getBody().getData().getPermissions());
+        }
+    }
+
+    @Test
+    void updateAccountPermissions_missingValue_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> controller.updateAccountPermissions(10L, Map.of()));
+        verifyNoInteractions(adminAccountService);
+    }
+
+    @Test
     void updateAccountRole_invalidRole_throwsIllegalArgumentException() {
         UserDetailDto currentUser = UserDetailDto.builder().id(99L).email("admin@example.com").build();
         try (MockedStatic<AppUtils> mocked = mockStatic(AppUtils.class)) {

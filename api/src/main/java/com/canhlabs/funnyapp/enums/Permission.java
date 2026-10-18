@@ -11,6 +11,9 @@ public enum Permission {
     DELETE(1 << 3),
     ADMIN(1 << 4);
 
+    /** Every defined bit; any other bit in a stored mask is invalid. */
+    public static final int ALL_BITS = 0b11111;
+
     private final int bit;
 
     Permission(int bit) {

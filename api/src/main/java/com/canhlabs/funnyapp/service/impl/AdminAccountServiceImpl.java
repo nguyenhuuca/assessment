@@ -1,7 +1,9 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.CredentialsVersionCache;
 import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.entity.User;
+import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
@@ -18,10 +20,16 @@ import org.springframework.stereotype.Service;
 public class AdminAccountServiceImpl implements AdminAccountService {
 
     private UserRepo userRepo;
+    private CredentialsVersionCache credentialsVersionCache;
 
     @Autowired
     public void injectUserRepo(UserRepo userRepo) {
         this.userRepo = userRepo;
+    }
+
+    @Autowired
+    public void injectCredentialsVersionCache(CredentialsVersionCache credentialsVersionCache) {
+        this.credentialsVersionCache = credentialsVersionCache;
     }
 
     @Override
@@ -57,6 +65,27 @@ public class AdminAccountServiceImpl implements AdminAccountService {
         userRepo.deleteById(targetId);
     }
 
+    @Override
+    public AdminAccountDto updatePermissions(Long targetId, Long currentUserId, int permissions) {
+        if (targetId.equals(currentUserId)) {
+            throw new IllegalArgumentException("Cannot change your own permissions");
+        }
+        if ((permissions & ~Permission.ALL_BITS) != 0) {
+            throw new IllegalArgumentException("Unknown permission bits: " + permissions);
+        }
+        UserRole actorRole = actorRole(currentUserId);
+        User user = userRepo.findById(targetId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetId));
+        requireOutranks(actorRole, user);
+        user.setPermissions(permissions);
+        // Permissions travel in the JWT: revoke the target's tokens so a removed bit stops working now
+        user.setCredentialsVersion(user.getCredentialsVersion() + 1);
+        User saved = userRepo.save(user);
+        credentialsVersionCache.evict(targetId);
+        log.info("Permissions of user id={} set to {} by user id={}", targetId, permissions, currentUserId);
+        return toDto(saved != null ? saved : user);
+    }
+
     /** Read from the DB, not the JWT: a token issued before a demotion still carries the old role. */
     private UserRole actorRole(Long currentUserId) {
         return userRepo.findById(currentUserId)
@@ -80,6 +109,7 @@ public class AdminAccountServiceImpl implements AdminAccountService {
                 .email(u.getUserName())
                 .role(u.getRole())
                 .mfaEnabled(u.isMfaEnabled())
+                .permissions(u.getPermissions())
                 .createdAt(u.getCreatedAt())
                 .build();
     }

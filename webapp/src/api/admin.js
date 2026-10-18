@@ -19,6 +19,7 @@ export const updateVideoVisibility = (id, hidden) => patch(`/admin/videos/${id}/
 export const deleteVideo       = (id) => api.delete(`/admin/videos/${id}`)
 export const getAccounts       = (params) => api.get(buildUrl('/admin/accounts', params))
 export const updateAccountRole = (id, role) => patch(`/admin/accounts/${id}/role`, { role })
+export const updateAccountPermissions = (id, permissions) => patch(`/admin/accounts/${id}/permissions`, { permissions })
 export const deleteAccount     = (id) => api.delete(`/admin/accounts/${id}`)
 export const getStats          = () => api.get('/admin/stats')
 

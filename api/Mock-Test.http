@@ -141,6 +141,18 @@ Authorization: {{token}}
     client.test("admin videos 200", () => client.assert(response.status === 200, "status " + response.status));
 %}
 
+### Admin accounts (each row carries the permission bitmask)
+GET {{api}}/admin/accounts
+Authorization: {{token}}
+
+> {%
+    client.test("admin accounts 200", () => client.assert(response.status === 200, "status " + response.status));
+    client.test("accounts carry permissions", () => {
+        const rows = response.body.data.content;
+        client.assert(rows.length > 0 && rows.every(r => typeof r.permissions === "number"), "permissions missing");
+    });
+%}
+
 ### Admin comments
 GET {{api}}/admin/comments
 Authorization: {{token}}
