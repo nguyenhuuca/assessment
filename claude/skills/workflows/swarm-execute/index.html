@@ -6712,7 +6712,7 @@
 <li><strong>Analyze</strong> — Check the task's <code>blockedBy</code> dependencies to confirm it is actually unblocked</li>
 <li><strong>Execute</strong> — Launch parallel workers for independent tasks</li>
 <li><strong>Gate</strong> — Run quality gates before marking tasks complete</li>
-<li><strong>Close</strong> — Mark complete via <code>TaskUpdate</code> (status: completed)</li>
+<li><strong>Close</strong> — Mark complete via <code>TaskUpdate</code> (status: completed), and in this repo flip the task's line in <code>TASKS.md</code> to <code>[x]</code> with the commit hash (<code>[~]</code> while in progress) in the same commit as the work or its docs</li>
 <li><strong>Push</strong> — Push to remote (MANDATORY)</li>
 </ol>
 <h2 id="context-efficiency">Context Efficiency<a class="headerlink" href="#context-efficiency" title="Permanent link">&para;</a></h2>
@@ -6818,7 +6818,7 @@
 <li>NO exceeding 8 parallel workers</li>
 <li>NO skipping git push step</li>
 <li>NO exposing secrets in error messages or comments</li>
-<li>ALWAYS update task status in real-time via <code>TaskUpdate</code></li>
+<li>ALWAYS update task status in real-time via <code>TaskUpdate</code>, and keep <code>TASKS.md</code> in step (this repo's durable task record)</li>
 <li>ALWAYS add comments for blocked work</li>
 <li>ALWAYS verify <code>git status</code> shows up to date</li>
 <li>ALWAYS validate inputs before executing commands</li>

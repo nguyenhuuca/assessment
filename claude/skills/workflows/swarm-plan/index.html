@@ -6883,6 +6883,7 @@
 <p>Every planning session MUST produce:
 1. Artifact(s) in <code>docs/</code> following naming conventions
 2. Tasks (via <code>TaskCreate</code>) for all implementation work, each with acceptance criteria
+   - <strong>This repo:</strong> also add a <code>## Feature: &lt;name&gt;</code> section to <code>TASKS.md</code> with one <code>- [ ] **&lt;ID&gt;**</code> line per task (the native list is machine-local; <code>TASKS.md</code> is the durable record). If <code>TaskCreate</code> is unavailable, <code>TASKS.md</code> + the plan's task table are the record.
 3. Dependency graph showing task order (via <code>blockedBy</code>)
 4. Handoff summary for /execute command</p>
 <h2 id="product-planning">Product Planning<a class="headerlink" href="#product-planning" title="Permanent link">&para;</a></h2>
