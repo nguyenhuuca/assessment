@@ -11,6 +11,7 @@ task: Continue Watching row (Explore)
 status: in_progress
 progress: 40
 done: FE-1 selector; FE-4 summary invalidation
+doing: FE-2 ContinueWatchingRow component
 next: FE-2 ContinueWatchingRow component + styles
 plan: docs/plans/plan-continue-watching.md
 updated: 2026-10-18 21:05
@@ -19,6 +20,7 @@ updated: 2026-10-18 21:05
 - `status`: `in_progress` | `blocked` | `done`
 - `progress`: integer 0–100, your honest estimate of the whole task (not the current step)
 - `done`: one `;`-item per **finished subtask**, written as `<ID> <what> <commit>`, e.g. `BE-1 position column 6a0a5849`. The startup report shows each item as a `✅` line, at most 8 items and 70 characters each, so keep every item short
+- `doing`: subtasks started but not finished (matching `[~]` in `TASKS.md`), same item format as `done`, shown as `🔄` lines. Optional: leave it out or set it to `-` when nothing is half-done. When a subtask finishes, move it from `doing` to `done`
 - `next`: short, `;`-separated, concrete enough to act on without the conversation. Only the first item shows in the startup report
 - `plan`: artifact path, or `-` when there is none
 - `blocked` adds a `blocker:` line saying what is needed and from whom

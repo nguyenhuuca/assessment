@@ -125,14 +125,19 @@ $NOTE
         BAR="$(printf '%*s' "$FILLED" '' | tr ' ' '#')$(printf '%*s' $((10 - FILLED)) '' | tr ' ' '-')"
         REPORT="$ICON $(short task)
    ${TASK_STATUS:-?} · [$BAR] $PROGRESS% · $(field updated)"
-        # Completed subtasks: one "✅" line per ";"-item of `done` (at most 8, each cut to 70 characters)
-        DONE_LINES=$(field done | LC_ALL=C.UTF-8 awk -v RS=';' '
-            { gsub(/^[ \t\n]+|[ \t\n]+$/, "") }
-            $0 == "" || $0 == "-" { next }
-            { n++; if (n <= 8) printf "   ✅ %s\n", (length($0) > 70 ? substr($0, 1, 69) "…" : $0) }
-            END { if (n > 8) printf "   … +%d more\n", n - 8 }')
-        [ -n "$DONE_LINES" ] && REPORT="$REPORT
-${DONE_LINES%$'\n'}"
+        # Subtasks: one "<icon>" line per ";"-item of a field (at most 8, each cut to 70 characters)
+        items() {
+            field "$1" | LC_ALL=C.UTF-8 awk -v RS=';' -v icon="$2" '
+                { gsub(/^[ \t\n]+|[ \t\n]+$/, "") }
+                $0 == "" || $0 == "-" { next }
+                { n++; if (n <= 8) printf "   %s %s\n", icon, (length($0) > 70 ? substr($0, 1, 69) "…" : $0) }
+                END { if (n > 8) printf "   … +%d more\n", n - 8 }'
+        }
+        for spec in "done ✅" "doing 🔄"; do
+            LINES=$(items ${spec% *} "${spec#* }")
+            [ -n "$LINES" ] && REPORT="$REPORT
+${LINES%$'\n'}"
+        done
         BLOCKER=$(short blocker)
         [ -n "$BLOCKER" ] && REPORT="$REPORT
    ⛔ $BLOCKER"
