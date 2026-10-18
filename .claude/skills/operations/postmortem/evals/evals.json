@@ -15,7 +15,7 @@
           "root cause analysis is a five-whys chain that terminates at a mechanism (a missing check, an untested path, an alert gap), not at an individual's action",
           "framing is blameless throughout — no person is named or blamed as the cause, only systems, processes, or mechanisms",
           "every action item lists an owner, a due date, and a tracking issue — none of the three left blank",
-          "names or produces the artifact at the path artifacts/postmortem_[incident-id].md, consistent with CLAUDE.md's artifact table"
+          "names or produces the artifact at the path docs/reports/postmortem-<YYYY-MM-DD>-<incident>.md, consistent with CLAUDE.md's artifact table"
         ]
       }
     },
@@ -42,7 +42,7 @@
           "performs a five-whys root cause analysis that terminates at a process/system mechanism, not at \"the engineer who ran the deploy\"",
           "if a contributing factor resembles human error, restates it as the missing guardrail or process gap that allowed the mistake, per blameless framing",
           "reconstructs the incident timeline from concrete evidence (deploy logs, alerts) rather than an unsupported narrative",
-          "treats the write-up as a postmortem artifact bound for artifacts/postmortem_[incident-id].md, not an ephemeral chat answer"
+          "treats the write-up as a postmortem artifact bound for docs/reports/postmortem-<YYYY-MM-DD>-<incident>.md, not an ephemeral chat answer"
         ]
       }
     },
@@ -53,7 +53,7 @@
       "expected": {
         "assertions": [
           "does not invoke the postmortem workflow — no timeline reconstruction, five-whys analysis, or action-item table",
-          "does not create or scaffold an artifacts/postmortem_*.md file",
+          "does not create or scaffold a docs/reports/postmortem-*.md file",
           "simply summarizes the runbook's existing content",
           "the words 'incident' and 'runbook' are a near-miss for the skill's trigger vocabulary, but there is no resolved-incident retrospective being requested, so the postmortem methodology does not fire"
         ]
@@ -66,7 +66,7 @@
       "expected": {
         "assertions": [
           "does not invoke the postmortem workflow or five-whys mechanism analysis",
-          "does not create or reference an artifacts/postmortem_*.md file",
+          "does not create or reference a docs/reports/postmortem-*.md file",
           "treats this as an ordinary defensive-coding / bug-fix task, following the debugging and testing skills' regression-test practice instead",
           "'doesn't crash again' is a near-miss for the skill's regression-guard vocabulary, but there is no resolved incident being retrospectively analyzed, so the postmortem workflow does not fire"
         ]

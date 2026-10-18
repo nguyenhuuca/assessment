@@ -2,7 +2,7 @@
 
 <!--
 Visual/UI Design Specification
-Filename: docs/design_spec_[component].md
+Filename: docs/specs/design-spec-<component>.md
 Owner: UI/UX Designer (/ui-ux-designer)
 Handoff to: Engineering (implementation), /code-check for accessibility review
 Related Skills: ui-ux-designer
@@ -18,7 +18,7 @@ Design Principles:
 **Status:** Draft | In Review | Approved
 **Designer:** [Name]
 **Date:** [YYYY-MM-DD]
-**Tracking Issue:** [issue link or N/A]
+**Tracking:** [`docs/tracking.md` row / issue link or N/A]
 **Related PRD:** [Link to PRD]
 **Approach:** Mobile-first
 

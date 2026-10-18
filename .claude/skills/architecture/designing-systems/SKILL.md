@@ -7,8 +7,8 @@ description: Produces this framework's ADR and system-design artifacts from bund
 
 ## Artifact Selection
 
-- **ADR** (`docs/adr_[topic].md`, [template](./resources/adr.template.md)): one decision — a choice among alternatives with rationale and consequences.
-- **System Design Doc** (`docs/system_design_[component].md`, [template](./resources/system-design.template.md)): a whole system or component — architecture, data model, API, NFRs, phased plan.
+- **ADR** (`docs/adr/NNNN-<topic>.md`, [template](./resources/adr.template.md)): one decision — a choice among alternatives with rationale and consequences.
+- **System Design Doc** (`docs/architecture/system-design-<component>.md`, [template](./resources/system-design.template.md)): a whole system or component — architecture, data model, API, NFRs, phased plan.
 
 A new system usually needs both: the system design doc for the overall shape, plus an ADR for each decision worth justifying independently (e.g., "why Postgres over DynamoDB").
 

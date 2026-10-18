@@ -2,10 +2,10 @@
 
 <!--
 Implementation Plan
-Filename: artifacts/plan_[task].md
+Filename: docs/plans/plan-<feature>.md
 Owner: Builder (/builder) or Architect (/architect)
 Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
-Related Skills: implementing-code, debugging, testing, test-driven-development
+Related Skills: swarm-plan, testing
 -->
 
 ## Overview
@@ -13,7 +13,7 @@ Related Skills: implementing-code, debugging, testing, test-driven-development
 **Status:** Draft | Approved | In Progress | Complete
 **Author:** [Name]
 **Date:** [YYYY-MM-DD]
-**Beads Issue:** [bd://issue-id or N/A]
+**Tracking:** [`docs/tracking.md` row / issue link or N/A]
 **Related PRD:** [Link to PRD]
 **Related ADR:** [Link to ADR]
 

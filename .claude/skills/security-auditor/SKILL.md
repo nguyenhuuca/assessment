@@ -41,7 +41,7 @@ Vulnerability classes (OWASP Top 10) and the security checklist live in `.claude
 - NO custom crypto implementations
 - NO skipping threat analysis
 - ALWAYS trace data flow with Grep for injection risks
-- ALWAYS document findings in `docs/security_audit_[date].md`
+- ALWAYS document findings in `docs/reports/security-audit-<YYYY-MM-DD>.md`
 - ALWAYS create GitHub issues for critical/high findings
 
 ## Output

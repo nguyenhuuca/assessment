@@ -21,6 +21,6 @@ Follow the same procedure as the `testing` skill's exemplar at
 Same evidence policy as the `testing` exemplar: record the with-skill vs
 without-skill comparison as a dated file under `scratchpad/` while iterating,
 then promote a summary (sample size, task set, raw pass/fail per case, date,
-model) into an `artifacts/` note before citing any improvement — per the
+model) into a `scratchpad/` note before citing any improvement — per the
 evidence policy in CONTRIBUTING.md. Do not assert an improvement without that
 raw data attached.

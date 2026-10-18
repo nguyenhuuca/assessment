@@ -2,10 +2,10 @@
 
 <!--
 Project Roadmap
-Filename: artifacts/roadmap_[project].md
+Filename: docs/plans/roadmap-<project>.md
 Owner: Architect (/architect)
 Handoff to: All personas as needed
-Related Skills: execution-roadmaps, decomposing-tasks, estimating-work, agile-methodology
+Related Skills: planning-artifacts
 -->
 
 ## Overview
@@ -13,7 +13,7 @@ Related Skills: execution-roadmaps, decomposing-tasks, estimating-work, agile-me
 **Status:** Active | Planning | Completed
 **Owner:** [Name]
 **Last Updated:** [YYYY-MM-DD]
-**Beads Issue:** [bd://issue-id or N/A]
+**Tracking:** [`docs/tracking.md` row / issue link or N/A]
 **Timeline:** [Start Date] - [End Date]
 
 ## Vision
@@ -172,9 +172,9 @@ Risk Score = Probability × Impact (L=1, M=2, H=3)
 
 ## Related Documents
 
-- [PRD](./prd_feature.md)
-- [ADR](./adr_topic.md)
-- [Design Spec](./design_spec_component.md)
+- [PRD](../prd/PRD-<feature>.md)
+- [ADR](../adr/NNNN-<topic>.md)
+- [Design Spec](../specs/design-spec-<component>.md)
 
 ---
 

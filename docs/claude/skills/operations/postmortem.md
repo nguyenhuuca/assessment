@@ -22,7 +22,7 @@ Work through `resources/postmortem.template.md` section by section — reference
 3. **Impact** — fill the User Impact and Business Impact tables with real numbers before writing prose. Unquantified impact under-motivates the action items that follow.
 4. **Action Items** — every row needs an owner, a due date, and a tracking issue link. No row ships with any of the three blank.
 5. **Prevention** — the trigger identified in Root Cause becomes a test, an alert, or a hook. Pick the strongest rung the trigger can support on the enforcement ladder (`security.md`: prose rule < skill < hook < CI) — a hook or CI check that blocks recurrence beats a prose reminder nobody re-reads.
-6. **File it** — `docs/postmortem_[incident-id].md`, per CLAUDE.md's artifact table.
+6. **File it** — `docs/reports/postmortem-<YYYY-MM-DD>-<incident>.md`, per CLAUDE.md's artifact table.
 
 ## Handoffs
 

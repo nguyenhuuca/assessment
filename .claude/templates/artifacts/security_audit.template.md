@@ -2,10 +2,10 @@
 
 <!--
 Security Audit Report
-Filename: docs/security_audit_[date].md
+Filename: docs/reports/security-audit-<YYYY-MM-DD>.md
 Owner: Security / Engineering
 Handoff to: Engineering for remediation, Architecture review for design changes
-Related Skills: threat-modeling
+Related Skills: security-auditor, threat-modeling
 
 Methodology:
 - STRIDE threat modeling (Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation)
@@ -25,7 +25,7 @@ For cloud-native systems, also consider:
 
 **Audit Date:** [YYYY-MM-DD]
 **Auditor:** [Name]
-**Tracking Issue:** [issue link or N/A]
+**Tracking:** [`docs/tracking.md` row / issue link or N/A]
 **Scope:** [What was audited]
 **Overall Risk Level:** Critical | High | Medium | Low
 

@@ -35,9 +35,9 @@ Save to `docs/` per CLAUDE.md's artifact table:
 
 | Artifact | Filename |
 |----------|----------|
-| PR-FAQ | `pr_faq_[feature].md` |
-| PRD | `prd_[feature].md` |
-| Roadmap | `roadmap_[project].md` |
+| PR-FAQ | `docs/prd/PR-FAQ-<feature>.md` |
+| PRD | `docs/prd/PRD-<feature>.md` |
+| Roadmap | `docs/plans/roadmap-<project>.md` |
 
 ## Resources
 

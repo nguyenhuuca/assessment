@@ -2,10 +2,10 @@
 
 <!--
 Implementation Plan
-Filename: docs/plan_[task].md
+Filename: docs/plans/plan-<feature>.md
 Owner: Engineering
 Handoff to: Engineering (implementation), /code-check (review), /swarm-review (audit)
-Related Skills: testing
+Related Skills: swarm-plan, testing
 -->
 
 ## Overview
@@ -13,7 +13,7 @@ Related Skills: testing
 **Status:** Draft | Approved | In Progress | Complete
 **Author:** [Name]
 **Date:** [YYYY-MM-DD]
-**Tracking Issue:** [issue link or N/A]
+**Tracking:** [`docs/tracking.md` row / issue link or N/A]
 **Related PRD:** [Link to PRD]
 **Related ADR:** [Link to ADR]
 

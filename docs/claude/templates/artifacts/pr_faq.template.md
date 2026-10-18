@@ -2,10 +2,10 @@
 
 <!--
 Press Release / Frequently Asked Questions
-Filename: artifacts/pr_faq_[feature].md
+Filename: docs/prd/PR-FAQ-<feature>.md
 Owner: Architect (/architect)
 Handoff to: Architect (/architect) for feasibility, then PRD creation
-Related Skills: writing-pr-faqs, brainstorming, requirements-analysis
+Related Skills: planning-artifacts
 
 This document comes BEFORE the PRD in the planning process.
 Uses Amazon's "Working Backwards" methodology.
@@ -27,7 +27,7 @@ Reading process: Everyone reads the document in silence at the start of review m
 **Status:** Draft | In Review | Approved
 **Author:** [Name]
 **Date:** [YYYY-MM-DD]
-**Beads Issue:** [bd://issue-id or N/A]
+**Tracking:** [`docs/tracking.md` row / issue link or N/A]
 
 ---
 
@@ -213,6 +213,6 @@ This is the most critical paragraph. Write from the CUSTOMER'S point of view.
 ## Next Steps
 
 After PR-FAQ approval:
-1. [ ] Create detailed PRD (`artifacts/prd_[feature].md`)
+1. [ ] Create detailed PRD (`docs/prd/PRD-<feature>.md`)
 2. [ ] Technical feasibility review with Architect
-3. [ ] Create Beads issue for tracking
+3. [ ] Add the feature row to `docs/tracking.md`

@@ -39,17 +39,17 @@ Decompose features into actionable plans using parallel exploration swarms.
 ## Artifact Requirements
 
 **Small Feature (1-3 days)**
-- `plan_[feature].md` — Implementation steps only
+- `docs/plans/plan-<feature>.md` — Implementation steps only
 
 **Medium Feature (1-2 weeks)**
-- `prd_[feature].md` — Requirements
-- `plan_[feature].md` — Implementation steps
+- `docs/prd/PRD-<feature>.md` — Requirements
+- `docs/plans/plan-<feature>.md` — Implementation steps
 
 **Large Feature (2+ weeks)**
-- `pr_faq_[feature].md` — Vision and customer value
-- `prd_[feature].md` — Detailed requirements
-- `adr_[key-decision].md` — Architectural decisions (format: `writing-adrs` skill; template bundled with `designing-systems` at `resources/adr.template.md`)
-- `plan_[feature].md` — Implementation steps
+- `docs/prd/PR-FAQ-<feature>.md` — Vision and customer value
+- `docs/prd/PRD-<feature>.md` — Detailed requirements
+- `docs/adr/NNNN-<topic>.md` — Architectural decisions (format: `writing-adrs` skill; template bundled with `designing-systems` at `resources/adr.template.md`)
+- `docs/plans/plan-<feature>.md` — Implementation steps
 
 ## Worker Types
 

@@ -2,10 +2,10 @@
 
 <!--
 Product Requirements Document
-Filename: artifacts/prd_[feature].md
+Filename: docs/prd/PRD-<feature>.md
 Owner: Architect (/architect)
 Handoff to: Architect (/architect), UI/UX Designer (/ui-ux-designer)
-Related Skills: writing-prds, decomposing-tasks, requirements-analysis
+Related Skills: scope, planning-artifacts
 -->
 
 ## Overview
@@ -14,7 +14,7 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 **Author:** [Name]
 **Date:** [YYYY-MM-DD]
 **Version:** [1.0]
-**Beads Issue:** [bd://issue-id or N/A]
+**Tracking:** [`docs/tracking.md` row / issue link or N/A]
 **PR-FAQ:** [Link to approved PR-FAQ - required for new initiatives]
 **Stakeholders:** [List]
 
@@ -142,18 +142,18 @@ After PRD approval:
 
 1. [ ] **Architect Review**: Technical feasibility assessment
    - Trigger: `/architect`
-   - Output: ADR (`artifacts/adr_[topic].md`)
+   - Output: ADR (`docs/adr/NNNN-<topic>.md`)
 
 2. [ ] **UI/UX Designer**: Visual design and wireframes
    - Trigger: `/ui-ux-designer`
-   - Output: Design Spec (`artifacts/design_spec_[component].md`)
+   - Output: Design Spec (`docs/specs/design-spec-<component>.md`)
 
 3. [ ] **Engineering Estimate**: Effort estimation and decomposition
    - Trigger: `/builder` or `/architect`
-   - Output: Implementation Plan (`artifacts/plan_[task].md`)
+   - Output: Implementation Plan (`docs/plans/plan-<feature>.md`)
 
-4. [ ] **Create Beads Issues**: Decompose into trackable work items
-   - Command: `bd create "Title" -t feature`
+4. [ ] **Track it**: add the feature row to `docs/tracking.md`
+   - Then decompose: `/swarm-plan <spec or PRD path>`
 
 **Related Artifacts**:
 - ADR: [Link after architect review]

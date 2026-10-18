@@ -17,7 +17,7 @@ flowchart LR
         D --> E["📐 ADR"]
         E --> F["📋 Spec"]
         F --> G["/swarm-plan"]
-        G --> H["📋 Plan + Beads"]
+        G --> H["📋 Plan + Tasks"]
     end
 
     subgraph exec ["⚙️ Execution"]
@@ -35,7 +35,7 @@ flowchart LR
 | 1. Scope | `/scope` | `docs/prd/PRD-{slug}.md` | `templates/artifacts/prd.template.md` |
 | 2. Architecture | `/architect` | `docs/adr/NNNN-{slug}.md` | `templates/artifacts/adr.template.md` |
 | 3. Spec | `/spec` | `docs/specs/spec-{slug}.md` | `templates/artifacts/spec.template.md` |
-| 4. Plan | `/swarm-plan` | `docs/plans/plan-{slug}.md` + Beads | `templates/artifacts/plan.template.md` |
+| 4. Plan | `/swarm-plan` | `docs/plans/plan-{slug}.md` + task list | `templates/artifacts/plan.template.md` |
 | 5. Implement | `/swarm-execute` or `/builder` | Code changes | — |
 | 6. Test | `/qa-engineer` | Test files | — |
 | 7. Review | `/code-review` | Findings | — |
@@ -156,7 +156,7 @@ Expected: At most one succeeds; limit remains enforced
 
 ## Step 4 — Implementation plan
 
-With Spec (or PRD + ADR) ready, use `/swarm-plan` to decompose the feature into a phased plan and Beads.
+With Spec (or PRD + ADR) ready, use `/swarm-plan` to decompose the feature into a phased plan with tasks.
 
 `/swarm-plan` accepts any combination of artifacts — pass whichever you have:
 
@@ -177,16 +177,16 @@ With Spec (or PRD + ADR) ready, use `/swarm-plan` to decompose the feature into 
 
 | | `/architect` | `/swarm-plan` |
 |---|---|---|
-| **Primary output** | ADR (decision record) | Plan + Beads (task breakdown) |
+| **Primary output** | ADR (decision record) | Plan + Tasks (task breakdown) |
 | **Asks questions** | No — explores codebase | No — reads input artifacts |
 | **Creates ADR** | Always | Only for One-Way Door (High) decisions found during planning |
-| **Creates Beads** | No | Yes — ready for `/swarm-execute` |
+| **Creates tasks** | No | Yes — ready for `/swarm-execute` |
 
 `/swarm-plan` will:
 1. Launch 3–6 `worker-explorer` agents in parallel to research existing patterns
 2. Classify decision reversibility (Two-Way Door vs One-Way Door)
 3. Write `docs/plans/plan-{slug}.md` using `templates/artifacts/plan.template.md`
-4. Output Beads commands for all implementation tasks with dependencies
+4. Output the implementation tasks (native task list, or listed in the plan) with `blockedBy` dependencies
 
 The plan contains:
 - Phased steps with exact file paths and acceptance criteria
@@ -195,7 +195,7 @@ The plan contains:
 - Dependency graph showing task order
 - Before/During/After PR checklist
 
-**Output:** `docs/plans/plan-{slug}.md` + Beads
+**Output:** `docs/plans/plan-{slug}.md` + task list
 
 ---
 
@@ -300,7 +300,7 @@ Fix findings, then commit and open a PR.
 /swarm-plan docs/prd/PRD-realtime-view-count.md docs/adr/0013-realtime-view-count.md
 
 # Launches parallel explorer agents → researches codebase
-# → docs/plans/plan-realtime-view-count.md + Beads
+# → docs/plans/plan-realtime-view-count.md + task list
 
 # 4. Implement
 git checkout -b feat/realtime-view-count

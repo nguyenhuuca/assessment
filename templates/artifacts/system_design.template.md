@@ -2,10 +2,10 @@
 
 <!--
 System Design Document (Technical Architecture)
-Filename: artifacts/system_design_[system].md
+Filename: docs/architecture/system-design-<component>.md
 Owner: Architect (/architect)
 Handoff to: Builder (/builder), Security Auditor (/security-auditor)
-Related Skills: designing-systems, designing-apis, cloud-native-patterns, domain-driven-design
+Related Skills: designing-systems, writing-adrs
 
 This document covers TECHNICAL architecture. For UI/visual design, use design_spec.template.md
 Uses C4 model for architecture visualization (Context → Container → Component → Code)
@@ -16,7 +16,7 @@ Uses C4 model for architecture visualization (Context → Container → Componen
 **Status:** Draft | In Review | Approved | Implemented
 **Author:** [Name]
 **Date:** [YYYY-MM-DD]
-**Beads Issue:** [bd://issue-id or N/A]
+**Tracking:** [`docs/tracking.md` row / issue link or N/A]
 **Related PRD:** [Link to PRD]
 **Related ADRs:** [Links to relevant ADRs]
 

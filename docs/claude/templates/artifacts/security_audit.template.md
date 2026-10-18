@@ -2,10 +2,10 @@
 
 <!--
 Security Audit Report
-Filename: artifacts/security_audit_[date].md
+Filename: docs/reports/security-audit-<YYYY-MM-DD>.md
 Owner: Security Auditor (/security-auditor)
 Handoff to: Builder (/builder) for remediation, Architect (/architect) for design changes
-Related Skills: application-security, threat-modeling, security-review, compliance, identity-access
+Related Skills: security-auditor, threat-modeling
 
 Methodology:
 - STRIDE threat modeling (Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation)
@@ -25,7 +25,7 @@ For cloud-native systems, also consider:
 
 **Audit Date:** [YYYY-MM-DD]
 **Auditor:** [Name]
-**Beads Issue:** [bd://issue-id or N/A]
+**Tracking:** [`docs/tracking.md` row / issue link or N/A]
 **Scope:** [What was audited]
 **Overall Risk Level:** Critical | High | Medium | Low
 
@@ -276,10 +276,10 @@ From `/security-auditor` persona requirements:
 
 ## Remediation Tracking
 
-| Finding | Owner | Due Date | Beads Issue | Status |
+| Finding | Owner | Due Date | Tracking | Status |
 |---------|-------|----------|-------------|--------|
-| FINDING-001 | [Name] | [Date] | [bd://issue-xxx] | Open |
-| FINDING-002 | [Name] | [Date] | [bd://issue-yyy] | In Progress |
+| FINDING-001 | [Name] | [Date] | [issue link] | Open |
+| FINDING-002 | [Name] | [Date] | [issue link] | In Progress |
 
 ## MITRE ATT&CK Mapping
 

@@ -29,7 +29,7 @@ Every feature gets tests; every bug fix gets a regression test (workflow detail 
 
 ### 4. Durable Artifacts Go in `docs/`
 
-Plans, ADRs, PRDs, design specs, security audits, and post-mortems belong in `docs/`, named per the Artifacts table in CLAUDE.md (e.g. `docs/adr/NNNN-<topic>.md`, `docs/prd/PRD-<feature>.md`, `docs/plans/plan-<feature>.md`). That table overrides the `adr_[topic].md`-style names in skill templates. Artifacts are the permanent record of decisions and must be checked in; after a feature/plan/ADR status change, update `docs/tracking.md`. (`./artifacts/` in this repo holds design images, e.g. Stitch exports — not planning docs.)
+Plans, ADRs, PRDs, design specs, security audits, and post-mortems belong in `docs/`, named per the Artifacts table in CLAUDE.md (e.g. `docs/adr/NNNN-<topic>.md`, `docs/prd/PRD-<feature>.md`, `docs/plans/plan-<feature>.md`). Skills and `templates/artifacts/` follow that table; if one disagrees, the table wins. Artifacts are the permanent record of decisions and must be checked in; after a feature/plan/ADR status change, update `docs/tracking.md`. (`./artifacts/` in this repo holds design images, e.g. Stitch exports — not planning docs.)
 
 ### 5. Ephemeral Notes Go in `./scratchpad/`
 

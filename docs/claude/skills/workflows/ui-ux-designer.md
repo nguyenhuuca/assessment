@@ -55,7 +55,7 @@ Every design spec must clear WCAG 2.1 AA before handoff:
 - ALWAYS mobile-first
 - ALWAYS test at all four breakpoints above
 - ALWAYS verify color contrast and keyboard navigation via DevTools
-- ALWAYS save to `docs/design_spec_[component].md`
+- ALWAYS save to `docs/specs/design-spec-<component>.md`
 
 ## Resources
 

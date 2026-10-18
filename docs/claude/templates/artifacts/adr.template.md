@@ -2,10 +2,10 @@
 
 <!--
 Architecture Decision Record
-Filename: docs/adr/NNNN-[kebab-title].md
+Filename: docs/adr/NNNN-<topic>.md
 Owner: Architect (/architect)
 Handoff to: Builder (/builder), Security Auditor (/security-auditor)
-Related Skills: designing-systems, designing-apis, domain-driven-design, cloud-native-patterns, writing-adrs
+Related Skills: writing-adrs, designing-systems
 
 Format: Based on MADR (Markdown Any Decision Records) - https://adr.github.io/madr/
 Best Practices:
@@ -17,16 +17,10 @@ Best Practices:
 
 ## Metadata
 
-**Status:** Proposed | Accepted | Deprecated | Superseded
-**Date:** YYYY-MM-DD
-**Deciders:** [List of people involved]
-**Related PRD:** [Link or N/A]
-**Tech Strategy Alignment:**
-- [ ] Decision follows Golden Path in `.claude/rules/tech-strategy.md`
-- [ ] OR deviation is explicitly justified in the Rationale below
-**Domain Tags:** [security | data | integration | infrastructure | api | frontend | devops]
-**Supersedes:** [ADR-NNNN or N/A]
-**Superseded By:** [ADR-NNNN or N/A]
+**Status:** Proposed \| Accepted \| Deprecated \| Superseded · **Date:** YYYY-MM-DD · **Deciders:** [names] · **Tags:** [tags]  
+**Related PRD:** [Link or N/A] · **Supersedes:** [ADR-NNNN or N/A] · **Superseded By:** [ADR-NNNN or N/A]
+
+**Tech Strategy:** ✅ Follows Golden Path OR ⚠️ Deviation — see Rationale
 
 ---
 

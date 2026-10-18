@@ -75,15 +75,18 @@ Distilled from `.claude/rules/` (auto-loaded); the rules and skills refer to the
 
 ## Workflow & Artifacts
 
-**Planning flow**: PRD → ADR → Spec → Plan → implementation; ceremony scales with scope (`core-directives.md` Rule 6). This table overrides the `adr_[topic].md`-style names used in skill templates:
+**Planning flow**: PRD → ADR → Spec → Plan → implementation; ceremony scales with scope (`core-directives.md` Rule 6). Skills and templates (`templates/artifacts/`) use these names; if one disagrees, this table wins:
 
 | Type | Location | Example |
 |------|----------|---------|
 | ADR | `docs/adr/NNNN-<topic>.md` | `docs/adr/0021-watch-history.md` |
+| PR-FAQ | `docs/prd/PR-FAQ-<feature>.md` | — |
 | PRD | `docs/prd/PRD-<feature>.md` | `docs/prd/PRD-watch-history-v2.md` |
 | Spec | `docs/specs/spec-<feature>.md` | `docs/specs/spec-user-settings.md` |
-| Plan | `docs/plans/plan-<feature>.md` | `docs/plans/plan-watch-history-v2.md` |
-| Security audit / postmortem / design spec | `docs/<type>/<name>.md` | `docs/reports/...` |
+| Design spec (UI) | `docs/specs/design-spec-<component>.md` | — |
+| System design | `docs/architecture/system-design-<component>.md` | — |
+| Plan / roadmap | `docs/plans/plan-<feature>.md`, `docs/plans/roadmap-<project>.md` | `docs/plans/plan-watch-history-v2.md` |
+| Security audit / postmortem | `docs/reports/security-audit-<YYYY-MM-DD>.md`, `docs/reports/postmortem-<YYYY-MM-DD>-<incident>.md` | `docs/reports/system-health-2026-05-30.md` |
 | Feature status | `docs/tracking.md` | — |
 
 Ephemeral notes go to `./scratchpad/` (gitignored). `./artifacts/` holds design images (Stitch exports), not planning docs.

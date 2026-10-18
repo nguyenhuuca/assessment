@@ -312,7 +312,7 @@ Nằm trong `templates/artifacts/` (dùng bởi `/scope`, `/spec`, `/swarm-plan`
 | **security_audit.template.md** | Security audit report | `docs/reports/` |
 | **system_design.template.md** | System design doc | `docs/architecture/` |
 
-Skill cũng mang template riêng trong `resources/` (ví dụ `designing-systems`, `planning-artifacts`, `postmortem`). Khi tên file trong template (`adr_[topic].md`) khác quy ước của repo, **bảng Artifacts trong `CLAUDE.md` thắng**.
+Skill cũng mang template riêng trong `resources/` (ví dụ `designing-systems`, `planning-artifacts`, `postmortem`). Tên file trong template theo bảng Artifacts trong `CLAUDE.md` (ví dụ `docs/adr/NNNN-<topic>.md`); nếu có chỗ lệch, **bảng đó thắng**.
 
 ### 🔧 Claude Mechanisms Templates
 

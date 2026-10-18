@@ -36,7 +36,7 @@ Follow the `designing-systems` and `writing-adrs` skills for methodology (system
 - ALWAYS align with `.claude/rules/tech-strategy.md` and define reusable standards/patterns, not one-off decisions
 
 ## Output
-Save artifacts to `docs/adr_[topic].md` or `docs/system_design_[component].md`. Working notes go to `scratchpad/`.
+Save artifacts to `docs/adr/NNNN-<topic>.md` or `docs/architecture/system-design-<component>.md`. Working notes go to `scratchpad/`.
 
 ## Handoff
 - To `/builder` / `/swarm-execute`: after ADR approval, for implementation

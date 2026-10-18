@@ -17,7 +17,7 @@ flowchart LR
         D --> E["📐 ADR"]
         E --> F["📋 Spec"]
         F --> G["/swarm-plan"]
-        G --> H["📋 Plan + Beads"]
+        G --> H["📋 Plan + Tasks"]
     end
 
     subgraph exec ["⚙️ Triển Khai"]
@@ -35,7 +35,7 @@ flowchart LR
 | 1. Scope | `/scope` | `docs/prd/PRD-{slug}.md` | `templates/artifacts/prd.template.md` |
 | 2. Kiến trúc | `/architect` | `docs/adr/NNNN-{slug}.md` | `templates/artifacts/adr.template.md` |
 | 3. Spec | `/spec` | `docs/specs/spec-{slug}.md` | `templates/artifacts/spec.template.md` |
-| 4. Kế hoạch | `/swarm-plan` | `docs/plans/plan-{slug}.md` + Beads | `templates/artifacts/plan.template.md` |
+| 4. Kế hoạch | `/swarm-plan` | `docs/plans/plan-{slug}.md` + task list | `templates/artifacts/plan.template.md` |
 | 5. Triển khai | `/swarm-execute` hoặc `/builder` | Code changes | — |
 | 6. Kiểm thử | `/qa-engineer` | Test files | — |
 | 7. Review | `/code-review` | Findings | — |
@@ -157,7 +157,7 @@ Expected: Tối đa một request thành công; limit vẫn được đảm bả
 
 ## Bước 4 — Kế hoạch triển khai
 
-Sau khi có Spec (hoặc PRD + ADR), dùng `/swarm-plan` để phân rã tính năng thành kế hoạch theo giai đoạn và Beads.
+Sau khi có Spec (hoặc PRD + ADR), dùng `/swarm-plan` để phân rã tính năng thành kế hoạch theo giai đoạn kèm danh sách task.
 
 `/swarm-plan` nhận bất kỳ artifact nào — truyền vào những gì bạn đang có:
 
@@ -178,16 +178,16 @@ Sau khi có Spec (hoặc PRD + ADR), dùng `/swarm-plan` để phân rã tính n
 
 | | `/architect` | `/swarm-plan` |
 |---|---|---|
-| **Output chính** | ADR (ghi lại quyết định) | Plan + Beads (chia nhỏ task) |
+| **Output chính** | ADR (ghi lại quyết định) | Plan + Tasks (chia nhỏ task) |
 | **Hỏi người dùng** | Không — tự explore codebase | Không — đọc artifacts đầu vào |
 | **Tạo ADR** | Luôn luôn | Chỉ khi gặp quyết định One-Way Door (High) |
-| **Tạo Beads** | Không | Có — sẵn sàng cho `/swarm-execute` |
+| **Tạo task** | Không | Có — sẵn sàng cho `/swarm-execute` |
 
 `/swarm-plan` sẽ:
 1. Spawn 3–6 `worker-explorer` agents song song để nghiên cứu patterns hiện có
 2. Phân loại khả năng đảo ngược (Two-Way Door vs One-Way Door)
 3. Viết `docs/plans/plan-{slug}.md` theo `templates/artifacts/plan.template.md`
-4. Output Beads commands cho tất cả tasks với dependency graph
+4. Output danh sách task (task list có sẵn, hoặc ghi trong plan) kèm `blockedBy`
 
 Kế hoạch bao gồm:
 - Các bước theo giai đoạn với đường dẫn file chính xác và acceptance criteria
@@ -196,7 +196,7 @@ Kế hoạch bao gồm:
 - Dependency graph thể hiện thứ tự tasks
 - Checklist trước/trong/sau PR
 
-**Output:** `docs/plans/plan-{slug}.md` + Beads
+**Output:** `docs/plans/plan-{slug}.md` + task list
 
 ---
 
@@ -296,7 +296,7 @@ Sửa các phát hiện, rồi commit và mở PR.
 /swarm-plan docs/prd/PRD-realtime-view-count.md docs/adr/0013-realtime-view-count.md
 
 # Spawn explorer agents song song → nghiên cứu codebase
-# → docs/plans/plan-realtime-view-count.md + Beads
+# → docs/plans/plan-realtime-view-count.md + task list
 
 # 4. Triển khai
 git checkout -b feat/realtime-view-count

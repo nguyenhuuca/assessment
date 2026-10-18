@@ -2,7 +2,7 @@
 
 <!--
 Feature Specification
-Filename: docs/specs/spec-{slug}.md
+Filename: docs/specs/spec-<feature>.md
 Owner: Builder (/builder) or Architect (/architect)
 Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 

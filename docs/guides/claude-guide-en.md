@@ -312,7 +312,7 @@ In `templates/artifacts/` (used by `/scope`, `/spec`, `/swarm-plan`):
 | **security_audit.template.md** | Security audit report | `docs/reports/` |
 | **system_design.template.md** | System design doc | `docs/architecture/` |
 
-Skills also bundle their own templates in `resources/` (e.g. `designing-systems`, `planning-artifacts`, `postmortem`). When a template's file name (`adr_[topic].md`) differs from this repo's convention, **the Artifacts table in `CLAUDE.md` wins**.
+Skills also bundle their own templates in `resources/` (e.g. `designing-systems`, `planning-artifacts`, `postmortem`). Their file names follow the Artifacts table in `CLAUDE.md` (e.g. `docs/adr/NNNN-<topic>.md`); if one ever disagrees, **the table wins**.
 
 ### Claude Mechanism Templates
 

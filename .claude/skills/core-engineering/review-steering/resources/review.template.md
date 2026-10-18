@@ -43,7 +43,7 @@
 -->
 ## Repo Invariants
 
-- [Artifact naming pattern, e.g. `docs/adr_[topic].md` — flag docs saved elsewhere]
+- [Artifact naming pattern, e.g. `docs/adr/NNNN-<topic>.md` — flag docs saved elsewhere]
 - [Enforcement-ladder placement, e.g. "a finding that's already a CI-blocking check is a
   duplicate, not a new finding — cite the CI job instead of re-flagging it"]
 - [Any other invariant a reviewer needs restated every run because it isn't in CLAUDE.md]

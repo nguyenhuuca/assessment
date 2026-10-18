@@ -2,7 +2,7 @@
 
 <!--
 Incident Post-Mortem Report
-Filename: docs/postmortem_[incident-id].md
+Filename: docs/reports/postmortem-<YYYY-MM-DD>-<incident>.md
 Owner: Engineering / SRE
 Handoff to: Engineering for design changes and fixes
 Related Skills: postmortem, testing
@@ -17,7 +17,7 @@ Blameless culture: Focus on systems and processes, not individuals.
 **Duration:** [X hours Y minutes]
 **Severity:** SEV1 | SEV2 | SEV3 | SEV4
 **Status:** Draft | In Review | Complete
-**Tracking Issue:** [issue link or N/A]
+**Tracking:** [`docs/tracking.md` row / issue link or N/A]
 
 **Author:** [Name]
 **Incident Commander:** [Name]

@@ -2,10 +2,10 @@
 
 <!--
 Architecture Decision Record
-Filename: docs/adr/NNNN-[kebab-title].md
+Filename: docs/adr/NNNN-<topic>.md
 Owner: Architect (/architect)
 Handoff to: Builder (/builder), Security Auditor (/security-auditor)
-Related Skills: designing-systems, designing-apis, domain-driven-design, cloud-native-patterns, writing-adrs
+Related Skills: writing-adrs, designing-systems
 
 Format: Based on MADR (Markdown Any Decision Records) - https://adr.github.io/madr/
 Best Practices:
