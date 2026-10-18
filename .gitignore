@@ -58,3 +58,6 @@ scratchpad/
 
 # Current in-flight task (.claude/rules/session-file.md), machine-local
 session.txt
+
+# Git Bash crash dumps
+*.stackdump
