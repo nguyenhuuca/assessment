@@ -9,7 +9,7 @@ Handoff to: Builder, QA Engineer
 
 ## Overview
 
-**Status:** In Review
+**Status:** Done
 **Author:** nguyenhuuca
 **Date:** 2026-10-18
 **Related plan:** [plan-library-collections](plan-library-collections.md) (listed drag & drop reordering as out of scope)

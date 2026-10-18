@@ -183,11 +183,11 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **Plan:** `docs/plans/plan-collection-reorder.md` · **ADR:** `docs/adr/0012-bookmark-feature-design.md` (no new ADR)
 
-- [~] **BE-1** Migration `position` (backfill newest-first, new index) + repo ordering / add-at-top / `renumber` — `6a0a5849`; pending: migration + `renumber` `Long[]` binding not yet run on Postgres
+- [x] **BE-1** Migration `position` (backfill newest-first, new index) + repo ordering / add-at-top / `renumber` — `6a0a5849`; migration + `renumber` verified on prod Postgres (2026-10-18)
 - [x] **BE-2** `moveVideo` service + `MoveVideoRequest` + `PATCH /collections/{id}/videos/{videoId}` + i18n errors — `33f82e64`
 - [x] **FE-1** `collectionsApi.moveVideo` + `useMoveCollectionItem` (optimistic + rollback) + `moveAfterId` util — `9c53b409`
 - [x] **FE-2** `@dnd-kit` "Sắp xếp" mode in `CollectionDetail` (pointer/touch/keyboard) + tech-strategy entry — `d0be64ee` (bundle +17.8 kB gz); push after BE-2 is deployed
-- [ ] **QA-1** Local E2E (mouse, touch, keyboard, concurrency) + prod smoke — after BE-2, FE-2
+- [x] **QA-1** Prod smoke by owner: health, `GET /collections/public`, drag reorder on desktop + mobile, reload keeps order, "Phát" order (2026-10-18)
 
 ---
 

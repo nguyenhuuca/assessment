@@ -1,9 +1,8 @@
 task: Collection Reorder (drag & drop videos in a collection)
-status: blocked
-progress: 90
-done: Plan 5ea4fec2; BE-2 PATCH move endpoint 33f82e64; FE-1 api + useMoveCollectionItem 9c53b409; FE-2 @dnd-kit reorder mode d0be64ee; pushed, CI green (build, tests, deploy)
-doing: BE-1 verify migration + renumber on Postgres (6a0a5849); QA-1 prod smoke + manual drag test
-next: prod smoke (/actuator/health, GET /collections/public, reorder in UI on desktop + mobile, reload, "Phát" order); then flip BE-1 + QA-1 in TASKS.md, plan/tracking to Done
-blocker: prod smoke test needs the owner (SSH from Claude was denied)
+status: done
+progress: 100
+done: Plan 5ea4fec2; BE-1 position migration + renumber 6a0a5849; BE-2 PATCH move endpoint 33f82e64; FE-1 api + useMoveCollectionItem 9c53b409; FE-2 @dnd-kit reorder mode d0be64ee; QA-1 prod smoke by owner
+doing: -
+next: -
 plan: docs/plans/plan-collection-reorder.md
 updated: 2026-10-18
