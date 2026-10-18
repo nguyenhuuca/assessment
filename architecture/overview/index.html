@@ -6776,7 +6776,7 @@ Superseded-by: -</p>
 </ul>
 <hr />
 <h2 id="architecture-decision-records-adr">Architecture Decision Records (ADR)<a class="headerlink" href="#architecture-decision-records-adr" title="Permanent link">&para;</a></h2>
-<p>The following ADRs record the key decisions made for this system. Each links to the full decision document including context, options considered, and consequences.</p>
+<p>The following ADRs record the key decisions made for this system. Each links to the full decision document including context, options considered, and consequences. Status mirrors <a href="../../tracking/">tracking.md</a>.</p>
 <table>
 <thead>
 <tr>
@@ -6787,92 +6787,183 @@ Superseded-by: -</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="adr/0001-use-relational-database.md">ADR-0001</a></td>
+<td><a href="../../adr/0001-use-relational-database/">ADR-0001</a></td>
 <td>Use Relational Database (PostgreSQL) for Core Data</td>
 <td>Accepted</td>
 </tr>
 <tr>
-<td><a href="adr/0002-backend-architecture.md">ADR-0002</a></td>
+<td><a href="../../adr/0002-backend-architecture/">ADR-0002</a></td>
 <td>Use Layered Spring Boot Architecture with Virtual Threads</td>
 <td>Accepted</td>
 </tr>
 <tr>
-<td><a href="adr/0003-use-cache.md">ADR-0003</a></td>
+<td><a href="../../adr/0003-use-cache/">ADR-0003</a></td>
 <td>Use Guava Cache Initially, with Planned Migration to Redis</td>
 <td>Accepted</td>
 </tr>
 <tr>
-<td><a href="adr/0004-frontend-structure.md">ADR-0004</a></td>
+<td><a href="../../adr/0004-frontend-structure/">ADR-0004</a></td>
 <td>Use Vanilla JS + Bootstrap with Planned Migration to React</td>
-<td>Accepted</td>
+<td>Accepted (superseded by 0008)</td>
 </tr>
 <tr>
-<td><a href="adr/0005-use_lru_cache_video_streaming.md">ADR-0005</a></td>
+<td><a href="../../adr/0005-use_lru_cache_video_streaming/">ADR-0005</a></td>
 <td>Use LRU Cache for Video Streaming</td>
 <td>Accepted</td>
 </tr>
 <tr>
-<td><a href="adr/0006-hls-video-streaming.md">ADR-0006</a></td>
+<td><a href="../../adr/0006-hls-video-streaming/">ADR-0006</a></td>
 <td>Switch to HLS for Local Video Streaming</td>
 <td>Proposed</td>
 </tr>
 <tr>
-<td><a href="adr/0007-admin-dashboard.md">ADR-0007</a></td>
+<td><a href="../../adr/0007-admin-dashboard/">ADR-0007</a></td>
 <td>Admin Dashboard — Content &amp; Account Management</td>
 <td>Accepted</td>
 </tr>
 <tr>
-<td><a href="adr/0008-react-migration.md">ADR-0008</a></td>
+<td><a href="../../adr/0008-react-migration/">ADR-0008</a></td>
 <td>Migrate Frontend to React with Vite</td>
 <td>Proposed</td>
 </tr>
 <tr>
-<td><a href="adr/0009-unified-video-list-api.md">ADR-0009</a></td>
+<td><a href="../../adr/0009-unified-video-list-api/">ADR-0009</a></td>
 <td>Unified Video List API for UI Display</td>
 <td>Proposed</td>
 </tr>
 <tr>
-<td><a href="adr/0010-trivy-container-scanning.md">ADR-0010</a></td>
+<td><a href="../../adr/0010-trivy-container-scanning/">ADR-0010</a></td>
 <td>Add Trivy Dependency &amp; Filesystem Scanning to CI</td>
 <td>Accepted</td>
 </tr>
 <tr>
-<td><a href="adr/0011-hot-video-priority.md">ADR-0011</a></td>
+<td><a href="../../adr/0011-hot-video-priority/">ADR-0011</a></td>
 <td>Hot Video Priority Scoring</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../../adr/0012-bookmark-feature-design/">ADR-0012</a></td>
+<td>Bookmark Feature — Collections-first Storage and API</td>
+<td>Proposed</td>
+</tr>
+<tr>
+<td><a href="../../adr/0013-watch-history-design/">ADR-0013</a></td>
+<td>Watch History — Recording, Cap, and Re-watch</td>
+<td>Superseded by 0021</td>
+</tr>
+<tr>
+<td><a href="../../adr/0014-watch-history-design-opus/">ADR-0014</a></td>
+<td>Watch History — Recording, Storage, and Ownership</td>
+<td>Superseded by 0021</td>
+</tr>
+<tr>
+<td><a href="../../adr/0015-bitwise-permission-system/">ADR-0015</a></td>
+<td>Bitwise Permission System — Fine-Grained Method Authorization</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../../adr/0016-user-settings-design/">ADR-0016</a></td>
+<td>User Settings — Storage, API Shape, and Account Deletion</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../../adr/0017-user-notifications/">ADR-0017</a></td>
+<td>User Notifications</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../../adr/0018-password-login-option/">ADR-0018</a></td>
+<td>Optional Email + Password Login</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../../adr/0019-admin-video-import/">ADR-0019</a></td>
+<td>Admin Video Import (YouTube / Facebook → Google Drive)</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../../adr/0020-i18n-vietnamese-english/">ADR-0020</a></td>
+<td>Internationalization (Vietnamese + English)</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="../../adr/0021-watch-history/">ADR-0021</a></td>
+<td>Watch History</td>
 <td>Accepted</td>
 </tr>
 </tbody>
 </table>
 <h3 id="decision-map">Decision Map<a class="headerlink" href="#decision-map" title="Permanent link">&para;</a></h3>
-<p>The diagram below shows how the ADRs relate to each architectural layer:</p>
+<p>The diagram below groups the ADRs by architectural layer. A solid arrow means "builds on"; a dashed arrow means "superseded by". Superseded ADRs are greyed out and Proposed ADRs have a dashed border.</p>
 <pre class="mermaid"><code>graph TD
     subgraph "Data Layer"
         ADR1[ADR-0001&lt;br/&gt;PostgreSQL]
-    end
-
-    subgraph "Backend"
-        ADR2[ADR-0002&lt;br/&gt;Spring Boot + Virtual Threads]
         ADR3[ADR-0003&lt;br/&gt;Guava Cache → Redis]
         ADR5[ADR-0005&lt;br/&gt;LRU Cache for Streaming]
+    end
+
+    subgraph "Backend Platform"
+        ADR2[ADR-0002&lt;br/&gt;Spring Boot + Virtual Threads]
         ADR6[ADR-0006&lt;br/&gt;HLS Streaming]
-        ADR7[ADR-0007&lt;br/&gt;Admin Dashboard]
+        ADR9[ADR-0009&lt;br/&gt;Unified Video List API]
+        ADR11[ADR-0011&lt;br/&gt;Hot Video Priority]
         ADR10[ADR-0010&lt;br/&gt;Trivy CI Scanning]
     end
 
+    subgraph "Security &amp; Access"
+        ADR15[ADR-0015&lt;br/&gt;Bitwise Permissions]
+        ADR18[ADR-0018&lt;br/&gt;Password Login Option]
+    end
+
+    subgraph "Admin"
+        ADR7[ADR-0007&lt;br/&gt;Admin Dashboard]
+        ADR19[ADR-0019&lt;br/&gt;Admin Video Import]
+    end
+
+    subgraph "User Features"
+        ADR12[ADR-0012&lt;br/&gt;Bookmarks → Collections]
+        ADR13[ADR-0013&lt;br/&gt;Watch History v1]
+        ADR14[ADR-0014&lt;br/&gt;Watch History v1 Opus]
+        ADR21[ADR-0021&lt;br/&gt;Watch History]
+        ADR16[ADR-0016&lt;br/&gt;User Settings]
+        ADR17[ADR-0017&lt;br/&gt;Notifications]
+    end
+
     subgraph "Frontend"
-        ADR4[ADR-0004&lt;br/&gt;Vanilla JS → React]
-        ADR8[ADR-0008&lt;br/&gt;React + Vite Migration]
-        ADR9[ADR-0009&lt;br/&gt;Unified Video List API]
+        ADR4[ADR-0004&lt;br/&gt;Vanilla JS + Bootstrap]
+        ADR8[ADR-0008&lt;br/&gt;React + Vite]
+        ADR20[ADR-0020&lt;br/&gt;i18n VI / EN]
     end
 
     ADR2 --&gt; ADR1
     ADR3 --&gt; ADR2
     ADR5 --&gt; ADR3
     ADR6 --&gt; ADR5
+    ADR9 --&gt; ADR2
+    ADR9 --&gt; ADR5
+    ADR11 --&gt; ADR5
+    ADR10 --&gt; ADR2
+    ADR15 --&gt; ADR2
     ADR7 --&gt; ADR2
-    ADR8 --&gt; ADR4
-    ADR9 --&gt; ADR8
-    ADR10 --&gt; ADR2</code></pre>
+    ADR7 --&gt; ADR15
+    ADR19 --&gt; ADR7
+    ADR19 --&gt; ADR17
+    ADR12 --&gt; ADR9
+    ADR12 --&gt; ADR11
+    ADR16 --&gt; ADR15
+    ADR17 --&gt; ADR3
+    ADR17 --&gt; ADR16
+    ADR18 --&gt; ADR16
+    ADR21 --&gt; ADR20
+    ADR20 --&gt; ADR8
+    ADR4 -.-&gt; ADR8
+    ADR13 -.-&gt; ADR21
+    ADR14 -.-&gt; ADR21
+
+    classDef proposed stroke-dasharray: 5 5
+    classDef superseded fill:#eee,color:#888,stroke:#bbb
+    class ADR6,ADR8,ADR9,ADR12 proposed
+    class ADR4,ADR13,ADR14 superseded</code></pre>
 
 
 
