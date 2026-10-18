@@ -532,6 +532,100 @@ class VideoCollectionServiceImplTest {
         verify(collectionRepository, never()).save(any());
     }
 
+    private void moveAndExpect(VideoCollection c, Long videoId, Long after, Long... expected) {
+        service.moveVideo(c.getId(), videoId, after);
+        verify(itemRepository).renumber(c.getId(), expected);
+    }
+
+    @Test
+    void moveVideo_toTop_middle_andBottom() {
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+        when(itemRepository.findOrderedVideoIds(mine.getId())).thenReturn(List.of(1L, 2L, 3L, 4L));
+
+        moveAndExpect(mine, 3L, null, 3L, 1L, 2L, 4L);
+        org.mockito.Mockito.clearInvocations(itemRepository);
+        moveAndExpect(mine, 1L, 3L, 2L, 3L, 1L, 4L);
+        org.mockito.Mockito.clearInvocations(itemRepository);
+        moveAndExpect(mine, 1L, 4L, 2L, 3L, 4L, 1L);
+        verify(collectionRepository, never()).save(any());
+    }
+
+    @Test
+    void moveVideo_alreadyInPlace_isNoop() {
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+        when(itemRepository.findOrderedVideoIds(mine.getId())).thenReturn(List.of(1L, 2L, 3L));
+
+        service.moveVideo(mine.getId(), 1L, null);
+        service.moveVideo(mine.getId(), 2L, 1L);
+
+        verify(itemRepository, never()).renumber(any(), any());
+    }
+
+    @Test
+    void moveVideo_unknownVideoOrAnchor_is404() {
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+        when(itemRepository.findOrderedVideoIds(mine.getId())).thenReturn(List.of(1L, 2L));
+
+        assertStatus(() -> service.moveVideo(mine.getId(), 9L, null), HttpStatus.NOT_FOUND);
+        assertStatus(() -> service.moveVideo(mine.getId(), 1L, 9L), HttpStatus.NOT_FOUND);
+        verify(itemRepository, never()).renumber(any(), any());
+    }
+
+    @Test
+    void moveVideo_afterItself_is400() {
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+
+        assertStatus(() -> service.moveVideo(mine.getId(), 1L, 1L), HttpStatus.BAD_REQUEST);
+        verify(itemRepository, never()).renumber(any(), any());
+    }
+
+    @Test
+    void moveVideo_notManageable_is404() {
+        login(USER);
+        VideoCollection theirs = stored(OTHER, CollectionVisibility.PRIVATE, false);
+        VideoCollection pub = stored(OTHER, CollectionVisibility.PUBLIC, false);
+
+        assertStatus(() -> service.moveVideo(theirs.getId(), 1L, null), HttpStatus.NOT_FOUND);
+        assertStatus(() -> service.moveVideo(pub.getId(), 1L, null), HttpStatus.NOT_FOUND);
+        verify(itemRepository, never()).renumber(any(), any());
+    }
+
+    @Test
+    void moveVideo_publicEvictsCache_privateDoesNot_andNeverTouches() {
+        when(collectionRepository.findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC)).thenReturn(List.of());
+        service.getPublic();
+
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+        when(itemRepository.findOrderedVideoIds(mine.getId())).thenReturn(List.of(1L, 2L));
+        service.moveVideo(mine.getId(), 2L, null);
+        SecurityContextHolder.clearContext();
+        service.getPublic();
+        verify(collectionRepository, times(1)).findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC);
+
+        login(USER);
+        role(USER, UserRole.ADMIN);
+        VideoCollection pub = stored(OTHER, CollectionVisibility.PUBLIC, false);
+        when(itemRepository.findOrderedVideoIds(pub.getId())).thenReturn(List.of(1L, 2L));
+        service.moveVideo(pub.getId(), 2L, null);
+        SecurityContextHolder.clearContext();
+        service.getPublic();
+        verify(collectionRepository, times(2)).findTop100ByVisibilityOrderByUpdatedAtDesc(CollectionVisibility.PUBLIC);
+
+        assertThat(mine.getUpdatedAt()).isNull();
+        assertThat(pub.getUpdatedAt()).isNull();
+        verify(collectionRepository, never()).save(any());
+    }
+
+    @Test
+    void moveVideo_requiresLogin() {
+        assertStatus(() -> service.moveVideo(UUID.randomUUID(), 1L, null), HttpStatus.UNAUTHORIZED);
+    }
+
     @Test
     void removeVideo_existingItem_touches() {
         login(USER);

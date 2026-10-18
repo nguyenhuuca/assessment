@@ -32,6 +32,12 @@ public interface VideoCollectionService {
 
     void removeVideo(UUID id, Long videoId);
 
+    /**
+     * Places the video right after {@code afterVideoId} (null = top). Both must be in the collection (404);
+     * moving a video after itself is 400. Does not bump updatedAt; a move to where it already is is a no-op.
+     */
+    void moveVideo(UUID id, Long videoId, Long afterVideoId);
+
     /** Ids of the caller's manageable collections that contain the video. */
     List<UUID> getMembership(Long videoId);
 }

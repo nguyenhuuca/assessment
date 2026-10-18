@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.RateLimited;
 import com.canhlabs.funnyapp.dto.collection.CollectionDto;
 import com.canhlabs.funnyapp.dto.collection.CollectionRequest;
+import com.canhlabs.funnyapp.dto.collection.MoveVideoRequest;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
@@ -114,6 +115,16 @@ public class VideoCollectionController {
     @AuditLog("removeVideoFromCollection")
     public ResponseEntity<Void> removeVideo(@PathVariable UUID id, @PathVariable Long videoId) {
         collectionService.removeVideo(id, videoId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Move a video within a collection", description = "Places it right after afterVideoId; null = top.")
+    @PatchMapping("/{id}/videos/{videoId}")
+    @RateLimited(permit = 60)
+    @AuditLog("moveVideoInCollection")
+    public ResponseEntity<Void> moveVideo(@PathVariable UUID id, @PathVariable Long videoId,
+                                          @RequestBody MoveVideoRequest request) {
+        collectionService.moveVideo(id, videoId, request.getAfterVideoId());
         return ResponseEntity.noContent().build();
     }
 

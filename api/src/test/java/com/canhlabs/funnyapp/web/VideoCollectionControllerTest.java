@@ -243,6 +243,36 @@ class VideoCollectionControllerTest {
     }
 
     @Test
+    void moveVideo_returns204_andPassesAfterVideoId() throws Exception {
+        String url = BASE + "/" + ID + "/videos/9";
+        mockMvc.perform(patch(url).servletPath(url).header("Authorization", TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"afterVideoId\":4}"))
+                .andExpect(status().isNoContent());
+        verify(collectionService).moveVideo(ID, 9L, 4L);
+    }
+
+    @Test
+    void moveVideo_nullAfterVideoId_movesToTop() throws Exception {
+        String url = BASE + "/" + ID + "/videos/9";
+        mockMvc.perform(patch(url).servletPath(url).header("Authorization", TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"afterVideoId\":null}"))
+                .andExpect(status().isNoContent());
+        verify(collectionService).moveVideo(ID, 9L, null);
+    }
+
+    @Test
+    void moveVideo_withoutToken_returns401() throws Exception {
+        String url = BASE + "/" + ID + "/videos/9";
+        mockMvc.perform(patch(url).servletPath(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"afterVideoId\":4}"))
+                .andExpect(status().isUnauthorized());
+        verify(collectionService, never()).moveVideo(any(), any(), any());
+    }
+
+    @Test
     void membership_returnsIds() throws Exception {
         String url = BASE + "/membership";
         when(collectionService.getMembership(9L)).thenReturn(List.of(ID));

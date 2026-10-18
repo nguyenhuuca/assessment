@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.Normalizer;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -223,6 +224,28 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
             touch(collection);
             evictPublicIf(collection);
         }
+    }
+
+    @Override
+    @Transactional
+    public void moveVideo(UUID id, Long videoId, Long afterVideoId) {
+        UserDetailDto user = requireUser();
+        VideoCollection collection = requireManageable(id, user.getId(), isAdmin(user.getId()));
+        if (videoId != null && videoId.equals(afterVideoId)) {
+            throw error(HttpStatus.BAD_REQUEST, "error.collection.moveInvalid");
+        }
+        List<Long> current = itemRepository.findOrderedVideoIds(collection.getId());
+        if (!current.contains(videoId) || (afterVideoId != null && !current.contains(afterVideoId))) {
+            throw error(HttpStatus.NOT_FOUND, "error.collection.itemNotFound");
+        }
+        List<Long> moved = new ArrayList<>(current);
+        moved.remove(videoId);
+        moved.add(afterVideoId == null ? 0 : moved.indexOf(afterVideoId) + 1, videoId);
+        if (moved.equals(current)) {
+            return;
+        }
+        itemRepository.renumber(collection.getId(), moved.toArray(new Long[0]));
+        evictPublicIf(collection);
     }
 
     @Override
