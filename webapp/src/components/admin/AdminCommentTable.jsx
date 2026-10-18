@@ -216,7 +216,6 @@ export default function AdminCommentTable() {
         </select>
         <input
           className="app-input"
-          style={{ maxWidth: 260 }}
           placeholder={t('searchPlaceholder')}
           aria-label={t('searchComments')}
           value={search}

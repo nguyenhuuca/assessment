@@ -2213,10 +2213,27 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 
 .admin-filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
   margin-bottom: 12px;
 }
+/* Filter bars (every admin tab): dropdowns, search boxes, date inputs and buttons share one height.
+   In-row .admin-status-select (table cells) keeps its compact size. */
+.admin-filters .admin-status-select,
+.admin-filters .app-input,
+.drive-time-filter .admin-status-select {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 13px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+}
+.admin-filters .admin-status-select:focus,
+.drive-time-filter .admin-status-select:focus { border-color: var(--accent-cyan); outline: none; }
+.admin-filters .app-input { width: 260px; max-width: 100%; }
+.drive-sync-toolbar .app-btn { height: 34px; }
 .admin-comment-text {
   display: -webkit-box;
   -webkit-line-clamp: 2;
