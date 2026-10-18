@@ -1,29 +1,7 @@
 import { api } from './client.js'
 
-const getBaseUrl = () => import.meta.env.VITE_API_BASE_URL || 'https://canh-labs.com/api/v1/funny-app'
-
-function createHeaders() {
-  const headers = { 'Content-Type': 'application/json' }
-  const jwt = localStorage.getItem('jwt')
-  const guestToken = localStorage.getItem('guestToken')
-  if (jwt) headers['Authorization'] = jwt
-  if (guestToken) headers['X-Guest-Token'] = guestToken
-  return headers
-}
-
-async function patch(path, body) {
-  const res = await fetch(`${getBaseUrl()}${path}`, {
-    method: 'PATCH',
-    headers: createHeaders(),
-    body: body ? JSON.stringify(body) : undefined,
-  })
-  const data = await res.json()
-  if (!res.ok) {
-    const msg = data?.error?.message || `HTTP ${res.status}`
-    throw { message: msg, status: res.status }
-  }
-  return data
-}
+// PATCH goes through the shared client: Accept-Language, 204 handling, error code and TOKEN_REVOKED logout
+const patch = (path, body) => api.patch(path, body)
 
 function buildUrl(path, params) {
   if (!params || Object.keys(params).length === 0) return path

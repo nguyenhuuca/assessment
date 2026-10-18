@@ -28,7 +28,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.UUID;
 
 @Service
@@ -107,7 +110,7 @@ public class VideoCommentServiceImpl {
                 .videoId(videoId)
                 .userId(isGuest ? "" : currentUser.getEmail())
                 .guestName(isGuest ? req.getGuestName() : null)
-                .guestTokenHash(isGuest ? token : null)
+                .guestTokenHash(isGuest ? hashGuestToken(token) : null)
                 .content(req.getContent())
                 .parentId(target == null ? null : target.rootId())
                 .status(CommentStatus.VISIBLE)
@@ -168,6 +171,16 @@ public class VideoCommentServiceImpl {
         }
     }
 
+    /** Guest tokens are random UUIDs, so an unsalted SHA-256 is enough to keep them out of the DB in plain text. */
+    static String hashGuestToken(String token) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
+    }
+
     private static CustomException error(HttpStatus status, int subCode, String messageKey) {
         return CustomException.of(status, subCode, messageKey);
     }
@@ -175,12 +188,12 @@ public class VideoCommentServiceImpl {
     /**
      * Delete policy:
      * - If authenticated user: may delete own comment or any comment when has ROLE_ADMIN.
-     * - If guest: must provide a plain token; compare with stored bcrypt hash.
+     * - If guest: must provide the plain token; its SHA-256 is compared with the stored hash.
      */
     @Transactional
     public void deleteComment(UUID commentId, String guestTokenIfAny) {
         VideoComment c = repo.findById(commentId)
-                .orElseThrow(() -> new NoSuchElementException("Comment not found"));
+                .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4043, "error.comment.notFound"));
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAuthed = (auth != null && auth.isAuthenticated());
@@ -195,11 +208,13 @@ public class VideoCommentServiceImpl {
 
         boolean guestOk = false;
         if (StringUtils.isEmpty(c.getUserId()) && c.getGuestTokenHash() != null && guestTokenIfAny != null) {
-            guestOk = guestTokenIfAny.equals(c.getGuestTokenHash());
+            guestOk = MessageDigest.isEqual(
+                    hashGuestToken(guestTokenIfAny).getBytes(StandardCharsets.UTF_8),
+                    c.getGuestTokenHash().getBytes(StandardCharsets.UTF_8));
         }
 
         if (!(isOwnerUser || guestOk)) {
-            throw new SecurityException("Not authorized to delete this comment");
+            throw error(HttpStatus.FORBIDDEN, 4031, "error.comment.deleteForbidden");
         }
 
         // Never destroy other people's replies: keep a placeholder when replies exist

@@ -50,8 +50,7 @@ public class AppConstant {
                 PathObject.builder().path("/user/mfa/verify").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().path("/share-links").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/health").method(HttpMethod.GET.name()).build(),
-                PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build(),
-                PathObject.builder().path("/thread/**").method(HttpMethod.GET.name()).build()
+                PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build()
 
         );
 

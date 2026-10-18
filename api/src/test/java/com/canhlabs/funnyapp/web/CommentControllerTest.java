@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.web;
 
+import org.springframework.http.HttpStatus;
+import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.aop.RateLimitAspect;
 import com.canhlabs.funnyapp.aop.SlidingWindowRateLimiter;
 import com.canhlabs.funnyapp.dto.comment.CommentNode;
@@ -27,7 +29,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -264,37 +265,24 @@ class CommentControllerTest {
     }
 
     @Test
-    void deleteComment_commentNotFound_throwsNoSuchElementException() throws Exception {
+    void deleteComment_commentNotFound_returns404() throws Exception {
         UUID commentId = UUID.randomUUID();
-        doThrow(new NoSuchElementException("Comment not found"))
+        doThrow(CustomException.of(HttpStatus.NOT_FOUND, 4043, "error.comment.notFound"))
                 .when(videoCommentService).deleteComment(eq(commentId), any());
 
-        // NoSuchElementException is not mapped in RestExceptionHandler; MockMvc re-throws it
-        try {
-            mockMvc.perform(delete(DELETE_URL, "vid-1", commentId.toString()));
-        } catch (Exception ex) {
-            // Unwrap the NestedServletException to verify the root cause
-            Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
-            org.junit.jupiter.api.Assertions.assertInstanceOf(
-                    NoSuchElementException.class, cause,
-                    "Expected NoSuchElementException as root cause");
-        }
+        mockMvc.perform(delete(DELETE_URL, "vid-1", commentId.toString()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error.code").value("error.comment.notFound"));
     }
 
     @Test
-    void deleteComment_notAuthorized_throwsSecurityException() throws Exception {
+    void deleteComment_notAuthorized_returns403() throws Exception {
         UUID commentId = UUID.randomUUID();
-        doThrow(new SecurityException("Not authorized to delete this comment"))
+        doThrow(CustomException.of(HttpStatus.FORBIDDEN, 4031, "error.comment.deleteForbidden"))
                 .when(videoCommentService).deleteComment(eq(commentId), any());
 
-        // SecurityException is not mapped in RestExceptionHandler; MockMvc re-throws it
-        try {
-            mockMvc.perform(delete(DELETE_URL, "vid-1", commentId.toString()));
-        } catch (Exception ex) {
-            Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
-            org.junit.jupiter.api.Assertions.assertInstanceOf(
-                    SecurityException.class, cause,
-                    "Expected SecurityException as root cause");
-        }
+        mockMvc.perform(delete(DELETE_URL, "vid-1", commentId.toString()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error.code").value("error.comment.deleteForbidden"));
     }
 }

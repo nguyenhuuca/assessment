@@ -111,6 +111,16 @@ class UserServiceImplTest {
     }
 
     @Test
+    void loadUserByUsername_unknownUser_throwsUsernameNotFound() {
+        when(userRepo.findAllByUserName("nobody@abc.com")).thenReturn(null);
+
+        // Regression: used to NPE (500) instead of a bad-credentials response
+        assertThatThrownBy(() -> userService.loadUserByUsername("nobody@abc.com"))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("nobody@abc.com");
+    }
+
+    @Test
     void generateSecret_returnsBase32String() {
         String secret = userService.generateSecret();
         assertThat(secret).isNotEmpty();

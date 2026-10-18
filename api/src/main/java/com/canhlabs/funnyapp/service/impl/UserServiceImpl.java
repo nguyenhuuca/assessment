@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         User user = userRepo.findAllByUserName(userName);
-        if (user.getPassword() == null) {
+        if (user == null || user.getPassword() == null) {
             throw new UsernameNotFoundException(userName);
         }
         return new com.canhlabs.funnyapp.config.AppUserDetails(user);

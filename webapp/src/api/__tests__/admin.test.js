@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getDriveSyncFiles } from '../admin.js'
+import { getDriveSyncFiles, updateVideoStatus, bulkModerateComments } from '../admin.js'
 import { api } from '../client.js'
 
-vi.mock('../client.js', () => ({ api: { get: vi.fn() } }))
+vi.mock('../client.js', () => ({ api: { get: vi.fn(), patch: vi.fn() } }))
 
 beforeEach(() => vi.clearAllMocks())
 
@@ -25,5 +25,15 @@ describe('getDriveSyncFiles', () => {
   it('drops empty values', async () => {
     await getDriveSyncFiles({ from: '', to: null })
     expect(api.get).toHaveBeenLastCalledWith('/admin/drive-sync/files')
+  })
+})
+
+describe('PATCH calls', () => {
+  // Regression: admin.js had its own fetch, which skipped Accept-Language and the TOKEN_REVOKED logout
+  it('go through the shared client', async () => {
+    await updateVideoStatus(7, 'ACTIVE')
+    expect(api.patch).toHaveBeenCalledWith('/admin/videos/7/status', { status: 'ACTIVE' })
+    await bulkModerateComments({ ids: ['a'], action: 'HIDE' })
+    expect(api.patch).toHaveBeenLastCalledWith('/admin/comments/moderation', { ids: ['a'], action: 'HIDE' })
   })
 })

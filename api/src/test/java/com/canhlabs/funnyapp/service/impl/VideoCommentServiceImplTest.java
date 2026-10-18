@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.exception.CustomException;
+import org.springframework.http.HttpStatus;
 import com.canhlabs.funnyapp.dto.comment.CommentNode;
 import com.canhlabs.funnyapp.dto.comment.CreateCommentRequest;
 import com.canhlabs.funnyapp.dto.comment.CreateCommentResponse;
@@ -23,7 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -216,7 +217,11 @@ class VideoCommentServiceImplTest {
 
         ArgumentCaptor<VideoComment> captor = ArgumentCaptor.forClass(VideoComment.class);
         verify(repo).save(captor.capture());
-        assertThat(captor.getValue().getGuestTokenHash()).isEqualTo(existingToken);
+        // Only the SHA-256 of the token is stored, never the token itself
+        assertThat(captor.getValue().getGuestTokenHash())
+                .isEqualTo(VideoCommentServiceImpl.hashGuestToken(existingToken))
+                .hasSize(64)
+                .isNotEqualTo(existingToken);
     }
 
     @Test
@@ -251,13 +256,15 @@ class VideoCommentServiceImplTest {
     // -------------------------------------------------------------------------
 
     @Test
-    void deleteComment_commentNotFound_throwsNoSuchElementException() {
+    void deleteComment_commentNotFound_throws404() {
         UUID missingId = UUID.randomUUID();
         when(repo.findById(missingId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.deleteComment(missingId, null))
-                .isInstanceOf(NoSuchElementException.class)
-                .hasMessageContaining("Comment not found");
+                .isInstanceOfSatisfying(CustomException.class, e -> {
+                    assertThat(e.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+                    assertThat(e.getMessageKey()).isEqualTo("error.comment.notFound");
+                });
 
         verify(repo, never()).deleteById(any());
     }
@@ -301,7 +308,7 @@ class VideoCommentServiceImplTest {
     }
 
     @Test
-    void deleteComment_differentAuthenticatedUser_throwsSecurityException() {
+    void deleteComment_differentAuthenticatedUser_throws403() {
         UUID commentId = UUID.randomUUID();
         VideoComment comment = buildComment(commentId, "vid1", null, "user-42", null, "someone else comment");
 
@@ -312,8 +319,10 @@ class VideoCommentServiceImplTest {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         assertThatThrownBy(() -> service.deleteComment(commentId, null))
-                .isInstanceOf(SecurityException.class)
-                .hasMessageContaining("Not authorized to delete this comment");
+                .isInstanceOfSatisfying(CustomException.class, e -> {
+                    assertThat(e.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
+                    assertThat(e.getMessageKey()).isEqualTo("error.comment.deleteForbidden");
+                });
 
         verify(repo, never()).deleteById(any());
     }
@@ -323,7 +332,8 @@ class VideoCommentServiceImplTest {
         UUID commentId = UUID.randomUUID();
         String plainToken = "plain-guest-token";
 
-        VideoComment comment = buildComment(commentId, "vid1", null, "", plainToken, "guest comment");
+        VideoComment comment = buildComment(commentId, "vid1", null, "",
+                VideoCommentServiceImpl.hashGuestToken(plainToken), "guest comment");
 
         when(repo.findById(commentId)).thenReturn(Optional.of(comment));
         when(repo.findByParentId(commentId.toString())).thenReturn(Collections.emptyList());
@@ -335,19 +345,35 @@ class VideoCommentServiceImplTest {
     }
 
     @Test
-    void deleteComment_guestWithWrongToken_throwsSecurityException() {
+    void deleteComment_guestWithWrongToken_throws403() {
         UUID commentId = UUID.randomUUID();
         String storedToken = "correct-token";
         String wrongToken = "wrong-token";
 
-        VideoComment comment = buildComment(commentId, "vid1", null, "", storedToken, "guest comment");
+        VideoComment comment = buildComment(commentId, "vid1", null, "",
+                VideoCommentServiceImpl.hashGuestToken(storedToken), "guest comment");
 
         when(repo.findById(commentId)).thenReturn(Optional.of(comment));
 
         assertThatThrownBy(() -> service.deleteComment(commentId, wrongToken))
-                .isInstanceOf(SecurityException.class)
-                .hasMessageContaining("Not authorized to delete this comment");
+                .isInstanceOfSatisfying(CustomException.class, e -> {
+                    assertThat(e.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
+                    assertThat(e.getMessageKey()).isEqualTo("error.comment.deleteForbidden");
+                });
 
+        verify(repo, never()).deleteById(any());
+    }
+
+    @Test
+    void deleteComment_guestSendingTheStoredHash_isRejected() {
+        UUID commentId = UUID.randomUUID();
+        String stored = VideoCommentServiceImpl.hashGuestToken("real-token");
+        VideoComment comment = buildComment(commentId, "vid1", null, "", stored, "guest comment");
+        when(repo.findById(commentId)).thenReturn(Optional.of(comment));
+
+        // A leaked DB value is not a usable token
+        assertThatThrownBy(() -> service.deleteComment(commentId, stored))
+                .isInstanceOf(CustomException.class);
         verify(repo, never()).deleteById(any());
     }
 
