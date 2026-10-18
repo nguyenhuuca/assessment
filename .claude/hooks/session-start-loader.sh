@@ -146,6 +146,15 @@ ${LINES%$'\n'}"
    → $NEXT"
         REPORT="$REPORT
    $HINT"
+        # Frame: left border only (emoji are 2 columns wide, so a right border would not line up)
+        REPORT=$(printf '%s\n' "$REPORT" | awk '
+            { line[NR] = $0 }
+            END {
+                for (i = 1; i <= NR; i++) {
+                    s = line[i]; sub(/^   /, "", s)
+                    printf "%s%s%s", (i == 1 ? "╭─ " : (i == NR ? "╰─ " : "│  ")), s, (i < NR ? "\n" : "")
+                }
+            }')
     fi
 fi
 
