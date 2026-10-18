@@ -100,10 +100,12 @@ if [ -s "$SESSION_FILE" ]; then
     TASK_STATUS=$(field status)
     if [ "$TASK_STATUS" = "done" ]; then
         ICON="✅"
+        TITLE="Task gần nhất (session.txt)"
         HINT="Đã xong · gõ yêu cầu mới để bắt đầu task khác"
         NOTE="- Last task is done. The user already saw it in a status report from this hook; do not resume it."
     else
         ICON="📌"
+        TITLE="Task đang dở (session.txt)"
         HINT="▶ /task-resume để làm tiếp"
         NOTE="- Unfinished task from a previous session. The user already saw a status report from this hook; in your first reply, if the user did not run /task-resume, add one line reminding them that /task-resume continues it. Continue only if they run /task-resume or ask to."
     fi
@@ -175,7 +177,10 @@ $NOTE
             w=$(dw "${VALUES[$i]}"); [ "$w" -gt "$VW" ] && VW=$w
             w=${#COMMITS[$i]}; [ "$w" -gt "$CW" ] && CW=$w
         done
+        # The UI prefixes the first line with "SessionStart:startup says: ", so the
+        # table starts on line two, under a title line that absorbs the prefix.
         REPORT=$(
+            printf '%s\n' "$TITLE"
             hr "┌" "┬" "┐"
             for i in "${!LABELS[@]}"; do
                 if [ "${LABELS[$i]}" = "sep" ]; then hr "├" "┼" "┤"; continue; fi
