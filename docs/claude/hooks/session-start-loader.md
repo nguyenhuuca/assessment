@@ -1,6 +1,6 @@
 # session-start-loader.sh
 
-SessionStart — re-orientation context after compact/resume.
+SessionStart — re-orientation context after compact/resume; injects the unfinished task from session.txt.
 
 Source: `.claude/hooks/session-start-loader.sh`, wired in `.claude/settings.json`.
 
@@ -90,6 +90,20 @@ if [ -f "$STATE_DIR/handoff.json" ]; then
 $HANDOFF_MSG"
         # Clear handoff after reading
         rm -f "$STATE_DIR/handoff.json"
+    fi
+fi
+
+# Current task from session.txt (.claude/rules/session-file.md); /task-resume continues it
+SESSION_FILE="$PROJECT_DIR/session.txt"
+if [ -s "$SESSION_FILE" ]; then
+    TASK_STATUS=$(sed -n 's/^status:[[:space:]]*//p' "$SESSION_FILE" | head -1 | tr -d '\r')
+    if [ "$TASK_STATUS" != "done" ]; then
+        CONTEXT="$CONTEXT
+
+[CURRENT TASK — session.txt]
+$(head -c 2000 "$SESSION_FILE" | tr -d '\r')
+- Unfinished task from a previous session. Mention it to the user; continue only if they run /task-resume or ask to.
+- Keep session.txt current while working (.claude/rules/session-file.md)."
     fi
 fi
 

@@ -179,6 +179,7 @@ nav:
           - /swarm-research: claude/skills/workflows/swarm-research.md
           - /land-the-plane: claude/skills/workflows/land-the-plane.md
           - /tailor: claude/skills/workflows/tailor.md
+          - /task-resume: claude/skills/workflows/task-resume.md
 
       - Skills — Architecture:
           - Designing Systems: claude/skills/architecture/designing-systems.md
@@ -216,6 +217,7 @@ nav:
           - Tech Strategy: claude/rules/tech-strategy.md
           - Debugging Protocol: claude/rules/debugging-protocol.md
           - Agent Constraints: claude/rules/agent-constraints.md
+          - Session File (session.txt): claude/rules/session-file.md
           - Hooks Conventions (scoped): claude/rules/hooks-conventions.md
 
       - Hooks:
