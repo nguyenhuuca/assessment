@@ -186,7 +186,7 @@
   <div class="card blue">
     <h3>🗺️ Pipeline</h3>
     <pre>🗺️ Planning
-  💡 Idea → /scope → 📄 PRD → /architect → 📐 ADR → 📋 Spec → /swarm-plan → 📋 Plan + Beads
+  💡 Idea → /scope → 📄 PRD → /architect → 📐 ADR → 📋 Spec → /swarm-plan → 📋 Plan + Tasks
 
 ⚙️ Execution
   /swarm-execute → 🧪 /qa-engineer → /code-review → ✅ Merge</pre>
@@ -200,7 +200,7 @@
         <tr><td>1. Scope</td><td><code>/scope</code></td><td><code>docs/prd/PRD-{slug}.md</code></td><td><code>templates/artifacts/prd.template.md</code></td></tr>
         <tr><td>2. Architecture</td><td><code>/architect</code></td><td><code>docs/adr/NNNN-{slug}.md</code></td><td><code>templates/artifacts/adr.template.md</code></td></tr>
         <tr><td>3. Spec</td><td><code>/spec</code></td><td><code>docs/specs/spec-{slug}.md</code></td><td><code>templates/artifacts/spec.template.md</code></td></tr>
-        <tr><td>4. Plan</td><td><code>/swarm-plan</code></td><td><code>docs/plans/plan-{slug}.md</code> + Beads</td><td><code>templates/artifacts/plan.template.md</code></td></tr>
+        <tr><td>4. Plan</td><td><code>/swarm-plan</code></td><td><code>docs/plans/plan-{slug}.md</code> + task list</td><td><code>templates/artifacts/plan.template.md</code></td></tr>
         <tr><td>5. Implement</td><td><code>/swarm-execute</code> or <code>/builder</code></td><td>Code changes</td><td>—</td></tr>
         <tr><td>6. Test</td><td><code>/qa-engineer</code></td><td>Test files</td><td>—</td></tr>
         <tr><td>7. Review</td><td><code>/code-review</code></td><td>Findings</td><td>—</td></tr>
@@ -362,7 +362,7 @@ Expected: At most one succeeds; limit remains enforced</pre>
 <!-- ═══════════════════════════════════════════════════════ t5 — Plan -->
 <section class="panel" id="t5">
   <h2 class="panel-title"><span class="num">4</span> Implementation plan</h2>
-  <p class="panel-sub">With Spec (or PRD + ADR) ready, use <code>/swarm-plan</code> to decompose the feature into a phased plan and Beads.</p>
+  <p class="panel-sub">With Spec (or PRD + ADR) ready, use <code>/swarm-plan</code> to decompose the feature into a phased plan with tasks.</p>
 
   <div class="card violet">
     <h3>💬 Command variants</h3>
@@ -386,10 +386,10 @@ Expected: At most one succeeds; limit remains enforced</pre>
     <table>
       <thead><tr><th></th><th><code>/architect</code></th><th><code>/swarm-plan</code></th></tr></thead>
       <tbody>
-        <tr><td><strong>Primary output</strong></td><td>ADR (decision record)</td><td>Plan + Beads (task breakdown)</td></tr>
+        <tr><td><strong>Primary output</strong></td><td>ADR (decision record)</td><td>Plan + Tasks (task breakdown)</td></tr>
         <tr><td><strong>Asks questions</strong></td><td>No — explores codebase</td><td>No — reads input artifacts</td></tr>
         <tr><td><strong>Creates ADR</strong></td><td>Always</td><td>Only for One-Way Door (High) decisions found during planning</td></tr>
-        <tr><td><strong>Creates Beads</strong></td><td>No</td><td>Yes — ready for <code>/swarm-execute</code></td></tr>
+        <tr><td><strong>Creates tasks</strong></td><td>No</td><td>Yes — ready for <code>/swarm-execute</code></td></tr>
       </tbody>
     </table>
   </div>
@@ -400,7 +400,7 @@ Expected: At most one succeeds; limit remains enforced</pre>
       <li>Launch 3–6 <code>worker-explorer</code> agents in parallel to research existing patterns</li>
       <li>Classify decision reversibility (Two-Way Door vs One-Way Door)</li>
       <li>Write <code>docs/plans/plan-{slug}.md</code> using <code>templates/artifacts/plan.template.md</code></li>
-      <li>Output Beads commands for all implementation tasks with dependencies</li>
+      <li>Output the implementation tasks (native task list, or listed in the plan) with `blockedBy` dependencies</li>
     </ol>
     <h4>The plan contains:</h4>
     <ul>
@@ -414,7 +414,7 @@ Expected: At most one succeeds; limit remains enforced</pre>
 
   <div class="card green">
     <h3>📦 Output</h3>
-    <div class="hl prod"><span class="ic">📄</span><span><code>docs/plans/plan-{slug}.md</code> + Beads</span></div>
+    <div class="hl prod"><span class="ic">📄</span><span><code>docs/plans/plan-{slug}.md</code> + task list</span></div>
   </div>
 </section>
 
@@ -524,7 +524,7 @@ cd webapp && npm run test     # frontend</pre>
 /swarm-plan docs/prd/PRD-realtime-view-count.md docs/adr/0013-realtime-view-count.md
 
 # Launches parallel explorer agents → researches codebase
-# → docs/plans/plan-realtime-view-count.md + Beads
+# → docs/plans/plan-realtime-view-count.md + task list
 
 # 4. Implement
 git checkout -b feat/realtime-view-count

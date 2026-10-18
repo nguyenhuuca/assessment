@@ -6650,7 +6650,7 @@ flowchart LR
         D --&gt; E["📐 ADR"]
         E --&gt; F["📋 Spec"]
         F --&gt; G["/swarm-plan"]
-        G --&gt; H["📋 Plan + Beads"]
+        G --&gt; H["📋 Plan + Tasks"]
     end
 
     subgraph exec ["⚙️ Triển Khai"]
@@ -6692,7 +6692,7 @@ flowchart LR
 <tr>
 <td>4. Kế hoạch</td>
 <td><code>/swarm-plan</code></td>
-<td><code>docs/plans/plan-{slug}.md</code> + Beads</td>
+<td><code>docs/plans/plan-{slug}.md</code> + task list</td>
 <td><code>templates/artifacts/plan.template.md</code></td>
 </tr>
 <tr>
@@ -6853,7 +6853,7 @@ flowchart LR
 <p><strong>Output:</strong> <code>docs/specs/spec-{slug}.md</code></p>
 <hr />
 <h2 id="buoc-4-ke-hoach-trien-khai">Bước 4 — Kế hoạch triển khai<a class="headerlink" href="#buoc-4-ke-hoach-trien-khai" title="Permanent link">&para;</a></h2>
-<p>Sau khi có Spec (hoặc PRD + ADR), dùng <code>/swarm-plan</code> để phân rã tính năng thành kế hoạch theo giai đoạn và Beads.</p>
+<p>Sau khi có Spec (hoặc PRD + ADR), dùng <code>/swarm-plan</code> để phân rã tính năng thành kế hoạch theo giai đoạn kèm danh sách task.</p>
 <p><code>/swarm-plan</code> nhận bất kỳ artifact nào — truyền vào những gì bạn đang có:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Với Spec (recommended — input chi tiết nhất)</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-comment-section.md
@@ -6880,7 +6880,7 @@ flowchart LR
 <tr>
 <td><strong>Output chính</strong></td>
 <td>ADR (ghi lại quyết định)</td>
-<td>Plan + Beads (chia nhỏ task)</td>
+<td>Plan + Tasks (chia nhỏ task)</td>
 </tr>
 <tr>
 <td><strong>Hỏi người dùng</strong></td>
@@ -6893,7 +6893,7 @@ flowchart LR
 <td>Chỉ khi gặp quyết định One-Way Door (High)</td>
 </tr>
 <tr>
-<td><strong>Tạo Beads</strong></td>
+<td><strong>Tạo task</strong></td>
 <td>Không</td>
 <td>Có — sẵn sàng cho <code>/swarm-execute</code></td>
 </tr>
@@ -6903,14 +6903,14 @@ flowchart LR
 1. Spawn 3–6 <code>worker-explorer</code> agents song song để nghiên cứu patterns hiện có
 2. Phân loại khả năng đảo ngược (Two-Way Door vs One-Way Door)
 3. Viết <code>docs/plans/plan-{slug}.md</code> theo <code>templates/artifacts/plan.template.md</code>
-4. Output Beads commands cho tất cả tasks với dependency graph</p>
+4. Output danh sách task (task list có sẵn, hoặc ghi trong plan) kèm <code>blockedBy</code></p>
 <p>Kế hoạch bao gồm:
 - Các bước theo giai đoạn với đường dẫn file chính xác và acceptance criteria
 - Chiến lược kiểm thử (unit + integration + manual)
 - Kế hoạch rollback
 - Dependency graph thể hiện thứ tự tasks
 - Checklist trước/trong/sau PR</p>
-<p><strong>Output:</strong> <code>docs/plans/plan-{slug}.md</code> + Beads</p>
+<p><strong>Output:</strong> <code>docs/plans/plan-{slug}.md</code> + task list</p>
 <hr />
 <h2 id="buoc-5-trien-khai">Bước 5 — Triển khai<a class="headerlink" href="#buoc-5-trien-khai" title="Permanent link">&para;</a></h2>
 <h3 id="lua-chon-a-builder-on-le-task-nhovua">Lựa chọn A — Builder đơn lẻ (task nhỏ/vừa)<a class="headerlink" href="#lua-chon-a-builder-on-le-task-nhovua" title="Permanent link">&para;</a></h3>
@@ -6977,7 +6977,7 @@ flowchart LR
 <a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>/swarm-plan<span class="w"> </span>docs/prd/PRD-realtime-view-count.md<span class="w"> </span>docs/adr/0013-realtime-view-count.md
 <a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
 <a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="c1"># Spawn explorer agents song song → nghiên cứu codebase</span>
-<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="c1"># → docs/plans/plan-realtime-view-count.md + Beads</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="c1"># → docs/plans/plan-realtime-view-count.md + task list</span>
 <a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>
 <a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="c1"># 4. Triển khai</span>
 <a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feat/realtime-view-count

@@ -6821,10 +6821,10 @@
 <h1 id="prd-feature-name">PRD: [Feature Name]<a class="headerlink" href="#prd-feature-name" title="Permanent link">&para;</a></h1>
 <!--
 Product Requirements Document
-Filename: artifacts/prd_[feature].md
+Filename: docs/prd/PRD-<feature>.md
 Owner: Architect (/architect)
 Handoff to: Architect (/architect), UI/UX Designer (/ui-ux-designer)
-Related Skills: writing-prds, decomposing-tasks, requirements-analysis
+Related Skills: scope, planning-artifacts
 -->
 
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
@@ -6832,7 +6832,7 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 <strong>Author:</strong> [Name]
 <strong>Date:</strong> [YYYY-MM-DD]
 <strong>Version:</strong> [1.0]
-<strong>Beads Issue:</strong> [bd://issue-id or N/A]
+<strong>Tracking:</strong> [<code>docs/tracking.md</code> row / issue link or N/A]
 <strong>PR-FAQ:</strong> [Link to approved PR-FAQ - required for new initiatives]
 <strong>Stakeholders:</strong> [List]</p>
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
@@ -7049,26 +7049,26 @@ Use INVEST criteria for all stories:
 <li>[ ] <strong>Architect Review</strong>: Technical feasibility assessment</li>
 <li>Trigger: <code>/architect</code></li>
 <li>
-<p>Output: ADR (<code>artifacts/adr_[topic].md</code>)</p>
+<p>Output: ADR (<code>docs/adr/NNNN-&lt;topic&gt;.md</code>)</p>
 </li>
 <li>
 <p>[ ] <strong>UI/UX Designer</strong>: Visual design and wireframes</p>
 </li>
 <li>Trigger: <code>/ui-ux-designer</code></li>
 <li>
-<p>Output: Design Spec (<code>artifacts/design_spec_[component].md</code>)</p>
+<p>Output: Design Spec (<code>docs/specs/design-spec-&lt;component&gt;.md</code>)</p>
 </li>
 <li>
 <p>[ ] <strong>Engineering Estimate</strong>: Effort estimation and decomposition</p>
 </li>
 <li>Trigger: <code>/builder</code> or <code>/architect</code></li>
 <li>
-<p>Output: Implementation Plan (<code>artifacts/plan_[task].md</code>)</p>
+<p>Output: Implementation Plan (<code>docs/plans/plan-&lt;feature&gt;.md</code>)</p>
 </li>
 <li>
-<p>[ ] <strong>Create Beads Issues</strong>: Decompose into trackable work items</p>
+<p>[ ] <strong>Track it</strong>: add the feature row to <code>docs/tracking.md</code></p>
 </li>
-<li>Command: <code>bd create "Title" -t feature</code></li>
+<li>Then decompose: <code>/swarm-plan &lt;spec or PRD path&gt;</code></li>
 </ol>
 <p><strong>Related Artifacts</strong>:
 - ADR: [Link after architect review]

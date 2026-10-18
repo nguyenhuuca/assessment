@@ -6650,7 +6650,7 @@ flowchart LR
         D --&gt; E["📐 ADR"]
         E --&gt; F["📋 Spec"]
         F --&gt; G["/swarm-plan"]
-        G --&gt; H["📋 Plan + Beads"]
+        G --&gt; H["📋 Plan + Tasks"]
     end
 
     subgraph exec ["⚙️ Execution"]
@@ -6692,7 +6692,7 @@ flowchart LR
 <tr>
 <td>4. Plan</td>
 <td><code>/swarm-plan</code></td>
-<td><code>docs/plans/plan-{slug}.md</code> + Beads</td>
+<td><code>docs/plans/plan-{slug}.md</code> + task list</td>
 <td><code>templates/artifacts/plan.template.md</code></td>
 </tr>
 <tr>
@@ -6852,7 +6852,7 @@ flowchart LR
 <p><strong>Output:</strong> <code>docs/specs/spec-{slug}.md</code></p>
 <hr />
 <h2 id="step-4-implementation-plan">Step 4 — Implementation plan<a class="headerlink" href="#step-4-implementation-plan" title="Permanent link">&para;</a></h2>
-<p>With Spec (or PRD + ADR) ready, use <code>/swarm-plan</code> to decompose the feature into a phased plan and Beads.</p>
+<p>With Spec (or PRD + ADR) ready, use <code>/swarm-plan</code> to decompose the feature into a phased plan with tasks.</p>
 <p><code>/swarm-plan</code> accepts any combination of artifacts — pass whichever you have:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># With Spec (recommended — most detailed input)</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-comment-section.md
@@ -6879,7 +6879,7 @@ flowchart LR
 <tr>
 <td><strong>Primary output</strong></td>
 <td>ADR (decision record)</td>
-<td>Plan + Beads (task breakdown)</td>
+<td>Plan + Tasks (task breakdown)</td>
 </tr>
 <tr>
 <td><strong>Asks questions</strong></td>
@@ -6892,7 +6892,7 @@ flowchart LR
 <td>Only for One-Way Door (High) decisions found during planning</td>
 </tr>
 <tr>
-<td><strong>Creates Beads</strong></td>
+<td><strong>Creates tasks</strong></td>
 <td>No</td>
 <td>Yes — ready for <code>/swarm-execute</code></td>
 </tr>
@@ -6902,14 +6902,14 @@ flowchart LR
 1. Launch 3–6 <code>worker-explorer</code> agents in parallel to research existing patterns
 2. Classify decision reversibility (Two-Way Door vs One-Way Door)
 3. Write <code>docs/plans/plan-{slug}.md</code> using <code>templates/artifacts/plan.template.md</code>
-4. Output Beads commands for all implementation tasks with dependencies</p>
+4. Output the implementation tasks (native task list, or listed in the plan) with <code>blockedBy</code> dependencies</p>
 <p>The plan contains:
 - Phased steps with exact file paths and acceptance criteria
 - Testing strategy (unit + integration + manual)
 - Rollback plan
 - Dependency graph showing task order
 - Before/During/After PR checklist</p>
-<p><strong>Output:</strong> <code>docs/plans/plan-{slug}.md</code> + Beads</p>
+<p><strong>Output:</strong> <code>docs/plans/plan-{slug}.md</code> + task list</p>
 <hr />
 <h2 id="step-5-implement">Step 5 — Implement<a class="headerlink" href="#step-5-implement" title="Permanent link">&para;</a></h2>
 <h3 id="option-a-single-builder-smallmedium-tasks">Option A — Single builder (small/medium tasks)<a class="headerlink" href="#option-a-single-builder-smallmedium-tasks" title="Permanent link">&para;</a></h3>
@@ -6981,7 +6981,7 @@ flowchart LR
 <a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>/swarm-plan<span class="w"> </span>docs/prd/PRD-realtime-view-count.md<span class="w"> </span>docs/adr/0013-realtime-view-count.md
 <a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>
 <a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="c1"># Launches parallel explorer agents → researches codebase</span>
-<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="c1"># → docs/plans/plan-realtime-view-count.md + Beads</span>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="c1"># → docs/plans/plan-realtime-view-count.md + task list</span>
 <a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a>
 <a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a><span class="c1"># 4. Implement</span>
 <a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feat/realtime-view-count
