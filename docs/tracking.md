@@ -40,7 +40,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Video Reactions (like / unlike / dislike)** | — | — | — | [Plan ✅](plans/plan-video-reactions.md) | — | ✅ | `28cc167`; fixes 404 on `/video/like`; per-user reactions, optional-auth GET |
 | **Admin Comment Moderation** | — | — | — | [Plan ✅](plans/plan-admin-comment-moderation.md) | — | ✅ | `acfc953` soft remove/restore with policy reasons; `6f66b15` bulk (≤100) |
 | **Comment Replies** | — | — | — | [Plan ✅](plans/plan-comment-replies.md) | — | ✅ | `a23950f` 2-level threads, author delete keeps others' replies; `368bf0c` reply-to-reply notifies the replied author |
-| **i18n (Vietnamese + English)** | [PRD ✅](prd/PRD-i18n.md) | [0020 ✅](adr/0020-i18n-vietnamese-english.md) | — | [Plan ✅](plans/plan-i18n.md) | — | ✅ | react-i18next, browser default; UI + API errors + emails + Admin. FE-1..5 + BE-1..3 done; QA-1 prod smoke pending |
+| **i18n (Vietnamese + English)** | [PRD ✅](prd/PRD-i18n.md) | [0020 ✅](adr/0020-i18n-vietnamese-english.md) | — | [Plan ✅](plans/plan-i18n.md) | — | ✅ | react-i18next, browser default; UI + API errors + emails + Admin. FE-1..5 + BE-1..3 done; QA-1 verified on prod by owner (recorded 2026-10-18) |
 | **Video Suggestions (+ button)** | [PRD ✅](prd/PRD-video-suggestions.md) | — | — | [Plan ✅](plans/plan-video-suggestions.md) | — | ✅ | Users suggest YouTube/FB links → admin approves → import pipeline; replaces legacy share; History → My suggestions; ~6.5d |
 | **User Notifications** | [PRD ✅](prd/PRD-user-notifications.md) | [0017 ✅](adr/0017-user-notifications.md) | — | [Plan ✅](plans/plan-user-notifications.md) | — | ✅ | `a11d31e` in-app + SSE (fetch + header auth) + 15-min digest; verified on prod 2026-10-03; nginx `worker_connections` 768→8192 |
 | **Password Login (optional)** | [PRD ✅](prd/PRD-password-login.md) | [0018 ✅](adr/0018-password-login-option.md) | — | [Plan ✅](plans/plan-password-login.md) | — | ✅ | `fd319cf` email + password next to magic link, lockout 5/15 min, `cv` session revocation; `e6d6a3f`/`63e21f0` modal + 🔑 icon; `3de7a4a` role in login response; verified on prod 2026-10-09 |
@@ -51,7 +51,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 
 ## Status Summary
 
-### ✅ Done (16)
+### ✅ Done (17)
 - [Use RDBMS](adr/0001-use-relational-database.md)
 - [Backend Architecture](adr/0002-backend-architecture.md)
 - [Cache Strategy](adr/0003-use-cache.md)
@@ -68,6 +68,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Password Login](adr/0018-password-login-option.md)
 - [Admin Video Import](adr/0019-admin-video-import.md)
 - [Watch History (v2)](adr/0021-watch-history.md)
+- [i18n Vietnamese + English](plans/plan-i18n.md)
 
 ### 🔄 In Progress (2)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
@@ -75,7 +76,6 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 
 ### 🔍 In Review (7)
 - [Video Suggestions](plans/plan-video-suggestions.md)
-- [i18n Vietnamese + English](plans/plan-i18n.md)
 - [HLS Video Streaming](plans/plan-hls-migration.md)
 - [Unified Video List API](adr/0009-unified-video-list-api.md)
 - [Hot Video Priority](plans/plan-hot-video-priority.md)

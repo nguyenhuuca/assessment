@@ -9,7 +9,7 @@ Handoff to: Builder, QA Engineer
 
 ## Overview
 
-**Status:** Approved (2026-10-14)
+**Status:** Done (QA-1 verified on prod by owner; recorded 2026-10-18). Approved 2026-10-14.
 **Author:** nguyenhuuca
 **Date:** 2026-10-14
 **Related PRD:** [PRD-i18n](../prd/PRD-i18n.md)
@@ -129,3 +129,4 @@ bd create --title="[QA-1] i18n E2E + prod smoke" --type=task
 | 2026-10-14 | Owner approved the PRD, ADR-0020 and this plan. The switcher is a "VI | EN" toggle and the English name is "Watch later". |
 | 2026-10-14 | Plan created from a parallel exploration of FE strings and BE text, errors and emails. Owner chose react-i18next, browser default, and full scope including Admin. |
 | 2026-10-15 | Implemented FE-1..5 and BE-1..3 with parallel workers. FE: 300 tests, ~20 KB gzip added. BE: 1145 tests, coverage 96.29%. QA: `/api` responses are `cache-control: no-store` and `cf-cache-status: DYNAMIC`, so no edge-cache leak and no `Vary` needed. useLocaleSync saves the UI language when `user_settings.locale` is null, so emails match. Digest emails for users who never log in again fall back to English (ADR D6). |
+| 2026-10-18 | QA-1 passed: owner tested both languages on prod. Plan marked Done. |

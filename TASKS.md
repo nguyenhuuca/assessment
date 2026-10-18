@@ -191,7 +191,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **BE-1** `MessageSource` + `LocaleResolver`, `ResultErrorInfo.code`, localized errors — `9bb06bd`
 - [x] **BE-2** `user_settings.locale` migration + `PATCH /user/settings` validation — `9bb06bd`
 - [x] **BE-3** Localized emails (magic link, password notice, digest) — `749617c`
-- [ ] **QA-1** E2E + prod smoke in both languages (emails, no mixed chrome) — pending per `docs/tracking.md`
+- [x] **QA-1** E2E + prod smoke in both languages (emails, no mixed chrome) — verified by owner, recorded 2026-10-18
 
 ---
 
