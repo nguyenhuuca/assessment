@@ -2399,7 +2399,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 .admin-badge.cancelled   { background: rgba(173, 170, 170, 0.13); color: var(--text-muted); border: 1px solid var(--text-muted); }
 @media (max-width: 768px) {
   .import-form { padding: 12px; }
-  .admin-tabs { overflow-x: auto; }
 }
 
 /* Drive force sync */
