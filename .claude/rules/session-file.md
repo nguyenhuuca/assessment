@@ -18,7 +18,8 @@ updated: 2026-10-18 21:05
 
 - `status`: `in_progress` | `blocked` | `done`
 - `progress`: integer 0–100, your honest estimate of the whole task (not the current step)
-- `done` / `next`: short, `;`-separated; `next` must be concrete enough to act on without the conversation
+- `done`: one `;`-item per **finished subtask**, written as `<ID> <what> <commit>`, e.g. `BE-1 position column 6a0a5849`. The startup report shows each item as a `✓` line, at most 8 items and 70 characters each, so keep every item short
+- `next`: short, `;`-separated, concrete enough to act on without the conversation. Only the first item shows in the startup report
 - `plan`: artifact path, or `-` when there is none
 - `blocked` adds a `blocker:` line saying what is needed and from whom
 
