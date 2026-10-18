@@ -166,6 +166,15 @@ describe('DriveSyncPanel', () => {
       expect(screen.queryByText(/Chọn "Tất cả" để xem orphan/)).not.toBeInTheDocument()
     })
 
+    it('custom does not call the server until a time is picked', async () => {
+      renderPanel()
+      await screen.findByText('one.mp4')
+      pick('custom')
+      expect(screen.getByLabelText('Từ')).toBeInTheDocument()
+      expect(screen.getByText('one.mp4')).toBeInTheDocument()
+      expect(adminApi.getDriveSyncFiles).toHaveBeenCalledTimes(1)
+    })
+
     it('custom range sends both bounds in UTC, to including its minute', async () => {
       renderPanel()
       await screen.findByText('one.mp4')

@@ -137,11 +137,11 @@ export const usePreviewImport  = () => useMutation({ mutationFn: (url) => adminA
 
 /** Relative presets resolve to a fresh window at fetch time, so the key holds the filter, not a timestamp. */
 export function useDriveSyncFiles(filter = DEFAULT_TIME_FILTER) {
-  const { error } = toRangeParams(filter)
+  const { params } = toRangeParams(filter)
   return useQuery({
     queryKey: ['admin', 'drive-sync', 'files', filter],
     queryFn: () => adminApi.getDriveSyncFiles(toRangeParams(filter).params),
-    enabled: !error,
+    enabled: params !== null,
     placeholderData: keepPreviousData,
   })
 }

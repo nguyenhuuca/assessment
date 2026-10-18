@@ -19,7 +19,8 @@ export const DEFAULT_TIME_FILTER = { mode: 'relative', preset: '12h' }
  * - { mode: 'all' } -> {}
  * - { mode: 'relative', preset } -> { from: now - preset }
  * - { mode: 'custom', from, to } (datetime-local, VN time) -> `to` gets +1 min so its minute is included
- * Returns { params, error }; from > to gives { params: null, error: 'admin:timeRangeInvalid' }.
+ * Returns { params, error }; from > to gives { params: null, error: 'admin:timeRangeInvalid' },
+ * and a custom range with no bound picked yet gives { params: null, error: '' } (nothing to fetch).
  */
 export function toRangeParams(filter, now = Date.now()) {
   if (filter?.mode === 'relative') {
@@ -29,6 +30,7 @@ export function toRangeParams(filter, now = Date.now()) {
   if (filter?.mode === 'custom') {
     const from = localToIso(filter.from)
     const toIso = localToIso(filter.to)
+    if (!from && !toIso) return { params: null, error: '' }
     // both are toISOString() output, so string order is time order
     if (from && toIso && from > toIso) {
       return { params: null, error: 'admin:timeRangeInvalid' }
