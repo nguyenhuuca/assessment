@@ -5,4 +5,4 @@ done: Plan 5ea4fec2; BE-1 position migration + renumber 6a0a5849; BE-2 PATCH mov
 doing: -
 next: -
 plan: docs/plans/plan-collection-reorder.md
-updated: 2026-10-18
+updated: 2026-10-18 12:30

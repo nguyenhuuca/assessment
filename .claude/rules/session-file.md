@@ -23,6 +23,7 @@ updated: 2026-10-18 21:05
 - `doing`: subtasks started but not finished (matching `[~]` in `TASKS.md`), same item format as `done`, shown as `🔄` lines. Optional: leave it out or set it to `-` when nothing is half-done. When a subtask finishes, move it from `doing` to `done`
 - `next`: short, `;`-separated, concrete enough to act on without the conversation. Only the first item shows in the startup report
 - `plan`: artifact path, or `-` when there is none
+- `updated`: local date and time as `YYYY-MM-DD HH:MM` (24h, e.g. `2026-10-18 21:05`), never the date alone; get it from `date "+%Y-%m-%d %H:%M"`
 - `blocked` adds a `blocker:` line saying what is needed and from whom
 
 ## When to Write It
