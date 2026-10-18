@@ -1,0 +1,8 @@
+task: Collection Reorder (drag & drop videos in a collection)
+status: blocked
+progress: 90
+done: all 6 commits pushed (50f00d60..f746bc5b); CI green: Funny App Build and Deploy (build, tests+coverage, docker, deploy), Deploy Frontend, Publish Docs
+next: prod smoke: /actuator/health, GET /collections/public, reorder a collection in the UI (mouse + mobile), reload, "Phát" follows the new order; then flip BE-1 + QA-1 in TASKS.md, plan/tracking to Done
+blocker: SSH smoke test to prod was denied by the permission classifier; owner runs the smoke test or allows it
+plan: docs/plans/plan-collection-reorder.md
+updated: 2026-10-18
