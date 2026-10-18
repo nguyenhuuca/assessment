@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Canh Labs — Dự án phần mềm</title>
+  <meta name="description" content="Canh Labs: nền tảng video streaming Funny Movies, công cụ đo kiến trúc AIC cho Spring Boot và app Android quét tài liệu offline Doc Scanner.">
+  <meta name="theme-color" content="#0b0b0c">
+  <meta property="og:title" content="Canh Labs — Dự án phần mềm">
+  <meta property="og:description" content="Ba dự án: Funny Movies, AIC và Doc Scanner.">
+  <meta property="og:image" content="https://canh-labs.com/img/funny-movies-home.webp">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0b0c'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23c8f560'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Canh Labs">
+        <span class="brand-dot" aria-hidden="true"></span>canh<span class="brand-sep">/</span>labs
+      </a>
+      <nav aria-label="Điều hướng chính">
+        <a href="#funny-movies">Funny Movies</a>
+        <a href="#aic">AIC</a>
+        <a href="#doc-scanner">Doc Scanner</a>
+        <a class="nav-gh" href="https://github.com/nguyenhuuca" rel="noopener">GitHub ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <p class="eyebrow"><span class="pulse" aria-hidden="true"></span>Side projects · Java · Android</p>
+      <h1 class="hero-line">Chỉ là sở thích cá nhân.<br>Build vài thứ <em>lúc rảnh rỗi</em>...</h1>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#projects">Xem dự án</a>
+        <a class="btn btn-ghost" href="https://github.com/nguyenhuuca" rel="noopener">GitHub ↗</a>
+      </div>
+
+      <dl class="facts">
+        <div><dt>Dự án</dt><dd>03</dd></div>
+        <div><dt>Backend</dt><dd>Java 24</dd></div>
+        <div><dt>Mobile</dt><dd>Kotlin</dd></div>
+        <div><dt>Coverage gate</dt><dd>90%</dd></div>
+      </dl>
+    </section>
+
+    <div id="projects" class="projects">
+
+      <!-- 01 · Funny Movies -->
+      <article id="funny-movies" class="project wrap">
+        <div class="project-text">
+          <p class="project-index"><span>01</span> Web platform · Production</p>
+          <h2>Funny Movies</h2>
+          <p class="project-lede">Nền tảng xem và chia sẻ video ngắn, từ backend Java 24 tới SPA React 19, tự deploy lên Kubernetes sau mỗi lần push.</p>
+          <ul class="points">
+            <li>Streaming theo <code>Range</code> request với LRU cache, chạy trên Virtual Threads</li>
+            <li>Đăng nhập passwordless bằng magic link, MFA TOTP tùy chọn</li>
+            <li>Tự đồng bộ video từ Google Drive, import từ YouTube và Facebook</li>
+            <li>Admin dashboard phân quyền theo role, giao diện Việt / Anh</li>
+            <li>CI/CD: GitHub Actions → Docker → Helm, coverage gate 90%</li>
+          </ul>
+          <ul class="stack" aria-label="Công nghệ">
+            <li>Java 24</li><li>Spring Boot 3.5</li><li>PostgreSQL</li><li>React 19</li><li>TanStack Query</li><li>Kubernetes</li>
+          </ul>
+          <div class="links">
+            <a class="btn btn-primary" href="https://funnyapp.canh-labs.com" rel="noopener">Mở app ↗</a>
+            <a class="link" href="https://nguyenhuuca.github.io/assessment/" rel="noopener">Tài liệu</a>
+            <a class="link" href="https://github.com/nguyenhuuca/assessment" rel="noopener">Source</a>
+          </div>
+        </div>
+        <figure class="project-visual">
+          <div class="browser">
+            <div class="browser-bar" aria-hidden="true"><i></i><i></i><i></i><span>funnyapp.canh-labs.com</span></div>
+            <img src="img/funny-movies-home.webp" width="1200" height="675" alt="Trang chủ Funny Movies: video dọc kèm cột like, comment, save, share" loading="lazy">
+          </div>
+        </figure>
+      </article>
+
+      <!-- 02 · AIC -->
+      <article id="aic" class="project project-flip wrap">
+        <div class="project-text">
+          <p class="project-index"><span>02</span> Developer tool · Open source</p>
+          <h2>AIC</h2>
+          <p class="project-lede">Abstractness &amp; Instability Calculator: đo kiến trúc package của dự án Spring Boot và chặn build khi thiết kế xuống cấp.</p>
+          <ul class="points">
+            <li>Tính A, I và khoảng cách D tới Main Sequence cho từng module package</li>
+            <li>Đồ thị phụ thuộc force-directed, phát hiện vòng phụ thuộc bằng Tarjan SCC</li>
+            <li>CLI headless không cần Spring (~2.5 MB) làm quality gate trong CI</li>
+            <li>Web UI trực quan và export JSON qua <code>GET /api/metrics</code></li>
+          </ul>
+          <ul class="stack" aria-label="Công nghệ">
+            <li>Java 22+</li><li>Spring Boot</li><li>Maven multi-module</li><li>Nix Flake</li>
+          </ul>
+          <div class="links">
+            <a class="btn btn-primary" href="https://nguyenhuuca.github.io/aic/" rel="noopener">Tài liệu ↗</a>
+            <a class="link" href="https://github.com/nguyenhuuca/aic" rel="noopener">Source</a>
+          </div>
+        </div>
+        <figure class="project-visual">
+          <div class="browser">
+            <div class="browser-bar" aria-hidden="true"><i></i><i></i><i></i><span>localhost:8081</span></div>
+            <img src="img/aic.webp" width="1200" height="836" alt="Giao diện AIC: biểu đồ Abstractness theo Instability và chi tiết package" loading="lazy">
+          </div>
+        </figure>
+      </article>
+
+      <!-- 03 · Doc Scanner -->
+      <article id="doc-scanner" class="project wrap">
+        <div class="project-text">
+          <p class="project-index"><span>03</span> Android app · v1.5.3</p>
+          <h2>Doc Scanner</h2>
+          <p class="project-lede">App quét tài liệu cho Android: chụp, tự cắt phối cảnh, chỉnh sửa rồi xuất PDF. Mọi thứ xử lý ngay trên máy, không upload đi đâu.</p>
+          <ul class="points">
+            <li>Tự phát hiện góc giấy bằng ML Kit, máy không có Play Services thì crop 4 góc thủ công</li>
+            <li>Xoay, chỉnh sáng, tương phản, thang xám, có undo; kéo thả để sắp xếp trang</li>
+            <li>Xuất PDF hoặc từng ảnh, chia sẻ thẳng sang app khác</li>
+            <li>Không tài khoản, không mạng, không quảng cáo</li>
+          </ul>
+          <ul class="stack" aria-label="Công nghệ">
+            <li>Kotlin 2.0</li><li>Jetpack Compose</li><li>Material 3</li><li>Room</li><li>Coroutines</li><li>Android 8.0+</li>
+          </ul>
+          <div class="links">
+            <a class="btn btn-primary" href="https://github.com/nguyenhuuca/doc-scan/releases/latest" rel="noopener">Tải APK ↗</a>
+            <a class="link" href="https://github.com/nguyenhuuca/doc-scan" rel="noopener">Source</a>
+          </div>
+        </div>
+        <figure class="project-visual phones">
+          <div class="phone phone-back"><img src="img/docscan-viewer.webp" width="540" height="1170" alt="Doc Scanner: xem tài liệu và menu thao tác" loading="lazy"></div>
+          <div class="phone phone-front"><img src="img/docscan-edit.webp" width="540" height="1170" alt="Doc Scanner: màn hình chỉnh sửa trang" loading="lazy"></div>
+        </figure>
+      </article>
+    </div>
+
+    <section class="closing wrap">
+      <h2>Mọi dự án đều <em>Open Source</em>.</h2>
+      <p>Code, tài liệu kiến trúc và ADR nằm trên GitHub.</p>
+      <a class="btn btn-primary" href="https://github.com/nguyenhuuca" rel="noopener">github.com/nguyenhuuca ↗</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>© 2026 Canh Labs</span>
+      <span class="footer-mono">canh-labs.com</span>
+    </div>
+  </footer>
+</body>
+</html>
