@@ -16,7 +16,7 @@ Pick up the task in `session.txt` (format: `.claude/rules/session-file.md`) as i
 On `startup`, `resume` and `clear`, `.claude/hooks/session-start-loader.sh` prints a status report from `session.txt` straight to the user as a `systemMessage`. The report is a few short lines:
 - 📌 and the task name
 - status, a progress bar and `updated`
-- one ✓ line per finished subtask in `done`, at most 8
+- one ✅ line per finished subtask in `done`, at most 8
 - ⛔ blocker, when there is one
 - → the first item of `next`
 - the hint "▶ /task-resume để làm tiếp"
