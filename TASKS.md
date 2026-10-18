@@ -179,6 +179,18 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ---
 
+## Feature: Collection Reorder (drag & drop)
+
+**Plan:** `docs/plans/plan-collection-reorder.md` · **ADR:** `docs/adr/0012-bookmark-feature-design.md` (no new ADR)
+
+- [ ] **BE-1** Migration `position` (backfill newest-first, new index) + repo ordering / add-at-top / `renumber`
+- [ ] **BE-2** `moveVideo` service + `MoveVideoRequest` + `PATCH /collections/{id}/videos/{videoId}` + i18n errors — after BE-1
+- [ ] **FE-1** `collectionsApi.moveVideo` + `useMoveCollectionItem` (optimistic + rollback) + `moveAfterId` util — contract-first
+- [ ] **FE-2** `@dnd-kit` "Sắp xếp" mode in `CollectionDetail` (pointer/touch/keyboard) + tech-strategy entry — after FE-1; push after BE-2 is deployed
+- [ ] **QA-1** Local E2E (mouse, touch, keyboard, concurrency) + prod smoke — after BE-2, FE-2
+
+---
+
 ## Feature: i18n (Vietnamese + English)
 
 **PRD:** `docs/prd/PRD-i18n.md` · **ADR:** `docs/adr/0020-i18n-vietnamese-english.md` (Accepted) · **Plan:** `docs/plans/plan-i18n.md`
