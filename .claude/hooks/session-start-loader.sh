@@ -122,18 +122,23 @@ $NOTE
         BAR="$(printf '%*s' "$FILLED" '' | tr ' ' '#')$(printf '%*s' $((10 - FILLED)) '' | tr ' ' '-')"
         # Two-column table: label | value. "sep" rows become ├──┼──┤ lines between groups.
         LC_ALL=C.UTF-8
-        LABELS=() VALUES=() SEP=0
+        LABELS=() VALUES=() COMMITS=() SEP=0
         row() {
-            [ "$SEP" = 1 ] && [ ${#LABELS[@]} -gt 0 ] && { LABELS+=("sep"); VALUES+=(""); }
-            SEP=0; LABELS+=("$1"); VALUES+=("$2")
+            [ "$SEP" = 1 ] && [ ${#LABELS[@]} -gt 0 ] && { LABELS+=("sep"); VALUES+=(""); COMMITS+=(""); }
+            SEP=0; LABELS+=("$1"); VALUES+=("$2"); COMMITS+=("${3:-}")
         }
-        # One row per ";"-item of a field (at most 8); the label shows on the first row only
+        # One row per ";"-item of a field (at most 8); the label shows on the first row only.
+        # A trailing commit hash ("... 6a0a5849" or "... (6a0a5849)") moves to its own column.
         rows() {
-            local label=$2 n=0 it
+            local label=$2 n=0 it commit
             while IFS= read -r it; do
                 it="${it#"${it%%[![:space:]]*}"}"; it="${it%"${it##*[![:space:]]}"}"
                 [ -z "$it" ] || [ "$it" = "-" ] && continue
-                n=$((n + 1)); [ $n -le 8 ] && { row "$label" "$(cut70 "$it")"; label=""; }
+                commit=""
+                if [[ $it =~ ^(.*[^[:space:]])[[:space:]]+\(?([0-9a-f]{7,40})\)?$ ]]; then
+                    it=${BASH_REMATCH[1]}; commit=${BASH_REMATCH[2]:0:8}
+                fi
+                n=$((n + 1)); [ $n -le 8 ] && { row "$label" "$(cut70 "$it")" "$commit"; label=""; }
             done < <(field "$1" | tr ';' '\n')
             [ $n -gt 8 ] && row "" "… +$((n - 8)) more"
         }
@@ -156,18 +161,27 @@ $NOTE
             echo $(( ${#s} + 2 * n ))
         }
         pad() { printf '%s%*s' "$1" $(( $2 - $(dw "$1") )) ''; }
-        hr() { printf '%s' "$1"; printf '%*s' $((LW + 2)) '' | sed 's/ /─/g'; printf '%s' "$2"; printf '%*s' $((VW + 2)) '' | sed 's/ /─/g'; printf '%s\n' "$3"; }
-        LW=0 VW=0
+        line() { printf '%*s' $(($1 + 2)) '' | sed 's/ /─/g'; }
+        # hr <left> <mid> <right>; the commit column is drawn only when some row has a commit
+        hr() {
+            printf '%s%s%s%s' "$1" "$(line $LW)" "$2" "$(line $VW)"
+            [ "$CW" -gt 0 ] && printf '%s%s' "$2" "$(line $CW)"
+            printf '%s\n' "$3"
+        }
+        LW=0 VW=0 CW=0
         for i in "${!LABELS[@]}"; do
             [ "${LABELS[$i]}" = "sep" ] && continue
             w=$(dw "${LABELS[$i]}"); [ "$w" -gt "$LW" ] && LW=$w
             w=$(dw "${VALUES[$i]}"); [ "$w" -gt "$VW" ] && VW=$w
+            w=${#COMMITS[$i]}; [ "$w" -gt "$CW" ] && CW=$w
         done
         REPORT=$(
             hr "┌" "┬" "┐"
             for i in "${!LABELS[@]}"; do
-                if [ "${LABELS[$i]}" = "sep" ]; then hr "├" "┼" "┤"
-                else printf '│ %s │ %s │\n' "$(pad "${LABELS[$i]}" "$LW")" "$(pad "${VALUES[$i]}" "$VW")"; fi
+                if [ "${LABELS[$i]}" = "sep" ]; then hr "├" "┼" "┤"; continue; fi
+                printf '│ %s │ %s │' "$(pad "${LABELS[$i]}" "$LW")" "$(pad "${VALUES[$i]}" "$VW")"
+                [ "$CW" -gt 0 ] && printf ' %s │' "$(pad "${COMMITS[$i]}" "$CW")"
+                printf '\n'
             done
             hr "└" "┴" "┘"
             printf '%s' "$HINT"

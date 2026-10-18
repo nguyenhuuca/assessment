@@ -13,7 +13,7 @@ Pick up the task in `session.txt` (format: `.claude/rules/session-file.md`) as i
 
 ## How the User Gets Here
 
-On `startup`, `resume` and `clear`, `.claude/hooks/session-start-loader.sh` prints a status report from `session.txt` straight to the user as a `systemMessage`. The report is a boxed two-column table (label | value). Its row groups are separated by `├──┼──┤` lines:
+On `startup`, `resume` and `clear`, `.claude/hooks/session-start-loader.sh` prints a status report from `session.txt` straight to the user as a `systemMessage`. The report is a boxed table with the columns label | value | commit. A trailing commit hash on a `done`/`doing` item moves into the commit column, and that column is left out when no item has a hash. Its row groups are separated by `├──┼──┤` lines:
 - 📌 Task and Status (progress bar and `updated`)
 - ✅ Done, one row per finished subtask
 - 🔄 Doing, one row per half-done subtask (at most 8 rows each group)
