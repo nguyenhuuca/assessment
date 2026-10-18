@@ -86,22 +86,50 @@ $HANDOFF_MSG"
     fi
 fi
 
-# Current task from session.txt (.claude/rules/session-file.md); /task-resume continues it
+# Current task from session.txt (.claude/rules/session-file.md); /task-resume continues it.
+# The model gets the raw file as context; the user gets a status report on screen
+# (systemMessage) right at startup, before typing anything.
+REPORT=""
 SESSION_FILE="$PROJECT_DIR/session.txt"
 if [ -s "$SESSION_FILE" ]; then
-    TASK_STATUS=$(sed -n 's/^status:[[:space:]]*//p' "$SESSION_FILE" | head -1 | tr -d '\r')
+    field() { sed -n "s/^$1:[[:space:]]*//p" "$SESSION_FILE" | head -1 | tr -d '\r'; }
+    TASK_STATUS=$(field status)
     if [ "$TASK_STATUS" != "done" ]; then
         CONTEXT="$CONTEXT
 
 [CURRENT TASK — session.txt]
 $(head -c 2000 "$SESSION_FILE" | tr -d '\r')
-- Unfinished task from a previous session. Mention it to the user; continue only if they run /task-resume or ask to.
+- Unfinished task from a previous session. The user already saw a status report from this hook; in your first reply, if the user did not run /task-resume, add one line reminding them that /task-resume continues it. Continue only if they run /task-resume or ask to.
 - Keep session.txt current while working (.claude/rules/session-file.md)."
+
+        if [ "$SOURCE" != "compact" ]; then
+            PROGRESS=$(field progress | tr -cd '0-9')
+            PROGRESS=${PROGRESS:-0}
+            [ "$PROGRESS" -gt 100 ] && PROGRESS=100
+            FILLED=$((PROGRESS / 10))
+            BAR="$(printf '%*s' "$FILLED" '' | tr ' ' '#')$(printf '%*s' $((10 - FILLED)) '' | tr ' ' '-')"
+            REPORT="📌 Task đang dở (session.txt)
+  Task:     $(field task)
+  Status:   ${TASK_STATUS:-?}  [$BAR] $PROGRESS%
+  Done:     $(field done)
+  Next:     $(field next)"
+            BLOCKER=$(field blocker)
+            [ -n "$BLOCKER" ] && REPORT="$REPORT
+  Blocker:  $BLOCKER"
+            REPORT="$REPORT
+  Plan:     $(field plan)   ·   Updated: $(field updated)
+
+▶ Tiếp tục: gõ /task-resume  (hoặc /task-resume <chỉ dẫn thêm>)
+  Bỏ qua: cứ làm việc khác; xong task thì đặt status: done trong session.txt để tắt thông báo này."
+        fi
     fi
 fi
 
-# Output context if any
-if [ -n "$CONTEXT" ]; then
+# Output: JSON when there is a report for the user, plain text (context only) otherwise
+if [ -n "$REPORT" ]; then
+    jq -n --arg msg "$REPORT" --arg ctx "$CONTEXT" \
+        '{systemMessage: $msg, hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $ctx}}'
+elif [ -n "$CONTEXT" ]; then
     echo "$CONTEXT"
 fi
 

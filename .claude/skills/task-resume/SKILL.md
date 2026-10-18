@@ -11,6 +11,10 @@ metadata:
 
 Pick up the task in `session.txt` (format: `.claude/rules/session-file.md`) as if the previous session never ended.
 
+## How the User Gets Here
+
+On `startup`, `resume` and `clear`, `.claude/hooks/session-start-loader.sh` prints a status report from `session.txt` straight to the user as a `systemMessage`. The report shows the task, status, a progress bar, done, next, blocker, plan and updated, and ends with the line "▶ Tiếp tục: gõ /task-resume". It is skipped on `compact` and when `status: done`. The same file also goes into the model's context. If the user's first message is not `/task-resume`, the reply carries one line reminding them about it, and Claude does not start the task on its own.
+
 ## Workflow
 
 1. **Read** `session.txt` at the repo root.
@@ -21,7 +25,7 @@ Pick up the task in `session.txt` (format: `.claude/rules/session-file.md`) as i
    - `git status` and `git log --oneline -10`: are the `done` items committed? Is anything unpushed or uncommitted?
    - Check `TASKS.md` lines for the same task IDs
    - If the repo disagrees with the file (e.g. `next` is already committed), trust the repo and correct `done`/`next`/`progress`
-3. **Report** in 3–5 lines: the task, `progress`%, what is done, what comes next, and any mismatch you fixed. If `status: blocked`, show the `blocker` and ask whether it is resolved before doing anything.
+3. **Report** in 3–5 lines, in the user's language: the task, `progress`%, what is done, what comes next, and any mismatch you fixed. The user already saw the raw report at startup, so lead with what the re-check found, not a copy of the file. If `status: blocked`, show the `blocker` and ask whether it is resolved before doing anything.
 4. **Continue** from `next` following the normal rules (plan tasks, quality gates, ask before every `git push`). Apply `$ARGUMENTS` as an extra instruction if given.
 5. **Keep `session.txt` current** after each step, per the rule's "When to Write It".
 
