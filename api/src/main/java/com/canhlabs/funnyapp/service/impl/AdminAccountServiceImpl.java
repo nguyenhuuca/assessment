@@ -50,7 +50,11 @@ public class AdminAccountServiceImpl implements AdminAccountService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetId));
         requireOutranks(actorRole, user);
         user.setRole(role);
+        user.setPermissions(role.defaultPermissions());
+        revokeSessions(user);
         userRepo.save(user);
+        credentialsVersionCache.evict(targetId);
+        log.info("Role of user id={} set to {} (permissions {}) by user id={}", targetId, role, user.getPermissions(), currentUserId);
     }
 
     @Override
@@ -78,12 +82,16 @@ public class AdminAccountServiceImpl implements AdminAccountService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetId));
         requireOutranks(actorRole, user);
         user.setPermissions(permissions);
-        // Permissions travel in the JWT: revoke the target's tokens so a removed bit stops working now
-        user.setCredentialsVersion(user.getCredentialsVersion() + 1);
+        revokeSessions(user);
         User saved = userRepo.save(user);
         credentialsVersionCache.evict(targetId);
         log.info("Permissions of user id={} set to {} by user id={}", targetId, permissions, currentUserId);
         return toDto(saved != null ? saved : user);
+    }
+
+    /** Role and permissions travel in the JWT: bump credentials_version so older tokens stop working now. */
+    private static void revokeSessions(User user) {
+        user.setCredentialsVersion(user.getCredentialsVersion() + 1);
     }
 
     /** Read from the DB, not the JWT: a token issued before a demotion still carries the old role. */

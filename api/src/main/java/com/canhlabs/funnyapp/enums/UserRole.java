@@ -14,4 +14,9 @@ public enum UserRole {
     public boolean outranks(UserRole other) {
         return other != null && ordinal() > other.ordinal();
     }
+
+    /** Permission bits an account gets when it is given this role (admins: every bit, users: none). */
+    public int defaultPermissions() {
+        return this == USER ? 0 : Permission.ALL_BITS;
+    }
 }

@@ -264,3 +264,4 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **AP-1** `permissions` in `AdminAccountDto` + `PATCH /admin/accounts/{id}/permissions` (rank rules as role change, revokes the target's JWTs)
 - [x] **AP-2** Accounts tab "Permissions" column: one toggle chip per bit; `Mock-Test.http` checks the field
+- [x] **AP-3** Role change sets `UserRole.defaultPermissions()` (ADMIN/SUPER_ADMIN 31, USER 0) and revokes the target's JWTs; migration `202610180003` backfills admins

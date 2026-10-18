@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.cache.CredentialsVersionCache;
 
 import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.entity.User;
+import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
@@ -95,6 +96,7 @@ class AdminAccountServiceImplTest {
         service.updateRole(10L, 1L, UserRole.ADMIN);
 
         assertEquals(UserRole.ADMIN, user.getRole());
+        assertEquals(Permission.ALL_BITS, user.getPermissions());
         verify(userRepo).save(user);
     }
 
@@ -103,9 +105,16 @@ class AdminAccountServiceImplTest {
         actor(1L, UserRole.SUPER_ADMIN);
         User user = target(10L, UserRole.ADMIN);
 
+        user.setPermissions(Permission.ALL_BITS);
+        user.setCredentialsVersion(2);
+
         service.updateRole(10L, 1L, UserRole.USER);
 
         assertEquals(UserRole.USER, user.getRole());
+        assertEquals(0, user.getPermissions());
+        // The JWT still says ADMIN: the demoted account must sign in again
+        assertEquals(3, user.getCredentialsVersion());
+        verify(credentialsVersionCache).evict(10L);
         verify(userRepo).save(user);
     }
 
