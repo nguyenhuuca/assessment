@@ -1,8 +1,8 @@
-task: Drive Sync time filter (server-side range, DRIVE_SYNC tab)
+task: Code health audit + fixes (comments login-only, admin UI polish)
 status: done
 progress: 100
-done: Plan 17115cec; BE-1 GET /files?from&to cc7f8f2b; FE-1 timeRange util + hook ad0adc82; FE-2 DriveTimeFilter + panel 31f01e86; Push + CI deploy ffd84a8e; QA-1 prod smoke by owner
+done: Audit report 0183aada; CH-1..5 fixes 40fe60b6; CH-6 login-only comments ae2d3e61; Admin filter bar sizes 9795bd76; Watched badge light theme e4fc888a
 doing: -
-next: -
-plan: docs/plans/plan-drive-sync-time-filter.md
-updated: 2026-10-18 15:45
+next: QA-1 owner: logged-in comment create + delete on prod; open findings #6-#8 in docs/reports/code-health-2026-10-18.md
+plan: docs/reports/code-health-2026-10-18.md
+updated: 2026-10-18 21:52
