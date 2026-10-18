@@ -1,9 +1,9 @@
 task: Drive Sync time filter (server-side range, DRIVE_SYNC tab)
 status: blocked
-progress: 15
-done: Plan plan-drive-sync-time-filter.md (server-side, default 12h)
+progress: 80
+done: Plan 17115cec; BE-1 GET /files?from&to cc7f8f2b; FE-1 timeRange util + hook ad0adc82; FE-2 DriveTimeFilter + panel 31f01e86
 doing: -
-next: BE-1 GET /files?from&to + tests; FE-1 timeRange util + hook; FE-2 DriveTimeFilter + panel; QA-1 prod smoke
+next: push BE-1 (up to cc7f8f2b), wait for deploy; push FE-2; QA-1 prod smoke
 plan: docs/plans/plan-drive-sync-time-filter.md
-updated: 2026-10-18 13:00
-blocker: owner approval of the revised plan (D1-D9) before /swarm-execute
+updated: 2026-10-18 13:10
+blocker: owner go-ahead to push (BE-1 first, then FE-2 after the backend deploy)
