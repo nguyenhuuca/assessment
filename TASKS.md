@@ -164,6 +164,16 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ---
 
+## Feature: Drive Sync Time Filter (relative + specific time on the DRIVE_SYNC tab)
+
+**Plan:** `docs/plans/plan-drive-sync-time-filter.md` (In Review 2026-10-18) · FE only, client-side filter on `createdAt`
+
+- [ ] **FE-1** `utils/timeRange.js` (`resolveTimeRange`, `inTimeRange`, presets 1h/24h/7d/30d, VN-time custom range) + unit tests
+- [ ] **FE-2** `DriveTimeFilter` control + `DriveSyncPanel` wiring (AND with "only unsynced", select-all on visible rows) + vi/en strings + tests — after FE-1
+- [ ] **QA-1** Local check on the real folder + prod smoke (ADMIN, SUPER_ADMIN), tracking + docs — after FE-2
+
+---
+
 ## Feature: Library Collections (replaces Bookmarks)
 
 **ADR:** `docs/adr/0012-bookmark-feature-design.md` (amended 2026-10-13) · **Plan:** `docs/plans/plan-library-collections.md`

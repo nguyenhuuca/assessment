@@ -46,6 +46,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **User Notifications** | [PRD ✅](prd/PRD-user-notifications.md) | [0017 ✅](adr/0017-user-notifications.md) | — | [Plan ✅](plans/plan-user-notifications.md) | — | ✅ | `a11d31e` in-app + SSE (fetch + header auth) + 15-min digest; verified on prod 2026-10-03; nginx `worker_connections` 768→8192 |
 | **Password Login (optional)** | [PRD ✅](prd/PRD-password-login.md) | [0018 ✅](adr/0018-password-login-option.md) | — | [Plan ✅](plans/plan-password-login.md) | — | ✅ | `fd319cf` email + password next to magic link, lockout 5/15 min, `cv` session revocation; `e6d6a3f`/`63e21f0` modal + 🔑 icon; `3de7a4a` role in login response; verified on prod 2026-10-09 |
 | **Admin Video Import (YouTube / Facebook → Drive)** | [PRD ✅](prd/PRD-admin-video-import.md) | [0019 ✅](adr/0019-admin-video-import.md) | — | [Plan ✅](plans/plan-admin-video-import.md) | — | ✅ | `795ec5e` yt-dlp → Drive (OAuth uploader) → existing cron ingests; bulk ≤20, run now / 5-min schedule slots, polling progress; `d9bddd9` FB reels; [setup guide](guides/video-import-setup-vi.md); verified on prod 2026-10-11 |
+| **Drive Sync Time Filter** | — | — | — | [Plan 🔍](plans/plan-drive-sync-time-filter.md) | — | 🔍 | DRIVE_SYNC tab: filter files by Drive created time, relative presets (1h/24h/7d/30d) or custom from/to (VN time); client-side, no API change |
 | **Admin Drive Force Sync** | — | — | — | [Plan 🔄](plans/plan-admin-drive-force-sync.md) | — | 🔄 | `1e961cc` tab DRIVE_SYNC: Drive ↔ local ↔ DB states; ADMIN views, SUPER_ADMIN force-syncs (re-download + upsert, ≤50/run); unique `(source_type, source_id)`; prod E2E pending |
 
 ---
@@ -75,7 +76,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
 - [Admin Drive Force Sync](plans/plan-admin-drive-force-sync.md)
 
-### 🔍 In Review (7)
+### 🔍 In Review (8)
+- [Drive Sync Time Filter](plans/plan-drive-sync-time-filter.md)
 - [Video Suggestions](plans/plan-video-suggestions.md)
 - [HLS Video Streaming](plans/plan-hls-migration.md)
 - [Unified Video List API](adr/0009-unified-video-list-api.md)

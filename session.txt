@@ -1,8 +1,9 @@
-task: Collection Reorder (drag & drop videos in a collection)
-status: done
-progress: 100
-done: Plan 5ea4fec2; BE-1 position migration + renumber 6a0a5849; BE-2 PATCH move endpoint 33f82e64; FE-1 api + useMoveCollectionItem 9c53b409; FE-2 @dnd-kit reorder mode d0be64ee; QA-1 prod smoke by owner
+task: Drive Sync time filter (relative + specific time, DRIVE_SYNC tab)
+status: blocked
+progress: 15
+done: Plan plan-drive-sync-time-filter.md
 doing: -
-next: -
-plan: docs/plans/plan-collection-reorder.md
-updated: 2026-10-18 12:30
+next: FE-1 utils/timeRange.js + tests; FE-2 DriveTimeFilter + panel wiring; QA-1 prod smoke
+plan: docs/plans/plan-drive-sync-time-filter.md
+updated: 2026-10-18 12:50
+blocker: owner approval of the plan (decisions D1-D7) before /swarm-execute
