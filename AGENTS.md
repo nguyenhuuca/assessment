@@ -46,7 +46,7 @@ An isolated worker runs in its own throwaway git worktree, not the shared checko
    git push
    git status  # MUST show "up to date with origin"
    ```
-6. **Verify** — watch the CI runs for the pushed SHA ("Funny App Build and Deploy", "Deploy Frontend (React Build)", "Publish Docs") and smoke-test prod
+6. **Verify** — watch the CI runs for the pushed SHA ("Funny App Build and Deploy", "Deploy Frontend (React Build)", "Publish Docs") and smoke-test prod: once the backend deploy is green, run `./api/mock-test.sh` (read-only API smoke, `api/Mock-Test.http`; exits non-zero on a failed check) and add a request there for any new API
 7. **Hand off** — leave clear context and artifact references for the next session
 
 **Rules:**

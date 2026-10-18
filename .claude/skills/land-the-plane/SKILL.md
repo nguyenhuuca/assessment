@@ -61,7 +61,8 @@ git status   # MUST show "up to date with origin"
 - Work is NOT complete until the push is verified. Report the pushed commit
   SHA (`git rev-parse HEAD`) as evidence, not just "pushed."
 - After the push, watch the CI runs for that SHA (`gh run list`) and
-  smoke-test prod; report any red run verbatim.
+  smoke-test prod (`./api/mock-test.sh` once the backend deploy is green;
+  add a request to `api/Mock-Test.http` for any new API); report any red run verbatim.
 
 ## 5. Handoff — Leave a Clean Trail
 

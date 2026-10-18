@@ -1,0 +1,211 @@
+# Post-deploy API smoke test (IntelliJ HTTP Client format, also run by httpyac).
+#
+# Run after every deploy:   ./api/mock-test.sh              (env "prod")
+#                           ENV=local ./api/mock-test.sh    (env "local", localhost:8081)
+# host/prefix per env live in api/http-client.env.json. The script reads USER_CLAUDE_TEST /
+# USER_CLAUDE_PASS from api/env.local (gitignored) and passes them as variables; nothing secret is stored here.
+# In IntelliJ: pick the env, and put both keys in api/http-client.private.env.json (gitignored), e.g.
+#   { "prod": { "USER_CLAUDE_TEST": "...", "USER_CLAUDE_PASS": "..." } }
+#
+# Rules: read-only requests only (GET + login). Never add a request that writes to prod data.
+# The test account is ADMIN, not SUPER_ADMIN. When a new API ships, add its smoke request here.
+# The backend reads the Authorization header as the raw JWT (no "Bearer " prefix).
+
+@api = {{host}}{{prefix}}/v1/funny-app
+
+### Health
+GET {{host}}{{prefix}}/actuator/health
+
+> {%
+    client.test("health is UP", () => {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "UP", "body " + JSON.stringify(response.body));
+    });
+%}
+
+### Admin API refuses anonymous calls
+GET {{api}}/admin/drive-sync/files
+
+> {%
+    client.test("anonymous gets 401", () => {
+        client.assert(response.status === 401, "status " + response.status);
+    });
+%}
+
+### Auth options for the test account
+GET {{api}}/user/auth-options?email={{USER_CLAUDE_TEST}}
+
+> {%
+    client.test("password login available", () => {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.data.passwordLoginAvailable === true, "passwordLoginAvailable");
+    });
+%}
+
+### Login (password) - saves the JWT for the requests below
+POST {{api}}/user/login
+Content-Type: application/json
+
+{
+  "email": "{{USER_CLAUDE_TEST}}",
+  "password": "{{USER_CLAUDE_PASS}}"
+}
+
+> {%
+    client.test("login succeeds as ADMIN", () => {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "SUCCESS", "status field " + response.body.status);
+        client.assert(response.body.data.user.role === "ADMIN", "role " + response.body.data.user.role);
+    });
+    client.global.set("token", response.body.data.jwt);
+%}
+
+### Current user
+GET {{api}}/user/me
+Authorization: {{token}}
+
+> {%
+    client.test("me is the test account", () => {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.data.role === "ADMIN", "role " + response.body.data.role);
+    });
+%}
+
+### User settings
+GET {{api}}/user/settings
+Authorization: {{token}}
+
+> {%
+    client.test("settings 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### Public video list
+GET {{api}}/video-stream/list
+
+> {%
+    client.test("video list 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### Public collections
+GET {{api}}/collections/public
+
+> {%
+    client.test("public collections 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### My collections
+GET {{api}}/collections
+Authorization: {{token}}
+
+> {%
+    client.test("my collections 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### Watch history summary
+GET {{api}}/watch-history/summary
+Authorization: {{token}}
+
+> {%
+    client.test("watch history summary 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### Notifications unread count
+GET {{api}}/notifications/unread-count
+Authorization: {{token}}
+
+> {%
+    client.test("unread count 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### My suggestions
+GET {{api}}/suggestions/mine
+Authorization: {{token}}
+
+> {%
+    client.test("my suggestions 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### Admin stats
+GET {{api}}/admin/stats
+Authorization: {{token}}
+
+> {%
+    client.test("admin stats 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### Admin videos
+GET {{api}}/admin/videos
+Authorization: {{token}}
+
+> {%
+    client.test("admin videos 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### Admin comments
+GET {{api}}/admin/comments
+Authorization: {{token}}
+
+> {%
+    client.test("admin comments 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### Admin pending suggestions count
+GET {{api}}/admin/video-suggestions/pending-count
+Authorization: {{token}}
+
+> {%
+    client.test("pending count 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### Admin video imports
+GET {{api}}/admin/video-imports
+Authorization: {{token}}
+
+> {%
+    client.test("imports 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
+
+### Drive sync - last 12 h (the tab default): ranged, so orphans are skipped
+< {%
+    client.global.set("from12h", new Date(Date.now() - 12 * 3600 * 1000).toISOString());
+%}
+GET {{api}}/admin/drive-sync/files?from={{from12h}}
+Authorization: {{token}}
+
+> {%
+    client.test("12h listing skips orphans", () => {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.data.orphansChecked === false, "orphansChecked " + response.body.data.orphansChecked);
+    });
+%}
+
+### Drive sync - All: whole folder with the orphan check
+GET {{api}}/admin/drive-sync/files
+Authorization: {{token}}
+
+> {%
+    client.test("All listing checks orphans", () => {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.data.orphansChecked === true, "orphansChecked " + response.body.data.orphansChecked);
+        client.assert(Array.isArray(response.body.data.files), "files array");
+    });
+%}
+
+### Drive sync - from after to is rejected
+GET {{api}}/admin/drive-sync/files?from=2026-10-18T10:00:00Z&to=2026-10-18T09:00:00Z
+Authorization: {{token}}
+
+> {%
+    client.test("from > to gives 400 invalidRange", () => {
+        client.assert(response.status === 400, "status " + response.status);
+        client.assert(response.body.error.code === "error.driveSync.invalidRange", "code " + response.body.error.code);
+    });
+%}
+
+### Drive sync - current run
+GET {{api}}/admin/drive-sync/runs/current
+Authorization: {{token}}
+
+> {%
+    client.test("current run 200", () => client.assert(response.status === 200, "status " + response.status));
+%}
