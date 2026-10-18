@@ -6580,7 +6580,8 @@ approval for one push does not carry over). Then:</p>
 <li>Work is NOT complete until the push is verified. Report the pushed commit
   SHA (<code>git rev-parse HEAD</code>) as evidence, not just "pushed."</li>
 <li>After the push, watch the CI runs for that SHA (<code>gh run list</code>) and
-  smoke-test prod; report any red run verbatim.</li>
+  smoke-test prod (<code>./api/mock-test.sh</code> once the backend deploy is green;
+  add a request to <code>api/Mock-Test.http</code> for any new API); report any red run verbatim.</li>
 </ul>
 <h2 id="5-handoff-leave-a-clean-trail">5. Handoff — Leave a Clean Trail<a class="headerlink" href="#5-handoff-leave-a-clean-trail" title="Permanent link">&para;</a></h2>
 <ul>
