@@ -63,6 +63,6 @@ export const cancelImport  = (id) => api.post(`/admin/video-imports/${id}/cancel
 export const retryImport   = (id) => api.post(`/admin/video-imports/${id}/retry`)
 
 // Drive force sync — see docs/plans/plan-admin-drive-force-sync.md
-export const getDriveSyncFiles  = () => api.get('/admin/drive-sync/files')
+export const getDriveSyncFiles  = (params = {}) => api.get(buildUrl('/admin/drive-sync/files', cleanParams(params)))
 export const startDriveSyncRun  = (fileIds) => api.post('/admin/drive-sync/runs', { fileIds })
 export const getDriveSyncRun    = () => api.get('/admin/drive-sync/runs/current')

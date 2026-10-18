@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import * as adminApi from '../api/admin.js'
 import { hasActive } from '../utils/importUtils.js'
+import { DEFAULT_TIME_FILTER, toRangeParams } from '../utils/timeRange.js'
 
 export function useAdminVideos(page = 0, status = null) {
   return useQuery({
@@ -134,10 +135,14 @@ export const useCancelImport   = () => useImportMutation((id) => adminApi.cancel
 export const useRetryImport    = () => useImportMutation((id) => adminApi.retryImport(id))
 export const usePreviewImport  = () => useMutation({ mutationFn: (url) => adminApi.previewImport(url) })
 
-export function useDriveSyncFiles() {
+/** Relative presets resolve to a fresh window at fetch time, so the key holds the filter, not a timestamp. */
+export function useDriveSyncFiles(filter = DEFAULT_TIME_FILTER) {
+  const { error } = toRangeParams(filter)
   return useQuery({
-    queryKey: ['admin', 'drive-sync', 'files'],
-    queryFn: () => adminApi.getDriveSyncFiles(),
+    queryKey: ['admin', 'drive-sync', 'files', filter],
+    queryFn: () => adminApi.getDriveSyncFiles(toRangeParams(filter).params),
+    enabled: !error,
+    placeholderData: keepPreviousData,
   })
 }
 
