@@ -1,6 +1,6 @@
 # session-start-loader.sh
 
-SessionStart — re-orientation context after compact/resume; injects the unfinished task from session.txt.
+SessionStart — re-orientation context after compact/resume; injects the task from session.txt into context and shows the user a boxed status report at startup.
 
 Source: `.claude/hooks/session-start-loader.sh`, wired in `.claude/settings.json`.
 
@@ -93,22 +93,119 @@ $HANDOFF_MSG"
     fi
 fi
 
-# Current task from session.txt (.claude/rules/session-file.md); /task-resume continues it
+# Current task from session.txt (.claude/rules/session-file.md); /task-resume continues it.
+# The model gets the raw file as context; the user gets a status report on screen
+# (systemMessage) right at startup, before typing anything.
+REPORT=""
 SESSION_FILE="$PROJECT_DIR/session.txt"
 if [ -s "$SESSION_FILE" ]; then
-    TASK_STATUS=$(sed -n 's/^status:[[:space:]]*//p' "$SESSION_FILE" | head -1 | tr -d '\r')
-    if [ "$TASK_STATUS" != "done" ]; then
-        CONTEXT="$CONTEXT
+    field() { sed -n "s/^$1:[[:space:]]*//p" "$SESSION_FILE" | head -1 | tr -d '\r'; }
+    # Cut to 70 characters (UTF-8 aware) so every table row stays one line
+    cut70() { local LC_ALL=C.UTF-8 v=$1; [ ${#v} -gt 70 ] && v="${v:0:69}…"; printf '%s' "$v"; }
+    # First ";"-item of a field
+    short() { local v; v=$(field "$1"); cut70 "${v%%;*}"; }
+    TASK_STATUS=$(field status)
+    if [ "$TASK_STATUS" = "done" ]; then
+        ICON="✅"
+        TITLE="Task gần nhất (session.txt)"
+        HINT="Đã xong · gõ yêu cầu mới để bắt đầu task khác"
+        NOTE="- Last task is done. The user already saw it in a status report from this hook; do not resume it."
+    else
+        ICON="📌"
+        TITLE="Task đang dở (session.txt)"
+        HINT="▶ /task-resume để làm tiếp"
+        NOTE="- Unfinished task from a previous session. The user already saw a status report from this hook; in your first reply, if the user did not run /task-resume, add one line reminding them that /task-resume continues it. Continue only if they run /task-resume or ask to."
+    fi
+    CONTEXT="$CONTEXT
 
 [CURRENT TASK — session.txt]
 $(head -c 2000 "$SESSION_FILE" | tr -d '\r')
-- Unfinished task from a previous session. Mention it to the user; continue only if they run /task-resume or ask to.
+$NOTE
 - Keep session.txt current while working (.claude/rules/session-file.md)."
+
+    if [ "$SOURCE" != "compact" ]; then
+        PROGRESS=$(field progress | tr -cd '0-9')
+        PROGRESS=${PROGRESS:-0}
+        [ "$PROGRESS" -gt 100 ] && PROGRESS=100
+        FILLED=$((PROGRESS / 10))
+        BAR="$(printf '%*s' "$FILLED" '' | sed 's/ /█/g')$(printf '%*s' $((10 - FILLED)) '' | sed 's/ /░/g')"
+        # Two-column table: label | value. "sep" rows become ├──┼──┤ lines between groups.
+        LC_ALL=C.UTF-8
+        LABELS=() VALUES=() COMMITS=() SEP=0
+        row() {
+            [ "$SEP" = 1 ] && [ ${#LABELS[@]} -gt 0 ] && { LABELS+=("sep"); VALUES+=(""); COMMITS+=(""); }
+            SEP=0; LABELS+=("$1"); VALUES+=("$2"); COMMITS+=("${3:-}")
+        }
+        # One row per ";"-item of a field (at most 8); the label shows on the first row only.
+        # A trailing commit hash ("... 6a0a5849" or "... (6a0a5849)") moves to its own column.
+        rows() {
+            local label=$2 n=0 it commit
+            while IFS= read -r it; do
+                it="${it#"${it%%[![:space:]]*}"}"; it="${it%"${it##*[![:space:]]}"}"
+                [ -z "$it" ] || [ "$it" = "-" ] && continue
+                commit=""
+                if [[ $it =~ ^(.*[^[:space:]])[[:space:]]+\(?([0-9a-f]{7,40})\)?$ ]]; then
+                    it=${BASH_REMATCH[1]}; commit=${BASH_REMATCH[2]:0:8}
+                fi
+                n=$((n + 1)); [ $n -le 8 ] && { row "$label" "$(cut70 "$it")" "$commit"; label=""; }
+            done < <(field "$1" | tr ';' '\n')
+            [ $n -gt 8 ] && row "" "… +$((n - 8)) more"
+        }
+        row "$ICON Task" "$(short task)"
+        row "Status" "${TASK_STATUS:-?} · [$BAR] $PROGRESS% · $(field updated)"
+        SEP=1; rows done "✅ Done"
+        SEP=1; rows doing "🔄 Doing"
+        SEP=1
+        BLOCKER=$(short blocker); [ -n "$BLOCKER" ] && row "⛔ Blocked" "$BLOCKER"
+        NEXT=$(short next)
+        [ "$TASK_STATUS" != "done" ] && [ -n "$NEXT" ] && [ "$NEXT" != "-" ] && row "→ Next" "$NEXT"
+
+        # Display width: these emoji take 2 terminal columns, everything else 1
+        # (counted per emoji: Git Bash sees 📌/🔄 as two UTF-16 units, so ${#s} alone is off)
+        dw() {
+            local s=$1 e r n=0
+            for e in ✅ 🔄 ⛔ 📌; do
+                r=${s//"$e"/}; n=$(( n + (${#s} - ${#r}) / ${#e} )); s=$r
+            done
+            echo $(( ${#s} + 2 * n ))
+        }
+        pad() { printf '%s%*s' "$1" $(( $2 - $(dw "$1") )) ''; }
+        line() { printf '%*s' $(($1 + 2)) '' | sed 's/ /─/g'; }
+        # hr <left> <mid> <right>; the commit column is drawn only when some row has a commit
+        hr() {
+            printf '%s%s%s%s' "$1" "$(line $LW)" "$2" "$(line $VW)"
+            [ "$CW" -gt 0 ] && printf '%s%s' "$2" "$(line $CW)"
+            printf '%s\n' "$3"
+        }
+        LW=0 VW=0 CW=0
+        for i in "${!LABELS[@]}"; do
+            [ "${LABELS[$i]}" = "sep" ] && continue
+            w=$(dw "${LABELS[$i]}"); [ "$w" -gt "$LW" ] && LW=$w
+            w=$(dw "${VALUES[$i]}"); [ "$w" -gt "$VW" ] && VW=$w
+            w=${#COMMITS[$i]}; [ "$w" -gt "$CW" ] && CW=$w
+        done
+        # The UI prefixes the first line with "SessionStart:startup says: ", so the
+        # table starts on line two, under a title line that absorbs the prefix.
+        REPORT=$(
+            printf '%s\n' "$TITLE"
+            hr "┌" "┬" "┐"
+            for i in "${!LABELS[@]}"; do
+                if [ "${LABELS[$i]}" = "sep" ]; then hr "├" "┼" "┤"; continue; fi
+                printf '│ %s │ %s │' "$(pad "${LABELS[$i]}" "$LW")" "$(pad "${VALUES[$i]}" "$VW")"
+                [ "$CW" -gt 0 ] && printf ' %s │' "$(pad "${COMMITS[$i]}" "$CW")"
+                printf '\n'
+            done
+            hr "└" "┴" "┘"
+            printf '%s' "$HINT"
+        )
     fi
 fi
 
-# Output context if any
-if [ -n "$CONTEXT" ]; then
+# Output: JSON when there is a report for the user, plain text (context only) otherwise
+if [ -n "$REPORT" ]; then
+    jq -n --arg msg "$REPORT" --arg ctx "$CONTEXT" \
+        '{systemMessage: $msg, hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $ctx}}'
+elif [ -n "$CONTEXT" ]; then
     echo "$CONTEXT"
 fi
 

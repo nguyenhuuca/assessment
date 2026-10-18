@@ -8,13 +8,14 @@
 
 1. [Introduction](#introduction)
 2. [Pre-configured Setup](#pre-configured-setup)
-3. [Workflow Skills — 14 Commands](#workflow-skills-14-commands)
+3. [Workflow Skills — 15 Commands](#workflow-skills-15-commands)
 4. [Library Skills — Loaded Automatically](#library-skills-loaded-automatically)
 5. [Swarm — Multi-Agent Parallel Execution](#swarm-multi-agent-parallel-execution)
-6. [Hooks & Permissions](#hooks-permissions)
-7. [Real-World Workflows](#real-world-workflows)
-8. [Available Templates](#available-templates)
-9. [Tips & Tricks](#tips-tricks)
+6. [Session File (session.txt)](#session-file-sessiontxt)
+7. [Hooks & Permissions](#hooks-permissions)
+8. [Real-World Workflows](#real-world-workflows)
+9. [Available Templates](#available-templates)
+10. [Tips & Tricks](#tips-tricks)
 
 ---
 
@@ -22,7 +23,7 @@
 
 This project uses the **[Claude Agentic Framework](https://github.com/dralgorhythm/claude-agentic-framework) v5**, adapted for Funny Movies (see [Claude Workspace](../claude/index.md)):
 
-- ✅ **14 workflow skills** you invoke as `/name` (scope, spec, architect, builder, swarm…)
+- ✅ **15 workflow skills** you invoke as `/name` (scope, spec, architect, builder, swarm…)
 - ✅ **10 library skills** Claude loads on its own when a task matches (testing, ADRs, threat modeling…)
 - ✅ **5 worker agents** for swarms, each with a pinned model, `maxTurns` and tool allowlist
 - ✅ **Rules** loaded in every session: core directives, code quality, security, tech strategy, debugging protocol
@@ -43,7 +44,7 @@ Two conventions specific to this repo:
 ```
 .claude/
 ├── skills/
-│   ├── <name>/SKILL.md          # 14 workflow skills: invoke as /name
+│   ├── <name>/SKILL.md          # 15 workflow skills: invoke as /name
 │   ├── architecture/            # designing-systems, writing-adrs
 │   ├── core-engineering/        # testing, dependency-upgrade, review-steering
 │   ├── design/                  # presentation
@@ -54,8 +55,10 @@ Two conventions specific to this repo:
 ├── rules/                       # Loaded in every session
 ├── hooks/                       # 4 safety hooks (bash)
 ├── templates/                   # Framework templates
+├── statusline-command.sh        # Status line: model | ctx | cost | rate | current task
 └── settings.json                # Permission allow/deny lists + hook registration
 
+session.txt                      # The one task in flight (committed; see Session File)
 AGENTS.md                        # "Landing the Plane": how a work session finishes
 templates/
 ├── artifacts/                   # PRD, ADR, spec, plan, design spec, postmortem…
@@ -66,14 +69,14 @@ templates/
 
 ---
 
-## Workflow Skills — 14 Commands
+## Workflow Skills — 15 Commands
 
 Workflow skills run only when you type `/name`; Claude never invokes them on its own.
 
 | Command | Role | Use when | Output |
 |---------|------|----------|--------|
 | `/scope <idea>` | PRD Generator | An idea is still vague: asks clarifying questions, then writes the PRD | `docs/prd/PRD-{slug}.md` |
-| `/spec <PRD> <ADR>` | Spec Generator | Turns an approved PRD + ADR into a behavior contract | `docs/specs/spec-{slug}.md` |
+| `/spec <PRD> [ADR]` | Spec Generator | Turns an approved PRD (+ ADR when there is one) into a behavior contract | `docs/specs/spec-{slug}.md` |
 | `/architect <topic>` | Principal Architect | System design; records decisions as ADRs | `docs/adr/NNNN-{slug}.md` |
 | `/builder <task>` | Builder | Implementation, debugging, refactoring with tests | Code + tests |
 | `/qa-engineer <component>` | QA Engineer | Test strategy, E2E, accessibility gate | Test plan / tests |
@@ -86,6 +89,7 @@ Workflow skills run only when you type `/name`; Claude never invokes them on its
 | `/swarm-research <topic>` | Research Orchestrator | Deep investigation, technology comparison | Research report |
 | `/land-the-plane` | Finish-Line Protocol | Gates → commit → (ask) push → check CI | Pushed commit |
 | `/tailor` | Configuration Tailor | Detects the stack and proposes config changes (proposal only) | `scratchpad/tailor-proposal.md` |
+| `/task-resume [instruction]` | Task Resumer | Continues the unfinished task in `session.txt` after re-checking the repo | Work continued from `next` |
 
 Examples:
 
@@ -194,6 +198,43 @@ Task tracking uses **Claude Code's native task list** (in-session) plus `TASKS.m
 
 ---
 
+## Session File (session.txt)
+
+`session.txt` at the repo root records the **one** task in flight, so the next session (on this machine or another) can pick it up. Full rule: `.claude/rules/session-file.md`. Durable status still lives in `TASKS.md` and `docs/tracking.md`.
+
+```
+task: Collection Reorder (drag & drop videos in a collection)
+status: in_progress
+progress: 60
+done: Plan 5ea4fec2; BE-1 position migration 6a0a5849
+doing: FE-2 @dnd-kit reorder mode
+next: FE-2 reorder mode; QA-1 prod smoke
+plan: docs/plans/plan-collection-reorder.md
+updated: 2026-10-18 21:05
+```
+
+| Field | Content |
+|-------|---------|
+| `task` | Short task name |
+| `status` | `in_progress` \| `blocked` \| `done`; `blocked` adds a `blocker:` line (what is needed, from whom) |
+| `progress` | 0–100, estimate for the whole task, not the current step |
+| `done` | `;`-separated finished subtasks, each `<ID> <what> <commit>` |
+| `doing` | Half-done subtasks (matching `[~]` in `TASKS.md`); `-` when none |
+| `next` | `;`-separated next steps, concrete enough to act on without the conversation |
+| `plan` | Plan artifact path, or `-` |
+| `updated` | Local date and time, `YYYY-MM-DD HH:MM` |
+
+**When Claude writes it**: at the start of any task with 3+ steps (or one likely to outlive the context window), after each step or commit, `blocked` while waiting on you, and `done` + `progress: 100` once pushed and verified. It is always a full overwrite; trivial edits and one-shot questions skip it.
+
+**Sync across machines**: the file is committed and pushed together with the work it describes (a status-only update gets its own `chore(session): …` commit). Run `git pull` first on another machine. Never put secrets, hostnames/IPs or key paths in it.
+
+**What you see**
+- **At startup**, `session-start-loader.sh` shows a boxed table: 📌 Task, Status (progress bar + `updated`), ✅ Done and 🔄 Doing (commit hashes in their own column), ⛔ Blocked, → Next. An unfinished task gets the hint `▶ /task-resume`; a `done` task is shown as the last task and is not resumed. The table is skipped after a compact.
+- **Status line** (`.claude/statusline-command.sh`) shows `task: <name> <progress>% (<status>)` while the task is not done.
+- **`/task-resume [instruction]`** re-reads the plan, `git status`/`git log` and `TASKS.md`, corrects the file when the repo disagrees, reports in 3–5 lines, then continues from `next`. Claude never resumes on its own, and pushes still need your go-ahead.
+
+---
+
 ## Hooks & Permissions
 
 Hooks are bash scripts in `.claude/hooks/`, registered in `.claude/settings.json`. They are **fail-open**: without `jq` they skip. On Windows they run through Git Bash.
@@ -202,7 +243,7 @@ Hooks are bash scripts in `.claude/hooks/`, registered in `.claude/settings.json
 |------|------|--------------|
 | `pre-tool-use-validator.sh` | Before Write/Edit/Bash | Asks when content looks like a secret (including Bash heredocs); denies edits to `.env`, `.git/`, `.mcp.json`; asks before editing `.claude/settings.json`, `.claude/rules/*`, `CLAUDE.md`; locks a file for 120 s while another session edits it |
 | `dangerous-command-guard.sh` | Before Bash | Warns on destructive commands (`terraform destroy`, `kubectl delete`…) |
-| `session-start-loader.sh` | Session start / after compact | Reminds to re-read the task list and plan after context compaction |
+| `session-start-loader.sh` | Session start / after compact | Shows the `session.txt` status table at startup and injects the task into context; reminds to re-read the task list and plan after compaction |
 | `stop-validator.sh` | End of a turn | Releases the session's locks; reminds about uncommitted files and unpushed commits |
 
 **Permission deny rules** (no allow rule can override them): reading `.env*`, `*.pem`, `~/.ssh`, `~/.aws`, credentials; `rm -rf`, `sudo`, `git push --force`, `git reset --hard`; `curl … | bash`.

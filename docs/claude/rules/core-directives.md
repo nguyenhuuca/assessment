@@ -37,7 +37,7 @@ Working notes, exploration output, draft content, and in-progress thinking belon
 
 ### 6. Follow the Planning Flow — Ceremony Scales With Scope
 
-Use the prescribed planning sequence: PR-FAQ → PRD → ADR → Design Spec → Plan → Implementation. Each phase produces an artifact that gates the next, and skipping a phase a feature actually needs creates unvalidated assumptions that surface as bugs or rework — but the flow applies in full only to features. A change describable in one sentence needs at most a plan artifact, and a trivial diff needs none. `swarm-plan`'s artifact-requirements table defines the scaling (Small/Medium/Large Feature tiers) — use it rather than defaulting to the full sequence for every change.
+Use the prescribed planning sequence: PR-FAQ → PRD → ADR → Spec (+ Design Spec for UI) → Plan → Implementation. Each phase produces an artifact that gates the next, and skipping a phase a feature actually needs creates unvalidated assumptions that surface as bugs or rework — but the flow applies in full only to features. A change describable in one sentence needs at most a plan artifact, and a trivial diff needs none. `swarm-plan`'s artifact-requirements table defines the scaling (Small/Medium/Large Feature tiers) — use it rather than defaulting to the full sequence for every change. PRD and PR-FAQ scale with feature size; an ADR is triggered by the decision type (one-way door or `writing-adrs` list), at any size.
 
 ### 7. Follow Command Protocols
 

@@ -8,13 +8,14 @@
 
 1. [Giới thiệu](#gioi-thieu)
 2. [Cấu hình có sẵn](#cau-hinh-co-san)
-3. [Workflow skills - 14 lệnh](#workflow-skills-14-lenh)
+3. [Workflow skills - 15 lệnh](#workflow-skills-15-lenh)
 4. [Library skills - tự động load](#library-skills-tu-ong-load)
 5. [Swarm - Multi-agent parallel execution](#swarm-multi-agent-parallel-execution)
-6. [Hooks & permissions](#hooks-permissions)
-7. [Workflows thực tế](#workflows-thuc-te)
-8. [Templates có sẵn](#templates-co-san)
-9. [Tips & Tricks](#tips-tricks)
+6. [Session file (session.txt)](#session-file-sessiontxt)
+7. [Hooks & permissions](#hooks-permissions)
+8. [Workflows thực tế](#workflows-thuc-te)
+9. [Templates có sẵn](#templates-co-san)
+10. [Tips & Tricks](#tips-tricks)
 
 ---
 
@@ -22,7 +23,7 @@
 
 Project này dùng **[Claude Agentic Framework](https://github.com/dralgorhythm/claude-agentic-framework) v5**, đã chỉnh cho Funny Movies (xem [Claude Workspace](../claude/index.md)):
 
-- ✅ **14 workflow skills** gọi bằng `/tên` (scope, spec, architect, builder, swarm…)
+- ✅ **15 workflow skills** gọi bằng `/tên` (scope, spec, architect, builder, swarm…)
 - ✅ **10 library skills** Claude tự load khi task phù hợp (testing, ADR, threat modeling…)
 - ✅ **5 worker agents** cho swarm, mỗi agent có model, `maxTurns` và tools cố định
 - ✅ **Rules** nạp vào mọi session: core directives, code quality, security, tech strategy, debugging protocol
@@ -43,7 +44,7 @@ Hai quy ước riêng của repo này cần nhớ:
 ```
 .claude/
 ├── skills/
-│   ├── <name>/SKILL.md          # 14 workflow skills: gọi bằng /name
+│   ├── <name>/SKILL.md          # 15 workflow skills: gọi bằng /name
 │   ├── architecture/            # designing-systems, writing-adrs
 │   ├── core-engineering/        # testing, dependency-upgrade, review-steering
 │   ├── design/                  # presentation
@@ -54,8 +55,10 @@ Hai quy ước riêng của repo này cần nhớ:
 ├── rules/                       # Nạp vào mọi session
 ├── hooks/                       # 4 safety hooks (bash)
 ├── templates/                   # Template của framework
+├── statusline-command.sh        # Status line: model | ctx | cost | rate | task hiện tại
 └── settings.json                # Permissions allow/deny + đăng ký hooks
 
+session.txt                      # Task đang làm (được commit; xem Session file)
 AGENTS.md                        # "Landing the Plane": cách kết thúc một phiên làm việc
 templates/
 ├── artifacts/                   # PRD, ADR, spec, plan, design spec, postmortem...
@@ -66,14 +69,14 @@ templates/
 
 ---
 
-## Workflow skills - 14 lệnh
+## Workflow skills - 15 lệnh
 
 Workflow skills chỉ chạy khi bạn gõ `/tên`; Claude không tự gọi chúng.
 
 | Lệnh | Vai trò | Dùng khi | Output |
 |------|---------|----------|--------|
 | `/scope <ý tưởng>` | PRD Generator | Ý tưởng còn mơ hồ: hỏi lại cho rõ rồi viết PRD | `docs/prd/PRD-{slug}.md` |
-| `/spec <PRD> <ADR>` | Spec Generator | Biến PRD + ADR đã duyệt thành behavior contract | `docs/specs/spec-{slug}.md` |
+| `/spec <PRD> [ADR]` | Spec Generator | Biến PRD đã duyệt (+ ADR nếu có) thành behavior contract | `docs/specs/spec-{slug}.md` |
 | `/architect <chủ đề>` | Principal Architect | Thiết kế hệ thống, ghi quyết định thành ADR | `docs/adr/NNNN-{slug}.md` |
 | `/builder <task>` | Builder | Implement, debug, refactor có test | Code + tests |
 | `/qa-engineer <component>` | QA Engineer | Test strategy, E2E, accessibility gate | Test plan / tests |
@@ -86,6 +89,7 @@ Workflow skills chỉ chạy khi bạn gõ `/tên`; Claude không tự gọi ch�
 | `/swarm-research <topic>` | Research Orchestrator | Nghiên cứu sâu, so sánh công nghệ | Research report |
 | `/land-the-plane` | Finish-Line Protocol | Chạy gates → commit → (hỏi) push → kiểm CI | Commit đã push |
 | `/tailor` | Configuration Tailor | Phát hiện stack, đề xuất chỉnh cấu hình (chỉ đề xuất) | `scratchpad/tailor-proposal.md` |
+| `/task-resume [chỉ dẫn]` | Task Resumer | Làm tiếp task dở trong `session.txt` sau khi kiểm lại repo | Làm tiếp từ `next` |
 
 Ví dụ:
 
@@ -194,6 +198,43 @@ Task tracking dùng **task list có sẵn của Claude Code** (trong phiên) + `
 
 ---
 
+## Session file (session.txt)
+
+`session.txt` ở root repo ghi **một** task đang làm, để session sau (trên máy này hay máy khác) làm tiếp được. Rule đầy đủ: `.claude/rules/session-file.md`. Trạng thái lâu dài vẫn nằm ở `TASKS.md` và `docs/tracking.md`.
+
+```
+task: Collection Reorder (drag & drop videos in a collection)
+status: in_progress
+progress: 60
+done: Plan 5ea4fec2; BE-1 position migration 6a0a5849
+doing: FE-2 @dnd-kit reorder mode
+next: FE-2 reorder mode; QA-1 prod smoke
+plan: docs/plans/plan-collection-reorder.md
+updated: 2026-10-18 21:05
+```
+
+| Field | Nội dung |
+|-------|----------|
+| `task` | Tên ngắn của task |
+| `status` | `in_progress` \| `blocked` \| `done`; `blocked` thêm dòng `blocker:` (cần gì, từ ai) |
+| `progress` | 0–100, ước lượng cho cả task, không phải bước hiện tại |
+| `done` | Các subtask đã xong, ngăn bằng `;`, mỗi item `<ID> <việc> <commit>` |
+| `doing` | Subtask đang dở (ứng với `[~]` trong `TASKS.md`); `-` nếu không có |
+| `next` | Các bước tiếp theo, ngăn bằng `;`, đủ cụ thể để làm mà không cần đọc lại hội thoại |
+| `plan` | Đường dẫn plan artifact, hoặc `-` |
+| `updated` | Ngày giờ local, `YYYY-MM-DD HH:MM` |
+
+**Khi nào Claude ghi file**: lúc bắt đầu task có từ 3 bước trở lên (hoặc task dễ vượt quá context window), sau mỗi bước hay commit, `blocked` khi đang chờ bạn, và `done` + `progress: 100` khi đã push và verify. Luôn ghi đè toàn bộ file; sửa vặt hay câu hỏi một lần thì không ghi.
+
+**Đồng bộ giữa các máy**: file được commit và push cùng phần việc nó mô tả (cập nhật chỉ trạng thái thì commit riêng `chore(session): …`). Sang máy khác thì `git pull` trước. Không ghi secret, hostname/IP hay đường dẫn key vào file.
+
+**Bạn sẽ thấy gì**
+- **Lúc mở session**, `session-start-loader.sh` hiện một bảng có khung: 📌 Task, Status (progress bar + `updated`), ✅ Done và 🔄 Doing (commit hash ở cột riêng), ⛔ Blocked, → Next. Task chưa xong có gợi ý `▶ /task-resume`; task `done` hiện như task gần nhất và không được làm tiếp. Sau compact thì không hiện bảng.
+- **Status line** (`.claude/statusline-command.sh`) hiện `task: <tên> <progress>% (<status>)` khi task chưa xong.
+- **`/task-resume [chỉ dẫn]`** đọc lại plan, `git status`/`git log` và `TASKS.md`, sửa file nếu repo khác với file, báo cáo 3–5 dòng rồi làm tiếp từ `next`. Claude không tự làm tiếp, và push vẫn cần bạn đồng ý.
+
+---
+
 ## Hooks & permissions
 
 Hooks là script bash trong `.claude/hooks/`, đăng ký trong `.claude/settings.json`. Chúng **fail-open**: thiếu `jq` thì bỏ qua. Trên Windows chúng chạy qua Git Bash.
@@ -202,7 +243,7 @@ Hooks là script bash trong `.claude/hooks/`, đăng ký trong `.claude/settings
 |------|---------|--------|
 | `pre-tool-use-validator.sh` | Trước Write/Edit/Bash | Hỏi lại khi nội dung trông giống secret (kể cả heredoc trong Bash); chặn sửa `.env`, `.git/`, `.mcp.json`; hỏi lại khi sửa `.claude/settings.json`, `.claude/rules/*`, `CLAUDE.md`; khoá file 120 s nếu một session khác đang sửa |
 | `dangerous-command-guard.sh` | Trước Bash | Cảnh báo lệnh phá huỷ (`terraform destroy`, `kubectl delete`…) |
-| `session-start-loader.sh` | Bắt đầu / sau compact | Nhắc đọc lại task list và plan sau khi context bị nén |
+| `session-start-loader.sh` | Bắt đầu / sau compact | Hiện bảng trạng thái từ `session.txt` lúc mở session và đưa task vào context; nhắc đọc lại task list và plan sau khi context bị nén |
 | `stop-validator.sh` | Kết thúc lượt | Nhả lock của session, nhắc file chưa commit / commit chưa push |
 
 **Permission deny** (không allow rule nào ghi đè được): đọc `.env*`, `*.pem`, `~/.ssh`, `~/.aws`, credential; `rm -rf`, `sudo`, `git push --force`, `git reset --hard`; `curl … | bash`.

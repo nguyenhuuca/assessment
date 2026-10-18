@@ -38,6 +38,8 @@ Decompose features into actionable plans using parallel exploration swarms.
 
 ## Artifact Requirements
 
+Two independent axes: **PRD/PR-FAQ scale with feature size**; **an ADR is triggered by the decision type, at any size**.
+
 **Small Feature (1-3 days)**
 - `docs/plans/plan-<feature>.md` — Implementation steps only
 
@@ -48,8 +50,12 @@ Decompose features into actionable plans using parallel exploration swarms.
 **Large Feature (2+ weeks)**
 - `docs/prd/PR-FAQ-<feature>.md` — Vision and customer value
 - `docs/prd/PRD-<feature>.md` — Detailed requirements
-- `docs/adr/NNNN-<topic>.md` — Architectural decisions (format: `writing-adrs` skill; template bundled with `designing-systems` at `resources/adr.template.md`)
 - `docs/plans/plan-<feature>.md` — Implementation steps
+
+**ADR — any size** (`docs/adr/NNNN-<topic>.md`; format: `writing-adrs` skill; template bundled with `designing-systems` at `resources/adr.template.md`)
+- Required when the work contains a One-Way Door (High) decision (Decision Framework above), or a decision on the `writing-adrs` "When to Write an ADR" list (framework/library, database or storage, a new API pattern, a coding convention, infrastructure, anything affecting multiple components)
+- One-Way Door (Medium) decisions: record the RFC/design excerpt in the plan's design section instead of a separate ADR
+- Following an existing pattern (another endpoint, another Liquibase column) is not a new decision and needs no ADR
 
 ## Worker Types
 
