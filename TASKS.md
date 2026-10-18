@@ -171,7 +171,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **BE-1** `GET /files?from&to` (ISO instants, 400 on from > to), Drive `q` with `createdTime`, filtered DB lookup, `orphansChecked` flag + tests — `cc7f8f2b`
 - [x] **FE-1** `utils/timeRange.js` (`toRangeParams`, presets 1h/12h/24h/7d/30d, VN-time custom range), `getDriveSyncFiles(params)`, `useDriveSyncFiles(filter)` + tests — contract-first, parallel to BE-1 — `ad0adc82`
 - [x] **FE-2** `DriveTimeFilter` control + panel wiring (default 12 h, refetch per change, clear selection, orphan note) + vi/en strings + tests — after FE-1; push only after BE-1 is deployed — `31f01e86`
-- [ ] **QA-1** Local check on the real folder + prod smoke (ADMIN, SUPER_ADMIN), tracking + docs — after BE-1, FE-2
+- [x] **QA-1** Prod smoke (default 12 h, presets, All + orphans, custom range, FORCE_SYNC) — verified by owner 2026-10-18
 
 ---
 

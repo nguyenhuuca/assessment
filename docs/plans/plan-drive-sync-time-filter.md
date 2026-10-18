@@ -9,7 +9,7 @@ Handoff to: Builder, QA Engineer
 
 ## Overview
 
-**Status:** Approved 2026-10-18 · BE-1 `cc7f8f2b`, FE-1 `ad0adc82`, FE-2 `31f01e86` committed; QA-1 (deploy + prod smoke) pending
+**Status:** Done 2026-10-18 · BE-1 `cc7f8f2b`, FE-1 `ad0adc82`, FE-2 `31f01e86`; deployed (prod-82), QA-1 prod smoke verified by owner
 **Author:** nguyenhuuca
 **Date:** 2026-10-18
 **Related plan:** [plan-admin-drive-force-sync](plan-admin-drive-force-sync.md) (the `DRIVE_SYNC` tab this extends)
