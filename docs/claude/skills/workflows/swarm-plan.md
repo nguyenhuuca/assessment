@@ -133,6 +133,7 @@ Link dependencies with `TaskUpdate` (addBlockedBy): Task 2 gets Task 1 added to 
 Every planning session MUST produce:
 1. Artifact(s) in `docs/` following naming conventions
 2. Tasks (via `TaskCreate`) for all implementation work, each with acceptance criteria
+   - **This repo:** also add a `## Feature: <name>` section to `TASKS.md` with one `- [ ] **<ID>**` line per task (the native list is machine-local; `TASKS.md` is the durable record). If `TaskCreate` is unavailable, `TASKS.md` + the plan's task table are the record.
 3. Dependency graph showing task order (via `blockedBy`)
 4. Handoff summary for /execute command
 

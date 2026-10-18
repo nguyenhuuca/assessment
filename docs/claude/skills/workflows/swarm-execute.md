@@ -29,7 +29,7 @@ Execute plans using parallel worker swarms with quality gates and native task-li
 3. **Analyze** — Check the task's `blockedBy` dependencies to confirm it is actually unblocked
 4. **Execute** — Launch parallel workers for independent tasks
 5. **Gate** — Run quality gates before marking tasks complete
-6. **Close** — Mark complete via `TaskUpdate` (status: completed)
+6. **Close** — Mark complete via `TaskUpdate` (status: completed), and in this repo flip the task's line in `TASKS.md` to `[x]` with the commit hash (`[~]` while in progress) in the same commit as the work or its docs
 7. **Push** — Push to remote (MANDATORY)
 
 ## Context Efficiency
@@ -130,7 +130,7 @@ If quality gates fail: stash changes, mark the task as blocked via `TaskUpdate`,
 - NO exceeding 8 parallel workers
 - NO skipping git push step
 - NO exposing secrets in error messages or comments
-- ALWAYS update task status in real-time via `TaskUpdate`
+- ALWAYS update task status in real-time via `TaskUpdate`, and keep `TASKS.md` in step (this repo's durable task record)
 - ALWAYS add comments for blocked work
 - ALWAYS verify `git status` shows up to date
 - ALWAYS validate inputs before executing commands

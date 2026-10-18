@@ -161,3 +161,66 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **FS-4** FE tab `DRIVE_SYNC` (all admins view; select/FORCE_SYNC SA only): table + states, select, FORCE_SYNC, polling progress + tests — contract-first
   - Fix found by test: `@HasPermission` is a meta `@PreAuthorize`, so the SA POST inlines the permission check into one `@PreAuthorize` (two would be a 500)
 - [ ] **FS-5** Prod E2E, `/security-auditor`, tracking + docs — after FS-3, FS-4
+
+---
+
+## Feature: Library Collections (replaces Bookmarks)
+
+**ADR:** `docs/adr/0012-bookmark-feature-design.md` (amended 2026-10-13) · **Plan:** `docs/plans/plan-library-collections.md`
+
+- [x] **BE-1** Migration, `VideoCollection` / `VideoCollectionItem` entities + repos — `50ade4e`
+- [x] **BE-2** DTOs + `VideoCollectionService` (lazy default "Xem sau", duplicate/cap 409, admin public collections) — `50ade4e`
+- [x] **BE-3** `VideoCollectionController`, optional-auth public GETs, WebMvc tests — `50ade4e`
+- [x] **FE-1** `api/collections.js` + `hooks/useCollections.js` — `50ade4e`
+- [x] **FE-2** `AddToCollectionModal` + "Lưu" button in `VideoSwiper` — `50ade4e`
+- [x] **FE-3** `LibraryView` (public + mine, detail, CRUD, `?l=` deep link) — `50ade4e`
+  - Follow-ups: `d27cdcc` adversarial review fixes; `e4018c6` search/add inside a collection; `2dc702c` "Phát" plays the whole list; `60428a0` dropped the legacy "Video riêng tư" section; `b677d60` titles on tiles
+- [ ] **QA-1** Local E2E + prod smoke (guest opens `?l=` link, hidden video disappears) — not recorded in the plan
+
+---
+
+## Feature: i18n (Vietnamese + English)
+
+**PRD:** `docs/prd/PRD-i18n.md` · **ADR:** `docs/adr/0020-i18n-vietnamese-english.md` (Accepted) · **Plan:** `docs/plans/plan-i18n.md`
+
+- [x] **FE-1** Foundation: i18next, `VI | EN` switcher, `<html lang>`, `Accept-Language`, parity test — `e445a03`
+- [x] **FE-2** Core UI: AppShell, video, explore, modals, common — `ae99e44`
+- [x] **FE-3** Library, comments, notifications — `ae99e44`
+- [x] **FE-4** Auth + Settings, language row synced with `user_settings.locale` — `8d7d97e`, `9155ec3`
+- [x] **FE-5** Admin — `ae99e44`
+- [x] **BE-1** `MessageSource` + `LocaleResolver`, `ResultErrorInfo.code`, localized errors — `9bb06bd`
+- [x] **BE-2** `user_settings.locale` migration + `PATCH /user/settings` validation — `9bb06bd`
+- [x] **BE-3** Localized emails (magic link, password notice, digest) — `749617c`
+- [ ] **QA-1** E2E + prod smoke in both languages (emails, no mixed chrome) — pending per `docs/tracking.md`
+
+---
+
+## Feature: Video Suggestions (+ button) and History → My suggestions
+
+**PRD:** `docs/prd/PRD-video-suggestions.md` · **Plan:** `docs/plans/plan-video-suggestions.md`
+
+- [x] **BE-1** Migration, entity, enums, repo, `VideoSuggestionService` (submit, mine, list, approve, reject) — `c11041a`
+- [x] **BE-2** User + admin controllers, permissions, rate limits — `c11041a`
+- [x] **BE-3** Notifications (approved / rejected / live), `SuggestionNotificationListener` — `c11041a`
+- [x] **FE-1** `SuggestVideoModal` on the + button, removed legacy `ShareModal` — `ed23c5e`
+- [x] **FE-2** Admin `SUGGESTIONS` tab (approve with title override, reject with reason) — `ed23c5e`
+- [x] **FE-3** Notification rendering for the three types — `ed23c5e`
+- [x] **FE-4** History page with "My suggestions" — `ed23c5e`
+  - Follow-ups: `d01ced7` History redesign (Stitch); `1843c44` real thumbnail for suggestions that are live
+- [ ] **QA-1** Local E2E + prod smoke (suggest → approve → ingest → 3 notifications) — not recorded in the plan
+
+---
+
+## Feature: Watch History v2
+
+**PRD:** `docs/prd/PRD-watch-history-v2.md` · **ADR:** `docs/adr/0021-watch-history.md` (Accepted) · **Plan:** `docs/plans/plan-watch-history-v2.md` (Done)
+
+- [x] **BE-1** `watch_history` migration, repository (upsert, trim, progress, page, summary), `WatchHistoryService` — `0a2a365`
+- [x] **BE-2** `WatchHistoryController` (5 endpoints, rate limits) + hook in `VideoViewController.record` — `0a2a365`
+- [x] **BE-3** Account deletion clears history — `0a2a365`
+- [x] **FE-1** `api/watchHistory.js`, `keepalive`, `hooks/useWatchHistory.js` — `4c46791`
+- [x] **FE-2** `VideoPlayer` progress + `startAt` resume via `AppShell.playVideo` — `4c46791`
+- [x] **FE-3** History tabs + `WatchHistorySection` (search, pause, clear-all, day groups, paging) — `4c46791`
+- [x] **FE-4** `WatchedBadge` on feed + Explore — `4c46791`
+  - Follow-ups: `e7b8ed1` History in the mobile bottom nav; `3c00d84` icon-only nav; `d79d68f` settings menu in the bottom nav
+- [x] **QA-1** Prod smoke, logged in — verified by owner 2026-10-18 (`14eeb7a`)
