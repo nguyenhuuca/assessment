@@ -5512,6 +5512,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#syncing-across-machines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syncing Across Machines
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -6353,6 +6364,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#syncing-across-machines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syncing Across Machines
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -6379,22 +6401,26 @@
 
 
 <h1 id="session-file-sessiontxt">Session File (<code>session.txt</code>)<a class="headerlink" href="#session-file-sessiontxt" title="Permanent link">&para;</a></h1>
-<p><code>session.txt</code> at the repo root holds the <strong>one</strong> task currently in flight, so a new session (or <code>/task-resume</code>) can pick it up. It is gitignored and machine-local; durable status still goes to <code>TASKS.md</code> and <code>docs/tracking.md</code>.</p>
+<p><code>session.txt</code> at the repo root holds the <strong>one</strong> task currently in flight, so a new session (or <code>/task-resume</code>) can pick it up. It is <strong>committed and pushed</strong>, so a session on another machine knows where work stopped after <code>git pull</code>. Durable status still goes to <code>TASKS.md</code> and <code>docs/tracking.md</code>. Whenever the file is non-empty, the SessionStart hook shows the user a status report from it at every startup. Unfinished tasks also get a "/task-resume" hint, and <code>done</code> tasks are shown as the last task, so keep the fields short and current: what it shows is exactly what is written here.</p>
 <h2 id="format">Format<a class="headerlink" href="#format" title="Permanent link">&para;</a></h2>
 <p>Plain <code>key: value</code> lines, one per key, no nesting:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>task: Continue Watching row (Explore)
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>status: in_progress
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>progress: 40
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>done: FE-1 selector; FE-4 summary invalidation
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>next: FE-2 ContinueWatchingRow component + styles
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>plan: docs/plans/plan-continue-watching.md
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>updated: 2026-10-18 21:05
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>doing: FE-2 ContinueWatchingRow component
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>next: FE-2 ContinueWatchingRow component + styles
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>plan: docs/plans/plan-continue-watching.md
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>updated: 2026-10-18 21:05
 </code></pre></div>
 <ul>
 <li><code>status</code>: <code>in_progress</code> | <code>blocked</code> | <code>done</code></li>
 <li><code>progress</code>: integer 0–100, your honest estimate of the whole task (not the current step)</li>
-<li><code>done</code> / <code>next</code>: short, <code>;</code>-separated; <code>next</code> must be concrete enough to act on without the conversation</li>
+<li><code>done</code>: one <code>;</code>-item per <strong>finished subtask</strong>, written as <code>&lt;ID&gt; &lt;what&gt; &lt;commit&gt;</code>, e.g. <code>BE-1 position column 6a0a5849</code>. The startup report shows each item as a <code>✅</code> line, at most 8 items and 70 characters each, so keep every item short</li>
+<li><code>doing</code>: subtasks started but not finished (matching <code>[~]</code> in <code>TASKS.md</code>), same item format as <code>done</code>, shown as <code>🔄</code> lines. Optional: leave it out or set it to <code>-</code> when nothing is half-done. When a subtask finishes, move it from <code>doing</code> to <code>done</code></li>
+<li><code>next</code>: short, <code>;</code>-separated, concrete enough to act on without the conversation. Only the first item shows in the startup report</li>
 <li><code>plan</code>: artifact path, or <code>-</code> when there is none</li>
+<li><code>updated</code>: local date and time as <code>YYYY-MM-DD HH:MM</code> (24h, e.g. <code>2026-10-18 21:05</code>), never the date alone; get it from <code>date "+%Y-%m-%d %H:%M"</code></li>
 <li><code>blocked</code> adds a <code>blocker:</code> line saying what is needed and from whom</li>
 </ul>
 <h2 id="when-to-write-it">When to Write It<a class="headerlink" href="#when-to-write-it" title="Permanent link">&para;</a></h2>
@@ -6404,7 +6430,13 @@
 <li><strong>Blocked or waiting on the user</strong>: <code>status: blocked</code> + <code>blocker:</code></li>
 <li><strong>Finished</strong> (pushed, verified): <code>status: done</code>, <code>progress: 100</code></li>
 </ul>
-<p>Skip it for one-shot questions and trivial edits. Write it with a single Write call (overwrite), never append. Never put secrets, tokens or customer data in it.</p>
+<p>Skip it for one-shot questions and trivial edits. Write it with a single Write call (overwrite), never append. Never put secrets, tokens, hostnames/IPs, key paths or customer data in it: it is pushed to the remote.</p>
+<h2 id="syncing-across-machines">Syncing Across Machines<a class="headerlink" href="#syncing-across-machines" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Commit <code>session.txt</code> together with the work it describes. A status-only update gets its own <code>chore(session): …</code> commit. Pushing still needs the user's go-ahead, like every push.</li>
+<li>Before stopping work on a machine, make sure the latest <code>session.txt</code> is committed, so the next <code>git pull</code> elsewhere brings it along.</li>
+<li>On a new machine, <code>git pull</code> first; the SessionStart hook only sees the local copy.</li>
+</ul>
 
 
 

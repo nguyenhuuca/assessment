@@ -6844,6 +6844,7 @@
 </tbody>
 </table>
 <h2 id="artifact-requirements">Artifact Requirements<a class="headerlink" href="#artifact-requirements" title="Permanent link">&para;</a></h2>
+<p>Two independent axes: <strong>PRD/PR-FAQ scale with feature size</strong>; <strong>an ADR is triggered by the decision type, at any size</strong>.</p>
 <p><strong>Small Feature (1-3 days)</strong>
 - <code>docs/plans/plan-&lt;feature&gt;.md</code> — Implementation steps only</p>
 <p><strong>Medium Feature (1-2 weeks)</strong>
@@ -6852,8 +6853,11 @@
 <p><strong>Large Feature (2+ weeks)</strong>
 - <code>docs/prd/PR-FAQ-&lt;feature&gt;.md</code> — Vision and customer value
 - <code>docs/prd/PRD-&lt;feature&gt;.md</code> — Detailed requirements
-- <code>docs/adr/NNNN-&lt;topic&gt;.md</code> — Architectural decisions (format: <code>writing-adrs</code> skill; template bundled with <code>designing-systems</code> at <code>resources/adr.template.md</code>)
 - <code>docs/plans/plan-&lt;feature&gt;.md</code> — Implementation steps</p>
+<p><strong>ADR — any size</strong> (<code>docs/adr/NNNN-&lt;topic&gt;.md</code>; format: <code>writing-adrs</code> skill; template bundled with <code>designing-systems</code> at <code>resources/adr.template.md</code>)
+- Required when the work contains a One-Way Door (High) decision (Decision Framework above), or a decision on the <code>writing-adrs</code> "When to Write an ADR" list (framework/library, database or storage, a new API pattern, a coding convention, infrastructure, anything affecting multiple components)
+- One-Way Door (Medium) decisions: record the RFC/design excerpt in the plan's design section instead of a separate ADR
+- Following an existing pattern (another endpoint, another Liquibase column) is not a new decision and needs no ADR</p>
 <h2 id="worker-types">Worker Types<a class="headerlink" href="#worker-types" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

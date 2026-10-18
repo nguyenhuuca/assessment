@@ -3054,10 +3054,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#workflow-skills-14-lenh" class="md-nav__link">
+  <a href="#workflow-skills-15-lenh" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Workflow skills - 14 lệnh
+        Workflow skills - 15 lệnh
       
     </span>
   </a>
@@ -3161,6 +3161,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#session-file-sessiontxt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session file (session.txt)
+      
+    </span>
+  </a>
   
 </li>
       
@@ -6874,10 +6885,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#workflow-skills-14-lenh" class="md-nav__link">
+  <a href="#workflow-skills-15-lenh" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Workflow skills - 14 lệnh
+        Workflow skills - 15 lệnh
       
     </span>
   </a>
@@ -6981,6 +6992,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#session-file-sessiontxt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session file (session.txt)
+      
+    </span>
+  </a>
   
 </li>
       
@@ -7407,9 +7429,10 @@
 <ol>
 <li><a href="#gioi-thieu">Giới thiệu</a></li>
 <li><a href="#cau-hinh-co-san">Cấu hình có sẵn</a></li>
-<li><a href="#workflow-skills-14-lenh">Workflow skills - 14 lệnh</a></li>
+<li><a href="#workflow-skills-15-lenh">Workflow skills - 15 lệnh</a></li>
 <li><a href="#library-skills-tu-ong-load">Library skills - tự động load</a></li>
 <li><a href="#swarm-multi-agent-parallel-execution">Swarm - Multi-agent parallel execution</a></li>
+<li><a href="#session-file-sessiontxt">Session file (session.txt)</a></li>
 <li><a href="#hooks-permissions">Hooks &amp; permissions</a></li>
 <li><a href="#workflows-thuc-te">Workflows thực tế</a></li>
 <li><a href="#templates-co-san">Templates có sẵn</a></li>
@@ -7419,7 +7442,7 @@
 <h2 id="gioi-thieu">Giới thiệu<a class="headerlink" href="#gioi-thieu" title="Permanent link">&para;</a></h2>
 <p>Project này dùng <strong><a href="https://github.com/dralgorhythm/claude-agentic-framework">Claude Agentic Framework</a> v5</strong>, đã chỉnh cho Funny Movies (xem <a href="../../claude/">Claude Workspace</a>):</p>
 <ul>
-<li>✅ <strong>14 workflow skills</strong> gọi bằng <code>/tên</code> (scope, spec, architect, builder, swarm…)</li>
+<li>✅ <strong>15 workflow skills</strong> gọi bằng <code>/tên</code> (scope, spec, architect, builder, swarm…)</li>
 <li>✅ <strong>10 library skills</strong> Claude tự load khi task phù hợp (testing, ADR, threat modeling…)</li>
 <li>✅ <strong>5 worker agents</strong> cho swarm, mỗi agent có model, <code>maxTurns</code> và tools cố định</li>
 <li>✅ <strong>Rules</strong> nạp vào mọi session: core directives, code quality, security, tech strategy, debugging protocol</li>
@@ -7436,7 +7459,7 @@
 <h3 id="cau-truc-thu-muc">📁 Cấu trúc thư mục<a class="headerlink" href="#cau-truc-thu-muc" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>.claude/
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── skills/
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── &lt;name&gt;/SKILL.md          # 14 workflow skills: gọi bằng /name
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── &lt;name&gt;/SKILL.md          # 15 workflow skills: gọi bằng /name
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── architecture/            # designing-systems, writing-adrs
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── core-engineering/        # testing, dependency-upgrade, review-steering
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── design/                  # presentation
@@ -7447,18 +7470,20 @@
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├── rules/                       # Nạp vào mọi session
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>├── hooks/                       # 4 safety hooks (bash)
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>├── templates/                   # Template của framework
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>└── settings.json                # Permissions allow/deny + đăng ký hooks
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>AGENTS.md                        # "Landing the Plane": cách kết thúc một phiên làm việc
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>templates/
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>├── artifacts/                   # PRD, ADR, spec, plan, design spec, postmortem...
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>└── claude_mechanisms/           # Agent, command, skill, rule templates
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>├── statusline-command.sh        # Status line: model | ctx | cost | rate | task hiện tại
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>└── settings.json                # Permissions allow/deny + đăng ký hooks
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>session.txt                      # Task đang làm (được commit; xem Session file)
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>AGENTS.md                        # "Landing the Plane": cách kết thúc một phiên làm việc
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>templates/
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>├── artifacts/                   # PRD, ADR, spec, plan, design spec, postmortem...
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>└── claude_mechanisms/           # Agent, command, skill, rule templates
 </code></pre></div>
 <blockquote>
 <p><strong>Từ v5 không còn <code>.claude/commands/</code>.</strong> Các lệnh cũ đã thành skill, tên lệnh giữ nguyên.</p>
 </blockquote>
 <hr />
-<h2 id="workflow-skills-14-lenh">Workflow skills - 14 lệnh<a class="headerlink" href="#workflow-skills-14-lenh" title="Permanent link">&para;</a></h2>
+<h2 id="workflow-skills-15-lenh">Workflow skills - 15 lệnh<a class="headerlink" href="#workflow-skills-15-lenh" title="Permanent link">&para;</a></h2>
 <p>Workflow skills chỉ chạy khi bạn gõ <code>/tên</code>; Claude không tự gọi chúng.</p>
 <table>
 <thead>
@@ -7477,9 +7502,9 @@
 <td><code>docs/prd/PRD-{slug}.md</code></td>
 </tr>
 <tr>
-<td><code>/spec &lt;PRD&gt; &lt;ADR&gt;</code></td>
+<td><code>/spec &lt;PRD&gt; [ADR]</code></td>
 <td>Spec Generator</td>
-<td>Biến PRD + ADR đã duyệt thành behavior contract</td>
+<td>Biến PRD đã duyệt (+ ADR nếu có) thành behavior contract</td>
 <td><code>docs/specs/spec-{slug}.md</code></td>
 </tr>
 <tr>
@@ -7553,6 +7578,12 @@
 <td>Configuration Tailor</td>
 <td>Phát hiện stack, đề xuất chỉnh cấu hình (chỉ đề xuất)</td>
 <td><code>scratchpad/tailor-proposal.md</code></td>
+</tr>
+<tr>
+<td><code>/task-resume [chỉ dẫn]</code></td>
+<td>Task Resumer</td>
+<td>Làm tiếp task dở trong <code>session.txt</code> sau khi kiểm lại repo</td>
+<td>Làm tiếp từ <code>next</code></td>
 </tr>
 </tbody>
 </table>
@@ -7755,6 +7786,66 @@
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>→ Tổng hợp thành report có trích dẫn
 </code></pre></div>
 <hr />
+<h2 id="session-file-sessiontxt">Session file (session.txt)<a class="headerlink" href="#session-file-sessiontxt" title="Permanent link">&para;</a></h2>
+<p><code>session.txt</code> ở root repo ghi <strong>một</strong> task đang làm, để session sau (trên máy này hay máy khác) làm tiếp được. Rule đầy đủ: <code>.claude/rules/session-file.md</code>. Trạng thái lâu dài vẫn nằm ở <code>TASKS.md</code> và <code>docs/tracking.md</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>task: Collection Reorder (drag &amp; drop videos in a collection)
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>status: in_progress
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>progress: 60
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>done: Plan 5ea4fec2; BE-1 position migration 6a0a5849
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>doing: FE-2 @dnd-kit reorder mode
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>next: FE-2 reorder mode; QA-1 prod smoke
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>plan: docs/plans/plan-collection-reorder.md
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>updated: 2026-10-18 21:05
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Nội dung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>task</code></td>
+<td>Tên ngắn của task</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>in_progress</code> | <code>blocked</code> | <code>done</code>; <code>blocked</code> thêm dòng <code>blocker:</code> (cần gì, từ ai)</td>
+</tr>
+<tr>
+<td><code>progress</code></td>
+<td>0–100, ước lượng cho cả task, không phải bước hiện tại</td>
+</tr>
+<tr>
+<td><code>done</code></td>
+<td>Các subtask đã xong, ngăn bằng <code>;</code>, mỗi item <code>&lt;ID&gt; &lt;việc&gt; &lt;commit&gt;</code></td>
+</tr>
+<tr>
+<td><code>doing</code></td>
+<td>Subtask đang dở (ứng với <code>[~]</code> trong <code>TASKS.md</code>); <code>-</code> nếu không có</td>
+</tr>
+<tr>
+<td><code>next</code></td>
+<td>Các bước tiếp theo, ngăn bằng <code>;</code>, đủ cụ thể để làm mà không cần đọc lại hội thoại</td>
+</tr>
+<tr>
+<td><code>plan</code></td>
+<td>Đường dẫn plan artifact, hoặc <code>-</code></td>
+</tr>
+<tr>
+<td><code>updated</code></td>
+<td>Ngày giờ local, <code>YYYY-MM-DD HH:MM</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Khi nào Claude ghi file</strong>: lúc bắt đầu task có từ 3 bước trở lên (hoặc task dễ vượt quá context window), sau mỗi bước hay commit, <code>blocked</code> khi đang chờ bạn, và <code>done</code> + <code>progress: 100</code> khi đã push và verify. Luôn ghi đè toàn bộ file; sửa vặt hay câu hỏi một lần thì không ghi.</p>
+<p><strong>Đồng bộ giữa các máy</strong>: file được commit và push cùng phần việc nó mô tả (cập nhật chỉ trạng thái thì commit riêng <code>chore(session): …</code>). Sang máy khác thì <code>git pull</code> trước. Không ghi secret, hostname/IP hay đường dẫn key vào file.</p>
+<p><strong>Bạn sẽ thấy gì</strong>
+- <strong>Lúc mở session</strong>, <code>session-start-loader.sh</code> hiện một bảng có khung: 📌 Task, Status (progress bar + <code>updated</code>), ✅ Done và 🔄 Doing (commit hash ở cột riêng), ⛔ Blocked, → Next. Task chưa xong có gợi ý <code>▶ /task-resume</code>; task <code>done</code> hiện như task gần nhất và không được làm tiếp. Sau compact thì không hiện bảng.
+- <strong>Status line</strong> (<code>.claude/statusline-command.sh</code>) hiện <code>task: &lt;tên&gt; &lt;progress&gt;% (&lt;status&gt;)</code> khi task chưa xong.
+- <strong><code>/task-resume [chỉ dẫn]</code></strong> đọc lại plan, <code>git status</code>/<code>git log</code> và <code>TASKS.md</code>, sửa file nếu repo khác với file, báo cáo 3–5 dòng rồi làm tiếp từ <code>next</code>. Claude không tự làm tiếp, và push vẫn cần bạn đồng ý.</p>
+<hr />
 <h2 id="hooks-permissions">Hooks &amp; permissions<a class="headerlink" href="#hooks-permissions" title="Permanent link">&para;</a></h2>
 <p>Hooks là script bash trong <code>.claude/hooks/</code>, đăng ký trong <code>.claude/settings.json</code>. Chúng <strong>fail-open</strong>: thiếu <code>jq</code> thì bỏ qua. Trên Windows chúng chạy qua Git Bash.</p>
 <table>
@@ -7779,7 +7870,7 @@
 <tr>
 <td><code>session-start-loader.sh</code></td>
 <td>Bắt đầu / sau compact</td>
-<td>Nhắc đọc lại task list và plan sau khi context bị nén</td>
+<td>Hiện bảng trạng thái từ <code>session.txt</code> lúc mở session và đưa task vào context; nhắc đọc lại task list và plan sau khi context bị nén</td>
 </tr>
 <tr>
 <td><code>stop-validator.sh</code></td>
@@ -7795,66 +7886,66 @@
 <hr />
 <h2 id="workflows-thuc-te">Workflows thực tế<a class="headerlink" href="#workflows-thuc-te" title="Permanent link">&para;</a></h2>
 <h3 id="workflow-1-implement-new-feature-spec-driven">🎯 Workflow 1: Implement New Feature (Spec-Driven)<a class="headerlink" href="#workflow-1-implement-new-feature-spec-driven" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Step 1: Scope — làm rõ yêu cầu, tạo PRD</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>/scope<span class="w"> </span>add<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>feature
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Step 2: Architect — quyết định kỹ thuật, tạo ADR</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>/architect<span class="w"> </span>docs/prd/PRD-video-recommendation.md
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Step 3: Spec — behavior contract chính xác, tạo Spec</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>/spec<span class="w"> </span>docs/prd/PRD-video-recommendation.md<span class="w"> </span>docs/adr/NNNN-video-recommendation.md
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1"># Step 4: Plan — chia task từ Spec</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-video-recommendation.md
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="c1"># Step 5: Execute (Swarm)</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-video-recommendation.md
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="c1"># Step 6: Review</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>/swarm-review<span class="w"> </span>the<span class="w"> </span>recommendation<span class="w"> </span>feature
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="c1"># Step 7: Land — gates, commit, hỏi push, kiểm CI + smoke prod</span>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>/land-the-plane
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Step 1: Scope — làm rõ yêu cầu, tạo PRD</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>/scope<span class="w"> </span>add<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>feature
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Step 2: Architect — quyết định kỹ thuật, tạo ADR</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>/architect<span class="w"> </span>docs/prd/PRD-video-recommendation.md
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># Step 3: Spec — behavior contract chính xác, tạo Spec</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>/spec<span class="w"> </span>docs/prd/PRD-video-recommendation.md<span class="w"> </span>docs/adr/NNNN-video-recommendation.md
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c1"># Step 4: Plan — chia task từ Spec</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-video-recommendation.md
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="c1"># Step 5: Execute (Swarm)</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-video-recommendation.md
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="c1"># Step 6: Review</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>/swarm-review<span class="w"> </span>the<span class="w"> </span>recommendation<span class="w"> </span>feature
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="c1"># Step 7: Land — gates, commit, hỏi push, kiểm CI + smoke prod</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>/land-the-plane
 </code></pre></div>
 <p>Ceremony theo độ lớn: thay đổi mô tả được trong một câu thì không cần PRD/ADR, chỉ cần plan hoặc làm luôn.</p>
 <hr />
 <h3 id="workflow-2-debug-production-issue">🐛 Workflow 2: Debug Production Issue<a class="headerlink" href="#workflow-2-debug-production-issue" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Step 1: Investigate — debugging-protocol (rule) luôn áp dụng:</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1">#   ≥ 3 giả thuyết, tìm root cause, đọc log/code trước khi sửa</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="s2">"prod báo CORS error, kiểm tra xem"</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="c1"># Step 2: Fix + regression test (testing skill tự load)</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>/builder<span class="w"> </span>fix<span class="w"> </span>the<span class="w"> </span>hang<span class="w"> </span><span class="k">in</span><span class="w"> </span>VideoImportServiceImpl
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="c1"># Step 3: Postmortem (postmortem skill tự load)</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="s2">"viết postmortem cho sự cố virtual-thread deadlock"</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Step 1: Investigate — debugging-protocol (rule) luôn áp dụng:</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1">#   ≥ 3 giả thuyết, tìm root cause, đọc log/code trước khi sửa</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="s2">"prod báo CORS error, kiểm tra xem"</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="c1"># Step 2: Fix + regression test (testing skill tự load)</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>/builder<span class="w"> </span>fix<span class="w"> </span>the<span class="w"> </span>hang<span class="w"> </span><span class="k">in</span><span class="w"> </span>VideoImportServiceImpl
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="c1"># Step 3: Postmortem (postmortem skill tự load)</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="s2">"viết postmortem cho sự cố virtual-thread deadlock"</span>
 </code></pre></div>
 <hr />
 <h3 id="workflow-3-security-audit">🔒 Workflow 3: Security Audit<a class="headerlink" href="#workflow-3-security-audit" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Step 1: Full audit</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>/swarm-review<span class="w"> </span>security<span class="w"> </span>audit<span class="w"> </span>entire<span class="w"> </span>codebase
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Step 2: Fix critical issues</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>/builder<span class="w"> </span>fix<span class="w"> </span>SQL<span class="w"> </span>injection<span class="w"> </span><span class="k">in</span><span class="w"> </span>UserRepo
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># Step 3: Verify</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>/security-auditor<span class="w"> </span>verify<span class="w"> </span>security<span class="w"> </span>fixes
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># Step 4: Document</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>→<span class="w"> </span>docs/reports/security-audit-YYYY-MM-DD.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Step 1: Full audit</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/swarm-review<span class="w"> </span>security<span class="w"> </span>audit<span class="w"> </span>entire<span class="w"> </span>codebase
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Step 2: Fix critical issues</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>/builder<span class="w"> </span>fix<span class="w"> </span>SQL<span class="w"> </span>injection<span class="w"> </span><span class="k">in</span><span class="w"> </span>UserRepo
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># Step 3: Verify</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>/security-auditor<span class="w"> </span>verify<span class="w"> </span>security<span class="w"> </span>fixes
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="c1"># Step 4: Document</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>→<span class="w"> </span>docs/reports/security-audit-YYYY-MM-DD.md
 </code></pre></div>
 <hr />
 <h3 id="workflow-4-performance-optimization">⚡ Workflow 4: Performance Optimization<a class="headerlink" href="#workflow-4-performance-optimization" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Step 1: Profile — đo trước, đoán sau</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="s2">"phân tích endpoint /videos chậm, dùng EXPLAIN và log thời gian"</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Step 2: Design solution</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>caching<span class="w"> </span>strategy<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>video<span class="w"> </span>list
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># Step 3: Implement (Two Hats: refactor và optimize ở hai commit riêng)</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>/builder<span class="w"> </span>implement<span class="w"> </span>the<span class="w"> </span>cache<span class="w"> </span>from<span class="w"> </span>docs/adr/NNNN-video-list-cache.md
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="c1"># Step 4: Verify — benchmark before/after</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Step 1: Profile — đo trước, đoán sau</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="s2">"phân tích endpoint /videos chậm, dùng EXPLAIN và log thời gian"</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Step 2: Design solution</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>caching<span class="w"> </span>strategy<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>video<span class="w"> </span>list
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Step 3: Implement (Two Hats: refactor và optimize ở hai commit riêng)</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>/builder<span class="w"> </span>implement<span class="w"> </span>the<span class="w"> </span>cache<span class="w"> </span>from<span class="w"> </span>docs/adr/NNNN-video-list-cache.md
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="c1"># Step 4: Verify — benchmark before/after</span>
 </code></pre></div>
 <hr />
 <h2 id="templates-co-san">Templates có sẵn<a class="headerlink" href="#templates-co-san" title="Permanent link">&para;</a></h2>
@@ -7954,42 +8045,42 @@
 <h2 id="tips-tricks">Tips &amp; Tricks<a class="headerlink" href="#tips-tricks" title="Permanent link">&para;</a></h2>
 <h3 id="best-practices">💡 Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h3>
 <h4 id="1-luon-design-truoc-khi-code">1. Luôn design trước khi code<a class="headerlink" href="#1-luon-design-truoc-khi-code" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># ❌ Bad</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="s2">"implement video recommendation"</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># ✅ Good</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>API
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="c1"># Review design → Approve</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>/swarm-plan<span class="w"> </span>docs/adr/NNNN-video-recommendation.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># ❌ Bad</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="s2">"implement video recommendation"</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># ✅ Good</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>API
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="c1"># Review design → Approve</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>/swarm-plan<span class="w"> </span>docs/adr/NNNN-video-recommendation.md
 </code></pre></div>
 <h4 id="2-dung-swarm-cho-task-lon">2. Dùng swarm cho task lớn<a class="headerlink" href="#2-dung-swarm-cho-task-lon" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># ❌ Bad: một agent cho cả hệ thống</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>/builder<span class="w"> </span>implement<span class="w"> </span>entire<span class="w"> </span>authentication<span class="w"> </span>system
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># ✅ Good: chia nhỏ rồi chạy song song</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/swarm-plan<span class="w"> </span>implement<span class="w"> </span>authentication<span class="w"> </span>system
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-authentication.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># ❌ Bad: một agent cho cả hệ thống</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>/builder<span class="w"> </span>implement<span class="w"> </span>entire<span class="w"> </span>authentication<span class="w"> </span>system
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># ✅ Good: chia nhỏ rồi chạy song song</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>/swarm-plan<span class="w"> </span>implement<span class="w"> </span>authentication<span class="w"> </span>system
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-authentication.md
 </code></pre></div>
 <h4 id="3-security-first-mindset">3. Security-first mindset<a class="headerlink" href="#3-security-first-mindset" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/security-auditor<span class="w"> </span>review<span class="w"> </span><span class="o">[</span>feature-name<span class="o">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>/security-auditor<span class="w"> </span>review<span class="w"> </span><span class="o">[</span>feature-name<span class="o">]</span>
 </code></pre></div>
 <h4 id="4-coverage-90-ci-gate">4. Coverage ≥ 90% (CI gate)<a class="headerlink" href="#4-coverage-90-ci-gate" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify<span class="w">    </span><span class="c1"># LINE coverage &gt;= api/.coverage-threshold</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify<span class="w">    </span><span class="c1"># LINE coverage &gt;= api/.coverage-threshold</span>
 </code></pre></div>
 <h4 id="5-ghi-lai-quyet-inh-quan-trong">5. Ghi lại quyết định quan trọng<a class="headerlink" href="#5-ghi-lai-quyet-inh-quan-trong" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>/architect<span class="w"> </span>document<span class="w"> </span>decision<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>Redis<span class="w"> </span>cache
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="c1"># Sau đó cập nhật docs/tracking.md</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>/architect<span class="w"> </span>document<span class="w"> </span>decision<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>Redis<span class="w"> </span>cache
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="c1"># Sau đó cập nhật docs/tracking.md</span>
 </code></pre></div>
 <hr />
 <h3 id="shortcuts">🚀 Shortcuts<a class="headerlink" href="#shortcuts" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Kết thúc công việc đúng quy trình</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>/land-the-plane
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Kiểm tra chất lượng toàn repo</span>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>/code-check<span class="w"> </span>all
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="c1"># Render tài liệu để trình bày</span>
-<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>/presentation<span class="w"> </span>docs/prd/PRD-watch-history-v2.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Kết thúc công việc đúng quy trình</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>/land-the-plane
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># Kiểm tra chất lượng toàn repo</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>/code-check<span class="w"> </span>all
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="c1"># Render tài liệu để trình bày</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>/presentation<span class="w"> </span>docs/prd/PRD-watch-history-v2.md
 </code></pre></div>
 <hr />
 <h3 id="learning-path">🎓 Learning Path<a class="headerlink" href="#learning-path" title="Permanent link">&para;</a></h3>
@@ -8013,9 +8104,9 @@
 <hr />
 <h2 id="support-contribution">📞 Support &amp; Contribution<a class="headerlink" href="#support-contribution" title="Permanent link">&para;</a></h2>
 <h3 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>/help<span class="w">                       </span><span class="c1"># Claude Code help</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>/doctor<span class="w">                     </span><span class="c1"># Kiểm tra skill/settings có lỗi không</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>/context<span class="w">                    </span><span class="c1"># Xem skill listing chiếm bao nhiêu context</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>/help<span class="w">                       </span><span class="c1"># Claude Code help</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>/doctor<span class="w">                     </span><span class="c1"># Kiểm tra skill/settings có lỗi không</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>/context<span class="w">                    </span><span class="c1"># Xem skill listing chiếm bao nhiêu context</span>
 </code></pre></div>
 <h3 id="customize-cho-team">Customize cho team<a class="headerlink" href="#customize-cho-team" title="Permanent link">&para;</a></h3>
 <ol>
@@ -8146,17 +8237,17 @@
 <li><strong>CI/CD</strong>: GitHub Actions, deploy từ <code>main</code> (VM qua SSH + Helm chart)</li>
 </ul>
 <h3 id="project-specific-commands">Project-Specific Commands<a class="headerlink" href="#project-specific-commands" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Build &amp; Run</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./startLocal.sh
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Run tests + coverage (gate: api/.coverage-threshold, hiện 90%)</span>
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify
-<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
-<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="c1"># Webapp</span>
-<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="nb">cd</span><span class="w"> </span>webapp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>lint<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npx<span class="w"> </span>vitest<span class="w"> </span>run<span class="w"> </span>--root<span class="w"> </span>.<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>build
-<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>
-<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="c1"># Docker build</span>
-<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>funny-app<span class="w"> </span>.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Build &amp; Run</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./startLocal.sh
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># Run tests + coverage (gate: api/.coverage-threshold, hiện 90%)</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="c1"># Webapp</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="nb">cd</span><span class="w"> </span>webapp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>lint<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npx<span class="w"> </span>vitest<span class="w"> </span>run<span class="w"> </span>--root<span class="w"> </span>.<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>build
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="c1"># Docker build</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>funny-app<span class="w"> </span>.
 </code></pre></div>
 <hr />
 <h2 id="related-documentation">🔗 Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Generate a Feature Specification from a PRD and ADR — asks clarifying questions one at a time, then writes docs/specs/spec-{slug}.md — a user-invoked workflow.">
+        <meta name="description" content="Generate a Feature Specification from a PRD and an optional ADR — asks clarifying questions one at a time, then writes docs/specs/spec-{slug}.md — a user-invoked workflow.">
       
       
         <meta name="author" content="nguyenhuuca">
@@ -6523,18 +6523,19 @@
 
 
 <h1 id="spec-feature-specification">Spec → Feature Specification<a class="headerlink" href="#spec-feature-specification" title="Permanent link">&para;</a></h1>
-<p>Turn an approved PRD + ADR into a precise, implementable Feature Specification.
+<p>Turn an approved PRD (+ ADR when the feature has one) into a precise, implementable Feature Specification.
 Ask clarifying questions before writing — the spec must be unambiguous.</p>
 <h2 id="how-to-use">How to use<a class="headerlink" href="#how-to-use" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/spec docs/prd/PRD-{slug}.md docs/adr/NNNN-{slug}.md
 </code></pre></div>
 <p>Example: <code>/spec docs/prd/PRD-bookmark-feature.md docs/adr/0012-bookmark-feature-design.md</code></p>
+<p>The ADR is optional: a feature without an architectural decision has none (<code>swarm-plan</code> Artifact Requirements). Without it, take the approach, schema and API sketch from the PRD and existing code, and ask about them in Step 2.</p>
 <hr />
 <h2 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Permanent link">&para;</a></h2>
 <h3 id="step-1-read-inputs">Step 1 — Read inputs<a class="headerlink" href="#step-1-read-inputs" title="Permanent link">&para;</a></h3>
-<p>Read both files from <code>$ARGUMENTS</code>:
+<p>Read the files from <code>$ARGUMENTS</code>:
 - <strong>PRD</strong> — extract: feature name, functional requirements, user stories, scope, NFRs
-- <strong>ADR</strong> — extract: chosen approach, schema sketch, API sketch, constraints, consequences</p>
+- <strong>ADR</strong> (if given) — extract: chosen approach, schema sketch, API sketch, constraints, consequences</p>
 <p>Derive the kebab slug from the PRD filename (e.g. <code>PRD-bookmark-feature.md</code> → <code>bookmark-feature</code>).</p>
 <h3 id="step-2-identify-gaps-and-ask-questions-one-at-a-time">Step 2 — Identify gaps and ask questions one at a time<a class="headerlink" href="#step-2-identify-gaps-and-ask-questions-one-at-a-time" title="Permanent link">&para;</a></h3>
 <p>The PRD and ADR answer the "why" and "how". The Spec must answer the "exactly what".
@@ -6656,7 +6657,7 @@ Ask ONLY for what is genuinely unclear or not stated in the inputs.</p>
 <hr />
 <h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Read PRD and ADR first</strong> — never ask questions already answered there</li>
+<li><strong>Read the PRD (and ADR, if given) first</strong> — never ask questions already answered there</li>
 <li><strong>One question at a time</strong> — use <code>AskUserQuestion</code>; wait for answer before next</li>
 <li><strong>Always provide options</strong> — 3–4 relevant choices, mark best guess <code>(Recommended)</code></li>
 <li><strong>Acknowledge each answer</strong> before moving to the next question</li>
