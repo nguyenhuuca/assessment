@@ -1,14 +1,14 @@
 ---
 name: spec
-description: "Generate a Feature Specification from a PRD and ADR — asks clarifying questions one at a time, then writes docs/specs/spec-{slug}.md — a user-invoked workflow."
-argument-hint: "<path/to/PRD.md> <path/to/ADR.md>"
+description: "Generate a Feature Specification from a PRD and an optional ADR — asks clarifying questions one at a time, then writes docs/specs/spec-{slug}.md — a user-invoked workflow."
+argument-hint: "<path/to/PRD.md> [path/to/ADR.md]"
 allowed-tools: Read, Write, Glob, Grep, AskUserQuestion
 disable-model-invocation: true
 ---
 
 # Spec → Feature Specification
 
-Turn an approved PRD + ADR into a precise, implementable Feature Specification.
+Turn an approved PRD (+ ADR when the feature has one) into a precise, implementable Feature Specification.
 Ask clarifying questions before writing — the spec must be unambiguous.
 
 ## How to use
@@ -19,15 +19,17 @@ Ask clarifying questions before writing — the spec must be unambiguous.
 
 Example: `/spec docs/prd/PRD-bookmark-feature.md docs/adr/0012-bookmark-feature-design.md`
 
+The ADR is optional: a feature without an architectural decision has none (`swarm-plan` Artifact Requirements). Without it, take the approach, schema and API sketch from the PRD and existing code, and ask about them in Step 2.
+
 ---
 
 ## Workflow
 
 ### Step 1 — Read inputs
 
-Read both files from `$ARGUMENTS`:
+Read the files from `$ARGUMENTS`:
 - **PRD** — extract: feature name, functional requirements, user stories, scope, NFRs
-- **ADR** — extract: chosen approach, schema sketch, API sketch, constraints, consequences
+- **ADR** (if given) — extract: chosen approach, schema sketch, API sketch, constraints, consequences
 
 Derive the kebab slug from the PRD filename (e.g. `PRD-bookmark-feature.md` → `bookmark-feature`).
 
@@ -139,7 +141,7 @@ Do not auto-create these — wait for the user to confirm.
 
 ## Rules
 
-- **Read PRD and ADR first** — never ask questions already answered there
+- **Read the PRD (and ADR, if given) first** — never ask questions already answered there
 - **One question at a time** — use `AskUserQuestion`; wait for answer before next
 - **Always provide options** — 3–4 relevant choices, mark best guess `(Recommended)`
 - **Acknowledge each answer** before moving to the next question

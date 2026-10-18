@@ -75,7 +75,7 @@ Distilled from `.claude/rules/` (auto-loaded); the rules and skills refer to the
 
 ## Workflow & Artifacts
 
-**Planning flow**: PRD → ADR → Spec → Plan → implementation; ceremony scales with scope (`core-directives.md` Rule 6). Skills and templates (`templates/artifacts/`) use these names; if one disagrees, this table wins:
+**Planning flow**: PR-FAQ → PRD → ADR → Spec (+ Design spec for UI) → Plan → implementation; ceremony scales with scope (`core-directives.md` Rule 6): PRD by feature size, ADR by decision type at any size. Skills and templates (`templates/artifacts/`) use these names; if one disagrees, this table wins:
 
 | Type | Location | Example |
 |------|----------|---------|
