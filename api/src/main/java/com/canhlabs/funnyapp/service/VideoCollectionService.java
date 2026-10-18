@@ -22,7 +22,7 @@ public interface VideoCollectionService {
 
     void delete(UUID id);
 
-    /** Visible videos, newest added first. PUBLIC: anyone; PRIVATE: owner only (404 otherwise). */
+    /** Visible videos in collection order (newest added first until reordered). PUBLIC: anyone; PRIVATE: owner only (404 otherwise). */
     Page<VideoDto> getVideos(UUID id, int page, int size);
 
     /** Every video id in a collection the caller manages (404 otherwise). */
