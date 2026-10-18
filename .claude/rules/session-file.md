@@ -1,6 +1,6 @@
 # Session File (`session.txt`)
 
-`session.txt` at the repo root holds the **one** task currently in flight, so a new session (or `/task-resume`) can pick it up. It is gitignored and machine-local; durable status still goes to `TASKS.md` and `docs/tracking.md`. While `status` is not `done`, the SessionStart hook shows the user a status report from this file plus a "/task-resume" hint at every startup, so keep the fields short and current: what it shows is exactly what is written here.
+`session.txt` at the repo root holds the **one** task currently in flight, so a new session (or `/task-resume`) can pick it up. It is gitignored and machine-local; durable status still goes to `TASKS.md` and `docs/tracking.md`. Whenever the file is non-empty, the SessionStart hook shows the user a status report from it at every startup. Unfinished tasks also get a "/task-resume" hint, and `done` tasks are shown as the last task, so keep the fields short and current: what it shows is exactly what is written here.
 
 ## Format
 

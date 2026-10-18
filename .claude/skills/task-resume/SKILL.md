@@ -13,7 +13,7 @@ Pick up the task in `session.txt` (format: `.claude/rules/session-file.md`) as i
 
 ## How the User Gets Here
 
-On `startup`, `resume` and `clear`, `.claude/hooks/session-start-loader.sh` prints a status report from `session.txt` straight to the user as a `systemMessage`. The report shows the task, status, a progress bar, done, next, blocker, plan and updated, and ends with the line "▶ Tiếp tục: gõ /task-resume". It is skipped on `compact` and when `status: done`. The same file also goes into the model's context. If the user's first message is not `/task-resume`, the reply carries one line reminding them about it, and Claude does not start the task on its own.
+On `startup`, `resume` and `clear`, `.claude/hooks/session-start-loader.sh` prints a status report from `session.txt` straight to the user as a `systemMessage`. The report shows the task, status, a progress bar, done, next, blocker, plan and updated, and ends with the line "▶ Tiếp tục: gõ /task-resume". A `status: done` task is still reported, as "✅ Task gần nhất — đã xong" with no resume hint. The report is skipped on `compact` and when `session.txt` is missing or empty. The same file also goes into the model's context. If the user's first message is not `/task-resume`, the reply carries one line reminding them about it, and Claude does not start the task on its own.
 
 ## Workflow
 

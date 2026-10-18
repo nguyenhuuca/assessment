@@ -94,34 +94,41 @@ SESSION_FILE="$PROJECT_DIR/session.txt"
 if [ -s "$SESSION_FILE" ]; then
     field() { sed -n "s/^$1:[[:space:]]*//p" "$SESSION_FILE" | head -1 | tr -d '\r'; }
     TASK_STATUS=$(field status)
-    if [ "$TASK_STATUS" != "done" ]; then
-        CONTEXT="$CONTEXT
+    if [ "$TASK_STATUS" = "done" ]; then
+        HEADER="✅ Task gần nhất — đã xong (session.txt)"
+        HINT="▶ Task mới: cứ gõ yêu cầu; session.txt sẽ được ghi đè khi bắt đầu task 3+ bước."
+        NOTE="- Last task is done. The user already saw it in a status report from this hook; do not resume it."
+    else
+        HEADER="📌 Task đang dở (session.txt)"
+        HINT="▶ Tiếp tục: gõ /task-resume  (hoặc /task-resume <chỉ dẫn thêm>)
+  Bỏ qua: cứ làm việc khác; xong task thì đặt status: done trong session.txt."
+        NOTE="- Unfinished task from a previous session. The user already saw a status report from this hook; in your first reply, if the user did not run /task-resume, add one line reminding them that /task-resume continues it. Continue only if they run /task-resume or ask to."
+    fi
+    CONTEXT="$CONTEXT
 
 [CURRENT TASK — session.txt]
 $(head -c 2000 "$SESSION_FILE" | tr -d '\r')
-- Unfinished task from a previous session. The user already saw a status report from this hook; in your first reply, if the user did not run /task-resume, add one line reminding them that /task-resume continues it. Continue only if they run /task-resume or ask to.
+$NOTE
 - Keep session.txt current while working (.claude/rules/session-file.md)."
 
-        if [ "$SOURCE" != "compact" ]; then
-            PROGRESS=$(field progress | tr -cd '0-9')
-            PROGRESS=${PROGRESS:-0}
-            [ "$PROGRESS" -gt 100 ] && PROGRESS=100
-            FILLED=$((PROGRESS / 10))
-            BAR="$(printf '%*s' "$FILLED" '' | tr ' ' '#')$(printf '%*s' $((10 - FILLED)) '' | tr ' ' '-')"
-            REPORT="📌 Task đang dở (session.txt)
+    if [ "$SOURCE" != "compact" ]; then
+        PROGRESS=$(field progress | tr -cd '0-9')
+        PROGRESS=${PROGRESS:-0}
+        [ "$PROGRESS" -gt 100 ] && PROGRESS=100
+        FILLED=$((PROGRESS / 10))
+        BAR="$(printf '%*s' "$FILLED" '' | tr ' ' '#')$(printf '%*s' $((10 - FILLED)) '' | tr ' ' '-')"
+        REPORT="$HEADER
   Task:     $(field task)
   Status:   ${TASK_STATUS:-?}  [$BAR] $PROGRESS%
   Done:     $(field done)
   Next:     $(field next)"
-            BLOCKER=$(field blocker)
-            [ -n "$BLOCKER" ] && REPORT="$REPORT
+        BLOCKER=$(field blocker)
+        [ -n "$BLOCKER" ] && REPORT="$REPORT
   Blocker:  $BLOCKER"
-            REPORT="$REPORT
+        REPORT="$REPORT
   Plan:     $(field plan)   ·   Updated: $(field updated)
 
-▶ Tiếp tục: gõ /task-resume  (hoặc /task-resume <chỉ dẫn thêm>)
-  Bỏ qua: cứ làm việc khác; xong task thì đặt status: done trong session.txt để tắt thông báo này."
-        fi
+$HINT"
     fi
 fi
 
