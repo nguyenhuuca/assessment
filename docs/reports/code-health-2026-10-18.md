@@ -17,6 +17,8 @@ The debt is concentrated in a few large classes/components and in small rules re
 
 ## Fix first (High + security Medium)
 
+#1-#5 fixed in `40fe60b` (2026-10-18); #6-#8 open.
+
 | # | Area | File:Line | Finding | Remediation |
 |---|------|-----------|---------|-------------|
 | 1 | BE bug | `service/impl/UserServiceImpl.java:96-97` | `loadUserByUsername` dereferences `user` without a null check; an unknown username throws NPE (500) instead of `UsernameNotFoundException` | Null-check, throw `UsernameNotFoundException`; regression test |

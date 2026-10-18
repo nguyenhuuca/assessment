@@ -247,3 +247,14 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **FE-4** `WatchedBadge` on feed + Explore — `4c46791`
   - Follow-ups: `e7b8ed1` History in the mobile bottom nav; `3c00d84` icon-only nav; `d79d68f` settings menu in the bottom nav
 - [x] **QA-1** Prod smoke, logged in — verified by owner 2026-10-18 (`14eeb7a`)
+
+## Code health fixes (2026-10-18)
+
+**Report:** `docs/reports/code-health-2026-10-18.md` — findings #1-#5
+
+- [x] **CH-1** `loadUserByUsername` unknown user → `UsernameNotFoundException` (was NPE) — `40fe60b`
+- [x] **CH-2** Comment delete: 404 / 403 via `CustomException` (was unmapped → 500) — `40fe60b`
+- [x] **CH-3** Remove public debug `ThreadController` (`/thread/**`) — `40fe60b`
+- [x] **CH-4** Guest comment tokens stored as SHA-256 + migration `202610180002` — `40fe60b`
+- [x] **CH-5** webapp admin PATCH via shared `client.js` — `40fe60b`
+- [ ] **QA-1** Prod after deploy: `./api/mock-test.sh`; guest comment create + delete still works
