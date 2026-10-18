@@ -26,6 +26,30 @@ export function pinDefaultFirst(collections = []) {
   return [...collections.filter(c => c.isDefault), ...collections.filter(c => !c.isDefault)]
 }
 
+/** Copy of `items` with the element at `from` moved to index `to` (same semantics as dnd-kit's arrayMove). */
+export function moveItem(items, from, to) {
+  const next = [...items]
+  next.splice(to, 0, next.splice(from, 1)[0])
+  return next
+}
+
+/** `afterVideoId` for the move API: the id now preceding the moved item (list after the move), or null at the top. */
+export function moveAfterId(ids, fromIndex, toIndex) {
+  if (toIndex <= 0) return null
+  return moveItem(ids, fromIndex, toIndex)[toIndex - 1]
+}
+
+/** The same move by neighbour id, as the API sees it: `videoId` goes right after `afterVideoId` (null = top). Unknown ids leave the list as is. */
+export function moveAfter(items, videoId, afterVideoId, getId = x => x) {
+  const from = items.findIndex(x => getId(x) === videoId)
+  if (from < 0) return items
+  const rest = items.filter((_, i) => i !== from)
+  const at = afterVideoId == null ? 0 : rest.findIndex(x => getId(x) === afterVideoId) + 1
+  if (afterVideoId != null && at === 0) return items
+  rest.splice(at, 0, items[from])
+  return rest
+}
+
 /** Accent- and case-insensitive ("hai huoc" matches "Hài hước"). */
 export function normalizeForSearch(value) {
   return (value || '')

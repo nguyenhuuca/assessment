@@ -12,13 +12,14 @@ import {
   useCreateCollection,
   useDeleteCollection,
   useToggleCollectionItem,
+  useMoveCollectionItem,
 } from '../useCollections.js'
 import { collectionsApi } from '../../api/collections.js'
 
 vi.mock('../../api/collections.js', () => ({
   collectionsApi: {
     mine: vi.fn(), publicList: vi.fn(), create: vi.fn(), update: vi.fn(), remove: vi.fn(),
-    videos: vi.fn(), videoIds: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), membership: vi.fn(),
+    videos: vi.fn(), videoIds: vi.fn(), addVideo: vi.fn(), removeVideo: vi.fn(), moveVideo: vi.fn(), membership: vi.fn(),
   },
 }))
 
@@ -147,5 +148,54 @@ describe('useCollections hooks', () => {
     expect(result.current.data.map(v => v.id)).toEqual([1, 2, 3])
     expect(collectionsApi.videos).toHaveBeenCalledTimes(3)
     expect(collectionsApi.videos).toHaveBeenLastCalledWith('c1', 2, 50)
+  })
+
+  describe('useMoveCollectionItem', () => {
+    const KEY = ['collections', 'c', 'videos', 'all']
+    const list = () => [{ id: 1 }, { id: 2 }, { id: 3 }]
+
+    it('reorders the full list at once and sends afterVideoId', async () => {
+      let release
+      collectionsApi.moveVideo.mockReturnValue(new Promise(r => { release = r }))
+      client.setQueryData(KEY, list())
+      const { result } = renderHook(() => useMoveCollectionItem(), { wrapper })
+      act(() => { result.current.mutate({ id: 'c', videoId: 3, afterVideoId: 1 }) })
+      await waitFor(() => expect(client.getQueryData(KEY).map(v => v.id)).toEqual([1, 3, 2]))
+      expect(collectionsApi.moveVideo).toHaveBeenCalledWith('c', 3, 1)
+      await act(async () => { release(null) })
+    })
+
+    it('moves to the top when afterVideoId is null', async () => {
+      collectionsApi.moveVideo.mockResolvedValue(null)
+      client.setQueryData(KEY, list())
+      const { result } = renderHook(() => useMoveCollectionItem(), { wrapper })
+      await act(async () => { await result.current.mutateAsync({ id: 'c', videoId: 3, afterVideoId: null }) })
+      expect(client.getQueryData(KEY).map(v => v.id)).toEqual([3, 1, 2])
+      expect(collectionsApi.moveVideo).toHaveBeenCalledWith('c', 3, null)
+    })
+
+    it('rolls back when the request fails', async () => {
+      collectionsApi.moveVideo.mockRejectedValue(new Error('boom'))
+      client.setQueryData(KEY, list())
+      const { result } = renderHook(() => useMoveCollectionItem(), { wrapper })
+      await act(async () => { await result.current.mutateAsync({ id: 'c', videoId: 3, afterVideoId: null }).catch(() => {}) })
+      expect(client.getQueryData(KEY).map(v => v.id)).toEqual([1, 2, 3])
+    })
+
+    it('refetches numeric pages and lists but not the all/ids queries', async () => {
+      collectionsApi.moveVideo.mockResolvedValue(null)
+      client.setQueryData(KEY, list())
+      const spy = vi.spyOn(client, 'invalidateQueries')
+      const { result } = renderHook(() => useMoveCollectionItem(), { wrapper })
+      await act(async () => { await result.current.mutateAsync({ id: 'c', videoId: 3, afterVideoId: null, visibility: 'PRIVATE' }) })
+      const pageCall = spy.mock.calls.find(c => c[0].predicate)[0]
+      const matches = k => pageCall.predicate({ queryKey: k })
+      expect(matches(['collections', 'c', 'videos', 0])).toBe(true)
+      expect(matches(['collections', 'c', 'videos', 'all'])).toBe(false)
+      expect(matches(['collections', 'c', 'videos', 'ids'])).toBe(false)
+      const keys = spy.mock.calls.map(c => JSON.stringify(c[0].queryKey))
+      expect(keys).toContain(JSON.stringify(['collections', 'mine']))
+      expect(keys).not.toContain(JSON.stringify(['collections', 'public']))
+    })
   })
 })

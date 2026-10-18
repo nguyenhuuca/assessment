@@ -1,6 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { collectionsApi } from '../api/collections.js'
 import { mapApiVideo } from '../utils/videoModel.js'
+import { moveAfter } from '../components/library/collectionUtils.js'
 
 export const COLLECTION_PAGE_SIZE = 24
 
@@ -147,6 +148,36 @@ export function useToggleCollectionItem() {
       invalidateLists({ includePublic: visibility !== 'PRIVATE' }),
       qc.invalidateQueries({ queryKey: ['collections', id, 'videos'] }),
       qc.invalidateQueries({ queryKey: ['collections', 'membership', videoId] }),
+    ]),
+  })
+}
+
+/**
+ * Move a video to sit right after `afterVideoId` (null = top) in a collection's order.
+ * Variables: { id, videoId, afterVideoId, visibility? }. The full-list cache is reordered at once and rolled back on error;
+ * paged queries and the lists (the cover may change) are refetched. The 'all' key is left alone so a drop does not reload up to 500 items.
+ */
+export function useMoveCollectionItem() {
+  const qc = useQueryClient()
+  const invalidateLists = useInvalidateLists()
+  return useMutation({
+    mutationFn: ({ id, videoId, afterVideoId }) => collectionsApi.moveVideo(id, videoId, afterVideoId),
+    onMutate: async ({ id, videoId, afterVideoId }) => {
+      const key = ['collections', id, 'videos', 'all']
+      await qc.cancelQueries({ queryKey: key })
+      const previous = qc.getQueryData(key)
+      if (previous) qc.setQueryData(key, moveAfter(previous, videoId, afterVideoId, v => v.id))
+      return { key, previous }
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) qc.setQueryData(ctx.key, ctx.previous)
+    },
+    onSettled: (_res, _err, { id, visibility }) => Promise.all([
+      qc.invalidateQueries({
+        queryKey: ['collections', id, 'videos'],
+        predicate: q => typeof q.queryKey[3] === 'number',
+      }),
+      invalidateLists({ includePublic: visibility !== 'PRIVATE' }),
     ]),
   })
 }
