@@ -166,11 +166,12 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Feature: Drive Sync Time Filter (relative + specific time on the DRIVE_SYNC tab)
 
-**Plan:** `docs/plans/plan-drive-sync-time-filter.md` (In Review 2026-10-18) · FE only, client-side filter on `createdAt`
+**Plan:** `docs/plans/plan-drive-sync-time-filter.md` (In Review 2026-10-18) · server-side range on Drive `createdTime`, default last 12 h, orphans only under "All"
 
-- [ ] **FE-1** `utils/timeRange.js` (`resolveTimeRange`, `inTimeRange`, presets 1h/24h/7d/30d, VN-time custom range) + unit tests
-- [ ] **FE-2** `DriveTimeFilter` control + `DriveSyncPanel` wiring (AND with "only unsynced", select-all on visible rows) + vi/en strings + tests — after FE-1
-- [ ] **QA-1** Local check on the real folder + prod smoke (ADMIN, SUPER_ADMIN), tracking + docs — after FE-2
+- [ ] **BE-1** `GET /files?from&to` (ISO instants, 400 on from > to), Drive `q` with `createdTime`, filtered DB lookup, `orphansChecked` flag + tests
+- [ ] **FE-1** `utils/timeRange.js` (`toRangeParams`, presets 1h/12h/24h/7d/30d, VN-time custom range), `getDriveSyncFiles(params)`, `useDriveSyncFiles(filter)` + tests — contract-first, parallel to BE-1
+- [ ] **FE-2** `DriveTimeFilter` control + panel wiring (default 12 h, refetch per change, clear selection, orphan note) + vi/en strings + tests — after FE-1; push only after BE-1 is deployed
+- [ ] **QA-1** Local check on the real folder + prod smoke (ADMIN, SUPER_ADMIN), tracking + docs — after BE-1, FE-2
 
 ---
 

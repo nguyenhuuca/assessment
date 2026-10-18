@@ -13,132 +13,170 @@ Handoff to: Builder, QA Engineer
 **Author:** nguyenhuuca
 **Date:** 2026-10-18
 **Related plan:** [plan-admin-drive-force-sync](plan-admin-drive-force-sync.md) (the `DRIVE_SYNC` tab this extends)
-**ADR:** none. Client-side filtering of a list the tab already loads is a Two-Way Door that follows the existing `onlyUnsynced` pattern (`swarm-plan` Artifact Requirements).
-**Size:** Small feature (< 1 day), so this plan is the only artifact (no PRD).
+**ADR:** none. Two optional query params on an existing admin endpoint follow the existing pattern; nothing is stored and the change is easy to undo (`swarm-plan` Artifact Requirements).
+**Size:** Small feature (~1 day), so this plan is the only artifact (no PRD).
 
 ## Objective
 
-On the admin **DRIVE_SYNC** tab, an admin can narrow the file table by the Drive **created time** in two ways:
+On the admin **DRIVE_SYNC** tab, the file table shows only files whose Drive **created time** falls in a chosen range, and the **server** does the filtering:
 
-- **Relative time**: a preset such as "last 24 hours" or "last 7 days", counted back from now
+- **Default: the last 12 hours.** The tab no longer loads the whole folder when it opens
+- **Relative time**: presets 1 h / 12 h / 24 h / 7 d / 30 d, counted back from the moment of the request
 - **Specific time**: a from/to range picked with date-time inputs (Vietnam time, like the rest of the admin)
-
-The time filter combines with the existing "only unsynced" checkbox, so the typical flow is: *last 7 days + only unsynced → select all unsynced → FORCE_SYNC*.
+- **All**: the whole folder, as today. Orphans are listed **only** in this mode
+- Every filter change calls `GET /admin/drive-sync/files` again with the new range
 
 ## Verified Facts (exploration 2026-10-18)
 
 | Area | Fact | Impact |
 |------|------|--------|
-| Data | `GET /admin/drive-sync/files` (`AdminDriveSyncController.java:37`) takes no params and returns **every** file in the folder: `DriveSyncServiceImpl.listFolder()` reads all Drive pages (pageSize 1000) and joins `video_sources` in memory | The whole list is already on the client, so filtering there needs no API change |
-| Time field | `DriveSyncFileDto.createdAt` (`Instant`, Drive `createdTime`) is the only time on a file row, shown in the "Created" column (`DriveSyncPanel.jsx:175`) | The filter applies to `createdAt`. Orphans (`DriveSyncOrphanDto`) and the run have no per-row time, so they are not filtered |
-| Existing filter | `onlyUnsynced` is client-side (`DriveSyncPanel.jsx:93,101`). `selectAllUnsynced` picks from `allFiles`, not from the visible rows (`:117`) | The time filter goes in the same place. "Select all unsynced" must pick from the visible rows, otherwise it selects files outside the chosen time range |
-| Time zone | Admin UI uses Asia/Ho_Chi_Minh: `localToIso` turns a `datetime-local` value into ISO UTC (`utils/importUtils.js:51`) and `formatTime` displays in VN time (`:81`). `ImportForm.jsx:101` already uses `<input type="datetime-local">` | Reuse `localToIso` and the same input. There is no date library in `package.json`, and none is needed |
-| No prior art | No admin endpoint or FE component takes a time range or relative preset | New small util + component; nothing to reuse beyond `localToIso` |
-| i18n | Drive strings are in `webapp/src/i18n/locales/{vi,en}/admin.json`, namespace `admin` (e.g. `onlyUnsynced`) | New keys go next to them, in both locales |
-| Tests | `DriveSyncPanel.test.jsx` mocks `api/admin.js` and asserts Vietnamese labels, with `createdAt: '2026-10-01T10:00:00Z'` fixtures | Add fixtures with different `createdAt` values; inject `now` into the util so tests are deterministic |
+| Listing | `GET /admin/drive-sync/files` (`AdminDriveSyncController.java:37`) takes no params. `DriveSyncServiceImpl.listFolder()` (`:87`) lists **every** Drive page (`'<folder>' in parents and trashed = false`, pageSize 1000), then loads **every** `google_drive` row (`findAllBySourceType`) | Both the Drive call and the DB load grow with the folder. A range cuts both |
+| States | `stateOf()` (`:201`) works per Drive file: lock → `SYNCING`; no local file → `MISSING_LOCAL` / `MISSING_BOTH`; size differs → `SIZE_MISMATCH`; else `SYNCED` / `MISSING_DB` | States stay correct on a filtered list: each file only needs its own DB row and local file |
+| Orphans | Orphans = DB rows left over after matching **all** folder files (`:107`) | With a range, every older row would look like an orphan → compute orphans only when no range is given (D3) |
+| Run check | `startRun` checks requested ids against a **full** listing (`:130`) | Must keep calling the unfiltered listing |
+| Time field | `DriveSyncFileDto.createdAt` = Drive `createdTime`, the "Created" column (`DriveSyncPanel.jsx:175`) | The range applies to `createdTime`. Drive's `q` supports `createdTime >= '<RFC 3339>'` |
+| FE data flow | `getDriveSyncFiles()` (`api/admin.js:66`) sends no params; `useDriveSyncFiles()` (`useAdmin.js:137`) key `['admin','drive-sync','files']`; refresh and run completion invalidate `['admin','drive-sync']` | Add the filter to the key; prefix invalidation keeps working. Reuse `buildUrl`/`cleanParams` (`admin.js:28,47`) like `getComments` |
+| Time zone | `localToIso` (`utils/importUtils.js:51`) turns a `datetime-local` value (Asia/Ho_Chi_Minh) into ISO UTC; `ImportForm.jsx:101` already uses that input | Reuse both; no date library needed |
+| Prior art | No admin endpoint takes a time range yet; admin lists take enum/text filters + paging | First `Instant` request params: use `@DateTimeFormat(iso = DATE_TIME)` |
+| Tests | `DriveSyncServiceImplTest` stubs the exact `setQ` string (`:79`); `AdminDriveSyncControllerPermissionTest` is `@WebMvcTest`; `DriveSyncPanel.test.jsx` mocks `api/admin.js` | Update the stub; add range cases in all three |
 
 ## Decisions
 
 | # | Decision | Why |
 |---|----------|-----|
-| D1 | Filter **on the client**, over the list already loaded | The backend already returns all files; a server filter would mean a new API param, Drive `q` changes and a test-stub rewrite for no gain. If the folder ever needs paging, move the filter to the server then (the util's range shape maps directly to `createdTime >= … and createdTime < …`) |
-| D2 | One control with modes: **All** (default), presets **1 h / 24 h / 7 d / 30 d**, and **Custom** (from/to) | Covers both requests with one select. "All" keeps today's behaviour. The presets match the cron window (60 min) and typical catch-up ranges |
-| D3 | Custom range: from and to are each **optional**; from is inclusive, to is inclusive to the minute (`createdAt < to + 1 min`); from > to shows an inline error and **does not filter** | An open range ("since 10/10") is common. Showing an error instead of an empty table avoids a silent "no files" |
-| D4 | Relative presets count back from `Date.now()` at render time | The files list is not polled; it is refetched on refresh or when a run finishes, which re-renders. No timer needed |
-| D5 | "Select all unsynced" selects unsynced rows **among the visible rows** (time filter applied), still capped at `maxBatch` | Matches what the admin sees. With no time filter, the result is the same as today |
-| D6 | Already-selected files stay selected when the filter changes; the FORCE_SYNC count and the confirm modal still list them | Changing a filter should not silently drop a selection. The modal already lists files from `allFiles` |
-| D7 | Filter state is local to the panel (not in the URL), like `onlyUnsynced` | Admin tabs keep no URL state today |
+| D1 | Filter **on the server**: `GET /files?from=<ISO>&to=<ISO>`, both optional. The range goes into the Drive `q` | Owner's choice (2026-10-18): the tab should not load the whole folder by default |
+| D2 | Dropdown: **1 h / 12 h (default) / 24 h / 7 d / 30 d**, **All**, **Custom** (from/to) | Owner's choice (2026-10-18) |
+| D3 | **Orphans are computed only when no range is sent (All).** With a range the response has `orphans: []` and `orphansChecked: false`; the panel shows "Chọn Tất cả để xem orphan" | Owner's choice (2026-10-18). Orphans need the full folder; a range would report every older row as an orphan |
+| D4 | With a range, the DB lookup loads only rows whose `source_id` is in the listed file ids (`findAllBySourceTypeAndSourceIdIn`, in chunks of 1 000) | Matches the smaller Drive listing; no full-table load for a 12 h view |
+| D5 | Relative presets are resolved to `from = now − preset` **inside the query function**, at fetch time. The query key holds the preset, not the timestamp | The key stays stable, and refresh or run completion refetches a fresh "last 12 h" window |
+| D6 | Custom range: from and to each optional; `to` includes its whole minute (FE sends `to + 1 min`, server treats `to` as exclusive). From > to shows an inline error and **does not call the server**. The server also rejects `from > to` with 400 | No wasted request; the API is safe for other callers too |
+| D7 | **Changing the filter clears the selection** | The new list may not contain the selected files; the confirm modal lists files from the current list, so keeping hidden ids would make the count and the modal disagree |
+| D8 | Keep the previous rows on screen while the new range loads (`placeholderData: keepPreviousData`) with a small loading state on the table | Avoids the table flashing empty on every change |
+| D9 | `startRun` keeps validating ids against the **unfiltered** listing | The folder-membership check is a security control (plan-admin-drive-force-sync) |
 
 ## Scope
 
 ### In Scope
 
-- `webapp/src/utils/timeRange.js`: `resolveTimeRange(filter, now)` and `inTimeRange(iso, range)` + unit tests
-- `DriveTimeFilter` component (select + two `datetime-local` inputs in Custom mode + inline error), placed in `.drive-sync-toolbar`
-- `DriveSyncPanel`: apply the time filter before `onlyUnsynced`; `selectAllUnsynced` uses the visible rows; `showingFiles` reflects both filters
-- vi/en strings
+- BE: `from`/`to` params, Drive `q` with `createdTime`, filtered DB lookup, `orphansChecked` flag, 400 on `from > to`, tests
+- FE: `getDriveSyncFiles(params)`, `useDriveSyncFiles(filter)`, `utils/timeRange.js`, `DriveTimeFilter` control, panel wiring, orphan note, vi/en strings, tests
 
 ### Out of Scope
 
-- Server-side filtering or paging of `GET /files`
-- Filtering orphans or the run progress
-- Filtering by modified time or sync time (the API exposes neither)
-- Remembering the filter across reloads
+- Paging of the file table
+- Filtering by modified time or sync time
+- Remembering the filter across reloads (it resets to 12 h)
+- Changing the cron (`AppScheduler.syncDriveVideos`) or the force-sync run
 
-## Contract of the util (FE-1)
+## API Contract (FE-1 can start from this before BE-1 lands)
+
+```
+GET /v1/funny-app/admin/drive-sync/files?from=2026-10-18T00:00:00Z&to=2026-10-18T12:01:00Z
+  from, to: optional ISO-8601 instants (UTC). from inclusive, to exclusive.
+  No params → whole folder + orphans (today's behaviour).
+200 ResultObjectInfo<DriveSyncListingDto>
+    { files: [...], orphans: [...], orphansChecked: true|false, maxBatch: 50 }
+    orphansChecked = false and orphans = [] whenever from or to is given
+400 when from > to, or a param is not a valid ISO instant
+502 DRIVE_UNAVAILABLE (unchanged)
+hasRole('ADMIN') (unchanged)
+```
+
+Drive query built by the server (values come from typed `Instant`s, formatted as RFC 3339 in UTC, so no user text reaches the `q` string):
+
+```
+'<folder>' in parents and trashed = false and createdTime >= '2026-10-18T00:00:00Z' and createdTime < '2026-10-18T12:01:00Z'
+```
+
+## FE util contract
 
 ```js
 // filter: { mode: 'all' }
-//       | { mode: 'relative', preset: '1h' | '24h' | '7d' | '30d' }
+//       | { mode: 'relative', preset: '1h' | '12h' | '24h' | '7d' | '30d' }    // default { mode: 'relative', preset: '12h' }
 //       | { mode: 'custom', from: 'YYYY-MM-DDTHH:mm' | '', to: 'YYYY-MM-DDTHH:mm' | '' }   // datetime-local, VN time
-resolveTimeRange(filter, now = Date.now())
-// → { from: number | null, to: number | null, error: '' }   // epoch ms; from inclusive, to exclusive
-// → { from: null, to: null, error: 'admin:timeRangeInvalid' } when custom from > to
-// mode 'all', or custom with both empty → { from: null, to: null, error: '' } (no filtering)
-
-inTimeRange(createdAtIso, range)  // true when no bound excludes it; a missing/invalid createdAt is kept only when range has no bounds
+toRangeParams(filter, now = Date.now())
+// → { params: { from?: ISO, to?: ISO }, error: '' }
+// → { params: null, error: 'admin:timeRangeInvalid' } when custom from > to
+// mode 'all', or custom with both empty → { params: {}, error: '' }
 ```
-
-`custom.to` becomes `localToIso(to) + 60 000 ms` so the picked minute is included.
 
 ## Tasks
 
 | ID | Task | Est. LOC | Depends on |
 |----|------|---------:|------------|
-| FE-1 | `utils/timeRange.js` + unit tests | ~120 | — |
-| FE-2 | `DriveTimeFilter` component, panel wiring, vi/en strings, panel tests | ~250 | FE-1 |
-| QA-1 | Local check against a real folder + prod smoke, tracking/docs | — | FE-2 |
+| BE-1 | `from`/`to` on `GET /files`, Drive `q`, filtered DB lookup, `orphansChecked`, tests | ~220 | — |
+| FE-1 | `utils/timeRange.js`, `getDriveSyncFiles(params)`, `useDriveSyncFiles(filter)` + tests | ~150 | — (uses the contract above) |
+| FE-2 | `DriveTimeFilter` control, panel wiring, orphan note, vi/en strings, tests | ~250 | FE-1 |
+| QA-1 | Local check against the real folder + prod smoke, tracking/docs | — | BE-1, FE-2 |
 
-Merge order to `main`: FE-1 → FE-2 → QA-1. FE-1 is dead code until FE-2 lands but is safe to merge on its own. No backend change, so only the frontend deploys.
+Merge order to `main`: BE-1 and FE-1 → FE-2 in parallel. **Push FE-2 only after BE-1 is deployed**: an old backend ignores unknown params and would return the whole folder while the panel says "12 h". BE-1 alone is backward compatible (no params = today's response plus `orphansChecked: true`).
 
-### FE-1: Time-range util
+### BE-1: Server-side range
 
-- `webapp/src/utils/timeRange.js` with `TIME_PRESETS` (`1h`, `24h`, `7d`, `30d` → ms), `resolveTimeRange`, `inTimeRange`, per the contract above; reuse `localToIso` from `importUtils.js`
-- `webapp/src/utils/__tests__/timeRange.test.js`
+- `AdminDriveSyncController.files(@RequestParam(required = false) @DateTimeFormat(iso = DATE_TIME) Instant from, … Instant to)`; `Contract.require(from == null || to == null || !from.isAfter(to), …)` → 400 with an i18n message key (vi + en)
+- `DriveSyncService.listFolder(Instant from, Instant to)` (replace the no-arg method; update the interface and its one caller)
+- `DriveSyncServiceImpl`:
+  - `listDriveFolder(Instant from, Instant to)` appends `and createdTime >= '…'` / `and createdTime < '…'` when set (`DateTimeFormatter.ISO_INSTANT` on `Instant.truncatedTo(SECONDS)`); `startRun` calls it with `(null, null)` (D9)
+  - with a range: DB rows from `videoSourceRepository.findAllBySourceTypeAndSourceIdIn(SOURCE_TYPE, ids)` in chunks of 1 000, empty list → no DB call; orphans = `[]`, `orphansChecked = false`
+  - without a range: today's code path, `orphansChecked = true`
+- `DriveSyncListingDto`: add `boolean orphansChecked`
+- `VideoSourceRepository`: derived query `findAllBySourceTypeAndSourceIdIn(String, Collection<String>)`
 
 **Acceptance criteria**
-- [ ] Each preset gives `from = now − preset`, `to = null`, with `now` injected
-- [ ] Custom from only, to only, both, and both empty behave per D3; `to` includes its whole minute
-- [ ] Custom from > to returns the `timeRangeInvalid` error and no bounds
-- [ ] A VN-time input `2026-10-18T07:00` maps to `2026-10-18T00:00:00Z`
-- [ ] `inTimeRange` handles boundaries (equal to `from` is in, equal to `to` is out) and a null `createdAt`
+- [ ] `DriveSyncServiceImplTest`: no range → same `q` as today and orphans computed; `from` only, `to` only, both → exact `q` strings; range → `findAllBySourceTypeAndSourceIdIn` used, `findAllBySourceType` not called, `orphansChecked = false`; empty listing → no DB call; states unchanged for a filtered file; `startRun` still lists without a range
+- [ ] `AdminDriveSyncControllerPermissionTest` (or a new WebMvc test): params bind as ISO instants; `from > to` → 400; malformed instant → 400; ADMIN allowed, anonymous rejected (unchanged)
+- [ ] New message key in `messages.properties` and `messages_vi.properties` (parity test passes)
+- [ ] `mvn verify` passes with LINE coverage ≥ `api/.coverage-threshold`
+
+### FE-1: Util + API + hook
+
+- `webapp/src/utils/timeRange.js`: `TIME_PRESETS` (`1h`, `12h`, `24h`, `7d`, `30d` → ms), `DEFAULT_TIME_FILTER = { mode: 'relative', preset: '12h' }`, `toRangeParams` per the contract; reuse `localToIso`
+- `api/admin.js`: `getDriveSyncFiles(params = {})` via `buildUrl` + `cleanParams`
+- `hooks/useAdmin.js`: `useDriveSyncFiles(filter)` → key `['admin','drive-sync','files', filter]`, `queryFn` calls `toRangeParams(filter)` at fetch time (D5), `enabled` only when there is no error, `placeholderData: keepPreviousData` (D8)
+- Tests: `utils/__tests__/timeRange.test.js`; hook/API call params checked through the panel test or a hook test
+
+**Acceptance criteria**
+- [ ] Each preset gives `from = now − preset` and no `to`, with `now` injected; `all` gives `{}`
+- [ ] Custom: from only, to only, both, both empty; `to` includes its minute; `2026-10-18T07:00` (VN) → `2026-10-18T00:00:00.000Z`; from > to → error and `params: null`
+- [ ] `getDriveSyncFiles({ from })` calls `/admin/drive-sync/files?from=…`; empty params call the bare path
 - [ ] `npm run test` and `npm run lint` pass
 
 ### FE-2: Filter control + panel wiring
 
-- `webapp/src/components/admin/DriveTimeFilter.jsx`: a labelled `<select>` (All, 1 h, 24 h, 7 d, 30 d, Custom); in Custom mode two `<input type="datetime-local">` (from, to) with labels, plus `role="alert"` text for the error. Controlled through `value`/`onChange`
+- `webapp/src/components/admin/DriveTimeFilter.jsx`: labelled `<select>` (1 h, 12 h, 24 h, 7 d, 30 d, All, Custom); in Custom mode two labelled `<input type="datetime-local">` (from, to) and a `role="alert"` error. Controlled via `value` / `onChange`
 - `DriveSyncPanel.jsx`:
-  - state `timeFilter` (default `{ mode: 'all' }`); `range = resolveTimeRange(timeFilter)`
-  - `files = allFiles.filter(f => inTimeRange(f.createdAt, range)).filter(onlyUnsynced ? notSynced : all)`
-  - `selectAllUnsynced` picks from the time-filtered rows (D5)
-  - `showingFiles` uses the filtered count over `allFiles.length`
-- `admin.json` (vi + en): `timeFilter`, `timeAll`, `timeLast1h`, `timeLast24h`, `timeLast7d`, `timeLast30d`, `timeCustom`, `timeFrom`, `timeTo`, `timeRangeInvalid`
-- Toolbar CSS only if the inputs wrap badly on mobile (reuse existing admin classes first)
+  - state `timeFilter = DEFAULT_TIME_FILTER`; `useDriveSyncFiles(timeFilter)`
+  - on filter change: `setSelected(new Set())` (D7)
+  - `onlyUnsynced` stays client-side on the returned rows; `selectAllUnsynced` and `showingFiles` work on the returned rows
+  - loading state on the table while `isFetching` with previous data (D8)
+  - orphan section: when `orphansChecked === false`, show the note "Chọn Tất cả để xem orphan" instead of the list
+- `admin.json` (vi + en): `timeFilter`, `timeLast1h`, `timeLast12h`, `timeLast24h`, `timeLast7d`, `timeLast30d`, `timeAll`, `timeCustom`, `timeFrom`, `timeTo`, `timeRangeInvalid`, `orphansOnlyInAll`
+- Toolbar CSS only if the controls wrap badly on mobile (reuse admin classes first)
 
 **Acceptance criteria**
-- [ ] Default "All" shows every file (existing panel tests pass unchanged)
-- [ ] A preset hides files older than the window; the "Showing x / y" line updates
-- [ ] Custom from/to filters to the range; from > to shows the error and the full list
-- [ ] Time filter + "only unsynced" combine (AND)
-- [ ] "Select all unsynced" selects only visible unsynced rows, capped at `maxBatch`
-- [ ] A file selected before narrowing the filter is still counted in FORCE_SYNC and listed in the confirm modal
-- [ ] Every new string exists in vi and en (i18n parity test passes); controls are reachable by keyboard and labelled
+- [ ] First render calls `getDriveSyncFiles` with `from ≈ now − 12 h` and no `to`
+- [ ] Each preset change calls the API again with the new `from`; "All" calls it with no params and shows orphans
+- [ ] Custom from/to calls the API with both bounds; from > to shows the error and makes no call
+- [ ] Changing the filter clears the selection and the FORCE_SYNC count
+- [ ] With a range, the orphan note shows instead of the orphan table
+- [ ] Existing panel tests pass (updated for the new default params); every new string exists in vi and en; controls are labelled and keyboard-reachable
 - [ ] `npm run test`, `npm run lint`, `npm run build` pass
 
 ### QA-1: Verify and close
 
-- Local: run against the real Drive folder, check presets against the "Created" column, check the custom range around a file's exact minute, check mobile width
-- After push + deploy: prod smoke on the DRIVE_SYNC tab as ADMIN and SUPER_ADMIN
+- Local (`startLocal.sh` + `npm run dev`) against the real Drive folder: default 12 h matches the "Created" column; presets, All (with orphans) and a custom range around a file's exact minute; mobile width
+- Push BE-1 → wait for deploy → push FE-2; prod smoke as ADMIN and SUPER_ADMIN, including FORCE_SYNC on a filtered list
 - Mark the plan Done, update `docs/tracking.md` and `TASKS.md`
 
 **Acceptance criteria**
-- [ ] Prod tab filters as above for both roles; FORCE_SYNC still works on a filtered selection
+- [ ] Prod tab filters per range for both roles; orphans only under All; FORCE_SYNC still works
 - [ ] Plan, `docs/tracking.md` and `TASKS.md` updated with commit hashes
 
 ## Risks
 
 | Risk | Mitigation |
 |------|------------|
-| Admin expects the filter to also cut orphans | The filter sits above the file table only; orphans have no time field. Mentioned in Out of Scope |
-| Browser `datetime-local` UI differs (Safari older versions) | Same input as `ImportForm`, already used in prod |
-| Folder grows large enough that loading everything is slow | Not a new problem (the tab already loads everything). D1 records the move to a server filter if that happens |
+| Admin misses orphans because the default is 12 h | Orphan note points to "All" (D3) |
+| Many filter changes → many Drive list calls | Each call is now smaller than today's full listing; the select changes one value at a time and custom inputs only fetch on a valid range. Add debounce in FE-2 only if QA shows typing in the inputs fires too many calls |
+| Drive `createdTime` precision / format mismatch | Server sends seconds-truncated RFC 3339 UTC; BE-1 tests pin the exact `q` string; QA-1 checks a boundary minute against real data |
+| FE deployed before BE | Push order in the Tasks section |
