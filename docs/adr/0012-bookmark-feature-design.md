@@ -10,7 +10,7 @@ Related Skills: designing-systems, designing-apis, domain-driven-design
 
 ## Metadata
 
-**Status:** Proposed · **Date:** 2026-05-31 · **Deciders:** nguyenhuuca · **Tags:** bookmark, api-design, schema, frontend-state  
+**Status:** Accepted (2026-10-13, as amended: collections-first) · **Date:** 2026-05-31 · **Deciders:** nguyenhuuca · **Tags:** bookmark, api-design, schema, frontend-state  
 **Related PRD:** [PRD-bookmark-feature](../prd/PRD-bookmark-feature.md) · **Supersedes:** N/A · **Superseded By:** N/A
 
 **Tech Strategy:** ✅ Follows Golden Path — PostgreSQL + Spring Boot + React + Guava LRU, no new infrastructure

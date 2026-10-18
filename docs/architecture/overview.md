@@ -124,11 +124,11 @@ The following ADRs record the key decisions made for this system. Each links to 
 | [ADR-0005](../adr/0005-use_lru_cache_video_streaming.md) | Use LRU Cache for Video Streaming | Accepted |
 | [ADR-0006](../adr/0006-hls-video-streaming.md) | Switch to HLS for Local Video Streaming | Proposed |
 | [ADR-0007](../adr/0007-admin-dashboard.md) | Admin Dashboard — Content & Account Management | Accepted |
-| [ADR-0008](../adr/0008-react-migration.md) | Migrate Frontend to React with Vite | Proposed |
+| [ADR-0008](../adr/0008-react-migration.md) | Migrate Frontend to React with Vite | Accepted |
 | [ADR-0009](../adr/0009-unified-video-list-api.md) | Unified Video List API for UI Display | Proposed |
 | [ADR-0010](../adr/0010-trivy-container-scanning.md) | Add Trivy Dependency & Filesystem Scanning to CI | Accepted |
 | [ADR-0011](../adr/0011-hot-video-priority.md) | Hot Video Priority Scoring | Accepted |
-| [ADR-0012](../adr/0012-bookmark-feature-design.md) | Bookmark Feature — Collections-first Storage and API | Proposed |
+| [ADR-0012](../adr/0012-bookmark-feature-design.md) | Bookmark Feature — Collections-first Storage and API | Accepted |
 | [ADR-0013](../adr/0013-watch-history-design.md) | Watch History — Recording, Cap, and Re-watch | Superseded by 0021 |
 | [ADR-0014](../adr/0014-watch-history-design-opus.md) | Watch History — Recording, Storage, and Ownership | Superseded by 0021 |
 | [ADR-0015](../adr/0015-bitwise-permission-system.md) | Bitwise Permission System — Fine-Grained Method Authorization | Accepted |
@@ -211,6 +211,6 @@ graph TD
 
     classDef proposed stroke-dasharray: 5 5
     classDef superseded fill:#eee,color:#888,stroke:#bbb
-    class ADR6,ADR8,ADR9,ADR12 proposed
+    class ADR6,ADR9 proposed
     class ADR4,ADR13,ADR14 superseded
 ```

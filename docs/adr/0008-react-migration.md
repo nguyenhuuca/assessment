@@ -2,7 +2,7 @@
 
 ## Metadata
 
-**Status:** Proposed · **Date:** 2026-03-01 · **Deciders:** nguyenhuuca · **Tags:** frontend  
+**Status:** Accepted (implemented; React SPA live in `webapp/`) · **Date:** 2026-03-01 · **Deciders:** nguyenhuuca · **Tags:** frontend  
 **Related PRD:** [PRD-react-migration](../prd/PRD-react-migration.md) · **Supersedes:** ADR-0004 · **Superseded By:** N/A
 
 **Tech Strategy:** ✅ Follows Golden Path

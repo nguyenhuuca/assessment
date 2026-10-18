@@ -34,7 +34,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Bitwise Permissions** | — | [0015 ✅](adr/0015-bitwise-permission-system.md) | [Spec ✅](specs/spec-bitwise-permissions.md) | [Plan](plans/plan-permissions-bitwise.md) | — | ✅ | AS-BUILT docs |
 | **Hot Score Migration** | — | — | — | [Plan 📋](plans/plan-vid2-hot-score-migration.md) | — | 🔍 | |
 | **File-based Hooks** | — | — | — | [Plan A 📋](plans/plan-a-file-based-hooks.md) · [Plan B 📋](plans/plan-b-direct-cli-spawn.md) | — | 🔍 | |
-| **Bookmark Feature** | [PRD 📝](prd/PRD-bookmark-feature.md) | [0012 💡](adr/0012-bookmark-feature-design.md) | — | [Plan 📋](plans/plan-bookmark-feature.md) · [Library Collections ✅](plans/plan-library-collections.md) | — | 🔍 | ADR amended 2026-10-13: collections-first, no bookmarks table; admin public collections |
+| **Bookmark Feature** | [PRD 📝](prd/PRD-bookmark-feature.md) | [0012 ✅](adr/0012-bookmark-feature-design.md) | — | [Plan 📋](plans/plan-bookmark-feature.md) · [Library Collections ✅](plans/plan-library-collections.md) | — | 🔍 | ADR amended 2026-10-13: collections-first, no bookmarks table; admin public collections |
 | **Watch History (v2)** | [PRD ✅](prd/PRD-watch-history-v2.md) | [0021 ✅](adr/0021-watch-history.md) | — | [Plan ✅](plans/plan-watch-history-v2.md) | — | ✅ | `0a2a365` BE (table, API, recording on the view call) + `4c46791` FE (History tab, progress/resume, badges); QA-1 verified on prod 2026-10-18. Supersedes ADR-0013/0014 |
 | **User Settings** | [PRD ✅](prd/PRD-user-settings.md) | [0016 ✅](adr/0016-user-settings-design.md) | [Spec ✅](specs/spec-user-settings.md) | [Plan ✅](plans/plan-user-settings.md) | — | ✅ | Pushed to main `dd45fc0`; coverage 95.91% |
 | **Video Reactions (like / unlike / dislike)** | — | — | — | [Plan ✅](plans/plan-video-reactions.md) | — | ✅ | `28cc167`; fixes 404 on `/video/like`; per-user reactions, optional-auth GET |
@@ -102,11 +102,11 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0005 | LRU Video Cache | ✅ Accepted |
 | 0006 | HLS Video Streaming | 💡 Proposed |
 | 0007 | Admin Dashboard | ✅ Accepted |
-| 0008 | React Migration | 💡 Proposed |
+| 0008 | React Migration | ✅ Accepted |
 | 0009 | Unified Video List API | 💡 Proposed |
 | 0010 | Trivy Container Scanning | ✅ Accepted |
 | 0011 | Hot Video Priority | ✅ Accepted |
-| 0012 | Bookmark Feature Design | 💡 Proposed |
+| 0012 | Bookmark Feature Design | ✅ Accepted (amended 2026-10-13) |
 | 0013 | Watch History Design (baseline) | ⛔ Superseded by 0021 |
 | 0014 | Watch History Design (Opus) | ⛔ Superseded by 0021 |
 | 0015 | Bitwise Permission System | ✅ Accepted |
@@ -119,4 +119,4 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 
 ---
 
-*Last updated: 2026-10-11 — Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod*
+*Last updated: 2026-10-18 — ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod*
