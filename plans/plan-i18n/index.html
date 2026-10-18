@@ -6318,7 +6318,7 @@ Handoff to: Builder, QA Engineer
 -->
 
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p><strong>Status:</strong> Approved (2026-10-14)
+<p><strong>Status:</strong> Done (QA-1 verified on prod by owner; recorded 2026-10-18). Approved 2026-10-14.
 <strong>Author:</strong> nguyenhuuca
 <strong>Date:</strong> 2026-10-14
 <strong>Related PRD:</strong> <a href="../../prd/PRD-i18n/">PRD-i18n</a>
@@ -6517,6 +6517,10 @@ Handoff to: Builder, QA Engineer
 <tr>
 <td>2026-10-15</td>
 <td>Implemented FE-1..5 and BE-1..3 with parallel workers. FE: 300 tests, ~20 KB gzip added. BE: 1145 tests, coverage 96.29%. QA: <code>/api</code> responses are <code>cache-control: no-store</code> and <code>cf-cache-status: DYNAMIC</code>, so no edge-cache leak and no <code>Vary</code> needed. useLocaleSync saves the UI language when <code>user_settings.locale</code> is null, so emails match. Digest emails for users who never log in again fall back to English (ADR D6).</td>
+</tr>
+<tr>
+<td>2026-10-18</td>
+<td>QA-1 passed: owner tested both languages on prod. Plan marked Done.</td>
 </tr>
 </tbody>
 </table>
