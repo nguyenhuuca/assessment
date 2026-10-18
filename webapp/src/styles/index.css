@@ -2784,12 +2784,13 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 /* Watched badge on the feed player overlay and Explore tiles */
 .watched-badge.done {
   display: inline-flex; align-items: center; gap: 4px; width: fit-content; margin-bottom: 6px; padding: 2px 8px; border-radius: 999px;
-  font-size: 11px; font-weight: 700; background: rgba(0, 238, 252, 0.18); color: var(--accent-cyan); border: 1px solid rgba(0, 238, 252, 0.4);
+  font-size: 11px; font-weight: 700; background: rgba(0, 0, 0, 0.6); color: #00eefc; border: 1px solid rgba(0, 238, 252, 0.5);
 }
 .watched-badge.done .material-symbols-outlined { font-size: 14px; }
 .watched-badge.line { display: block; width: 100%; max-width: 160px; height: 3px; margin-bottom: 8px; border-radius: 2px; background: rgba(255, 255, 255, 0.25); overflow: hidden; }
-.watched-badge-fill { display: block; height: 100%; background: var(--accent-cyan); }
-.explore-reel .watched-badge.done { position: absolute; top: 8px; left: 8px; z-index: 2; margin: 0; background: rgba(0, 0, 0, 0.6); }
+/* Watched badge and bar always sit on video imagery: fixed overlay colours, same in both themes */
+.watched-badge-fill { display: block; height: 100%; background: #00eefc; }
+.explore-reel .watched-badge.done { position: absolute; top: 8px; left: 8px; z-index: 2; margin: 0; }
 .explore-reel .watched-badge.line { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; max-width: none; margin: 0; border-radius: 0; }
 
 @media (max-width: 768px) {
@@ -2810,5 +2811,4 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 [data-theme="light"] .hist-watch-clear { color: #b92902; border-color: rgba(185, 41, 2, 0.35); }
 [data-theme="light"] .hist-watch-popover { background: #fff; border-color: rgba(25, 28, 29, 0.12); box-shadow: 0 8px 24px rgba(25, 28, 29, 0.15); }
 [data-theme="light"] .hist-watch-popover-item:hover { color: #b92902; }
-[data-theme="light"] .hist-watch-progress-fill,
-[data-theme="light"] .watched-badge-fill { background: #006970; box-shadow: none; }
+[data-theme="light"] .hist-watch-progress-fill { background: #006970; box-shadow: none; }
