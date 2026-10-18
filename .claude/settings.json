@@ -1,18 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "// === Core Claude Tools (Read/Navigation) ===",
       "Read",
       "Glob",
       "Grep",
       "WebSearch",
 
-      "// === Core Claude Tools (Write) ===",
       "Edit",
       "Write",
       "NotebookEdit",
 
-      "// === File System Read Operations ===",
       "Bash(cat:*)",
       "Bash(ls:*)",
       "Bash(head:*)",
@@ -31,14 +28,12 @@
       "Bash(dirname:*)",
       "Bash(basename:*)",
 
-      "// === File System Write Operations ===",
       "Bash(cp:*)",
       "Bash(mv:*)",
       "Bash(touch:*)",
       "Bash(mkdir:*)",
       "Bash(chmod:*)",
 
-      "// === Text Processing ===",
       "Bash(grep:*)",
       "Bash(sort:*)",
       "Bash(uniq:*)",
@@ -50,7 +45,6 @@
       "Bash(jq:*)",
       "Bash(yq:*)",
 
-      "// === System Info ===",
       "Bash(date:*)",
       "Bash(uname:*)",
       "Bash(whoami:*)",
@@ -67,7 +61,6 @@
       "Bash(command -v:*)",
       "Bash(command:*)",
 
-      "// === Git Read Operations ===",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git show:*)",
@@ -89,7 +82,6 @@
       "Bash(git tag -l:*)",
       "Bash(git -C:*)",
 
-      "// === Git Write Operations ===",
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git fetch:*)",
@@ -108,7 +100,6 @@
       "Bash(git branch -D:*)",
       "Bash(git clean -n:*)",
 
-      "// === GitHub CLI Read Operations ===",
       "Bash(gh issue list:*)",
       "Bash(gh issue view:*)",
       "Bash(gh issue status:*)",
@@ -132,14 +123,12 @@
       "Bash(gh api:*)",
       "Bash(gh auth status:*)",
 
-      "// === GitHub CLI Write Operations ===",
       "Bash(gh issue create:*)",
       "Bash(gh pr create:*)",
       "Bash(gh pr edit:*)",
       "Bash(gh pr merge:*)",
       "Bash(gh release create:*)",
 
-      "// === Docker Operations ===",
       "Bash(docker ps:*)",
       "Bash(docker logs:*)",
       "Bash(docker images:*)",
@@ -154,7 +143,6 @@
       "Bash(docker run:*)",
       "Bash(docker exec:*)",
 
-      "// === Terraform Operations ===",
       "Bash(terraform version:*)",
       "Bash(terraform fmt:*)",
       "Bash(terraform validate:*)",
@@ -167,7 +155,6 @@
       "Bash(terraform providers:*)",
       "Bash(terraform graph:*)",
 
-      "// === Node.js / Package Managers ===",
       "Bash(node --version:*)",
       "Bash(node -v:*)",
       "Bash(node -e:*)",
@@ -177,7 +164,6 @@
       "Bash(pnpm:*)",
       "Bash(npx:*)",
 
-      "// === Build & Quality Tools ===",
       "Bash(vitest:*)",
       "Bash(biome:*)",
       "Bash(tsc:*)",
@@ -190,21 +176,17 @@
       "Bash(echo:*)",
       "Bash(#:*)",
 
-      "// === Claude CLI ===",
       "Bash(claude:*)",
 
-      "// === Scripting ===",
       "Bash(python3:*)",
       "Bash(bash:*)",
 
-      "// === MCP Tools ===",
       "mcp__context7__resolve-library-id",
       "mcp__context7__query-docs",
       "mcp__sequential-thinking__sequentialthinking",
       "mcp__ide__getDiagnostics",
       "mcp__ide__executeCode",
 
-      "// === WebFetch: Documentation Sites ===",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:docs.github.com)",
@@ -221,24 +203,20 @@
       "WebFetch(domain:npmjs.com)",
       "WebFetch(domain:stackoverflow.com)",
 
-      "// === WebFetch: Anthropic/Claude ===",
       "WebFetch(domain:anthropic.com)",
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:modelcontextprotocol.io)",
 
-      "// === WebFetch: Cloud Providers ===",
       "WebFetch(domain:cloudflare.com)",
       "WebFetch(domain:developers.cloudflare.com)",
       "WebFetch(domain:docs.aws.amazon.com)"
     ],
     "deny": [
-      "// === Destructive File Operations ===",
       "Bash(rm -rf:*)",
       "Bash(rm -r:*)",
       "Bash(sudo:*)",
 
-      "// === Git Destructive Operations ===",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
       "Bash(git push origin --force:*)",
@@ -247,30 +225,25 @@
       "Bash(git clean -f:*)",
       "Bash(git clean -fd:*)",
 
-      "// === Infrastructure Destructive Operations ===",
       "Bash(terraform destroy:*)",
       "Bash(terraform apply -auto-approve:*)",
       "Bash(docker system prune:*)",
       "Bash(docker rm:*)",
       "Bash(docker rmi:*)",
 
-      "// === Dangerous Permission Changes ===",
       "Bash(chmod 777:*)",
 
-      "// === Pipe-to-Shell (Remote Code Execution) ===",
       "Bash(curl * | bash*)",
       "Bash(wget * | bash*)",
       "Bash(curl * | sh*)",
       "Bash(wget * | sh*)",
 
-      "// === Sensitive Credential Paths (Read) ===",
       "Read(~/.ssh/**)",
       "Read(~/.gnupg/**)",
       "Read(~/.aws/**)",
       "Read(~/.azure/**)",
       "Read(~/.config/gcloud/**)",
 
-      "// === Shell Profile & SSH Key Protection (Edit/Write) ===",
       "Edit(~/.bashrc)",
       "Edit(~/.zshrc)",
       "Edit(~/.bash_profile)",
@@ -280,7 +253,6 @@
       "Edit(~/.ssh/**)",
       "Write(~/.ssh/**)",
 
-      "// === Project Secrets (Read) ===",
       "Read(**/.env)",
       "Read(**/.env.*)",
       "Read(**/secrets/**)",
