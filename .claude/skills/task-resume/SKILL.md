@@ -13,15 +13,13 @@ Pick up the task in `session.txt` (format: `.claude/rules/session-file.md`) as i
 
 ## How the User Gets Here
 
-On `startup`, `resume` and `clear`, `.claude/hooks/session-start-loader.sh` prints a status report from `session.txt` straight to the user as a `systemMessage`. The report is a few short lines:
-- 📌 and the task name
-- status, a progress bar and `updated`
-- one ✅ line per finished subtask in `done`, then one 🔄 line per half-done subtask in `doing`, at most 8 each
-- ⛔ blocker, when there is one
-- → the first item of `next`
-- the hint "▶ /task-resume để làm tiếp"
+On `startup`, `resume` and `clear`, `.claude/hooks/session-start-loader.sh` prints a status report from `session.txt` straight to the user as a `systemMessage`. The report is a boxed two-column table (label | value). Its row groups are separated by `├──┼──┤` lines:
+- 📌 Task and Status (progress bar and `updated`)
+- ✅ Done, one row per finished subtask
+- 🔄 Doing, one row per half-done subtask (at most 8 rows each group)
+- ⛔ Blocked and → Next
 
-`next` and `blocker` show only their first `;` item, cut at 80 characters, and `plan` is left out. A `status: done` task is still reported, with ✅ and no resume hint. The report is skipped on `compact` and when `session.txt` is missing or empty. The same file also goes into the model's context. If the user's first message is not `/task-resume`, the reply carries one line reminding them about it, and Claude does not start the task on its own.
+Below the table is the hint "▶ /task-resume để làm tiếp". `next` and `blocker` show only their first `;` item. Every value is cut at 70 characters, and `plan` is left out. A `status: done` task is still reported, with ✅ and no resume hint. The report is skipped on `compact` and when `session.txt` is missing or empty. The same file also goes into the model's context. If the user's first message is not `/task-resume`, the reply carries one line reminding them about it, and Claude does not start the task on its own.
 
 ## Workflow
 

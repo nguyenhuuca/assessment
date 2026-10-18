@@ -93,13 +93,10 @@ REPORT=""
 SESSION_FILE="$PROJECT_DIR/session.txt"
 if [ -s "$SESSION_FILE" ]; then
     field() { sed -n "s/^$1:[[:space:]]*//p" "$SESSION_FILE" | head -1 | tr -d '\r'; }
-    # First ";"-item of a field, cut to 80 characters (UTF-8 aware) so the report stays one line per field
-    short() {
-        local LC_ALL=C.UTF-8 v
-        v=$(field "$1"); v=${v%%;*}
-        [ ${#v} -gt 80 ] && v="${v:0:79}…"
-        printf '%s' "$v"
-    }
+    # Cut to 70 characters (UTF-8 aware) so every table row stays one line
+    cut70() { local LC_ALL=C.UTF-8 v=$1; [ ${#v} -gt 70 ] && v="${v:0:69}…"; printf '%s' "$v"; }
+    # First ";"-item of a field
+    short() { local v; v=$(field "$1"); cut70 "${v%%;*}"; }
     TASK_STATUS=$(field status)
     if [ "$TASK_STATUS" = "done" ]; then
         ICON="✅"
@@ -123,38 +120,58 @@ $NOTE
         [ "$PROGRESS" -gt 100 ] && PROGRESS=100
         FILLED=$((PROGRESS / 10))
         BAR="$(printf '%*s' "$FILLED" '' | tr ' ' '#')$(printf '%*s' $((10 - FILLED)) '' | tr ' ' '-')"
-        REPORT="$ICON $(short task)
-   ${TASK_STATUS:-?} · [$BAR] $PROGRESS% · $(field updated)"
-        # Subtasks: one "<icon>" line per ";"-item of a field (at most 8, each cut to 70 characters)
-        items() {
-            field "$1" | LC_ALL=C.UTF-8 awk -v RS=';' -v icon="$2" '
-                { gsub(/^[ \t\n]+|[ \t\n]+$/, "") }
-                $0 == "" || $0 == "-" { next }
-                { n++; if (n <= 8) printf "   %s %s\n", icon, (length($0) > 70 ? substr($0, 1, 69) "…" : $0) }
-                END { if (n > 8) printf "   … +%d more\n", n - 8 }'
+        # Two-column table: label | value. "sep" rows become ├──┼──┤ lines between groups.
+        LC_ALL=C.UTF-8
+        LABELS=() VALUES=() SEP=0
+        row() {
+            [ "$SEP" = 1 ] && [ ${#LABELS[@]} -gt 0 ] && { LABELS+=("sep"); VALUES+=(""); }
+            SEP=0; LABELS+=("$1"); VALUES+=("$2")
         }
-        for spec in "done ✅" "doing 🔄"; do
-            LINES=$(items ${spec% *} "${spec#* }")
-            [ -n "$LINES" ] && REPORT="$REPORT
-${LINES%$'\n'}"
-        done
-        BLOCKER=$(short blocker)
-        [ -n "$BLOCKER" ] && REPORT="$REPORT
-   ⛔ $BLOCKER"
+        # One row per ";"-item of a field (at most 8); the label shows on the first row only
+        rows() {
+            local label=$2 n=0 it
+            while IFS= read -r it; do
+                it="${it#"${it%%[![:space:]]*}"}"; it="${it%"${it##*[![:space:]]}"}"
+                [ -z "$it" ] || [ "$it" = "-" ] && continue
+                n=$((n + 1)); [ $n -le 8 ] && { row "$label" "$(cut70 "$it")"; label=""; }
+            done < <(field "$1" | tr ';' '\n')
+            [ $n -gt 8 ] && row "" "… +$((n - 8)) more"
+        }
+        row "$ICON Task" "$(short task)"
+        row "Status" "${TASK_STATUS:-?} · [$BAR] $PROGRESS% · $(field updated)"
+        SEP=1; rows done "✅ Done"
+        SEP=1; rows doing "🔄 Doing"
+        SEP=1
+        BLOCKER=$(short blocker); [ -n "$BLOCKER" ] && row "⛔ Blocked" "$BLOCKER"
         NEXT=$(short next)
-        [ "$TASK_STATUS" != "done" ] && [ -n "$NEXT" ] && [ "$NEXT" != "-" ] && REPORT="$REPORT
-   → $NEXT"
-        REPORT="$REPORT
-   $HINT"
-        # Frame: left border only (emoji are 2 columns wide, so a right border would not line up)
-        REPORT=$(printf '%s\n' "$REPORT" | awk '
-            { line[NR] = $0 }
-            END {
-                for (i = 1; i <= NR; i++) {
-                    s = line[i]; sub(/^   /, "", s)
-                    printf "%s%s%s", (i == 1 ? "╭─ " : (i == NR ? "╰─ " : "│  ")), s, (i < NR ? "\n" : "")
-                }
-            }')
+        [ "$TASK_STATUS" != "done" ] && [ -n "$NEXT" ] && [ "$NEXT" != "-" ] && row "→ Next" "$NEXT"
+
+        # Display width: these emoji take 2 terminal columns, everything else 1
+        # (counted per emoji: Git Bash sees 📌/🔄 as two UTF-16 units, so ${#s} alone is off)
+        dw() {
+            local s=$1 e r n=0
+            for e in ✅ 🔄 ⛔ 📌; do
+                r=${s//"$e"/}; n=$(( n + (${#s} - ${#r}) / ${#e} )); s=$r
+            done
+            echo $(( ${#s} + 2 * n ))
+        }
+        pad() { printf '%s%*s' "$1" $(( $2 - $(dw "$1") )) ''; }
+        hr() { printf '%s' "$1"; printf '%*s' $((LW + 2)) '' | sed 's/ /─/g'; printf '%s' "$2"; printf '%*s' $((VW + 2)) '' | sed 's/ /─/g'; printf '%s\n' "$3"; }
+        LW=0 VW=0
+        for i in "${!LABELS[@]}"; do
+            [ "${LABELS[$i]}" = "sep" ] && continue
+            w=$(dw "${LABELS[$i]}"); [ "$w" -gt "$LW" ] && LW=$w
+            w=$(dw "${VALUES[$i]}"); [ "$w" -gt "$VW" ] && VW=$w
+        done
+        REPORT=$(
+            hr "┌" "┬" "┐"
+            for i in "${!LABELS[@]}"; do
+                if [ "${LABELS[$i]}" = "sep" ]; then hr "├" "┼" "┤"
+                else printf '│ %s │ %s │\n' "$(pad "${LABELS[$i]}" "$LW")" "$(pad "${VALUES[$i]}" "$VW")"; fi
+            done
+            hr "└" "┴" "┘"
+            printf '%s' "$HINT"
+        )
     fi
 fi
 
