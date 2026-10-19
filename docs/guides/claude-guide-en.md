@@ -232,6 +232,7 @@ Plan ⇄ Plan review → [GATE 1: you approve the plan] → Implement ⇄ Code r
 | **Bug fix with a known cause**: you know what to change and want a regression test | — |
 | Changes to backend and/or webapp that **automated tests can verify** (JUnit, Vitest) | both runs above |
 | A small technical decision that needs an ADR | Still fine: the Plan stage writes the ADR too |
+| **A plan already exists** (from `/swarm-plan` or written by hand) with **≤ 6 open tasks** | `/autopilot docs/plans/plan-x.md` skips the Plan stage but still runs Plan review and Gate 1. It works only on the tasks still `[ ]` in `TASKS.md` |
 
 ### ⚠️ When Not to Use It (use another flow)
 
@@ -252,6 +253,8 @@ Plan ⇄ Plan review → [GATE 1: you approve the plan] → Implement ⇄ Code r
 | Situation | What autopilot does | What you do |
 |-----------|---------------------|-------------|
 | **Scope guard**: the request needs a PRD/PR-FAQ | **Refuses** at once, before planning, with one line pointing to `/scope` | Run `/scope`, or shrink the request and run again |
+| **Plan mode**: the plan has > 6 open tasks, a task is `[~]`, or the plan is Done | **Refuses** and points to `/swarm-execute` | Use `/swarm-execute`, or split the plan |
+| **Plan mode**: the plan has no open tasks left | Says so and stops | — |
 | Plan review still `revise` after 3 rounds | Stops, `session.txt` gets `status: blocked`, the open blocking findings are listed | Clarify the request or decide the stuck points yourself |
 | Code review still `revise` after 3 rounds | Stops `blocked`; the code stays on the worktree branch, not on `main` | Read the findings, fix by hand or drop |
 | QA fails both runs and still fails after 3 Fix rounds | Stops `blocked` with the `FAIL` list and log paths | Debug with Workflow 2 |
@@ -302,6 +305,7 @@ A stopped run can be continued with `/task-resume`, which reads `session.txt` an
 /autopilot on the Suggestions tab let an admin move a suggestion back to Pending and review it again
 /autopilot refactor: put the suggestion status transition rules in one place, no behavior change
 /autopilot fix: the Reopen button is not disabled while the request is pending
+/autopilot docs/plans/plan-<feature>.md               # run on an existing plan (plan mode)
 ```
 
 - **Typed command only.** `autopilot` has `disable-model-invocation: true`, so Claude starts it only when you **type `/autopilot`**. If you ask in chat instead ("run autopilot for X"), Claude reads the `SKILL.md` and follows it step by step, gates included.

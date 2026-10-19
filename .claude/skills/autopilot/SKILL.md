@@ -1,7 +1,7 @@
 ---
 name: autopilot
 description: Run one small feature or fix end to end — plan, plan review, your approval, implement, code review, QA tests twice, commit, your push approval — with round caps and a run ledger. A user-invoked workflow.
-argument-hint: "<feature or fix request>"
+argument-hint: "<feature or fix request> | <docs/plans/plan-*.md>"
 disable-model-invocation: true
 ---
 
@@ -15,9 +15,21 @@ Plan ⇄ Plan review → [GATE 1] → Implement ⇄ Code review → Local QA ×2
 
 Plan: `docs/plans/plan-autopilot.md` (design decisions D1–D7 referenced below).
 
-## 0. Scope Guard (D6)
+## 0. Input and Scope Guard (D6, D8)
 
-Classify `$ARGUMENTS` with `swarm-plan`'s Artifact Requirements before anything else.
+**Input mode.** The input is in **plan mode** when `$ARGUMENTS` starts with a path matching `docs/plans/plan-*.md` and that file exists. Any text after the path is extra notes for the run. Every other input is in **request mode**.
+
+**Plan mode** (a plan already made by `/swarm-plan` or by hand):
+- Read the plan and its `TASKS.md` section, matched by the plan path or by the task IDs in the plan.
+- **Open tasks** = the plan's tasks not yet `[x]` in `TASKS.md`. Count only implementation tasks: owner-only QA or prod checks do not count and are not run.
+- **Refuse**, in one line pointing to `/swarm-execute`, when:
+  - there are **more than 6 open tasks** (one autopilot round must stay reviewable, ≤ ~400 LOC);
+  - any task is `[~]` (someone else is working on it);
+  - the plan's Status is Done.
+- **No open tasks:** say so and stop.
+- **Otherwise:** continue. Stage 1 skips **Plan**, and the ledger records `plan | reused`.
+
+**Request mode:** classify `$ARGUMENTS` with `swarm-plan`'s Artifact Requirements before anything else.
 
 - **Small feature or fix:** continue.
 - **Medium/Large (needs a PRD or PR-FAQ):** stop. Say so in one line and point to `/scope`.
@@ -51,7 +63,7 @@ Use the fallback when a skill call is refused, the skill is missing, or its `dis
 
 ### 1. Plan ⇄ Plan review (cap 3 rounds, D3)
 
-1. **Plan:** produce `docs/plans/plan-<slug>.md` + a `TASKS.md` section (repo convention).
+1. **Plan:** produce `docs/plans/plan-<slug>.md` + a `TASKS.md` section (repo convention). **Plan mode:** skip this step and go straight to Plan review on the given plan. A `revise` round edits **that** plan file in place, and only the open tasks may change; tasks that are already `[x]` stay as they are.
 2. **Plan review:** review the plan, not code. Check that:
    - each task has acceptance criteria;
    - every fact cites `file:line`;

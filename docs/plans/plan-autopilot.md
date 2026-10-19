@@ -77,6 +77,11 @@ Start ─▶ Plan ⇄ Plan review ─▶ [GATE 1: you approve plan] ─▶ Imple
   - The full gates (`mvn verify`, `npm run test`, `npm run lint`) still run once before the commit.
 - **D5 — Ledger.** The ledger lives at `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md` (ephemeral) and holds one row per worker run: stage, round, verdict, turns, min, tokens, ≈$. The run report (results + ledger + cost) goes to `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md`, so a durable record stays in `docs/`. The plan artifact is not edited for it (owner, 2026-10-19).
 - **D6 — Scope guard.** Autopilot refuses tasks that need a PR-FAQ or PRD (Medium/Large features per `swarm-plan`) and points to `/scope`. It targets small features and fixes.
+- **D8 — Plan mode (added 2026-10-19).** `/autopilot docs/plans/plan-<x>.md` runs on an existing plan, e.g. one made by `/swarm-plan`.
+  - **Skipped:** only the Plan stage.
+  - **Kept:** Plan review (that plan has not been through a reviewer yet) and Gate 1. Without them, autopilot would just be `/swarm-execute`.
+  - **Scope:** only tasks still `[ ]` in `TASKS.md`. Owner-only QA/prod checks are not counted or run.
+  - **Refused (→ `/swarm-execute`):** more than 6 open tasks, any task `[~]`, or the plan's Status is Done.
 - **D7 — Gates are never skipped.** Gate 1 (plan) and Gate 2 (push) always use `AskUserQuestion`. There is no `--yes` flag. This follows the standing "ask before every push" rule.
 
 ## Tasks
