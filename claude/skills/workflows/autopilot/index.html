@@ -6708,6 +6708,11 @@
 - The build job finds the plan with <code>git diff --name-only origin/main...HEAD -- docs/plans/</code>.
 - <code>session.txt</code> is not written, because the runner is thrown away; the PR is the record.
 - The ledger lives in the runner's <code>scratchpad/</code>. The report (<code>docs/reports/autopilot-&lt;date&gt;-&lt;slug&gt;.md</code>) is committed to the PR branch. Its cost comes from <code>node scripts/claude-cost.mjs --from &lt;job start&gt; --md</code>, which finds the runner's own transcripts.</p>
+<p><strong>Shell use in CI.</strong> Only the commands in the workflow's <code>--allowedTools</code> run; anything else is denied, and Claude Code checks each part of a <code>&amp;&amp;</code> chain separately.
+- Run one simple command per call.
+- Write files, including PR bodies and comments, with the Write tool, then pass them with <code>--body-file</code>.
+- Prefer <code>git -C &lt;dir&gt;</code> and <code>gh</code> flags over <code>cd</code>.
+- If a command is denied, do not retry variations. Post a comment naming the denied command and stop.</p>
 <p><strong>Stop conditions</strong> (round cap, red gate, denylist, refused input): comment the reason on the PR (or on the issue if no PR exists yet), push nothing further, and exit.</p>
 <h2 id="stage-runner-d1">Stage Runner (D1)<a class="headerlink" href="#stage-runner-d1" title="Permanent link">&para;</a></h2>
 <p>Every stage runs its <strong>primary</strong> path when the skill can be invoked, otherwise the <strong>fallback</strong>. Record which path ran in the ledger.</p>

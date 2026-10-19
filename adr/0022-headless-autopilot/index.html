@@ -6458,6 +6458,12 @@
 <li><strong>Auth:</strong> <code>CLAUDE_CODE_OAUTH_TOKEN</code> (subscription), created by the owner with <code>claude setup-token</code> and stored as a repo secret by the owner.</li>
 <li><strong>GitHub token:</strong> the workflow passes <code>github_token: ${{ github.token }}</code> with job permissions <code>contents: write</code>, <code>pull-requests: write</code>, <code>issues: write</code>, so the broad Claude GitHub App is not needed. Pushes made with this token start no workflows. That is fine here, because <code>autopilot/*</code> branches have no CI.</li>
 <li>No other secrets are referenced by the job.</li>
+<li><strong>The Bash allowlist is a guardrail, not a boundary.</strong> <code>node</code>, <code>mvn</code>, <code>npm</code>, <code>awk</code> and <code>sed</code> can all run arbitrary code, and the build job needs them. The OAuth token is present in the job, so a determined prompt injection could reach it. The real boundaries are:</li>
+<li>only the owner can trigger (D2);</li>
+<li>both gates are human;</li>
+<li>the job has no deploy secrets;</li>
+<li>the token can be revoked by running <code>claude setup-token</code> again.</li>
+<li><code>curl</code> and <code>wget</code> are not allowed, which keeps casual exfiltration harder.</li>
 </ul>
 <h3 id="d5-limits">D5. Limits<a class="headerlink" href="#d5-limits" title="Permanent link">&para;</a></h3>
 <ul>
