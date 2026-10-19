@@ -1,0 +1,134 @@
+---
+name: autopilot
+description: Run one small feature or fix end to end — plan, plan review, your approval, implement, code review, QA tests twice, commit, your push approval — with round caps and a run ledger. A user-invoked workflow.
+argument-hint: "<feature or fix request>"
+disable-model-invocation: true
+---
+
+# Autopilot
+
+Chain the existing skills into one run for `$ARGUMENTS`. A human is needed at **Start** (this command), **Gate 1** (plan) and **Gate 2** (push). Everything else runs on its own until a gate, a round cap, or a red gate stops it.
+
+```
+Plan ⇄ Plan review → [GATE 1] → Implement ⇄ Code review → Local QA ×2 ⇄ Fix → Commit → [GATE 2] → CI + smoke
+```
+
+Plan: `docs/plans/plan-autopilot.md` (design decisions D1–D7 referenced below).
+
+## 0. Scope Guard (D6)
+
+Classify `$ARGUMENTS` with `swarm-plan`'s Artifact Requirements before anything else.
+
+- **Small feature or fix:** continue.
+- **Medium/Large (needs a PRD or PR-FAQ):** stop. Say so in one line and point to `/scope`.
+- **Needs an ADR:** continue, but the Plan stage must produce the ADR too.
+
+Write `session.txt` (`.claude/rules/session-file.md`) and create the ledger (see Ledger) before stage 1.
+
+## Stage Runner (D1)
+
+Every stage runs its **primary** path when the skill can be invoked, otherwise the **fallback**. Record which path ran in the ledger.
+
+| Stage | Primary: Skill tool | Fallback: `Agent` worker |
+|-------|---------------------|--------------------------|
+| Plan | `swarm-plan` | `worker-architect` if an ADR is needed, else `worker-builder` |
+| Plan review | `swarm-review` on the plan artifact | `worker-reviewer` |
+| Implement / Fix | `swarm-execute` on the plan | `worker-builder` (focus `implementation`) |
+| Code review | `swarm-review` on the uncommitted diff | `worker-reviewer` (focus `quality`; add `security` when auth, input or SQL changed) |
+| Local QA specs | `qa-engineer` | `worker-builder` (focus `testing`) |
+| Land | `land-the-plane` | Orchestrator follows AGENTS.md "Landing the Plane" Mode B |
+
+Use the fallback when a skill call is refused, the skill is missing, or its `disable-model-invocation` is `true` again. The fallback prompt is:
+
+> Read `.claude/skills/<name>/SKILL.md` and follow its method for this input: <stage input>. <stage-specific limits below>. End your reply with the verdict block from `.claude/skills/autopilot/resources/verdict.md` (review stages only).
+
+**Overrides that apply inside autopilot, whichever path runs:**
+- **No push before Gate 2.** Skip `swarm-execute`'s "Push" step and any other push. Commit only in the Land stage.
+- **Workers return summaries, not file dumps.** Ask for: files changed, tests added, and the verdict block where one applies.
+- **Re-read state after every stage**: the plan file, the ledger, and `git status` (Stale Context Check).
+
+## Stages
+
+### 1. Plan ⇄ Plan review (cap 3 rounds, D3)
+
+1. **Plan:** produce `docs/plans/plan-<slug>.md` + a `TASKS.md` section (repo convention).
+2. **Plan review:** review the plan, not code. Check that:
+   - each task has acceptance criteria;
+   - every fact cites `file:line`;
+   - nothing breaks the tech strategy or security rules;
+   - the scope matches the request.
+3. **Parse the verdict** (`resources/verdict.md`):
+   - `approve` → go to Gate 1.
+   - `revise` → replan with **only the blocking findings** as input, then review again.
+   - Round 3 still `revise` → **stop**, `status: blocked`.
+
+### Gate 1 — Plan approval (D7)
+
+Show the plan path, the task table, the advisories that were left open, and the ledger total so far. Ask with `AskUserQuestion`: **Approve / Revise with notes / Stop**.
+- **Revise with notes:** go back to Plan with the notes as input. This starts a new cycle and resets the round counter.
+- Never skip this gate.
+
+### 2. Implement ⇄ Code review (cap 3 rounds)
+
+1. **Implement** the plan tasks. Each task ends with its tests passing locally; nothing is committed yet.
+2. **Code review** the diff (`git diff` + new files), then parse the verdict.
+   - `approve` → stage 3.
+   - `revise` → Fix with the blocking findings, then review again.
+   - Round 3 still `revise` → **stop**, `status: blocked`.
+
+### 3. Local QA ×2 ⇄ Fix (cap 3 rounds)
+
+1. **QA specs:** write or extend tests for the plan's acceptance criteria. List any criterion that cannot be automated; it goes to the summary as a manual check for the owner.
+2. **Run** `scripts/qa-twice.sh --be <changed/added test classes> --fe <changed/added test files>`.
+   - `exit 0` → stage 4. `flaky` lines go into the ledger and the summary but do not block.
+   - `exit 1` → Fix with the `FAIL` lines, then run again.
+   - `exit 2` → the run itself broke (compile error, no report). Treat it as a fail and include the log path.
+   - Round 3 still failing → **stop**, `status: blocked`.
+
+### 4. Land → Gate 2 → CI + smoke
+
+1. Run the full quality gates once: `mvn verify` in `api/` (coverage ≥ `api/.coverage-threshold`), then `npm run test` and `npm run lint` in `webapp/`, for whichever side changed.
+2. Commit with explicit pathspecs. Flip the `TASKS.md` lines to `[x]` with the hash and update `docs/tracking.md` when the plan status changes.
+3. **Gate 2:** show the commits, the gate results, the flaky list, the manual checks, and the ledger total. Ask with `AskUserQuestion`: **Push / Don't push yet**. There is no auto-push and no `--yes`.
+4. **After a push:**
+   - `git pull --rebase --autostash`, then push, and check that `git status` is in sync.
+   - Watch CI.
+   - Run `./api/mock-test.sh` when the backend changed.
+
+## Ledger (D5)
+
+File: `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md`. Append one row per stage run:
+
+```
+| # | stage | round | path | verdict / result | blocking | advisory | turns | min | tokens | ≈$ |
+```
+
+- `turns` / `tokens` / `min` come from each Agent result's usage. For a primary-path stage, add up the workers it spawned, plus the orchestrator's wall time.
+- `≈$` is an estimate: tokens × the model's list price. Always show it with "≈" and never present it as billed cost.
+- **Update `session.txt` after every stage:**
+  - put the stage in `doing`, and move it to `done` when it finishes;
+  - set `progress` to: plan ≈20, Gate 1 ≈30, implement+review ≈60, QA ≈80, landed 100.
+
+At the end, append the table and its totals to the plan artifact under `## Autopilot run`, so the record survives the scratchpad.
+
+## Stop Conditions
+
+Stop with `status: blocked` and a `blocker:` line in `session.txt` when:
+- a round cap is reached;
+- a quality gate stays red after the QA loop;
+- the user picks **Stop** at a gate.
+
+Report:
+- what each round tried;
+- the open blocking findings;
+- the ledger total.
+
+`/task-resume` can continue the run from the ledger and the plan.
+
+## Constraints
+
+- ALWAYS stop at Gate 1 and Gate 2. Approval at one gate never covers the other, and never covers a later run.
+- NEVER push, force-push, or open a PR inside the loop.
+- NEVER write to prod data. The smoke test stays read-only (`api/Mock-Test.http` rules).
+- NEVER copy rule text from the chained skills into prompts. Point to the SKILL.md instead (DRY).
+- Workers never spawn workers (agent-constraints). Only this orchestrator calls `Agent`.
