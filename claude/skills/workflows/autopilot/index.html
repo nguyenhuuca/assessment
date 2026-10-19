@@ -6720,7 +6720,8 @@
 <p><strong>Shell use in CI.</strong> Only the commands in the workflow's <code>--allowedTools</code> run; anything else is denied, and Claude Code checks each part of a <code>&amp;&amp;</code> chain separately.
 - Run one simple command per call.
 - Write files, including PR bodies and comments, with the Write tool, then pass them with <code>--body-file</code>.
-- Prefer <code>git -C &lt;dir&gt;</code> and <code>gh</code> flags over <code>cd</code>.
+- <strong>Never <code>cd</code>; stay in the repo root.</strong> Use <code>git -C &lt;dir&gt;</code>, <code>npm --prefix webapp run &lt;script&gt;</code>, <code>mvn -f api/pom.xml &lt;goal&gt;</code>, and <code>bash scripts/qa-twice.sh</code> with paths relative to the root. Claude Code asks for approval on <code>cd &lt;dir&gt; &amp;&amp; git …</code>, which CI cannot give, and a changed directory leads to path forms the allowlist does not match (issue #32: <code>bash /home/runner/…/qa-twice.sh</code> was denied).
+- When reporting a denied command, quote it exactly as it was sent.
 - If a command is denied, do not retry variations. Post a comment naming the denied command and stop.</p>
 <p><strong>Stop conditions</strong> (round cap, red gate, denylist, refused input): comment the reason on the PR (or on the issue if no PR exists yet), push nothing further, and exit.</p>
 <h2 id="stage-runner-d1">Stage Runner (D1)<a class="headerlink" href="#stage-runner-d1" title="Permanent link">&para;</a></h2>
@@ -6811,7 +6812,7 @@
 </ol>
 <h3 id="4-land-gate-2-ci-smoke">4. Land → Gate 2 → CI + smoke<a class="headerlink" href="#4-land-gate-2-ci-smoke" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Run the full quality gates once: <code>mvn verify</code> in <code>api/</code> (coverage ≥ <code>api/.coverage-threshold</code>), then <code>npm run test</code> and <code>npm run lint</code> in <code>webapp/</code>, for whichever side changed.</li>
+<li>Run the full quality gates once, for whichever side changed: <code>mvn -f api/pom.xml verify</code> (coverage ≥ <code>api/.coverage-threshold</code>), then <code>npm --prefix webapp run test</code> and <code>npm --prefix webapp run lint</code>.</li>
 <li>Commit with explicit pathspecs. Flip the <code>TASKS.md</code> lines to <code>[x]</code> with the hash and update <code>docs/tracking.md</code> when the plan status changes.</li>
 <li><strong>Gate 2:</strong> show the commits, the gate results, the flaky list, the manual checks, and the ledger total. Ask with <code>AskUserQuestion</code>: <strong>Push / Don't push yet</strong>. There is no auto-push and no <code>--yes</code>.</li>
 <li><strong>After a push:</strong></li>
