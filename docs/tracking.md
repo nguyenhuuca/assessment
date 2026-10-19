@@ -49,13 +49,13 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Drive Sync Time Filter** | — | — | — | [Plan ✅](plans/plan-drive-sync-time-filter.md) | — | ✅ | `cc7f8f2b` BE + `ad0adc82`/`31f01e86` FE. DRIVE_SYNC tab: server-side filter on Drive created time (`GET /files?from&to`), default last 12 h, presets 1h/12h/24h/7d/30d, All, custom from/to (VN time); orphans only under All. QA-1 verified on prod by owner (2026-10-18) |
 | **Admin Drive Force Sync** | — | — | — | [Plan 🔄](plans/plan-admin-drive-force-sync.md) | — | 🔄 | `1e961cc` tab DRIVE_SYNC: Drive ↔ local ↔ DB states; ADMIN views, SUPER_ADMIN force-syncs (re-download + upsert, ≤50/run); unique `(source_type, source_id)`; prod E2E pending |
 | **/autopilot skill (dev tooling)** | — | — | — | [Plan ✅](plans/plan-autopilot.md) | — | 🔄 | Built 2026-10-19 (`f8fa31ce`, `d52f6b2e`); QA-1 dry run pending. One skill chains plan → plan review → [you approve] → implement ⇄ review → QA tests ×2 → commit → [you approve push]; round caps 3, run ledger |
-| **Suggestion Re-review** | — | — | — | [Plan ✅](plans/plan-suggestion-rereview.md) | — | 🔄 | `6c16388e` BE + `29c1fd94` FE (first /autopilot run). Admin Reopen (REJECTED, or APPROVED with FAILED/CANCELLED job) → Pending; submitter re-review request after rejection (max 2, optional message). SR-QA-1 prod check pending |
+| **Suggestion Re-review** | — | — | — | [Plan ✅](plans/plan-suggestion-rereview.md) | — | ✅ | `6c16388e` BE + `29c1fd94` FE (first /autopilot run). Admin Reopen (REJECTED, or APPROVED with FAILED/CANCELLED job) → Pending; submitter re-review request after rejection (max 2, optional message). SR-QA-1 verified on prod by owner (2026-10-19) |
 
 ---
 
 ## Status Summary
 
-### ✅ Done (18)
+### ✅ Done (19)
 - [Use RDBMS](adr/0001-use-relational-database.md)
 - [Backend Architecture](adr/0002-backend-architecture.md)
 - [Cache Strategy](adr/0003-use-cache.md)
@@ -74,9 +74,9 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Watch History (v2)](adr/0021-watch-history.md)
 - [i18n Vietnamese + English](plans/plan-i18n.md)
 - [Drive Sync Time Filter](plans/plan-drive-sync-time-filter.md)
-
-### 🔄 In Progress (4)
 - [Suggestion Re-review](plans/plan-suggestion-rereview.md)
+
+### 🔄 In Progress (3)
 - [/autopilot skill](plans/plan-autopilot.md)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
 - [Admin Drive Force Sync](plans/plan-admin-drive-force-sync.md)

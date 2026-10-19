@@ -285,4 +285,4 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **SR-BE-2** `POST /admin/video-suggestions/{id}/reopen`, `POST /suggestions/{id}/rereview` — `6c16388e`
 - [x] **SR-FE-1** Admin Đề xuất tab: Reopen button (confirm) when `canReopen` — `29c1fd94`
 - [x] **SR-FE-2** My suggestions: "Request re-review" on rejected cards (optional message, 2 max) — `29c1fd94`
-- [ ] **SR-QA-1** Owner prod check: reject → user re-review → approve; admin reopen
+- [x] **SR-QA-1** Owner prod check: reject → user re-review → approve; admin reopen — verified by owner 2026-10-19

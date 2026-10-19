@@ -9,7 +9,7 @@ Handoff to: Builder, QA Engineer
 
 ## Overview
 
-**Status:** Built 2026-10-19 (autopilot) · BE `6c16388e`, FE `29c1fd94`; SR-QA-1 prod check pending (owner)
+**Status:** Built 2026-10-19 (autopilot) · BE `6c16388e`, FE `29c1fd94`; SR-QA-1 verified on prod by owner (2026-10-19)
 **Author:** nguyenhuuca
 **Date:** 2026-10-19
 **Related plan:** [plan-video-suggestions](plan-video-suggestions.md) (the flow this extends)

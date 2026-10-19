@@ -3,6 +3,6 @@ status: done
 progress: 100
 done: Plan 1af57e24; BE reopen + rereview 6c16388e; FE Reopen + re-review modal 29c1fd94; deployed ae6366ad, smoke 22/22
 doing: -
-next: SR-QA-1 owner prod check (reject → re-review → approve; admin reopen)
+next: -
 plan: docs/plans/plan-suggestion-rereview.md
-updated: 2026-10-19 09:57
+updated: 2026-10-19 10:32
