@@ -6700,21 +6700,22 @@
 - <strong>Gate 1:</strong> the plan job ends by opening a <strong>draft PR</strong>:
   - branch <code>autopilot/issue-&lt;N&gt;</code> from <code>origin/main</code>;
   - <code>gh pr create --draft --base main</code>, titled <code>Autopilot: &lt;issue title&gt; (#&lt;N&gt;)</code>, with a body containing <code>Closes #&lt;N&gt;</code> so the merge closes the issue;
-  - the PR body holds the plan link, the task table, the plan-review verdict and the open advisories, and ends with "Gate 1: comment <code>/approve</code>, or <code>/revise &lt;notes&gt;</code>".
+  - the branch also holds the run report, created from <code>resources/report.template.md</code> with the header, the Start / Plan / Plan review / Gate 1 rows and the plan-stage <code>## Runs</code> rows filled in (Gate 1: "pending: <code>/approve</code>"). A <code>/revise</code> cycle appends its rows to the same file;
+  - the PR body holds the plan link, the report link, the task table, the plan-review verdict and the open advisories, and ends with "Gate 1: comment <code>/approve</code>, or <code>/revise &lt;notes&gt;</code>".
   - It also comments the PR link on the issue. <strong>Stop there.</strong>
 - <strong>Gate 2:</strong> the build job ends with <code>git push origin HEAD</code> (the PR branch only), <code>gh pr ready &lt;N&gt;</code>, the run report in the PR body, and a comment: "Gate 2: review the diff, then merge to deploy. Run <code>./api/mock-test.sh</code> after the deploy." <strong>Never push to <code>main</code>, never merge, never approve your own PR.</strong></p>
 <p><strong>Differences from a local run:</strong>
 - Worker worktree commits are cherry-picked onto the <strong>PR branch</strong>, not <code>main</code>.
 - The build job finds the plan with <code>git diff --name-only origin/main...HEAD -- docs/plans/</code>.
 - <code>session.txt</code> is not written, because the runner is thrown away; the PR is the record.
-- The ledger lives in the runner's <code>scratchpad/</code>. The report (<code>docs/reports/autopilot-&lt;date&gt;-&lt;slug&gt;.md</code>) is committed to the PR branch. Its cost comes from <code>node scripts/claude-cost.mjs --from &lt;job start&gt; --md</code>, which finds the runner's own transcripts.</p>
+- The runner's <code>scratchpad/</code> is lost when the job ends, so the <strong>report on the PR branch is the ledger</strong>: each job writes its <code>## Runs</code> rows there, not only in <code>scratchpad/</code>. The build job finds the report with <code>git diff --name-only origin/main...HEAD -- docs/reports/</code>, reads it, and fills every remaining section of the template (Gate 2: "pending: owner merges"; CI + smoke: "n/a in CI: runs after merge").</p>
 <p><strong>No stage is optional in CI.</strong> Plan review and <strong>code review</strong> run on every headless run, whatever the diff size: a separate <code>worker-reviewer</code> (or <code>swarm-review</code>) must return a verdict block. "The owner reviews at Gate 2" is <strong>not</strong> a reason to skip one; Gate 2 is in addition to the reviews, not a substitute. The Gate 2 comment lists every stage with its result (plan review verdict, code review verdict, QA ×2 result, gates). Without a code-review <code>approve</code>, do <strong>not</strong> run <code>gh pr ready</code>: comment <code>blocked</code> instead. Found on issue #26: the build job skipped code review because "the diff is tiny".</p>
 <p><strong>Prove the regression test.</strong> For a bug fix, show the new test fails without the fix. Use separate git commands:
 1. <code>git stash push -- &lt;file&gt;</code>
 2. run the test and expect a FAIL
 3. <code>git stash pop</code>
 4. run the test again and expect a PASS</p>
-<p><strong>Cost in CI.</strong> Do not run <code>claude-cost.mjs</code> in CI, because the runner's transcripts are not under the working directory. The workflow posts each job's cost from the action's result as a PR comment. In the report, write "Cost: see the job cost comments on the PR".</p>
+<p><strong>Cost in CI.</strong> Do not run <code>claude-cost.mjs</code> in CI, because the runner's transcripts are not under the working directory. After each job, the workflow appends that job's row to the report's <code>## Cost</code> table, commits it to the PR branch, and posts the same figure as a PR comment. Leave the <code>## Cost</code> table rows to the workflow; never write or edit them.</p>
 <p><strong>Workers in CI run in the foreground.</strong> The workflow sets <code>CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1</code>, because in <code>-p</code> mode the session ends with the turn and a background worker's result would never arrive. Never end a turn while a worker or command is still running, and never answer "waiting for the review". Every stage must finish within the job.</p>
 <p><strong>Shell use in CI.</strong> Only the commands in the workflow's <code>--allowedTools</code> run; anything else is denied, and Claude Code checks each part of a <code>&amp;&amp;</code> chain separately.
 - Run one simple command per call.
@@ -6827,7 +6828,7 @@
 <li>put the stage in <code>doing</code>, and move it to <code>done</code> when it finishes;</li>
 <li>set <code>progress</code> to: plan ≈20, Gate 1 ≈30, implement+review ≈60, QA ≈80, landed 100.</li>
 </ul>
-<p>At the end, write the run report to <code>docs/reports/autopilot-&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md</code>: result per stage, the runs table, tokens per model, cost, CI + smoke result, manual checks and open advisories. The plan artifact is <strong>not</strong> edited for this (owner preference, 2026-10-19).</p>
+<p>At the end, write the run report to <code>docs/reports/autopilot-&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md</code> from <code>resources/report.template.md</code>. Keep every section of the template, local or headless; write "n/a" with the reason rather than dropping one. The plan artifact is <strong>not</strong> edited for this (owner preference, 2026-10-19).</p>
 <h2 id="stop-conditions">Stop Conditions<a class="headerlink" href="#stop-conditions" title="Permanent link">&para;</a></h2>
 <p>Stop with <code>status: blocked</code> and a <code>blocker:</code> line in <code>session.txt</code> when:
 - a round cap is reached;

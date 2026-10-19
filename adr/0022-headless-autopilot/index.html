@@ -6475,7 +6475,7 @@
 </li>
 <li><code>concurrency: autopilot</code> with <code>cancel-in-progress: false</code>: one run at a time, others wait.</li>
 <li><code>--max-turns</code> per job.</li>
-<li>The skill's round caps (3) still apply. Cost is reported per run with <code>scripts/claude-cost.mjs</code>.</li>
+<li>The skill's round caps (3) still apply. After each job, <code>scripts/claude-autopilot-cost.sh</code> (run from <code>main</code>, so a PR branch cannot change it) posts the job's cost from the action's result and appends it to the run report on the PR branch.</li>
 </ul>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <ul>
