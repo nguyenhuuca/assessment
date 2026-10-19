@@ -304,3 +304,10 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **AH-4** Guide vi/en headless section
 - [ ] **AH-5** Owner: `claude setup-token` → `gh secret set CLAUDE_CODE_OAUTH_TOKEN`; create label `autopilot`
 - [ ] **AH-QA-1** Owner: first run on a tiny issue (label → draft PR → /approve → merge → CI green)
+
+## Fix: Reopen button disabled while pending (2026-10-19, autopilot, issue #26)
+
+**Plan:** `docs/plans/plan-reopen-button-disable.md`
+
+- [ ] **RB-1** Reopen row button `disabled` while its request is pending
+- [ ] **RB-2** Test: disabled + aria-busy while pending, one request on double click
