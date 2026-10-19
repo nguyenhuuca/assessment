@@ -4,7 +4,7 @@
 **Request:** Gather the suggestion status transition rules (approve, reject, reopen, rereview), now spread across the service, into one place. Behavior must not change.
 **Plan:** [plan-suggestion-transitions](../plans/plan-suggestion-transitions.md)
 **Skill:** `/autopilot` (second run). The skill has `disable-model-invocation: true`, so the owner asked in chat ("chạy autopilot refactor đó") and the orchestrator followed `.claude/skills/autopilot/SKILL.md` step by step.
-**Result:** Commit `08f16414` is on `main` locally, waiting for Gate 2.
+**Result:** ✅ Pushed `4600c1b8`. Both gates were approved, every review passed in round 1, and CI plus smoke are green.
 
 ## Pipeline
 
@@ -19,7 +19,8 @@
 | Local QA ×2 | `qa-twice.sh`, 4 classes, 117 tests: **pass 117 · flaky 0 · fail 0**. The `qa-engineer` skill was skipped because every criterion already had a test | 1 of 3 |
 | Fix | not needed | — |
 | Land: full gates | `mvn verify` OK, line coverage 96.71% (threshold 90%). Webapp untouched | — |
-| Gate 2 (owner) | _pending_ | — |
+| Gate 2 (owner) | **push** | — |
+| CI + smoke | "Funny App Build and Deploy" green, `mock-test.sh` 22/22 | — |
 
 ### What changed
 
@@ -66,7 +67,8 @@ Prices from the [platform pricing page](https://platform.claude.com/docs/en/abou
 
 ## CI and Smoke
 
-_Pending Gate 2._
+- `4600c1b8` "Funny App Build and Deploy": ✅ success
+- `./api/mock-test.sh` on prod: ✅ 22/22
 
 ## Manual Checks for the Owner
 

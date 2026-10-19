@@ -1,8 +1,8 @@
 task: Autopilot: centralize suggestion status transitions (refactor)
-status: in_progress
-progress: 90
-done: Plan 0a80d026; SuggestionTransition refactor 08f16414; QA ×2 117 pass; mvn verify cov 96.71%
-doing: Gate 2 (owner approves push)
-next: push + CI + mock-test.sh
+status: done
+progress: 100
+done: Plan 0a80d026; SuggestionTransition refactor 08f16414; QA ×2 117 pass; mvn verify cov 96.71%; deployed 4600c1b8, smoke 22/22
+doing: -
+next: -
 plan: docs/plans/plan-suggestion-transitions.md
-updated: 2026-10-19 10:45
+updated: 2026-10-19 10:52
