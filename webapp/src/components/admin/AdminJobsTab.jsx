@@ -1,16 +1,22 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
+import Tooltip from 'react-bootstrap/Tooltip'
+import CronEditModal from './CronEditModal.jsx'
+import { describeCron } from '../../utils/cronText.js'
 import { useAdminJobs, useUpdateJob, useRunJob } from '../../hooks/useAdmin.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { isSuperAdmin } from '../../utils/roles.js'
 import { formatTime } from '../../utils/importUtils.js'
 
 function JobRow({ job, canEdit, onError }) {
-  const { t } = useTranslation('admin')
+  const { t, i18n } = useTranslation('admin')
   const update = useUpdateJob()
   const run = useRunJob()
-  const [cron, setCron] = useState(job.cron)
-  const cronChanged = cron.trim() !== job.cron
+  const [editing, setEditing] = useState(false)
+  const [editError, setEditError] = useState('')
+  const closeEditor = useCallback(() => setEditing(false), [])
+  const cronText = describeCron(job.cron, i18n.language) ?? job.cron
   const busy = job.running || run.isPending
 
   const fail = e => onError(e?.message || t('jobs.actionFailed'))
@@ -21,20 +27,27 @@ function JobRow({ job, canEdit, onError }) {
       <td>{job.name}</td>
       <td className="admin-cell-muted">{job.description}</td>
       <td>
-        {canEdit ? (
-          <span style={{ display: 'inline-flex', gap: 6 }}>
-            <input
-              className="app-input"
-              aria-label={t('jobs.cronAria', { name: job.name })}
-              value={cron}
-              onChange={e => setCron(e.target.value)}
-            />
-            <button className="app-btn secondary" disabled={!cronChanged || !cron.trim() || update.isPending}
-              onClick={() => save({ cron: cron.trim() })}>
-              {t('jobs.save')}
+        <OverlayTrigger placement="top" overlay={<Tooltip id={`cron-tip-${job.name}`}>{cronText}</Tooltip>}>
+          {canEdit ? (
+            <button type="button" className="cron-cell-btn" aria-label={t('jobs.editCronAria', { name: job.name })}
+              onClick={() => { setEditError(''); setEditing(true) }}>
+              <code>{job.cron}</code>
+              <span className="material-symbols-outlined" aria-hidden="true">edit</span>
             </button>
-          </span>
-        ) : <code>{job.cron}</code>}
+          ) : <code tabIndex={0}>{job.cron}</code>}
+        </OverlayTrigger>
+        {editing && (
+          <CronEditModal
+            job={job}
+            pending={update.isPending}
+            error={editError}
+            onCancel={closeEditor}
+            onSave={cron => update.mutate({ name: job.name, body: { cron } }, {
+              onSuccess: closeEditor,
+              onError: e => setEditError(e?.message || t('jobs.actionFailed')),
+            })}
+          />
+        )}
       </td>
       <td className="admin-cell-muted">{job.zone || '—'}</td>
       <td>

@@ -45,6 +45,8 @@ export const retryImport   = (id) => api.post(`/admin/video-imports/${id}/retry`
 export const getJobs   = () => api.get('/admin/jobs')
 export const updateJob = (name, body) => patch(`/admin/jobs/${encodeURIComponent(name)}`, body)
 export const runJob    = (name) => api.post(`/admin/jobs/${encodeURIComponent(name)}/runs`)
+export const previewJobCron = (cron, zone, count = 5) =>
+  api.get(buildUrl('/admin/jobs/preview', { cron, zone: zone || undefined, count }))
 
 // Drive force sync — see docs/plans/plan-admin-drive-force-sync.md
 export const getDriveSyncFiles  = (params = {}) => api.get(buildUrl('/admin/drive-sync/files', cleanParams(params)))

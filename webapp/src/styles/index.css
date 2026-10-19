@@ -2827,3 +2827,41 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 [data-theme="light"] .hist-watch-popover { background: #fff; border-color: rgba(25, 28, 29, 0.12); box-shadow: 0 8px 24px rgba(25, 28, 29, 0.15); }
 [data-theme="light"] .hist-watch-popover-item:hover { color: #b92902; }
 [data-theme="light"] .hist-watch-progress-fill { background: #006970; box-shadow: none; }
+
+/* ── Scheduled jobs: cron cell + crontab.guru-style editor (AdminJobsTab, CronEditModal) ── */
+.cron-cell-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: 1px dashed var(--border-subtle); border-radius: 6px;
+  padding: 2px 8px; color: var(--text); cursor: pointer;
+}
+.cron-cell-btn:hover, .cron-cell-btn:focus-visible { border-color: var(--accent-cyan); }
+.cron-cell-btn .material-symbols-outlined { font-size: 16px; color: var(--text-muted); }
+.cron-editor { width: min(560px, calc(100vw - 32px)); }
+.cron-editor-text {
+  font-size: 22px; line-height: 1.3; text-align: center; color: var(--accent-cyan);
+  margin: 4px 0 6px; min-height: 2.6em;
+}
+.cron-editor-text.invalid { color: var(--danger); font-size: 16px; }
+.cron-editor-next { text-align: center; font-size: 13px; color: var(--text-muted); min-height: 1.4em; margin-bottom: 12px; }
+.cron-editor-input {
+  width: 100%; text-align: center; font-size: 26px; letter-spacing: 0.08em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.cron-editor-fields {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
+  margin: 6px 0 12px; text-align: center; font-size: 12px; color: var(--text-muted);
+}
+.cron-editor-fields .active { color: var(--accent-cyan); font-weight: 600; }
+.cron-editor-legend { width: 100%; font-size: 13px; border-collapse: collapse; }
+.cron-editor-legend td { padding: 3px 8px; border-top: 1px solid var(--border-subtle); color: var(--text-muted); }
+.cron-editor-legend td:first-child {
+  width: 40%; text-align: right; color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.cron-editor-legend tr.active td { color: var(--accent-cyan); }
+.cron-editor-examples { display: flex; flex-wrap: wrap; gap: 6px; }
+.cron-editor-examples .app-btn { padding: 4px 8px; font-size: 12px; }
+@media (max-width: 480px) {
+  .cron-editor-input { font-size: 18px; }
+  .cron-editor-fields { font-size: 10px; }
+}

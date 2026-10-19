@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getDriveSyncFiles, updateVideoStatus, bulkModerateComments, getJobs, updateJob, runJob } from '../admin.js'
+import { getDriveSyncFiles, updateVideoStatus, bulkModerateComments, getJobs, updateJob, runJob, previewJobCron } from '../admin.js'
 import { api } from '../client.js'
 
 vi.mock('../client.js', () => ({ api: { get: vi.fn(), patch: vi.fn(), post: vi.fn() } }))
@@ -46,5 +46,12 @@ describe("scheduled jobs", () => {
     expect(api.patch).toHaveBeenCalledWith("/admin/jobs/logStats", { cron: "0 0 * * * *", enabled: false })
     await runJob("logStats")
     expect(api.post).toHaveBeenCalledWith("/admin/jobs/logStats/runs")
+  })
+
+  it('previews a cron with an encoded query and skips an empty zone', async () => {
+    await previewJobCron('0 */5 * * * *', 'Asia/Ho_Chi_Minh')
+    expect(api.get).toHaveBeenCalledWith('/admin/jobs/preview?cron=0%20*%2F5%20*%20*%20*%20*&zone=Asia%2FHo_Chi_Minh&count=5')
+    await previewJobCron('0 0 3 * * *', null)
+    expect(api.get).toHaveBeenLastCalledWith('/admin/jobs/preview?cron=0%200%203%20*%20*%20*&count=5')
   })
 })

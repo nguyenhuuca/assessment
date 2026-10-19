@@ -257,7 +257,11 @@
     "colNextRun": "Lần chạy tới",
     "colLastRun": "Lần chạy gần nhất",
     "colActions": "Thao tác",
-    "result": { "SUCCESS": "THÀNH CÔNG", "FAILED": "THẤT BẠI", "SKIPPED": "BỎ QUA" },
+    "result": {
+      "SUCCESS": "THÀNH CÔNG",
+      "FAILED": "THẤT BẠI",
+      "SKIPPED": "BỎ QUA"
+    },
     "running": "ĐANG CHẠY",
     "enabledAria": "Bật {{name}}",
     "cronAria": "Cron của {{name}}",
@@ -265,6 +269,34 @@
     "runNow": "Chạy ngay",
     "noJobs": "Chưa có tác vụ định kỳ nào",
     "readOnly": "Chỉ SUPER_ADMIN được sửa tác vụ định kỳ",
-    "actionFailed": "Thao tác thất bại"
+    "actionFailed": "Thao tác thất bại",
+    "editCronAria": "Sửa cron của {{name}}",
+    "editor": {
+      "title": "Sửa cron — {{name}}",
+      "nextAt": "lần tới lúc",
+      "then": "tiếp theo",
+      "never": "Cron này không bao giờ chạy",
+      "secondsNote": "Trường giây phải là một số (0-59): mỗi job chạy tối đa 1 lần/phút.",
+      "field": {
+        "second": "giây",
+        "minute": "phút",
+        "hour": "giờ",
+        "dayOfMonth": "ngày (tháng)",
+        "month": "tháng",
+        "dayOfWeek": "thứ (tuần)"
+      },
+      "legend": {
+        "any": "mọi giá trị",
+        "list": "phân tách danh sách giá trị",
+        "range": "khoảng giá trị",
+        "step": "bước nhảy",
+        "allowed": "giá trị hợp lệ cho {{field}}"
+      },
+      "error": {
+        "fieldCount": "Cron cần 6 trường: giây phút giờ ngày tháng thứ",
+        "tooFrequent": "Trường giây phải là một số (0-59)",
+        "invalid": "Cron không hợp lệ"
+      }
+    }
   }
 }

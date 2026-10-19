@@ -266,7 +266,11 @@
     "colNextRun": "Next run",
     "colLastRun": "Last run",
     "colActions": "Actions",
-    "result": { "SUCCESS": "SUCCESS", "FAILED": "FAILED", "SKIPPED": "SKIPPED" },
+    "result": {
+      "SUCCESS": "SUCCESS",
+      "FAILED": "FAILED",
+      "SKIPPED": "SKIPPED"
+    },
     "running": "RUNNING",
     "enabledAria": "Enable {{name}}",
     "cronAria": "Cron of {{name}}",
@@ -274,6 +278,34 @@
     "runNow": "Run now",
     "noJobs": "No scheduled jobs",
     "readOnly": "Only SUPER_ADMIN can change scheduled jobs",
-    "actionFailed": "Action failed"
+    "actionFailed": "Action failed",
+    "editCronAria": "Edit cron of {{name}}",
+    "editor": {
+      "title": "Edit cron — {{name}}",
+      "nextAt": "next at",
+      "then": "then",
+      "never": "This cron never fires",
+      "secondsNote": "The seconds field must be one number (0-59): a job runs at most once per minute.",
+      "field": {
+        "second": "second",
+        "minute": "minute",
+        "hour": "hour",
+        "dayOfMonth": "day (month)",
+        "month": "month",
+        "dayOfWeek": "day (week)"
+      },
+      "legend": {
+        "any": "any value",
+        "list": "value list separator",
+        "range": "range of values",
+        "step": "step values",
+        "allowed": "allowed values for {{field}}"
+      },
+      "error": {
+        "fieldCount": "A cron needs 6 fields: second minute hour day month weekday",
+        "tooFrequent": "The seconds field must be a single number (0-59)",
+        "invalid": "Invalid cron expression"
+      }
+    }
   }
 }

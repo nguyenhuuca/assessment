@@ -1,13 +1,13 @@
 import React from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import AdminJobsTab from '../AdminJobsTab.jsx'
 import * as adminApi from '../../../api/admin.js'
 import { useAuth } from '../../../hooks/useAuth.js'
 import i18n from '../../../i18n/index.js'
 
-vi.mock('../../../api/admin.js', () => ({ getJobs: vi.fn(), updateJob: vi.fn(), runJob: vi.fn() }))
+vi.mock('../../../api/admin.js', () => ({ getJobs: vi.fn(), updateJob: vi.fn(), runJob: vi.fn(), previewJobCron: vi.fn() }))
 vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: vi.fn() }))
 
 const job = (o) => ({ name: 'logStats', description: 'Log stats', cron: '0 0 * * * *', zone: 'UTC', enabled: true,
@@ -26,6 +26,7 @@ beforeEach(() => {
   adminApi.getJobs.mockResolvedValue({ data: [job(), job({ name: 'cleanup', description: 'Cleanup', zone: null, enabled: false, lastResult: 'FAILED', nextRunAt: null })] })
   adminApi.updateJob.mockResolvedValue({ data: job() })
   adminApi.runJob.mockResolvedValue({})
+  adminApi.previewJobCron.mockResolvedValue({ data: ['2026-10-20T01:00:00Z', '2026-10-20T01:05:00Z'] })
 })
 
 describe('AdminJobsTab', () => {
@@ -55,14 +56,37 @@ describe('AdminJobsTab', () => {
     await waitFor(() => expect(adminApi.updateJob).toHaveBeenCalledWith('cleanup', { enabled: true }))
   })
 
-  it('SUPER_ADMIN edits and saves the cron', async () => {
+  it('hovering the cron shows its description', async () => {
+    setRole('ADMIN')
     renderTab()
-    const input = await screen.findByLabelText('Cron của logStats')
-    const save = input.nextElementSibling
+    fireEvent.mouseOver((await screen.findAllByText('0 0 * * * *'))[0])
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Mỗi giờ')
+  })
+
+  it('SUPER_ADMIN edits the cron in the modal and saves it', async () => {
+    renderTab()
+    fireEvent.click(await screen.findByLabelText('Sửa cron của logStats'))
+    const dialog = await screen.findByRole('dialog')
+    const input = within(dialog).getByLabelText('Cron của logStats')
+    const save = within(dialog).getByText('Lưu')
     expect(save).toBeDisabled()
     fireEvent.change(input, { target: { value: ' 0 */5 * * * * ' } })
+    expect(within(dialog).getByText('“Mỗi 5 phút”')).toBeInTheDocument()
+    await waitFor(() => expect(adminApi.previewJobCron).toHaveBeenCalledWith('0 */5 * * * *', 'UTC'))
     fireEvent.click(save)
     await waitFor(() => expect(adminApi.updateJob).toHaveBeenCalledWith('logStats', { cron: '0 */5 * * * *' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  it('keeps the modal open with the server error when saving fails', async () => {
+    adminApi.updateJob.mockRejectedValue({ message: 'Múi giờ không hợp lệ' })
+    renderTab()
+    fireEvent.click(await screen.findByLabelText('Sửa cron của logStats'))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.change(within(dialog).getByLabelText('Cron của logStats'), { target: { value: '0 */5 * * * *' } })
+    await waitFor(() => expect(adminApi.previewJobCron).toHaveBeenCalled())
+    fireEvent.click(within(dialog).getByText('Lưu'))
+    expect(await within(dialog).findByText('Múi giờ không hợp lệ')).toBeInTheDocument()
   })
 
   it('Run now posts and refreshes the list', async () => {

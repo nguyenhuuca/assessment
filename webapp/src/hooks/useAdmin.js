@@ -199,5 +199,16 @@ function useJobMutation(fn) {
   })
 }
 
+/** Next runs of the cron being edited (server validates); own key so list invalidation leaves it alone. */
+export function useCronPreview(cron, zone, enabled) {
+  return useQuery({
+    queryKey: ['admin', 'job-preview', cron, zone ?? null],
+    queryFn: () => adminApi.previewJobCron(cron, zone),
+    enabled,
+    retry: false,
+    staleTime: 30_000,
+  })
+}
+
 export const useUpdateJob = () => useJobMutation(({ name, body }) => adminApi.updateJob(name, body))
 export const useRunJob    = () => useJobMutation((name) => adminApi.runJob(name))
