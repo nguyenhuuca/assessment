@@ -293,3 +293,14 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **ST-1** `enums/SuggestionTransition` (+ `Refusal`) with table test — `08f16414`
 - [x] **ST-2** `VideoSuggestionServiceImpl` uses it; existing tests unchanged and green — `08f16414`
+
+## Feature: Headless autopilot (2026-10-19)
+
+**Plan:** `docs/plans/plan-autopilot-headless.md` · **ADR:** `docs/adr/0022-headless-autopilot.md`
+
+- [x] **AH-1** ADR-0022 (gates on GitHub, owner-only triggers, least privilege)
+- [x] **AH-2** `.github/workflows/autopilot.yml` (plan / build jobs, 60 min, concurrency 1)
+- [x] **AH-3** `SKILL.md` headless mode (untrusted input, denylist, draft PR / merge gates)
+- [x] **AH-4** Guide vi/en headless section
+- [ ] **AH-5** Owner: `claude setup-token` → `gh secret set CLAUDE_CODE_OAUTH_TOKEN`; create label `autopilot`
+- [ ] **AH-QA-1** Owner: first run on a tiny issue (label → draft PR → /approve → merge → CI green)

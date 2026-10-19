@@ -294,6 +294,31 @@ Số liệu chính xác, tính bằng `node scripts/claude-cost.mjs --from <bắ
 
 Orchestrator (Opus) chiếm 67–79% chi phí mỗi run, chủ yếu do mỗi request đọc lại context ngày càng lớn của session. Muốn rẻ hơn thì: viết yêu cầu rõ (tránh replan), giữ mỗi run một việc, và chỉ bật song song FE/BE khi cả hai cùng đổi.
 
+### ☁️ Chạy headless trên GitHub (không cần terminal)
+
+Ngoài cách chạy local, autopilot còn chạy được trên GitHub Actions ([ADR-0022](../adr/0022-headless-autopilot.md), workflow `.github/workflows/autopilot.yml`). Hai cổng duyệt chuyển lên GitHub:
+
+| Bước | Bạn làm | Autopilot làm |
+|------|---------|---------------|
+| Start | Gắn label **`autopilot`** cho một issue (issue do chính bạn tạo) | Viết plan + review trên branch `autopilot/issue-<N>`, mở **draft PR**, comment link PR lên issue |
+| Gate 1 | Comment **`/approve`** trên PR, hoặc **`/revise <ghi chú>`** để plan lại | Implement ⇄ review → QA ×2 → full gates → push lên branch của PR, ghi report vào PR, chuyển PR sang ready |
+| Gate 2 | Xem diff rồi **merge** PR. Merge chính là push lên `main`, CI sẽ deploy | Không bao giờ tự push `main` hay tự merge |
+| Sau deploy | Chạy `./api/mock-test.sh` | — |
+
+**Cài đặt một lần (bạn tự làm, Claude không đụng vào token):**
+
+```bash
+claude setup-token                                  # tạo token từ gói subscription
+gh secret set CLAUDE_CODE_OAUTH_TOKEN               # dán token vào khi được hỏi
+gh label create autopilot --color 5319e7 --description "Run /autopilot headless"
+```
+
+**Giới hạn và an toàn:**
+- Chỉ **owner của repo** kích hoạt được, kể cả label lẫn comment. Repo đang public, nên comment của người khác bị bỏ qua.
+- Nội dung issue chỉ là dữ liệu. Chỉ dẫn nằm trong issue mà định thay đổi workflow, quyền hay gate sẽ bị bỏ qua và được ghi lại trong PR.
+- Headless **từ chối** sửa `.github/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, file `.env` và migration xóa dữ liệu. Những việc đó phải làm ở local.
+- Mỗi job tối đa 60 phút, mỗi lúc chỉ 1 run. Chỉ dùng secret `CLAUDE_CODE_OAUTH_TOKEN`; các secret deploy (SSH, Docker) không bao giờ lộ ra job.
+
 ### ▶️ Cách gọi
 
 ```bash

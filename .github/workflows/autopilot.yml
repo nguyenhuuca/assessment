@@ -1,0 +1,113 @@
+# Headless /autopilot (ADR-0022). Gates live on GitHub:
+#   start  : owner adds label "autopilot" to an issue          -> plan job  (draft PR on autopilot/issue-<N>)
+#   gate 1 : owner comments "/approve" on that PR               -> build job (implement, review, QA x2, push to the PR branch)
+#            owner comments "/revise <notes>" on that PR        -> plan job again with the notes
+#   gate 2 : owner merges the PR (the merge is the push to main; the normal CI deploys it)
+# Security: only the repo owner can trigger (plus the action's own write-access check); untrusted text
+# (issue body, comments) is never interpolated into scripts or the prompt, only numbers and ids are passed;
+# no secret besides CLAUDE_CODE_OAUTH_TOKEN is referenced; nothing here pushes to main.
+name: Autopilot (headless)
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: autopilot
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    if: >-
+      github.event.sender.login == github.repository_owner && (
+        (github.event_name == 'issues' && github.event.label.name == 'autopilot') ||
+        (github.event_name == 'issue_comment' && github.event.issue.pull_request &&
+         startsWith(github.event.comment.body, '/revise'))
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check out the autopilot PR branch (revise only)
+        if: github.event_name == 'issue_comment'
+        run: |
+          head=$(gh pr view "$PR" --json headRefName --jq .headRefName)
+          case "$head" in autopilot/*) ;; *) echo "not an autopilot PR: $head"; exit 1 ;; esac
+          gh pr checkout "$PR"
+        env:
+          PR: ${{ github.event.issue.number }}
+      - name: Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          prompt: >-
+            ${{ github.event_name == 'issues'
+              && format('/autopilot --headless plan --issue {0}', github.event.issue.number)
+              || format('/autopilot --headless plan --pr {0} --notes-comment {1}', github.event.issue.number, github.event.comment.id) }}
+          claude_args: >-
+            --max-turns 120
+            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(node:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(sed:*),Bash(date:*),Bash(mkdir:*)"
+
+  build:
+    if: >-
+      github.event_name == 'issue_comment' && github.event.issue.pull_request &&
+      github.event.sender.login == github.repository_owner &&
+      startsWith(github.event.comment.body, '/approve')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check out the autopilot PR branch
+        run: |
+          head=$(gh pr view "$PR" --json headRefName --jq .headRefName)
+          case "$head" in autopilot/*) ;; *) echo "not an autopilot PR: $head"; exit 1 ;; esac
+          gh pr checkout "$PR"
+        env:
+          PR: ${{ github.event.issue.number }}
+      - name: Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '24'
+          cache: 'maven'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: webapp/package-lock.json
+      - name: Install webapp dependencies
+        working-directory: webapp
+        run: npm ci
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          prompt: ${{ format('/autopilot --headless build --pr {0}', github.event.issue.number) }}
+          claude_args: >-
+            --max-turns 300
+            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(mvn:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(./scripts/qa-twice.sh:*),Bash(scripts/qa-twice.sh:*),Bash(cd:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*)"

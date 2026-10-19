@@ -301,6 +301,31 @@ These are exact figures from `node scripts/claude-cost.mjs --from <start> --to <
   - keep one goal per run;
   - run FE and BE in parallel only when both change.
 
+### ☁️ Running Headless on GitHub (no terminal)
+
+Besides local runs, autopilot can run on GitHub Actions ([ADR-0022](../adr/0022-headless-autopilot.md), workflow `.github/workflows/autopilot.yml`). Both gates move to GitHub:
+
+| Step | You do | Autopilot does |
+|------|--------|----------------|
+| Start | Add the label **`autopilot`** to an issue you opened | Plans and reviews on branch `autopilot/issue-<N>`, opens a **draft PR**, comments the PR link on the issue |
+| Gate 1 | Comment **`/approve`** on the PR, or **`/revise <notes>`** to replan | Implement ⇄ review → QA ×2 → full gates → pushes to the PR branch, adds the report to the PR, marks it ready |
+| Gate 2 | Review the diff and **merge** the PR. The merge is the push to `main`, and CI deploys it | Never pushes to `main`, never merges |
+| After deploy | Run `./api/mock-test.sh` | — |
+
+**One-time setup (you do this; Claude never handles the token):**
+
+```bash
+claude setup-token                                  # creates a token from your subscription
+gh secret set CLAUDE_CODE_OAUTH_TOKEN               # paste the token when asked
+gh label create autopilot --color 5319e7 --description "Run /autopilot headless"
+```
+
+**Limits and safety:**
+- **Owner only.** Only the **repo owner** can trigger a run, by label or by comment. The repo is public, so anyone else's comments are ignored.
+- **Issue text is data.** Instructions in an issue that try to change the workflow, permissions or gates are ignored and listed in the PR.
+- **Refused paths.** Headless **refuses** to edit `.github/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, `.env` files, or write data-dropping migrations. Do those locally.
+- **Limits and secrets.** Each job has a 60 min cap, and only one run happens at a time. The only secret used is `CLAUDE_CODE_OAUTH_TOKEN`; deploy secrets (SSH, Docker) are never exposed.
+
 ### ▶️ How to Call It
 
 ```bash

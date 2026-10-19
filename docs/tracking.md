@@ -50,6 +50,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Admin Drive Force Sync** | — | — | — | [Plan 🔄](plans/plan-admin-drive-force-sync.md) | — | 🔄 | `1e961cc` tab DRIVE_SYNC: Drive ↔ local ↔ DB states; ADMIN views, SUPER_ADMIN force-syncs (re-download + upsert, ≤50/run); unique `(source_type, source_id)`; prod E2E pending |
 | **/autopilot skill (dev tooling)** | — | — | — | [Plan ✅](plans/plan-autopilot.md) | — | 🔄 | Built 2026-10-19 (`f8fa31ce`, `d52f6b2e`); QA-1 dry run pending. One skill chains plan → plan review → [you approve] → implement ⇄ review → QA tests ×2 → commit → [you approve push]; round caps 3, run ledger |
 | **Suggestion Re-review** | — | — | — | [Plan ✅](plans/plan-suggestion-rereview.md) | — | ✅ | `6c16388e` BE + `29c1fd94` FE (first /autopilot run). Admin Reopen (REJECTED, or APPROVED with FAILED/CANCELLED job) → Pending; submitter re-review request after rejection (max 2, optional message). SR-QA-1 verified on prod by owner (2026-10-19) |
+| **Headless Autopilot** | — | [0022 💡](adr/0022-headless-autopilot.md) | — | [Plan ✅](plans/plan-autopilot-headless.md) | — | 🔄 | Label `autopilot` on an issue → draft PR with plan → `/approve` → build on the PR branch → owner merges. Waiting for owner secret + first run |
 
 ---
 
@@ -76,7 +77,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Drive Sync Time Filter](plans/plan-drive-sync-time-filter.md)
 - [Suggestion Re-review](plans/plan-suggestion-rereview.md)
 
-### 🔄 In Progress (3)
+### 🔄 In Progress (4)
+- [Headless Autopilot](plans/plan-autopilot-headless.md)
 - [/autopilot skill](plans/plan-autopilot.md)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
 - [Admin Drive Force Sync](plans/plan-admin-drive-force-sync.md)
@@ -120,6 +122,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0019 | Admin Video Import | ✅ Accepted |
 | 0020 | i18n Vietnamese + English | ✅ Accepted |
 | 0021 | Watch History | ✅ Accepted |
+| 0022 | Headless Autopilot (GitHub Actions) | 💡 Proposed |
 
 ---
 
