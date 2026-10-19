@@ -49,21 +49,19 @@
 
 ## Cost
 
-Prices from the [platform pricing page](https://platform.claude.com/docs/en/about-claude/pricing) (read 2026-10-19). Sonnet 5.5: $2 base input, $0.10 cache hit, $10 output per MTok. The Agent results give one total per worker, so each figure is a range:
-- **Low:** every token billed at the cache-hit price.
-- **High:** 90% base input + 10% output.
+Exact figures, computed from the session transcripts with `node scripts/claude-cost.mjs --from … --to … --md`. The script dedupes every API request and prices it at [API list price](https://platform.claude.com/docs/en/about-claude/pricing) (read 2026-10-19). On a Claude subscription this is the equivalent cost, not a bill.
 
-| Who | Tokens | Low | High |
-|-----|--------|-----|------|
-| Sonnet workers (3 runs) | 142,554 | ≈$0.01 | ≈$0.40 |
-| Orchestrator (Opus 5.5) | not measured | — | — |
+| who | model | requests | input | cache write | cache read | output | cost |
+|---|---|---|---|---|---|---|---|
+| main session (orchestrator) | claude-opus-5-5 | 25 | 56 | 35,570 | 5,602,318 | 18,493 | $1.78 |
+| worker-reviewer: Code review transitions refactor | claude-sonnet-5-5 | 4 | 8 | 39,959 | 92,168 | 789 | $0.12 |
+| worker-builder: Implement ST-1 and ST-2 refactor | claude-sonnet-5-5 | 12 | 24 | 53,337 | 434,789 | 2,414 | $0.20 |
+| worker-reviewer: Review transitions refactor plan | claude-sonnet-5-5 | 4 | 10 | 45,894 | 110,775 | 2,579 | $0.15 |
+| **TOTAL** |  | **45** | **98** | **174,760** | **6,240,050** | **24,275** | **$2.24** |
 
-- The workers cost **at most ≈$0.40**, about 44% of the first run's upper bound (≈$0.91).
-- **Why this run was cheaper:**
-  - no explorers;
-  - one builder instead of two;
-  - no replan round.
-- For the exact session total, run `/cost` or check the Console usage page.
+- **Run total $2.24**: orchestrator (Opus 5.5) $1.78 (79%), workers $0.47.
+- **Cheaper than the first run ($3.76):** no explorers, one builder instead of two, and no replan round.
+- **Correction (2026-10-19).** The first version of this report estimated the worker cost from the token totals in the Agent results. Those totals miss the repeated cache reads, so the estimate was too low. The figures above replace it.
 
 ## CI and Smoke
 

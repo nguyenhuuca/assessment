@@ -288,12 +288,14 @@ A stopped run can be continued with `/task-resume`, which reads `session.txt` an
 
 ### 💰 Real Cost So Far
 
-| Run | Wall time | Worker tokens | Worker cost (estimate) |
-|-----|-----------|---------------|------------------------|
-| Suggestion re-review (BE + FE, 1 replan) | ~20 min | ~424k | ≈ $0.03 – $0.91 |
-| Transitions refactor (BE only) | ~11 min | ~143k | ≈ $0.01 – $0.40 |
+| Run | Wall time | Orchestrator (Opus) | Workers (Sonnet/Haiku) | Total |
+|-----|-----------|---------------------|------------------------|-------|
+| Suggestion re-review (BE + FE, 1 replan) | ~20 min | $2.51 | $1.25 | **$3.76** |
+| Transitions refactor (BE only) | ~11 min | $1.78 | $0.47 | **$2.24** |
 
-- **Not counted: the orchestrator.** The main session (Opus) is not in the ledger. Use `/cost` for the exact total.
+These are exact figures from `node scripts/claude-cost.mjs --from <start> --to <end>`, which reads the session transcripts and prices them at API list price. On a subscription they are the equivalent cost, not a bill. Each run report has the per-agent breakdown.
+
+- **Where the money goes:** the orchestrator (Opus) is 67–79% of each run, mostly cache reads of the growing session context.
 - **To spend less:**
   - write a clear request, so no replan is needed;
   - keep one goal per run;

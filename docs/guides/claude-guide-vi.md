@@ -285,12 +285,14 @@ Run bị dừng có thể làm tiếp bằng `/task-resume`, dựa vào `session
 
 ### 💰 Chi phí thực tế
 
-| Run | Thời gian | Tokens của worker | Chi phí worker (ước tính) |
-|-----|-----------|-------------------|---------------------------|
-| Suggestion re-review (BE + FE, 1 lần replan) | ~20 phút | ~424k | ≈ $0.03 – $0.91 |
-| Transitions refactor (chỉ BE) | ~11 phút | ~143k | ≈ $0.01 – $0.40 |
+| Run | Thời gian | Orchestrator (Opus) | Worker (Sonnet/Haiku) | Tổng |
+|-----|-----------|---------------------|-----------------------|------|
+| Suggestion re-review (BE + FE, 1 lần replan) | ~20 phút | $2.51 | $1.25 | **$3.76** |
+| Transitions refactor (chỉ BE) | ~11 phút | $1.78 | $0.47 | **$2.24** |
 
-Phần orchestrator (session chính, Opus) không được tính trong ledger; xem tổng chính xác bằng `/cost`. Muốn rẻ hơn thì: viết yêu cầu rõ (tránh replan), giữ mỗi run một việc, và chỉ bật song song FE/BE khi cả hai cùng đổi.
+Số liệu chính xác, tính bằng `node scripts/claude-cost.mjs --from <bắt đầu> --to <kết thúc>`. Script đọc transcript của session và tính theo giá API list price (với gói subscription thì đây là chi phí quy đổi, không phải hóa đơn). Report của mỗi run có bảng chi phí chi tiết theo từng agent.
+
+Orchestrator (Opus) chiếm 67–79% chi phí mỗi run, chủ yếu do mỗi request đọc lại context ngày càng lớn của session. Muốn rẻ hơn thì: viết yêu cầu rõ (tránh replan), giữ mỗi run một việc, và chỉ bật song song FE/BE khi cả hai cùng đổi.
 
 ### ▶️ Cách gọi
 

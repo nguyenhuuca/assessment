@@ -112,7 +112,7 @@ Show the plan path, the task table, the advisories that were left open, and the 
 File: `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md`, started from `resources/ledger.template.md`. Append one row per stage run (columns and rules are in the template).
 
 - `turns` / `tokens` / `min` come from each Agent result's usage. For a primary-path stage, add up the workers it spawned, plus the orchestrator's wall time.
-- `≈$` is an estimate: tokens × the model's list price. Always show it with "≈" and never present it as billed cost.
+- **Cost is exact, not estimated.** At the end, run `node scripts/claude-cost.mjs --from <run start ISO> --to <now ISO> --md`. It reads this session's transcripts (main + `subagents/`), dedupes requests and prices them with `scripts/claude-pricing.json`. Paste its table into the report's `## Cost`. Label the figures as API list-price equivalent, not a bill. Do not estimate cost from the token totals in Agent results: they miss repeated cache reads. If a model is missing from the pricing file, the script warns; add the model from the pricing page.
 - **Update `session.txt` after every stage:**
   - put the stage in `doing`, and move it to `done` when it finishes;
   - set `progress` to: plan ≈20, Gate 1 ≈30, implement+review ≈60, QA ≈80, landed 100.

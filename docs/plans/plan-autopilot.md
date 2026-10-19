@@ -82,6 +82,7 @@ Start ─▶ Plan ⇄ Plan review ─▶ [GATE 1: you approve plan] ─▶ Imple
   - **Kept:** Plan review (that plan has not been through a reviewer yet) and Gate 1. Without them, autopilot would just be `/swarm-execute`.
   - **Scope:** only tasks still `[ ]` in `TASKS.md`. Owner-only QA/prod checks are not counted or run.
   - **Refused (→ `/swarm-execute`):** more than 6 open tasks, any task `[~]`, or the plan's Status is Done.
+- **D9 — Exact cost (added 2026-10-19).** `scripts/claude-cost.mjs` prices every API request found in the session transcripts (`~/.claude/projects/<project>/<session>.jsonl` + `subagents/*.jsonl`). It dedupes by `message.id` and uses the cache write 5m/1h split, the Haiku long-prompt tier, fast mode and US-geo. Prices come from `scripts/claude-pricing.json` (pricing page, read 2026-10-19). It replaces the ≈$ estimate, which was too low because Agent result token totals miss repeated cache reads.
 - **D7 — Gates are never skipped.** Gate 1 (plan) and Gate 2 (push) always use `AskUserQuestion`. There is no `--yes` flag. This follows the standing "ask before every push" rule.
 
 ## Tasks

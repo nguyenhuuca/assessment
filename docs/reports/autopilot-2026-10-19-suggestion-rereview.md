@@ -48,29 +48,24 @@ All stages ran on the primary path (Skill tool); no fallback was needed. FE and 
 
 ## Cost
 
-Prices: [platform.claude.com pricing](https://platform.claude.com/docs/en/about-claude/pricing), read 2026-10-19, USD per million tokens.
+Exact figures, computed from the session transcripts with `node scripts/claude-cost.mjs --from … --to … --md`. The script dedupes every API request and prices it at [API list price](https://platform.claude.com/docs/en/about-claude/pricing) (read 2026-10-19). On a Claude subscription this is the equivalent cost, not a bill.
 
-| Model | Base input | Cache hit | Output |
-|-------|-----------|-----------|--------|
-| Opus 5.5 | $4 | $0.20 | $20 |
-| Sonnet 5.5 | $2 | $0.10 | $10 |
-| Haiku 5.5 (≤100k prompt) | $0.10 | $0.01 | $0.50 |
+| who | model | requests | input | cache write | cache read | output | cost |
+|---|---|---|---|---|---|---|---|
+| main session (orchestrator) | claude-opus-5-5 | 44 | 108 | 69,039 | 7,089,321 | 27,143 | $2.51 |
+| worker-builder: Implement SR-FE-1 and SR-FE-2 | claude-sonnet-5-5 | 17 | 34 | 71,105 | 867,056 | 2,483 | $0.29 |
+| worker-reviewer: Code review FE re-review branch | claude-sonnet-5-5 | 3 | 6 | 36,881 | 59,234 | 47 | $0.10 |
+| worker-builder: Implement SR-BE-1 and SR-BE-2 | claude-sonnet-5-5 | 31 | 62 | 114,353 | 2,065,802 | 756 | $0.50 |
+| worker-reviewer: Review suggestion re-review plan | claude-sonnet-5-5 | 10 | 26 | 47,720 | 326,676 | 4,678 | $0.20 |
+| worker-explorer: Explore backend suggestion flow | claude-haiku-5-5 | 8 | 18 | 47,835 | 258,993 | 6,135 | $0.01 |
+| worker-reviewer: Code review BE re-review branch | claude-sonnet-5-5 | 7 | 16 | 39,838 | 225,464 | 1,154 | $0.13 |
+| worker-explorer: Explore frontend suggestion UI | claude-haiku-5-5 | 8 | 16 | 50,974 | 262,587 | 5,835 | $0.01 |
+| **TOTAL** |  | **128** | **286** | **477,745** | **11,155,133** | **48,231** | **$3.76** |
 
-The Agent results report one total token count per worker, with no input/output/cache split. Each figure below is therefore a **range**:
-- **Low** = every token billed at the cache-hit price.
-- **High** = 90% billed as base input + 10% as output.
-
-| Who | Tokens | Low | High |
-|-----|--------|-----|------|
-| Haiku explorers | 102,956 | ≈$0.001 | ≈$0.01 |
-| Sonnet reviewers (4 runs) | 132,605 | ≈$0.01 | ≈$0.37 |
-| Sonnet builders (2 runs) | 188,213 | ≈$0.02 | ≈$0.53 |
-| **Workers total** | **423,774** | **≈$0.03** | **≈$0.91** |
-| Orchestrator (Opus 5.5, this session) | not measured by the ledger | — | — |
-
-- **The workers cost at most about $0.9.** Most of their input is cached context, so the real figure is likely near the low end.
-- **The ledger does not cover the orchestrator.** It reads plans and diffs, runs the gates and asks at the gates, and is probably the larger share. For the exact session total, run `/cost` in Claude Code or check the Console usage page.
-- For comparison, the run in the screenshot that inspired the skill reported $17.62 for 16 runs.
+- **Run total $3.76**: orchestrator (Opus 5.5) $2.51 (67%), workers $1.25.
+- **Cache reads dominate:** 11.2M of the run's tokens are cache reads, against 48k output tokens.
+- **For comparison:** the run in the screenshot that inspired the skill reported $17.62.
+- **Correction (2026-10-19).** The first version of this report estimated the worker cost from the token totals in the Agent results. Those totals miss the repeated cache reads, so the estimate was too low. The figures above replace it.
 
 ## CI and Smoke
 
@@ -101,5 +96,5 @@ The Agent results report one total token count per worker, with no input/output/
 
 - `worker-builder` uses `isolation: worktree`, so the implement commits landed on worktree branches. They were cherry-picked to `main` only after code review, which still happened before Gate 2.
 - The verdict block parsed without problems in all 4 reviews.
-- Reusing the same reviewer for plan review round 2 kept that round cheap (≈7.9k tokens).
+- Reusing the same reviewer for plan review round 2 kept both plan-review rounds together at $0.20 (see Cost).
 - Change after this run (owner): the run report goes to `docs/reports/` and the plan is not edited.

@@ -17,7 +17,7 @@ Column rules:
   - QA: `pass` / `flaky n` / `fail n`;
   - gates: `approved` / `revise` / `stopped` / `push` / `no push`.
 - `turns`, `tokens`, `min`: added up from the Agent results of that stage. Write `—` when the stage spawned no worker.
-- `≈$`: tokens × the current list price of the worker's model. Write `—` when the price is unknown, and never guess one. It is an estimate, not billed cost.
+- `≈$`: leave `—` while running. The exact per-agent cost comes at the end from `node scripts/claude-cost.mjs --from <start> --to <end> --md` and goes into the report's `## Cost`. Write `—` when the price is unknown, and never guess one. The figures are API list-price equivalent, not a bill.
 
 ## Notes
 
