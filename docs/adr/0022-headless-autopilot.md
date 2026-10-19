@@ -64,6 +64,12 @@ The build and revise jobs also require:
 - **Auth:** `CLAUDE_CODE_OAUTH_TOKEN` (subscription), created by the owner with `claude setup-token` and stored as a repo secret by the owner.
 - **GitHub token:** the workflow passes `github_token: ${{ github.token }}` with job permissions `contents: write`, `pull-requests: write`, `issues: write`, so the broad Claude GitHub App is not needed. Pushes made with this token start no workflows. That is fine here, because `autopilot/*` branches have no CI.
 - No other secrets are referenced by the job.
+- **The Bash allowlist is a guardrail, not a boundary.** `node`, `mvn`, `npm`, `awk` and `sed` can all run arbitrary code, and the build job needs them. The OAuth token is present in the job, so a determined prompt injection could reach it. The real boundaries are:
+  - only the owner can trigger (D2);
+  - both gates are human;
+  - the job has no deploy secrets;
+  - the token can be revoked by running `claude setup-token` again.
+  - `curl` and `wget` are not allowed, which keeps casual exfiltration harder.
 
 ### D5. Limits
 

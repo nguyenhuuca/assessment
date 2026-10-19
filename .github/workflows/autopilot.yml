@@ -50,18 +50,27 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - uses: anthropics/claude-code-action@v1
+      - id: claude
+        uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
+          display_report: "true"
           prompt: >-
             ${{ github.event_name == 'issues'
               && format('/autopilot --headless plan --issue {0}', github.event.issue.number)
               || format('/autopilot --headless plan --pr {0} --notes-comment {1}', github.event.issue.number, github.event.comment.id) }}
           claude_args: >-
             --max-turns 120
-            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(node:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(sed:*),Bash(date:*),Bash(mkdir:*)"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(node:*),Bash(cd:*),Bash(pwd:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(sort:*),Bash(cut:*),Bash(tr:*),Bash(test:*),Bash(echo:*),Bash(printf:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*),Bash(mv:*),Bash(basename:*),Bash(dirname:*)"
 
+      - name: Keep the Claude transcript for diagnosis
+        if: always() && steps.claude.outputs.execution_file != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: autopilot-${{ github.job }}-${{ github.run_id }}
+          path: ${{ steps.claude.outputs.execution_file }}
+          retention-days: 3
   build:
     if: >-
       github.event_name == 'issue_comment' && github.event.issue.pull_request &&
@@ -103,11 +112,20 @@ jobs:
       - name: Install webapp dependencies
         working-directory: webapp
         run: npm ci
-      - uses: anthropics/claude-code-action@v1
+      - id: claude
+        uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
+          display_report: "true"
           prompt: ${{ format('/autopilot --headless build --pr {0}', github.event.issue.number) }}
           claude_args: >-
             --max-turns 300
-            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(mvn:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(./scripts/qa-twice.sh:*),Bash(scripts/qa-twice.sh:*),Bash(cd:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*)"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(mvn:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(./scripts/qa-twice.sh:*),Bash(scripts/qa-twice.sh:*),Bash(cd:*),Bash(pwd:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(sort:*),Bash(cut:*),Bash(tr:*),Bash(test:*),Bash(echo:*),Bash(printf:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*),Bash(mv:*),Bash(basename:*),Bash(dirname:*)"
+      - name: Keep the Claude transcript for diagnosis
+        if: always() && steps.claude.outputs.execution_file != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: autopilot-${{ github.job }}-${{ github.run_id }}
+          path: ${{ steps.claude.outputs.execution_file }}
+          retention-days: 3

@@ -67,6 +67,12 @@ Used when `$ARGUMENTS` starts with `--headless`. `.github/workflows/autopilot.ym
 - `session.txt` is not written, because the runner is thrown away; the PR is the record.
 - The ledger lives in the runner's `scratchpad/`. The report (`docs/reports/autopilot-<date>-<slug>.md`) is committed to the PR branch. Its cost comes from `node scripts/claude-cost.mjs --from <job start> --md`, which finds the runner's own transcripts.
 
+**Shell use in CI.** Only the commands in the workflow's `--allowedTools` run; anything else is denied, and Claude Code checks each part of a `&&` chain separately.
+- Run one simple command per call.
+- Write files, including PR bodies and comments, with the Write tool, then pass them with `--body-file`.
+- Prefer `git -C <dir>` and `gh` flags over `cd`.
+- If a command is denied, do not retry variations. Post a comment naming the denied command and stop.
+
 **Stop conditions** (round cap, red gate, denylist, refused input): comment the reason on the PR (or on the issue if no PR exists yet), push nothing further, and exit.
 
 ## Stage Runner (D1)
