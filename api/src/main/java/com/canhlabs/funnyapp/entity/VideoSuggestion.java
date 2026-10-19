@@ -71,4 +71,9 @@ public class VideoSuggestion extends BaseDomain {
 
     @Column(name = "import_job_id")
     private Long importJobId;
+
+    /** User re-review requests so far; admin reopens do not count. */
+    @Column(name = "rereview_count", nullable = false)
+    @Builder.Default
+    private int rereviewCount = 0;
 }

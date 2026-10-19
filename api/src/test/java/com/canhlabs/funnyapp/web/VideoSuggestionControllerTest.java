@@ -241,4 +241,72 @@ class VideoSuggestionControllerTest {
                 .andExpect(status().isBadRequest());
         verifyNoInteractions(suggestionService);
     }
+
+    // ── rereview ──────────────────────────────────────────────────────────────
+
+    @Test
+    void rereview_guest_401() throws Exception {
+        mockMvc.perform(withPath(post(BASE + "/5/rereview"), BASE + "/5/rereview")
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isUnauthorized());
+        verifyNoInteractions(suggestionService);
+    }
+
+    @Test
+    void rereview_passesCurrentUserAndMessage_returnsDto() throws Exception {
+        SuggestionDto result = dto(5);
+        result.setRereviewCount(1);
+        when(suggestionService.requestRereview(5L, 7L, "look again")).thenReturn(result);
+
+        mockMvc.perform(withPath(post(BASE + "/5/rereview"), BASE + "/5/rereview").header("Authorization", TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"message\":\"look again\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(5))
+                .andExpect(jsonPath("$.data.rereviewCount").value(1))
+                .andExpect(jsonPath("$.data.canRequestRereview").value(false))
+                .andExpect(jsonPath("$.data.canReopen").value(false));
+    }
+
+    @Test
+    void rereview_noBody_okWithNullMessage() throws Exception {
+        when(suggestionService.requestRereview(5L, 7L, null)).thenReturn(dto(5));
+
+        mockMvc.perform(withPath(post(BASE + "/5/rereview"), BASE + "/5/rereview").header("Authorization", TOKEN))
+                .andExpect(status().isOk());
+
+        verify(suggestionService).requestRereview(5L, 7L, null);
+    }
+
+    @Test
+    void rereview_messageOver300_400() throws Exception {
+        mockMvc.perform(withPath(post(BASE + "/5/rereview"), BASE + "/5/rereview").header("Authorization", TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"message\":\"" + "m".repeat(301) + "\"}"))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(suggestionService);
+    }
+
+    @Test
+    void rereview_errors_passThroughStatusAndLocalizedMessage() throws Exception {
+        when(suggestionService.requestRereview(1L, 7L, null)).thenThrow(
+                CustomException.of(HttpStatus.NOT_FOUND, 4042, "error.suggestion.notFound"));
+        when(suggestionService.requestRereview(2L, 7L, null)).thenThrow(
+                CustomException.of(HttpStatus.CONFLICT, 4097, "error.suggestion.notRejected"));
+        when(suggestionService.requestRereview(3L, 7L, null)).thenThrow(
+                CustomException.of(HttpStatus.CONFLICT, 4098, "error.suggestion.rereviewLimit"));
+
+        mockMvc.perform(withPath(post(BASE + "/1/rereview"), BASE + "/1/rereview").header("Authorization", TOKEN))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error.code").value("error.suggestion.notFound"));
+        mockMvc.perform(withPath(post(BASE + "/2/rereview"), BASE + "/2/rereview").header("Authorization", TOKEN)
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, "vi"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error.code").value("error.suggestion.notRejected"))
+                .andExpect(jsonPath("$.error.message").value("Chỉ đề xuất đã bị từ chối mới có thể gửi yêu cầu duyệt lại"));
+        mockMvc.perform(withPath(post(BASE + "/3/rereview"), BASE + "/3/rereview").header("Authorization", TOKEN)
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, "en"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error.code").value("error.suggestion.rereviewLimit"))
+                .andExpect(jsonPath("$.error.message").value("You have used all re-review requests for this suggestion"));
+    }
 }

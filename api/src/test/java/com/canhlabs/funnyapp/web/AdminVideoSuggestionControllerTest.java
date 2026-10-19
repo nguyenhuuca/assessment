@@ -147,6 +147,7 @@ class AdminVideoSuggestionControllerTest {
                 .andExpect(status().isUnauthorized());
         mockMvc.perform(post(BASE + "/1/reject").contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"DUPLICATE\"}"))
                 .andExpect(status().isUnauthorized());
+        mockMvc.perform(post(BASE + "/1/reopen")).andExpect(status().isUnauthorized());
         verifyNoInteractions(suggestionService);
     }
 
@@ -161,6 +162,7 @@ class AdminVideoSuggestionControllerTest {
         mockMvc.perform(post(BASE + "/1/reject").with(authentication(user))
                 .contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"DUPLICATE\"}"))
                 .andExpect(status().isForbidden());
+        mockMvc.perform(post(BASE + "/1/reopen").with(authentication(user))).andExpect(status().isForbidden());
         verifyNoInteractions(suggestionService);
     }
 
@@ -317,5 +319,46 @@ class AdminVideoSuggestionControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error.code").value("error.suggestion.noteRequired"))
                 .andExpect(jsonPath("$.error.message").value("Cần nhập ghi chú khi lý do là Khác"));
+    }
+
+    // ── reopen ────────────────────────────────────────────────────────────────
+
+    @Test
+    void reopen_passesAdminId_returnsPendingDto() throws Exception {
+        when(suggestionService.reopen(6L, 11L)).thenReturn(dto(6, SuggestionStatus.PENDING));
+
+        mockMvc.perform(post(BASE + "/6/reopen").with(authentication(admin())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("PENDING"))
+                .andExpect(jsonPath("$.data.canReopen").value(false))
+                .andExpect(jsonPath("$.data.rereviewCount").value(0));
+        verify(suggestionService).reopen(6L, 11L);
+    }
+
+    @Test
+    void reopen_adminRoleWithoutAdminPermissionBit_403() throws Exception {
+        mockMvc.perform(post(BASE + "/6/reopen").with(authentication(principal(UserRole.ADMIN, 0))))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(suggestionService);
+    }
+
+    @Test
+    void reopen_errors_carryStatusCodeAndLocalizedMessage() throws Exception {
+        when(suggestionService.reopen(1L, 11L)).thenThrow(
+                CustomException.of(HttpStatus.CONFLICT, 4095, "error.suggestion.alreadyPending"));
+        when(suggestionService.reopen(2L, 11L)).thenThrow(
+                CustomException.of(HttpStatus.CONFLICT, 4096, "error.suggestion.cannotReopen"));
+        when(suggestionService.reopen(3L, 11L)).thenThrow(
+                CustomException.of(HttpStatus.NOT_FOUND, 4042, "error.suggestion.notFound"));
+
+        mockMvc.perform(post(BASE + "/1/reopen").with(authentication(admin())).header(HttpHeaders.ACCEPT_LANGUAGE, "en"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error.code").value("error.suggestion.alreadyPending"))
+                .andExpect(jsonPath("$.error.message").value("This suggestion is already pending"));
+        mockMvc.perform(post(BASE + "/2/reopen").with(authentication(admin())).header(HttpHeaders.ACCEPT_LANGUAGE, "vi"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error.code").value("error.suggestion.cannotReopen"));
+        mockMvc.perform(post(BASE + "/3/reopen").with(authentication(admin())))
+                .andExpect(status().isNotFound());
     }
 }

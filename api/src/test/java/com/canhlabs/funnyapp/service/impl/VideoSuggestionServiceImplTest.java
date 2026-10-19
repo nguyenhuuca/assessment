@@ -45,6 +45,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -570,5 +572,296 @@ class VideoSuggestionServiceImplTest {
                 HttpStatus.NOT_FOUND, "error.suggestion.notFound");
         verify(userRepo, never()).findAllById(any(Iterable.class));
         verify(jobRepository, never()).existsByNormalizedUrlAndStatusIn(anyString(), anyCollection());
+    }
+
+    // ── reopen / re-review ──────────────────────────────────────────────────────
+
+    private static VideoSuggestion rejected(long id, int rereviewCount) {
+        VideoSuggestion s = pending(id);
+        s.setStatus(SuggestionStatus.REJECTED);
+        s.setRejectReason(SuggestionRejectReason.DUPLICATE);
+        s.setRejectNote("dup");
+        s.setReviewedBy(ADMIN);
+        s.setReviewedAt(Instant.now());
+        s.setRereviewCount(rereviewCount);
+        return s;
+    }
+
+    private static VideoSuggestion approvedWithJob(long id, long jobId) {
+        VideoSuggestion s = pending(id);
+        s.setStatus(SuggestionStatus.APPROVED);
+        s.setImportJobId(jobId);
+        s.setReviewedBy(ADMIN);
+        s.setReviewedAt(Instant.now());
+        return s;
+    }
+
+    private static com.canhlabs.funnyapp.entity.VideoImportJob job(long id, ImportStatus status) {
+        return com.canhlabs.funnyapp.entity.VideoImportJob.builder().id(id).status(status).build();
+    }
+
+    @Test
+    void reopen_rejected_backToPending_decisionCleared() {
+        VideoSuggestion s = rejected(6, 1);
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(s));
+
+        SuggestionDto dto = service.reopen(6L, ADMIN);
+
+        assertThat(s.getStatus()).isEqualTo(SuggestionStatus.PENDING);
+        assertThat(s.getRejectReason()).isNull();
+        assertThat(s.getRejectNote()).isNull();
+        assertThat(s.getReviewedBy()).isNull();
+        assertThat(s.getReviewedAt()).isNull();
+        assertThat(s.getImportJobId()).isNull();
+        assertThat(s.getRereviewCount()).isEqualTo(1); // an admin reopen does not count
+        assertThat(dto.getStatus()).isEqualTo(SuggestionStatus.PENDING);
+        assertThat(dto.isCanReopen()).isFalse();
+        verify(repository).saveAndFlush(s);
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
+    }
+
+    @Test
+    void reopen_approvedWithFailedOrCancelledJob_detachesJob() {
+        for (ImportStatus end : List.of(ImportStatus.FAILED, ImportStatus.CANCELLED)) {
+            VideoSuggestion s = approvedWithJob(6, 9L);
+            when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(s));
+            when(jobRepository.findLockedById(9L)).thenReturn(Optional.of(job(9L, end)));
+
+            service.reopen(6L, ADMIN);
+
+            assertThat(s.getStatus()).isEqualTo(SuggestionStatus.PENDING);
+            assertThat(s.getImportJobId()).isNull();
+        }
+        verify(jobRepository, times(2)).findLockedById(9L);
+    }
+
+    @Test
+    void reopen_approvedWithDoneOrActiveJob_409CannotReopen() {
+        for (ImportStatus status : List.of(ImportStatus.DONE, ImportStatus.PENDING, ImportStatus.DOWNLOADING,
+                ImportStatus.UPLOADING)) {
+            VideoSuggestion s = approvedWithJob(6, 9L);
+            when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(s));
+            when(jobRepository.findLockedById(9L)).thenReturn(Optional.of(job(9L, status)));
+
+            assertError(() -> service.reopen(6L, ADMIN), HttpStatus.CONFLICT, "error.suggestion.cannotReopen");
+            assertThat(s.getStatus()).isEqualTo(SuggestionStatus.APPROVED);
+            assertThat(s.getImportJobId()).isEqualTo(9L);
+        }
+    }
+
+    @Test
+    void reopen_approvedWithMissingJob_409CannotReopen() {
+        VideoSuggestion noJob = approvedWithJob(6, 9L);
+        noJob.setImportJobId(null);
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(noJob));
+        assertError(() -> service.reopen(6L, ADMIN), HttpStatus.CONFLICT, "error.suggestion.cannotReopen");
+
+        when(repository.findByIdForUpdate(7L)).thenReturn(Optional.of(approvedWithJob(7, 10L)));
+        when(jobRepository.findLockedById(10L)).thenReturn(Optional.empty());
+        assertError(() -> service.reopen(7L, ADMIN), HttpStatus.CONFLICT, "error.suggestion.cannotReopen");
+    }
+
+    @Test
+    void reopen_readsJobStatusUnderTheJobLock_notThroughPlainFindById() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(approvedWithJob(6, 9L)));
+        when(jobRepository.findLockedById(9L)).thenReturn(Optional.of(job(9L, ImportStatus.FAILED)));
+
+        service.reopen(6L, ADMIN);
+
+        verify(jobRepository).findLockedById(9L);
+        verify(jobRepository, never()).findById(anyLong());
+    }
+
+    @Test
+    void reopen_thenRetryReactivatesDetachedJob_approveHitsDuplicateActive_noSecondJob() {
+        VideoSuggestion s = approvedWithJob(6, 9L);
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(s));
+        when(jobRepository.findLockedById(9L)).thenReturn(Optional.of(job(9L, ImportStatus.FAILED)));
+        service.reopen(6L, ADMIN);
+        // the retry runs on the detached job; approving must be refused by the import line, not create another job
+        when(importService.createResolved(any(), any(), eq(ADMIN))).thenReturn(
+                CreateVideoImportResultDto.LineResult.builder().line(1)
+                        .errorCode(VideoImportServiceImpl.DUPLICATE_ACTIVE).build());
+
+        assertError(() -> service.approve(6L, null, ADMIN), HttpStatus.CONFLICT, "error.import.duplicateActive");
+        assertThat(s.getStatus()).isEqualTo(SuggestionStatus.PENDING);
+        assertThat(s.getImportJobId()).isNull();
+        verify(importService, times(1)).createResolved(any(), any(), eq(ADMIN));
+    }
+
+    @Test
+    void reopen_pending_409AlreadyPending_unknown_404() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(pending(6)));
+        assertError(() -> service.reopen(6L, ADMIN), HttpStatus.CONFLICT, "error.suggestion.alreadyPending");
+
+        when(repository.findByIdForUpdate(8L)).thenReturn(Optional.empty());
+        assertError(() -> service.reopen(8L, ADMIN), HttpStatus.NOT_FOUND, "error.suggestion.notFound");
+        verify(repository, never()).saveAndFlush(any(VideoSuggestion.class));
+    }
+
+    @Test
+    void reopen_duplicatePendingOrBlockingJob_409Duplicate() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(rejected(6, 0)));
+        when(repository.existsByNormalizedUrlAndStatus(YT, SuggestionStatus.PENDING)).thenReturn(true);
+        assertError(() -> service.reopen(6L, ADMIN), HttpStatus.CONFLICT, "error.suggestion.duplicate");
+
+        when(repository.existsByNormalizedUrlAndStatus(YT, SuggestionStatus.PENDING)).thenReturn(false);
+        when(jobRepository.existsByNormalizedUrlAndStatusIn(eq(YT), anyCollection())).thenReturn(true);
+        assertError(() -> service.reopen(6L, ADMIN), HttpStatus.CONFLICT, "error.suggestion.duplicate");
+        verify(repository, never()).saveAndFlush(any(VideoSuggestion.class));
+    }
+
+    @Test
+    void reopen_losesRaceAgainstUniqueIndex_409Duplicate() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(rejected(6, 0)));
+        when(repository.saveAndFlush(any(VideoSuggestion.class))).thenThrow(new DataIntegrityViolationException("uq"));
+
+        assertError(() -> service.reopen(6L, ADMIN), HttpStatus.CONFLICT, "error.suggestion.duplicate");
+    }
+
+    @Test
+    void requestRereview_owner_ok_passesTrimmedMessageAndCap() {
+        VideoSuggestion before = rejected(6, 1);
+        VideoSuggestion after = pending(6);
+        after.setRereviewCount(2);
+        after.setNote("please look again");
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(before));
+        when(repository.requestRereview(eq(6L), eq(USER), eq("please look again"), eq(2), any(Instant.class))).thenReturn(1);
+        when(repository.findById(6L)).thenReturn(Optional.of(after));
+
+        SuggestionDto dto = service.requestRereview(6L, USER, "  please look again  ");
+
+        assertThat(dto.getStatus()).isEqualTo(SuggestionStatus.PENDING);
+        assertThat(dto.getRereviewCount()).isEqualTo(2);
+        assertThat(dto.getNote()).isEqualTo("please look again");
+        assertThat(dto.isCanRequestRereview()).isFalse();
+        assertThat(dto.getImportJobId()).isNull();
+    }
+
+    @Test
+    void requestRereview_blankOrNullMessage_passesNull() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(rejected(6, 0)));
+        when(repository.requestRereview(anyLong(), anyLong(), any(), anyInt(), any(Instant.class))).thenReturn(1);
+        when(repository.findById(6L)).thenReturn(Optional.of(pending(6)));
+
+        service.requestRereview(6L, USER, "   ");
+        service.requestRereview(6L, USER, null);
+
+        verify(repository, times(2)).requestRereview(eq(6L), eq(USER), isNull(), eq(2), any(Instant.class));
+    }
+
+    @Test
+    void requestRereview_thirdRequest_409Limit() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(rejected(6, 2)));
+
+        assertError(() -> service.requestRereview(6L, USER, null), HttpStatus.CONFLICT, "error.suggestion.rereviewLimit");
+        verify(repository, never()).requestRereview(anyLong(), anyLong(), any(), anyInt(), any(Instant.class));
+    }
+
+    @Test
+    void requestRereview_nonOwnerOrUnknown_404() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(rejected(6, 0)));
+        assertError(() -> service.requestRereview(6L, USER + 1, null), HttpStatus.NOT_FOUND, "error.suggestion.notFound");
+        assertError(() -> service.requestRereview(6L, null, null), HttpStatus.NOT_FOUND, "error.suggestion.notFound");
+
+        when(repository.findByIdForUpdate(8L)).thenReturn(Optional.empty());
+        assertError(() -> service.requestRereview(8L, USER, null), HttpStatus.NOT_FOUND, "error.suggestion.notFound");
+        verify(repository, never()).requestRereview(anyLong(), anyLong(), any(), anyInt(), any(Instant.class));
+    }
+
+    @Test
+    void requestRereview_notRejected_409() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(pending(6)));
+        assertError(() -> service.requestRereview(6L, USER, null), HttpStatus.CONFLICT, "error.suggestion.notRejected");
+
+        when(repository.findByIdForUpdate(7L)).thenReturn(Optional.of(approvedWithJob(7, 9L)));
+        assertError(() -> service.requestRereview(7L, USER, null), HttpStatus.CONFLICT, "error.suggestion.notRejected");
+    }
+
+    @Test
+    void requestRereview_duplicate_409() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(rejected(6, 0)));
+        when(repository.existsByNormalizedUrlAndStatus(YT, SuggestionStatus.PENDING)).thenReturn(true);
+        assertError(() -> service.requestRereview(6L, USER, null), HttpStatus.CONFLICT, "error.suggestion.duplicate");
+
+        when(repository.existsByNormalizedUrlAndStatus(YT, SuggestionStatus.PENDING)).thenReturn(false);
+        when(repository.requestRereview(anyLong(), anyLong(), any(), anyInt(), any(Instant.class)))
+                .thenThrow(new DataIntegrityViolationException("uq"));
+        assertError(() -> service.requestRereview(6L, USER, null), HttpStatus.CONFLICT, "error.suggestion.duplicate");
+    }
+
+    @Test
+    void requestRereview_guardedUpdateMatchesNothing_reportsWhyFromFreshRow() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(rejected(6, 0)));
+        when(repository.requestRereview(anyLong(), anyLong(), any(), anyInt(), any(Instant.class))).thenReturn(0);
+
+        when(repository.findById(6L)).thenReturn(Optional.of(rejected(6, 2)));
+        assertError(() -> service.requestRereview(6L, USER, null), HttpStatus.CONFLICT, "error.suggestion.rereviewLimit");
+
+        when(repository.findById(6L)).thenReturn(Optional.of(pending(6)));
+        assertError(() -> service.requestRereview(6L, USER, null), HttpStatus.CONFLICT, "error.suggestion.notRejected");
+
+        when(repository.findById(6L)).thenReturn(Optional.empty());
+        assertError(() -> service.requestRereview(6L, USER, null), HttpStatus.NOT_FOUND, "error.suggestion.notFound");
+    }
+
+    @Test
+    void requestRereview_rowVanishesAfterUpdate_404() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(rejected(6, 0)));
+        when(repository.requestRereview(anyLong(), anyLong(), any(), anyInt(), any(Instant.class))).thenReturn(1);
+        when(repository.findById(6L)).thenReturn(Optional.empty());
+
+        assertError(() -> service.requestRereview(6L, USER, null), HttpStatus.NOT_FOUND, "error.suggestion.notFound");
+    }
+
+    @Test
+    void mine_rejected_exposesRereviewState_notCanReopen() {
+        when(repository.findByUserId(eq(USER), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(rejected(1, 1), rejected(2, 2))));
+
+        List<SuggestionDto> content = service.mine(USER, null, 0, 20).getContent();
+
+        assertThat(content.get(0).getRereviewCount()).isEqualTo(1);
+        assertThat(content.get(0).isCanRequestRereview()).isTrue();
+        assertThat(content.get(1).isCanRequestRereview()).isFalse();
+        assertThat(content).allSatisfy(d -> assertThat(d.isCanReopen()).isFalse());
+        verify(jobRepository, never()).findAllById(any());
+    }
+
+    @Test
+    void list_canReopen_fromOneBatchedJobLookup() {
+        VideoSuggestion failed = approvedWithJob(1, 10L);
+        VideoSuggestion done = approvedWithJob(2, 11L);
+        VideoSuggestion active = approvedWithJob(3, 12L);
+        VideoSuggestion cancelled = approvedWithJob(4, 13L);
+        when(repository.findAllPendingFirst(any(Pageable.class))).thenReturn(new PageImpl<>(
+                List.of(pending(5), rejected(6, 0), failed, done, active, cancelled)));
+        when(userRepo.findAllById(any(Iterable.class))).thenReturn(List.of(user(USER, "bob@example.com")));
+        when(jobRepository.findAllById(anyCollection())).thenReturn(List.of(job(10L, ImportStatus.FAILED),
+                job(11L, ImportStatus.DONE), job(12L, ImportStatus.DOWNLOADING), job(13L, ImportStatus.CANCELLED)));
+
+        List<SuggestionDto> content = service.list(null, 0, 20).getContent();
+
+        assertThat(content).extracting(SuggestionDto::isCanReopen)
+                .containsExactly(false, true, true, false, false, true);
+        verify(jobRepository, times(1)).findAllById(anyCollection());
+    }
+
+    @Test
+    void list_noApprovedRows_skipsJobLookup() {
+        when(repository.findAllPendingFirst(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(pending(5), rejected(6, 0))));
+        when(userRepo.findAllById(any(Iterable.class))).thenReturn(List.of(user(USER, "bob@example.com")));
+
+        List<SuggestionDto> content = service.list(null, 0, 20).getContent();
+
+        assertThat(content.get(1).isCanReopen()).isTrue();
+        verify(jobRepository, never()).findAllById(any());
+    }
+
+    @Test
+    void reject_result_canReopen() {
+        when(repository.findByIdForUpdate(6L)).thenReturn(Optional.of(pending(6)));
+        assertThat(service.reject(6L, SuggestionRejectReason.DUPLICATE, null, ADMIN).isCanReopen()).isTrue();
     }
 }

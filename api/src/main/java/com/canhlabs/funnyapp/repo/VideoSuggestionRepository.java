@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,6 +29,25 @@ public interface VideoSuggestionRepository extends JpaRepository<VideoSuggestion
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from VideoSuggestion s where s.id = :id")
     Optional<VideoSuggestion> findByIdForUpdate(@Param("id") Long id);
+
+    /**
+     * Rejected to pending for a user re-review. The cap lives in the WHERE clause so concurrent calls
+     * cannot both pass. A null message keeps the current note. Returns 0 when no row qualifies.
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            update VideoSuggestion s
+               set s.status = com.canhlabs.funnyapp.enums.SuggestionStatus.PENDING,
+                   s.rereviewCount = s.rereviewCount + 1,
+                   s.note = coalesce(:message, s.note),
+                   s.rejectReason = null, s.rejectNote = null, s.reviewedBy = null, s.reviewedAt = null,
+                   s.updatedAt = :now
+             where s.id = :id and s.userId = :userId
+               and s.status = com.canhlabs.funnyapp.enums.SuggestionStatus.REJECTED
+               and s.rereviewCount < :maxCount
+            """)
+    int requestRereview(@Param("id") Long id, @Param("userId") Long userId, @Param("message") String message,
+                        @Param("maxCount") int maxCount, @Param("now") Instant now);
 
     // user's own list (the caller supplies newest-first sorting through the Pageable)
 

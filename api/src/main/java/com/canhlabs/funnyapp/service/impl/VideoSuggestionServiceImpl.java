@@ -49,6 +49,10 @@ import java.util.function.Supplier;
 public class VideoSuggestionServiceImpl implements VideoSuggestionService {
 
     static final int MAX_PAGE_SIZE = 50;
+    /** User re-review requests allowed per suggestion. */
+    static final int MAX_REREVIEWS = 2;
+    /** An approved suggestion can be reopened only when its import job ended in one of these. */
+    static final Set<ImportStatus> REOPENABLE_JOB_STATUSES = Set.of(ImportStatus.FAILED, ImportStatus.CANCELLED);
     static final Duration LIMIT_WINDOW = Duration.ofHours(24);
     /** An import job in one of these states already covers the URL. */
     static final List<ImportStatus> BLOCKING_IMPORT_STATUSES = blockingStatuses();
@@ -59,6 +63,10 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
     static final String KEY_NOT_FOUND = "error.suggestion.notFound";
     static final String KEY_NOT_PENDING = "error.suggestion.notPending";
     static final String KEY_NOTE_REQUIRED = "error.suggestion.noteRequired";
+    static final String KEY_ALREADY_PENDING = "error.suggestion.alreadyPending";
+    static final String KEY_CANNOT_REOPEN = "error.suggestion.cannotReopen";
+    static final String KEY_NOT_REJECTED = "error.suggestion.notRejected";
+    static final String KEY_REREVIEW_LIMIT = "error.suggestion.rereviewLimit";
     static final String KEY_IMPORT_DISABLED = "error.import.disabled";
     static final String KEY_IMPORT_DUPLICATE = "error.import.duplicateActive";
     static final String KEY_IMPORT_INVALID_URL = "error.import.invalidUrl";
@@ -111,10 +119,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         }
         ImportUrlValidator.ImportUrl parsed = urlResolver.resolve(url)
                 .orElseThrow(() -> error(HttpStatus.BAD_REQUEST, 4301, KEY_INVALID_URL));
-        if (repository.existsByNormalizedUrlAndStatus(parsed.normalizedUrl(), SuggestionStatus.PENDING)
-                || jobRepository.existsByNormalizedUrlAndStatusIn(parsed.normalizedUrl(), BLOCKING_IMPORT_STATUSES)) {
-            throw duplicate();
-        }
+        requireNoDuplicate(parsed.normalizedUrl());
         VideoSuggestion suggestion = VideoSuggestion.builder()
                 .userId(userId)
                 .sourceUrl(parsed.sourceUrl())
@@ -124,7 +129,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
                 .note(blankToNull(note == null ? null : note.trim()))
                 .build();
         try {
-            return toDto(repository.saveAndFlush(suggestion), null, null, false);
+            return toDto(repository.saveAndFlush(suggestion), null, null, false, false);
         } catch (DataIntegrityViolationException e) {
             // lost the race against the partial unique index on pending normalized_url
             throw duplicate();
@@ -144,7 +149,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
             result = repository.findByUserIdAndStatus(userId, SuggestionStatus.valueOf(filter.name()), newestFirst);
         }
         Map<Long, SuggestionLiveRef> live = liveRefs(result.getContent());
-        return result.map(s -> toDto(s, live.get(s.getId()), null, false));
+        return result.map(s -> toDto(s, live.get(s.getId()), null, false, false));
     }
 
     // ── admin ───────────────────────────────────────────────────────────────────
@@ -162,7 +167,9 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         }
         Map<Long, SuggestionLiveRef> live = liveRefs(result.getContent());
         Map<Long, String> names = suggesterNames(result.getContent());
-        return result.map(s -> toDto(s, live.get(s.getId()), names.get(s.getUserId()), true));
+        Map<Long, ImportStatus> jobStatuses = jobStatuses(result.getContent());
+        return result.map(s -> toDto(s, live.get(s.getId()), names.get(s.getUserId()), true,
+                canReopen(s, jobStatuses.get(s.getImportJobId()))));
     }
 
     @Override
@@ -187,7 +194,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
             VideoSuggestion saved = repository.save(s);
             eventPublisher.publishEvent(new SuggestionReviewedEvent(
                     saved.getId(), saved.getUserId(), true, snippetOf(saved), null));
-            return toDto(saved, null, suggesterNames(List.of(saved)).get(saved.getUserId()), true);
+            return toDto(saved, null, suggesterNames(List.of(saved)).get(saved.getUserId()), true, false);
         });
         // the import created the job inside the transaction; wake the worker again now that it is visible
         importWorker.wakeUp();
@@ -209,7 +216,61 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
             VideoSuggestion saved = repository.save(s);
             eventPublisher.publishEvent(new SuggestionReviewedEvent(
                     saved.getId(), saved.getUserId(), false, snippetOf(saved), reason == null ? null : reason.name()));
-            return toDto(saved, null, suggesterNames(List.of(saved)).get(saved.getUserId()), true);
+            return toDto(saved, null, suggesterNames(List.of(saved)).get(saved.getUserId()), true, true);
+        });
+    }
+
+    @Override
+    public SuggestionDto reopen(Long id, Long adminId) {
+        return inTx(() -> {
+            VideoSuggestion s = repository.findByIdForUpdate(id)
+                    .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4042, KEY_NOT_FOUND));
+            if (s.getStatus() == SuggestionStatus.PENDING) {
+                throw error(HttpStatus.CONFLICT, 4095, KEY_ALREADY_PENDING);
+            }
+            if (s.getStatus() == SuggestionStatus.APPROVED) {
+                // the job row is locked, then its status re-read under the lock: a racing retry cannot slip in
+                ImportStatus jobStatus = s.getImportJobId() == null ? null
+                        : jobRepository.findLockedById(s.getImportJobId()).map(j -> j.getStatus()).orElse(null);
+                if (jobStatus == null || !REOPENABLE_JOB_STATUSES.contains(jobStatus)) {
+                    throw error(HttpStatus.CONFLICT, 4096, KEY_CANNOT_REOPEN);
+                }
+            }
+            requireNoDuplicate(s.getNormalizedUrl());
+            s.setStatus(SuggestionStatus.PENDING);
+            s.setRejectReason(null);
+            s.setRejectNote(null);
+            s.setReviewedBy(null);
+            s.setReviewedAt(null);
+            s.setImportJobId(null);
+            VideoSuggestion saved = saveOrDuplicate(s);
+            return toDto(saved, null, suggesterNames(List.of(saved)).get(saved.getUserId()), true, false);
+        });
+    }
+
+    @Override
+    public SuggestionDto requestRereview(Long id, Long userId, String message) {
+        String cleanMessage = blankToNull(message == null ? null : message.trim());
+        return inTx(() -> {
+            VideoSuggestion s = repository.findByIdForUpdate(id)
+                    .filter(found -> userId != null && userId.equals(found.getUserId()))
+                    .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4042, KEY_NOT_FOUND));
+            requireRereviewable(s);
+            requireNoDuplicate(s.getNormalizedUrl());
+            int updated;
+            try {
+                updated = repository.requestRereview(id, userId, cleanMessage, MAX_REREVIEWS, Instant.now());
+            } catch (DataIntegrityViolationException e) {
+                throw duplicate();
+            }
+            if (updated == 0) {
+                // the guarded UPDATE found no row: say why from a fresh read
+                repository.findById(id).ifPresent(VideoSuggestionServiceImpl::requireRereviewable);
+                throw error(HttpStatus.NOT_FOUND, 4042, KEY_NOT_FOUND);
+            }
+            VideoSuggestion saved = repository.findById(id)
+                    .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4042, KEY_NOT_FOUND));
+            return toDto(saved, null, null, false, false);
         });
     }
 
@@ -222,6 +283,54 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
             throw error(HttpStatus.CONFLICT, 4093, KEY_NOT_PENDING);
         }
         return s;
+    }
+
+    private static void requireRereviewable(VideoSuggestion s) {
+        if (s.getStatus() != SuggestionStatus.REJECTED) {
+            throw error(HttpStatus.CONFLICT, 4097, KEY_NOT_REJECTED);
+        }
+        if (s.getRereviewCount() >= MAX_REREVIEWS) {
+            throw error(HttpStatus.CONFLICT, 4098, KEY_REREVIEW_LIMIT);
+        }
+    }
+
+    /** Same rule as submit: another pending suggestion, or an import job that already covers the URL. */
+    private void requireNoDuplicate(String normalizedUrl) {
+        if (repository.existsByNormalizedUrlAndStatus(normalizedUrl, SuggestionStatus.PENDING)
+                || jobRepository.existsByNormalizedUrlAndStatusIn(normalizedUrl, BLOCKING_IMPORT_STATUSES)) {
+            throw duplicate();
+        }
+    }
+
+    private VideoSuggestion saveOrDuplicate(VideoSuggestion s) {
+        try {
+            return repository.saveAndFlush(s);
+        } catch (DataIntegrityViolationException e) {
+            // lost the race against the partial unique index on pending normalized_url
+            throw duplicate();
+        }
+    }
+
+    private static boolean canReopen(VideoSuggestion s, ImportStatus jobStatus) {
+        return s.getStatus() == SuggestionStatus.REJECTED
+                || (s.getStatus() == SuggestionStatus.APPROVED && jobStatus != null
+                && REOPENABLE_JOB_STATUSES.contains(jobStatus));
+    }
+
+    /** Import job status per job id for the APPROVED suggestions of this page, in one query. */
+    private Map<Long, ImportStatus> jobStatuses(Collection<VideoSuggestion> suggestions) {
+        Set<Long> jobIds = new HashSet<>();
+        for (VideoSuggestion s : suggestions) {
+            if (s.getStatus() == SuggestionStatus.APPROVED && s.getImportJobId() != null) {
+                jobIds.add(s.getImportJobId());
+            }
+        }
+        Map<Long, ImportStatus> byId = new HashMap<>();
+        if (jobIds.isEmpty()) {
+            return byId;
+        }
+        jobRepository.findAllById(jobIds).forEach(j -> byId.put(j.getId(), j.getStatus()));
+        return byId;
     }
 
     private static void markReviewed(VideoSuggestion s, Long adminId) {
@@ -288,7 +397,8 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         return names;
     }
 
-    private static SuggestionDto toDto(VideoSuggestion s, SuggestionLiveRef live, String suggesterName, boolean admin) {
+    private static SuggestionDto toDto(VideoSuggestion s, SuggestionLiveRef live, String suggesterName,
+                                    boolean admin, boolean canReopen) {
         return SuggestionDto.builder()
                 .id(s.getId())
                 .sourceUrl(s.getSourceUrl())
@@ -305,6 +415,9 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
                 .reviewedAt(s.getReviewedAt())
                 .suggesterName(admin ? suggesterName : null)
                 .importJobId(admin ? s.getImportJobId() : null)
+                .rereviewCount(s.getRereviewCount())
+                .canRequestRereview(s.getStatus() == SuggestionStatus.REJECTED && s.getRereviewCount() < MAX_REREVIEWS)
+                .canReopen(admin && canReopen)
                 .build();
     }
 

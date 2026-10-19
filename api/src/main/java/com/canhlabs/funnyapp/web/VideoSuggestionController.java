@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.RateLimited;
+import com.canhlabs.funnyapp.dto.suggestion.RereviewSuggestionRequest;
 import com.canhlabs.funnyapp.dto.suggestion.SubmitSuggestionRequest;
 import com.canhlabs.funnyapp.dto.suggestion.SuggestionDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,16 @@ public class VideoSuggestionController {
     public ResponseEntity<ResultObjectInfo<SuggestionDto>> submit(@Valid @RequestBody SubmitSuggestionRequest request) {
         SuggestionDto dto = suggestionService.submit(currentUserId(), request.getUrl(), request.getTitle(), request.getNote());
         return ResponseEntity.status(HttpStatus.CREATED).body(wrap(dto));
+    }
+
+    @PostMapping("/{id}/rereview")
+    @RateLimited(permit = 10)
+    @AuditLog("requestSuggestionRereview")
+    public ResponseEntity<ResultObjectInfo<SuggestionDto>> rereview(
+            @PathVariable Long id,
+            @Valid @RequestBody(required = false) RereviewSuggestionRequest request) {
+        String message = request == null ? null : request.getMessage();
+        return ResponseEntity.ok(wrap(suggestionService.requestRereview(id, currentUserId(), message)));
     }
 
     @GetMapping("/mine")

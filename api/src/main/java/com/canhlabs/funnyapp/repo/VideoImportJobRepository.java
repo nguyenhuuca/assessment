@@ -5,6 +5,8 @@ import com.canhlabs.funnyapp.enums.ImportStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +18,11 @@ import java.util.Optional;
 public interface VideoImportJobRepository extends JpaRepository<VideoImportJob, Long> {
 
     Page<VideoImportJob> findByStatus(ImportStatus status, Pageable pageable);
+
+    /** Row lock so a concurrent retry cannot change the status while a suggestion reopen decides on it. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select j from VideoImportJob j where j.id = :id")
+    Optional<VideoImportJob> findLockedById(@Param("id") Long id);
 
     boolean existsByNormalizedUrlAndStatusIn(String normalizedUrl, Collection<ImportStatus> statuses);
 

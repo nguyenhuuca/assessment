@@ -21,5 +21,17 @@ public interface VideoSuggestionService {
     /** Creates exactly one import job (scheduled now) and links it. 503 when import is disabled. */
     SuggestionDto approve(Long id, String titleOverride, Long adminId);
 
+    /**
+     * REJECTED, or APPROVED with a FAILED/CANCELLED import job, back to PENDING (decision cleared).
+     * 404 notFound, 409 alreadyPending / cannotReopen / duplicate.
+     */
+    SuggestionDto reopen(Long id, Long adminId);
+
+    /**
+     * Owner asks for a re-review of a REJECTED suggestion (max 2 times). A non-blank message replaces the note.
+     * 404 notFound (also for other users' ids), 409 notRejected / rereviewLimit / duplicate.
+     */
+    SuggestionDto requestRereview(Long id, Long userId, String message);
+
     SuggestionDto reject(Long id, SuggestionRejectReason reason, String note, Long adminId);
 }

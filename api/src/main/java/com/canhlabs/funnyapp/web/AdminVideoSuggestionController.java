@@ -70,6 +70,13 @@ public class AdminVideoSuggestionController {
         return ok(suggestionService.reject(id, request.getReason(), request.getNote(), adminId()));
     }
 
+    @PostMapping("/{id}/reopen")
+    @AuditLog("reopenVideoSuggestion")
+    @HasPermission(perm = Permission.ADMIN)
+    public ResponseEntity<ResultObjectInfo<SuggestionDto>> reopen(@PathVariable Long id) {
+        return ok(suggestionService.reopen(id, adminId()));
+    }
+
     private static Long adminId() {
         UserDetailDto current = AppUtils.getCurrentUser();
         return current == null ? null : current.getId();
