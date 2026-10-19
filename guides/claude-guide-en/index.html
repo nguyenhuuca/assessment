@@ -3215,6 +3215,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#running-headless-on-github-no-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ☁️ Running Headless on GitHub (no terminal)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#how-to-call-it" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7198,6 +7209,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#running-headless-on-github-no-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ☁️ Running Headless on GitHub (no terminal)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#how-to-call-it" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8278,37 +8300,84 @@
 <tr>
 <th>Run</th>
 <th>Wall time</th>
-<th>Worker tokens</th>
-<th>Worker cost (estimate)</th>
+<th>Orchestrator (Opus)</th>
+<th>Workers (Sonnet/Haiku)</th>
+<th>Total</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Suggestion re-review (BE + FE, 1 replan)</td>
 <td>~20 min</td>
-<td>~424k</td>
-<td>≈ $0.03 – $0.91</td>
+<td>$2.51</td>
+<td>$1.25</td>
+<td><strong>$3.76</strong></td>
 </tr>
 <tr>
 <td>Transitions refactor (BE only)</td>
 <td>~11 min</td>
-<td>~143k</td>
-<td>≈ $0.01 – $0.40</td>
+<td>$1.78</td>
+<td>$0.47</td>
+<td><strong>$2.24</strong></td>
 </tr>
 </tbody>
 </table>
+<p>These are exact figures from <code>node scripts/claude-cost.mjs --from &lt;start&gt; --to &lt;end&gt;</code>, which reads the session transcripts and prices them at API list price. On a subscription they are the equivalent cost, not a bill. Each run report has the per-agent breakdown.</p>
 <ul>
-<li><strong>Not counted: the orchestrator.</strong> The main session (Opus) is not in the ledger. Use <code>/cost</code> for the exact total.</li>
+<li><strong>Where the money goes:</strong> the orchestrator (Opus) is 67–79% of each run, mostly cache reads of the growing session context.</li>
 <li><strong>To spend less:</strong></li>
 <li>write a clear request, so no replan is needed;</li>
 <li>keep one goal per run;</li>
 <li>run FE and BE in parallel only when both change.</li>
 </ul>
+<h3 id="running-headless-on-github-no-terminal">☁️ Running Headless on GitHub (no terminal)<a class="headerlink" href="#running-headless-on-github-no-terminal" title="Permanent link">&para;</a></h3>
+<p>Besides local runs, autopilot can run on GitHub Actions (<a href="../../adr/0022-headless-autopilot/">ADR-0022</a>, workflow <code>.github/workflows/autopilot.yml</code>). Both gates move to GitHub:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>You do</th>
+<th>Autopilot does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Start</td>
+<td>Add the label <strong><code>autopilot</code></strong> to an issue you opened</td>
+<td>Plans and reviews on branch <code>autopilot/issue-&lt;N&gt;</code>, opens a <strong>draft PR</strong>, comments the PR link on the issue</td>
+</tr>
+<tr>
+<td>Gate 1</td>
+<td>Comment <strong><code>/approve</code></strong> on the PR, or <strong><code>/revise &lt;notes&gt;</code></strong> to replan</td>
+<td>Implement ⇄ review → QA ×2 → full gates → pushes to the PR branch, adds the report to the PR, marks it ready</td>
+</tr>
+<tr>
+<td>Gate 2</td>
+<td>Review the diff and <strong>merge</strong> the PR. The merge is the push to <code>main</code>, and CI deploys it</td>
+<td>Never pushes to <code>main</code>, never merges</td>
+</tr>
+<tr>
+<td>After deploy</td>
+<td>Run <code>./api/mock-test.sh</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>One-time setup (you do this; Claude never handles the token):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>claude<span class="w"> </span>setup-token<span class="w">                                  </span><span class="c1"># creates a token from your subscription</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>CLAUDE_CODE_OAUTH_TOKEN<span class="w">               </span><span class="c1"># paste the token when asked</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>gh<span class="w"> </span>label<span class="w"> </span>create<span class="w"> </span>autopilot<span class="w"> </span>--color<span class="w"> </span>5319e7<span class="w"> </span>--description<span class="w"> </span><span class="s2">"Run /autopilot headless"</span>
+</code></pre></div>
+<p><strong>Limits and safety:</strong>
+- <strong>Owner only.</strong> Only the <strong>repo owner</strong> can trigger a run, by label or by comment. The repo is public, so anyone else's comments are ignored.
+- <strong>Issue text is data.</strong> Instructions in an issue that try to change the workflow, permissions or gates are ignored and listed in the PR.
+- <strong>Refused paths.</strong> Headless <strong>refuses</strong> to edit <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>.env</code> files, or write data-dropping migrations. Do those locally.
+- <strong>Limits and secrets.</strong> Each job has a 60 min cap, and only one run happens at a time. The only secret used is <code>CLAUDE_CODE_OAUTH_TOKEN</code>; deploy secrets (SSH, Docker) are never exposed.</p>
 <h3 id="how-to-call-it">▶️ How to Call It<a class="headerlink" href="#how-to-call-it" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/autopilot<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>Suggestions<span class="w"> </span>tab<span class="w"> </span><span class="nb">let</span><span class="w"> </span>an<span class="w"> </span>admin<span class="w"> </span>move<span class="w"> </span>a<span class="w"> </span>suggestion<span class="w"> </span>back<span class="w"> </span>to<span class="w"> </span>Pending<span class="w"> </span>and<span class="w"> </span>review<span class="w"> </span>it<span class="w"> </span>again
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>/autopilot<span class="w"> </span>refactor:<span class="w"> </span>put<span class="w"> </span>the<span class="w"> </span>suggestion<span class="w"> </span>status<span class="w"> </span>transition<span class="w"> </span>rules<span class="w"> </span><span class="k">in</span><span class="w"> </span>one<span class="w"> </span>place,<span class="w"> </span>no<span class="w"> </span>behavior<span class="w"> </span>change
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>/autopilot<span class="w"> </span>fix:<span class="w"> </span>the<span class="w"> </span>Reopen<span class="w"> </span>button<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>disabled<span class="w"> </span><span class="k">while</span><span class="w"> </span>the<span class="w"> </span>request<span class="w"> </span>is<span class="w"> </span>pending
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>/autopilot<span class="w"> </span>docs/plans/plan-&lt;feature&gt;.md<span class="w">               </span><span class="c1"># run on an existing plan (plan mode)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/autopilot<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>Suggestions<span class="w"> </span>tab<span class="w"> </span><span class="nb">let</span><span class="w"> </span>an<span class="w"> </span>admin<span class="w"> </span>move<span class="w"> </span>a<span class="w"> </span>suggestion<span class="w"> </span>back<span class="w"> </span>to<span class="w"> </span>Pending<span class="w"> </span>and<span class="w"> </span>review<span class="w"> </span>it<span class="w"> </span>again
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>/autopilot<span class="w"> </span>refactor:<span class="w"> </span>put<span class="w"> </span>the<span class="w"> </span>suggestion<span class="w"> </span>status<span class="w"> </span>transition<span class="w"> </span>rules<span class="w"> </span><span class="k">in</span><span class="w"> </span>one<span class="w"> </span>place,<span class="w"> </span>no<span class="w"> </span>behavior<span class="w"> </span>change
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>/autopilot<span class="w"> </span>fix:<span class="w"> </span>the<span class="w"> </span>Reopen<span class="w"> </span>button<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>disabled<span class="w"> </span><span class="k">while</span><span class="w"> </span>the<span class="w"> </span>request<span class="w"> </span>is<span class="w"> </span>pending
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>/autopilot<span class="w"> </span>docs/plans/plan-&lt;feature&gt;.md<span class="w">               </span><span class="c1"># run on an existing plan (plan mode)</span>
 </code></pre></div>
 <ul>
 <li><strong>Typed command only.</strong> <code>autopilot</code> has <code>disable-model-invocation: true</code>, so Claude starts it only when you <strong>type <code>/autopilot</code></strong>. If you ask in chat instead ("run autopilot for X"), Claude reads the <code>SKILL.md</code> and follows it step by step, gates included.</li>
@@ -8318,14 +8387,14 @@
 <hr />
 <h2 id="session-file-sessiontxt">Session File (session.txt)<a class="headerlink" href="#session-file-sessiontxt" title="Permanent link">&para;</a></h2>
 <p><code>session.txt</code> at the repo root records the <strong>one</strong> task in flight, so the next session (on this machine or another) can pick it up. Full rule: <code>.claude/rules/session-file.md</code>. Durable status still lives in <code>TASKS.md</code> and <code>docs/tracking.md</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>task: Collection Reorder (drag &amp; drop videos in a collection)
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>status: in_progress
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>progress: 60
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>done: Plan 5ea4fec2; BE-1 position migration 6a0a5849
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>doing: FE-2 @dnd-kit reorder mode
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>next: FE-2 reorder mode; QA-1 prod smoke
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>plan: docs/plans/plan-collection-reorder.md
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>updated: 2026-10-18 21:05
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>task: Collection Reorder (drag &amp; drop videos in a collection)
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>status: in_progress
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>progress: 60
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>done: Plan 5ea4fec2; BE-1 position migration 6a0a5849
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>doing: FE-2 @dnd-kit reorder mode
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>next: FE-2 reorder mode; QA-1 prod smoke
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>plan: docs/plans/plan-collection-reorder.md
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>updated: 2026-10-18 21:05
 </code></pre></div>
 <table>
 <thead>
@@ -8416,66 +8485,66 @@
 <hr />
 <h2 id="real-world-workflows">Real-World Workflows<a class="headerlink" href="#real-world-workflows" title="Permanent link">&para;</a></h2>
 <h3 id="workflow-1-implement-a-new-feature-spec-driven">Workflow 1: Implement a New Feature (Spec-Driven)<a class="headerlink" href="#workflow-1-implement-a-new-feature-spec-driven" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Step 1: Scope — clarify requirements, create the PRD</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/scope<span class="w"> </span>add<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>feature
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Step 2: Architect — technical decisions, create the ADR</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>/architect<span class="w"> </span>docs/prd/PRD-video-recommendation.md
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># Step 3: Spec — precise behavior contract</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>/spec<span class="w"> </span>docs/prd/PRD-video-recommendation.md<span class="w"> </span>docs/adr/NNNN-video-recommendation.md
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="c1"># Step 4: Plan — break the spec into tasks</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-video-recommendation.md
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="c1"># Step 5: Execute (swarm)</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-video-recommendation.md
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="c1"># Step 6: Review</span>
-<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>/swarm-review<span class="w"> </span>the<span class="w"> </span>recommendation<span class="w"> </span>feature
-<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>
-<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="c1"># Step 7: Land — gates, commit, ask to push, check CI + smoke prod</span>
-<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>/land-the-plane
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Step 1: Scope — clarify requirements, create the PRD</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>/scope<span class="w"> </span>add<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>feature
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Step 2: Architect — technical decisions, create the ADR</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>/architect<span class="w"> </span>docs/prd/PRD-video-recommendation.md
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Step 3: Spec — precise behavior contract</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>/spec<span class="w"> </span>docs/prd/PRD-video-recommendation.md<span class="w"> </span>docs/adr/NNNN-video-recommendation.md
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="c1"># Step 4: Plan — break the spec into tasks</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>/swarm-plan<span class="w"> </span>docs/specs/spec-video-recommendation.md
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="c1"># Step 5: Execute (swarm)</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-video-recommendation.md
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="c1"># Step 6: Review</span>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>/swarm-review<span class="w"> </span>the<span class="w"> </span>recommendation<span class="w"> </span>feature
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="c1"># Step 7: Land — gates, commit, ask to push, check CI + smoke prod</span>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>/land-the-plane
 </code></pre></div>
 <p>Ceremony scales with scope: a change you can describe in one sentence needs no PRD/ADR — at most a plan, often nothing.</p>
 <hr />
 <h3 id="workflow-2-debug-a-production-issue">Workflow 2: Debug a Production Issue<a class="headerlink" href="#workflow-2-debug-a-production-issue" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Step 1: Investigate — the debugging-protocol rule always applies:</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="c1">#   ≥ 3 hypotheses, find the root cause, read logs/code before editing</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="s2">"prod shows CORS errors, investigate"</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="c1"># Step 2: Fix + regression test (the testing skill loads itself)</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>/builder<span class="w"> </span>fix<span class="w"> </span>the<span class="w"> </span>hang<span class="w"> </span><span class="k">in</span><span class="w"> </span>VideoImportServiceImpl
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="c1"># Step 3: Postmortem (the postmortem skill loads itself)</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="s2">"write a postmortem for the virtual-thread deadlock"</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Step 1: Investigate — the debugging-protocol rule always applies:</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="c1">#   ≥ 3 hypotheses, find the root cause, read logs/code before editing</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="s2">"prod shows CORS errors, investigate"</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="c1"># Step 2: Fix + regression test (the testing skill loads itself)</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>/builder<span class="w"> </span>fix<span class="w"> </span>the<span class="w"> </span>hang<span class="w"> </span><span class="k">in</span><span class="w"> </span>VideoImportServiceImpl
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="c1"># Step 3: Postmortem (the postmortem skill loads itself)</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="s2">"write a postmortem for the virtual-thread deadlock"</span>
 </code></pre></div>
 <hr />
 <h3 id="workflow-3-security-audit">Workflow 3: Security Audit<a class="headerlink" href="#workflow-3-security-audit" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Step 1: Full audit</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>/swarm-review<span class="w"> </span>security<span class="w"> </span>audit<span class="w"> </span>entire<span class="w"> </span>codebase
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Step 2: Fix critical issues</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/builder<span class="w"> </span>fix<span class="w"> </span>SQL<span class="w"> </span>injection<span class="w"> </span><span class="k">in</span><span class="w"> </span>UserRepo
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1"># Step 3: Verify</span>
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>/security-auditor<span class="w"> </span>verify<span class="w"> </span>security<span class="w"> </span>fixes
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
-<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="c1"># Step 4: Document</span>
-<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>→<span class="w"> </span>docs/reports/security-audit-YYYY-MM-DD.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Step 1: Full audit</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>/swarm-review<span class="w"> </span>security<span class="w"> </span>audit<span class="w"> </span>entire<span class="w"> </span>codebase
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Step 2: Fix critical issues</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>/builder<span class="w"> </span>fix<span class="w"> </span>SQL<span class="w"> </span>injection<span class="w"> </span><span class="k">in</span><span class="w"> </span>UserRepo
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1"># Step 3: Verify</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>/security-auditor<span class="w"> </span>verify<span class="w"> </span>security<span class="w"> </span>fixes
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="c1"># Step 4: Document</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>→<span class="w"> </span>docs/reports/security-audit-YYYY-MM-DD.md
 </code></pre></div>
 <hr />
 <h3 id="workflow-4-performance-optimization">Workflow 4: Performance Optimization<a class="headerlink" href="#workflow-4-performance-optimization" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Step 1: Profile — measure before guessing</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="s2">"analyze the slow /videos endpoint with EXPLAIN and timing logs"</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Step 2: Design the solution</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>caching<span class="w"> </span>strategy<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>video<span class="w"> </span>list
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1"># Step 3: Implement (Two Hats: refactor and optimize in separate commits)</span>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>/builder<span class="w"> </span>implement<span class="w"> </span>the<span class="w"> </span>cache<span class="w"> </span>from<span class="w"> </span>docs/adr/NNNN-video-list-cache.md
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="c1"># Step 4: Verify — benchmark before/after</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Step 1: Profile — measure before guessing</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="s2">"analyze the slow /videos endpoint with EXPLAIN and timing logs"</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Step 2: Design the solution</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>caching<span class="w"> </span>strategy<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>video<span class="w"> </span>list
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># Step 3: Implement (Two Hats: refactor and optimize in separate commits)</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>/builder<span class="w"> </span>implement<span class="w"> </span>the<span class="w"> </span>cache<span class="w"> </span>from<span class="w"> </span>docs/adr/NNNN-video-list-cache.md
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="c1"># Step 4: Verify — benchmark before/after</span>
 </code></pre></div>
 <hr />
 <h2 id="available-templates">Available Templates<a class="headerlink" href="#available-templates" title="Permanent link">&para;</a></h2>
@@ -8575,42 +8644,42 @@
 <h2 id="tips-tricks">Tips &amp; Tricks<a class="headerlink" href="#tips-tricks" title="Permanent link">&para;</a></h2>
 <h3 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h3>
 <h4 id="1-design-before-coding">1. Design before coding<a class="headerlink" href="#1-design-before-coding" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># ❌ Bad</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="s2">"implement video recommendation"</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># ✅ Good</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>API
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="c1"># Review design → Approve</span>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>/swarm-plan<span class="w"> </span>docs/adr/NNNN-video-recommendation.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># ❌ Bad</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="s2">"implement video recommendation"</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># ✅ Good</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>/architect<span class="w"> </span>design<span class="w"> </span>video<span class="w"> </span>recommendation<span class="w"> </span>API
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="c1"># Review design → Approve</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>/swarm-plan<span class="w"> </span>docs/adr/NNNN-video-recommendation.md
 </code></pre></div>
 <h4 id="2-use-a-swarm-for-large-tasks">2. Use a swarm for large tasks<a class="headerlink" href="#2-use-a-swarm-for-large-tasks" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># ❌ Bad: one agent for a whole system</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>/builder<span class="w"> </span>implement<span class="w"> </span>entire<span class="w"> </span>authentication<span class="w"> </span>system
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># ✅ Good: break it down, then run in parallel</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>/swarm-plan<span class="w"> </span>implement<span class="w"> </span>authentication<span class="w"> </span>system
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-authentication.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># ❌ Bad: one agent for a whole system</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>/builder<span class="w"> </span>implement<span class="w"> </span>entire<span class="w"> </span>authentication<span class="w"> </span>system
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># ✅ Good: break it down, then run in parallel</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>/swarm-plan<span class="w"> </span>implement<span class="w"> </span>authentication<span class="w"> </span>system
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>/swarm-execute<span class="w"> </span>docs/plans/plan-authentication.md
 </code></pre></div>
 <h4 id="3-security-first-mindset">3. Security-first mindset<a class="headerlink" href="#3-security-first-mindset" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>/security-auditor<span class="w"> </span>review<span class="w"> </span><span class="o">[</span>feature-name<span class="o">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>/security-auditor<span class="w"> </span>review<span class="w"> </span><span class="o">[</span>feature-name<span class="o">]</span>
 </code></pre></div>
 <h4 id="4-coverage-90-ci-gate">4. Coverage ≥ 90% (CI gate)<a class="headerlink" href="#4-coverage-90-ci-gate" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify<span class="w">    </span><span class="c1"># LINE coverage &gt;= api/.coverage-threshold</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify<span class="w">    </span><span class="c1"># LINE coverage &gt;= api/.coverage-threshold</span>
 </code></pre></div>
 <h4 id="5-record-important-decisions">5. Record important decisions<a class="headerlink" href="#5-record-important-decisions" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>/architect<span class="w"> </span>document<span class="w"> </span>decision<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>Redis<span class="w"> </span>cache
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="c1"># Then update docs/tracking.md</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>/architect<span class="w"> </span>document<span class="w"> </span>decision<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>Redis<span class="w"> </span>cache
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="c1"># Then update docs/tracking.md</span>
 </code></pre></div>
 <hr />
 <h3 id="shortcuts">Shortcuts<a class="headerlink" href="#shortcuts" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Finish work the right way</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>/land-the-plane
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># Audit the whole repo</span>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>/code-check<span class="w"> </span>all
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="c1"># Render a document for a presentation</span>
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>/presentation<span class="w"> </span>docs/prd/PRD-watch-history-v2.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Finish work the right way</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>/land-the-plane
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Audit the whole repo</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>/code-check<span class="w"> </span>all
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="c1"># Render a document for a presentation</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>/presentation<span class="w"> </span>docs/prd/PRD-watch-history-v2.md
 </code></pre></div>
 <hr />
 <h3 id="learning-path">Learning Path<a class="headerlink" href="#learning-path" title="Permanent link">&para;</a></h3>
@@ -8634,9 +8703,9 @@
 <hr />
 <h2 id="support-contribution">Support &amp; Contribution<a class="headerlink" href="#support-contribution" title="Permanent link">&para;</a></h2>
 <h3 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>/help<span class="w">                       </span><span class="c1"># Claude Code help</span>
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>/doctor<span class="w">                     </span><span class="c1"># Check skills/settings for problems</span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>/context<span class="w">                    </span><span class="c1"># See how much context the skill listing uses</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>/help<span class="w">                       </span><span class="c1"># Claude Code help</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>/doctor<span class="w">                     </span><span class="c1"># Check skills/settings for problems</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>/context<span class="w">                    </span><span class="c1"># See how much context the skill listing uses</span>
 </code></pre></div>
 <h3 id="customizing-for-your-team">Customizing for Your Team<a class="headerlink" href="#customizing-for-your-team" title="Permanent link">&para;</a></h3>
 <ol>
@@ -8772,17 +8841,17 @@
 <li><strong>CI/CD</strong>: GitHub Actions, deploying from <code>main</code> (VM over SSH + Helm chart)</li>
 </ul>
 <h3 id="project-specific-commands">Project-Specific Commands<a class="headerlink" href="#project-specific-commands" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Build &amp; run</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./startLocal.sh
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
-<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1"># Tests + coverage (gate: api/.coverage-threshold, currently 90%)</span>
-<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify
-<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>
-<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="c1"># Webapp</span>
-<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="nb">cd</span><span class="w"> </span>webapp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>lint<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npx<span class="w"> </span>vitest<span class="w"> </span>run<span class="w"> </span>--root<span class="w"> </span>.<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>build
-<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>
-<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="c1"># Docker build</span>
-<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>funny-app<span class="w"> </span>.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Build &amp; run</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./startLocal.sh
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Tests + coverage (gate: api/.coverage-threshold, currently 90%)</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="c1"># Webapp</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="nb">cd</span><span class="w"> </span>webapp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>lint<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npx<span class="w"> </span>vitest<span class="w"> </span>run<span class="w"> </span>--root<span class="w"> </span>.<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>build
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="c1"># Docker build</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>funny-app<span class="w"> </span>.
 </code></pre></div>
 <hr />
 <h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>

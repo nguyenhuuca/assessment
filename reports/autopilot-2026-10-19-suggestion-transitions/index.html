@@ -6564,40 +6564,77 @@
 </tbody>
 </table>
 <h2 id="cost">Cost<a class="headerlink" href="#cost" title="Permanent link">&para;</a></h2>
-<p>Prices from the <a href="https://platform.claude.com/docs/en/about-claude/pricing">platform pricing page</a> (read 2026-10-19). Sonnet 5.5: $2 base input, $0.10 cache hit, $10 output per MTok. The Agent results give one total per worker, so each figure is a range:
-- <strong>Low:</strong> every token billed at the cache-hit price.
-- <strong>High:</strong> 90% base input + 10% output.</p>
+<p>Exact figures, computed from the session transcripts with <code>node scripts/claude-cost.mjs --from … --to … --md</code>. The script dedupes every API request and prices it at <a href="https://platform.claude.com/docs/en/about-claude/pricing">API list price</a> (read 2026-10-19). On a Claude subscription this is the equivalent cost, not a bill.</p>
 <table>
 <thead>
 <tr>
-<th>Who</th>
-<th>Tokens</th>
-<th>Low</th>
-<th>High</th>
+<th>who</th>
+<th>model</th>
+<th>requests</th>
+<th>input</th>
+<th>cache write</th>
+<th>cache read</th>
+<th>output</th>
+<th>cost</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Sonnet workers (3 runs)</td>
-<td>142,554</td>
-<td>≈$0.01</td>
-<td>≈$0.40</td>
+<td>main session (orchestrator)</td>
+<td>claude-opus-5-5</td>
+<td>25</td>
+<td>56</td>
+<td>35,570</td>
+<td>5,602,318</td>
+<td>18,493</td>
+<td>$1.78</td>
 </tr>
 <tr>
-<td>Orchestrator (Opus 5.5)</td>
-<td>not measured</td>
-<td>—</td>
-<td>—</td>
+<td>worker-reviewer: Code review transitions refactor</td>
+<td>claude-sonnet-5-5</td>
+<td>4</td>
+<td>8</td>
+<td>39,959</td>
+<td>92,168</td>
+<td>789</td>
+<td>$0.12</td>
+</tr>
+<tr>
+<td>worker-builder: Implement ST-1 and ST-2 refactor</td>
+<td>claude-sonnet-5-5</td>
+<td>12</td>
+<td>24</td>
+<td>53,337</td>
+<td>434,789</td>
+<td>2,414</td>
+<td>$0.20</td>
+</tr>
+<tr>
+<td>worker-reviewer: Review transitions refactor plan</td>
+<td>claude-sonnet-5-5</td>
+<td>4</td>
+<td>10</td>
+<td>45,894</td>
+<td>110,775</td>
+<td>2,579</td>
+<td>$0.15</td>
+</tr>
+<tr>
+<td><strong>TOTAL</strong></td>
+<td></td>
+<td><strong>45</strong></td>
+<td><strong>98</strong></td>
+<td><strong>174,760</strong></td>
+<td><strong>6,240,050</strong></td>
+<td><strong>24,275</strong></td>
+<td><strong>$2.24</strong></td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li>The workers cost <strong>at most ≈$0.40</strong>, about 44% of the first run's upper bound (≈$0.91).</li>
-<li><strong>Why this run was cheaper:</strong></li>
-<li>no explorers;</li>
-<li>one builder instead of two;</li>
-<li>no replan round.</li>
-<li>For the exact session total, run <code>/cost</code> or check the Console usage page.</li>
+<li><strong>Run total $2.24</strong>: orchestrator (Opus 5.5) $1.78 (79%), workers $0.47.</li>
+<li><strong>Cheaper than the first run ($3.76):</strong> no explorers, one builder instead of two, and no replan round.</li>
+<li><strong>Correction (2026-10-19).</strong> The first version of this report estimated the worker cost from the token totals in the Agent results. Those totals miss the repeated cache reads, so the estimate was too low. The figures above replace it.</li>
 </ul>
 <h2 id="ci-and-smoke">CI and Smoke<a class="headerlink" href="#ci-and-smoke" title="Permanent link">&para;</a></h2>
 <ul>

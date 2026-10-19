@@ -6473,6 +6473,7 @@ Handoff to: Builder, QA Engineer
   - <strong>Kept:</strong> Plan review (that plan has not been through a reviewer yet) and Gate 1. Without them, autopilot would just be <code>/swarm-execute</code>.
   - <strong>Scope:</strong> only tasks still <code>[ ]</code> in <code>TASKS.md</code>. Owner-only QA/prod checks are not counted or run.
   - <strong>Refused (→ <code>/swarm-execute</code>):</strong> more than 6 open tasks, any task <code>[~]</code>, or the plan's Status is Done.
+- <strong>D9 — Exact cost (added 2026-10-19).</strong> <code>scripts/claude-cost.mjs</code> prices every API request found in the session transcripts (<code>~/.claude/projects/&lt;project&gt;/&lt;session&gt;.jsonl</code> + <code>subagents/*.jsonl</code>). It dedupes by <code>message.id</code> and uses the cache write 5m/1h split, the Haiku long-prompt tier, fast mode and US-geo. Prices come from <code>scripts/claude-pricing.json</code> (pricing page, read 2026-10-19). It replaces the ≈$ estimate, which was too low because Agent result token totals miss repeated cache reads.
 - <strong>D7 — Gates are never skipped.</strong> Gate 1 (plan) and Gate 2 (push) always use <code>AskUserQuestion</code>. There is no <code>--yes</code> flag. This follows the standing "ask before every push" rule.</p>
 <h2 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h2>
 <table>

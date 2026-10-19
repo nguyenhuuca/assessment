@@ -6622,86 +6622,118 @@
 </table>
 <p>All stages ran on the primary path (Skill tool); no fallback was needed. FE and BE implement ran in parallel, so their minutes overlap.</p>
 <h2 id="cost">Cost<a class="headerlink" href="#cost" title="Permanent link">&para;</a></h2>
-<p>Prices: <a href="https://platform.claude.com/docs/en/about-claude/pricing">platform.claude.com pricing</a>, read 2026-10-19, USD per million tokens.</p>
+<p>Exact figures, computed from the session transcripts with <code>node scripts/claude-cost.mjs --from … --to … --md</code>. The script dedupes every API request and prices it at <a href="https://platform.claude.com/docs/en/about-claude/pricing">API list price</a> (read 2026-10-19). On a Claude subscription this is the equivalent cost, not a bill.</p>
 <table>
 <thead>
 <tr>
-<th>Model</th>
-<th>Base input</th>
-<th>Cache hit</th>
-<th>Output</th>
+<th>who</th>
+<th>model</th>
+<th>requests</th>
+<th>input</th>
+<th>cache write</th>
+<th>cache read</th>
+<th>output</th>
+<th>cost</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Opus 5.5</td>
-<td>$4</td>
-<td>$0.20</td>
-<td>$20</td>
+<td>main session (orchestrator)</td>
+<td>claude-opus-5-5</td>
+<td>44</td>
+<td>108</td>
+<td>69,039</td>
+<td>7,089,321</td>
+<td>27,143</td>
+<td>$2.51</td>
 </tr>
 <tr>
-<td>Sonnet 5.5</td>
-<td>$2</td>
-<td>$0.10</td>
-<td>$10</td>
+<td>worker-builder: Implement SR-FE-1 and SR-FE-2</td>
+<td>claude-sonnet-5-5</td>
+<td>17</td>
+<td>34</td>
+<td>71,105</td>
+<td>867,056</td>
+<td>2,483</td>
+<td>$0.29</td>
 </tr>
 <tr>
-<td>Haiku 5.5 (≤100k prompt)</td>
+<td>worker-reviewer: Code review FE re-review branch</td>
+<td>claude-sonnet-5-5</td>
+<td>3</td>
+<td>6</td>
+<td>36,881</td>
+<td>59,234</td>
+<td>47</td>
 <td>$0.10</td>
-<td>$0.01</td>
+</tr>
+<tr>
+<td>worker-builder: Implement SR-BE-1 and SR-BE-2</td>
+<td>claude-sonnet-5-5</td>
+<td>31</td>
+<td>62</td>
+<td>114,353</td>
+<td>2,065,802</td>
+<td>756</td>
 <td>$0.50</td>
 </tr>
-</tbody>
-</table>
-<p>The Agent results report one total token count per worker, with no input/output/cache split. Each figure below is therefore a <strong>range</strong>:
-- <strong>Low</strong> = every token billed at the cache-hit price.
-- <strong>High</strong> = 90% billed as base input + 10% as output.</p>
-<table>
-<thead>
 <tr>
-<th>Who</th>
-<th>Tokens</th>
-<th>Low</th>
-<th>High</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Haiku explorers</td>
-<td>102,956</td>
-<td>≈$0.001</td>
-<td>≈$0.01</td>
+<td>worker-reviewer: Review suggestion re-review plan</td>
+<td>claude-sonnet-5-5</td>
+<td>10</td>
+<td>26</td>
+<td>47,720</td>
+<td>326,676</td>
+<td>4,678</td>
+<td>$0.20</td>
 </tr>
 <tr>
-<td>Sonnet reviewers (4 runs)</td>
-<td>132,605</td>
-<td>≈$0.01</td>
-<td>≈$0.37</td>
+<td>worker-explorer: Explore backend suggestion flow</td>
+<td>claude-haiku-5-5</td>
+<td>8</td>
+<td>18</td>
+<td>47,835</td>
+<td>258,993</td>
+<td>6,135</td>
+<td>$0.01</td>
 </tr>
 <tr>
-<td>Sonnet builders (2 runs)</td>
-<td>188,213</td>
-<td>≈$0.02</td>
-<td>≈$0.53</td>
+<td>worker-reviewer: Code review BE re-review branch</td>
+<td>claude-sonnet-5-5</td>
+<td>7</td>
+<td>16</td>
+<td>39,838</td>
+<td>225,464</td>
+<td>1,154</td>
+<td>$0.13</td>
 </tr>
 <tr>
-<td><strong>Workers total</strong></td>
-<td><strong>423,774</strong></td>
-<td><strong>≈$0.03</strong></td>
-<td><strong>≈$0.91</strong></td>
+<td>worker-explorer: Explore frontend suggestion UI</td>
+<td>claude-haiku-5-5</td>
+<td>8</td>
+<td>16</td>
+<td>50,974</td>
+<td>262,587</td>
+<td>5,835</td>
+<td>$0.01</td>
 </tr>
 <tr>
-<td>Orchestrator (Opus 5.5, this session)</td>
-<td>not measured by the ledger</td>
-<td>—</td>
-<td>—</td>
+<td><strong>TOTAL</strong></td>
+<td></td>
+<td><strong>128</strong></td>
+<td><strong>286</strong></td>
+<td><strong>477,745</strong></td>
+<td><strong>11,155,133</strong></td>
+<td><strong>48,231</strong></td>
+<td><strong>$3.76</strong></td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li><strong>The workers cost at most about $0.9.</strong> Most of their input is cached context, so the real figure is likely near the low end.</li>
-<li><strong>The ledger does not cover the orchestrator.</strong> It reads plans and diffs, runs the gates and asks at the gates, and is probably the larger share. For the exact session total, run <code>/cost</code> in Claude Code or check the Console usage page.</li>
-<li>For comparison, the run in the screenshot that inspired the skill reported $17.62 for 16 runs.</li>
+<li><strong>Run total $3.76</strong>: orchestrator (Opus 5.5) $2.51 (67%), workers $1.25.</li>
+<li><strong>Cache reads dominate:</strong> 11.2M of the run's tokens are cache reads, against 48k output tokens.</li>
+<li><strong>For comparison:</strong> the run in the screenshot that inspired the skill reported $17.62.</li>
+<li><strong>Correction (2026-10-19).</strong> The first version of this report estimated the worker cost from the token totals in the Agent results. Those totals miss the repeated cache reads, so the estimate was too low. The figures above replace it.</li>
 </ul>
 <h2 id="ci-and-smoke">CI and Smoke<a class="headerlink" href="#ci-and-smoke" title="Permanent link">&para;</a></h2>
 <ul>
@@ -6762,7 +6794,7 @@
 <ul>
 <li><code>worker-builder</code> uses <code>isolation: worktree</code>, so the implement commits landed on worktree branches. They were cherry-picked to <code>main</code> only after code review, which still happened before Gate 2.</li>
 <li>The verdict block parsed without problems in all 4 reviews.</li>
-<li>Reusing the same reviewer for plan review round 2 kept that round cheap (≈7.9k tokens).</li>
+<li>Reusing the same reviewer for plan review round 2 kept both plan-review rounds together at $0.20 (see Cost).</li>
 <li>Change after this run (owner): the run report goes to <code>docs/reports/</code> and the plan is not edited.</li>
 </ul>
 
