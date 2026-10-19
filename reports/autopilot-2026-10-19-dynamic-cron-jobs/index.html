@@ -6363,8 +6363,8 @@ back and fills the rest. The workflow appends the rows under "## Cost" itself; d
 <li><strong>Request:</strong> feature "dynamic cron job management (Mức 2)": DB-backed schedules + admin API + Admin UI tab</li>
 <li><strong>Mode:</strong> local</li>
 <li><strong>Plan:</strong> <a href="../../plans/plan-dynamic-cron-jobs/">plan-dynamic-cron-jobs</a> · <a href="../../adr/0023-dynamic-cron-jobs/">ADR-0023</a></li>
-<li><strong>Started:</strong> 2026-10-19 21:03 · <strong>Landed:</strong> pending (Gate 2)</li>
-<li><strong>Result:</strong> pending Gate 2: committed <code>985ba5b5</code> BE + <code>e7b53b4f</code> FE, not pushed</li>
+<li><strong>Started:</strong> 2026-10-19 21:03 · <strong>Landed:</strong> 2026-10-19 21:45</li>
+<li><strong>Result:</strong> ✅ pushed <code>653af769</code> (<code>985ba5b5</code> BE + <code>e7b53b4f</code> FE + docs)</li>
 </ul>
 <h2 id="pipeline">Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h2>
 <table>
@@ -6423,12 +6423,12 @@ back and fills the rest. The workflow appends the rows under "## Cost" itself; d
 </tr>
 <tr>
 <td>Gate 2 (owner)</td>
-<td>pending</td>
+<td>push</td>
 <td>—</td>
 </tr>
 <tr>
 <td>CI + smoke</td>
-<td>pending: runs after push</td>
+<td>green: Funny App Build and Deploy, Deploy Frontend, Publish Docs · <code>mock-test.sh</code> 22/22 (does not cover <code>/admin/jobs</code> yet)</td>
 <td>—</td>
 </tr>
 </tbody>
@@ -6558,6 +6558,34 @@ back and fills the rest. The workflow appends the rows under "## Cost" itself; d
 <td>—</td>
 <td>—</td>
 <td>5</td>
+<td>—</td>
+<td>opus</td>
+</tr>
+<tr>
+<td>8</td>
+<td>1</td>
+<td>gate 2</td>
+<td>—</td>
+<td>—</td>
+<td>push</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>9</td>
+<td>1</td>
+<td>CI + smoke</td>
+<td>—</td>
+<td>orchestrator</td>
+<td>green · smoke 22/22</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>8</td>
 <td>—</td>
 <td>opus</td>
 </tr>
