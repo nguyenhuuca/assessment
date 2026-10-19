@@ -36,7 +36,7 @@ Start ─▶ Plan ⇄ Plan review ─▶ [GATE 1: you approve plan] ─▶ Imple
 
 | Area | Fact | Impact |
 |------|------|--------|
-| Skills | 15 skills have `disable-model-invocation: true` (incl. `swarm-plan`, `swarm-execute`, `swarm-review`, `qa-engineer`, `land-the-plane`) | The model **cannot** call them through the Skill tool. Autopilot does its own orchestration with `Agent` workers and **reads** those SKILL.md files as the method. It does not chain slash commands |
+| Skills | 15 skills had `disable-model-invocation: true`; the 5 autopilot uses were switched to `false` on 2026-10-19 (owner may flip back any time) | Primary path calls them via the Skill tool; fallback (D1) runs a worker that reads the SKILL.md when the flag is `true` again |
 | Workers | `worker-builder` sonnet/90 turns, `worker-reviewer` sonnet/60, `worker-explorer` haiku/30, `worker-architect` opus/40. None has `Agent` in its tools | The orchestrator is the main session, so there is no nesting (agent-constraints). Model tiering stays in the agent frontmatter |
 | Verdict | `swarm-review` has an Approve / Request Changes framework but no machine-readable output | Add a small verdict contract that the orchestrator can parse (D2) |
 | Landing | AGENTS.md "Landing the Plane": quality gates → commit → **ask** → push → CI → smoke (`./api/mock-test.sh`) | Autopilot Gate 2 = this protocol, reused unchanged |
@@ -45,13 +45,22 @@ Start ─▶ Plan ⇄ Plan review ─▶ [GATE 1: you approve plan] ─▶ Imple
 
 ## Design Decisions
 
-- **D1 — Orchestrate with workers, reference skills.** Each stage prompt tells its worker to follow one existing skill's method:
-  - Plan → `worker-architect` (opus) when the task needs an ADR, otherwise `worker-builder` in plan mode. It follows `swarm-plan`.
-  - Plan review / code review → `worker-reviewer`, following `swarm-review`.
-  - Implement / Fix → `worker-builder`, following `swarm-execute`.
-  - QA specs → `worker-builder`, following `qa-engineer` and the `testing` skill.
+- **D1 — Call skills directly, fall back to workers.** On 2026-10-19 five skills were set to `disable-model-invocation: false` so the orchestrator can call them with the Skill tool: `swarm-plan`, `swarm-review`, `swarm-execute`, `qa-engineer`, `land-the-plane`.
 
-  The rules stay in one place (DRY).
+  | Stage | Primary: Skill tool | Fallback: worker reads the SKILL.md |
+  |-------|---------------------|-------------------------------------|
+  | Plan | `swarm-plan` | `worker-architect` (opus) if an ADR is needed, otherwise `worker-builder` |
+  | Plan review / code review | `swarm-review` | `worker-reviewer` |
+  | Implement / Fix | `swarm-execute` | `worker-builder` |
+  | Local QA specs | `qa-engineer` | `worker-builder` (+ `testing` skill) |
+  | Land | `land-the-plane` | Orchestrator follows AGENTS.md "Landing the Plane" itself |
+
+  **Fallback rule.** The fallback is used for a stage when its skill is unavailable:
+  - the owner set the flag back to `true`;
+  - the Skill tool refuses the call;
+  - the skill is missing.
+
+  The fallback worker gets "Read `.claude/skills/<name>/SKILL.md` and follow its method" plus the stage input, and must end with the same verdict contract (D2). The run ledger records which path each stage used (`skill` / `fallback`), so flipping the flag never breaks a run. Either way, the rules stay in one place (DRY).
 - **D2 — Verdict contract.** Every review worker ends its reply with a fenced block, and the orchestrator parses only that block:
   ```
   VERDICT: approve | revise

@@ -2,7 +2,7 @@
 name: swarm-review
 description: Run an adversarial, multi-perspective code review with root-cause analysis and security focus — a user-invoked Adversarial Reviewer workflow.
 argument-hint: "[branch-name-or-pr-number]"
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # Adversarial Reviewer
