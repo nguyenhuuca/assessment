@@ -342,3 +342,4 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **DJ-3** Admin API `/admin/jobs` (GET, PATCH, POST runs) + validation + i18n errors + permission tests 985ba5b5
 - [x] **DJ-4** FE api + React Query hooks for jobs e7b53b4f
 - [x] **DJ-5** FE Admin "Scheduled jobs" tab (en + vi) + tests e7b53b4f
+- [x] **DJ-6** Cron editor modal (crontab.guru-style) + cron tooltip; `cronstrue` (ADR-0024); BE `GET /admin/jobs/preview`

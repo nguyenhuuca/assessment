@@ -46,6 +46,7 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 | Drag & Drop | @dnd-kit (core + sortable) |
 | HTTP Client | Fetch API (via React Query) |
 | i18n | i18next + react-i18next (ADR-0020) |
+| Cron Text | cronstrue (ADR-0024; validation + next runs stay on the server) |
 | Testing | Vitest + Testing Library |
 | Location | `webapp/` directory |
 | Architecture | SPA with component-based rendering |

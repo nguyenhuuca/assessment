@@ -50,7 +50,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Admin Drive Force Sync** | — | — | — | [Plan 🔄](plans/plan-admin-drive-force-sync.md) | — | 🔄 | `1e961cc` tab DRIVE_SYNC: Drive ↔ local ↔ DB states; ADMIN views, SUPER_ADMIN force-syncs (re-download + upsert, ≤50/run); unique `(source_type, source_id)`; prod E2E pending |
 | **/autopilot skill (dev tooling)** | — | — | — | [Plan ✅](plans/plan-autopilot.md) | — | 🔄 | Built 2026-10-19 (`f8fa31ce`, `d52f6b2e`); QA-1 dry run pending. One skill chains plan → plan review → [you approve] → implement ⇄ review → QA tests ×2 → commit → [you approve push]; round caps 3, run ledger |
 | **Suggestion Re-review** | — | — | — | [Plan ✅](plans/plan-suggestion-rereview.md) | — | ✅ | `6c16388e` BE + `29c1fd94` FE (first /autopilot run). Admin Reopen (REJECTED, or APPROVED with FAILED/CANCELLED job) → Pending; submitter re-review request after rejection (max 2, optional message). SR-QA-1 verified on prod by owner (2026-10-19) |
-| **Dynamic Cron Jobs** | — | [ADR-0023 ✅](adr/0023-dynamic-cron-jobs.md) | — | [Plan ✅](plans/plan-dynamic-cron-jobs.md) | — | ✅ | `985ba5b5` BE + `e7b53b4f` FE (autopilot). Schedules of the 6 AppScheduler jobs in `scheduled_job`; Admin → Scheduled jobs: ADMIN views, SUPER_ADMIN edits cron/zone/enabled or runs now. Prod check pending |
+| **Dynamic Cron Jobs** | — | [ADR-0023 ✅](adr/0023-dynamic-cron-jobs.md) | — | [Plan ✅](plans/plan-dynamic-cron-jobs.md) | — | ✅ | `985ba5b5` BE + `e7b53b4f` FE (autopilot). Schedules of the 6 AppScheduler jobs in `scheduled_job`; Admin → Scheduled jobs: ADMIN views, SUPER_ADMIN edits cron/zone/enabled or runs now. Cron editor modal + tooltip (ADR-0024). Prod check pending |
 | **Headless Autopilot** | — | [0022 ✅](adr/0022-headless-autopilot.md) | — | [Plan ✅](plans/plan-autopilot-headless.md) | — | ✅ | Label `autopilot` on an issue → draft PR with plan → `/approve` → build on the PR branch → owner merges. First run issue #26 → PR #27 merged 2026-10-19 (3 workflow fixes on the way: allowlist, foreground workers, mandatory code review + cost comment) |
 
 ---
@@ -125,6 +125,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0021 | Watch History | ✅ Accepted |
 | 0022 | Headless Autopilot (GitHub Actions) | ✅ Accepted |
 | 0023 | Dynamic Cron Jobs | ✅ Accepted |
+| 0024 | cronstrue for Cron Text | ✅ Accepted |
 
 ---
 
