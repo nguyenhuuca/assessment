@@ -56,6 +56,8 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
           display_report: "true"
+          # -p mode ends the session when the turn ends, so workers must run in the foreground (docs: sub-agents)
+          settings: '{"env":{"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS":"1"}}'
           prompt: >-
             ${{ github.event_name == 'issues'
               && format('/autopilot --headless plan --issue {0}', github.event.issue.number)
@@ -118,6 +120,8 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
           display_report: "true"
+          # -p mode ends the session when the turn ends, so workers must run in the foreground (docs: sub-agents)
+          settings: '{"env":{"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS":"1"}}'
           prompt: ${{ format('/autopilot --headless build --pr {0}', github.event.issue.number) }}
           claude_args: >-
             --max-turns 300

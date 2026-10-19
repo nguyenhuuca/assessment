@@ -67,6 +67,8 @@ Used when `$ARGUMENTS` starts with `--headless`. `.github/workflows/autopilot.ym
 - `session.txt` is not written, because the runner is thrown away; the PR is the record.
 - The ledger lives in the runner's `scratchpad/`. The report (`docs/reports/autopilot-<date>-<slug>.md`) is committed to the PR branch. Its cost comes from `node scripts/claude-cost.mjs --from <job start> --md`, which finds the runner's own transcripts.
 
+**Workers in CI run in the foreground.** The workflow sets `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1`, because in `-p` mode the session ends with the turn and a background worker's result would never arrive. Never end a turn while a worker or command is still running, and never answer "waiting for the review". Every stage must finish within the job.
+
 **Shell use in CI.** Only the commands in the workflow's `--allowedTools` run; anything else is denied, and Claude Code checks each part of a `&&` chain separately.
 - Run one simple command per call.
 - Write files, including PR bodies and comments, with the Write tool, then pass them with `--body-file`.

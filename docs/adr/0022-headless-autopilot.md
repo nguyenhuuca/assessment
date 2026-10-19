@@ -73,6 +73,8 @@ The build and revise jobs also require:
 
 ### D5. Limits
 
+- Workers run in the foreground: `settings: {"env":{"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS":"1"}}`. In `-p` mode the session ends with the turn, so a background worker's result is lost. This was found on the first run for issue #26: the plan job ended "waiting for the review" without a PR.
+
 - Each job has `timeout-minutes: 60`.
 - `concurrency: autopilot` with `cancel-in-progress: false`: one run at a time, others wait.
 - `--max-turns` per job.
