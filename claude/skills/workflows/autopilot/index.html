@@ -6708,6 +6708,13 @@
 - The build job finds the plan with <code>git diff --name-only origin/main...HEAD -- docs/plans/</code>.
 - <code>session.txt</code> is not written, because the runner is thrown away; the PR is the record.
 - The ledger lives in the runner's <code>scratchpad/</code>. The report (<code>docs/reports/autopilot-&lt;date&gt;-&lt;slug&gt;.md</code>) is committed to the PR branch. Its cost comes from <code>node scripts/claude-cost.mjs --from &lt;job start&gt; --md</code>, which finds the runner's own transcripts.</p>
+<p><strong>No stage is optional in CI.</strong> Plan review and <strong>code review</strong> run on every headless run, whatever the diff size: a separate <code>worker-reviewer</code> (or <code>swarm-review</code>) must return a verdict block. "The owner reviews at Gate 2" is <strong>not</strong> a reason to skip one; Gate 2 is in addition to the reviews, not a substitute. The Gate 2 comment lists every stage with its result (plan review verdict, code review verdict, QA ×2 result, gates). Without a code-review <code>approve</code>, do <strong>not</strong> run <code>gh pr ready</code>: comment <code>blocked</code> instead. Found on issue #26: the build job skipped code review because "the diff is tiny".</p>
+<p><strong>Prove the regression test.</strong> For a bug fix, show the new test fails without the fix. Use separate git commands:
+1. <code>git stash push -- &lt;file&gt;</code>
+2. run the test and expect a FAIL
+3. <code>git stash pop</code>
+4. run the test again and expect a PASS</p>
+<p><strong>Cost in CI.</strong> Do not run <code>claude-cost.mjs</code> in CI, because the runner's transcripts are not under the working directory. The workflow posts each job's cost from the action's result as a PR comment. In the report, write "Cost: see the job cost comments on the PR".</p>
 <p><strong>Workers in CI run in the foreground.</strong> The workflow sets <code>CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1</code>, because in <code>-p</code> mode the session ends with the turn and a background worker's result would never arrive. Never end a turn while a worker or command is still running, and never answer "waiting for the review". Every stage must finish within the job.</p>
 <p><strong>Shell use in CI.</strong> Only the commands in the workflow's <code>--allowedTools</code> run; anything else is denied, and Claude Code checks each part of a <code>&amp;&amp;</code> chain separately.
 - Run one simple command per call.
