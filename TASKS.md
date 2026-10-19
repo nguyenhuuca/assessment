@@ -276,3 +276,13 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **AU-4** Run ledger + `session.txt`/TASKS.md updates + summary appended to plan — `d52f6b2e`
 - [x] **AU-5** List `/autopilot` in CLAUDE.md, AGENTS.md pointer — `d52f6b2e`
 - [ ] **QA-1** Dry run (owner types `/autopilot`) on code-health finding #6 (CommentPanel useQuery)
+
+## Feature: Suggestion re-review (2026-10-19, autopilot)
+
+**Plan:** `docs/plans/plan-suggestion-rereview.md`
+
+- [ ] **SR-BE-1** `rereview_count` migration + `reopen` / `requestRereview` service + DTO flags + i18n
+- [ ] **SR-BE-2** `POST /admin/video-suggestions/{id}/reopen`, `POST /suggestions/{id}/rereview`
+- [ ] **SR-FE-1** Admin Đề xuất tab: Reopen button (confirm) when `canReopen`
+- [ ] **SR-FE-2** My suggestions: "Request re-review" on rejected cards (optional message, 2 max)
+- [ ] **SR-QA-1** Owner prod check: reject → user re-review → approve; admin reopen
