@@ -47,3 +47,13 @@ export function useSubmitSuggestion() {
     ]),
   })
 }
+
+
+/** Ask admins to review a rejected suggestion again (optional message, max 300). */
+export function useRequestRereview() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, message }) => suggestionsApi.requestRereview(id, message),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['suggestions'] }),
+  })
+}

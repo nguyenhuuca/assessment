@@ -238,6 +238,12 @@
       "LOW_QUALITY": "Chất lượng thấp",
       "COPYRIGHT": "Bản quyền",
       "OTHER": "Khác"
-    }
+    },
+    "reopen": "Mở lại",
+    "reopenTitle": "Mở lại đề xuất?",
+    "reopenMessage": "\"{{title}}\" sẽ quay về trạng thái chờ duyệt và quyết định trước đó sẽ bị xoá.",
+    "cannotReopen": "Không thể mở lại đề xuất này (import đang chạy hoặc đã xong)",
+    "alreadyPending": "Đề xuất này đang chờ duyệt",
+    "duplicate": "Đã có đề xuất đang chờ hoặc import đang chạy cho liên kết này"
   }
 }

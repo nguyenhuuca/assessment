@@ -55,5 +55,16 @@
   "emptyWatchSearch": "No videos match your search.",
   "loadFailedWatch": "Couldn't load your watch history",
   "badgeWatched": "Watched",
-  "badgeProgress": "Watch progress"
+  "badgeProgress": "Watch progress",
+  "rereviewAction": "Request re-review",
+  "rereviewTitle": "Request re-review",
+  "rereviewHint": "Ask the admins to look at this video again. You can add a message (optional).",
+  "rereviewMessageLabel": "Message (optional)",
+  "rereviewSend": "Send request",
+  "rereviewCancel": "Cancel",
+  "rereviewCount": "Re-review requested {{count}}/{{max}}",
+  "rereviewError": "Couldn't send the request",
+  "rereviewNotRejected": "Only rejected suggestions can be re-reviewed",
+  "rereviewLimit": "You have used all re-review requests for this suggestion",
+  "rereviewDuplicate": "This link is already pending or being imported"
 }

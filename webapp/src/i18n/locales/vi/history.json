@@ -53,5 +53,16 @@
   "emptyWatchSearch": "Không có video nào khớp với tìm kiếm.",
   "loadFailedWatch": "Không tải được lịch sử xem",
   "badgeWatched": "Đã xem",
-  "badgeProgress": "Tiến độ đã xem"
+  "badgeProgress": "Tiến độ đã xem",
+  "rereviewAction": "Yêu cầu duyệt lại",
+  "rereviewTitle": "Yêu cầu duyệt lại",
+  "rereviewHint": "Nhờ admin xem xét lại video này. Bạn có thể kèm lời nhắn (tuỳ chọn).",
+  "rereviewMessageLabel": "Lời nhắn (tuỳ chọn)",
+  "rereviewSend": "Gửi yêu cầu",
+  "rereviewCancel": "Huỷ",
+  "rereviewCount": "Đã yêu cầu duyệt lại {{count}}/{{max}}",
+  "rereviewError": "Không gửi được yêu cầu",
+  "rereviewNotRejected": "Chỉ đề xuất bị từ chối mới được duyệt lại",
+  "rereviewLimit": "Bạn đã dùng hết số lần yêu cầu duyệt lại cho đề xuất này",
+  "rereviewDuplicate": "Liên kết này đang chờ duyệt hoặc đang được import"
 }

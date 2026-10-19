@@ -17,9 +17,11 @@ export const suggestionsApi = {
     ...(note ? { note } : {}),
   }),
   mine: (status = '', page = 0, size = 20) => api.get(`/suggestions/mine${query({ status, page, size })}`),
+  requestRereview: (id, message) => api.post(`/suggestions/${id}/rereview`, message ? { message } : {}),
   // admin
   adminList: (status = '', page = 0, size = 20) => api.get(`/admin/video-suggestions${query({ status, page, size })}`),
   pendingCount: () => api.get('/admin/video-suggestions/pending-count'),
   approve: (id, title) => api.post(`/admin/video-suggestions/${id}/approve`, title ? { title } : {}),
+  reopen: (id) => api.post(`/admin/video-suggestions/${id}/reopen`),
   reject: (id, reason, note) => api.post(`/admin/video-suggestions/${id}/reject`, { reason, ...(note ? { note } : {}) }),
 }

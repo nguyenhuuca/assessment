@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  useAdminSuggestions, useApproveSuggestion, useRejectSuggestion,
+  useAdminSuggestions, useApproveSuggestion, useRejectSuggestion, useReopenSuggestion,
 } from '../../hooks/useAdminSuggestions.js'
+import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { formatDate as formatDateI18n } from '../../i18n/format.js'
 
@@ -10,6 +11,12 @@ const FILTERS = ['PENDING', 'APPROVED', 'REJECTED', 'LIVE']
 const REASONS = ['DUPLICATE', 'INAPPROPRIATE', 'LOW_QUALITY', 'COPYRIGHT', 'OTHER']
 const TITLE_MAX = 200
 const NOTE_MAX = 300
+
+const REOPEN_ERRORS = {
+  'error.suggestion.cannotReopen': 'sugg.cannotReopen',
+  'error.suggestion.alreadyPending': 'sugg.alreadyPending',
+  'error.suggestion.duplicate': 'sugg.duplicate',
+}
 
 function formatDate(s) {
   return s ? formatDateI18n(s, { dateStyle: 'medium', timeStyle: 'short' }) : '—'
@@ -20,6 +27,8 @@ function useErrorText() {
   return err => {
     if (err?.code === 'error.import.disabled') return t('sugg.importDisabled')
     if (err?.code === 'error.suggestion.notPending') return t('sugg.notPending')
+    const key = REOPEN_ERRORS[err?.code]
+    if (key) return t(key)
     return err?.message || t('actionFailed')
   }
 }
@@ -149,6 +158,8 @@ export default function AdminSuggestionTable() {
   const { data, isLoading } = useAdminSuggestions(status === 'ALL' ? null : status, page)
   const approve = useApproveSuggestion()
   const reject = useRejectSuggestion()
+  const reopen = useReopenSuggestion()
+  const [confirm, confirmDialog] = useConfirm()
 
   const pageData = data?.data ?? data ?? {}
   const items = pageData?.content ?? []
@@ -165,8 +176,20 @@ export default function AdminSuggestionTable() {
     })
   }
 
+  async function reopenRow(s) {
+    const ok = await confirm({
+      title: t('sugg.reopenTitle'),
+      message: t('sugg.reopenMessage', { title: s.title || s.sourceUrl }),
+      confirmLabel: t('sugg.reopen'),
+    })
+    if (!ok) return
+    setError('')
+    reopen.mutate({ id: s.id }, { onError: e => setError(errorText(e)) })
+  }
+
   return (
     <div className="admin-table-wrap">
+      {confirmDialog}
       <div className="admin-filters">
         <select
           className="admin-status-select"
@@ -233,6 +256,17 @@ export default function AdminSuggestionTable() {
                               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>block</span>
                             </button>
                           </>
+                        )}
+                        {s.canReopen && (
+                          <button
+                            className="admin-action-btn"
+                            onClick={() => reopenRow(s)}
+                            title={t('sugg.reopen')}
+                            aria-label={t('sugg.reopen')}
+                            aria-busy={isBusyFor(reopen, s.id, v => v?.id)}
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>undo</span>
+                          </button>
                         )}
                       </div>
                     </td>

@@ -32,3 +32,5 @@ export const useApproveSuggestion = () =>
   useSuggestionMutation(({ id, title }) => suggestionsApi.approve(id, title))
 export const useRejectSuggestion = () =>
   useSuggestionMutation(({ id, reason, note }) => suggestionsApi.reject(id, reason, note))
+export const useReopenSuggestion = () =>
+  useSuggestionMutation(({ id }) => suggestionsApi.reopen(id))

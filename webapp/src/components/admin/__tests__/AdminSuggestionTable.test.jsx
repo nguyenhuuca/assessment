@@ -7,7 +7,7 @@ import { suggestionsApi } from '../../../api/suggestions.js'
 import i18n from '../../../i18n/index.js'
 
 vi.mock('../../../api/suggestions.js', () => ({
-  suggestionsApi: { adminList: vi.fn(), approve: vi.fn(), reject: vi.fn(), pendingCount: vi.fn() },
+  suggestionsApi: { adminList: vi.fn(), approve: vi.fn(), reject: vi.fn(), reopen: vi.fn(), pendingCount: vi.fn() },
 }))
 
 const pending = {
@@ -128,5 +128,49 @@ describe('AdminSuggestionTable', () => {
     fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'DUPLICATE' } })
     fireEvent.click(within(dialog).getByRole('button', { name: 'Reject' }))
     expect(await screen.findByText('This suggestion has already been reviewed')).toBeTruthy()
+  })
+
+  describe('reopen', () => {
+    const reopenable = { ...rejected, canReopen: true }
+    const listOf = rows => ({ data: { content: rows, totalPages: 1, totalElements: rows.length } })
+
+    it('shows Reopen only on rows with canReopen', async () => {
+      suggestionsApi.adminList.mockResolvedValue(listOf([pending, reopenable, approved]))
+      renderTable()
+      await screen.findByText('Funny cat')
+      expect(screen.getAllByLabelText('Mở lại')).toHaveLength(1)
+    })
+
+    it('confirms, POSTs reopen and refetches the list', async () => {
+      suggestionsApi.adminList.mockResolvedValue(listOf([reopenable]))
+      suggestionsApi.reopen.mockResolvedValue({ data: {} })
+      renderTable()
+      fireEvent.click(await screen.findByLabelText('Mở lại'))
+      expect(suggestionsApi.reopen).not.toHaveBeenCalled()
+      const calls = suggestionsApi.adminList.mock.calls.length
+      fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Mở lại' }))
+      await waitFor(() => expect(suggestionsApi.reopen).toHaveBeenCalledWith(2))
+      await waitFor(() => expect(suggestionsApi.adminList.mock.calls.length).toBeGreaterThan(calls))
+    })
+
+    it('does nothing when the confirmation is cancelled', async () => {
+      suggestionsApi.adminList.mockResolvedValue(listOf([reopenable]))
+      renderTable()
+      fireEvent.click(await screen.findByLabelText('Mở lại'))
+      const dialog = screen.getByRole('dialog')
+      fireEvent.click(within(dialog).getAllByRole('button').find(b => /Huỷ|Hủy/.test(b.textContent)))
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+      expect(suggestionsApi.reopen).not.toHaveBeenCalled()
+    })
+
+    it('shows the translated 409 error', async () => {
+      await i18n.changeLanguage('en')
+      suggestionsApi.adminList.mockResolvedValue(listOf([reopenable]))
+      suggestionsApi.reopen.mockRejectedValue({ status: 409, code: 'error.suggestion.cannotReopen', message: 'x' })
+      renderTable()
+      fireEvent.click(await screen.findByLabelText('Reopen'))
+      fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Reopen' }))
+      expect(await screen.findByText("This suggestion can't be reopened (its import is running or finished)")).toBeTruthy()
+    })
   })
 })
