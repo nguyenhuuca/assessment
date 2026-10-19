@@ -141,7 +141,7 @@ Show the plan path, the task table, the advisories that were left open, and the 
 ### 3. Local QA ×2 ⇄ Fix (cap 3 rounds)
 
 1. **QA specs:** write or extend tests for the plan's acceptance criteria. List any criterion that cannot be automated; it goes to the summary as a manual check for the owner.
-2. **Run** `scripts/qa-twice.sh --be <changed/added test classes> --fe <changed/added test files>`.
+2. **Run** `bash scripts/qa-twice.sh --be <changed/added test classes> --fe <changed/added test files>`. Always call it through `bash`: a script committed from Windows can lose its exec bit (PR #29 hit `Permission denied`).
    - `exit 0` → stage 4. `flaky` lines go into the ledger and the summary but do not block.
    - `exit 1` → Fix with the `FAIL` lines, then run again.
    - `exit 2` → the run itself broke (compile error, no report). Treat it as a fail and include the log path.
