@@ -318,3 +318,10 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **RM-1** BE `SuggestionDto.maxRereviews` from `SuggestionTransition.MAX_REREVIEWS` + service test
 - [x] **RM-2** FE `SuggestionCard` uses `s.maxRereviews`, drop `REREVIEW_MAX` + test (`1/3` from API)
+
+## Fix: Re-review modal closes on Escape and focuses the message field (2026-10-19, autopilot, issue #30)
+
+**Plan:** `docs/plans/plan-rereview-modal-escape-focus.md`
+
+- [x] **RE-1** `RereviewModal`: Escape closes (not while pending), textarea focused on open (c1d2a550)
+- [x] **RE-2** Tests: Escape closes, Escape while pending keeps open, textarea has focus (c1d2a550)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { relativeTime } from '../../i18n/format.js'
 import SuggestionStatusChip from '../suggestions/SuggestionStatusChip.jsx'
@@ -19,6 +19,18 @@ function RereviewModal({ suggestion, onClose }) {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const rereview = useRequestRereview()
+  const messageRef = useRef(null)
+  const pending = rereview.isPending
+
+  // Focus once on open. Kept apart from the Escape effect: onClose is a new function on
+  // every parent render, so that effect re-runs and would steal focus back to the textarea.
+  useEffect(() => { messageRef.current?.focus() }, [])
+
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape' && !pending) onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose, pending])
 
   function submit() {
     setError('')
@@ -39,6 +51,7 @@ function RereviewModal({ suggestion, onClose }) {
           <label className="app-label" htmlFor={`rereview-msg-${suggestion.id}`}>{t('rereviewMessageLabel')}</label>
           <textarea
             id={`rereview-msg-${suggestion.id}`}
+            ref={messageRef}
             className="app-input"
             rows={3}
             maxLength={MESSAGE_MAX}
