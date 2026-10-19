@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status:** Planned 2026-10-19 (autopilot, headless, issue #32)
+**Status:** Implemented 2026-10-19 (autopilot, headless, issue #32), awaiting Gate 2
 **Author:** nguyenhuuca
 **Date:** 2026-10-19
 **Related plan:** [plan-suggestion-rereview](plan-suggestion-rereview.md) (added re-review), [plan-rereview-max-from-api](plan-rereview-max-from-api.md) (added `maxRereviews` to the DTO)
