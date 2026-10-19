@@ -39,6 +39,8 @@ public class SuggestionDto {
     private Long importJobId;
     /** User re-review requests used so far. */
     private int rereviewCount;
+    /** Re-review requests allowed per suggestion. */
+    private int maxRereviews;
     /** REJECTED and fewer than the allowed re-review requests used. */
     private boolean canRequestRereview;
     /** Admin endpoints only: REJECTED, or APPROVED with a FAILED/CANCELLED import job. */

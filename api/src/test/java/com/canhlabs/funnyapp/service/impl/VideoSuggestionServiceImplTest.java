@@ -11,6 +11,7 @@ import com.canhlabs.funnyapp.enums.ImportStatus;
 import com.canhlabs.funnyapp.enums.SuggestionFilter;
 import com.canhlabs.funnyapp.enums.SuggestionRejectReason;
 import com.canhlabs.funnyapp.enums.SuggestionStatus;
+import com.canhlabs.funnyapp.enums.SuggestionTransition;
 import com.canhlabs.funnyapp.event.SuggestionReviewedEvent;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.SuggestionLiveRef;
@@ -826,6 +827,17 @@ class VideoSuggestionServiceImplTest {
         assertThat(content.get(1).isCanRequestRereview()).isFalse();
         assertThat(content).allSatisfy(d -> assertThat(d.isCanReopen()).isFalse());
         verify(jobRepository, never()).findAllById(any());
+    }
+
+    @Test
+    void mine_rejected_exposesMaxRereviewsFromTransition() {
+        when(repository.findByUserId(eq(USER), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(rejected(1, 1))));
+
+        SuggestionDto dto = service.mine(USER, null, 0, 20).getContent().get(0);
+
+        assertThat(dto.getRereviewCount()).isEqualTo(1);
+        assertThat(dto.getMaxRereviews()).isEqualTo(SuggestionTransition.MAX_REREVIEWS).isEqualTo(2);
     }
 
     @Test
