@@ -51,6 +51,26 @@ describe('AdminSuggestionTable', () => {
     expect(screen.getAllByLabelText('Duyệt')).toHaveLength(1)
   })
 
+  it('shows a re-review badge with count/max (vi)', async () => {
+    suggestionsApi.adminList.mockResolvedValue({ data: { content: [{ ...pending, rereviewCount: 1, maxRereviews: 2 }], totalPages: 1, totalElements: 1 } })
+    renderTable()
+    expect(await screen.findByText('Yêu cầu review lại 1/2')).toBeTruthy()
+  })
+
+  it('shows a re-review badge with count/max (en)', async () => {
+    await i18n.changeLanguage('en')
+    suggestionsApi.adminList.mockResolvedValue({ data: { content: [{ ...pending, rereviewCount: 1, maxRereviews: 2 }], totalPages: 1, totalElements: 1 } })
+    renderTable()
+    expect(await screen.findByText('Re-review 1/2')).toBeTruthy()
+  })
+
+  it('shows no re-review badge when the count is 0 or missing', async () => {
+    suggestionsApi.adminList.mockResolvedValue({ data: { content: [{ ...pending, rereviewCount: 0, maxRereviews: 2 }, rejected, approved], totalPages: 1, totalElements: 3 } })
+    renderTable()
+    await screen.findByText('Funny cat')
+    expect(screen.queryByText(/review lại/)).toBeNull()
+  })
+
   it('status filter changes the query', async () => {
     renderTable()
     await screen.findByText('Funny cat')

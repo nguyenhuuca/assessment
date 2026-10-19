@@ -325,3 +325,10 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **RE-1** `RereviewModal`: Escape closes (not while pending), textarea focused on open (c1d2a550)
 - [x] **RE-2** Tests: Escape closes, Escape while pending keeps open, textarea has focus (c1d2a550)
+
+## Feature: Admin suggestions mark re-review requests (2026-10-19, autopilot, issue #32)
+
+**Plan:** `docs/plans/plan-admin-rereview-badge.md`
+
+- [x] **RR-1** `AdminSuggestionTable` `StatusCell` shows a "Re-review n/max" badge when `rereviewCount > 0`; i18n key `sugg.rereviewBadge` (en + vi) fb67d234
+- [x] **RR-2** Tests: badge with count/max (vi + en), no badge when 0 or missing fb67d234

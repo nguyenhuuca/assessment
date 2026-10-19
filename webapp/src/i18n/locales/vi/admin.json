@@ -242,6 +242,7 @@
     "reopen": "Mở lại",
     "reopenTitle": "Mở lại đề xuất?",
     "reopenMessage": "\"{{title}}\" sẽ quay về trạng thái chờ duyệt và quyết định trước đó sẽ bị xoá.",
+    "rereviewBadge": "Yêu cầu review lại {{count}}/{{max}}",
     "cannotReopen": "Không thể mở lại đề xuất này (import đang chạy hoặc đã xong)",
     "alreadyPending": "Đề xuất này đang chờ duyệt",
     "duplicate": "Đã có đề xuất đang chờ hoặc import đang chạy cho liên kết này"
