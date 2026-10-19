@@ -291,5 +291,5 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **Plan:** `docs/plans/plan-suggestion-transitions.md`
 
-- [ ] **ST-1** `enums/SuggestionTransition` (+ `Refusal`) with table test
-- [ ] **ST-2** `VideoSuggestionServiceImpl` uses it; existing tests unchanged and green
+- [x] **ST-1** `enums/SuggestionTransition` (+ `Refusal`) with table test — `08f16414`
+- [x] **ST-2** `VideoSuggestionServiceImpl` uses it; existing tests unchanged and green — `08f16414`

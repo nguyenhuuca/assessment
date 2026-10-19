@@ -9,7 +9,7 @@ Handoff to: Builder
 
 ## Overview
 
-**Status:** Planned 2026-10-19 (autopilot run)
+**Status:** Built 2026-10-19 (autopilot) · `08f16414`
 **Author:** nguyenhuuca
 **Date:** 2026-10-19
 **Related plan:** [plan-suggestion-rereview](plan-suggestion-rereview.md) (added reopen + rereview, which spread the rules out)
