@@ -309,5 +309,5 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **Plan:** `docs/plans/plan-reopen-button-disable.md`
 
-- [ ] **RB-1** Reopen row button `disabled` while its request is pending
-- [ ] **RB-2** Test: disabled + aria-busy while pending, one request on double click
+- [x] **RB-1** Reopen row button `disabled` while its request is pending
+- [x] **RB-2** Test: disabled + aria-busy while pending, one request on double click

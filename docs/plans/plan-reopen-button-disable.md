@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status:** Planned 2026-10-19 (autopilot, headless, issue #26)
+**Status:** Done 2026-10-19 (autopilot, headless, issue #26)
 **Author:** nguyenhuuca
 **Date:** 2026-10-19
 **Related plan:** [plan-suggestion-rereview](plan-suggestion-rereview.md) (added the Reopen button)

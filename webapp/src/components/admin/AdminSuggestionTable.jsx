@@ -177,6 +177,7 @@ export default function AdminSuggestionTable() {
   }
 
   async function reopenRow(s) {
+    if (reopen.isPending) return
     const ok = await confirm({
       title: t('sugg.reopenTitle'),
       message: t('sugg.reopenMessage', { title: s.title || s.sourceUrl }),
@@ -263,6 +264,7 @@ export default function AdminSuggestionTable() {
                             onClick={() => reopenRow(s)}
                             title={t('sugg.reopen')}
                             aria-label={t('sugg.reopen')}
+                            disabled={isBusyFor(reopen, s.id, v => v?.id)}
                             aria-busy={isBusyFor(reopen, s.id, v => v?.id)}
                           >
                             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>undo</span>
