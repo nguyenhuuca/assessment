@@ -23,6 +23,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -72,6 +73,25 @@ class AdminJobControllerPermissionTest {
         mockMvc.perform(get(JOBS_URL).with(authentication(principal(UserRole.ADMIN))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].name").value("log-stats"));
+    }
+
+    @Test
+    void preview_admin_returns200WithRuns() throws Exception {
+        when(scheduledJobService.preview("0 0 3 * * *", "UTC", 5)).thenReturn(List.of(
+                Instant.parse("2026-10-20T03:00:00Z"), Instant.parse("2026-10-21T03:00:00Z")));
+
+        mockMvc.perform(get(JOBS_URL + "/preview").param("cron", "0 0 3 * * *").param("zone", "UTC")
+                        .with(authentication(principal(UserRole.ADMIN))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(2));
+    }
+
+    @Test
+    void preview_user_returns403() throws Exception {
+        mockMvc.perform(get(JOBS_URL + "/preview").param("cron", "0 0 3 * * *")
+                        .with(authentication(principal(UserRole.USER))))
+                .andExpect(status().isForbidden());
+        verifyNoMoreInteractions(scheduledJobService);
     }
 
     @Test

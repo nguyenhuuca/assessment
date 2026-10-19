@@ -16,6 +16,7 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,6 +26,7 @@ public class ScheduledJobServiceImpl implements ScheduledJobService {
 
     static final int MAX_CRON_LENGTH = 64;
     static final int MAX_ZONE_LENGTH = 64;
+    static final int MAX_PREVIEW = 10;
     /** Seconds must be one number, so a job runs at most once per minute. */
     private static final Pattern SECONDS = Pattern.compile("[0-5]?\\d");
 
@@ -66,6 +68,23 @@ public class ScheduledJobServiceImpl implements ScheduledJobService {
         // a throw here rolls the row back, so the DB and the live schedule stay the same
         scheduler.reschedule(saved);
         return toDto(saved);
+    }
+
+    @Override
+    public List<Instant> preview(String cron, String zone, int count) {
+        if (cron == null) {
+            throw CustomException.of(HttpStatus.BAD_REQUEST, 400, "error.job.invalidCron");
+        }
+        validateCron(cron);
+        ZoneId zoneId = zone == null || zone.isEmpty() ? ZoneId.systemDefault() : ZoneId.of(validateZone(zone));
+        CronExpression expression = CronExpression.parse(cron);
+        List<Instant> runs = new ArrayList<>();
+        ZonedDateTime next = ZonedDateTime.now(zoneId);
+        while (runs.size() < Math.clamp(count, 1, MAX_PREVIEW)
+                && (next = expression.next(next)) != null) {
+            runs.add(next.toInstant());
+        }
+        return runs;
     }
 
     @Override

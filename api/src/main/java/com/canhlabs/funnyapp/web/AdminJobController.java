@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Instant;
 
 /** ADMIN can view the scheduled jobs; only SUPER_ADMIN can change a schedule or run a job now. */
 @RestController
@@ -41,6 +44,17 @@ public class AdminJobController {
     public ResponseEntity<ResultListInfo<ScheduledJobDto>> list() {
         return ResponseEntity.ok(ResultListInfo.<ScheduledJobDto>builder()
                 .status(ResultStatus.SUCCESS).data(scheduledJobService.list()).build());
+    }
+
+    /** Next runs for the cron editor; read-only, so ADMIN may call it. Called debounced while typing. */
+    @GetMapping("/preview")
+    @HasPermission(perm = Permission.ADMIN)
+    @RateLimited(permit = 60)
+    public ResponseEntity<ResultListInfo<Instant>> preview(@RequestParam String cron,
+                                                           @RequestParam(required = false) String zone,
+                                                           @RequestParam(defaultValue = "5") int count) {
+        return ResponseEntity.ok(ResultListInfo.<Instant>builder()
+                .status(ResultStatus.SUCCESS).data(scheduledJobService.preview(cron, zone, count)).build());
     }
 
     @PatchMapping("/{name}")

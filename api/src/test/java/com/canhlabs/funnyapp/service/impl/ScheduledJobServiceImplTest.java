@@ -16,7 +16,9 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,6 +113,38 @@ class ScheduledJobServiceImplTest {
         List<ScheduledJobDto> dtos = service.list();
 
         assertThat(dtos).hasSize(2).allSatisfy(d -> assertThat(d.getNextRunAt()).isNull());
+    }
+
+    @Test
+    void preview_returnsNextRunsInOrder() {
+        List<Instant> runs = service.preview("0 30 3 * * *", "Asia/Ho_Chi_Minh", 3);
+
+        assertThat(runs).hasSize(3).isSorted();
+        assertThat(Duration.between(runs.get(0), runs.get(1))).isEqualTo(Duration.ofDays(1));
+        assertThat(runs.get(0).atZone(ZoneId.of("Asia/Ho_Chi_Minh")).getHour()).isEqualTo(3);
+    }
+
+    @Test
+    void preview_countIsClampedAndImpossibleDateIsEmpty() {
+        assertThat(service.preview("0 */15 * * * *", null, 500)).hasSize(ScheduledJobServiceImpl.MAX_PREVIEW);
+        assertThat(service.preview("0 */15 * * * *", "", 0)).hasSize(1);
+        assertThat(service.preview("0 0 3 30 2 *", null, 5)).isEmpty();
+    }
+
+    @Test
+    void preview_appliesTheUpdateRules() {
+        assertPreviewRejected(null, null, "error.job.invalidCron");
+        assertPreviewRejected("nope", null, "error.job.invalidCron");
+        assertPreviewRejected("* * * * * *", null, "error.job.tooFrequent");
+        assertPreviewRejected("0 0 3 * * *", "Mars/Olympus", "error.job.invalidZone");
+    }
+
+    private void assertPreviewRejected(String cron, String zone, String key) {
+        assertThatThrownBy(() -> service.preview(cron, zone, 5))
+                .isInstanceOfSatisfying(CustomException.class, e -> {
+                    assertThat(e.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+                    assertThat(e.getMessageKey()).isEqualTo(key);
+                });
     }
 
     @Test
