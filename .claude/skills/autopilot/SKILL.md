@@ -97,11 +97,7 @@ Show the plan path, the task table, the advisories that were left open, and the 
 
 ## Ledger (D5)
 
-File: `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md`. Append one row per stage run:
-
-```
-| # | stage | round | path | verdict / result | blocking | advisory | turns | min | tokens | ≈$ |
-```
+File: `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md`, started from `resources/ledger.template.md`. Append one row per stage run (columns and rules are in the template).
 
 - `turns` / `tokens` / `min` come from each Agent result's usage. For a primary-path stage, add up the workers it spawned, plus the orchestrator's wall time.
 - `≈$` is an estimate: tokens × the model's list price. Always show it with "≈" and never present it as billed cost.
