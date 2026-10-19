@@ -137,7 +137,7 @@ jobs:
           prompt: ${{ format('/autopilot --headless build --pr {0}', github.event.issue.number) }}
           claude_args: >-
             --max-turns 300
-            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(mvn:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(./scripts/qa-twice.sh:*),Bash(scripts/qa-twice.sh:*),Bash(bash scripts/qa-twice.sh:*),Bash(/home/runner/work/assessment/assessment/scripts/qa-twice.sh:*),Bash(cd:*),Bash(pwd:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(sort:*),Bash(cut:*),Bash(tr:*),Bash(test:*),Bash(echo:*),Bash(printf:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*),Bash(mv:*),Bash(basename:*),Bash(dirname:*)"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(mvn:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(./scripts/qa-twice.sh:*),Bash(scripts/qa-twice.sh:*),Bash(bash scripts/qa-twice.sh:*),Bash(/home/runner/work/assessment/assessment/scripts/qa-twice.sh:*),Bash(bash /home/runner/work/assessment/assessment/scripts/qa-twice.sh:*),Bash(cd:*),Bash(pwd:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(sort:*),Bash(cut:*),Bash(tr:*),Bash(test:*),Bash(echo:*),Bash(printf:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*),Bash(mv:*),Bash(basename:*),Bash(dirname:*)"
       - name: Post the run cost and add it to the report
         if: always() && steps.claude.outputs.execution_file != ''
         # Runs the script from main, not the PR branch: a headless run must not change what runs here.

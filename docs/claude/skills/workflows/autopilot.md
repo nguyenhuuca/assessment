@@ -83,7 +83,8 @@ Used when `$ARGUMENTS` starts with `--headless`. `.github/workflows/autopilot.ym
 **Shell use in CI.** Only the commands in the workflow's `--allowedTools` run; anything else is denied, and Claude Code checks each part of a `&&` chain separately.
 - Run one simple command per call.
 - Write files, including PR bodies and comments, with the Write tool, then pass them with `--body-file`.
-- Prefer `git -C <dir>` and `gh` flags over `cd`.
+- **Never `cd`; stay in the repo root.** Use `git -C <dir>`, `npm --prefix webapp run <script>`, `mvn -f api/pom.xml <goal>`, and `bash scripts/qa-twice.sh` with paths relative to the root. Claude Code asks for approval on `cd <dir> && git …`, which CI cannot give, and a changed directory leads to path forms the allowlist does not match (issue #32: `bash /home/runner/…/qa-twice.sh` was denied).
+- When reporting a denied command, quote it exactly as it was sent.
 - If a command is denied, do not retry variations. Post a comment naming the denied command and stop.
 
 **Stop conditions** (round cap, red gate, denylist, refused input): comment the reason on the PR (or on the issue if no PR exists yet), push nothing further, and exit.
@@ -150,7 +151,7 @@ Show the plan path, the task table, the advisories that were left open, and the 
 
 ### 4. Land → Gate 2 → CI + smoke
 
-1. Run the full quality gates once: `mvn verify` in `api/` (coverage ≥ `api/.coverage-threshold`), then `npm run test` and `npm run lint` in `webapp/`, for whichever side changed.
+1. Run the full quality gates once, for whichever side changed: `mvn -f api/pom.xml verify` (coverage ≥ `api/.coverage-threshold`), then `npm --prefix webapp run test` and `npm --prefix webapp run lint`.
 2. Commit with explicit pathspecs. Flip the `TASKS.md` lines to `[x]` with the hash and update `docs/tracking.md` when the plan status changes.
 3. **Gate 2:** show the commits, the gate results, the flaky list, the manual checks, and the ledger total. Ask with `AskUserQuestion`: **Push / Don't push yet**. There is no auto-push and no `--yes`.
 4. **After a push:**
