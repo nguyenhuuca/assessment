@@ -132,6 +132,11 @@ function StatusCell({ s }) {
   return (
     <>
       <span className={`admin-badge ${cls}`}>{t(`status.${s.status}`, { defaultValue: s.status })}</span>
+      {s.rereviewCount > 0 && (
+        <div className="admin-cell-muted">
+          <span className="admin-badge pending">{t('sugg.rereviewBadge', { count: s.rereviewCount, max: s.maxRereviews })}</span>
+        </div>
+      )}
       {s.status === 'REJECTED' && s.rejectReason && (
         <div className="admin-cell-muted" title={s.rejectNote || undefined}>
           {t(`sugg.reasons.${s.rejectReason}`, { defaultValue: s.rejectReason })}

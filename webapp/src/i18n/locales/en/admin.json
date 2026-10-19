@@ -251,6 +251,7 @@
     "reopen": "Reopen",
     "reopenTitle": "Reopen suggestion?",
     "reopenMessage": "\"{{title}}\" will go back to Pending and the previous decision will be cleared.",
+    "rereviewBadge": "Re-review {{count}}/{{max}}",
     "cannotReopen": "This suggestion can't be reopened (its import is running or finished)",
     "alreadyPending": "This suggestion is already pending",
     "duplicate": "Another pending suggestion or active import already exists for this link"
