@@ -1,8 +1,8 @@
-task: Code health audit + fixes (comments login-only, admin UI polish)
-status: done
-progress: 100
-done: Audit report 0183aada; CH-1..5 fixes 40fe60b6; CH-6 login-only comments ae2d3e61; Admin filter bar sizes 9795bd76; Watched badge light theme e4fc888a
+task: /autopilot skill (plan → review → build → QA ×2 → land)
+status: in_progress
+progress: 50
+done: Plan 9e2fab5d; 5 skills model-invocable 32d0f45c; AU-1 SKILL.md f8fa31ce; AU-3 qa-twice.sh f8fa31ce
 doing: -
-next: QA-1 owner: logged-in comment create + delete on prod; open findings #6-#8 in docs/reports/code-health-2026-10-18.md
-plan: docs/reports/code-health-2026-10-18.md
-updated: 2026-10-18 21:52
+next: AU-2 resources/verdict.md; AU-4 ledger check; AU-5 CLAUDE.md/AGENTS.md; QA-1 dry run
+plan: docs/plans/plan-autopilot.md
+updated: 2026-10-19 09:18

@@ -9,7 +9,7 @@ Handoff to: Builder, QA Engineer
 
 ## Overview
 
-**Status:** Planned 2026-10-19
+**Status:** In progress 2026-10-19 · AU-1, AU-3 `f8fa31ce`
 **Author:** nguyenhuuca
 **Date:** 2026-10-19
 **ADR:** none. This is dev tooling inside `.claude/`, it changes no app code or stored data, and deleting the skill folder undoes it (`swarm-plan` Artifact Requirements). The existing skills, agents, and the "ask before push" rule stay as they are.
