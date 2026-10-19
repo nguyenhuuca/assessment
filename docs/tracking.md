@@ -48,7 +48,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Admin Video Import (YouTube / Facebook → Drive)** | [PRD ✅](prd/PRD-admin-video-import.md) | [0019 ✅](adr/0019-admin-video-import.md) | — | [Plan ✅](plans/plan-admin-video-import.md) | — | ✅ | `795ec5e` yt-dlp → Drive (OAuth uploader) → existing cron ingests; bulk ≤20, run now / 5-min schedule slots, polling progress; `d9bddd9` FB reels; [setup guide](guides/video-import-setup-vi.md); verified on prod 2026-10-11 |
 | **Drive Sync Time Filter** | — | — | — | [Plan ✅](plans/plan-drive-sync-time-filter.md) | — | ✅ | `cc7f8f2b` BE + `ad0adc82`/`31f01e86` FE. DRIVE_SYNC tab: server-side filter on Drive created time (`GET /files?from&to`), default last 12 h, presets 1h/12h/24h/7d/30d, All, custom from/to (VN time); orphans only under All. QA-1 verified on prod by owner (2026-10-18) |
 | **Admin Drive Force Sync** | — | — | — | [Plan 🔄](plans/plan-admin-drive-force-sync.md) | — | 🔄 | `1e961cc` tab DRIVE_SYNC: Drive ↔ local ↔ DB states; ADMIN views, SUPER_ADMIN force-syncs (re-download + upsert, ≤50/run); unique `(source_type, source_id)`; prod E2E pending |
-| **/autopilot skill (dev tooling)** | — | — | — | [Plan 📋](plans/plan-autopilot.md) | — | 📋 | Planned 2026-10-19. One skill chains plan → plan review → [you approve] → implement ⇄ review → QA tests ×2 → commit → [you approve push]; round caps 3, run ledger |
+| **/autopilot skill (dev tooling)** | — | — | — | [Plan ✅](plans/plan-autopilot.md) | — | 🔄 | Built 2026-10-19 (`f8fa31ce`, `d52f6b2e`); QA-1 dry run pending. One skill chains plan → plan review → [you approve] → implement ⇄ review → QA tests ×2 → commit → [you approve push]; round caps 3, run ledger |
 
 ---
 
@@ -74,7 +74,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [i18n Vietnamese + English](plans/plan-i18n.md)
 - [Drive Sync Time Filter](plans/plan-drive-sync-time-filter.md)
 
-### 🔄 In Progress (2)
+### 🔄 In Progress (3)
+- [/autopilot skill](plans/plan-autopilot.md)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
 - [Admin Drive Force Sync](plans/plan-admin-drive-force-sync.md)
 
@@ -87,8 +88,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [File-based Hooks](plans/plan-a-file-based-hooks.md)
 - [Bookmark Feature](plans/plan-bookmark-feature.md)
 
-### 💡 Proposed / No Plan Yet (1)
-- [/autopilot skill](plans/plan-autopilot.md) — planned, not started
+### 💡 Proposed / No Plan Yet (0)
+- —
 
 ---
 
@@ -120,4 +121,4 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 
 ---
 
-*Last updated: 2026-10-19 — /autopilot skill planned; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod*
+*Last updated: 2026-10-19 — /autopilot skill built (dry run pending); ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod*

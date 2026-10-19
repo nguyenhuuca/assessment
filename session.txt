@@ -1,8 +1,9 @@
 task: /autopilot skill (plan → review → build → QA ×2 → land)
-status: in_progress
-progress: 50
-done: Plan 9e2fab5d; 5 skills model-invocable 32d0f45c; AU-1 SKILL.md f8fa31ce; AU-3 qa-twice.sh f8fa31ce
+status: blocked
+progress: 90
+done: Plan 9e2fab5d; 5 skills model-invocable 32d0f45c; AU-1 SKILL.md f8fa31ce; AU-3 qa-twice.sh f8fa31ce; AU-2/4/5 verdict, ledger, docs d52f6b2e
 doing: -
-next: AU-2 resources/verdict.md; AU-4 ledger check; AU-5 CLAUDE.md/AGENTS.md; QA-1 dry run
+next: QA-1 owner types /autopilot for code-health finding #6 (CommentPanel useQuery)
+blocker: QA-1 needs the owner to start /autopilot (user-invoked only)
 plan: docs/plans/plan-autopilot.md
-updated: 2026-10-19 09:18
+updated: 2026-10-19 09:21
