@@ -9,6 +9,8 @@ import com.canhlabs.funnyapp.enums.ImportStatus;
 import com.canhlabs.funnyapp.enums.SuggestionFilter;
 import com.canhlabs.funnyapp.enums.SuggestionRejectReason;
 import com.canhlabs.funnyapp.enums.SuggestionStatus;
+import com.canhlabs.funnyapp.enums.SuggestionTransition;
+import com.canhlabs.funnyapp.enums.SuggestionTransition.Refusal;
 import com.canhlabs.funnyapp.event.SuggestionReviewedEvent;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.SuggestionLiveRef;
@@ -41,6 +43,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -49,10 +52,6 @@ import java.util.function.Supplier;
 public class VideoSuggestionServiceImpl implements VideoSuggestionService {
 
     static final int MAX_PAGE_SIZE = 50;
-    /** User re-review requests allowed per suggestion. */
-    static final int MAX_REREVIEWS = 2;
-    /** An approved suggestion can be reopened only when its import job ended in one of these. */
-    static final Set<ImportStatus> REOPENABLE_JOB_STATUSES = Set.of(ImportStatus.FAILED, ImportStatus.CANCELLED);
     static final Duration LIMIT_WINDOW = Duration.ofHours(24);
     /** An import job in one of these states already covers the URL. */
     static final List<ImportStatus> BLOCKING_IMPORT_STATUSES = blockingStatuses();
@@ -61,12 +60,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
     static final String KEY_DUPLICATE = "error.suggestion.duplicate";
     static final String KEY_DAILY_LIMIT = "error.suggestion.dailyLimit";
     static final String KEY_NOT_FOUND = "error.suggestion.notFound";
-    static final String KEY_NOT_PENDING = "error.suggestion.notPending";
     static final String KEY_NOTE_REQUIRED = "error.suggestion.noteRequired";
-    static final String KEY_ALREADY_PENDING = "error.suggestion.alreadyPending";
-    static final String KEY_CANNOT_REOPEN = "error.suggestion.cannotReopen";
-    static final String KEY_NOT_REJECTED = "error.suggestion.notRejected";
-    static final String KEY_REREVIEW_LIMIT = "error.suggestion.rereviewLimit";
     static final String KEY_IMPORT_DISABLED = "error.import.disabled";
     static final String KEY_IMPORT_DUPLICATE = "error.import.duplicateActive";
     static final String KEY_IMPORT_INVALID_URL = "error.import.invalidUrl";
@@ -169,7 +163,8 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         Map<Long, String> names = suggesterNames(result.getContent());
         Map<Long, ImportStatus> jobStatuses = jobStatuses(result.getContent());
         return result.map(s -> toDto(s, live.get(s.getId()), names.get(s.getUserId()), true,
-                canReopen(s, jobStatuses.get(s.getImportJobId()))));
+                SuggestionTransition.REOPEN.allowed(s.getStatus(), jobStatuses.get(s.getImportJobId()),
+                        s.getRereviewCount())));
     }
 
     @Override
@@ -183,7 +178,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
             throw error(HttpStatus.SERVICE_UNAVAILABLE, 4100, KEY_IMPORT_DISABLED);
         }
         SuggestionDto dto = inTx(() -> {
-            VideoSuggestion s = lockPending(id);
+            VideoSuggestion s = lockPending(id, SuggestionTransition.APPROVE);
             String override = blankToNull(TitleSanitizer.sanitize(titleOverride));
             if (override != null) {
                 s.setTitle(override);
@@ -208,7 +203,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
             throw error(HttpStatus.BAD_REQUEST, 4001, KEY_NOTE_REQUIRED);
         }
         return inTx(() -> {
-            VideoSuggestion s = lockPending(id);
+            VideoSuggestion s = lockPending(id, SuggestionTransition.REJECT);
             s.setStatus(SuggestionStatus.REJECTED);
             s.setRejectReason(reason);
             s.setRejectNote(cleanNote);
@@ -225,17 +220,11 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
         return inTx(() -> {
             VideoSuggestion s = repository.findByIdForUpdate(id)
                     .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4042, KEY_NOT_FOUND));
-            if (s.getStatus() == SuggestionStatus.PENDING) {
-                throw error(HttpStatus.CONFLICT, 4095, KEY_ALREADY_PENDING);
-            }
-            if (s.getStatus() == SuggestionStatus.APPROVED) {
-                // the job row is locked, then its status re-read under the lock: a racing retry cannot slip in
-                ImportStatus jobStatus = s.getImportJobId() == null ? null
-                        : jobRepository.findLockedById(s.getImportJobId()).map(j -> j.getStatus()).orElse(null);
-                if (jobStatus == null || !REOPENABLE_JOB_STATUSES.contains(jobStatus)) {
-                    throw error(HttpStatus.CONFLICT, 4096, KEY_CANNOT_REOPEN);
-                }
-            }
+            // the job row is locked, then its status re-read under the lock: a racing retry cannot slip in
+            ImportStatus jobStatus = s.getStatus() == SuggestionStatus.APPROVED && s.getImportJobId() != null
+                    ? jobRepository.findLockedById(s.getImportJobId()).map(j -> j.getStatus()).orElse(null)
+                    : null;
+            refuse(SuggestionTransition.REOPEN.check(s.getStatus(), jobStatus, s.getRereviewCount()));
             requireNoDuplicate(s.getNormalizedUrl());
             s.setStatus(SuggestionStatus.PENDING);
             s.setRejectReason(null);
@@ -259,7 +248,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
             requireNoDuplicate(s.getNormalizedUrl());
             int updated;
             try {
-                updated = repository.requestRereview(id, userId, cleanMessage, MAX_REREVIEWS, Instant.now());
+                updated = repository.requestRereview(id, userId, cleanMessage, SuggestionTransition.MAX_REREVIEWS, Instant.now());
             } catch (DataIntegrityViolationException e) {
                 throw duplicate();
             }
@@ -276,22 +265,21 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
 
     // ── helpers ─────────────────────────────────────────────────────────────────
 
-    private VideoSuggestion lockPending(Long id) {
+    private VideoSuggestion lockPending(Long id, SuggestionTransition transition) {
         VideoSuggestion s = repository.findByIdForUpdate(id)
                 .orElseThrow(() -> error(HttpStatus.NOT_FOUND, 4042, KEY_NOT_FOUND));
-        if (s.getStatus() != SuggestionStatus.PENDING) {
-            throw error(HttpStatus.CONFLICT, 4093, KEY_NOT_PENDING);
-        }
+        refuse(transition.check(s.getStatus(), null, s.getRereviewCount()));
         return s;
     }
 
     private static void requireRereviewable(VideoSuggestion s) {
-        if (s.getStatus() != SuggestionStatus.REJECTED) {
-            throw error(HttpStatus.CONFLICT, 4097, KEY_NOT_REJECTED);
-        }
-        if (s.getRereviewCount() >= MAX_REREVIEWS) {
-            throw error(HttpStatus.CONFLICT, 4098, KEY_REREVIEW_LIMIT);
-        }
+        refuse(SuggestionTransition.REREVIEW.check(s.getStatus(), null, s.getRereviewCount()));
+    }
+
+    private static void refuse(Optional<Refusal> refusal) {
+        refusal.ifPresent(r -> {
+            throw error(r.status(), r.subCode(), r.messageKey());
+        });
     }
 
     /** Same rule as submit: another pending suggestion, or an import job that already covers the URL. */
@@ -309,12 +297,6 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
             // lost the race against the partial unique index on pending normalized_url
             throw duplicate();
         }
-    }
-
-    private static boolean canReopen(VideoSuggestion s, ImportStatus jobStatus) {
-        return s.getStatus() == SuggestionStatus.REJECTED
-                || (s.getStatus() == SuggestionStatus.APPROVED && jobStatus != null
-                && REOPENABLE_JOB_STATUSES.contains(jobStatus));
     }
 
     /** Import job status per job id for the APPROVED suggestions of this page, in one query. */
@@ -416,7 +398,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
                 .suggesterName(admin ? suggesterName : null)
                 .importJobId(admin ? s.getImportJobId() : null)
                 .rereviewCount(s.getRereviewCount())
-                .canRequestRereview(s.getStatus() == SuggestionStatus.REJECTED && s.getRereviewCount() < MAX_REREVIEWS)
+                .canRequestRereview(SuggestionTransition.REREVIEW.allowed(s.getStatus(), null, s.getRereviewCount()))
                 .canReopen(admin && canReopen)
                 .build();
     }
