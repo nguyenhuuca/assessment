@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -27,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+/** Job bodies only; schedules live in the scheduled_job table (see {@link DynamicJobScheduler}). */
 @Slf4j
 @Service
 public class AppScheduler implements ApplicationRunner {
@@ -66,9 +66,8 @@ public class AppScheduler implements ApplicationRunner {
         }
     }
 
-    @Scheduled(cron = "0 45 10 * * *", zone = "Asia/Ho_Chi_Minh")
     public void scheduleMakePoem() {
-        log.info("Start running scheduleMakePoem at 10:10 ");
+        log.info("Start running scheduleMakePoem");
         try {
             streamVideoService.updateDesc();
         } catch (Exception ex) {
@@ -76,7 +75,6 @@ public class AppScheduler implements ApplicationRunner {
         }
     }
 
-    @Scheduled(fixedRate = 5 * 60000)
     public void logStats() {
         log.info("Cron-based stats log every 5 minutes for logStats");
         log.info("Total hits: {}, Total misses: {}", statsCache.getTotalHits(), statsCache.getTotalMisses());
@@ -88,7 +86,6 @@ public class AppScheduler implements ApplicationRunner {
         }
     }
 
-    @Scheduled(cron = "0 */15 * * * *") // every 20 minutes
     public void syncDriveVideos() {
         log.info("Syncing Google Drive folder...");
         Instant fifteenMinutesAgo = Instant.now().minus(Duration.ofMinutes(60));
@@ -104,7 +101,6 @@ public class AppScheduler implements ApplicationRunner {
     }
 
 
-    @Scheduled(cron = "0 */15 * * * *")
     public void notificationDigest() {
         try {
             int sent = notificationDigestService.sendDigests();
@@ -114,7 +110,6 @@ public class AppScheduler implements ApplicationRunner {
         }
     }
 
-    @Scheduled(cron = "0 30 3 * * *", zone = "Asia/Ho_Chi_Minh")
     public void notificationRetention() {
         try {
             int deleted = notificationDigestService.purgeOldRead(Instant.now());
@@ -124,7 +119,6 @@ public class AppScheduler implements ApplicationRunner {
         }
     }
 
-    @Scheduled(cron = "0 0 3 30 2 *")
     public void cleanUpOldVideos() {
         List<String> candidates = videoAccessService.getLeastAccessedVideos(Duration.ofDays(1000), 100);
         for (String videoId : candidates) {

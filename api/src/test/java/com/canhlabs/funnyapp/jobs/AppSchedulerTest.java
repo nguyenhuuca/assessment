@@ -322,17 +322,6 @@ class AppSchedulerTest {
         org.assertj.core.api.Assertions.assertThatCode(() -> scheduler.notificationRetention()).doesNotThrowAnyException();
     }
 
-    @Test
-    void notificationJobs_scheduleExpressions() throws Exception {
-        var digest = AppScheduler.class.getMethod("notificationDigest")
-                .getAnnotation(org.springframework.scheduling.annotation.Scheduled.class);
-        var retention = AppScheduler.class.getMethod("notificationRetention")
-                .getAnnotation(org.springframework.scheduling.annotation.Scheduled.class);
-        org.assertj.core.api.Assertions.assertThat(digest.cron()).isEqualTo("0 */15 * * * *");
-        org.assertj.core.api.Assertions.assertThat(retention.cron()).isEqualTo("0 30 3 * * *");
-        org.assertj.core.api.Assertions.assertThat(retention.zone()).isEqualTo("Asia/Ho_Chi_Minh");
-    }
-
     // ── helpers ────────────────────────────────────────────────────────────────
 
     private static VideoSource source(String sourceId) {
