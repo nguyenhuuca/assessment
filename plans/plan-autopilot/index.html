@@ -6317,7 +6317,7 @@ Handoff to: Builder, QA Engineer
 -->
 
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p><strong>Status:</strong> Built 2026-10-19 · AU-1, AU-3 <code>f8fa31ce</code>; AU-2, AU-4, AU-5 <code>d52f6b2e</code>; QA-1 dry run pending (owner runs <code>/autopilot</code>)
+<p><strong>Status:</strong> Built 2026-10-19 · AU-1, AU-3 <code>f8fa31ce</code>; AU-2, AU-4, AU-5 <code>d52f6b2e</code>; QA-1 first run 2026-10-19 → <a href="../../reports/autopilot-2026-10-19-suggestion-rereview/">report</a>
 <strong>Author:</strong> nguyenhuuca
 <strong>Date:</strong> 2026-10-19
 <strong>ADR:</strong> none. This is dev tooling inside <code>.claude/</code>, it changes no app code or stored data, and deleting the skill folder undoes it (<code>swarm-plan</code> Artifact Requirements). The existing skills, agents, and the "ask before push" rule stay as they are.
@@ -6436,7 +6436,7 @@ Handoff to: Builder, QA Engineer
   - It runs each set twice: <code>mvn -q test -Dtest=…</code> and <code>npx vitest run …</code>.
   - It prints <code>pass</code> / <code>flaky</code> / <code>fail</code> per test.
   - The full gates (<code>mvn verify</code>, <code>npm run test</code>, <code>npm run lint</code>) still run once before the commit.
-- <strong>D5 — Ledger.</strong> The ledger lives at <code>scratchpad/autopilot/&lt;YYYYMMDD-HHMM&gt;-&lt;slug&gt;.md</code> (ephemeral) and holds one row per worker run: stage, round, verdict, turns, min, tokens, ≈$. The final summary table is also appended to the plan artifact under <code>## Autopilot run</code>, so a durable record stays in <code>docs/</code>.
+- <strong>D5 — Ledger.</strong> The ledger lives at <code>scratchpad/autopilot/&lt;YYYYMMDD-HHMM&gt;-&lt;slug&gt;.md</code> (ephemeral) and holds one row per worker run: stage, round, verdict, turns, min, tokens, ≈$. The run report (results + ledger + cost) goes to <code>docs/reports/autopilot-&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md</code>, so a durable record stays in <code>docs/</code>. The plan artifact is not edited for it (owner, 2026-10-19).
 - <strong>D6 — Scope guard.</strong> Autopilot refuses tasks that need a PR-FAQ or PRD (Medium/Large features per <code>swarm-plan</code>) and points to <code>/scope</code>. It targets small features and fixes.
 - <strong>D7 — Gates are never skipped.</strong> Gate 1 (plan) and Gate 2 (push) always use <code>AskUserQuestion</code>. There is no <code>--yes</code> flag. This follows the standing "ask before every push" rule.</p>
 <h2 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h2>
