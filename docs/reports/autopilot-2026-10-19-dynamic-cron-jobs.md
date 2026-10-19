@@ -12,8 +12,8 @@ back and fills the rest. The workflow appends the rows under "## Cost" itself; d
 - **Request:** feature "dynamic cron job management (Mức 2)": DB-backed schedules + admin API + Admin UI tab
 - **Mode:** local
 - **Plan:** [plan-dynamic-cron-jobs](../plans/plan-dynamic-cron-jobs.md) · [ADR-0023](../adr/0023-dynamic-cron-jobs.md)
-- **Started:** 2026-10-19 21:03 · **Landed:** pending (Gate 2)
-- **Result:** pending Gate 2: committed `985ba5b5` BE + `e7b53b4f` FE, not pushed
+- **Started:** 2026-10-19 21:03 · **Landed:** 2026-10-19 21:45
+- **Result:** ✅ pushed `653af769` (`985ba5b5` BE + `e7b53b4f` FE + docs)
 
 ## Pipeline
 
@@ -28,8 +28,8 @@ back and fills the rest. The workflow appends the rows under "## Cost" itself; d
 | Local QA ×2 | `qa-twice.sh`: 84 tests, pass 84 · flaky 0 · fail 0 | 1 of 3 |
 | Fix | advisories folded in during QA: hook test for `['admin','jobs']` invalidation (DJ-4 AC), zone length check, `nextRunAt` = null for a corrupt row instead of a 500 | — |
 | Land: full gates | `mvn verify`: 1425 tests, 0 fail, LINE 96.82% (≥ 90%) · `npm run test` 481/481 · `npm run lint` 0 errors (3 old warnings in untouched files) | — |
-| Gate 2 (owner) | pending | — |
-| CI + smoke | pending: runs after push | — |
+| Gate 2 (owner) | push | — |
+| CI + smoke | green: Funny App Build and Deploy, Deploy Frontend, Publish Docs · `mock-test.sh` 22/22 (does not cover `/admin/jobs` yet) | — |
 
 ## What changed
 
@@ -54,6 +54,8 @@ Same columns and rules as `.claude/skills/autopilot/resources/ledger.template.md
 | 5 | 1 | code review | 1 | skill | approve (quality + security) | 0 | 6 | 23 | 2.8 | 98388 | sonnet ×2 |
 | 6 | 1 | QA ×2 | 1 | orchestrator | pass 84 | — | — | — | 2 | — | opus |
 | 7 | 1 | land: gates + commit | — | orchestrator | green; `985ba5b5`, `e7b53b4f` | — | — | — | 5 | — | opus |
+| 8 | 1 | gate 2 | — | — | push | — | — | — | — | — | — |
+| 9 | 1 | CI + smoke | — | orchestrator | green · smoke 22/22 | — | — | — | 8 | — | opus |
 
 ## Open advisories
 
