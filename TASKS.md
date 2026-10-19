@@ -265,3 +265,14 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **AP-1** `permissions` in `AdminAccountDto` + `PATCH /admin/accounts/{id}/permissions` (rank rules as role change, revokes the target's JWTs)
 - [x] **AP-2** Accounts tab "Permissions" column: one toggle chip per bit; `Mock-Test.http` checks the field
 - [x] **AP-3** Role change sets `UserRole.defaultPermissions()` (ADMIN/SUPER_ADMIN 31, USER 0) and revokes the target's JWTs; migration `202610180003` backfills admins
+
+## Feature: /autopilot skill (2026-10-19)
+
+**Plan:** `docs/plans/plan-autopilot.md`
+
+- [ ] **AU-1** `.claude/skills/autopilot/SKILL.md` — stages, 2 gates, round caps 3, worker prompts
+- [ ] **AU-2** Verdict contract (`resources/verdict.md`) — blocking/advisory, parse rules
+- [ ] **AU-3** `scripts/qa-twice.sh` — run affected tests twice, pass/flaky/fail
+- [ ] **AU-4** Run ledger + `session.txt`/TASKS.md updates + summary appended to plan
+- [ ] **AU-5** List `/autopilot` in CLAUDE.md, AGENTS.md pointer
+- [ ] **QA-1** Dry run on code-health finding #6 (CommentPanel useQuery)
