@@ -6336,7 +6336,7 @@ Handoff to: Owner (secret + first run)
 -->
 
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p><strong>Status:</strong> Built 2026-10-19, waiting for the owner's secret + first run (AH-QA-1)
+<p><strong>Status:</strong> Done 2026-10-19 · first run issue #26 → PR #27 merged (<code>b0a2d7a1</code>)
 <strong>Author:</strong> nguyenhuuca
 <strong>Date:</strong> 2026-10-19
 <strong>ADR:</strong> <a href="../../adr/0022-headless-autopilot/">ADR-0022</a> (gates on GitHub, owner-only triggers, least privilege)
@@ -6411,13 +6411,13 @@ Handoff to: Owner (secret + first run)
 <td><strong>AH-5</strong> (owner)</td>
 <td>Setup</td>
 <td>Run <code>claude setup-token</code>, then <code>gh secret set CLAUDE_CODE_OAUTH_TOKEN</code>; create the <code>autopilot</code> label</td>
-<td>pending</td>
+<td>done</td>
 </tr>
 <tr>
 <td><strong>AH-QA-1</strong> (owner)</td>
 <td>First run on a tiny issue</td>
 <td>Label → draft PR with plan → <code>/approve</code> → PR ready with report → merge → CI green</td>
-<td>pending</td>
+<td>done: #26 → #27. It took 3 plan runs and needed 3 workflow fixes</td>
 </tr>
 </tbody>
 </table>

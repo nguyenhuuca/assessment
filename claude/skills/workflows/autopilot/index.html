@@ -6699,7 +6699,7 @@
 <p><strong>Gates on GitHub.</strong> There is no <code>AskUserQuestion</code> in CI.
 - <strong>Gate 1:</strong> the plan job ends by opening a <strong>draft PR</strong>:
   - branch <code>autopilot/issue-&lt;N&gt;</code> from <code>origin/main</code>;
-  - <code>gh pr create --draft --base main</code>, titled <code>Autopilot: &lt;issue title&gt; (#&lt;N&gt;)</code>;
+  - <code>gh pr create --draft --base main</code>, titled <code>Autopilot: &lt;issue title&gt; (#&lt;N&gt;)</code>, with a body containing <code>Closes #&lt;N&gt;</code> so the merge closes the issue;
   - the PR body holds the plan link, the task table, the plan-review verdict and the open advisories, and ends with "Gate 1: comment <code>/approve</code>, or <code>/revise &lt;notes&gt;</code>".
   - It also comments the PR link on the issue. <strong>Stop there.</strong>
 - <strong>Gate 2:</strong> the build job ends with <code>git push origin HEAD</code> (the PR branch only), <code>gh pr ready &lt;N&gt;</code>, the run report in the PR body, and a comment: "Gate 2: review the diff, then merge to deploy. Run <code>./api/mock-test.sh</code> after the deploy." <strong>Never push to <code>main</code>, never merge, never approve your own PR.</strong></p>
