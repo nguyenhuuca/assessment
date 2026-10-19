@@ -3775,6 +3775,8 @@
       
         
       
+        
+      
     
     
     
@@ -4229,6 +4231,34 @@
     
   
     /task-resume
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/autopilot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /autopilot
   
 
     
@@ -6341,7 +6371,7 @@
 <strong>Request:</strong> Gather the suggestion status transition rules (approve, reject, reopen, rereview), now spread across the service, into one place. Behavior must not change.
 <strong>Plan:</strong> <a href="../../plans/plan-suggestion-transitions/">plan-suggestion-transitions</a>
 <strong>Skill:</strong> <code>/autopilot</code> (second run). The skill has <code>disable-model-invocation: true</code>, so the owner asked in chat ("chạy autopilot refactor đó") and the orchestrator followed <code>.claude/skills/autopilot/SKILL.md</code> step by step.
-<strong>Result:</strong> Commit <code>08f16414</code> is on <code>main</code> locally, waiting for Gate 2.</p>
+<strong>Result:</strong> ✅ Pushed <code>4600c1b8</code>. Both gates were approved, every review passed in round 1, and CI plus smoke are green.</p>
 <h2 id="pipeline">Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -6399,7 +6429,12 @@
 </tr>
 <tr>
 <td>Gate 2 (owner)</td>
-<td><em>pending</em></td>
+<td><strong>push</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td>CI + smoke</td>
+<td>"Funny App Build and Deploy" green, <code>mock-test.sh</code> 22/22</td>
 <td>—</td>
 </tr>
 </tbody>
@@ -6565,7 +6600,10 @@
 <li>For the exact session total, run <code>/cost</code> or check the Console usage page.</li>
 </ul>
 <h2 id="ci-and-smoke">CI and Smoke<a class="headerlink" href="#ci-and-smoke" title="Permanent link">&para;</a></h2>
-<p><em>Pending Gate 2.</em></p>
+<ul>
+<li><code>4600c1b8</code> "Funny App Build and Deploy": ✅ success</li>
+<li><code>./api/mock-test.sh</code> on prod: ✅ 22/22</li>
+</ul>
 <h2 id="manual-checks-for-the-owner">Manual Checks for the Owner<a class="headerlink" href="#manual-checks-for-the-owner" title="Permanent link">&para;</a></h2>
 <p>None needed beyond CI. The change is internal and behavior is pinned by the unedited tests. An optional quick smoke on prod: reject, re-review, reopen, approve should all behave as before.</p>
 <h2 id="open-advisories-not-blocking">Open Advisories (not blocking)<a class="headerlink" href="#open-advisories-not-blocking" title="Permanent link">&para;</a></h2>
