@@ -323,5 +323,5 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **Plan:** `docs/plans/plan-rereview-modal-escape-focus.md`
 
-- [ ] **RE-1** `RereviewModal`: Escape closes (not while pending), textarea focused on open
-- [ ] **RE-2** Tests: Escape closes, Escape while pending keeps open, textarea has focus
+- [x] **RE-1** `RereviewModal`: Escape closes (not while pending), textarea focused on open (c1d2a550)
+- [x] **RE-2** Tests: Escape closes, Escape while pending keeps open, textarea has focus (c1d2a550)

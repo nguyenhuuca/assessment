@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status:** Planned 2026-10-19 (autopilot, headless, issue #30)
+**Status:** Done 2026-10-19 (autopilot, headless, issue #30; merge deploys)
 **Author:** nguyenhuuca
 **Date:** 2026-10-19
 **Related plan:** [plan-suggestion-rereview](plan-suggestion-rereview.md) (added the modal)
