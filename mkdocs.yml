@@ -180,6 +180,7 @@ nav:
           - /land-the-plane: claude/skills/workflows/land-the-plane.md
           - /tailor: claude/skills/workflows/tailor.md
           - /task-resume: claude/skills/workflows/task-resume.md
+          - /autopilot: claude/skills/workflows/autopilot.md
 
       - Skills — Architecture:
           - Designing Systems: claude/skills/architecture/designing-systems.md

@@ -2,7 +2,7 @@
 name: qa-engineer
 description: Define test strategy and verify quality against WCAG and testing-pyramid criteria — a user-invoked QA Engineer workflow.
 argument-hint: "[component-to-test]"
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # QA Engineer

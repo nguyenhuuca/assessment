@@ -2,7 +2,7 @@
 name: land-the-plane
 description: "Lands in-flight work: quality gates, atomic commit, rebase, push, verified remote sync, then handoff — a user-invoked finish-line workflow."
 argument-hint: "[scope or branch]"
-disable-model-invocation: true
+disable-model-invocation: false
 metadata:
   category: encoded-preference
 ---

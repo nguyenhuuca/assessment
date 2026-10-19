@@ -8,14 +8,15 @@
 
 1. [Introduction](#introduction)
 2. [Pre-configured Setup](#pre-configured-setup)
-3. [Workflow Skills — 15 Commands](#workflow-skills-15-commands)
+3. [Workflow Skills — 16 Commands](#workflow-skills-16-commands)
 4. [Library Skills — Loaded Automatically](#library-skills-loaded-automatically)
 5. [Swarm — Multi-Agent Parallel Execution](#swarm-multi-agent-parallel-execution)
-6. [Session File (session.txt)](#session-file-sessiontxt)
-7. [Hooks & Permissions](#hooks-permissions)
-8. [Real-World Workflows](#real-world-workflows)
-9. [Available Templates](#available-templates)
-10. [Tips & Tricks](#tips-tricks)
+6. [Autopilot — Run One Task End to End](#autopilot-run-one-task-end-to-end)
+7. [Session File (session.txt)](#session-file-sessiontxt)
+8. [Hooks & Permissions](#hooks-permissions)
+9. [Real-World Workflows](#real-world-workflows)
+10. [Available Templates](#available-templates)
+11. [Tips & Tricks](#tips-tricks)
 
 ---
 
@@ -23,7 +24,7 @@
 
 This project uses the **[Claude Agentic Framework](https://github.com/dralgorhythm/claude-agentic-framework) v5**, adapted for Funny Movies (see [Claude Workspace](../claude/index.md)):
 
-- ✅ **15 workflow skills** you invoke as `/name` (scope, spec, architect, builder, swarm…)
+- ✅ **16 workflow skills** you invoke as `/name` (scope, spec, architect, builder, swarm, autopilot…)
 - ✅ **10 library skills** Claude loads on its own when a task matches (testing, ADRs, threat modeling…)
 - ✅ **5 worker agents** for swarms, each with a pinned model, `maxTurns` and tool allowlist
 - ✅ **Rules** loaded in every session: core directives, code quality, security, tech strategy, debugging protocol
@@ -44,7 +45,7 @@ Two conventions specific to this repo:
 ```
 .claude/
 ├── skills/
-│   ├── <name>/SKILL.md          # 15 workflow skills: invoke as /name
+│   ├── <name>/SKILL.md          # 16 workflow skills: invoke as /name
 │   ├── architecture/            # designing-systems, writing-adrs
 │   ├── core-engineering/        # testing, dependency-upgrade, review-steering
 │   ├── design/                  # presentation
@@ -69,9 +70,9 @@ templates/
 
 ---
 
-## Workflow Skills — 15 Commands
+## Workflow Skills — 16 Commands
 
-Workflow skills run only when you type `/name`; Claude never invokes them on its own.
+Most workflow skills run only when you type `/name`. The exceptions are the 5 skills `/autopilot` chains (`swarm-plan`, `swarm-review`, `swarm-execute`, `qa-engineer`, `land-the-plane`): they have `disable-model-invocation: false`, so Claude may also invoke them when a request matches. See [Autopilot](#autopilot-run-one-task-end-to-end).
 
 | Command | Role | Use when | Output |
 |---------|------|----------|--------|
@@ -89,6 +90,7 @@ Workflow skills run only when you type `/name`; Claude never invokes them on its
 | `/swarm-research <topic>` | Research Orchestrator | Deep investigation, technology comparison | Research report |
 | `/land-the-plane` | Finish-Line Protocol | Gates → commit → (ask) push → check CI | Pushed commit |
 | `/tailor` | Configuration Tailor | Detects the stack and proposes config changes (proposal only) | `scratchpad/tailor-proposal.md` |
+| `/autopilot <request>` | Autopilot | Run one small feature, fix or refactor end to end: plan → review → you approve → code → review → QA ×2 → you approve the push | Deployed code + `docs/reports/autopilot-*.md` |
 | `/task-resume [instruction]` | Task Resumer | Continues the unfinished task in `session.txt` after re-checking the repo | Work continued from `next` |
 
 Examples:
@@ -195,6 +197,116 @@ Task tracking uses **Claude Code's native task list** (in-session) plus `TASKS.m
 → worker-explorer / worker-research investigate each angle
 → Synthesized into a cited report
 ```
+
+---
+
+## Autopilot — Run One Task End to End
+
+`/autopilot <request>` chains the workflow skills into one automatic run, from the request to a deployed commit. You are needed at **3 points only**: when you type the command (Start), when the plan is ready (**Gate 1**) and before the push (**Gate 2**). Every loop is capped at 3 rounds, so a run never loops forever.
+
+```
+Plan ⇄ Plan review → [GATE 1: you approve the plan] → Implement ⇄ Code review
+     → Local QA (tests ×2) ⇄ Fix → Commit → [GATE 2: you approve the push] → CI + smoke
+```
+
+| Stage | Skill called | Fallback (when a skill is set back to `disable-model-invocation: true`) |
+|-------|--------------|------------------------------------------------------------------------|
+| Plan | `swarm-plan` | `worker-architect` / `worker-builder` reads the `SKILL.md` and follows it |
+| Plan review, Code review | `swarm-review` | `worker-reviewer` |
+| Implement, Fix | `swarm-execute` | `worker-builder` (in its own worktree) |
+| Local QA | `qa-engineer` + `scripts/qa-twice.sh` | `worker-builder` (testing focus) |
+| Land | `land-the-plane` | Orchestrator follows AGENTS.md "Landing the Plane" |
+
+- **Verdict block.** Every reviewer ends with one (`approve` / `revise` + blocking / advisory counts), as defined in `.claude/skills/autopilot/resources/verdict.md`. Only **blocking** findings trigger another round; advisories go into the report.
+- **Tests twice.** `scripts/qa-twice.sh` runs the affected tests **twice**:
+  - pass both runs → `pass`;
+  - fail once → `flaky` (logged, does not block);
+  - fail both runs → `fail` (goes to Fix).
+
+### ✅ When It Fits
+
+| Kind of work | Real example in this repo |
+|--------------|---------------------------|
+| **Small feature** (about ≤ 1–3 days, `swarm-plan`'s "Small Feature"), clear enough to write acceptance criteria without asking back | Suggestion re-review: admin Reopen + user re-review request ([report](../reports/autopilot-2026-10-19-suggestion-rereview.md)) |
+| **Small refactor with no behavior change** (Two Hats): existing tests must pass unedited | One `SuggestionTransition` table for status rules ([report](../reports/autopilot-2026-10-19-suggestion-transitions.md)) |
+| **Bug fix with a known cause**: you know what to change and want a regression test | — |
+| Changes to backend and/or webapp that **automated tests can verify** (JUnit, Vitest) | both runs above |
+| A small technical decision that needs an ADR | Still fine: the Plan stage writes the ADR too |
+
+### ⚠️ When Not to Use It (use another flow)
+
+| Situation | Why | Use instead |
+|-----------|-----|-------------|
+| The idea is still vague | Autopilot does not ask back to clarify the request | `/scope` |
+| Medium or large feature (≥ 1 week, needs a PRD or PR-FAQ) | Bigger than one small plan; **rejected** by the scope guard | `/scope` → `/spec` → `/swarm-plan` → `/swarm-execute` |
+| Big architecture decision, one-way door | Needs options compared and a careful human review | `/architect` |
+| Production incident with an unknown root cause | Autopilot needs to know what to fix; debugging needs ≥ 3 hypotheses and log reading | Workflow 2 (Debug Production Issue) |
+| A question, an explanation, a typo or a 1–2 line change | Each run costs a plan + 2 reviews + QA ×2; doing it directly is far cheaper | Ask Claude directly |
+| Writing prod data, infra work (VM, secrets, manual SQL) | Autopilot **never** writes to prod; the smoke test is read-only | Do it by hand, or have Claude draft the commands for you |
+| New UI that needs design or visual approval | No automated Lighthouse/visual gate (only listed as a manual check) | `/ui-ux-designer` first, then autopilot |
+| Performance optimization | No before/after benchmark stage | Workflow 4 (Performance) |
+| Several unrelated changes in one request | One run = one plan = one goal; mixing them dilutes the reviews | Split into several runs |
+
+### 🛑 When Autopilot Refuses or Stops
+
+| Situation | What autopilot does | What you do |
+|-----------|---------------------|-------------|
+| **Scope guard**: the request needs a PRD/PR-FAQ | **Refuses** at once, before planning, with one line pointing to `/scope` | Run `/scope`, or shrink the request and run again |
+| Plan review still `revise` after 3 rounds | Stops, `session.txt` gets `status: blocked`, the open blocking findings are listed | Clarify the request or decide the stuck points yourself |
+| Code review still `revise` after 3 rounds | Stops `blocked`; the code stays on the worktree branch, not on `main` | Read the findings, fix by hand or drop |
+| QA fails both runs and still fails after 3 Fix rounds | Stops `blocked` with the `FAIL` list and log paths | Debug with Workflow 2 |
+| `qa-twice.sh` exits 2 (compile error, no report) | Treated as a fail; the log path goes to Fix | — |
+| A **flaky** test (fails 1 of 2 runs) | **Does not block**; recorded in the report | Fix the flaky test in a later task (`qa-engineer`: no flaky tests) |
+| A reviewer returns no verdict block, even after one re-ask | Stops `blocked` ("review returned no verdict") | Run again |
+| A full gate is red (`mvn verify`, coverage < `api/.coverage-threshold`, vitest, lint) | Does not commit | Same as a QA fail |
+| You pick **Revise with notes** at Gate 1 | Replans with your notes (new cycle, round counter reset) | — |
+| You pick **Stop** at Gate 1 | Stops `blocked` | — |
+| You pick **Don't push yet** at Gate 2 | Commits stay local, no push | Push later with `/land-the-plane` or ask Claude |
+| Rebase conflict on push | Stops and reports; never force-pushes | Resolve the conflict |
+
+A stopped run can be continued with `/task-resume`, which reads `session.txt` and the ledger in `scratchpad/autopilot/`.
+
+### 🔒 What Autopilot Never Does
+
+- **Skip Gate 1 or Gate 2.** There is no `--yes`, and approving one gate never covers the other or a later run.
+- **Push early.** It never pushes before Gate 2, never force-pushes and never opens a PR mid-run.
+- **Write prod data.** `api/Mock-Test.http` runs only GET and login.
+- **Edit existing tests to make a refactor pass.**
+
+### 📄 What a Run Produces
+
+| File | Content |
+|------|---------|
+| `docs/plans/plan-<slug>.md` | The plan approved at Gate 1. The report is **not** written into the plan |
+| `TASKS.md` | One section per feature; tasks flipped to `[x]` with the commit hash |
+| `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` | The report:<br>• result per stage<br>• ledger table<br>• tokens per model and estimated cost<br>• CI + smoke result<br>• manual checks and open advisories |
+| `scratchpad/autopilot/<timestamp>-<slug>.md` | The live ledger (gitignored) |
+| `session.txt` | Current stage, progress, and a `blocker` when stopped |
+
+### 💰 Real Cost So Far
+
+| Run | Wall time | Worker tokens | Worker cost (estimate) |
+|-----|-----------|---------------|------------------------|
+| Suggestion re-review (BE + FE, 1 replan) | ~20 min | ~424k | ≈ $0.03 – $0.91 |
+| Transitions refactor (BE only) | ~11 min | ~143k | ≈ $0.01 – $0.40 |
+
+- **Not counted: the orchestrator.** The main session (Opus) is not in the ledger. Use `/cost` for the exact total.
+- **To spend less:**
+  - write a clear request, so no replan is needed;
+  - keep one goal per run;
+  - run FE and BE in parallel only when both change.
+
+### ▶️ How to Call It
+
+```bash
+/autopilot on the Suggestions tab let an admin move a suggestion back to Pending and review it again
+/autopilot refactor: put the suggestion status transition rules in one place, no behavior change
+/autopilot fix: the Reopen button is not disabled while the request is pending
+```
+
+- **Typed command only.** `autopilot` has `disable-model-invocation: true`, so Claude starts it only when you **type `/autopilot`**. If you ask in chat instead ("run autopilot for X"), Claude reads the `SKILL.md` and follows it step by step, gates included.
+- **The chained skills.** `swarm-plan`, `swarm-review`, `swarm-execute`, `qa-engineer` and `land-the-plane` have `disable-model-invocation: false`, so the orchestrator can call them. You can flip any of them back to `true` at any time. That stage then uses its fallback, and the report records which path each stage took.
+- **Design details:** [plan-autopilot](../plans/plan-autopilot.md).
 
 ---
 
@@ -481,6 +593,7 @@ Editing `CLAUDE.md`, `.claude/settings.json` or `.claude/rules/*` triggers a con
 | `/qa-engineer ...` | Write tests | Test files |
 | `/security-auditor ...` | Security audit | Audit report |
 | `/code-check ...` | Code quality | Quality report |
+| `/autopilot ...` | Small task end to end, 2 approval gates | Deployed code + `docs/reports/autopilot-*.md` |
 | `/land-the-plane` | Gates → commit → push (asks first) | Pushed commit |
 | `/presentation ...` | Render a doc as an HTML deck | `<doc-name>.html` |
 
