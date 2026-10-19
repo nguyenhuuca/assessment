@@ -2,7 +2,7 @@
 
 ## Metadata
 
-**Status:** Proposed (2026-10-19) · **Date:** 2026-10-19 · **Deciders:** nguyenhuuca · **Tags:** ci, agents, security, workflow
+**Status:** Accepted (2026-10-19, after the first end-to-end run: issue #26 → PR #27 merged) · **Date:** 2026-10-19 · **Deciders:** nguyenhuuca · **Tags:** ci, agents, security, workflow
 **Related:** [plan-autopilot](../plans/plan-autopilot.md) (the local skill) · [plan-autopilot-headless](../plans/plan-autopilot-headless.md) · [Claude Code GitHub Actions docs](https://code.claude.com/docs/en/github-actions)
 
 ## Context

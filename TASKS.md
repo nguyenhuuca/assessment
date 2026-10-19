@@ -302,8 +302,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **AH-2** `.github/workflows/autopilot.yml` (plan / build jobs, 60 min, concurrency 1)
 - [x] **AH-3** `SKILL.md` headless mode (untrusted input, denylist, draft PR / merge gates)
 - [x] **AH-4** Guide vi/en headless section
-- [ ] **AH-5** Owner: `claude setup-token` → `gh secret set CLAUDE_CODE_OAUTH_TOKEN`; create label `autopilot`
-- [ ] **AH-QA-1** Owner: first run on a tiny issue (label → draft PR → /approve → merge → CI green)
+- [x] **AH-5** Owner: `claude setup-token` → `gh secret set CLAUDE_CODE_OAUTH_TOKEN`; create label `autopilot` — done 2026-10-19
+- [x] **AH-QA-1** Owner: first run on a tiny issue (label → draft PR → /approve → merge → CI green) — issue #26 → PR #27 `b0a2d7a1`; fixes `ad8931fe`, `19e68821`, `773212f8`
 
 ## Fix: Reopen button disabled while pending (2026-10-19, autopilot, issue #26)
 

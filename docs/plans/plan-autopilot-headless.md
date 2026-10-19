@@ -9,7 +9,7 @@ Handoff to: Owner (secret + first run)
 
 ## Overview
 
-**Status:** Built 2026-10-19, waiting for the owner's secret + first run (AH-QA-1)
+**Status:** Done 2026-10-19 · first run issue #26 → PR #27 merged (`b0a2d7a1`)
 **Author:** nguyenhuuca
 **Date:** 2026-10-19
 **ADR:** [ADR-0022](../adr/0022-headless-autopilot.md) (gates on GitHub, owner-only triggers, least privilege)
@@ -41,8 +41,8 @@ Start `/autopilot` from GitHub and approve it there, without a terminal:
 | **AH-2** | `.github/workflows/autopilot.yml` | Plan job triggers on label `autopilot`, or on `/revise` on an `autopilot/*` PR. Build job triggers on `/approve`. Both require sender == owner. Only numbers and ids reach `prompt` and `run:`. Only `CLAUDE_CODE_OAUTH_TOKEN` is referenced. 60 min timeout, concurrency 1 | done |
 | **AH-3** | `SKILL.md` headless mode | The three `--headless` forms. Untrusted-input rules and path denylist. Gates mapped to draft PR / merge. No push to `main` | done |
 | **AH-4** | Guide vi/en: headless section | How to set up, how to run, what is refused | done |
-| **AH-5** (owner) | Setup | Run `claude setup-token`, then `gh secret set CLAUDE_CODE_OAUTH_TOKEN`; create the `autopilot` label | pending |
-| **AH-QA-1** (owner) | First run on a tiny issue | Label → draft PR with plan → `/approve` → PR ready with report → merge → CI green | pending |
+| **AH-5** (owner) | Setup | Run `claude setup-token`, then `gh secret set CLAUDE_CODE_OAUTH_TOKEN`; create the `autopilot` label | done |
+| **AH-QA-1** (owner) | First run on a tiny issue | Label → draft PR with plan → `/approve` → PR ready with report → merge → CI green | done: #26 → #27. It took 3 plan runs and needed 3 workflow fixes |
 
 ## Risks
 

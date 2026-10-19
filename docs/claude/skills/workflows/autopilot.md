@@ -56,7 +56,7 @@ Used when `$ARGUMENTS` starts with `--headless`. `.github/workflows/autopilot.ym
 **Gates on GitHub.** There is no `AskUserQuestion` in CI.
 - **Gate 1:** the plan job ends by opening a **draft PR**:
   - branch `autopilot/issue-<N>` from `origin/main`;
-  - `gh pr create --draft --base main`, titled `Autopilot: <issue title> (#<N>)`;
+  - `gh pr create --draft --base main`, titled `Autopilot: <issue title> (#<N>)`, with a body containing `Closes #<N>` so the merge closes the issue;
   - the PR body holds the plan link, the task table, the plan-review verdict and the open advisories, and ends with "Gate 1: comment `/approve`, or `/revise <notes>`".
   - It also comments the PR link on the issue. **Stop there.**
 - **Gate 2:** the build job ends with `git push origin HEAD` (the PR branch only), `gh pr ready <N>`, the run report in the PR body, and a comment: "Gate 2: review the diff, then merge to deploy. Run `./api/mock-test.sh` after the deploy." **Never push to `main`, never merge, never approve your own PR.**
