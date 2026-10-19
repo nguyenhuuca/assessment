@@ -102,4 +102,29 @@ describe('SuggestionCard re-review', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(suggestionsApi.requestRereview).not.toHaveBeenCalled()
   })
+
+  it('closes on Escape without calling the API, and the listener is gone afterwards', () => {
+    renderCard(rejected())
+    openDialog()
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(suggestionsApi.requestRereview).not.toHaveBeenCalled()
+  })
+
+  it('keeps the dialog open on Escape while the request is pending', async () => {
+    suggestionsApi.requestRereview.mockReturnValue(new Promise(() => {}))
+    renderCard(rejected())
+    const dialog = openDialog()
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Send request' }))
+    await waitFor(() => expect(suggestionsApi.requestRereview).toHaveBeenCalled())
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.getByRole('dialog')).toBeTruthy()
+  })
+
+  it('focuses the message field when the dialog opens', () => {
+    renderCard(rejected())
+    expect(within(openDialog()).getByLabelText('Message (optional)')).toHaveFocus()
+  })
 })
