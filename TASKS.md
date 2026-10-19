@@ -273,9 +273,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **AU-1** `.claude/skills/autopilot/SKILL.md` — stages, 2 gates, round caps 3; Skill-tool primary + worker fallback per stage — `f8fa31ce`
 - [x] **AU-2** Verdict contract (`resources/verdict.md`) — blocking/advisory, parse rules — `d52f6b2e`
 - [x] **AU-3** `scripts/qa-twice.sh` — run affected tests twice, pass/flaky/fail — `f8fa31ce`
-- [x] **AU-4** Run ledger + `session.txt`/TASKS.md updates + summary appended to plan — `d52f6b2e`
+- [x] **AU-4** Run ledger + `session.txt`/TASKS.md updates + run report in docs/reports — `d52f6b2e`
 - [x] **AU-5** List `/autopilot` in CLAUDE.md, AGENTS.md pointer — `d52f6b2e`
-- [ ] **QA-1** Dry run (owner types `/autopilot`) on code-health finding #6 (CommentPanel useQuery)
+- [x] **QA-1** First real run: suggestion re-review (not finding #6) — report `docs/reports/autopilot-2026-10-19-suggestion-rereview.md`
 
 ## Feature: Suggestion re-review (2026-10-19, autopilot)
 

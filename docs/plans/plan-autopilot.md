@@ -9,7 +9,7 @@ Handoff to: Builder, QA Engineer
 
 ## Overview
 
-**Status:** Built 2026-10-19 · AU-1, AU-3 `f8fa31ce`; AU-2, AU-4, AU-5 `d52f6b2e`; QA-1 dry run pending (owner runs `/autopilot`)
+**Status:** Built 2026-10-19 · AU-1, AU-3 `f8fa31ce`; AU-2, AU-4, AU-5 `d52f6b2e`; QA-1 first run 2026-10-19 → [report](../reports/autopilot-2026-10-19-suggestion-rereview.md)
 **Author:** nguyenhuuca
 **Date:** 2026-10-19
 **ADR:** none. This is dev tooling inside `.claude/`, it changes no app code or stored data, and deleting the skill folder undoes it (`swarm-plan` Artifact Requirements). The existing skills, agents, and the "ask before push" rule stay as they are.
@@ -75,7 +75,7 @@ Start ─▶ Plan ⇄ Plan review ─▶ [GATE 1: you approve plan] ─▶ Imple
   - It runs each set twice: `mvn -q test -Dtest=…` and `npx vitest run …`.
   - It prints `pass` / `flaky` / `fail` per test.
   - The full gates (`mvn verify`, `npm run test`, `npm run lint`) still run once before the commit.
-- **D5 — Ledger.** The ledger lives at `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md` (ephemeral) and holds one row per worker run: stage, round, verdict, turns, min, tokens, ≈$. The final summary table is also appended to the plan artifact under `## Autopilot run`, so a durable record stays in `docs/`.
+- **D5 — Ledger.** The ledger lives at `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md` (ephemeral) and holds one row per worker run: stage, round, verdict, turns, min, tokens, ≈$. The run report (results + ledger + cost) goes to `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md`, so a durable record stays in `docs/`. The plan artifact is not edited for it (owner, 2026-10-19).
 - **D6 — Scope guard.** Autopilot refuses tasks that need a PR-FAQ or PRD (Medium/Large features per `swarm-plan`) and points to `/scope`. It targets small features and fixes.
 - **D7 — Gates are never skipped.** Gate 1 (plan) and Gate 2 (push) always use `AskUserQuestion`. There is no `--yes` flag. This follows the standing "ask before every push" rule.
 

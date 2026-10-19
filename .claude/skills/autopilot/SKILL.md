@@ -105,7 +105,7 @@ File: `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md`, started from `resources/
   - put the stage in `doing`, and move it to `done` when it finishes;
   - set `progress` to: plan ≈20, Gate 1 ≈30, implement+review ≈60, QA ≈80, landed 100.
 
-At the end, append the table and its totals to the plan artifact under `## Autopilot run`, so the record survives the scratchpad.
+At the end, write the run report to `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md`: result per stage, the runs table, tokens per model, cost, CI + smoke result, manual checks and open advisories. The plan artifact is **not** edited for this (owner preference, 2026-10-19).
 
 ## Stop Conditions
 
