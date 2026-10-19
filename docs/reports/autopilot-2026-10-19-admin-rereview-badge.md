@@ -55,3 +55,4 @@ API list-price equivalent, not a bill. The workflow appends one row per job afte
 | job | turns | cost | models | run |
 |-----|-------|------|--------|-----|
 | plan | 25 | $0.64 | claude-sonnet-5-5 $0.64 | [run](https://github.com/nguyenhuuca/assessment/actions/runs/39227453685) |
+| build | 25 | $0.39 | claude-sonnet-5-5 $0.39 | [run](https://github.com/nguyenhuuca/assessment/actions/runs/39228033342) |
