@@ -67,6 +67,16 @@ Used when `$ARGUMENTS` starts with `--headless`. `.github/workflows/autopilot.ym
 - `session.txt` is not written, because the runner is thrown away; the PR is the record.
 - The ledger lives in the runner's `scratchpad/`. The report (`docs/reports/autopilot-<date>-<slug>.md`) is committed to the PR branch. Its cost comes from `node scripts/claude-cost.mjs --from <job start> --md`, which finds the runner's own transcripts.
 
+**No stage is optional in CI.** Plan review and **code review** run on every headless run, whatever the diff size: a separate `worker-reviewer` (or `swarm-review`) must return a verdict block. "The owner reviews at Gate 2" is **not** a reason to skip one; Gate 2 is in addition to the reviews, not a substitute. The Gate 2 comment lists every stage with its result (plan review verdict, code review verdict, QA ×2 result, gates). Without a code-review `approve`, do **not** run `gh pr ready`: comment `blocked` instead. Found on issue #26: the build job skipped code review because "the diff is tiny".
+
+**Prove the regression test.** For a bug fix, show the new test fails without the fix. Use separate git commands:
+1. `git stash push -- <file>`
+2. run the test and expect a FAIL
+3. `git stash pop`
+4. run the test again and expect a PASS
+
+**Cost in CI.** Do not run `claude-cost.mjs` in CI, because the runner's transcripts are not under the working directory. The workflow posts each job's cost from the action's result as a PR comment. In the report, write "Cost: see the job cost comments on the PR".
+
 **Workers in CI run in the foreground.** The workflow sets `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1`, because in `-p` mode the session ends with the turn and a background worker's result would never arrive. Never end a turn while a worker or command is still running, and never answer "waiting for the review". Every stage must finish within the job.
 
 **Shell use in CI.** Only the commands in the workflow's `--allowedTools` run; anything else is denied, and Claude Code checks each part of a `&&` chain separately.

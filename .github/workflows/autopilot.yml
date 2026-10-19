@@ -66,6 +66,25 @@ jobs:
             --max-turns 120
             --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(node:*),Bash(cd:*),Bash(pwd:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(sort:*),Bash(cut:*),Bash(tr:*),Bash(test:*),Bash(echo:*),Bash(printf:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*),Bash(mv:*),Bash(basename:*),Bash(dirname:*)"
 
+      - name: Post the run cost
+        if: always() && steps.claude.outputs.execution_file != ''
+        run: |
+          cost=$(jq -r '[.[] | select(.type=="result")][-1].total_cost_usd // empty' "$EXEC")
+          turns=$(jq -r '[.[] | select(.type=="result")][-1].num_turns // empty' "$EXEC")
+          [ -n "$cost" ] || exit 0
+          if [ "$EVENT" = "issues" ]; then
+            target=$(gh pr list --head "autopilot/issue-$NUM" --state all --json number --jq '.[0].number // empty')
+          else
+            target=$NUM
+          fi
+          msg=$(printf 'Autopilot %s job cost: $%.2f (%s turns), API list-price equivalent. Run: %s' "$JOB" "$cost" "$turns" "$RUN_URL")
+          if [ -n "$target" ]; then gh pr comment "$target" --body "$msg"; else gh issue comment "$NUM" --body "$msg"; fi
+        env:
+          EXEC: ${{ steps.claude.outputs.execution_file }}
+          EVENT: ${{ github.event_name }}
+          NUM: ${{ github.event.issue.number }}
+          JOB: ${{ github.job }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       - name: Keep the Claude transcript for diagnosis
         if: always() && steps.claude.outputs.execution_file != ''
         uses: actions/upload-artifact@v4
@@ -125,7 +144,26 @@ jobs:
           prompt: ${{ format('/autopilot --headless build --pr {0}', github.event.issue.number) }}
           claude_args: >-
             --max-turns 300
-            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(mvn:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(./scripts/qa-twice.sh:*),Bash(scripts/qa-twice.sh:*),Bash(cd:*),Bash(pwd:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(sort:*),Bash(cut:*),Bash(tr:*),Bash(test:*),Bash(echo:*),Bash(printf:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*),Bash(mv:*),Bash(basename:*),Bash(dirname:*)"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(mvn:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(./scripts/qa-twice.sh:*),Bash(scripts/qa-twice.sh:*),Bash(bash scripts/qa-twice.sh:*),Bash(/home/runner/work/assessment/assessment/scripts/qa-twice.sh:*),Bash(cd:*),Bash(pwd:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(sort:*),Bash(cut:*),Bash(tr:*),Bash(test:*),Bash(echo:*),Bash(printf:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*),Bash(mv:*),Bash(basename:*),Bash(dirname:*)"
+      - name: Post the run cost
+        if: always() && steps.claude.outputs.execution_file != ''
+        run: |
+          cost=$(jq -r '[.[] | select(.type=="result")][-1].total_cost_usd // empty' "$EXEC")
+          turns=$(jq -r '[.[] | select(.type=="result")][-1].num_turns // empty' "$EXEC")
+          [ -n "$cost" ] || exit 0
+          if [ "$EVENT" = "issues" ]; then
+            target=$(gh pr list --head "autopilot/issue-$NUM" --state all --json number --jq '.[0].number // empty')
+          else
+            target=$NUM
+          fi
+          msg=$(printf 'Autopilot %s job cost: $%.2f (%s turns), API list-price equivalent. Run: %s' "$JOB" "$cost" "$turns" "$RUN_URL")
+          if [ -n "$target" ]; then gh pr comment "$target" --body "$msg"; else gh issue comment "$NUM" --body "$msg"; fi
+        env:
+          EXEC: ${{ steps.claude.outputs.execution_file }}
+          EVENT: ${{ github.event_name }}
+          NUM: ${{ github.event.issue.number }}
+          JOB: ${{ github.job }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       - name: Keep the Claude transcript for diagnosis
         if: always() && steps.claude.outputs.execution_file != ''
         uses: actions/upload-artifact@v4
