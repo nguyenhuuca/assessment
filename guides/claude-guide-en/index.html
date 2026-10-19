@@ -8088,6 +8088,10 @@
 <td>A small technical decision that needs an ADR</td>
 <td>Still fine: the Plan stage writes the ADR too</td>
 </tr>
+<tr>
+<td><strong>A plan already exists</strong> (from <code>/swarm-plan</code> or written by hand) with <strong>≤ 6 open tasks</strong></td>
+<td><code>/autopilot docs/plans/plan-x.md</code> skips the Plan stage but still runs Plan review and Gate 1. It works only on the tasks still <code>[ ]</code> in <code>TASKS.md</code></td>
+</tr>
 </tbody>
 </table>
 <h3 id="when-not-to-use-it-use-another-flow">⚠️ When Not to Use It (use another flow)<a class="headerlink" href="#when-not-to-use-it-use-another-flow" title="Permanent link">&para;</a></h3>
@@ -8161,6 +8165,16 @@
 <td><strong>Scope guard</strong>: the request needs a PRD/PR-FAQ</td>
 <td><strong>Refuses</strong> at once, before planning, with one line pointing to <code>/scope</code></td>
 <td>Run <code>/scope</code>, or shrink the request and run again</td>
+</tr>
+<tr>
+<td><strong>Plan mode</strong>: the plan has &gt; 6 open tasks, a task is <code>[~]</code>, or the plan is Done</td>
+<td><strong>Refuses</strong> and points to <code>/swarm-execute</code></td>
+<td>Use <code>/swarm-execute</code>, or split the plan</td>
+</tr>
+<tr>
+<td><strong>Plan mode</strong>: the plan has no open tasks left</td>
+<td>Says so and stops</td>
+<td>—</td>
 </tr>
 <tr>
 <td>Plan review still <code>revise</code> after 3 rounds</td>
@@ -8294,6 +8308,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/autopilot<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>Suggestions<span class="w"> </span>tab<span class="w"> </span><span class="nb">let</span><span class="w"> </span>an<span class="w"> </span>admin<span class="w"> </span>move<span class="w"> </span>a<span class="w"> </span>suggestion<span class="w"> </span>back<span class="w"> </span>to<span class="w"> </span>Pending<span class="w"> </span>and<span class="w"> </span>review<span class="w"> </span>it<span class="w"> </span>again
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>/autopilot<span class="w"> </span>refactor:<span class="w"> </span>put<span class="w"> </span>the<span class="w"> </span>suggestion<span class="w"> </span>status<span class="w"> </span>transition<span class="w"> </span>rules<span class="w"> </span><span class="k">in</span><span class="w"> </span>one<span class="w"> </span>place,<span class="w"> </span>no<span class="w"> </span>behavior<span class="w"> </span>change
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>/autopilot<span class="w"> </span>fix:<span class="w"> </span>the<span class="w"> </span>Reopen<span class="w"> </span>button<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>disabled<span class="w"> </span><span class="k">while</span><span class="w"> </span>the<span class="w"> </span>request<span class="w"> </span>is<span class="w"> </span>pending
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>/autopilot<span class="w"> </span>docs/plans/plan-&lt;feature&gt;.md<span class="w">               </span><span class="c1"># run on an existing plan (plan mode)</span>
 </code></pre></div>
 <ul>
 <li><strong>Typed command only.</strong> <code>autopilot</code> has <code>disable-model-invocation: true</code>, so Claude starts it only when you <strong>type <code>/autopilot</code></strong>. If you ask in chat instead ("run autopilot for X"), Claude reads the <code>SKILL.md</code> and follows it step by step, gates included.</li>

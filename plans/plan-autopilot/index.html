@@ -6468,6 +6468,11 @@ Handoff to: Builder, QA Engineer
   - The full gates (<code>mvn verify</code>, <code>npm run test</code>, <code>npm run lint</code>) still run once before the commit.
 - <strong>D5 — Ledger.</strong> The ledger lives at <code>scratchpad/autopilot/&lt;YYYYMMDD-HHMM&gt;-&lt;slug&gt;.md</code> (ephemeral) and holds one row per worker run: stage, round, verdict, turns, min, tokens, ≈$. The run report (results + ledger + cost) goes to <code>docs/reports/autopilot-&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md</code>, so a durable record stays in <code>docs/</code>. The plan artifact is not edited for it (owner, 2026-10-19).
 - <strong>D6 — Scope guard.</strong> Autopilot refuses tasks that need a PR-FAQ or PRD (Medium/Large features per <code>swarm-plan</code>) and points to <code>/scope</code>. It targets small features and fixes.
+- <strong>D8 — Plan mode (added 2026-10-19).</strong> <code>/autopilot docs/plans/plan-&lt;x&gt;.md</code> runs on an existing plan, e.g. one made by <code>/swarm-plan</code>.
+  - <strong>Skipped:</strong> only the Plan stage.
+  - <strong>Kept:</strong> Plan review (that plan has not been through a reviewer yet) and Gate 1. Without them, autopilot would just be <code>/swarm-execute</code>.
+  - <strong>Scope:</strong> only tasks still <code>[ ]</code> in <code>TASKS.md</code>. Owner-only QA/prod checks are not counted or run.
+  - <strong>Refused (→ <code>/swarm-execute</code>):</strong> more than 6 open tasks, any task <code>[~]</code>, or the plan's Status is Done.
 - <strong>D7 — Gates are never skipped.</strong> Gate 1 (plan) and Gate 2 (push) always use <code>AskUserQuestion</code>. There is no <code>--yes</code> flag. This follows the standing "ask before every push" rule.</p>
 <h2 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h2>
 <table>

@@ -4323,10 +4323,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#0-scope-guard-d6" class="md-nav__link">
+  <a href="#0-input-and-scope-guard-d6-d8" class="md-nav__link">
     <span class="md-ellipsis">
       
-        0. Scope Guard (D6)
+        0. Input and Scope Guard (D6, D8)
       
     </span>
   </a>
@@ -6467,10 +6467,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#0-scope-guard-d6" class="md-nav__link">
+  <a href="#0-input-and-scope-guard-d6-d8" class="md-nav__link">
     <span class="md-ellipsis">
       
-        0. Scope Guard (D6)
+        0. Input and Scope Guard (D6, D8)
       
     </span>
   </a>
@@ -6623,8 +6623,18 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Plan ⇄ Plan review → [GATE 1] → Implement ⇄ Code review → Local QA ×2 ⇄ Fix → Commit → [GATE 2] → CI + smoke
 </code></pre></div>
 <p>Plan: <code>docs/plans/plan-autopilot.md</code> (design decisions D1–D7 referenced below).</p>
-<h2 id="0-scope-guard-d6">0. Scope Guard (D6)<a class="headerlink" href="#0-scope-guard-d6" title="Permanent link">&para;</a></h2>
-<p>Classify <code>$ARGUMENTS</code> with <code>swarm-plan</code>'s Artifact Requirements before anything else.</p>
+<h2 id="0-input-and-scope-guard-d6-d8">0. Input and Scope Guard (D6, D8)<a class="headerlink" href="#0-input-and-scope-guard-d6-d8" title="Permanent link">&para;</a></h2>
+<p><strong>Input mode.</strong> The input is in <strong>plan mode</strong> when <code>$ARGUMENTS</code> starts with a path matching <code>docs/plans/plan-*.md</code> and that file exists. Any text after the path is extra notes for the run. Every other input is in <strong>request mode</strong>.</p>
+<p><strong>Plan mode</strong> (a plan already made by <code>/swarm-plan</code> or by hand):
+- Read the plan and its <code>TASKS.md</code> section, matched by the plan path or by the task IDs in the plan.
+- <strong>Open tasks</strong> = the plan's tasks not yet <code>[x]</code> in <code>TASKS.md</code>. Count only implementation tasks: owner-only QA or prod checks do not count and are not run.
+- <strong>Refuse</strong>, in one line pointing to <code>/swarm-execute</code>, when:
+  - there are <strong>more than 6 open tasks</strong> (one autopilot round must stay reviewable, ≤ ~400 LOC);
+  - any task is <code>[~]</code> (someone else is working on it);
+  - the plan's Status is Done.
+- <strong>No open tasks:</strong> say so and stop.
+- <strong>Otherwise:</strong> continue. Stage 1 skips <strong>Plan</strong>, and the ledger records <code>plan | reused</code>.</p>
+<p><strong>Request mode:</strong> classify <code>$ARGUMENTS</code> with <code>swarm-plan</code>'s Artifact Requirements before anything else.</p>
 <ul>
 <li><strong>Small feature or fix:</strong> continue.</li>
 <li><strong>Medium/Large (needs a PRD or PR-FAQ):</strong> stop. Say so in one line and point to <code>/scope</code>.</li>
@@ -6685,7 +6695,7 @@
 <h2 id="stages">Stages<a class="headerlink" href="#stages" title="Permanent link">&para;</a></h2>
 <h3 id="1-plan-plan-review-cap-3-rounds-d3">1. Plan ⇄ Plan review (cap 3 rounds, D3)<a class="headerlink" href="#1-plan-plan-review-cap-3-rounds-d3" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Plan:</strong> produce <code>docs/plans/plan-&lt;slug&gt;.md</code> + a <code>TASKS.md</code> section (repo convention).</li>
+<li><strong>Plan:</strong> produce <code>docs/plans/plan-&lt;slug&gt;.md</code> + a <code>TASKS.md</code> section (repo convention). <strong>Plan mode:</strong> skip this step and go straight to Plan review on the given plan. A <code>revise</code> round edits <strong>that</strong> plan file in place, and only the open tasks may change; tasks that are already <code>[x]</code> stay as they are.</li>
 <li><strong>Plan review:</strong> review the plan, not code. Check that:</li>
 <li>each task has acceptance criteria;</li>
 <li>every fact cites <code>file:line</code>;</li>

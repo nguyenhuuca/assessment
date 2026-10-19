@@ -8085,6 +8085,10 @@
 <td>Có quyết định kỹ thuật nhỏ cần ADR</td>
 <td>Vẫn chạy được: bước Plan viết luôn ADR</td>
 </tr>
+<tr>
+<td><strong>Đã có plan</strong> (từ <code>/swarm-plan</code> hoặc viết tay) với <strong>≤ 6 task chưa làm</strong></td>
+<td><code>/autopilot docs/plans/plan-x.md</code>: bỏ qua bước Plan, vẫn chạy Plan review và Gate 1, chỉ làm các task còn <code>[ ]</code> trong <code>TASKS.md</code></td>
+</tr>
 </tbody>
 </table>
 <h3 id="truong-hop-khong-nen-dung-dung-flow-khac">⚠️ Trường hợp không nên dùng (dùng flow khác)<a class="headerlink" href="#truong-hop-khong-nen-dung-dung-flow-khac" title="Permanent link">&para;</a></h3>
@@ -8158,6 +8162,16 @@
 <td><strong>Scope guard</strong>: yêu cầu cần PRD/PR-FAQ</td>
 <td><strong>Từ chối</strong> ngay, trước khi plan, báo một dòng và chỉ sang <code>/scope</code></td>
 <td>Chạy <code>/scope</code>, hoặc thu nhỏ yêu cầu rồi chạy lại</td>
+</tr>
+<tr>
+<td><strong>Plan mode</strong>: plan có &gt; 6 task chưa làm, có task đang <code>[~]</code>, hoặc plan đã Done</td>
+<td><strong>Từ chối</strong>, chỉ sang <code>/swarm-execute</code></td>
+<td>Dùng <code>/swarm-execute</code>, hoặc tách plan nhỏ hơn</td>
+</tr>
+<tr>
+<td><strong>Plan mode</strong>: plan không còn task nào chưa làm</td>
+<td>Báo và dừng</td>
+<td>—</td>
 </tr>
 <tr>
 <td>Plan review vẫn <code>revise</code> sau 3 round</td>
@@ -8285,6 +8299,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/autopilot<span class="w"> </span>ben<span class="w"> </span>tab<span class="w"> </span>Đề<span class="w"> </span>xuất<span class="w"> </span>cho<span class="w"> </span>admin<span class="w"> </span>move<span class="w"> </span>về<span class="w"> </span>chờ<span class="w"> </span>duyệt<span class="w"> </span>rồi<span class="w"> </span>review<span class="w"> </span>lại
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>/autopilot<span class="w"> </span>refactor:<span class="w"> </span>gom<span class="w"> </span>luật<span class="w"> </span>chuyển<span class="w"> </span>trạng<span class="w"> </span>thái<span class="w"> </span>suggestion<span class="w"> </span>vào<span class="w"> </span>một<span class="w"> </span>chỗ,<span class="w"> </span>không<span class="w"> </span>đổi<span class="w"> </span>behavior
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>/autopilot<span class="w"> </span>fix:<span class="w"> </span>nút<span class="w"> </span>Reopen<span class="w"> </span>chưa<span class="w"> </span>disable<span class="w"> </span>khi<span class="w"> </span>đang<span class="w"> </span>gửi<span class="w"> </span>request
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>/autopilot<span class="w"> </span>docs/plans/plan-&lt;feature&gt;.md<span class="w">               </span><span class="c1"># chạy trên plan có sẵn (plan mode)</span>
 </code></pre></div>
 <ul>
 <li><code>autopilot</code> đặt <code>disable-model-invocation: true</code>: Claude chỉ chạy khi bạn <strong>gõ <code>/autopilot</code></strong>. Nếu bạn yêu cầu bằng lời trong chat ("chạy autopilot cho việc X"), Claude đọc <code>SKILL.md</code> và làm theo từng bước, vẫn đủ hai gate.</li>
