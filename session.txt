@@ -1,9 +1,8 @@
-task: /autopilot skill (plan → review → build → QA ×2 → land)
-status: blocked
+task: Autopilot: suggestion re-review (admin reopen + user request)
+status: in_progress
 progress: 90
-done: Plan 9e2fab5d; 5 skills model-invocable 32d0f45c; AU-1 SKILL.md f8fa31ce; AU-3 qa-twice.sh f8fa31ce; AU-2/4/5 verdict, ledger, docs d52f6b2e
-doing: -
-next: QA-1 owner types /autopilot for code-health finding #6 (CommentPanel useQuery)
-blocker: QA-1 needs the owner to start /autopilot (user-invoked only)
-plan: docs/plans/plan-autopilot.md
-updated: 2026-10-19 09:21
+done: Plan 1af57e24; BE reopen + rereview 6c16388e; FE Reopen + re-review modal 29c1fd94; QA ×2 134 pass
+doing: Gate 2 (owner approves push)
+next: push + CI + mock-test.sh; SR-QA-1 owner prod check
+plan: docs/plans/plan-suggestion-rereview.md
+updated: 2026-10-19 09:47

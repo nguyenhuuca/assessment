@@ -9,7 +9,7 @@ Handoff to: Builder, QA Engineer
 
 ## Overview
 
-**Status:** Planned 2026-10-19 (autopilot run)
+**Status:** Built 2026-10-19 (autopilot) · BE `6c16388e`, FE `29c1fd94`; SR-QA-1 prod check pending (owner)
 **Author:** nguyenhuuca
 **Date:** 2026-10-19
 **Related plan:** [plan-video-suggestions](plan-video-suggestions.md) (the flow this extends)
@@ -81,3 +81,30 @@ Order: BE-1 → BE-2 → FE-1 and FE-2 in parallel → QA-1. Each unit can be co
 | Race between two admins (reopen vs approve) | Same PESSIMISTIC_WRITE lock as approve/reject |
 | Race between reopen and an import retry | Job row locked and re-read under lock (D1); a retry after reopen ends in 409 duplicateActive on approve, never a second job |
 | Concurrent re-review requests | Conditional UPDATE with `rereview_count < 2` (D3) |
+
+## Autopilot run
+
+| # | cycle | stage | round | path | result | blocking | advisory | turns | min | tokens | ≈$ |
+|---|-------|-------|-------|------|--------|----------|----------|-------|-----|--------|----|
+| 1 | 1 | plan | 1 | skill | plan written (2 explorers) | — | — | 50 | 2 | 102956 | — |
+| 2 | 1 | plan review | 1 | skill | revise | 2 | 5 | 7 | 1 | 40591 | — |
+| 3 | 1 | replan | 2 | skill | 2 blocking fixed (+3 advisories folded in) | — | — | — | 2 | — | — |
+| 4 | 1 | plan review | 2 | skill | approve | 0 | 1 | 6 | 0.3 | 7898 | — |
+| 5 | 1 | gate 1 | — | — | approved | — | — | — | — | — | — |
+| 6 | 1 | implement FE | 1 | skill (worktree builder) | 3521a354, 461 tests pass, lint 0 errors | — | — | 23 | 4.1 | 72165 | — |
+| 6b | 1 | implement BE | 1 | skill (worktree builder) | 5e2c2901, mvn verify 1355 tests, cov 96.72% | — | — | 48 | 9.0 | 116048 | — |
+| 7 | 1 | code review FE | 1 | skill | approve | 0 | 4 | 3 | 0.2 | 37800 | — |
+| 8 | 1 | code review BE | 1 | skill | approve | 0 | 3 | 6 | 0.6 | 46316 | — |
+| 9 | 1 | local QA ×2 | 1 | skill | pass (134 tests, flaky 0, fail 0) | — | — | — | 4 | — | — |
+| 10 | 1 | land: full gates | — | skill | mvn verify ok (cov 96.72%), vitest 461/461, lint 0 errors | — | — | — | 6 | — | — |
+
+### Notes
+
+- Flaky tests: none
+- Manual checks for the owner (not automatable): real DB row-lock / conditional-UPDATE race (tests are mock-only); keyboard + screen-reader pass on the Reopen button and re-review modal (no local stack for Lighthouse); SR-QA-1 prod flow
+- Open advisories: plan — reopen erases the previous reject reason (audit log only); FE — re-review modal has no Escape/focus trap, backdrop click drops the typed message, Reopen button not disabled while pending, REREVIEW_MAX hardcoded; BE — race tests mock-only, catch-all 404 comment, import order
+- Parser notes: worker-builder runs in a worktree, so implement commits landed on worktree branches and were cherry-picked to main after review (6c16388e, 29c1fd94)
+
+### Total
+
+11 runs · ~20 min wall · ~424k worker tokens (+ orchestrator) · ≈$ — (no price table in repo)

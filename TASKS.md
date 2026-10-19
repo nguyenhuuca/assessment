@@ -281,8 +281,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **Plan:** `docs/plans/plan-suggestion-rereview.md`
 
-- [ ] **SR-BE-1** `rereview_count` migration + `reopen` / `requestRereview` service + DTO flags + i18n
-- [ ] **SR-BE-2** `POST /admin/video-suggestions/{id}/reopen`, `POST /suggestions/{id}/rereview`
-- [ ] **SR-FE-1** Admin Đề xuất tab: Reopen button (confirm) when `canReopen`
-- [ ] **SR-FE-2** My suggestions: "Request re-review" on rejected cards (optional message, 2 max)
+- [x] **SR-BE-1** `rereview_count` migration + `reopen` / `requestRereview` service + DTO flags + i18n — `6c16388e`
+- [x] **SR-BE-2** `POST /admin/video-suggestions/{id}/reopen`, `POST /suggestions/{id}/rereview` — `6c16388e`
+- [x] **SR-FE-1** Admin Đề xuất tab: Reopen button (confirm) when `canReopen` — `29c1fd94`
+- [x] **SR-FE-2** My suggestions: "Request re-review" on rejected cards (optional message, 2 max) — `29c1fd94`
 - [ ] **SR-QA-1** Owner prod check: reject → user re-review → approve; admin reopen
