@@ -6871,6 +6871,16 @@
 <td><code>6c16388e</code> BE + <code>29c1fd94</code> FE (first /autopilot run). Admin Reopen (REJECTED, or APPROVED with FAILED/CANCELLED job) → Pending; submitter re-review request after rejection (max 2, optional message). SR-QA-1 verified on prod by owner (2026-10-19)</td>
 </tr>
 <tr>
+<td><strong>Dynamic Cron Jobs</strong></td>
+<td>—</td>
+<td><a href="../adr/0023-dynamic-cron-jobs/">ADR-0023 ✅</a></td>
+<td>—</td>
+<td><a href="../plans/plan-dynamic-cron-jobs/">Plan ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td><code>985ba5b5</code> BE + <code>e7b53b4f</code> FE (autopilot). Schedules of the 6 AppScheduler jobs in <code>scheduled_job</code>; Admin → Scheduled jobs: ADMIN views, SUPER_ADMIN edits cron/zone/enabled or runs now. Prod check pending</td>
+</tr>
+<tr>
 <td><strong>Headless Autopilot</strong></td>
 <td>—</td>
 <td><a href="../adr/0022-headless-autopilot/">0022 ✅</a></td>
@@ -7048,10 +7058,15 @@
 <td>Headless Autopilot (GitHub Actions)</td>
 <td>✅ Accepted</td>
 </tr>
+<tr>
+<td>0023</td>
+<td>Dynamic Cron Jobs</td>
+<td>✅ Accepted</td>
+</tr>
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-19 — /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-19 — dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 
