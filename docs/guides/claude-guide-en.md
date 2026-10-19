@@ -282,7 +282,7 @@ A stopped run can be continued with `/task-resume`, which reads `session.txt` an
 |------|---------|
 | `docs/plans/plan-<slug>.md` | The plan approved at Gate 1. The report is **not** written into the plan |
 | `TASKS.md` | One section per feature; tasks flipped to `[x]` with the commit hash |
-| `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` | The report:<br>• result per stage<br>• ledger table<br>• tokens per model and estimated cost<br>• CI + smoke result<br>• manual checks and open advisories |
+| `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` | The report, same sections local or headless (`.claude/skills/autopilot/resources/report.template.md`):<br>• result per stage<br>• ledger table<br>• cost per agent (local) or per job (headless, added by the workflow)<br>• CI + smoke result (headless: after merge)<br>• manual checks and open advisories |
 | `scratchpad/autopilot/<timestamp>-<slug>.md` | The live ledger (gitignored) |
 | `session.txt` | Current stage, progress, and a `blocker` when stopped |
 

@@ -57,7 +57,8 @@ Used when `$ARGUMENTS` starts with `--headless`. `.github/workflows/autopilot.ym
 - **Gate 1:** the plan job ends by opening a **draft PR**:
   - branch `autopilot/issue-<N>` from `origin/main`;
   - `gh pr create --draft --base main`, titled `Autopilot: <issue title> (#<N>)`, with a body containing `Closes #<N>` so the merge closes the issue;
-  - the PR body holds the plan link, the task table, the plan-review verdict and the open advisories, and ends with "Gate 1: comment `/approve`, or `/revise <notes>`".
+  - the branch also holds the run report, created from `resources/report.template.md` with the header, the Start / Plan / Plan review / Gate 1 rows and the plan-stage `## Runs` rows filled in (Gate 1: "pending: `/approve`"). A `/revise` cycle appends its rows to the same file;
+  - the PR body holds the plan link, the report link, the task table, the plan-review verdict and the open advisories, and ends with "Gate 1: comment `/approve`, or `/revise <notes>`".
   - It also comments the PR link on the issue. **Stop there.**
 - **Gate 2:** the build job ends with `git push origin HEAD` (the PR branch only), `gh pr ready <N>`, the run report in the PR body, and a comment: "Gate 2: review the diff, then merge to deploy. Run `./api/mock-test.sh` after the deploy." **Never push to `main`, never merge, never approve your own PR.**
 
@@ -65,7 +66,7 @@ Used when `$ARGUMENTS` starts with `--headless`. `.github/workflows/autopilot.ym
 - Worker worktree commits are cherry-picked onto the **PR branch**, not `main`.
 - The build job finds the plan with `git diff --name-only origin/main...HEAD -- docs/plans/`.
 - `session.txt` is not written, because the runner is thrown away; the PR is the record.
-- The ledger lives in the runner's `scratchpad/`. The report (`docs/reports/autopilot-<date>-<slug>.md`) is committed to the PR branch. Its cost comes from `node scripts/claude-cost.mjs --from <job start> --md`, which finds the runner's own transcripts.
+- The runner's `scratchpad/` is lost when the job ends, so the **report on the PR branch is the ledger**: each job writes its `## Runs` rows there, not only in `scratchpad/`. The build job finds the report with `git diff --name-only origin/main...HEAD -- docs/reports/`, reads it, and fills every remaining section of the template (Gate 2: "pending: owner merges"; CI + smoke: "n/a in CI: runs after merge").
 
 **No stage is optional in CI.** Plan review and **code review** run on every headless run, whatever the diff size: a separate `worker-reviewer` (or `swarm-review`) must return a verdict block. "The owner reviews at Gate 2" is **not** a reason to skip one; Gate 2 is in addition to the reviews, not a substitute. The Gate 2 comment lists every stage with its result (plan review verdict, code review verdict, QA ×2 result, gates). Without a code-review `approve`, do **not** run `gh pr ready`: comment `blocked` instead. Found on issue #26: the build job skipped code review because "the diff is tiny".
 
@@ -75,7 +76,7 @@ Used when `$ARGUMENTS` starts with `--headless`. `.github/workflows/autopilot.ym
 3. `git stash pop`
 4. run the test again and expect a PASS
 
-**Cost in CI.** Do not run `claude-cost.mjs` in CI, because the runner's transcripts are not under the working directory. The workflow posts each job's cost from the action's result as a PR comment. In the report, write "Cost: see the job cost comments on the PR".
+**Cost in CI.** Do not run `claude-cost.mjs` in CI, because the runner's transcripts are not under the working directory. After each job, the workflow appends that job's row to the report's `## Cost` table, commits it to the PR branch, and posts the same figure as a PR comment. Leave the `## Cost` table rows to the workflow; never write or edit them.
 
 **Workers in CI run in the foreground.** The workflow sets `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1`, because in `-p` mode the session ends with the turn and a background worker's result would never arrive. Never end a turn while a worker or command is still running, and never answer "waiting for the review". Every stage must finish within the job.
 
@@ -167,7 +168,7 @@ File: `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md`, started from `resources/
   - put the stage in `doing`, and move it to `done` when it finishes;
   - set `progress` to: plan ≈20, Gate 1 ≈30, implement+review ≈60, QA ≈80, landed 100.
 
-At the end, write the run report to `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md`: result per stage, the runs table, tokens per model, cost, CI + smoke result, manual checks and open advisories. The plan artifact is **not** edited for this (owner preference, 2026-10-19).
+At the end, write the run report to `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` from `resources/report.template.md`. Keep every section of the template, local or headless; write "n/a" with the reason rather than dropping one. The plan artifact is **not** edited for this (owner preference, 2026-10-19).
 
 ## Stop Conditions
 

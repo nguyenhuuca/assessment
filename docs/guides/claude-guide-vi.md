@@ -279,7 +279,7 @@ Run bị dừng có thể làm tiếp bằng `/task-resume`, dựa vào `session
 |------|----------|
 | `docs/plans/plan-<slug>.md` | Plan đã duyệt ở Gate 1. Report **không** được ghi vào plan |
 | `TASKS.md` | Một section cho feature, task đánh `[x]` kèm commit hash |
-| `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` | Report: kết quả từng bước, bảng ledger, tokens theo model, chi phí ước tính, CI + smoke, manual check, advisory còn mở |
+| `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` | Report, cùng các section khi chạy local hay headless (`.claude/skills/autopilot/resources/report.template.md`): kết quả từng bước, bảng ledger, chi phí theo agent (local) hoặc theo job (headless, workflow tự thêm), CI + smoke (headless: sau khi merge), manual check, advisory còn mở |
 | `scratchpad/autopilot/<timestamp>-<slug>.md` | Ledger trong lúc chạy (gitignored) |
 | `session.txt` | Bước đang chạy, progress, và `blocker` khi dừng |
 

@@ -78,7 +78,7 @@ The build and revise jobs also require:
 - Each job has `timeout-minutes: 60`.
 - `concurrency: autopilot` with `cancel-in-progress: false`: one run at a time, others wait.
 - `--max-turns` per job.
-- The skill's round caps (3) still apply. Cost is reported per run with `scripts/claude-cost.mjs`.
+- The skill's round caps (3) still apply. After each job, `scripts/claude-autopilot-cost.sh` (run from `main`, so a PR branch cannot change it) posts the job's cost from the action's result and appends it to the run report on the PR branch.
 
 ## Consequences
 
