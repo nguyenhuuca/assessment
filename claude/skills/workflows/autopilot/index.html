@@ -6802,7 +6802,7 @@
 <h3 id="3-local-qa-2-fix-cap-3-rounds">3. Local QA ×2 ⇄ Fix (cap 3 rounds)<a class="headerlink" href="#3-local-qa-2-fix-cap-3-rounds" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>QA specs:</strong> write or extend tests for the plan's acceptance criteria. List any criterion that cannot be automated; it goes to the summary as a manual check for the owner.</li>
-<li><strong>Run</strong> <code>scripts/qa-twice.sh --be &lt;changed/added test classes&gt; --fe &lt;changed/added test files&gt;</code>.</li>
+<li><strong>Run</strong> <code>bash scripts/qa-twice.sh --be &lt;changed/added test classes&gt; --fe &lt;changed/added test files&gt;</code>. Always call it through <code>bash</code>: a script committed from Windows can lose its exec bit (PR #29 hit <code>Permission denied</code>).</li>
 <li><code>exit 0</code> → stage 4. <code>flaky</code> lines go into the ledger and the summary but do not block.</li>
 <li><code>exit 1</code> → Fix with the <code>FAIL</code> lines, then run again.</li>
 <li><code>exit 2</code> → the run itself broke (compile error, no report). Treat it as a fail and include the log path.</li>
