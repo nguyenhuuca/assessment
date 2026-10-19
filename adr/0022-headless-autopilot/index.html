@@ -6467,7 +6467,12 @@
 </ul>
 <h3 id="d5-limits">D5. Limits<a class="headerlink" href="#d5-limits" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Each job has <code>timeout-minutes: 60</code>.</li>
+<li>
+<p>Workers run in the foreground: <code>settings: {"env":{"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS":"1"}}</code>. In <code>-p</code> mode the session ends with the turn, so a background worker's result is lost. This was found on the first run for issue #26: the plan job ended "waiting for the review" without a PR.</p>
+</li>
+<li>
+<p>Each job has <code>timeout-minutes: 60</code>.</p>
+</li>
 <li><code>concurrency: autopilot</code> with <code>cancel-in-progress: false</code>: one run at a time, others wait.</li>
 <li><code>--max-turns</code> per job.</li>
 <li>The skill's round caps (3) still apply. Cost is reported per run with <code>scripts/claude-cost.mjs</code>.</li>

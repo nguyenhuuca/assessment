@@ -6708,6 +6708,7 @@
 - The build job finds the plan with <code>git diff --name-only origin/main...HEAD -- docs/plans/</code>.
 - <code>session.txt</code> is not written, because the runner is thrown away; the PR is the record.
 - The ledger lives in the runner's <code>scratchpad/</code>. The report (<code>docs/reports/autopilot-&lt;date&gt;-&lt;slug&gt;.md</code>) is committed to the PR branch. Its cost comes from <code>node scripts/claude-cost.mjs --from &lt;job start&gt; --md</code>, which finds the runner's own transcripts.</p>
+<p><strong>Workers in CI run in the foreground.</strong> The workflow sets <code>CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1</code>, because in <code>-p</code> mode the session ends with the turn and a background worker's result would never arrive. Never end a turn while a worker or command is still running, and never answer "waiting for the review". Every stage must finish within the job.</p>
 <p><strong>Shell use in CI.</strong> Only the commands in the workflow's <code>--allowedTools</code> run; anything else is denied, and Claude Code checks each part of a <code>&amp;&amp;</code> chain separately.
 - Run one simple command per call.
 - Write files, including PR bodies and comments, with the Write tool, then pass them with <code>--body-file</code>.
