@@ -311,3 +311,10 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **RB-1** Reopen row button `disabled` while its request is pending
 - [x] **RB-2** Test: disabled + aria-busy while pending, one request on double click
+
+## Fix: Max re-review count from the API (2026-10-19, autopilot, issue #28)
+
+**Plan:** `docs/plans/plan-rereview-max-from-api.md`
+
+- [x] **RM-1** BE `SuggestionDto.maxRereviews` from `SuggestionTransition.MAX_REREVIEWS` + service test
+- [x] **RM-2** FE `SuggestionCard` uses `s.maxRereviews`, drop `REREVIEW_MAX` + test (`1/3` from API)

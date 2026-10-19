@@ -398,6 +398,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
                 .suggesterName(admin ? suggesterName : null)
                 .importJobId(admin ? s.getImportJobId() : null)
                 .rereviewCount(s.getRereviewCount())
+                .maxRereviews(SuggestionTransition.MAX_REREVIEWS)
                 .canRequestRereview(SuggestionTransition.REREVIEW.allowed(s.getStatus(), null, s.getRereviewCount()))
                 .canReopen(admin && canReopen)
                 .build();

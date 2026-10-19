@@ -7,7 +7,6 @@ import { thumbnailUrl } from '../../utils/videoModel.js'
 import { useRequestRereview } from '../../hooks/useSuggestions.js'
 
 const MESSAGE_MAX = 300
-const REREVIEW_MAX = 2
 const REREVIEW_ERRORS = {
   'error.suggestion.notRejected': 'rereviewNotRejected',
   'error.suggestion.rereviewLimit': 'rereviewLimit',
@@ -128,7 +127,7 @@ export default function SuggestionCard({ suggestion: s, onPlayVideo }) {
         {s.note && <p className="hist-card-note">{s.note}</p>}
         {status === 'APPROVED' && <p className="hist-card-hint">{t('approvedHint')}</p>}
         {s.rereviewCount > 0 && (
-          <p className="hist-card-hint">{t('rereviewCount', { count: s.rereviewCount, max: REREVIEW_MAX })}</p>
+          <p className="hist-card-hint">{t('rereviewCount', { count: s.rereviewCount, max: s.maxRereviews })}</p>
         )}
       </div>
 

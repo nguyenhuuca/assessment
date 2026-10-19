@@ -10,7 +10,7 @@ vi.mock('../../../api/suggestions.js', () => ({ suggestionsApi: { requestRerevie
 
 const rejected = (over = {}) => ({
   id: 7, sourceUrl: 'https://youtu.be/abc', title: 'Cat', note: null, status: 'REJECTED', live: false,
-  createdAt: '2026-10-10T10:00:00Z', rereviewCount: 0, canRequestRereview: true, ...over,
+  createdAt: '2026-10-10T10:00:00Z', rereviewCount: 0, maxRereviews: 2, canRequestRereview: true, ...over,
 })
 
 function renderCard(s) {
@@ -40,6 +40,11 @@ describe('SuggestionCard re-review', () => {
   it('shows the requested counter when count > 0', () => {
     renderCard(rejected({ rereviewCount: 1 }))
     expect(screen.getByText('Re-review requested 1/2')).toBeTruthy()
+  })
+
+  it('takes the limit from the API, not a constant', () => {
+    renderCard(rejected({ rereviewCount: 1, maxRereviews: 3 }))
+    expect(screen.getByText('Re-review requested 1/3')).toBeTruthy()
   })
 
   it('hides the counter when count is 0', () => {
