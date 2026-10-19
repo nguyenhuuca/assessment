@@ -1,8 +1,8 @@
-task: Autopilot: centralize suggestion status transitions (refactor)
-status: done
-progress: 100
-done: Plan 0a80d026; SuggestionTransition refactor 08f16414; QA ×2 117 pass; mvn verify cov 96.71%; deployed 4600c1b8, smoke 22/22
-doing: -
-next: -
-plan: docs/plans/plan-suggestion-transitions.md
-updated: 2026-10-19 10:52
+task: Autopilot: dynamic cron job management (DB + admin API/UI)
+status: in_progress
+progress: 90
+done: DJ-1..3 BE 985ba5b5; DJ-4..5 FE e7b53b4f; reviews approve; QA x2 84 pass; verify cov 96.82%
+doing: Gate 2 (push approval)
+next: push after owner approval; watch CI; bash api/mock-test.sh; prod check Admin > Scheduled jobs
+plan: docs/plans/plan-dynamic-cron-jobs.md
+updated: 2026-10-19 21:30

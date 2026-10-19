@@ -332,3 +332,13 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **RR-1** `AdminSuggestionTable` `StatusCell` shows a "Re-review n/max" badge when `rereviewCount > 0`; i18n key `sugg.rereviewBadge` (en + vi) fb67d234
 - [x] **RR-2** Tests: badge with count/max (vi + en), no badge when 0 or missing fb67d234
+
+## Feature: Dynamic cron job management (2026-10-19, autopilot)
+
+**Plan:** `docs/plans/plan-dynamic-cron-jobs.md` · **ADR:** `docs/adr/0023-dynamic-cron-jobs.md`
+
+- [x] **DJ-1** Liquibase `scheduled_job` table + 6 seed rows, entity + repository 985ba5b5
+- [x] **DJ-2** `JobRegistry` + `DynamicJobScheduler` (TaskScheduler + CronTrigger, overlap guard); remove `@Scheduled` from AppScheduler jobs 985ba5b5
+- [x] **DJ-3** Admin API `/admin/jobs` (GET, PATCH, POST runs) + validation + i18n errors + permission tests 985ba5b5
+- [x] **DJ-4** FE api + React Query hooks for jobs e7b53b4f
+- [x] **DJ-5** FE Admin "Scheduled jobs" tab (en + vi) + tests e7b53b4f

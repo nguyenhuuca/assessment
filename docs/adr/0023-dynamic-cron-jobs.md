@@ -2,7 +2,7 @@
 
 ## Metadata
 
-**Status:** Proposed (2026-10-19) · **Date:** 2026-10-19 · **Deciders:** nguyenhuuca · **Tags:** scheduling, admin, api-contract, data-model
+**Status:** Accepted (2026-10-19) · **Date:** 2026-10-19 · **Deciders:** nguyenhuuca · **Tags:** scheduling, admin, api-contract, data-model
 **Related:** [plan-dynamic-cron-jobs](../plans/plan-dynamic-cron-jobs.md)
 
 ## Context

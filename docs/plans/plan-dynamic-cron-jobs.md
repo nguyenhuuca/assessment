@@ -9,7 +9,7 @@ Handoff to: Builder
 
 ## Overview
 
-**Status:** Planned 2026-10-19 (autopilot)
+**Status:** Built 2026-10-19 (autopilot) · `985ba5b5` BE + `e7b53b4f` FE
 **Author:** nguyenhuuca
 **Date:** 2026-10-19
 **ADR:** [ADR-0023](../adr/0023-dynamic-cron-jobs.md). The ADR is needed because this adds a new API pattern and a new table (D1–D6 live there; this plan does not repeat them).
