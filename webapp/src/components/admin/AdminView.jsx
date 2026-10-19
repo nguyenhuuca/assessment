@@ -7,10 +7,11 @@ import AdminAccountTable from './AdminAccountTable.jsx'
 import AdminCommentTable from './AdminCommentTable.jsx'
 import AdminImportPanel from './AdminImportPanel.jsx'
 import DriveSyncPanel from './DriveSyncPanel.jsx'
+import AdminJobsTab from './AdminJobsTab.jsx'
 import AdminSuggestionTable from './AdminSuggestionTable.jsx'
 import { useSuggestionPendingCount } from '../../hooks/useAdminSuggestions.js'
 
-const TABS = ['VIDEO_VAULT', 'USER_ACCOUNTS', 'FLAGGED_LOGS', 'COMMENTS', 'SUGGESTIONS', 'IMPORT_VIDEO', 'DRIVE_SYNC']
+const TABS = ['VIDEO_VAULT', 'USER_ACCOUNTS', 'FLAGGED_LOGS', 'COMMENTS', 'SUGGESTIONS', 'IMPORT_VIDEO', 'DRIVE_SYNC', 'SCHEDULED_JOBS']
 
 // Query key prefix (see hooks/useAdmin.js) that each tab reads from
 const TAB_QUERY = {
@@ -21,6 +22,7 @@ const TAB_QUERY = {
   SUGGESTIONS:   ['admin', 'suggestions'],
   IMPORT_VIDEO:  ['admin', 'imports'],
   DRIVE_SYNC:    ['admin', 'drive-sync'],
+  SCHEDULED_JOBS: ['admin', 'jobs'],
 }
 
 export default function AdminView({ initialTab }) {
@@ -118,6 +120,7 @@ export default function AdminView({ initialTab }) {
         {activeTab === 'SUGGESTIONS'   && <AdminSuggestionTable />}
         {activeTab === 'IMPORT_VIDEO'  && <AdminImportPanel />}
         {activeTab === 'DRIVE_SYNC'    && <DriveSyncPanel />}
+        {activeTab === 'SCHEDULED_JOBS' && <AdminJobsTab />}
       </div>
     </div>
   )

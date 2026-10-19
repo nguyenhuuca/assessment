@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getDriveSyncFiles, updateVideoStatus, bulkModerateComments } from '../admin.js'
+import { getDriveSyncFiles, updateVideoStatus, bulkModerateComments, getJobs, updateJob, runJob } from '../admin.js'
 import { api } from '../client.js'
 
-vi.mock('../client.js', () => ({ api: { get: vi.fn(), patch: vi.fn() } }))
+vi.mock('../client.js', () => ({ api: { get: vi.fn(), patch: vi.fn(), post: vi.fn() } }))
 
 beforeEach(() => vi.clearAllMocks())
 
@@ -35,5 +35,16 @@ describe('PATCH calls', () => {
     expect(api.patch).toHaveBeenCalledWith('/admin/videos/7/status', { status: 'ACTIVE' })
     await bulkModerateComments({ ids: ['a'], action: 'HIDE' })
     expect(api.patch).toHaveBeenLastCalledWith('/admin/comments/moderation', { ids: ['a'], action: 'HIDE' })
+  })
+})
+
+describe("scheduled jobs", () => {
+  it("uses the right URL, method and body", async () => {
+    await getJobs()
+    expect(api.get).toHaveBeenCalledWith("/admin/jobs")
+    await updateJob("logStats", { cron: "0 0 * * * *", enabled: false })
+    expect(api.patch).toHaveBeenCalledWith("/admin/jobs/logStats", { cron: "0 0 * * * *", enabled: false })
+    await runJob("logStats")
+    expect(api.post).toHaveBeenCalledWith("/admin/jobs/logStats/runs")
   })
 })

@@ -181,3 +181,23 @@ export function useStartDriveSyncRun() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'drive-sync', 'run'] }),
   })
 }
+
+/** Scheduler table; polls every 5 s while a job is running so the Run now button re-enables. */
+export function useAdminJobs() {
+  return useQuery({
+    queryKey: ['admin', 'jobs'],
+    queryFn: () => adminApi.getJobs(),
+    refetchInterval: (q) => ((q.state.data?.data ?? []).some(j => j.running) ? 5000 : false),
+  })
+}
+
+function useJobMutation(fn) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: fn,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'jobs'] }),
+  })
+}
+
+export const useUpdateJob = () => useJobMutation(({ name, body }) => adminApi.updateJob(name, body))
+export const useRunJob    = () => useJobMutation((name) => adminApi.runJob(name))

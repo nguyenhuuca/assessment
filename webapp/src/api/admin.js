@@ -41,6 +41,11 @@ export const runImportNow  = (id) => api.post(`/admin/video-imports/${id}/run-no
 export const cancelImport  = (id) => api.post(`/admin/video-imports/${id}/cancel`)
 export const retryImport   = (id) => api.post(`/admin/video-imports/${id}/retry`)
 
+// Scheduled jobs — see docs/adr/0023-dynamic-cron-jobs.md D4
+export const getJobs   = () => api.get('/admin/jobs')
+export const updateJob = (name, body) => patch(`/admin/jobs/${encodeURIComponent(name)}`, body)
+export const runJob    = (name) => api.post(`/admin/jobs/${encodeURIComponent(name)}/runs`)
+
 // Drive force sync — see docs/plans/plan-admin-drive-force-sync.md
 export const getDriveSyncFiles  = (params = {}) => api.get(buildUrl('/admin/drive-sync/files', cleanParams(params)))
 export const startDriveSyncRun  = (fileIds) => api.post('/admin/drive-sync/runs', { fileIds })

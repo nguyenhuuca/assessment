@@ -18,7 +18,8 @@
     "COMMENTS": "COMMENTS",
     "SUGGESTIONS": "SUGGESTIONS",
     "IMPORT_VIDEO": "IMPORT_VIDEO",
-    "DRIVE_SYNC": "DRIVE_SYNC"
+    "DRIVE_SYNC": "DRIVE_SYNC",
+    "SCHEDULED_JOBS": "SCHEDULED_JOBS"
   },
   "showing": "SHOWING {{shown}} OF {{total}} ENTRIES",
   "showingFiles": "SHOWING {{shown}} OF {{total}} FILES",
@@ -255,5 +256,24 @@
     "cannotReopen": "This suggestion can't be reopened (its import is running or finished)",
     "alreadyPending": "This suggestion is already pending",
     "duplicate": "Another pending suggestion or active import already exists for this link"
+  },
+  "jobs": {
+    "colName": "Job",
+    "colDescription": "Description",
+    "colCron": "Cron",
+    "colZone": "Zone",
+    "colEnabled": "Enabled",
+    "colNextRun": "Next run",
+    "colLastRun": "Last run",
+    "colActions": "Actions",
+    "result": { "SUCCESS": "SUCCESS", "FAILED": "FAILED", "SKIPPED": "SKIPPED" },
+    "running": "RUNNING",
+    "enabledAria": "Enable {{name}}",
+    "cronAria": "Cron of {{name}}",
+    "save": "Save",
+    "runNow": "Run now",
+    "noJobs": "No scheduled jobs",
+    "readOnly": "Only SUPER_ADMIN can change scheduled jobs",
+    "actionFailed": "Action failed"
   }
 }

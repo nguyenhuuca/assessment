@@ -18,7 +18,8 @@
     "COMMENTS": "BÌNH LUẬN",
     "SUGGESTIONS": "ĐỀ XUẤT",
     "IMPORT_VIDEO": "NHẬP VIDEO",
-    "DRIVE_SYNC": "ĐỒNG BỘ DRIVE"
+    "DRIVE_SYNC": "ĐỒNG BỘ DRIVE",
+    "SCHEDULED_JOBS": "TÁC VỤ ĐỊNH KỲ"
   },
   "showing": "HIỂN THỊ {{shown}} / {{total}} MỤC",
   "showingFiles": "HIỂN THỊ {{shown}} / {{total}} FILE",
@@ -246,5 +247,24 @@
     "cannotReopen": "Không thể mở lại đề xuất này (import đang chạy hoặc đã xong)",
     "alreadyPending": "Đề xuất này đang chờ duyệt",
     "duplicate": "Đã có đề xuất đang chờ hoặc import đang chạy cho liên kết này"
+  },
+  "jobs": {
+    "colName": "Tác vụ",
+    "colDescription": "Mô tả",
+    "colCron": "Cron",
+    "colZone": "Múi giờ",
+    "colEnabled": "Bật",
+    "colNextRun": "Lần chạy tới",
+    "colLastRun": "Lần chạy gần nhất",
+    "colActions": "Thao tác",
+    "result": { "SUCCESS": "THÀNH CÔNG", "FAILED": "THẤT BẠI", "SKIPPED": "BỎ QUA" },
+    "running": "ĐANG CHẠY",
+    "enabledAria": "Bật {{name}}",
+    "cronAria": "Cron của {{name}}",
+    "save": "Lưu",
+    "runNow": "Chạy ngay",
+    "noJobs": "Chưa có tác vụ định kỳ nào",
+    "readOnly": "Chỉ SUPER_ADMIN được sửa tác vụ định kỳ",
+    "actionFailed": "Thao tác thất bại"
   }
 }
