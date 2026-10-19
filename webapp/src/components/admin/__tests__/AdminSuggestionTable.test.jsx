@@ -153,6 +153,21 @@ describe('AdminSuggestionTable', () => {
       await waitFor(() => expect(suggestionsApi.adminList.mock.calls.length).toBeGreaterThan(calls))
     })
 
+    it('disables the button while pending and sends a single request', async () => {
+      suggestionsApi.adminList.mockResolvedValue(listOf([reopenable]))
+      suggestionsApi.reopen.mockReturnValue(new Promise(() => {}))
+      renderTable()
+      const button = await screen.findByLabelText('Mở lại')
+      fireEvent.click(button)
+      fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Mở lại' }))
+      await waitFor(() => expect(button).toBeDisabled())
+      expect(button).toHaveAttribute('aria-busy', 'true')
+      fireEvent.click(button)
+      expect(screen.queryByRole('dialog')).toBeNull()
+      expect(suggestionsApi.reopen).toHaveBeenCalledTimes(1)
+      expect(suggestionsApi.reopen).toHaveBeenCalledWith(2)
+    })
+
     it('does nothing when the confirmation is cancelled', async () => {
       suggestionsApi.adminList.mockResolvedValue(listOf([reopenable]))
       renderTable()
