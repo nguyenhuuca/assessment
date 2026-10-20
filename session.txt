@@ -1,8 +1,8 @@
-task: Autopilot: dynamic cron job management (DB + admin API/UI)
-status: done
-progress: 100
-done: DJ-1..3 BE 985ba5b5; DJ-4..5 FE e7b53b4f; pushed 653af769, CI green; smoke 22/22
-doing: -
-next: owner prod check: Admin > Scheduled jobs (6 jobs, cleanup disabled)
-plan: docs/plans/plan-dynamic-cron-jobs.md
-updated: 2026-10-19 21:38
+task: Autopilot (lite): scheduled jobs report FAILED when the job body fails
+status: in_progress
+progress: 85
+done: SJ-1 4 job bodies propagate failures 62526c97
+doing: Gate 2 (push approval)
+next: push, watch BE CI, smoke ./api/mock-test.sh
+plan: -
+updated: 2026-10-20 17:33

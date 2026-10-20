@@ -359,3 +359,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **TITLE-1** `index.css` (≤768px): `.admin-asset-title` one line, `max-width`, `text-overflow: ellipsis` 810cdb38
 - [x] **TITLE-2** `AdminVideoTable.jsx:115` full title in `title` attribute 810cdb38
 - [x] **TITLE-3** `AdminVideoTable` test: title span has the full title attribute 810cdb38
+
+## Feature: Scheduled jobs report real failures (2026-10-20, autopilot lite)
+
+- [x] **SJ-1** AppScheduler: 4 job bodies propagate failures so Admin shows FAILED (make-poem, sync-drive-videos, notification-digest, notification-retention) 62526c97
