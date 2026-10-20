@@ -356,6 +356,6 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **Plan:** in the PR body (lite mode)
 
-- [ ] **TITLE-1** `index.css` (≤768px): `.admin-asset-title` one line, `max-width`, `text-overflow: ellipsis`
-- [ ] **TITLE-2** `AdminVideoTable.jsx:115` full title in `title` attribute
-- [ ] **TITLE-3** `AdminVideoTable` test: title span has the full title attribute
+- [x] **TITLE-1** `index.css` (≤768px): `.admin-asset-title` one line, `max-width`, `text-overflow: ellipsis` 810cdb38
+- [x] **TITLE-2** `AdminVideoTable.jsx:115` full title in `title` attribute 810cdb38
+- [x] **TITLE-3** `AdminVideoTable` test: title span has the full title attribute 810cdb38
