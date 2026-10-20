@@ -375,3 +375,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **IR-5** FE `api/reports.js` + hooks + `__APP_BUILD__` define + i18n `report.json`/`navReport`; tests 932991b1
 - [x] **IR-6** FE `ReportPage` + AppShell nav above Settings (desktop + mobile); component tests d49f51fb
 - [ ] **IR-7** Owner: label `report`, PAT, `GITHUB_REPORT_TOKEN` in `/opt/funnyapp/.env`, prod check
+
+## Issue #42 — Report notice unreadable (autopilot, lite)
+
+- [x] **FE-1** `.app-alert.info` rule in `index.css`
+- [x] **FE-2** `ReportPage.jsx` notice `app-alert error` → `app-alert info`
+- [x] **FE-3** Vitest: notice has class `info`, not `error`

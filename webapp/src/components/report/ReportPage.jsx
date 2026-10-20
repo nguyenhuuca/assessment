@@ -142,7 +142,7 @@ export default function ReportPage({ fromPage }) {
             ))}
           </dl>
         </div>
-        <div className="app-alert error" role="note">{t('publicWarning')}</div>
+        <div className="app-alert info" role="note">{t('publicWarning')}</div>
         <div>
           <button type="submit" className="app-btn primary" disabled={!valid || create.isPending} aria-busy={create.isPending}>
             {create.isPending ? t('submitting') : t('submit')}
