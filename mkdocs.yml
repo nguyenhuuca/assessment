@@ -93,6 +93,7 @@ nav:
       - User Notifications: prd/PRD-user-notifications.md
       - Password Login: prd/PRD-password-login.md
       - Admin Video Import: prd/PRD-admin-video-import.md
+      - In-App Report: prd/PRD-in-app-report.md
 
   - Specs:
       - Overview: specs/index.md
