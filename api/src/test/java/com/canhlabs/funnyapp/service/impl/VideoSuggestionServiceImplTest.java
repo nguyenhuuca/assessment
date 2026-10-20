@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.client.RedirectProbe;
+import com.canhlabs.funnyapp.utils.RedirectProbe;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.admin.CreateVideoImportResultDto;
 import com.canhlabs.funnyapp.dto.suggestion.SuggestionDto;

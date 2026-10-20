@@ -1,6 +1,5 @@
 package com.canhlabs.funnyapp.utils;
 
-import com.canhlabs.funnyapp.client.RedirectProbe;
 import com.canhlabs.funnyapp.enums.ImportPlatform;
 import com.canhlabs.funnyapp.utils.ImportUrlValidator.ImportUrl;
 import com.google.common.cache.Cache;

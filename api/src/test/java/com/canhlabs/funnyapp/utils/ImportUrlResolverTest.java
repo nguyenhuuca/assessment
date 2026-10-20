@@ -1,6 +1,5 @@
 package com.canhlabs.funnyapp.utils;
 
-import com.canhlabs.funnyapp.client.RedirectProbe;
 import com.canhlabs.funnyapp.enums.ImportPlatform;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

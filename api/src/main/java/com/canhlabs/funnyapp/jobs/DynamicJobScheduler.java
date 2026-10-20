@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.jobs;
 
 import com.canhlabs.funnyapp.entity.ScheduledJob;
 import com.canhlabs.funnyapp.repo.ScheduledJobRepository;
+import com.canhlabs.funnyapp.service.JobScheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -23,11 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @Slf4j
 @Component
-public class DynamicJobScheduler {
-
-    /** In-memory outcome of the latest run; reset on restart. */
-    public record JobRun(Instant at, String result) {
-    }
+public class DynamicJobScheduler implements JobScheduler {
 
     private final TaskScheduler taskScheduler;
     private final ScheduledJobRepository repository;
@@ -70,7 +67,7 @@ public class DynamicJobScheduler {
         }
     }
 
-    /** Replaces the live schedule of one job: cancels the old future, then schedules a new one if enabled. */
+    @Override
     public void reschedule(ScheduledJob job) {
         String name = job.getName();
         Runnable task = registry.get(name);
@@ -87,7 +84,7 @@ public class DynamicJobScheduler {
         });
     }
 
-    /** Starts a run now; false when the job is already running or has no code. */
+    @Override
     public boolean runNow(String name) {
         Runnable task = registry.get(name);
         if (task == null || guard(name).get()) {
@@ -97,15 +94,18 @@ public class DynamicJobScheduler {
         return true;
     }
 
+    @Override
     public boolean isRunning(String name) {
         AtomicBoolean flag = running.get(name);
         return flag != null && flag.get();
     }
 
+    @Override
     public boolean hasCode(String name) {
         return registry.get(name) != null;
     }
 
+    @Override
     public JobRun lastRun(String name) {
         return lastRuns.get(name);
     }

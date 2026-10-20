@@ -1,8 +1,7 @@
-package com.canhlabs.funnyapp.config;
+package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.service.DriveUploader;
-import com.canhlabs.funnyapp.service.impl.NotConfiguredDriveUploader;
-import com.canhlabs.funnyapp.service.impl.OAuthDriveUploader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

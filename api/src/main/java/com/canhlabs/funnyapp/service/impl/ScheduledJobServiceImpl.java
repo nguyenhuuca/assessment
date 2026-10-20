@@ -4,8 +4,8 @@ import com.canhlabs.funnyapp.dto.admin.ScheduledJobDto;
 import com.canhlabs.funnyapp.dto.admin.UpdateScheduledJobRequest;
 import com.canhlabs.funnyapp.entity.ScheduledJob;
 import com.canhlabs.funnyapp.exception.CustomException;
-import com.canhlabs.funnyapp.jobs.DynamicJobScheduler;
 import com.canhlabs.funnyapp.repo.ScheduledJobRepository;
+import com.canhlabs.funnyapp.service.JobScheduler;
 import com.canhlabs.funnyapp.service.ScheduledJobService;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.support.CronExpression;
@@ -31,9 +31,9 @@ public class ScheduledJobServiceImpl implements ScheduledJobService {
     private static final Pattern SECONDS = Pattern.compile("[0-5]?\\d");
 
     private final ScheduledJobRepository repository;
-    private final DynamicJobScheduler scheduler;
+    private final JobScheduler scheduler;
 
-    public ScheduledJobServiceImpl(ScheduledJobRepository repository, DynamicJobScheduler scheduler) {
+    public ScheduledJobServiceImpl(ScheduledJobRepository repository, JobScheduler scheduler) {
         this.repository = repository;
         this.scheduler = scheduler;
     }
@@ -128,7 +128,7 @@ public class ScheduledJobServiceImpl implements ScheduledJobService {
     }
 
     private ScheduledJobDto toDto(ScheduledJob job) {
-        DynamicJobScheduler.JobRun last = scheduler.lastRun(job.getName());
+        JobScheduler.JobRun last = scheduler.lastRun(job.getName());
         return ScheduledJobDto.builder()
                 .name(job.getName())
                 .description(job.getDescription())

@@ -4,7 +4,7 @@ import com.canhlabs.funnyapp.dto.admin.ScheduledJobDto;
 import com.canhlabs.funnyapp.dto.admin.UpdateScheduledJobRequest;
 import com.canhlabs.funnyapp.entity.ScheduledJob;
 import com.canhlabs.funnyapp.exception.CustomException;
-import com.canhlabs.funnyapp.jobs.DynamicJobScheduler;
+import com.canhlabs.funnyapp.service.JobScheduler;
 import com.canhlabs.funnyapp.repo.ScheduledJobRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ScheduledJobServiceImplTest {
     @Mock ScheduledJobRepository repository;
-    @Mock DynamicJobScheduler scheduler;
+    @Mock JobScheduler scheduler;
 
     ScheduledJobServiceImpl service;
     ScheduledJob job;
@@ -229,7 +229,7 @@ class ScheduledJobServiceImplTest {
         other.setEnabled(true);
         when(repository.findAll()).thenReturn(List.of(job, other));
         Instant at = Instant.parse("2026-10-19T00:00:00Z");
-        when(scheduler.lastRun("notification-digest")).thenReturn(new DynamicJobScheduler.JobRun(at, "FAILED"));
+        when(scheduler.lastRun("notification-digest")).thenReturn(new JobScheduler.JobRun(at, "FAILED"));
         when(scheduler.isRunning("notification-digest")).thenReturn(true);
 
         List<ScheduledJobDto> dtos = service.list();

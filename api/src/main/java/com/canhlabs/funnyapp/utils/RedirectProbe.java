@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.client;
+package com.canhlabs.funnyapp.utils;
 
 import java.util.Optional;
 
