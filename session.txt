@@ -1,8 +1,8 @@
 task: Autopilot (lite): scheduled jobs report FAILED when the job body fails
-status: in_progress
-progress: 85
-done: SJ-1 4 job bodies propagate failures 62526c97
-doing: Gate 2 (push approval)
-next: push, watch BE CI, smoke ./api/mock-test.sh
+status: done
+progress: 100
+done: SJ-1 4 job bodies propagate failures 62526c97; CI green, smoke 22/22
+doing: -
+next: owner prod check: Admin > Scheduled jobs shows FAILED on a real failure
 plan: -
-updated: 2026-10-20 17:33
+updated: 2026-10-20 17:47
