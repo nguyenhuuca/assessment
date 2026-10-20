@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.config.AppProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class JdkGitHubIssueClient implements GitHubIssueClient {
     private final AppProperties props;
     private final ObjectMapper mapper;
 
+    @Autowired
     public JdkGitHubIssueClient(AppProperties props, ObjectMapper mapper) {
         this(HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.NEVER)
