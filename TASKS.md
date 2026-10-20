@@ -363,3 +363,15 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 ## Feature: Scheduled jobs report real failures (2026-10-20, autopilot lite)
 
 - [x] **SJ-1** AppScheduler: 4 job bodies propagate failures so Admin shows FAILED (make-poem, sync-drive-videos, notification-digest, notification-retention) 62526c97
+
+## Feature: In-App Report → GitHub issue (2026-10-20)
+
+**Plan:** `docs/plans/plan-in-app-report.md` · **Spec:** `docs/specs/spec-in-app-report.md` · **ADR:** `docs/adr/0026-in-app-report.md`
+
+- [ ] **IR-1** Liquibase `app_report` + `AppReport` entity + `AppReportRepository` (cap count, paged list) + migration test
+- [ ] **IR-2** `AppProperties.Github` + `GitHubIssueClient`/`JdkGitHubIssueClient` (create, state) + `GitHubIssueStateCache`; stub-server tests, token never logged
+- [ ] **IR-3** `ReportService` (validation, labels, daily cap, body builder, store-then-call, retry, list + parallel state) + DTOs + `error.report.*` i18n; service tests
+- [ ] **IR-4** `AdminReportController` (POST, GET paged, POST retry) + `@AuditLog`/`@RateLimited`; permission + contract tests
+- [ ] **IR-5** FE `api/reports.js` + hooks + `__APP_BUILD__` define + i18n `report.json`/`navReport`; tests
+- [ ] **IR-6** FE `ReportPage` + AppShell nav above Settings (desktop + mobile); component tests
+- [ ] **IR-7** Owner: label `report`, PAT, `GITHUB_REPORT_TOKEN` in `/opt/funnyapp/.env`, prod check

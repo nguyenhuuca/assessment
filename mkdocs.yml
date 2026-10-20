@@ -100,6 +100,7 @@ nav:
       - Watch History: specs/spec-watch-history-opus.md
       - Bitwise Permissions: specs/spec-bitwise-permissions.md
       - User Settings: specs/spec-user-settings.md
+      - In-App Report: specs/spec-in-app-report.md
 
   - Plans:
       - HLS Migration: plans/plan-hls-migration.md
@@ -121,6 +122,7 @@ nav:
       - Password Login: plans/plan-password-login.md
       - Admin Video Import: plans/plan-admin-video-import.md
       - Admin Drive Force Sync: plans/plan-admin-drive-force-sync.md
+      - In-App Report: plans/plan-in-app-report.md
 
   - Presentations:
       - presentations/index.md
