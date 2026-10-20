@@ -368,10 +368,10 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 **Plan:** `docs/plans/plan-in-app-report.md` · **Spec:** `docs/specs/spec-in-app-report.md` · **ADR:** `docs/adr/0026-in-app-report.md`
 
-- [ ] **IR-1** Liquibase `app_report` + `AppReport` entity + `AppReportRepository` (cap count, paged list) + migration test
-- [ ] **IR-2** `AppProperties.Github` + `GitHubIssueClient`/`JdkGitHubIssueClient` (create, state) + `GitHubIssueStateCache`; stub-server tests, token never logged
-- [ ] **IR-3** `ReportService` (validation, labels, daily cap, body builder, store-then-call, retry, list + parallel state) + DTOs + `error.report.*` i18n; service tests
-- [ ] **IR-4** `AdminReportController` (POST, GET paged, POST retry) + `@AuditLog`/`@RateLimited`; permission + contract tests
-- [ ] **IR-5** FE `api/reports.js` + hooks + `__APP_BUILD__` define + i18n `report.json`/`navReport`; tests
-- [ ] **IR-6** FE `ReportPage` + AppShell nav above Settings (desktop + mobile); component tests
+- [x] **IR-1** Liquibase `app_report` + `AppReport` entity + `AppReportRepository` (cap count, paged list) + migration test ca21f28e
+- [x] **IR-2** `AppProperties.Github` + `GitHubIssueClient`/`JdkGitHubIssueClient` (create, state) + `GitHubIssueStateCache`; stub-server tests, token never logged 9e16d0c5
+- [x] **IR-3** `ReportService` (validation, labels, daily cap, body builder, store-then-call, retry, list + parallel state) + DTOs + `error.report.*` i18n; service tests 170354a4
+- [x] **IR-4** `AdminReportController` (POST, GET paged, POST retry) + `@AuditLog`/`@RateLimited`; permission + contract tests c1c3760a
+- [x] **IR-5** FE `api/reports.js` + hooks + `__APP_BUILD__` define + i18n `report.json`/`navReport`; tests 932991b1
+- [x] **IR-6** FE `ReportPage` + AppShell nav above Settings (desktop + mobile); component tests d49f51fb
 - [ ] **IR-7** Owner: label `report`, PAT, `GITHUB_REPORT_TOKEN` in `/opt/funnyapp/.env`, prod check

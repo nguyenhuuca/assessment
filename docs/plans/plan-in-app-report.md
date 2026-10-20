@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status:** Planned
+**Status:** Built (IR-1..IR-6); IR-7 owner setup pending
 **Date:** 2026-10-20
 **Spec:** [spec-in-app-report](../specs/spec-in-app-report.md) · **ADR:** [ADR-0026](../adr/0026-in-app-report.md) · **PRD:** [PRD-in-app-report](../prd/PRD-in-app-report.md)
 **Size:** Medium. 6 implementation tasks (IR-1..IR-6) of about 150–400 LOC each, plus owner setup (IR-7).
