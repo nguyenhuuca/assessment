@@ -50,6 +50,21 @@ describe('AdminJobsTab', () => {
     expect(screen.queryByRole('button')).toBeNull()
   })
 
+  it('ADMIN sees the translated ON/OFF badge', async () => {
+    setRole('ADMIN')
+    renderTab()
+    await screen.findByText('logStats')
+    expect(screen.getByText('BẬT')).toBeInTheDocument()
+    expect(screen.getByText('TẮT')).toBeInTheDocument()
+    await i18n.changeLanguage('en')
+    try {
+      expect(await screen.findByText('ON')).toBeInTheDocument()
+      expect(screen.getByText('OFF')).toBeInTheDocument()
+    } finally {
+      await i18n.changeLanguage('vi')
+    }
+  })
+
   it('SUPER_ADMIN toggles enabled', async () => {
     renderTab()
     fireEvent.click(await screen.findByLabelText('Bật cleanup'))

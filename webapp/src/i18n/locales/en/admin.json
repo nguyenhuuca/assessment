@@ -272,6 +272,8 @@
       "SKIPPED": "SKIPPED"
     },
     "running": "RUNNING",
+    "enabledOn": "ON",
+    "enabledOff": "OFF",
     "enabledAria": "Enable {{name}}",
     "cronAria": "Cron of {{name}}",
     "save": "Save",
