@@ -20,10 +20,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -187,11 +191,11 @@ class AppSchedulerTest {
     }
 
     @Test
-    void scheduleMakePoem_whenUpdateDescThrows_exceptionIsCaughtAndNotRethrown() {
-        doThrow(new RuntimeException("service failure")).when(streamVideoService).updateDesc();
+    void scheduleMakePoem_whenUpdateDescThrows_propagates() {
+        RuntimeException boom = new RuntimeException("service failure");
+        doThrow(boom).when(streamVideoService).updateDesc();
 
-        // Must not throw
-        scheduler.scheduleMakePoem();
+        assertSame(boom, assertThrows(RuntimeException.class, () -> scheduler.scheduleMakePoem()));
 
         verify(streamVideoService).updateDesc();
     }
@@ -254,14 +258,23 @@ class AppSchedulerTest {
     }
 
     @Test
-    void syncDriveVideos_whenServiceThrows_exceptionIsCaughtAndNotRethrown() throws Exception {
-        doThrow(new RuntimeException("drive error"))
-                .when(videoStorageService).downloadFileFromFolder(anyString(), anyString());
+    void syncDriveVideos_whenServiceThrowsRuntime_propagates() throws Exception {
+        RuntimeException boom = new RuntimeException("drive error");
+        doThrow(boom).when(videoStorageService).downloadFileFromFolder(anyString(), anyString());
 
-        // Must not throw
-        scheduler.syncDriveVideos();
+        assertSame(boom, assertThrows(RuntimeException.class, () -> scheduler.syncDriveVideos()));
 
         verify(videoStorageService).downloadFileFromFolder(anyString(), anyString());
+    }
+
+    @Test
+    void syncDriveVideos_whenServiceThrowsIOException_throwsUncheckedIOException() throws Exception {
+        IOException cause = new IOException("drive down");
+        doThrow(cause).when(videoStorageService).downloadFileFromFolder(anyString(), anyString());
+
+        UncheckedIOException ex = assertThrows(UncheckedIOException.class, () -> scheduler.syncDriveVideos());
+
+        assertSame(cause, ex.getCause());
     }
 
     // ── cleanUpOldVideos() ────────────────────────────────────────────────────
@@ -300,10 +313,11 @@ class AppSchedulerTest {
     }
 
     @Test
-    void notificationDigest_swallowsFailures() {
-        when(notificationDigestService.sendDigests()).thenThrow(new IllegalStateException("boom"));
+    void notificationDigest_whenServiceThrows_propagates() {
+        IllegalStateException boom = new IllegalStateException("boom");
+        when(notificationDigestService.sendDigests()).thenThrow(boom);
 
-        org.assertj.core.api.Assertions.assertThatCode(() -> scheduler.notificationDigest()).doesNotThrowAnyException();
+        assertSame(boom, assertThrows(IllegalStateException.class, () -> scheduler.notificationDigest()));
     }
 
     @Test
@@ -316,10 +330,11 @@ class AppSchedulerTest {
     }
 
     @Test
-    void notificationRetention_swallowsFailures() {
-        when(notificationDigestService.purgeOldRead(any(java.time.Instant.class))).thenThrow(new IllegalStateException("boom"));
+    void notificationRetention_whenServiceThrows_propagates() {
+        IllegalStateException boom = new IllegalStateException("boom");
+        when(notificationDigestService.purgeOldRead(any(java.time.Instant.class))).thenThrow(boom);
 
-        org.assertj.core.api.Assertions.assertThatCode(() -> scheduler.notificationRetention()).doesNotThrowAnyException();
+        assertSame(boom, assertThrows(IllegalStateException.class, () -> scheduler.notificationRetention()));
     }
 
     // ── helpers ────────────────────────────────────────────────────────────────

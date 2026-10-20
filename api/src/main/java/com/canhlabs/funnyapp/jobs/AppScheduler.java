@@ -19,6 +19,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
@@ -68,11 +70,7 @@ public class AppScheduler implements ApplicationRunner {
 
     public void scheduleMakePoem() {
         log.info("Start running scheduleMakePoem");
-        try {
-            streamVideoService.updateDesc();
-        } catch (Exception ex) {
-            log.error("Error running scheduleMakePoem job", ex);
-        }
+        streamVideoService.updateDesc();
     }
 
     public void logStats() {
@@ -95,28 +93,20 @@ public class AppScheduler implements ApplicationRunner {
         try {
             videoStorageService.downloadFileFromFolder(AppConstant.FOLDER_ID, isoTime);
             log.info("✅ Successfully synced from Google Drive");
-        } catch (Exception e) {
-            log.error("❌ Failed to sync from Google Drive", e);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Google Drive sync failed", e);
         }
     }
 
 
     public void notificationDigest() {
-        try {
-            int sent = notificationDigestService.sendDigests();
-            log.info("Notification digest sent {} email(s)", sent);
-        } catch (Exception e) {
-            log.error("Error running notificationDigest job", e);
-        }
+        int sent = notificationDigestService.sendDigests();
+        log.info("Notification digest sent {} email(s)", sent);
     }
 
     public void notificationRetention() {
-        try {
-            int deleted = notificationDigestService.purgeOldRead(Instant.now());
-            log.info("Notification retention deleted {} read notification(s)", deleted);
-        } catch (Exception e) {
-            log.error("Error running notificationRetention job", e);
-        }
+        int deleted = notificationDigestService.purgeOldRead(Instant.now());
+        log.info("Notification retention deleted {} read notification(s)", deleted);
     }
 
     public void cleanUpOldVideos() {

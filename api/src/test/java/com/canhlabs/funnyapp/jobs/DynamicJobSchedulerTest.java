@@ -6,6 +6,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.canhlabs.funnyapp.entity.ScheduledJob;
 import com.canhlabs.funnyapp.repo.ScheduledJobRepository;
+import com.canhlabs.funnyapp.service.notification.NotificationDigestService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -225,6 +226,19 @@ class DynamicJobSchedulerTest {
 
         assertThat(scheduler.lastRun("a").result()).isEqualTo("FAILED");
         assertThat(scheduler.lastRun("a").at()).isNotNull();
+    }
+
+    @Test
+    void run_realAppSchedulerJobThatFails_isRecordedAsFailed() {
+        NotificationDigestService digestService = mock(NotificationDigestService.class);
+        when(digestService.sendDigests()).thenThrow(new IllegalStateException("smtp down"));
+        AppScheduler appScheduler = new AppScheduler(null, null, null, null, null, null, null, null, digestService);
+        when(registry.get("notification-digest")).thenReturn(appScheduler::notificationDigest);
+        scheduler.reschedule(job("notification-digest", true));
+
+        scheduledTask().run();
+
+        assertThat(scheduler.lastRun("notification-digest").result()).isEqualTo("FAILED");
     }
 
     @Test
