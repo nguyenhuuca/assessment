@@ -1,0 +1,52 @@
+{
+  "title": "Báo lỗi",
+  "intro": "Báo lỗi, đề xuất cải tiến hoặc nêu vấn đề. Nội dung sẽ được gửi lên GitHub dưới dạng issue.",
+  "typeLabel": "Loại",
+  "type": { "BUG": "Lỗi", "ENHANCEMENT": "Cải tiến", "ISSUE": "Vấn đề" },
+  "titleLabel": "Tiêu đề",
+  "titleHint": "Tối đa {{max}} ký tự",
+  "descriptionLabel": "Mô tả",
+  "descriptionHint": "Tối đa {{max}} ký tự",
+  "autopilotLabel": "Autopilot",
+  "autopilot": { "NONE": "Không", "AUTO_MERGE": "Auto-merge", "AUTO": "Full auto" },
+  "contextTitle": "Ngữ cảnh trang",
+  "context": {
+    "page": "Trang",
+    "path": "Đường dẫn",
+    "appVersion": "Phiên bản app",
+    "userAgent": "Trình duyệt",
+    "screenWidth": "Độ rộng màn hình"
+  },
+  "publicWarning": "Repository GitHub là public. Không đưa mật khẩu, token hay dữ liệu cá nhân vào nội dung. Tên của bạn không được gửi lên GitHub.",
+  "submit": "Gửi báo cáo",
+  "submitting": "Đang gửi...",
+  "retry": "Thử lại",
+  "retrying": "Đang thử lại...",
+  "created": "Đã tạo issue #{{number}}",
+  "viewIssue": "Xem trên GitHub",
+  "capReached": "Hôm nay đã hết hạn mức Autopilot; chủ sở hữu có thể tự thêm label.",
+  "failed": "Báo cáo đã được lưu nhưng chưa tạo được issue trên GitHub.",
+  "error": {
+    "github": {
+      "notConfigured": "GitHub chưa được cấu hình. Hãy nhờ chủ sở hữu thiết lập rồi thử lại.",
+      "timeout": "GitHub phản hồi quá chậm. Hãy thử lại sau ít phút.",
+      "http": "GitHub từ chối yêu cầu (HTTP {{status}}). Hãy thử lại sau.",
+      "io": "Không kết nối được tới GitHub. Hãy thử lại sau.",
+      "unknown": "Không tạo được issue trên GitHub. Hãy thử lại sau."
+    }
+  },
+  "list": {
+    "title": "Báo cáo gần đây",
+    "empty": "Chưa có báo cáo nào.",
+    "colIssue": "Issue",
+    "colType": "Loại",
+    "colTitle": "Tiêu đề",
+    "colReporter": "Người báo",
+    "colState": "Trạng thái",
+    "colCreated": "Ngày tạo",
+    "colActions": "Thao tác",
+    "deletedUser": "Người dùng đã xóa",
+    "failedBadge": "Thất bại"
+  },
+  "state": { "OPEN": "Đang mở", "CLOSED": "Đã đóng", "UNKNOWN": "Không rõ" }
+}

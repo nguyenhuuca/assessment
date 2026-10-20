@@ -1,0 +1,52 @@
+{
+  "title": "Report",
+  "intro": "Report a bug, suggest an enhancement or raise an issue. It is sent to GitHub as an issue.",
+  "typeLabel": "Type",
+  "type": { "BUG": "Bug", "ENHANCEMENT": "Enhancement", "ISSUE": "Issue" },
+  "titleLabel": "Title",
+  "titleHint": "At most {{max}} characters",
+  "descriptionLabel": "Description",
+  "descriptionHint": "At most {{max}} characters",
+  "autopilotLabel": "Autopilot",
+  "autopilot": { "NONE": "None", "AUTO_MERGE": "Auto-merge", "AUTO": "Full auto" },
+  "contextTitle": "Page context",
+  "context": {
+    "page": "Page",
+    "path": "Path",
+    "appVersion": "App version",
+    "userAgent": "Browser",
+    "screenWidth": "Screen width"
+  },
+  "publicWarning": "The GitHub repository is public. Do not include passwords, tokens or personal data. Your name is not sent to GitHub.",
+  "submit": "Submit report",
+  "submitting": "Submitting...",
+  "retry": "Retry",
+  "retrying": "Retrying...",
+  "created": "Issue #{{number}} created",
+  "viewIssue": "View on GitHub",
+  "capReached": "Autopilot quota reached for today; the owner can add the label.",
+  "failed": "The report was saved, but the GitHub issue could not be created.",
+  "error": {
+    "github": {
+      "notConfigured": "GitHub is not configured. Ask the owner to set it up, then retry.",
+      "timeout": "GitHub did not respond in time. Retry in a moment.",
+      "http": "GitHub rejected the request (HTTP {{status}}). Retry later.",
+      "io": "Could not reach GitHub. Retry later.",
+      "unknown": "Could not create the GitHub issue. Retry later."
+    }
+  },
+  "list": {
+    "title": "Recent reports",
+    "empty": "No reports yet.",
+    "colIssue": "Issue",
+    "colType": "Type",
+    "colTitle": "Title",
+    "colReporter": "Reporter",
+    "colState": "State",
+    "colCreated": "Created",
+    "colActions": "Actions",
+    "deletedUser": "Deleted user",
+    "failedBadge": "Failed"
+  },
+  "state": { "OPEN": "Open", "CLOSED": "Closed", "UNKNOWN": "Unknown" }
+}
