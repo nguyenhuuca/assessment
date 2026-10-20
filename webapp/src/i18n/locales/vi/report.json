@@ -23,7 +23,6 @@
   "retry": "Thử lại",
   "retrying": "Đang thử lại...",
   "created": "Đã tạo issue #{{number}}",
-  "viewIssue": "Xem trên GitHub",
   "capReached": "Hôm nay đã hết hạn mức Autopilot; chủ sở hữu có thể tự thêm label.",
   "failed": "Báo cáo đã được lưu nhưng chưa tạo được issue trên GitHub.",
   "error": {
@@ -46,6 +45,8 @@
     "colCreated": "Ngày tạo",
     "colActions": "Thao tác",
     "deletedUser": "Người dùng đã xóa",
+    "prev": "Trang trước",
+    "next": "Trang sau",
     "failedBadge": "Thất bại"
   },
   "state": { "OPEN": "Đang mở", "CLOSED": "Đã đóng", "UNKNOWN": "Không rõ" }

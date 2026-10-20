@@ -23,7 +23,6 @@
   "retry": "Retry",
   "retrying": "Retrying...",
   "created": "Issue #{{number}} created",
-  "viewIssue": "View on GitHub",
   "capReached": "Autopilot quota reached for today; the owner can add the label.",
   "failed": "The report was saved, but the GitHub issue could not be created.",
   "error": {
@@ -46,6 +45,8 @@
     "colCreated": "Created",
     "colActions": "Actions",
     "deletedUser": "Deleted user",
+    "prev": "Previous page",
+    "next": "Next page",
     "failedBadge": "Failed"
   },
   "state": { "OPEN": "Open", "CLOSED": "Closed", "UNKNOWN": "Unknown" }

@@ -69,7 +69,7 @@ describe('ReportPage', () => {
   })
 
   it('shows the cap-reached notice', async () => {
-    reportsApi.createReport.mockResolvedValue({ data: { status: 'CREATED', issueNumber: 3, issueUrl: 'https://x/3', capReached: true } })
+    reportsApi.createReport.mockResolvedValue({ data: { status: 'CREATED', issueNumber: 3, issueUrl: 'https://github.com/o/r/issues/3', capReached: true } })
     renderPage()
     await fill()
     fireEvent.click(submitBtn())
@@ -78,7 +78,7 @@ describe('ReportPage', () => {
 
   it('FAILED shows the localized error and Retry calls retryReport', async () => {
     reportsApi.createReport.mockResolvedValue({ data: { id: 'f1', status: 'FAILED', error: 'github.http.502' } })
-    reportsApi.retryReport.mockResolvedValue({ data: { id: 'f1', status: 'CREATED', issueNumber: 4, issueUrl: 'https://x/4' } })
+    reportsApi.retryReport.mockResolvedValue({ data: { id: 'f1', status: 'CREATED', issueNumber: 4, issueUrl: 'https://github.com/o/r/issues/4' } })
     renderPage()
     await fill()
     fireEvent.click(submitBtn())
@@ -118,6 +118,40 @@ describe('ReportPage', () => {
     renderPage()
     fireEvent.click(await screen.findByRole('button', { name: i18n.t('report:retry') }))
     await waitFor(() => expect(reportsApi.retryReport).toHaveBeenCalledWith('f1'))
+  })
+
+  it('renders a non-GitHub issue URL as plain text, not a link', async () => {
+    reportsApi.createReport.mockResolvedValue({ data: { status: 'CREATED', issueNumber: 5, issueUrl: 'javascript:alert(1)' } })
+    renderPage()
+    await fill()
+    fireEvent.click(submitBtn())
+    expect(await screen.findByText(i18n.t('report:created', { number: 5 }))).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: i18n.t('report:created', { number: 5 }) })).toBeNull()
+  })
+
+  it('sends at most 300 characters of user agent', async () => {
+    const original = navigator.userAgent
+    Object.defineProperty(navigator, 'userAgent', { value: 'U'.repeat(400), configurable: true })
+    try {
+      reportsApi.createReport.mockResolvedValue({ data: { status: 'CREATED', issueNumber: 6, issueUrl: 'https://github.com/o/r/issues/6' } })
+      renderPage()
+      await fill()
+      fireEvent.click(submitBtn())
+      await waitFor(() => expect(reportsApi.createReport).toHaveBeenCalled())
+      expect(reportsApi.createReport.mock.calls[0][0].context.userAgent).toHaveLength(300)
+    } finally {
+      Object.defineProperty(navigator, 'userAgent', { value: original, configurable: true })
+    }
+  })
+
+  it('a failed retry shows an error', async () => {
+    reportsApi.createReport.mockResolvedValue({ data: { id: 'f1', status: 'FAILED', error: 'github.timeout' } })
+    reportsApi.retryReport.mockRejectedValue(new Error('Too many requests'))
+    renderPage()
+    await fill()
+    fireEvent.click(submitBtn())
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('report:retry') }))
+    expect(await screen.findByText('Too many requests')).toBeInTheDocument()
   })
 
   it('submit is disabled while pending', async () => {

@@ -22,7 +22,12 @@ function errorText(t, code) {
   return t(`error.github.${key ?? 'unknown'}`)
 }
 
+const GITHUB_ISSUE_URL = 'https://github.com/'
+const USER_AGENT_MAX = 300
+
+/** Links only to GitHub; any other URL from the server renders as plain text. */
 function IssueLink({ url, children }) {
+  if (typeof url !== 'string' || !url.startsWith(GITHUB_ISSUE_URL)) return <span>{children}</span>
   return <a href={url} target="_blank" rel="noopener noreferrer">{children}</a>
 }
 
@@ -57,7 +62,7 @@ export default function ReportPage({ fromPage }) {
     page: fromPage ?? null,
     path: window.location.pathname,
     appVersion: __APP_BUILD__,
-    userAgent: navigator.userAgent,
+    userAgent: navigator.userAgent.slice(0, USER_AGENT_MAX),
     screenWidth: window.innerWidth,
   }
 
@@ -76,6 +81,11 @@ export default function ReportPage({ fromPage }) {
         onError: err => setSubmitError(err?.message || t('error.github.unknown')),
       },
     )
+  }
+
+  function retryReport(id, onSuccess) {
+    setSubmitError('')
+    retry.mutate(id, { onSuccess, onError: err => setSubmitError(err?.message || t('error.github.unknown')) })
   }
 
   // Server enforces ownership; show Retry to the reporter when the user name is known, else to SUPER_ADMIN only.
@@ -152,7 +162,7 @@ export default function ReportPage({ fromPage }) {
           <div>{t('failed')}</div>
           <div>{errorText(t, result.error)}</div>
           <button type="button" className="app-btn secondary" disabled={retry.isPending}
-            onClick={() => retry.mutate(result.id, { onSuccess: res => setResult(res?.data ?? null) })}>
+            onClick={() => retryReport(result.id, res => setResult(res?.data ?? null))}>
             {retry.isPending ? t('retrying') : t('retry')}
           </button>
         </div>
@@ -182,7 +192,7 @@ export default function ReportPage({ fromPage }) {
                   <td>
                     {canRetry(r) && (
                       <button type="button" className="app-btn secondary" disabled={retry.isPending}
-                        onClick={() => retry.mutate(r.id)}>
+                        onClick={() => retryReport(r.id)}>
                         {t('retry')}
                       </button>
                     )}
@@ -195,10 +205,10 @@ export default function ReportPage({ fromPage }) {
         {totalPages > 1 && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 12 }}>
             <button type="button" className="app-btn secondary" disabled={page === 0}
-              onClick={() => setPage(p => p - 1)} aria-label="prev">‹</button>
+              onClick={() => setPage(p => p - 1)} aria-label={t('list.prev')}>‹</button>
             <span className="admin-cell-muted">{page + 1} / {totalPages}</span>
             <button type="button" className="app-btn secondary" disabled={page + 1 >= totalPages}
-              onClick={() => setPage(p => p + 1)} aria-label="next">›</button>
+              onClick={() => setPage(p => p + 1)} aria-label={t('list.next')}>›</button>
           </div>
         )}
       </div>
