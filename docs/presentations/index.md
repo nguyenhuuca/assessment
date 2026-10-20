@@ -34,6 +34,12 @@ business and technical stakeholders through *what* we are building, *why*, and
 |------|-------|--------|
 | <a href="../specs/spec-watch-history.html" target="_blank" rel="noopener">🎤 Watch History (baseline)</a> | Watch-history feature specification | [Spec](../specs/spec-watch-history.md) |
 
+### Guides — *how we work*
+
+| Deck | Topic | Source |
+|------|-------|--------|
+| <a href="../guides/claude-levels-vi.html" target="_blank" rel="noopener">🎤 Các cấp độ sử dụng Claude</a> | 6 levels, from asking questions to auto-gated autopilot | [Claude guide (VI)](../guides/claude-guide-vi.md) |
+
 ---
 
 *New presentations are added here as features move through the

@@ -7,16 +7,17 @@
 ## 📚 Mục lục
 
 1. [Giới thiệu](#gioi-thieu)
-2. [Cấu hình có sẵn](#cau-hinh-co-san)
-3. [Workflow skills - 16 lệnh](#workflow-skills-16-lenh)
-4. [Library skills - tự động load](#library-skills-tu-ong-load)
-5. [Swarm - Multi-agent parallel execution](#swarm-multi-agent-parallel-execution)
-6. [Autopilot - chạy trọn một task](#autopilot-chay-tron-mot-task)
-7. [Session file (session.txt)](#session-file-sessiontxt)
-8. [Hooks & permissions](#hooks-permissions)
-9. [Workflows thực tế](#workflows-thuc-te)
-10. [Templates có sẵn](#templates-co-san)
-11. [Tips & Tricks](#tips-tricks)
+2. [Các cấp độ sử dụng Claude](#cac-cap-o-su-dung-claude)
+3. [Cấu hình có sẵn](#cau-hinh-co-san)
+4. [Workflow skills - 16 lệnh](#workflow-skills-16-lenh)
+5. [Library skills - tự động load](#library-skills-tu-ong-load)
+6. [Swarm - Multi-agent parallel execution](#swarm-multi-agent-parallel-execution)
+7. [Autopilot - chạy trọn một task](#autopilot-chay-tron-mot-task)
+8. [Session file (session.txt)](#session-file-sessiontxt)
+9. [Hooks & permissions](#hooks-permissions)
+10. [Workflows thực tế](#workflows-thuc-te)
+11. [Templates có sẵn](#templates-co-san)
+12. [Tips & Tricks](#tips-tricks)
 
 ---
 
@@ -35,6 +36,28 @@ Hai quy ước riêng của repo này cần nhớ:
 
 1. **Tài liệu planning nằm trong `docs/`**: `docs/adr/`, `docs/prd/`, `docs/specs/`, `docs/plans/`, trạng thái ở `docs/tracking.md`.
 2. **Commit trên `main`, và Claude luôn hỏi trước mỗi lần `git push`**, vì CI deploy từ `main`.
+
+---
+
+## Các cấp độ sử dụng Claude
+
+Dự án dùng Claude Code theo 6 cấp. Cấp càng cao, Claude tự làm càng nhiều và bạn chạm vào càng ít. Rules, hooks và quality gates ở cấp thấp vẫn áp dụng ở mọi cấp trên.
+
+| Cấp | Cách dùng | Bạn tham gia | Ví dụ thật trong repo |
+|-----|-----------|--------------|------------------------|
+| 1 | **Hỏi & khám phá:** hỏi về code, Claude đọc và grep trước khi trả lời, không đổi code | Mỗi câu hỏi | "Quản lý cron job dynamic thế nào?" → 3 mức, đề xuất Mức 2 (DB + TaskScheduler + admin UI) |
+| 2 | **Làm trực tiếp có guardrails:** CLAUDE.md + `.claude/rules/` luôn load, library skills tự load, hooks chặn secret, `session.txt`, hỏi trước mỗi push | Từng bước, duyệt push | Cron editor modal + tooltip (`df8bdba1`, `9b1d5419`): làm trực tiếp, không qua autopilot |
+| 3 | **Workflow skills + swarm:** `/scope` → `/architect` → `/spec` → `/swarm-plan` → `/swarm-execute` → `/swarm-review` → `/land-the-plane`; worker agents chạy song song, model pinned theo agent | Duyệt từng artifact (PRD, ADR, Spec, Plan) | Feature "premium user": autopilot từ chối vì cần PRD → chuyển sang `/scope` |
+| 4 | **`/autopilot` local:** plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke; tối đa 3 round mỗi vòng | 3 lần: Start, Gate 1, Gate 2 | Dynamic cron jobs (ADR-0023): BE + FE, CI xanh, smoke 22/22, $3.71 |
+| 5 | **Headless trên GitHub** ([ADR-0022](../adr/0022-headless-autopilot.md)): label `autopilot` → draft PR → `/approve` → build → bạn merge | Gắn label, `/approve`, merge | Issue #34 (màu nút quay lại) → PR #35 |
+| 6 | **Auto gates** ([ADR-0025](../adr/0025-autopilot-auto-gates.md)): thêm label `autopilot:auto` hoặc `autopilot:auto-merge`, workflow tự duyệt và tự merge sau khi tự kiểm tra | Chỉ gắn label | Issue #36 → PR #37 merged + deployed trong ~5 phút, build job $0.39 |
+
+**Chọn cấp nào:**
+- Chưa rõ nên làm gì, hoặc chỉ cần hiểu code → **cấp 1**.
+- Sửa nhỏ, cần bạn nhìn từng bước → **cấp 2**.
+- Feature vừa/lớn (cần PRD, nhiều ngày) → **cấp 3**.
+- Feature nhỏ, fix, refactor có acceptance criteria rõ → **cấp 4**, hoặc **cấp 5** nếu không mở terminal.
+- Việc nhỏ, rủi ro thấp, không đụng migration hay config agent → **cấp 6**.
 
 ---
 
@@ -283,6 +306,8 @@ Run bị dừng có thể làm tiếp bằng `/task-resume`, dựa vào `session
 | `scratchpad/autopilot/<timestamp>-<slug>.md` | Ledger trong lúc chạy (gitignored) |
 | `session.txt` | Bước đang chạy, progress, và `blocker` khi dừng |
 
+**Lite mode** (task dưới 100 dòng code, không tính test, và không cần ADR): **không** tạo `docs/plans/plan-*.md` và `docs/reports/autopilot-*.md`. Plan và report in ra console (local) hoặc ghi vào mô tả PR (headless). `TASKS.md` và `session.txt` vẫn cập nhật. Nếu trong lúc làm diff vượt khoảng 100 dòng hoặc cần ADR, autopilot chuyển sang chế độ đầy đủ và viết file plan.
+
 ### 💰 Chi phí thực tế
 
 | Run | Thời gian | Orchestrator (Opus) | Worker (Sonnet/Haiku) | Tổng |
@@ -305,19 +330,39 @@ Ngoài cách chạy local, autopilot còn chạy được trên GitHub Actions (
 | Gate 2 | Xem diff rồi **merge** PR. Merge chính là push lên `main`, CI sẽ deploy | Không bao giờ tự push `main` hay tự merge |
 | Sau deploy | Chạy `./api/mock-test.sh` | — |
 
+**Bỏ qua gate bằng label** ([ADR-0025](../adr/0025-autopilot-auto-gates.md)). Gắn thêm một label cùng với `autopilot` (thứ tự không quan trọng):
+
+| Label thêm | Gate 1 | Gate 2 |
+|------------|--------|--------|
+| (không có) | bạn `/approve` | bạn merge |
+| `autopilot:auto-merge` | bạn `/approve` | tự merge |
+| `autopilot:auto` | tự duyệt | tự merge |
+
+- **Gate 1 tự duyệt:** plan job chỉ ghi dấu `<!-- autopilot:plan-review=approve -->` vào mô tả PR khi plan review ra `approve`. Workflow thấy dấu đó thì tự chạy build job (`workflow_dispatch`). `/revise` luôn chờ bạn.
+- **Gate 2 tự merge:** `scripts/claude-autopilot-merge.sh` (luôn chạy bản trên `main`) chỉ merge khi đủ hết các điều kiện:
+  - PR đã ready, tức là code review ra `approve`;
+  - không đụng `.github/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, `scripts/claude-*`, migration Liquibase hay `.env`;
+  - ≤ 400 dòng thay đổi ngoài test và docs;
+  - script **tự chạy lại** `mvn verify` / test + lint + build webapp.
+  - Sau đó merge squash bằng secret `AUTOPILOT_MERGE_TOKEN`, để CI deploy chạy. Thiếu điều kiện nào thì script comment lý do và để PR cho bạn.
+- **Ví dụ thật:** issue #36 (dịch nhãn ON/OFF) → PR #37 merged + frontend deployed trong khoảng 5 phút, build job $0.39, không ai bấm gì.
+- **Rủi ro:** code lên prod mà không ai đọc. Smoke test sau deploy vẫn chạy tay. Rollback = `git revert` commit squash.
+
 **Cài đặt một lần (bạn tự làm, Claude không đụng vào token):**
 
 ```bash
 claude setup-token                                  # tạo token từ gói subscription
 gh secret set CLAUDE_CODE_OAUTH_TOKEN               # dán token vào khi được hỏi
 gh label create autopilot --color 5319e7 --description "Run /autopilot headless"
+# Chỉ cần nếu dùng auto gate: fine-grained PAT chỉ cho repo này, Contents + Pull requests read/write
+gh secret set AUTOPILOT_MERGE_TOKEN
 ```
 
 **Giới hạn và an toàn:**
 - Chỉ **owner của repo** kích hoạt được, kể cả label lẫn comment. Repo đang public, nên comment của người khác bị bỏ qua.
 - Nội dung issue chỉ là dữ liệu. Chỉ dẫn nằm trong issue mà định thay đổi workflow, quyền hay gate sẽ bị bỏ qua và được ghi lại trong PR.
 - Headless **từ chối** sửa `.github/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, file `.env` và migration xóa dữ liệu. Những việc đó phải làm ở local.
-- Mỗi job tối đa 60 phút, mỗi lúc chỉ 1 run. Chỉ dùng secret `CLAUDE_CODE_OAUTH_TOKEN`; các secret deploy (SSH, Docker) không bao giờ lộ ra job.
+- Mỗi job tối đa 60 phút, mỗi lúc chỉ 1 run. Bước Claude chỉ thấy secret `CLAUDE_CODE_OAUTH_TOKEN`; `AUTOPILOT_MERGE_TOKEN` chỉ bước auto-merge thấy; các secret deploy (SSH, Docker) không bao giờ lộ ra job.
 
 ### ▶️ Cách gọi
 

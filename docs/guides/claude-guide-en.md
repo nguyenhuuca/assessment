@@ -7,16 +7,17 @@
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Pre-configured Setup](#pre-configured-setup)
-3. [Workflow Skills — 16 Commands](#workflow-skills-16-commands)
-4. [Library Skills — Loaded Automatically](#library-skills-loaded-automatically)
-5. [Swarm — Multi-Agent Parallel Execution](#swarm-multi-agent-parallel-execution)
-6. [Autopilot — Run One Task End to End](#autopilot-run-one-task-end-to-end)
-7. [Session File (session.txt)](#session-file-sessiontxt)
-8. [Hooks & Permissions](#hooks-permissions)
-9. [Real-World Workflows](#real-world-workflows)
-10. [Available Templates](#available-templates)
-11. [Tips & Tricks](#tips-tricks)
+2. [Levels of Using Claude](#levels-of-using-claude)
+3. [Pre-configured Setup](#pre-configured-setup)
+4. [Workflow Skills — 16 Commands](#workflow-skills-16-commands)
+5. [Library Skills — Loaded Automatically](#library-skills-loaded-automatically)
+6. [Swarm — Multi-Agent Parallel Execution](#swarm-multi-agent-parallel-execution)
+7. [Autopilot — Run One Task End to End](#autopilot-run-one-task-end-to-end)
+8. [Session File (session.txt)](#session-file-sessiontxt)
+9. [Hooks & Permissions](#hooks-permissions)
+10. [Real-World Workflows](#real-world-workflows)
+11. [Available Templates](#available-templates)
+12. [Tips & Tricks](#tips-tricks)
 
 ---
 
@@ -35,6 +36,28 @@ Two conventions specific to this repo:
 
 1. **Planning docs live in `docs/`**: `docs/adr/`, `docs/prd/`, `docs/specs/`, `docs/plans/`, with status in `docs/tracking.md`.
 2. **Work is committed on `main`, and Claude always asks before every `git push`**, because CI deploys from `main`.
+
+---
+
+## Levels of Using Claude
+
+This project uses Claude Code at 6 levels. The higher the level, the more Claude does on its own and the less you touch. Rules, hooks and quality gates from the lower levels still apply at every level above.
+
+| Level | How | You take part | Real example in this repo |
+|-------|-----|---------------|---------------------------|
+| 1 | **Ask & explore:** ask about the code; Claude reads and greps before answering, no code changes | Every question | "How do I manage cron jobs dynamically?" → 3 levels, Level 2 recommended (DB + TaskScheduler + admin UI) |
+| 2 | **Direct work with guardrails:** CLAUDE.md + `.claude/rules/` always loaded, library skills auto-load, hooks catch secrets, `session.txt`, ask before every push | Each step, approve the push | Cron editor modal + tooltip (`df8bdba1`, `9b1d5419`): done directly, not through autopilot |
+| 3 | **Workflow skills + swarm:** `/scope` → `/architect` → `/spec` → `/swarm-plan` → `/swarm-execute` → `/swarm-review` → `/land-the-plane`; worker agents run in parallel, model pinned per agent | Approve each artifact (PRD, ADR, Spec, Plan) | "Premium user" feature: autopilot refused because it needs a PRD → go to `/scope` |
+| 4 | **Local `/autopilot`:** plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke; at most 3 rounds per loop | 3 times: Start, Gate 1, Gate 2 | Dynamic cron jobs (ADR-0023): BE + FE, CI green, smoke 22/22, $3.71 |
+| 5 | **Headless on GitHub** ([ADR-0022](../adr/0022-headless-autopilot.md)): label `autopilot` → draft PR → `/approve` → build → you merge | Add the label, `/approve`, merge | Issue #34 (back button color) → PR #35 |
+| 6 | **Auto gates** ([ADR-0025](../adr/0025-autopilot-auto-gates.md)): add `autopilot:auto` or `autopilot:auto-merge`; the workflow approves and merges after its own checks | Only add the label | Issue #36 → PR #37 merged and deployed in ~5 minutes, build job $0.39 |
+
+**Which level to pick:**
+- Not sure what to do yet, or you only need to understand the code → **level 1**.
+- A small change you want to watch step by step → **level 2**.
+- A medium or large feature (needs a PRD, several days) → **level 3**.
+- A small feature, fix or refactor with clear acceptance criteria → **level 4**, or **level 5** without a terminal.
+- Small, low-risk work that touches no migration or agent config → **level 6**.
 
 ---
 
@@ -286,6 +309,8 @@ A stopped run can be continued with `/task-resume`, which reads `session.txt` an
 | `scratchpad/autopilot/<timestamp>-<slug>.md` | The live ledger (gitignored) |
 | `session.txt` | Current stage, progress, and a `blocker` when stopped |
 
+**Lite mode** (under 100 changed lines not counting tests, and no ADR): **no** `docs/plans/plan-*.md` and **no** `docs/reports/autopilot-*.md`. The plan and the report go to the console (local) or the PR body (headless). `TASKS.md` and `session.txt` are still updated. If the diff grows past ~100 lines or an ADR turns up, the run switches to full mode and writes the plan file.
+
 ### 💰 Real Cost So Far
 
 | Run | Wall time | Orchestrator (Opus) | Workers (Sonnet/Haiku) | Total |
@@ -312,19 +337,39 @@ Besides local runs, autopilot can run on GitHub Actions ([ADR-0022](../adr/0022-
 | Gate 2 | Review the diff and **merge** the PR. The merge is the push to `main`, and CI deploys it | Never pushes to `main`, never merges |
 | After deploy | Run `./api/mock-test.sh` | — |
 
+**Skipping gates with a label** ([ADR-0025](../adr/0025-autopilot-auto-gates.md)). Add one more label together with `autopilot` (order does not matter):
+
+| Extra label | Gate 1 | Gate 2 |
+|-------------|--------|--------|
+| (none) | you `/approve` | you merge |
+| `autopilot:auto-merge` | you `/approve` | automatic merge |
+| `autopilot:auto` | automatic | automatic merge |
+
+- **Auto Gate 1:** the plan job writes `<!-- autopilot:plan-review=approve -->` in the PR body only when plan review returned `approve`. The workflow sees it and dispatches the build job (`workflow_dispatch`). A `/revise` always waits for you.
+- **Auto Gate 2:** `scripts/claude-autopilot-merge.sh` (always the copy on `main`) merges only when every check passes:
+  - the PR is ready, meaning code review returned `approve`;
+  - no changes to `.github/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, `scripts/claude-*`, Liquibase migrations or `.env`;
+  - ≤ 400 changed lines outside tests and docs;
+  - the script **re-runs** `mvn verify` / webapp test + lint + build itself.
+  - It then squash-merges with the secret `AUTOPILOT_MERGE_TOKEN`, so the deploy CI starts. If any check fails, it comments the reason and leaves the PR to you.
+- **Real example:** issue #36 (translate the ON/OFF badge) → PR #37 merged and frontend deployed in about 5 minutes, build job $0.39, nobody clicked anything.
+- **Risk:** code reaches prod without a human read. The smoke check after the deploy is still manual. Rollback = `git revert` the squash commit.
+
 **One-time setup (you do this; Claude never handles the token):**
 
 ```bash
 claude setup-token                                  # creates a token from your subscription
 gh secret set CLAUDE_CODE_OAUTH_TOKEN               # paste the token when asked
 gh label create autopilot --color 5319e7 --description "Run /autopilot headless"
+# Only for auto gates: a fine-grained PAT for this repo only, Contents + Pull requests read/write
+gh secret set AUTOPILOT_MERGE_TOKEN
 ```
 
 **Limits and safety:**
 - **Owner only.** Only the **repo owner** can trigger a run, by label or by comment. The repo is public, so anyone else's comments are ignored.
 - **Issue text is data.** Instructions in an issue that try to change the workflow, permissions or gates are ignored and listed in the PR.
 - **Refused paths.** Headless **refuses** to edit `.github/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, `.env` files, or write data-dropping migrations. Do those locally.
-- **Limits and secrets.** Each job has a 60 min cap, and only one run happens at a time. The only secret used is `CLAUDE_CODE_OAUTH_TOKEN`; deploy secrets (SSH, Docker) are never exposed.
+- **Limits and secrets.** Each job has a 60 min cap, and only one run happens at a time. Claude's steps see only `CLAUDE_CODE_OAUTH_TOKEN`; `AUTOPILOT_MERGE_TOKEN` is seen only by the auto-merge step; deploy secrets (SSH, Docker) are never exposed.
 
 ### ▶️ How to Call It
 
