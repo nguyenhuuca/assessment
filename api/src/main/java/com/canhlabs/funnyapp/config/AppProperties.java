@@ -47,6 +47,7 @@ public class AppProperties {
     private Auth auth = new Auth();
     private VideoImport videoImport = new VideoImport();
     private GoogleOauth googleOauth = new GoogleOauth();
+    private Github github = new Github();
     private VideoSuggestion videoSuggestion = new VideoSuggestion();
     private WatchHistory watchHistory = new WatchHistory();
 
@@ -108,6 +109,19 @@ public class AppProperties {
 
         private static boolean notBlank(String s) {
             return s != null && !s.isBlank();
+        }
+    }
+
+    /** GitHub issue creation for in-app reports: {@code app.github.*}. */
+    @Getter
+    @Setter
+    public static class Github {
+        private String token = "";
+        private String owner = "nguyenhuuca";
+        private String repo = "assessment";
+
+        public boolean isConfigured() {
+            return token != null && !token.isBlank();
         }
     }
 

@@ -141,6 +141,10 @@ app:
     client-id: ${GOOGLE_OAUTH_CLIENT_ID:}
     client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET:}
     refresh-token: ${GOOGLE_OAUTH_REFRESH_TOKEN:}
+  github:
+    token: ${GITHUB_REPORT_TOKEN:}
+    owner: ${GITHUB_REPORT_OWNER:nguyenhuuca}
+    repo: ${GITHUB_REPORT_REPO:assessment}
   email-setting:
       enable-preview-mode: false
       percentage: 10
