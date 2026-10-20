@@ -8021,9 +8021,9 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 </ul>
 <h3 id="br-6-retry">BR-6: Retry<a class="headerlink" href="#br-6-retry" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Only a report with <code>status = FAILED</code> can be retried. Retrying a <code>CREATED</code> report returns 409 <code>error.report.alreadyCreated</code>.</li>
-<li>Only the original reporter or a <code>SUPER_ADMIN</code> may retry. Anyone else gets 403 <code>error.report.retryForbidden</code>.</li>
-<li>A retry reuses the stored type, title, description and context. It re-applies BR-3, and it re-applies BR-4 from the stored <code>autoLabel</code>.</li>
+<li>Ownership is checked first: only the original reporter or a <code>SUPER_ADMIN</code> may retry. Anyone else gets 403 <code>error.report.retryForbidden</code>, whatever the report status.</li>
+<li>Only a report with <code>status = FAILED</code> can be retried. Retrying a <code>CREATED</code> report returns 409 <code>error.report.alreadyCreated</code> (after the ownership check).</li>
+<li>A retry reuses the stored type, title, description and context. It re-applies BR-3 and BR-4, and the auto label and cap follow the caller's current role on retry (read from the database, not the stored <code>reporterRole</code>): the stored <code>autoLabel</code> is sent only when the caller is a <code>SUPER_ADMIN</code>; any other caller sends no auto label and is capped like an ADMIN.</li>
 </ul>
 <h3 id="br-7-public-issue-content">BR-7: Public issue content<a class="headerlink" href="#br-7-public-issue-content" title="Permanent link">&para;</a></h3>
 <p>The issue <code>title</code> is the report title as typed. The issue <code>body</code> is, in order:</p>
@@ -8681,6 +8681,12 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <td>2026-10-20</td>
 <td>nguyenhuuca</td>
 <td>Planning fixes: list returns <code>Page&lt;ReportDto&gt;</code> like other admin lists; <code>navReport</code> lives in <code>shell.json</code></td>
+</tr>
+<tr>
+<td>1.2</td>
+<td>2026-10-20</td>
+<td>nguyenhuuca</td>
+<td>Review fixes: context and title reject control characters; retry checks ownership before 409; retry auto label and cap follow the caller's current role</td>
 </tr>
 </tbody>
 </table>
