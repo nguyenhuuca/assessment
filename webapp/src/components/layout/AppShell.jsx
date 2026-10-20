@@ -16,6 +16,7 @@ import LibraryView from '../library/LibraryView.jsx'
 import ComingSoon from './ComingSoon.jsx'
 import MobileNavMenu from './MobileNavMenu.jsx'
 import AdminView from '../admin/AdminView.jsx'
+import ReportPage from '../report/ReportPage.jsx'
 import SettingsPage from '../settings/SettingsPage.jsx'
 import ActivityBar from '../common/ActivityBar.jsx'
 import LanguageSwitcher from '../common/LanguageSwitcher.jsx'
@@ -40,6 +41,9 @@ const SIDE_NAV = [
   { key: 'admin',    icon: 'admin_panel_settings', labelKey: 'navAdmin',  requiresAdmin: true },
 ]
 
+// Rendered in the sidebar just above the Settings button (pinned to the bottom)
+const REPORT_NAV = { key: 'report', icon: 'bug_report', labelKey: 'navReport', requiresAdmin: true }
+
 export default function AppShell() {
   const { t } = useTranslation(['shell', 'common'])
   const { isLoggedIn, user, logout, sessionNotice, clearSessionNotice } = useAuth()
@@ -48,6 +52,7 @@ export default function AppShell() {
   const [mfaModal,      setMfaModal]      = useState({ show: false, pendingData: null })
   const [profileOpen,   setProfileOpen]   = useState(false)
   const [suggestOpen,   setSuggestOpen]   = useState(false)
+  const [prevNav,        setPrevNav]        = useState('home')
   const [adminTab,       setAdminTab]       = useState(null)
   const [adminNonce,     setAdminNonce]     = useState(0)
   const [deleteModal,   setDeleteModal]   = useState({ show: false, video: null })
@@ -122,6 +127,7 @@ export default function AppShell() {
 
   function goNav(key) {
     setAdminTab(null)
+    if (key !== activeNav) setPrevNav(activeNav)
     setActiveNav(key)
   }
 
@@ -149,9 +155,10 @@ export default function AppShell() {
   const mobileMenu = [
     { key: 'suggest',  icon: 'add',                  labelKey: 'suggestVideo', onSelect: handleFab },
     ...(user?.isAdmin ? [{ key: 'admin', icon: 'admin_panel_settings', labelKey: 'navAdmin', onSelect: () => goNav('admin') }] : []),
+    ...(user?.isAdmin ? [{ key: 'report', icon: 'bug_report', labelKey: 'navReport', onSelect: () => goNav('report') }] : []),
     { key: 'settings', icon: 'settings',             labelKey: 'navSettings',  onSelect: () => goNav('settings') },
   ]
-  const mobileTitle = activeNav === 'home' ? t('forYou') : t(SIDE_NAV.find(n => n.key === activeNav)?.labelKey ?? 'forYou')
+  const mobileTitle = activeNav === 'home' ? t('forYou') : t([...SIDE_NAV, REPORT_NAV].find(n => n.key === activeNav)?.labelKey ?? 'forYou')
 
   function renderMobileNavItem(item) {
     const active = activeNav === item.key
@@ -318,9 +325,19 @@ export default function AppShell() {
             <span>{t(item.labelKey)}</span>
           </button>
         ))}
+        {user?.isAdmin && (
+          <button
+            className={`sidenav-item${activeNav === 'report' ? ' active' : ''}`}
+            style={{ marginTop: 'auto' }}
+            onClick={() => goNav('report')}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 22 }}>{REPORT_NAV.icon}</span>
+            <span>{t(REPORT_NAV.labelKey)}</span>
+          </button>
+        )}
         <button
           className={`sidenav-item${activeNav === 'settings' ? ' active' : ''}`}
-          style={{ marginTop: 'auto' }}
+          style={user?.isAdmin ? undefined : { marginTop: 'auto' }}
           onClick={() => goNav('settings')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 22 }}>settings</span>
@@ -349,8 +366,8 @@ export default function AppShell() {
         marginLeft: 'var(--sidenav-w)',
         marginTop: 'var(--topnav-h)',
         height: 'calc(100vh - var(--topnav-h))',
-        overflow: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'library' || activeNav === 'history') ? 'auto' : 'hidden',
-        display: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'library' || activeNav === 'history') ? 'block' : 'flex',
+        overflow: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'report' || activeNav === 'library' || activeNav === 'history') ? 'auto' : 'hidden',
+        display: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'report' || activeNav === 'library' || activeNav === 'history') ? 'block' : 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--bg)',
@@ -359,6 +376,8 @@ export default function AppShell() {
           <ExploreView onNavigateToVideo={handleExploreNavigate} />
         ) : activeNav === 'admin' && user?.isAdmin ? (
           <AdminView key={`admin-${adminNonce}`} initialTab={adminTab ?? undefined} />
+        ) : activeNav === 'report' && user?.isAdmin ? (
+          <ReportPage fromPage={prevNav} />
         ) : activeNav === 'settings' && isLoggedIn ? (
           <SettingsPage />
         ) : activeNav === 'settings' && !isLoggedIn ? (
@@ -405,7 +424,7 @@ export default function AppShell() {
       }}>
         {MOBILE_NAV.map(renderMobileNavItem)}
         {isLoggedIn && (
-          <MobileNavMenu items={mobileMenu} active={activeNav === 'settings' || activeNav === 'admin'} />
+          <MobileNavMenu items={mobileMenu} active={activeNav === 'settings' || activeNav === 'admin' || activeNav === 'report'} />
         )}
       </nav>
 
