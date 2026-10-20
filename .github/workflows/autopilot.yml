@@ -66,7 +66,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
-          display_report: "true"
+          display_report: "false"  # full transcript is in the artifact; cost is a PR comment
           # -p mode ends the session when the turn ends, so workers must run in the foreground (docs: sub-agents)
           settings: '{"env":{"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS":"1"}}'
           prompt: >-
@@ -159,7 +159,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
-          display_report: "true"
+          display_report: "false"  # full transcript is in the artifact; cost is a PR comment
           # -p mode ends the session when the turn ends, so workers must run in the foreground (docs: sub-agents)
           settings: '{"env":{"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS":"1"}}'
           # the auto gate 1 dispatch comes from github-actions[bot]; the job's own `if` already limits who can start it
