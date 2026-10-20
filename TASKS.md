@@ -375,3 +375,12 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **IR-5** FE `api/reports.js` + hooks + `__APP_BUILD__` define + i18n `report.json`/`navReport`; tests 932991b1
 - [x] **IR-6** FE `ReportPage` + AppShell nav above Settings (desktop + mobile); component tests d49f51fb
 - [ ] **IR-7** Owner: label `report`, PAT, `GITHUB_REPORT_TOKEN` in `/opt/funnyapp/.env`, prod check
+
+## Fix: Report page public-repo notice unreadable (2026-10-20, autopilot, issue #40)
+
+**Plan:** in the PR body (lite mode)
+
+- [ ] **RN-1** `index.css`: new `.app-alert.notice` (token colors, readable in both themes)
+- [ ] **RN-2** `ReportPage.jsx:145` notice uses `app-alert notice` instead of `app-alert error`
+- [ ] **RN-3** `ReportPage` test: `getByRole('note')` has class `notice`, not `error`
+- [ ] **RN-4** `webapp/CLAUDE.md:113` document `.app-alert.notice`
