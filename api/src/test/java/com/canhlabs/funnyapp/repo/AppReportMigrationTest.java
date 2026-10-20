@@ -1,0 +1,133 @@
+package com.canhlabs.funnyapp.repo;
+
+import com.canhlabs.funnyapp.entity.AppReport;
+import com.canhlabs.funnyapp.enums.ReportAutoLabel;
+import com.canhlabs.funnyapp.enums.ReportStatus;
+import com.canhlabs.funnyapp.enums.ReportType;
+import com.canhlabs.funnyapp.enums.UserRole;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.repository.query.parser.PartTree;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Reads the migration from the classpath so it cannot drift from the entity and enums.
+ * The project has no database test harness (no Testcontainers/H2, and the DDL uses
+ * Postgres-only features), so this checks the SQL text and the JPA mapping, not a live schema.
+ */
+class AppReportMigrationTest {
+
+    private static String sql() throws Exception {
+        return new ClassPathResource("db/changelog/sql/202610200001-create-app-report.sql")
+                .getContentAsString(StandardCharsets.UTF_8);
+    }
+
+    private static List<String> checkValues(String sql, String column) {
+        Matcher m = Pattern.compile(column + "\\s+VARCHAR\\(\\d+\\)\\s+(?:NOT NULL\\s+)?CHECK \\(" + column
+                + " IN \\(([^)]*)\\)\\)").matcher(sql);
+        assertThat(m.find()).as("check constraint on " + column).isTrue();
+        return Arrays.stream(m.group(1).split(",")).map(s -> s.trim().replace("'", "")).toList();
+    }
+
+    private static Field field(String name) throws Exception {
+        return AppReport.class.getDeclaredField(name);
+    }
+
+    @Test
+    void migration_createsTableAndBothIndexes() throws Exception {
+        String sql = sql();
+
+        assertThat(sql).contains("CREATE TABLE app_report");
+        assertThat(sql).contains("CREATE INDEX idx_app_report_created_at ON app_report (created_at DESC)");
+        assertThat(sql).containsPattern("CREATE INDEX idx_app_report_autopilot_cap ON app_report \\(created_at\\)\\s+"
+                + "WHERE status = 'CREATED' AND autopilot AND reporter_role = 'ADMIN'");
+        assertThat(sql).contains("reporter_id   BIGINT       REFERENCES users (id) ON DELETE SET NULL");
+    }
+
+    @Test
+    void checkConstraints_matchTheEnums() throws Exception {
+        String sql = sql();
+
+        assertThat(checkValues(sql, "type"))
+                .containsExactlyElementsOf(Arrays.stream(ReportType.values()).map(Enum::name).toList());
+        assertThat(checkValues(sql, "status"))
+                .containsExactlyElementsOf(Arrays.stream(ReportStatus.values()).map(Enum::name).toList());
+        assertThat(checkValues(sql, "auto_label"))
+                .containsExactlyElementsOf(Arrays.stream(ReportAutoLabel.values()).map(Enum::name).toList());
+    }
+
+    @Test
+    void entity_mapsEnumsAsStringAndEveryColumnExists() throws Exception {
+        String sql = sql();
+        for (String enumField : List.of("reporterRole", "type", "autoLabel", "status")) {
+            Enumerated e = field(enumField).getAnnotation(Enumerated.class);
+            assertThat(e).as(enumField).isNotNull();
+            assertThat(e.value()).as(enumField).isEqualTo(EnumType.STRING);
+        }
+        assertThat(field("reporterRole").getType()).isEqualTo(UserRole.class);
+
+        for (Field f : AppReport.class.getDeclaredFields()) {
+            Column c = f.getAnnotation(Column.class);
+            if (c != null) {
+                assertThat(sql).as(c.name()).containsPattern("\\n\\s+" + c.name() + "\\s+");
+            }
+        }
+    }
+
+    @Test
+    void entity_reporterIsLazyAndNullable() throws Exception {
+        ManyToOne rel = field("reporter").getAnnotation(ManyToOne.class);
+
+        assertThat(rel.fetch()).isEqualTo(FetchType.LAZY);
+        assertThat(rel.optional()).isTrue();
+    }
+
+    @Test
+    void entity_defaultsLabelsToEmpty() {
+        assertThat(AppReport.builder().build().getLabels()).isEmpty();
+    }
+
+    @Test
+    void repository_pagedListIsNewestFirstWithReporterGraph() throws Exception {
+        Method m = AppReportRepository.class.getMethod("findAllByOrderByCreatedAtDesc", Pageable.class);
+
+        assertThat(m.getReturnType()).isEqualTo(Page.class);
+        assertThat(m.getAnnotation(EntityGraph.class).attributePaths()).containsExactly("reporter");
+    }
+
+    @Test
+    void repository_capCountFiltersCreatedAutopilotAdminInWindow() throws Exception {
+        Method m = AppReportRepository.class.getMethod(
+                "countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter",
+                ReportStatus.class, UserRole.class, Instant.class);
+
+        assertThat(m.getReturnType()).isEqualTo(long.class);
+    }
+
+    @Test
+    void repository_derivedQueryNamesResolveAgainstTheEntity() {
+        new PartTree("findAllByOrderByCreatedAtDesc", AppReport.class);
+        PartTree count = new PartTree("countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter", AppReport.class);
+
+        assertThat(count.isCountProjection()).isTrue();
+        assertThat(count.getParts()).hasSize(4);
+    }
+}
