@@ -38,11 +38,11 @@
   • Plan : 🎯 Objective · 🧭 Scope · 🏗️ Approach · 🪜 Phases · 📁 Files · ⚠️ Risks
   ============================================================================
 -->
-<html lang="vi" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Các cấp độ sử dụng Claude</title>
+<title>Levels of Using Claude</title>
 
 <!-- MathJax (optional — for formulas in specs/plans) -->
 <script>
@@ -196,184 +196,184 @@
   <a class="back-link" href="https://nguyenhuuca.github.io/assessment/presentations/">← Presentations</a>
   <button class="theme-toggle" id="themeToggle" title="Toggle dark / light theme">☀️ Light</button>
   <div class="eyebrow">GUIDE · CLAUDE CODE</div>
-  <h1>Các cấp độ sử dụng Claude trong dự án Funny Movies</h1>
+  <h1>Levels of Using Claude in Funny Movies</h1>
   <div class="meta">
-    <span class="chip">📄 <b>Nguồn:</b> claude-guide-vi.md</span>
-    <span class="chip">🪜 <b>Cấp:</b> 1 → 6</span>
-    <span class="chip">📅 <b>Cập nhật:</b> 2026-10-20</span>
+    <span class="chip">📄 <b>Source:</b> claude-guide-en.md</span>
+    <span class="chip">🪜 <b>Levels:</b> 1 → 6</span>
+    <span class="chip">📅 <b>Updated:</b> 2026-10-20</span>
   </div>
 </header>
 
 <nav class="tabs" id="tabbar">
-  <button class="tab-btn active" data-tab="t1"><span class="ico">🎯</span>Tổng quan</button>
-  <button class="tab-btn" data-tab="t2"><span class="ico">💬</span>1 · Hỏi</button>
-  <button class="tab-btn" data-tab="t3"><span class="ico">🛡️</span>2 · Trực tiếp</button>
+  <button class="tab-btn active" data-tab="t1"><span class="ico">🎯</span>Overview</button>
+  <button class="tab-btn" data-tab="t2"><span class="ico">💬</span>1 · Ask</button>
+  <button class="tab-btn" data-tab="t3"><span class="ico">🛡️</span>2 · Direct</button>
   <button class="tab-btn" data-tab="t4"><span class="ico">🐝</span>3 · Skills + swarm</button>
   <button class="tab-btn" data-tab="t5"><span class="ico">🤖</span>4 · Autopilot</button>
   <button class="tab-btn" data-tab="t6"><span class="ico">☁️</span>5 · Headless</button>
   <button class="tab-btn" data-tab="t7"><span class="ico">⚡</span>6 · Auto gates</button>
-  <button class="tab-btn" data-tab="t8"><span class="ico">🧭</span>Chọn cấp nào</button>
+  <button class="tab-btn" data-tab="t8"><span class="ico">🧭</span>Which level</button>
 </nav>
 
 <main>
 
   <section class="panel show" id="t1">
-    <h2 class="panel-title"><span class="num">I</span> 6 cấp độ</h2>
-    <p class="panel-sub">Cấp càng cao, Claude tự làm càng nhiều và bạn chạm vào càng ít. Rules, hooks và quality gates ở cấp thấp vẫn áp dụng ở mọi cấp trên.</p>
+    <h2 class="panel-title"><span class="num">I</span> 6 levels</h2>
+    <p class="panel-sub">The higher the level, the more Claude does on its own and the less you touch. Rules, hooks and quality gates from the lower levels still apply at every level above.</p>
     <div class="card blue">
-      <h3>🪜 Bảng tóm tắt</h3>
+      <h3>🪜 Summary</h3>
       <table>
-        <tr><th>Cấp</th><th>Cách dùng</th><th>Bạn tham gia</th></tr>
-        <tr><td>1</td><td>Hỏi &amp; khám phá</td><td>Mỗi câu hỏi</td></tr>
-        <tr><td>2</td><td>Làm trực tiếp có guardrails</td><td>Từng bước, duyệt push</td></tr>
-        <tr><td>3</td><td>Workflow skills + swarm</td><td>Duyệt từng artifact (PRD, ADR, Spec, Plan)</td></tr>
-        <tr><td>4</td><td><code>/autopilot</code> local</td><td>3 lần: Start, Gate 1, Gate 2</td></tr>
-        <tr><td>5</td><td>Headless trên GitHub</td><td>Gắn label, <code>/approve</code>, merge</td></tr>
-        <tr><td>6</td><td>Auto gates</td><td>Chỉ gắn label</td></tr>
+        <tr><th>Level</th><th>How</th><th>You take part</th></tr>
+        <tr><td>1</td><td>Ask &amp; explore</td><td>Every question</td></tr>
+        <tr><td>2</td><td>Direct work with guardrails</td><td>Each step, approve the push</td></tr>
+        <tr><td>3</td><td>Workflow skills + swarm</td><td>Approve each artifact (PRD, ADR, Spec, Plan)</td></tr>
+        <tr><td>4</td><td>Local <code>/autopilot</code></td><td>3 times: Start, Gate 1, Gate 2</td></tr>
+        <tr><td>5</td><td>Headless on GitHub</td><td>Add the label, <code>/approve</code>, merge</td></tr>
+        <tr><td>6</td><td>Auto gates</td><td>Only add the label</td></tr>
       </table>
     </div>
   </section>
 
   <section class="panel" id="t2">
-    <h2 class="panel-title"><span class="num">1</span> Hỏi &amp; khám phá</h2>
-    <p class="panel-sub">Hỏi về code. Claude đọc và grep trước khi trả lời, không đổi code.</p>
+    <h2 class="panel-title"><span class="num">1</span> Ask &amp; explore</h2>
+    <p class="panel-sub">Ask about the code. Claude reads and greps before answering, no code changes.</p>
     <div class="card blue">
-      <h3>💬 Cách dùng <span class="tag">Cấp 1</span></h3>
-      <div class="hl goal"><span class="ic">🎯</span><div>Bạn tham gia: <strong>mỗi câu hỏi</strong>.</div></div>
+      <h3>💬 How <span class="tag">Level 1</span></h3>
+      <div class="hl goal"><span class="ic">🎯</span><div>You take part: <strong>every question</strong>.</div></div>
     </div>
     <div class="card yellow">
-      <h3>📌 Ví dụ thật</h3>
-      <div class="prompt">"Quản lý cron job dynamic thế nào?"</div>
-      <p>→ 3 mức, đề xuất Mức 2 (DB + TaskScheduler + admin UI).</p>
+      <h3>📌 Real example</h3>
+      <div class="prompt">"How do I manage cron jobs dynamically?"</div>
+      <p>→ 3 levels, Level 2 recommended (DB + TaskScheduler + admin UI).</p>
     </div>
   </section>
 
   <section class="panel" id="t3">
-    <h2 class="panel-title"><span class="num">2</span> Làm trực tiếp có guardrails</h2>
-    <p class="panel-sub">Claude sửa code trong session, bạn theo dõi từng bước.</p>
+    <h2 class="panel-title"><span class="num">2</span> Direct work with guardrails</h2>
+    <p class="panel-sub">Claude changes code in the session; you watch each step.</p>
     <div class="card cyan">
-      <h3>🛡️ Guardrails luôn bật <span class="tag">Cấp 2</span></h3>
+      <h3>🛡️ Always-on guardrails <span class="tag">Level 2</span></h3>
       <ul>
-        <li><code>CLAUDE.md</code> + <code>.claude/rules/</code> luôn load</li>
-        <li>Library skills tự load</li>
-        <li>Hooks chặn secret</li>
+        <li><code>CLAUDE.md</code> + <code>.claude/rules/</code> always loaded</li>
+        <li>Library skills auto-load</li>
+        <li>Hooks catch secrets</li>
         <li><code>session.txt</code></li>
-        <li>Hỏi trước mỗi push</li>
+        <li>Ask before every push</li>
       </ul>
-      <div class="hl goal"><span class="ic">🎯</span><div>Bạn tham gia: <strong>từng bước, duyệt push</strong>.</div></div>
+      <div class="hl goal"><span class="ic">🎯</span><div>You take part: <strong>each step, approve the push</strong>.</div></div>
     </div>
     <div class="card yellow">
-      <h3>📌 Ví dụ thật</h3>
-      <p>Cron editor modal + tooltip (<code>df8bdba1</code>, <code>9b1d5419</code>): làm trực tiếp, không qua autopilot.</p>
+      <h3>📌 Real example</h3>
+      <p>Cron editor modal + tooltip (<code>df8bdba1</code>, <code>9b1d5419</code>): done directly, not through autopilot.</p>
     </div>
   </section>
 
   <section class="panel" id="t4">
     <h2 class="panel-title"><span class="num">3</span> Workflow skills + swarm</h2>
-    <p class="panel-sub">Đi theo planning flow, mỗi bước tạo một artifact trong <code>docs/</code>.</p>
+    <p class="panel-sub">Follow the planning flow; each step produces an artifact in <code>docs/</code>.</p>
     <div class="card violet">
-      <h3>🐝 Chuỗi skill <span class="tag">Cấp 3</span></h3>
+      <h3>🐝 Skill chain <span class="tag">Level 3</span></h3>
       <pre>/scope → /architect → /spec → /swarm-plan → /swarm-execute → /swarm-review → /land-the-plane</pre>
-      <p>Worker agents chạy song song, model pinned theo agent.</p>
-      <div class="hl goal"><span class="ic">🎯</span><div>Bạn tham gia: <strong>duyệt từng artifact</strong> (PRD, ADR, Spec, Plan).</div></div>
+      <p>Worker agents run in parallel, model pinned per agent.</p>
+      <div class="hl goal"><span class="ic">🎯</span><div>You take part: <strong>approve each artifact</strong> (PRD, ADR, Spec, Plan).</div></div>
     </div>
     <div class="card yellow">
-      <h3>📌 Ví dụ thật</h3>
-      <p>Feature "premium user": autopilot từ chối vì cần PRD → chuyển sang <code>/scope</code>.</p>
+      <h3>📌 Real example</h3>
+      <p>"Premium user" feature: autopilot refused because it needs a PRD → go to <code>/scope</code>.</p>
     </div>
   </section>
 
   <section class="panel" id="t5">
-    <h2 class="panel-title"><span class="num">4</span> <code>/autopilot</code> local</h2>
-    <p class="panel-sub">Nối các workflow skill thành một chuỗi tự chạy; tối đa 3 round mỗi vòng.</p>
+    <h2 class="panel-title"><span class="num">4</span> Local <code>/autopilot</code></h2>
+    <p class="panel-sub">Chains the workflow skills into one run; at most 3 rounds per loop.</p>
     <div class="card blue">
-      <h3>🤖 Luồng chạy <span class="tag">Cấp 4</span></h3>
+      <h3>🤖 Flow <span class="tag">Level 4</span></h3>
       <pre>plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke</pre>
-      <div class="hl goal"><span class="ic">🎯</span><div>Bạn tham gia: <strong>3 lần</strong>: Start, Gate 1, Gate 2.</div></div>
+      <div class="hl goal"><span class="ic">🎯</span><div>You take part: <strong>3 times</strong>: Start, Gate 1, Gate 2.</div></div>
     </div>
     <div class="card green">
-      <h3>📌 Ví dụ thật</h3>
-      <div class="hl prod"><span class="ic">📦</span><div>Dynamic cron jobs (ADR-0023): BE + FE, CI xanh, smoke 22/22, <strong>$3.71</strong>.</div></div>
+      <h3>📌 Real example</h3>
+      <div class="hl prod"><span class="ic">📦</span><div>Dynamic cron jobs (ADR-0023): BE + FE, CI green, smoke 22/22, <strong>$3.71</strong>.</div></div>
     </div>
     <div class="card amber">
       <h3>🪶 Lite mode</h3>
-      <p>Task dưới 100 dòng code (không tính test) và không cần ADR: <strong>không</strong> tạo <code>docs/plans/plan-*.md</code> và <code>docs/reports/autopilot-*.md</code>. Plan và report in ra console (local) hoặc ghi vào mô tả PR (headless).</p>
+      <p>Under 100 changed lines not counting tests, and no ADR: <strong>no</strong> <code>docs/plans/plan-*.md</code> and <strong>no</strong> <code>docs/reports/autopilot-*.md</code>. The plan and the report go to the console (local) or the PR body (headless).</p>
     </div>
   </section>
 
   <section class="panel" id="t6">
-    <h2 class="panel-title"><span class="num">5</span> Headless trên GitHub</h2>
-    <p class="panel-sub">ADR-0022 · workflow <code>.github/workflows/autopilot.yml</code> · hai cổng duyệt chuyển lên GitHub.</p>
+    <h2 class="panel-title"><span class="num">5</span> Headless on GitHub</h2>
+    <p class="panel-sub">ADR-0022 · workflow <code>.github/workflows/autopilot.yml</code> · both gates move to GitHub.</p>
     <div class="card blue">
-      <h3>☁️ Các bước <span class="tag">Cấp 5</span></h3>
+      <h3>☁️ Steps <span class="tag">Level 5</span></h3>
       <table>
-        <tr><th>Bước</th><th>Bạn làm</th><th>Autopilot làm</th></tr>
-        <tr><td>Start</td><td>Gắn label <code>autopilot</code> cho issue</td><td>Plan + review trên <code>autopilot/issue-&lt;N&gt;</code>, mở draft PR</td></tr>
-        <tr><td>Gate 1</td><td>Comment <code>/approve</code> hoặc <code>/revise &lt;ghi chú&gt;</code></td><td>Implement ⇄ review → QA ×2 → full gates → push lên branch PR, chuyển PR sang ready</td></tr>
-        <tr><td>Gate 2</td><td>Xem diff rồi merge PR (CI deploy)</td><td>Không bao giờ tự push <code>main</code> hay tự merge</td></tr>
-        <tr><td>Sau deploy</td><td>Chạy <code>./api/mock-test.sh</code></td><td>—</td></tr>
+        <tr><th>Step</th><th>You do</th><th>Autopilot does</th></tr>
+        <tr><td>Start</td><td>Add the label <code>autopilot</code> to an issue</td><td>Plans and reviews on <code>autopilot/issue-&lt;N&gt;</code>, opens a draft PR</td></tr>
+        <tr><td>Gate 1</td><td>Comment <code>/approve</code>, or <code>/revise &lt;notes&gt;</code></td><td>Implement ⇄ review → QA ×2 → full gates → pushes to the PR branch, marks it ready</td></tr>
+        <tr><td>Gate 2</td><td>Review the diff and merge the PR (CI deploys it)</td><td>Never pushes to <code>main</code>, never merges</td></tr>
+        <tr><td>After deploy</td><td>Run <code>./api/mock-test.sh</code></td><td>—</td></tr>
       </table>
     </div>
     <div class="card yellow">
-      <h3>📌 Ví dụ thật</h3>
-      <p>Issue #34 (màu nút quay lại) → PR #35.</p>
+      <h3>📌 Real example</h3>
+      <p>Issue #34 (back button color) → PR #35.</p>
     </div>
     <div class="card red">
-      <h3>🔒 An toàn</h3>
+      <h3>🔒 Safety</h3>
       <ul>
-        <li>Chỉ owner của repo kích hoạt được, kể cả label lẫn comment.</li>
-        <li>Nội dung issue chỉ là dữ liệu; chỉ dẫn định thay đổi workflow, quyền hay gate bị bỏ qua.</li>
-        <li>Từ chối sửa <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>.env</code> và migration xóa dữ liệu.</li>
+        <li>Only the repo owner can trigger a run, by label or by comment.</li>
+        <li>Issue text is data; instructions that try to change the workflow, permissions or gates are ignored.</li>
+        <li>Refuses to edit <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>.env</code> files, or write data-dropping migrations.</li>
       </ul>
     </div>
   </section>
 
   <section class="panel" id="t7">
     <h2 class="panel-title"><span class="num">6</span> Auto gates</h2>
-    <p class="panel-sub">ADR-0025 · thêm một label cùng với <code>autopilot</code>.</p>
+    <p class="panel-sub">ADR-0025 · add one more label together with <code>autopilot</code>.</p>
     <div class="card blue">
-      <h3>⚡ Label <span class="tag">Cấp 6</span></h3>
+      <h3>⚡ Labels <span class="tag">Level 6</span></h3>
       <table>
-        <tr><th>Label thêm</th><th>Gate 1</th><th>Gate 2</th></tr>
-        <tr><td>(không có)</td><td>bạn <code>/approve</code></td><td>bạn merge</td></tr>
-        <tr><td><code>autopilot:auto-merge</code></td><td>bạn <code>/approve</code></td><td>tự merge</td></tr>
-        <tr><td><code>autopilot:auto</code></td><td>tự duyệt</td><td>tự merge</td></tr>
+        <tr><th>Extra label</th><th>Gate 1</th><th>Gate 2</th></tr>
+        <tr><td>(none)</td><td>you <code>/approve</code></td><td>you merge</td></tr>
+        <tr><td><code>autopilot:auto-merge</code></td><td>you <code>/approve</code></td><td>automatic merge</td></tr>
+        <tr><td><code>autopilot:auto</code></td><td>automatic</td><td>automatic merge</td></tr>
       </table>
     </div>
     <div class="card cyan">
-      <h3>✅ Điều kiện tự merge</h3>
+      <h3>✅ Auto-merge conditions</h3>
       <ul>
-        <li>PR đã ready, tức là code review ra <code>approve</code>.</li>
-        <li>Không đụng <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>scripts/claude-*</code>, migration Liquibase hay <code>.env</code>.</li>
-        <li>≤ 400 dòng thay đổi ngoài test và docs.</li>
-        <li>Script tự chạy lại <code>mvn verify</code> / test + lint + build webapp.</li>
+        <li>The PR is ready, meaning code review returned <code>approve</code>.</li>
+        <li>No changes to <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>scripts/claude-*</code>, Liquibase migrations or <code>.env</code>.</li>
+        <li>≤ 400 changed lines outside tests and docs.</li>
+        <li>The script re-runs <code>mvn verify</code> / webapp test + lint + build itself.</li>
       </ul>
       <details><summary>🔎 Details</summary><div class="body">
-        <p>Gate 1: plan job chỉ ghi dấu <code>&lt;!-- autopilot:plan-review=approve --&gt;</code> khi plan review ra <code>approve</code>; workflow thấy dấu đó thì tự chạy build job (<code>workflow_dispatch</code>). <code>/revise</code> luôn chờ bạn.</p>
-        <p>Gate 2: <code>scripts/claude-autopilot-merge.sh</code> (luôn chạy bản trên <code>main</code>) merge squash bằng secret <code>AUTOPILOT_MERGE_TOKEN</code>. Thiếu điều kiện nào thì script comment lý do và để PR cho bạn.</p>
+        <p>Gate 1: the plan job writes <code>&lt;!-- autopilot:plan-review=approve --&gt;</code> in the PR body only when plan review returned <code>approve</code>; the workflow sees it and dispatches the build job (<code>workflow_dispatch</code>). A <code>/revise</code> always waits for you.</p>
+        <p>Gate 2: <code>scripts/claude-autopilot-merge.sh</code> (always the copy on <code>main</code>) squash-merges with the secret <code>AUTOPILOT_MERGE_TOKEN</code>. If any check fails, it comments the reason and leaves the PR to you.</p>
       </div></details>
     </div>
     <div class="card green">
-      <h3>📌 Ví dụ thật</h3>
-      <div class="hl prod"><span class="ic">📦</span><div>Issue #36 → PR #37 merged + deployed trong ~5 phút, build job <strong>$0.39</strong>, không ai bấm gì.</div></div>
+      <h3>📌 Real example</h3>
+      <div class="hl prod"><span class="ic">📦</span><div>Issue #36 → PR #37 merged and deployed in ~5 minutes, build job <strong>$0.39</strong>, nobody clicked anything.</div></div>
     </div>
     <div class="card amber">
-      <h3>⚠️ Rủi ro</h3>
-      <p>Code lên prod mà không ai đọc. Smoke test sau deploy vẫn chạy tay. Rollback = <code>git revert</code> commit squash.</p>
+      <h3>⚠️ Risk</h3>
+      <p>Code reaches prod without a human read. The smoke check after the deploy is still manual. Rollback = <code>git revert</code> the squash commit.</p>
     </div>
   </section>
 
   <section class="panel" id="t8">
-    <h2 class="panel-title"><span class="num">II</span> Chọn cấp nào</h2>
+    <h2 class="panel-title"><span class="num">II</span> Which level to pick</h2>
     <div class="card green">
-      <h3>🧭 Theo loại việc</h3>
+      <h3>🧭 By kind of work</h3>
       <table>
-        <tr><th>Việc</th><th>Cấp</th></tr>
-        <tr><td>Chưa rõ nên làm gì, hoặc chỉ cần hiểu code</td><td><strong>1</strong></td></tr>
-        <tr><td>Sửa nhỏ, cần bạn nhìn từng bước</td><td><strong>2</strong></td></tr>
-        <tr><td>Feature vừa/lớn (cần PRD, nhiều ngày)</td><td><strong>3</strong></td></tr>
-        <tr><td>Feature nhỏ, fix, refactor có acceptance criteria rõ</td><td><strong>4</strong>, hoặc <strong>5</strong> nếu không mở terminal</td></tr>
-        <tr><td>Việc nhỏ, rủi ro thấp, không đụng migration hay config agent</td><td><strong>6</strong></td></tr>
+        <tr><th>Work</th><th>Level</th></tr>
+        <tr><td>Not sure what to do yet, or you only need to understand the code</td><td><strong>1</strong></td></tr>
+        <tr><td>A small change you want to watch step by step</td><td><strong>2</strong></td></tr>
+        <tr><td>A medium or large feature (needs a PRD, several days)</td><td><strong>3</strong></td></tr>
+        <tr><td>A small feature, fix or refactor with clear acceptance criteria</td><td><strong>4</strong>, or <strong>5</strong> without a terminal</td></tr>
+        <tr><td>Small, low-risk work that touches no migration or agent config</td><td><strong>6</strong></td></tr>
       </table>
     </div>
   </section>
