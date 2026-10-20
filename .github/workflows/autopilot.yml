@@ -3,9 +3,13 @@
 #   gate 1 : owner comments "/approve" on that PR               -> build job (implement, review, QA x2, push to the PR branch)
 #            owner comments "/revise <notes>" on that PR        -> plan job again with the notes
 #   gate 2 : owner merges the PR (the merge is the push to main; the normal CI deploys it)
+# Opt-in labels on the issue (ADR-0025), added before or with "autopilot":
+#   autopilot:auto-merge : gate 2 is automatic (scripts/claude-autopilot-merge.sh merges when every check passes)
+#   autopilot:auto       : gates 1 and 2 are automatic (an approved plan dispatches the build job)
 # Security: only the repo owner can trigger (plus the action's own write-access check); untrusted text
 # (issue body, comments) is never interpolated into scripts or the prompt, only numbers and ids are passed;
-# no secret besides CLAUDE_CODE_OAUTH_TOKEN is referenced; nothing here pushes to main.
+# Claude's steps see no secret besides CLAUDE_CODE_OAUTH_TOKEN. Only the auto-merge step sees
+# AUTOPILOT_MERGE_TOKEN, and it runs a script from main, not from the PR branch.
 name: Autopilot (headless)
 
 on:
@@ -13,6 +17,12 @@ on:
     types: [labeled]
   issue_comment:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Autopilot PR number to build (gate 1 already approved)
+        required: true
+        type: number
 
 concurrency:
   group: autopilot
@@ -32,6 +42,7 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+      actions: write
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -66,6 +77,21 @@ jobs:
             --max-turns 120
             --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(node:*),Bash(cd:*),Bash(pwd:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(sort:*),Bash(cut:*),Bash(tr:*),Bash(test:*),Bash(echo:*),Bash(printf:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*),Bash(mv:*),Bash(basename:*),Bash(dirname:*)"
 
+      - name: Auto gate 1 (label autopilot:auto)
+        # A first plan only, not a /revise. The marker is written by the plan job only when plan review approved.
+        if: success() && github.event_name == 'issues'
+        run: |
+          gh issue view "$NUM" --json labels --jq '.labels[].name' | grep -qx 'autopilot:auto' || exit 0
+          pr=$(gh pr list --head "autopilot/issue-$NUM" --state open --json number --jq '.[0].number // empty')
+          [ -n "$pr" ] || { echo "no open autopilot PR for #$NUM"; exit 0; }
+          if ! gh pr view "$pr" --json body --jq .body | grep -qF '<!-- autopilot:plan-review=approve -->'; then
+            gh pr comment "$pr" --body "Gate 1 auto-approve skipped: plan review did not approve. Comment \`/approve\` or \`/revise <notes>\`."
+            exit 0
+          fi
+          gh workflow run autopilot.yml --ref main -f pr="$pr"
+          gh pr comment "$pr" --body "Gate 1 auto-approved by label \`autopilot:auto\` (ADR-0025): build job dispatched."
+        env:
+          NUM: ${{ github.event.issue.number }}
       - name: Post the run cost and add it to the report
         if: always() && steps.claude.outputs.execution_file != ''
         # Runs the script from main, not the PR branch: a headless run must not change what runs here.
@@ -86,10 +112,13 @@ jobs:
           path: ${{ steps.claude.outputs.execution_file }}
           retention-days: 3
   build:
+    # workflow_dispatch: sent by the plan job's auto gate 1 (github-actions[bot]) or by the owner by hand
     if: >-
-      github.event_name == 'issue_comment' && github.event.issue.pull_request &&
-      github.event.sender.login == github.repository_owner &&
-      startsWith(github.event.comment.body, '/approve')
+      (github.event_name == 'workflow_dispatch' &&
+       (github.actor == github.repository_owner || github.actor == 'github-actions[bot]')) ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request &&
+       github.event.sender.login == github.repository_owner &&
+       startsWith(github.event.comment.body, '/approve'))
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -98,6 +127,7 @@ jobs:
       issues: write
     env:
       GH_TOKEN: ${{ github.token }}
+      PR: ${{ inputs.pr || github.event.issue.number }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -107,8 +137,6 @@ jobs:
           head=$(gh pr view "$PR" --json headRefName --jq .headRefName)
           case "$head" in autopilot/*) ;; *) echo "not an autopilot PR: $head"; exit 1 ;; esac
           gh pr checkout "$PR"
-        env:
-          PR: ${{ github.event.issue.number }}
       - name: Git identity
         run: |
           git config user.name "github-actions[bot]"
@@ -134,7 +162,9 @@ jobs:
           display_report: "true"
           # -p mode ends the session when the turn ends, so workers must run in the foreground (docs: sub-agents)
           settings: '{"env":{"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS":"1"}}'
-          prompt: ${{ format('/autopilot --headless build --pr {0}', github.event.issue.number) }}
+          # the auto gate 1 dispatch comes from github-actions[bot]; the job's own `if` already limits who can start it
+          allowed_bots: "github-actions[bot]"
+          prompt: ${{ format('/autopilot --headless build --pr {0}', inputs.pr || github.event.issue.number) }}
           claude_args: >-
             --max-turns 300
             --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Skill,TodoWrite,Bash(git:*),Bash(gh:*),Bash(mvn:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(./scripts/qa-twice.sh:*),Bash(scripts/qa-twice.sh:*),Bash(bash scripts/qa-twice.sh:*),Bash(/home/runner/work/assessment/assessment/scripts/qa-twice.sh:*),Bash(bash /home/runner/work/assessment/assessment/scripts/qa-twice.sh:*),Bash(cd:*),Bash(pwd:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sed:*),Bash(awk:*),Bash(sort:*),Bash(cut:*),Bash(tr:*),Bash(test:*),Bash(echo:*),Bash(printf:*),Bash(date:*),Bash(mkdir:*),Bash(cp:*),Bash(mv:*),Bash(basename:*),Bash(dirname:*)"
@@ -147,9 +177,19 @@ jobs:
         env:
           EXEC: ${{ steps.claude.outputs.execution_file }}
           EVENT: ${{ github.event_name }}
-          NUM: ${{ github.event.issue.number }}
+          NUM: ${{ env.PR }}
           JOB: ${{ github.job }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Auto gate 2 (label autopilot:auto-merge or autopilot:auto)
+        # After the cost step, which may add a commit; the script re-checks every condition itself.
+        if: success()
+        run: |
+          git show origin/main:scripts/claude-autopilot-merge.sh > "$RUNNER_TEMP/merge.sh"
+          git fetch -q origin "$(gh pr view "$PR" --json headRefName --jq .headRefName)"
+          git checkout -q -f --detach FETCH_HEAD
+          bash "$RUNNER_TEMP/merge.sh" "$PR"
+        env:
+          MERGE_TOKEN: ${{ secrets.AUTOPILOT_MERGE_TOKEN }}
       - name: Keep the Claude transcript for diagnosis
         if: always() && steps.claude.outputs.execution_file != ''
         uses: actions/upload-artifact@v4

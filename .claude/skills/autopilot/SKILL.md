@@ -66,8 +66,10 @@ Used when `$ARGUMENTS` starts with `--headless`. `.github/workflows/autopilot.ym
   - the branch also holds the run report, created from `resources/report.template.md` with the header, the Start / Plan / Plan review / Gate 1 rows and the plan-stage `## Runs` rows filled in (Gate 1: "pending: `/approve`"). A `/revise` cycle appends its rows to the same file;
   - the PR body holds the plan link, the report link, the task table, the plan-review verdict and the open advisories, and ends with "Gate 1: comment `/approve`, or `/revise <notes>`".
   - **Lite mode:** no plan or report file. The PR body holds the full plan and the report rows instead. The branch gets one `git commit --allow-empty -m "autopilot: plan for #<N>"` so the PR can be opened.
+  - **Plan-review marker:** only when the last plan review returned `approve`, the PR body also contains the exact line `<!-- autopilot:plan-review=approve -->`. Never write it for `revise` or `blocked`. The workflow's auto gate 1 reads it (ADR-0025).
   - It also comments the PR link on the issue. **Stop there.**
 - **Gate 2:** the build job ends with `git push origin HEAD` (the PR branch only), `gh pr ready <N>`, the run report in the PR body, and a comment: "Gate 2: review the diff, then merge to deploy. Run `./api/mock-test.sh` after the deploy." **Never push to `main`, never merge, never approve your own PR.**
+- **Auto labels (ADR-0025):** `autopilot:auto-merge` (Gate 2) and `autopilot:auto` (both gates) on the issue let the **workflow**, not you, dispatch the build and merge the PR after its own checks. Nothing changes in what you do: still write the marker only on `approve`, still run `gh pr ready` only after a code-review `approve` and green gates, and still never merge.
 
 **Differences from a local run:**
 - Worker worktree commits are cherry-picked onto the **PR branch**, not `main`.
