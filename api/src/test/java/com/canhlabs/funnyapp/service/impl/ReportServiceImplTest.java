@@ -158,6 +158,29 @@ class ReportServiceImplTest {
         assertThat(dto.getError()).isNull();
     }
 
+    /** Prod 2026-10-20: save() merges the existing row and returns a copy with a detached lazy reporter. */
+    @Test
+    void create_saveReturnsMergedCopyWithDetachedReporter_dtoStillHasReporter() {
+        capCount(0);
+        User detached = org.mockito.Mockito.mock(User.class);
+        when(detached.getUserName()).thenThrow(new org.hibernate.LazyInitializationException("no session"));
+        when(repository.save(any(AppReport.class))).thenAnswer(inv -> {
+            AppReport r = inv.getArgument(0);
+            if (r.getId() == null) {
+                r.setId(UUID.fromString("6f1c2b0e-1111-2222-3333-444455556666"));
+                return r;
+            }
+            AppReport merged = AppReport.builder().id(r.getId()).status(r.getStatus()).reporter(detached).build();
+            return merged;
+        });
+
+        ReportDto dto = service.create(request());
+
+        assertThat(dto.getReporter()).isEqualTo("admin@example.com");
+        assertThat(dto.getStatus()).isEqualTo(ReportStatus.CREATED);
+        assertThat(dto.getIssueNumber()).isEqualTo(41);
+    }
+
     @Test
     void create_typeLabels() {
         capCount(0);

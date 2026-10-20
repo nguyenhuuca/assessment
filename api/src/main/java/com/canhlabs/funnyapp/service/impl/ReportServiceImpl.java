@@ -171,7 +171,10 @@ public class ReportServiceImpl implements ReportService {
             log.warn("GitHub call failed for report {}: {}", row.getId(), e.getClass().getSimpleName());
             markFailed(row, "github.io");
         }
-        return repository.save(row);
+        // save() merges a row that already has an id and returns a copy whose reporter is a lazy proxy;
+        // with no transaction here, reading it later throws LazyInitializationException. Keep our row.
+        repository.save(row);
+        return row;
     }
 
     private static void markFailed(AppReport row, String code) {
