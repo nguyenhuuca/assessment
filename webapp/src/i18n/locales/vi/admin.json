@@ -263,6 +263,8 @@
       "SKIPPED": "BỎ QUA"
     },
     "running": "ĐANG CHẠY",
+    "enabledOn": "BẬT",
+    "enabledOff": "TẮT",
     "enabledAria": "Bật {{name}}",
     "cronAria": "Cron của {{name}}",
     "save": "Lưu",

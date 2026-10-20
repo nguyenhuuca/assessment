@@ -56,7 +56,7 @@ function JobRow({ job, canEdit, onError }) {
             checked={job.enabled} disabled={update.isPending}
             onChange={e => save({ enabled: e.target.checked })} />
         ) : (
-          <span className={`admin-badge ${job.enabled ? 'published' : 'removed'}`}>{job.enabled ? 'ON' : 'OFF'}</span>
+          <span className={`admin-badge ${job.enabled ? 'published' : 'removed'}`}>{job.enabled ? t('jobs.enabledOn') : t('jobs.enabledOff')}</span>
         )}
       </td>
       <td className="admin-cell-muted">{formatTime(job.nextRunAt)}</td>
