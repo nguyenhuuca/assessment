@@ -351,3 +351,11 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **BACK-1** `.app-btn.back` in `index.css` (`background: var(--text); color: var(--bg)`)
 - [x] **BACK-2** `LibraryView.jsx` lines 197, 221, 285 use `app-btn back`
 - [x] **BACK-3** `LibraryView` test: back has `back`, Share keeps `secondary`
+
+## Fix: Admin Video Vault title ellipsis on mobile (2026-10-20, autopilot, issue #38)
+
+**Plan:** in the PR body (lite mode)
+
+- [ ] **TITLE-1** `index.css` (≤768px): `.admin-asset-title` one line, `max-width`, `text-overflow: ellipsis`
+- [ ] **TITLE-2** `AdminVideoTable.jsx:115` full title in `title` attribute
+- [ ] **TITLE-3** `AdminVideoTable` test: title span has the full title attribute
