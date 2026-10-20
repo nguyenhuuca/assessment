@@ -61,9 +61,9 @@ The `type` is exactly one of three values, each with a fixed type label:
 
 ### BR-6: Retry
 
-- Only a report with `status = FAILED` can be retried. Retrying a `CREATED` report returns 409 `error.report.alreadyCreated`.
-- Only the original reporter or a `SUPER_ADMIN` may retry. Anyone else gets 403 `error.report.retryForbidden`.
-- A retry reuses the stored type, title, description and context. It re-applies BR-3, and it re-applies BR-4 from the stored `autoLabel`.
+- Ownership is checked first: only the original reporter or a `SUPER_ADMIN` may retry. Anyone else gets 403 `error.report.retryForbidden`, whatever the report status.
+- Only a report with `status = FAILED` can be retried. Retrying a `CREATED` report returns 409 `error.report.alreadyCreated` (after the ownership check).
+- A retry reuses the stored type, title, description and context. It re-applies BR-3 and BR-4, and the auto label and cap follow the caller's current role on retry (read from the database, not the stored `reporterRole`): the stored `autoLabel` is sent only when the caller is a `SUPER_ADMIN`; any other caller sends no auto label and is capped like an ADMIN.
 
 ### BR-7: Public issue content
 
@@ -565,3 +565,4 @@ No `AppScheduler` or `scheduled_job` change.
 |---------|------|--------|--------|
 | 1.0 | 2026-10-20 | nguyenhuuca | Initial draft from `/spec` |
 | 1.1 | 2026-10-20 | nguyenhuuca | Planning fixes: list returns `Page<ReportDto>` like other admin lists; `navReport` lives in `shell.json` |
+| 1.2 | 2026-10-20 | nguyenhuuca | Review fixes: context and title reject control characters; retry checks ownership before 409; retry auto label and cap follow the caller's current role |

@@ -89,6 +89,9 @@ public class ReportServiceImpl implements ReportService {
         }
         ReportType type = parseType(request.getType());
         String title = trimmed(request.getTitle(), MAX_TITLE, "error.report.invalidTitle");
+        if (hasControlChar(title)) {
+            throw CustomException.of(HttpStatus.BAD_REQUEST, 400, "error.report.invalidTitle");
+        }
         String description = trimmed(request.getDescription(), MAX_DESCRIPTION, "error.report.invalidDescription");
         ReportContext context = request.getContext() == null ? new ReportContext() : request.getContext();
         validateContext(context);
@@ -112,7 +115,7 @@ public class ReportServiceImpl implements ReportService {
                 .status(ReportStatus.FAILED)
                 .error(PENDING)
                 .build());
-        return toDto(callGitHub(row), IssueState.OPEN.name());
+        return toDto(callGitHub(row, reporter.getRole()), IssueState.OPEN.name());
     }
 
     @Override
@@ -136,20 +139,24 @@ public class ReportServiceImpl implements ReportService {
         User caller = currentUser();
         AppReport row = repository.findWithReporterById(id)
                 .orElseThrow(() -> CustomException.of(HttpStatus.NOT_FOUND, 404, "error.report.notFound"));
-        if (row.getStatus() == ReportStatus.CREATED) {
-            throw CustomException.of(HttpStatus.CONFLICT, 409, "error.report.alreadyCreated");
-        }
         boolean isReporter = row.getReporter() != null && row.getReporter().getId().equals(caller.getId());
         if (!isReporter && caller.getRole() != UserRole.SUPER_ADMIN) {
             throw CustomException.of(HttpStatus.FORBIDDEN, 403, "error.report.retryForbidden");
         }
-        return toDto(callGitHub(row), IssueState.OPEN.name());
+        if (row.getStatus() == ReportStatus.CREATED) {
+            throw CustomException.of(HttpStatus.CONFLICT, 409, "error.report.alreadyCreated");
+        }
+        return toDto(callGitHub(row, caller.getRole()), IssueState.OPEN.name());
     }
 
-    /** Applies the cap, calls GitHub and saves the outcome; never throws for a GitHub failure. */
-    private AppReport callGitHub(AppReport row) {
-        boolean autopilot = !isCapped(row);
-        List<String> labels = ReportIssueContent.labels(row.getType(), row.getAutoLabel(), autopilot);
+    /**
+     * Applies the cap, calls GitHub and saves the outcome; never throws for a GitHub failure.
+     * The auto label and the cap follow the caller's current role, not the stored reporter role.
+     */
+    private AppReport callGitHub(AppReport row, UserRole callerRole) {
+        boolean autopilot = !isCapped(callerRole);
+        ReportAutoLabel autoLabel = callerRole == UserRole.SUPER_ADMIN ? row.getAutoLabel() : null;
+        List<String> labels = ReportIssueContent.labels(row.getType(), autoLabel, autopilot);
         try {
             CreatedIssue issue = client.create(row.getTitle(), ReportIssueContent.body(row), labels);
             row.setStatus(ReportStatus.CREATED);
@@ -175,8 +182,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     /** BR-3: only ADMIN reports are capped; the count takes no lock (EC-3). */
-    private boolean isCapped(AppReport row) {
-        if (row.getReporterRole() != UserRole.ADMIN) {
+    private boolean isCapped(UserRole callerRole) {
+        if (callerRole == UserRole.SUPER_ADMIN) {
             return false;
         }
         long used = repository.countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter(
@@ -189,7 +196,6 @@ public class ReportServiceImpl implements ReportService {
         IssueState[] states = new IssueState[rows.size()];
         List<Integer> missing = new ArrayList<>();
         List<Callable<IssueState>> tasks = new ArrayList<>();
-        Optional<IssueState> cached;
         for (int i = 0; i < rows.size(); i++) {
             AppReport row = rows.get(i);
             if (row.getStatus() != ReportStatus.CREATED) {
@@ -198,7 +204,10 @@ public class ReportServiceImpl implements ReportService {
             Integer number = row.getIssueNumber();
             if (number == null) {
                 states[i] = IssueState.UNKNOWN;
-            } else if ((cached = stateCache.get(number)).isPresent()) {
+                continue;
+            }
+            Optional<IssueState> cached = stateCache.get(number);
+            if (cached.isPresent()) {
                 states[i] = cached.get();
             } else {
                 missing.add(i);
@@ -255,7 +264,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private static void validateContext(ReportContext c) {
-        boolean valid = within(c.getPage(), MAX_PAGE)
+        boolean valid = !hasControlChar(c.getPage()) && !hasControlChar(c.getPath())
+                && !hasControlChar(c.getAppVersion()) && !hasControlChar(c.getUserAgent())
+                && within(c.getPage(), MAX_PAGE)
                 && within(c.getAppVersion(), MAX_APP_VERSION)
                 && within(c.getUserAgent(), MAX_USER_AGENT)
                 && (c.getPath() == null || (c.getPath().startsWith("/") && c.getPath().length() <= MAX_PATH))
@@ -263,6 +274,11 @@ public class ReportServiceImpl implements ReportService {
         if (!valid) {
             throw CustomException.of(HttpStatus.BAD_REQUEST, 400, "error.report.invalidContext");
         }
+    }
+
+    /** CWE-74: CR, LF and other ISO control characters must not reach the issue body or logs. */
+    private static boolean hasControlChar(String value) {
+        return value != null && value.chars().anyMatch(Character::isISOControl);
     }
 
     private static boolean within(String value, int max) {

@@ -401,6 +401,39 @@ class ReportServiceImplTest {
         verify(repository, never()).save(any());
     }
 
+    // ---- control characters (CWE-74)
+
+    @Test
+    void create_controlCharsInContext_400() {
+        for (String bad : List.of("a\nb", "a\rb", "a\u0000b", "a\u001fb")) {
+            for (int field = 0; field < 4; field++) {
+                CreateReportRequest r = request();
+                ReportContext c = r.getContext();
+                switch (field) {
+                    case 0 -> c.setPage(bad);
+                    case 1 -> c.setPath("/" + bad);
+                    case 2 -> c.setAppVersion(bad);
+                    default -> c.setUserAgent(bad);
+                }
+                assertCode(() -> service.create(r), HttpStatus.BAD_REQUEST, "error.report.invalidContext");
+            }
+        }
+    }
+
+    @Test
+    void create_controlCharsInTitle_400_descriptionMayKeepNewlines() {
+        CreateReportRequest r = request();
+        r.setTitle("Line1\nLine2");
+        assertCode(() -> service.create(r), HttpStatus.BAD_REQUEST, "error.report.invalidTitle");
+        r.setTitle("Line1\rLine2");
+        assertCode(() -> service.create(r), HttpStatus.BAD_REQUEST, "error.report.invalidTitle");
+
+        capCount(0);
+        CreateReportRequest ok = request();
+        ok.setDescription("a\nb");
+        assertThat(service.create(ok).getStatus()).isEqualTo(ReportStatus.CREATED);
+    }
+
     // ---- retry
 
     AppReport failedRow(User reporter, UserRole role) {
@@ -453,6 +486,38 @@ class ReportServiceImplTest {
 
         assertCode(() -> service.retry(row.getId()), HttpStatus.CONFLICT, "error.report.alreadyCreated");
         verify(client, never()).create(anyString(), anyString(), anyList());
+    }
+
+    @Test
+    void retry_otherAdminOnCreatedRow_403_not409() {
+        User other = user(3L, "other@example.com", UserRole.ADMIN);
+        AppReport row = failedRow(other, UserRole.ADMIN);
+        row.setStatus(ReportStatus.CREATED);
+        when(repository.findWithReporterById(row.getId())).thenReturn(Optional.of(row));
+
+        assertCode(() -> service.retry(row.getId()), HttpStatus.FORBIDDEN, "error.report.retryForbidden");
+    }
+
+    @Test
+    void retry_adminOwnRowWithStoredAutoLabel_sendsNoAutoLabelAndIsCapped() {
+        AppReport row = failedRow(admin, UserRole.ADMIN);
+        row.setAutoLabel(ReportAutoLabel.AUTO_MERGE);
+        when(repository.findWithReporterById(row.getId())).thenReturn(Optional.of(row));
+        capCount(10);
+
+        ReportDto dto = service.retry(row.getId());
+        assertThat(dto.getLabels()).containsExactly("bug");
+        assertThat(dto.isCapReached()).isTrue();
+    }
+
+    @Test
+    void retry_adminOwnRowStoredAsSuperAdmin_followsCallerRole() {
+        AppReport row = failedRow(admin, UserRole.SUPER_ADMIN);
+        row.setAutoLabel(ReportAutoLabel.AUTO_MERGE);
+        when(repository.findWithReporterById(row.getId())).thenReturn(Optional.of(row));
+        capCount(0);
+
+        assertThat(service.retry(row.getId()).getLabels()).containsExactly("autopilot", "bug");
     }
 
     @Test
