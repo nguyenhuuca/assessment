@@ -38,7 +38,7 @@ business and technical stakeholders through *what* we are building, *why*, and
 
 | Deck | Topic | Source |
 |------|-------|--------|
-| <a href="../guides/claude-levels-vi.html" target="_blank" rel="noopener">🎤 Các cấp độ sử dụng Claude</a> | 6 levels, from asking questions to auto-gated autopilot | [Claude guide (VI)](../guides/claude-guide-vi.md) |
+| <a href="../guides/claude-levels.html" target="_blank" rel="noopener">🎤 Levels of Using Claude</a> | 6 levels, from asking questions to auto-gated autopilot | [Claude guide](../guides/claude-guide-en.md) |
 
 ---
 

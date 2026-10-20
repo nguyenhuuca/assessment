@@ -129,7 +129,7 @@ nav:
           - Watch History: specs/spec-watch-history.html
       - Guides:
           - Scope to Implement Flow: guides/flow-scope-to-implement.html
-          - Claude Usage Levels (VI): guides/claude-levels-vi.html
+          - Claude Usage Levels: guides/claude-levels.html
       # - ADRs:
       #     - <title>: adr/<name>.html
       # - Plans:
