@@ -2740,6 +2740,8 @@
       
         
       
+        
+      
     
     
     
@@ -2802,6 +2804,34 @@
     
   
     Scope to Implement Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../claude-levels-vi.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Usage Levels (VI)
   
 
     
@@ -3019,6 +3049,17 @@
     <span class="md-ellipsis">
       
         Giới thiệu
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cac-cap-o-su-dung-claude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Các cấp độ sử dụng Claude
       
     </span>
   </a>
@@ -6992,6 +7033,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#cac-cap-o-su-dung-claude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Các cấp độ sử dụng Claude
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cau-hinh-co-san" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7668,6 +7720,7 @@
 <h2 id="muc-luc">📚 Mục lục<a class="headerlink" href="#muc-luc" title="Permanent link">&para;</a></h2>
 <ol>
 <li><a href="#gioi-thieu">Giới thiệu</a></li>
+<li><a href="#cac-cap-o-su-dung-claude">Các cấp độ sử dụng Claude</a></li>
 <li><a href="#cau-hinh-co-san">Cấu hình có sẵn</a></li>
 <li><a href="#workflow-skills-16-lenh">Workflow skills - 16 lệnh</a></li>
 <li><a href="#library-skills-tu-ong-load">Library skills - tự động load</a></li>
@@ -7695,6 +7748,63 @@
 <li><strong>Tài liệu planning nằm trong <code>docs/</code></strong>: <code>docs/adr/</code>, <code>docs/prd/</code>, <code>docs/specs/</code>, <code>docs/plans/</code>, trạng thái ở <code>docs/tracking.md</code>.</li>
 <li><strong>Commit trên <code>main</code>, và Claude luôn hỏi trước mỗi lần <code>git push</code></strong>, vì CI deploy từ <code>main</code>.</li>
 </ol>
+<hr />
+<h2 id="cac-cap-o-su-dung-claude">Các cấp độ sử dụng Claude<a class="headerlink" href="#cac-cap-o-su-dung-claude" title="Permanent link">&para;</a></h2>
+<p>Dự án dùng Claude Code theo 6 cấp. Cấp càng cao, Claude tự làm càng nhiều và bạn chạm vào càng ít. Rules, hooks và quality gates ở cấp thấp vẫn áp dụng ở mọi cấp trên.</p>
+<table>
+<thead>
+<tr>
+<th>Cấp</th>
+<th>Cách dùng</th>
+<th>Bạn tham gia</th>
+<th>Ví dụ thật trong repo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Hỏi &amp; khám phá:</strong> hỏi về code, Claude đọc và grep trước khi trả lời, không đổi code</td>
+<td>Mỗi câu hỏi</td>
+<td>"Quản lý cron job dynamic thế nào?" → 3 mức, đề xuất Mức 2 (DB + TaskScheduler + admin UI)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Làm trực tiếp có guardrails:</strong> CLAUDE.md + <code>.claude/rules/</code> luôn load, library skills tự load, hooks chặn secret, <code>session.txt</code>, hỏi trước mỗi push</td>
+<td>Từng bước, duyệt push</td>
+<td>Cron editor modal + tooltip (<code>df8bdba1</code>, <code>9b1d5419</code>): làm trực tiếp, không qua autopilot</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Workflow skills + swarm:</strong> <code>/scope</code> → <code>/architect</code> → <code>/spec</code> → <code>/swarm-plan</code> → <code>/swarm-execute</code> → <code>/swarm-review</code> → <code>/land-the-plane</code>; worker agents chạy song song, model pinned theo agent</td>
+<td>Duyệt từng artifact (PRD, ADR, Spec, Plan)</td>
+<td>Feature "premium user": autopilot từ chối vì cần PRD → chuyển sang <code>/scope</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong><code>/autopilot</code> local:</strong> plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke; tối đa 3 round mỗi vòng</td>
+<td>3 lần: Start, Gate 1, Gate 2</td>
+<td>Dynamic cron jobs (ADR-0023): BE + FE, CI xanh, smoke 22/22, $3.71</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Headless trên GitHub</strong> (<a href="../../adr/0022-headless-autopilot/">ADR-0022</a>): label <code>autopilot</code> → draft PR → <code>/approve</code> → build → bạn merge</td>
+<td>Gắn label, <code>/approve</code>, merge</td>
+<td>Issue #34 (màu nút quay lại) → PR #35</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Auto gates</strong> (<a href="../../adr/0025-autopilot-auto-gates/">ADR-0025</a>): thêm label <code>autopilot:auto</code> hoặc <code>autopilot:auto-merge</code>, workflow tự duyệt và tự merge sau khi tự kiểm tra</td>
+<td>Chỉ gắn label</td>
+<td>Issue #36 → PR #37 merged + deployed trong ~5 phút, build job $0.39</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chọn cấp nào:</strong>
+- Chưa rõ nên làm gì, hoặc chỉ cần hiểu code → <strong>cấp 1</strong>.
+- Sửa nhỏ, cần bạn nhìn từng bước → <strong>cấp 2</strong>.
+- Feature vừa/lớn (cần PRD, nhiều ngày) → <strong>cấp 3</strong>.
+- Feature nhỏ, fix, refactor có acceptance criteria rõ → <strong>cấp 4</strong>, hoặc <strong>cấp 5</strong> nếu không mở terminal.
+- Việc nhỏ, rủi ro thấp, không đụng migration hay config agent → <strong>cấp 6</strong>.</p>
 <hr />
 <h2 id="cau-hinh-co-san">Cấu hình có sẵn<a class="headerlink" href="#cau-hinh-co-san" title="Permanent link">&para;</a></h2>
 <h3 id="cau-truc-thu-muc">📁 Cấu trúc thư mục<a class="headerlink" href="#cau-truc-thu-muc" title="Permanent link">&para;</a></h3>
@@ -8291,6 +8401,7 @@
 </tr>
 </tbody>
 </table>
+<p><strong>Lite mode</strong> (task dưới 100 dòng code, không tính test, và không cần ADR): <strong>không</strong> tạo <code>docs/plans/plan-*.md</code> và <code>docs/reports/autopilot-*.md</code>. Plan và report in ra console (local) hoặc ghi vào mô tả PR (headless). <code>TASKS.md</code> và <code>session.txt</code> vẫn cập nhật. Nếu trong lúc làm diff vượt khoảng 100 dòng hoặc cần ADR, autopilot chuyển sang chế độ đầy đủ và viết file plan.</p>
 <h3 id="chi-phi-thuc-te">💰 Chi phí thực tế<a class="headerlink" href="#chi-phi-thuc-te" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -8354,16 +8465,56 @@
 </tr>
 </tbody>
 </table>
+<p><strong>Bỏ qua gate bằng label</strong> (<a href="../../adr/0025-autopilot-auto-gates/">ADR-0025</a>). Gắn thêm một label cùng với <code>autopilot</code> (thứ tự không quan trọng):</p>
+<table>
+<thead>
+<tr>
+<th>Label thêm</th>
+<th>Gate 1</th>
+<th>Gate 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(không có)</td>
+<td>bạn <code>/approve</code></td>
+<td>bạn merge</td>
+</tr>
+<tr>
+<td><code>autopilot:auto-merge</code></td>
+<td>bạn <code>/approve</code></td>
+<td>tự merge</td>
+</tr>
+<tr>
+<td><code>autopilot:auto</code></td>
+<td>tự duyệt</td>
+<td>tự merge</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Gate 1 tự duyệt:</strong> plan job chỉ ghi dấu <code>&lt;!-- autopilot:plan-review=approve --&gt;</code> vào mô tả PR khi plan review ra <code>approve</code>. Workflow thấy dấu đó thì tự chạy build job (<code>workflow_dispatch</code>). <code>/revise</code> luôn chờ bạn.</li>
+<li><strong>Gate 2 tự merge:</strong> <code>scripts/claude-autopilot-merge.sh</code> (luôn chạy bản trên <code>main</code>) chỉ merge khi đủ hết các điều kiện:</li>
+<li>PR đã ready, tức là code review ra <code>approve</code>;</li>
+<li>không đụng <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>scripts/claude-*</code>, migration Liquibase hay <code>.env</code>;</li>
+<li>≤ 400 dòng thay đổi ngoài test và docs;</li>
+<li>script <strong>tự chạy lại</strong> <code>mvn verify</code> / test + lint + build webapp.</li>
+<li>Sau đó merge squash bằng secret <code>AUTOPILOT_MERGE_TOKEN</code>, để CI deploy chạy. Thiếu điều kiện nào thì script comment lý do và để PR cho bạn.</li>
+<li><strong>Ví dụ thật:</strong> issue #36 (dịch nhãn ON/OFF) → PR #37 merged + frontend deployed trong khoảng 5 phút, build job $0.39, không ai bấm gì.</li>
+<li><strong>Rủi ro:</strong> code lên prod mà không ai đọc. Smoke test sau deploy vẫn chạy tay. Rollback = <code>git revert</code> commit squash.</li>
+</ul>
 <p><strong>Cài đặt một lần (bạn tự làm, Claude không đụng vào token):</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>claude<span class="w"> </span>setup-token<span class="w">                                  </span><span class="c1"># tạo token từ gói subscription</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>CLAUDE_CODE_OAUTH_TOKEN<span class="w">               </span><span class="c1"># dán token vào khi được hỏi</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>gh<span class="w"> </span>label<span class="w"> </span>create<span class="w"> </span>autopilot<span class="w"> </span>--color<span class="w"> </span>5319e7<span class="w"> </span>--description<span class="w"> </span><span class="s2">"Run /autopilot headless"</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Chỉ cần nếu dùng auto gate: fine-grained PAT chỉ cho repo này, Contents + Pull requests read/write</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>AUTOPILOT_MERGE_TOKEN
 </code></pre></div>
 <p><strong>Giới hạn và an toàn:</strong>
 - Chỉ <strong>owner của repo</strong> kích hoạt được, kể cả label lẫn comment. Repo đang public, nên comment của người khác bị bỏ qua.
 - Nội dung issue chỉ là dữ liệu. Chỉ dẫn nằm trong issue mà định thay đổi workflow, quyền hay gate sẽ bị bỏ qua và được ghi lại trong PR.
 - Headless <strong>từ chối</strong> sửa <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, file <code>.env</code> và migration xóa dữ liệu. Những việc đó phải làm ở local.
-- Mỗi job tối đa 60 phút, mỗi lúc chỉ 1 run. Chỉ dùng secret <code>CLAUDE_CODE_OAUTH_TOKEN</code>; các secret deploy (SSH, Docker) không bao giờ lộ ra job.</p>
+- Mỗi job tối đa 60 phút, mỗi lúc chỉ 1 run. Bước Claude chỉ thấy secret <code>CLAUDE_CODE_OAUTH_TOKEN</code>; <code>AUTOPILOT_MERGE_TOKEN</code> chỉ bước auto-merge thấy; các secret deploy (SSH, Docker) không bao giờ lộ ra job.</p>
 <h3 id="cach-goi">▶️ Cách gọi<a class="headerlink" href="#cach-goi" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/autopilot<span class="w"> </span>ben<span class="w"> </span>tab<span class="w"> </span>Đề<span class="w"> </span>xuất<span class="w"> </span>cho<span class="w"> </span>admin<span class="w"> </span>move<span class="w"> </span>về<span class="w"> </span>chờ<span class="w"> </span>duyệt<span class="w"> </span>rồi<span class="w"> </span>review<span class="w"> </span>lại
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>/autopilot<span class="w"> </span>refactor:<span class="w"> </span>gom<span class="w"> </span>luật<span class="w"> </span>chuyển<span class="w"> </span>trạng<span class="w"> </span>thái<span class="w"> </span>suggestion<span class="w"> </span>vào<span class="w"> </span>một<span class="w"> </span>chỗ,<span class="w"> </span>không<span class="w"> </span>đổi<span class="w"> </span>behavior

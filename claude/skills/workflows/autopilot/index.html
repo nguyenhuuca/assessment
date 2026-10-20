@@ -2740,6 +2740,8 @@
       
         
       
+        
+      
     
     
     
@@ -2802,6 +2804,34 @@
     
   
     Scope to Implement Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../guides/claude-levels-vi.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Usage Levels (VI)
   
 
     
@@ -6662,6 +6692,11 @@
 <li><strong>Medium/Large (needs a PRD or PR-FAQ):</strong> stop. Say so in one line and point to <code>/scope</code>.</li>
 <li><strong>Needs an ADR:</strong> continue, but the Plan stage must produce the ADR too.</li>
 </ul>
+<p><strong>Lite mode</strong> (owner preference, 2026-10-20: too many small md files fragment the docs). A request is <strong>lite</strong> when it is a small feature or fix, the estimate is <strong>under 100 changed LOC not counting tests</strong>, and it needs <strong>no ADR</strong>. A lite run writes <strong>no <code>docs/plans/</code> file and no <code>docs/reports/</code> file</strong>:
+- <strong>Plan:</strong> the task table (IDs, acceptance criteria, <code>file:line</code> facts) lives in the conversation. Local runs print it at Gate 1; headless runs put it in the PR body. Plan review gets the plan text in its prompt.
+- <strong>Report:</strong> the final summary (runs, gates, flaky, manual checks, cost) goes to the console, or to the PR body in headless mode.
+- <strong>Still written:</strong> the <code>TASKS.md</code> lines (one per task, <code>[x]</code> + hash when landed), <code>session.txt</code> with <code>plan: -</code>, and the scratchpad ledger.
+- <strong>Promote to full mode</strong> when the diff (tests excluded) grows past ~100 LOC or an ADR turns up: write the plan file then and continue as a normal run.</p>
 <p>Write <code>session.txt</code> (<code>.claude/rules/session-file.md</code>) and create the ledger (see Ledger) before stage 1.</p>
 <h2 id="headless-mode-adr-0022">Headless Mode (ADR-0022)<a class="headerlink" href="#headless-mode-adr-0022" title="Permanent link">&para;</a></h2>
 <p>Used when <code>$ARGUMENTS</code> starts with <code>--headless</code>. <code>.github/workflows/autopilot.yml</code> sends one of these forms, built from numbers and ids only:</p>
@@ -6702,11 +6737,14 @@
   - <code>gh pr create --draft --base main</code>, titled <code>Autopilot: &lt;issue title&gt; (#&lt;N&gt;)</code>, with a body containing <code>Closes #&lt;N&gt;</code> so the merge closes the issue;
   - the branch also holds the run report, created from <code>resources/report.template.md</code> with the header, the Start / Plan / Plan review / Gate 1 rows and the plan-stage <code>## Runs</code> rows filled in (Gate 1: "pending: <code>/approve</code>"). A <code>/revise</code> cycle appends its rows to the same file;
   - the PR body holds the plan link, the report link, the task table, the plan-review verdict and the open advisories, and ends with "Gate 1: comment <code>/approve</code>, or <code>/revise &lt;notes&gt;</code>".
+  - <strong>Lite mode:</strong> no plan or report file. The PR body holds the full plan and the report rows instead. The branch gets one <code>git commit --allow-empty -m "autopilot: plan for #&lt;N&gt;"</code> so the PR can be opened.
+  - <strong>Plan-review marker:</strong> only when the last plan review returned <code>approve</code>, the PR body also contains the exact line <code>&lt;!-- autopilot:plan-review=approve --&gt;</code>. Never write it for <code>revise</code> or <code>blocked</code>. The workflow's auto gate 1 reads it (ADR-0025).
   - It also comments the PR link on the issue. <strong>Stop there.</strong>
-- <strong>Gate 2:</strong> the build job ends with <code>git push origin HEAD</code> (the PR branch only), <code>gh pr ready &lt;N&gt;</code>, the run report in the PR body, and a comment: "Gate 2: review the diff, then merge to deploy. Run <code>./api/mock-test.sh</code> after the deploy." <strong>Never push to <code>main</code>, never merge, never approve your own PR.</strong></p>
+- <strong>Gate 2:</strong> the build job ends with <code>git push origin HEAD</code> (the PR branch only), <code>gh pr ready &lt;N&gt;</code>, the run report in the PR body, and a comment: "Gate 2: review the diff, then merge to deploy. Run <code>./api/mock-test.sh</code> after the deploy." <strong>Never push to <code>main</code>, never merge, never approve your own PR.</strong>
+- <strong>Auto labels (ADR-0025):</strong> <code>autopilot:auto-merge</code> (Gate 2) and <code>autopilot:auto</code> (both gates) on the issue let the <strong>workflow</strong>, not you, dispatch the build and merge the PR after its own checks. Nothing changes in what you do: still write the marker only on <code>approve</code>, still run <code>gh pr ready</code> only after a code-review <code>approve</code> and green gates, and still never merge.</p>
 <p><strong>Differences from a local run:</strong>
 - Worker worktree commits are cherry-picked onto the <strong>PR branch</strong>, not <code>main</code>.
-- The build job finds the plan with <code>git diff --name-only origin/main...HEAD -- docs/plans/</code>.
+- The build job finds the plan with <code>git diff --name-only origin/main...HEAD -- docs/plans/</code>. If there is none (lite mode), the plan and the report rows are in the PR body: read them with <code>gh pr view &lt;N&gt; --json body --jq .body</code>, and write the final report back with <code>gh pr edit &lt;N&gt; --body-file</code>.
 - <code>session.txt</code> is not written, because the runner is thrown away; the PR is the record.
 - The runner's <code>scratchpad/</code> is lost when the job ends, so the <strong>report on the PR branch is the ledger</strong>: each job writes its <code>## Runs</code> rows there, not only in <code>scratchpad/</code>. The build job finds the report with <code>git diff --name-only origin/main...HEAD -- docs/reports/</code>, reads it, and fills every remaining section of the template (Gate 2: "pending: owner merges"; CI + smoke: "n/a in CI: runs after merge").</p>
 <p><strong>No stage is optional in CI.</strong> Plan review and <strong>code review</strong> run on every headless run, whatever the diff size: a separate <code>worker-reviewer</code> (or <code>swarm-review</code>) must return a verdict block. "The owner reviews at Gate 2" is <strong>not</strong> a reason to skip one; Gate 2 is in addition to the reviews, not a substitute. The Gate 2 comment lists every stage with its result (plan review verdict, code review verdict, QA ×2 result, gates). Without a code-review <code>approve</code>, do <strong>not</strong> run <code>gh pr ready</code>: comment <code>blocked</code> instead. Found on issue #26: the build job skipped code review because "the diff is tiny".</p>
@@ -6778,7 +6816,7 @@
 <h2 id="stages">Stages<a class="headerlink" href="#stages" title="Permanent link">&para;</a></h2>
 <h3 id="1-plan-plan-review-cap-3-rounds-d3">1. Plan ⇄ Plan review (cap 3 rounds, D3)<a class="headerlink" href="#1-plan-plan-review-cap-3-rounds-d3" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Plan:</strong> produce <code>docs/plans/plan-&lt;slug&gt;.md</code> + a <code>TASKS.md</code> section (repo convention). <strong>Plan mode:</strong> skip this step and go straight to Plan review on the given plan. A <code>revise</code> round edits <strong>that</strong> plan file in place, and only the open tasks may change; tasks that are already <code>[x]</code> stay as they are.</li>
+<li><strong>Plan:</strong> produce <code>docs/plans/plan-&lt;slug&gt;.md</code> + a <code>TASKS.md</code> section (repo convention). <strong>Lite mode:</strong> no plan file; keep the plan in the conversation (see Scope Guard). <strong>Plan mode:</strong> skip this step and go straight to Plan review on the given plan. A <code>revise</code> round edits <strong>that</strong> plan file in place, and only the open tasks may change; tasks that are already <code>[x]</code> stay as they are.</li>
 <li><strong>Plan review:</strong> review the plan, not code. Check that:</li>
 <li>each task has acceptance criteria;</li>
 <li>every fact cites <code>file:line</code>;</li>
@@ -6829,7 +6867,7 @@
 <li>put the stage in <code>doing</code>, and move it to <code>done</code> when it finishes;</li>
 <li>set <code>progress</code> to: plan ≈20, Gate 1 ≈30, implement+review ≈60, QA ≈80, landed 100.</li>
 </ul>
-<p>At the end, write the run report to <code>docs/reports/autopilot-&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md</code> from <code>resources/report.template.md</code>. Keep every section of the template, local or headless; write "n/a" with the reason rather than dropping one. The plan artifact is <strong>not</strong> edited for this (owner preference, 2026-10-19).</p>
+<p>At the end, write the run report to <code>docs/reports/autopilot-&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md</code> from <code>resources/report.template.md</code>. Keep every section of the template, local or headless; write "n/a" with the reason rather than dropping one. The plan artifact is <strong>not</strong> edited for this (owner preference, 2026-10-19). <strong>Lite mode:</strong> no report file; print the same sections in the final console summary (headless: the PR body).</p>
 <h2 id="stop-conditions">Stop Conditions<a class="headerlink" href="#stop-conditions" title="Permanent link">&para;</a></h2>
 <p>Stop with <code>status: blocked</code> and a <code>blocker:</code> line in <code>session.txt</code> when:
 - a round cap is reached;

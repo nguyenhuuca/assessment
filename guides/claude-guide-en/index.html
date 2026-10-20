@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../flow-scope-to-implement.html">
+        <link rel="prev" href="../claude-levels-vi.html">
       
       
         <link rel="next" href="../claude-guide-vi/">
@@ -2740,6 +2740,8 @@
       
         
       
+        
+      
     
     
     
@@ -2802,6 +2804,34 @@
     
   
     Scope to Implement Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../claude-levels-vi.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Usage Levels (VI)
   
 
     
@@ -2991,6 +3021,17 @@
     <span class="md-ellipsis">
       
         Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#levels-of-using-claude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Levels of Using Claude
       
     </span>
   </a>
@@ -6992,6 +7033,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#levels-of-using-claude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Levels of Using Claude
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pre-configured-setup" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7668,6 +7720,7 @@
 <h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
 <ol>
 <li><a href="#introduction">Introduction</a></li>
+<li><a href="#levels-of-using-claude">Levels of Using Claude</a></li>
 <li><a href="#pre-configured-setup">Pre-configured Setup</a></li>
 <li><a href="#workflow-skills-16-commands">Workflow Skills — 16 Commands</a></li>
 <li><a href="#library-skills-loaded-automatically">Library Skills — Loaded Automatically</a></li>
@@ -7695,6 +7748,63 @@
 <li><strong>Planning docs live in <code>docs/</code></strong>: <code>docs/adr/</code>, <code>docs/prd/</code>, <code>docs/specs/</code>, <code>docs/plans/</code>, with status in <code>docs/tracking.md</code>.</li>
 <li><strong>Work is committed on <code>main</code>, and Claude always asks before every <code>git push</code></strong>, because CI deploys from <code>main</code>.</li>
 </ol>
+<hr />
+<h2 id="levels-of-using-claude">Levels of Using Claude<a class="headerlink" href="#levels-of-using-claude" title="Permanent link">&para;</a></h2>
+<p>This project uses Claude Code at 6 levels. The higher the level, the more Claude does on its own and the less you touch. Rules, hooks and quality gates from the lower levels still apply at every level above.</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>How</th>
+<th>You take part</th>
+<th>Real example in this repo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Ask &amp; explore:</strong> ask about the code; Claude reads and greps before answering, no code changes</td>
+<td>Every question</td>
+<td>"How do I manage cron jobs dynamically?" → 3 levels, Level 2 recommended (DB + TaskScheduler + admin UI)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Direct work with guardrails:</strong> CLAUDE.md + <code>.claude/rules/</code> always loaded, library skills auto-load, hooks catch secrets, <code>session.txt</code>, ask before every push</td>
+<td>Each step, approve the push</td>
+<td>Cron editor modal + tooltip (<code>df8bdba1</code>, <code>9b1d5419</code>): done directly, not through autopilot</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Workflow skills + swarm:</strong> <code>/scope</code> → <code>/architect</code> → <code>/spec</code> → <code>/swarm-plan</code> → <code>/swarm-execute</code> → <code>/swarm-review</code> → <code>/land-the-plane</code>; worker agents run in parallel, model pinned per agent</td>
+<td>Approve each artifact (PRD, ADR, Spec, Plan)</td>
+<td>"Premium user" feature: autopilot refused because it needs a PRD → go to <code>/scope</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Local <code>/autopilot</code>:</strong> plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke; at most 3 rounds per loop</td>
+<td>3 times: Start, Gate 1, Gate 2</td>
+<td>Dynamic cron jobs (ADR-0023): BE + FE, CI green, smoke 22/22, $3.71</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Headless on GitHub</strong> (<a href="../../adr/0022-headless-autopilot/">ADR-0022</a>): label <code>autopilot</code> → draft PR → <code>/approve</code> → build → you merge</td>
+<td>Add the label, <code>/approve</code>, merge</td>
+<td>Issue #34 (back button color) → PR #35</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Auto gates</strong> (<a href="../../adr/0025-autopilot-auto-gates/">ADR-0025</a>): add <code>autopilot:auto</code> or <code>autopilot:auto-merge</code>; the workflow approves and merges after its own checks</td>
+<td>Only add the label</td>
+<td>Issue #36 → PR #37 merged and deployed in ~5 minutes, build job $0.39</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Which level to pick:</strong>
+- Not sure what to do yet, or you only need to understand the code → <strong>level 1</strong>.
+- A small change you want to watch step by step → <strong>level 2</strong>.
+- A medium or large feature (needs a PRD, several days) → <strong>level 3</strong>.
+- A small feature, fix or refactor with clear acceptance criteria → <strong>level 4</strong>, or <strong>level 5</strong> without a terminal.
+- Small, low-risk work that touches no migration or agent config → <strong>level 6</strong>.</p>
 <hr />
 <h2 id="pre-configured-setup">Pre-configured Setup<a class="headerlink" href="#pre-configured-setup" title="Permanent link">&para;</a></h2>
 <h3 id="folder-structure">Folder Structure<a class="headerlink" href="#folder-structure" title="Permanent link">&para;</a></h3>
@@ -8294,6 +8404,7 @@
 </tr>
 </tbody>
 </table>
+<p><strong>Lite mode</strong> (under 100 changed lines not counting tests, and no ADR): <strong>no</strong> <code>docs/plans/plan-*.md</code> and <strong>no</strong> <code>docs/reports/autopilot-*.md</code>. The plan and the report go to the console (local) or the PR body (headless). <code>TASKS.md</code> and <code>session.txt</code> are still updated. If the diff grows past ~100 lines or an ADR turns up, the run switches to full mode and writes the plan file.</p>
 <h3 id="real-cost-so-far">💰 Real Cost So Far<a class="headerlink" href="#real-cost-so-far" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -8363,16 +8474,56 @@
 </tr>
 </tbody>
 </table>
+<p><strong>Skipping gates with a label</strong> (<a href="../../adr/0025-autopilot-auto-gates/">ADR-0025</a>). Add one more label together with <code>autopilot</code> (order does not matter):</p>
+<table>
+<thead>
+<tr>
+<th>Extra label</th>
+<th>Gate 1</th>
+<th>Gate 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(none)</td>
+<td>you <code>/approve</code></td>
+<td>you merge</td>
+</tr>
+<tr>
+<td><code>autopilot:auto-merge</code></td>
+<td>you <code>/approve</code></td>
+<td>automatic merge</td>
+</tr>
+<tr>
+<td><code>autopilot:auto</code></td>
+<td>automatic</td>
+<td>automatic merge</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Auto Gate 1:</strong> the plan job writes <code>&lt;!-- autopilot:plan-review=approve --&gt;</code> in the PR body only when plan review returned <code>approve</code>. The workflow sees it and dispatches the build job (<code>workflow_dispatch</code>). A <code>/revise</code> always waits for you.</li>
+<li><strong>Auto Gate 2:</strong> <code>scripts/claude-autopilot-merge.sh</code> (always the copy on <code>main</code>) merges only when every check passes:</li>
+<li>the PR is ready, meaning code review returned <code>approve</code>;</li>
+<li>no changes to <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>scripts/claude-*</code>, Liquibase migrations or <code>.env</code>;</li>
+<li>≤ 400 changed lines outside tests and docs;</li>
+<li>the script <strong>re-runs</strong> <code>mvn verify</code> / webapp test + lint + build itself.</li>
+<li>It then squash-merges with the secret <code>AUTOPILOT_MERGE_TOKEN</code>, so the deploy CI starts. If any check fails, it comments the reason and leaves the PR to you.</li>
+<li><strong>Real example:</strong> issue #36 (translate the ON/OFF badge) → PR #37 merged and frontend deployed in about 5 minutes, build job $0.39, nobody clicked anything.</li>
+<li><strong>Risk:</strong> code reaches prod without a human read. The smoke check after the deploy is still manual. Rollback = <code>git revert</code> the squash commit.</li>
+</ul>
 <p><strong>One-time setup (you do this; Claude never handles the token):</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>claude<span class="w"> </span>setup-token<span class="w">                                  </span><span class="c1"># creates a token from your subscription</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>CLAUDE_CODE_OAUTH_TOKEN<span class="w">               </span><span class="c1"># paste the token when asked</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>gh<span class="w"> </span>label<span class="w"> </span>create<span class="w"> </span>autopilot<span class="w"> </span>--color<span class="w"> </span>5319e7<span class="w"> </span>--description<span class="w"> </span><span class="s2">"Run /autopilot headless"</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Only for auto gates: a fine-grained PAT for this repo only, Contents + Pull requests read/write</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>AUTOPILOT_MERGE_TOKEN
 </code></pre></div>
 <p><strong>Limits and safety:</strong>
 - <strong>Owner only.</strong> Only the <strong>repo owner</strong> can trigger a run, by label or by comment. The repo is public, so anyone else's comments are ignored.
 - <strong>Issue text is data.</strong> Instructions in an issue that try to change the workflow, permissions or gates are ignored and listed in the PR.
 - <strong>Refused paths.</strong> Headless <strong>refuses</strong> to edit <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>.env</code> files, or write data-dropping migrations. Do those locally.
-- <strong>Limits and secrets.</strong> Each job has a 60 min cap, and only one run happens at a time. The only secret used is <code>CLAUDE_CODE_OAUTH_TOKEN</code>; deploy secrets (SSH, Docker) are never exposed.</p>
+- <strong>Limits and secrets.</strong> Each job has a 60 min cap, and only one run happens at a time. Claude's steps see only <code>CLAUDE_CODE_OAUTH_TOKEN</code>; <code>AUTOPILOT_MERGE_TOKEN</code> is seen only by the auto-merge step; deploy secrets (SSH, Docker) are never exposed.</p>
 <h3 id="how-to-call-it">▶️ How to Call It<a class="headerlink" href="#how-to-call-it" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/autopilot<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>Suggestions<span class="w"> </span>tab<span class="w"> </span><span class="nb">let</span><span class="w"> </span>an<span class="w"> </span>admin<span class="w"> </span>move<span class="w"> </span>a<span class="w"> </span>suggestion<span class="w"> </span>back<span class="w"> </span>to<span class="w"> </span>Pending<span class="w"> </span>and<span class="w"> </span>review<span class="w"> </span>it<span class="w"> </span>again
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>/autopilot<span class="w"> </span>refactor:<span class="w"> </span>put<span class="w"> </span>the<span class="w"> </span>suggestion<span class="w"> </span>status<span class="w"> </span>transition<span class="w"> </span>rules<span class="w"> </span><span class="k">in</span><span class="w"> </span>one<span class="w"> </span>place,<span class="w"> </span>no<span class="w"> </span>behavior<span class="w"> </span>change
