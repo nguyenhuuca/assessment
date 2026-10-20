@@ -209,6 +209,7 @@
   <button class="tab-btn" data-tab="t2"><span class="ico">💬</span>1 · Ask</button>
   <button class="tab-btn" data-tab="t3"><span class="ico">🛡️</span>2 · Direct</button>
   <button class="tab-btn" data-tab="t4"><span class="ico">🐝</span>3 · Skills + swarm</button>
+  <button class="tab-btn" data-tab="t9"><span class="ico">🤝</span>Agents</button>
   <button class="tab-btn" data-tab="t5"><span class="ico">🤖</span>4 · Autopilot</button>
   <button class="tab-btn" data-tab="t6"><span class="ico">☁️</span>5 · Headless</button>
   <button class="tab-btn" data-tab="t7"><span class="ico">⚡</span>6 · Auto gates</button>
@@ -280,6 +281,40 @@
     <div class="card yellow">
       <h3>📌 Real example</h3>
       <p>"Premium user" feature: autopilot refused because it needs a PRD → go to <code>/scope</code>.</p>
+    </div>
+  </section>
+
+  <section class="panel" id="t9">
+    <h2 class="panel-title"><span class="num">3+</span> How the agents work together</h2>
+    <p class="panel-sub">One orchestrator, focused workers, separate reviewers.</p>
+    <div class="card blue">
+      <h3>🧭 Roles</h3>
+      <ul>
+        <li><strong>The orchestrator is the main session (Opus).</strong> It is the only agent that starts workers (workers have no <code>Agent</code> tool), owns the task list, merges their work, runs the gates and asks you at the gates.</li>
+        <li><strong>Each worker gets one focused prompt and returns a summary</strong> (files changed, tests added, verdict block), not file dumps. Workers never share state with each other.</li>
+        <li><strong><code>worker-builder</code> works in its own git worktree.</strong> The orchestrator merges or cherry-picks its commits into <code>main</code>, then re-runs the gates itself.</li>
+        <li><strong>Reviewers are separate agents from builders.</strong> Each ends with a verdict block (<code>approve</code> / <code>revise</code>). Only blocking findings send work back, at most 3 rounds.</li>
+      </ul>
+      <pre>                    You  (Start · Gate 1 · Gate 2)
+                              │
+               Orchestrator  (main session, Opus)
+     ┌──────────────┬─────────┴──────────┬──────────────────┐
+worker-explorer ×3  worker-reviewer     worker-builder ×2    worker-reviewer ×2
+(Haiku: find        (plan review)       (BE + FE, each in    (quality + security)
+ existing patterns)                      its own worktree)</pre>
+    </div>
+    <div class="card green">
+      <h3>📌 Example: the dynamic cron jobs run</h3>
+      <table>
+        <tr><th>Step</th><th>Agent(s)</th><th>Model</th><th>Result</th><th>Cost</th></tr>
+        <tr><td>Explore</td><td>3 × <code>worker-explorer</code>: Liquibase + entity patterns, backend admin patterns, webapp admin UI patterns</td><td>Haiku</td><td>Patterns for the plan; the orchestrator writes the plan + ADR-0023</td><td>$0.03</td></tr>
+        <tr><td>Plan review</td><td><code>worker-reviewer</code></td><td>Sonnet</td><td><code>approve</code>, 0 blocking, 7 advisory</td><td>$0.16</td></tr>
+        <tr><td>Gate 1</td><td>you</td><td>—</td><td>approved</td><td>—</td></tr>
+        <tr><td>Implement</td><td>2 × <code>worker-builder</code> in parallel: BE (DJ-1..3), FE (DJ-4..5)</td><td>Sonnet</td><td>Committed in worktrees, cherry-picked onto <code>main</code></td><td>$0.42 + $0.25</td></tr>
+        <tr><td>Code review</td><td>2 × <code>worker-reviewer</code>: quality, security</td><td>Sonnet</td><td><code>approve</code>, 0 blocking, 6 advisory</td><td>$0.17 + $0.15</td></tr>
+        <tr><td>QA ×2, gates, commit, CI + smoke</td><td>orchestrator</td><td>Opus</td><td>84 tests pass twice, CI green, smoke 22/22</td><td>$2.53 (whole run)</td></tr>
+      </table>
+      <div class="hl prod"><span class="ic">📦</span><div>Total <strong>$3.71</strong>. The orchestrator is 68% of it; the 8 workers together cost $1.18.</div></div>
     </div>
   </section>
 
