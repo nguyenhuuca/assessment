@@ -1806,6 +1806,14 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   /* Keep columns readable; the wrapper scrolls instead of squashing them */
   .admin-table-scroll > .admin-table { min-width: 640px; }
   .admin-stat-cards { grid-template-columns: repeat(2, 1fr); }
+  /* One-line title with an ellipsis; the full title is in the title attribute */
+  .admin-asset-title {
+    display: block;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 /* ═══════════════════════════════════════════

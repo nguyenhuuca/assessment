@@ -25,6 +25,15 @@ beforeEach(() => {
   adminApi.updateVideoVisibility.mockResolvedValue({})
 })
 
+describe('AdminVideoTable title cell', () => {
+  it('exposes the full title as a tooltip so the mobile ellipsis loses nothing', async () => {
+    const long = 'A very long video title that is cut with an ellipsis on a phone screen'
+    adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 1, title: long })], totalPages: 1, totalElements: 1 } })
+    renderTable()
+    expect(await screen.findByText(long)).toHaveAttribute('title', long)
+  })
+})
+
 describe('AdminVideoTable hidden column', () => {
   it('reflects the hidden flag per row', async () => {
     adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 1, title: 'Shown' }), video({ id: 2, title: 'Gone', hidden: true })], totalPages: 1, totalElements: 2 } })

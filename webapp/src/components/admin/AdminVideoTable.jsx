@@ -112,7 +112,7 @@ export default function AdminVideoTable({ statusFilter }) {
                     {v.thumbnailPath && (
                       <img src={v.thumbnailPath} alt="" className="admin-thumb" />
                     )}
-                    <span className="admin-asset-title">{v.title || t('untitled')}</span>
+                    <span className="admin-asset-title" title={v.title || undefined}>{v.title || t('untitled')}</span>
                   </div>
                 </td>
                 <td className="admin-cell-muted">{v.creatorEmail || '—'}</td>
