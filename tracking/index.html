@@ -6883,12 +6883,12 @@
 <tr>
 <td><strong>Headless Autopilot</strong></td>
 <td>—</td>
-<td><a href="../adr/0022-headless-autopilot/">0022 ✅</a></td>
+<td><a href="../adr/0022-headless-autopilot/">0022 ✅</a> + <a href="../adr/0025-autopilot-auto-gates/">0025 ✅</a></td>
 <td>—</td>
 <td><a href="../plans/plan-autopilot-headless/">Plan ✅</a></td>
 <td>—</td>
 <td>✅</td>
-<td>Label <code>autopilot</code> on an issue → draft PR with plan → <code>/approve</code> → build on the PR branch → owner merges. First run issue #26 → PR #27 merged 2026-10-19 (3 workflow fixes on the way: allowlist, foreground workers, mandatory code review + cost comment)</td>
+<td>Label <code>autopilot</code> on an issue → draft PR with plan → <code>/approve</code> → build on the PR branch → owner merges. Opt-in labels <code>autopilot:auto-merge</code> / <code>autopilot:auto</code> skip Gate 2 / both gates (ADR-0025, needs secret <code>AUTOPILOT_MERGE_TOKEN</code>). First run issue #26 → PR #27 merged 2026-10-19 (3 workflow fixes on the way: allowlist, foreground workers, mandatory code review + cost comment)</td>
 </tr>
 </tbody>
 </table>
@@ -7068,10 +7068,15 @@
 <td>cronstrue for Cron Text</td>
 <td>✅ Accepted</td>
 </tr>
+<tr>
+<td>0025</td>
+<td>Opt-in Auto Gates for Headless Autopilot</td>
+<td>✅ Accepted</td>
+</tr>
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-19 — dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-20 — opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 
