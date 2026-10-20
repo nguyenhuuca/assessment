@@ -35,6 +35,12 @@ Plan: `docs/plans/plan-autopilot.md` (design decisions D1–D7 referenced below)
 - **Medium/Large (needs a PRD or PR-FAQ):** stop. Say so in one line and point to `/scope`.
 - **Needs an ADR:** continue, but the Plan stage must produce the ADR too.
 
+**Lite mode** (owner preference, 2026-10-20: too many small md files fragment the docs). A request is **lite** when it is a small feature or fix, the estimate is **under 100 changed LOC not counting tests**, and it needs **no ADR**. A lite run writes **no `docs/plans/` file and no `docs/reports/` file**:
+- **Plan:** the task table (IDs, acceptance criteria, `file:line` facts) lives in the conversation. Local runs print it at Gate 1; headless runs put it in the PR body. Plan review gets the plan text in its prompt.
+- **Report:** the final summary (runs, gates, flaky, manual checks, cost) goes to the console, or to the PR body in headless mode.
+- **Still written:** the `TASKS.md` lines (one per task, `[x]` + hash when landed), `session.txt` with `plan: -`, and the scratchpad ledger.
+- **Promote to full mode** when the diff (tests excluded) grows past ~100 LOC or an ADR turns up: write the plan file then and continue as a normal run.
+
 Write `session.txt` (`.claude/rules/session-file.md`) and create the ledger (see Ledger) before stage 1.
 
 ## Headless Mode (ADR-0022)
@@ -59,12 +65,13 @@ Used when `$ARGUMENTS` starts with `--headless`. `.github/workflows/autopilot.ym
   - `gh pr create --draft --base main`, titled `Autopilot: <issue title> (#<N>)`, with a body containing `Closes #<N>` so the merge closes the issue;
   - the branch also holds the run report, created from `resources/report.template.md` with the header, the Start / Plan / Plan review / Gate 1 rows and the plan-stage `## Runs` rows filled in (Gate 1: "pending: `/approve`"). A `/revise` cycle appends its rows to the same file;
   - the PR body holds the plan link, the report link, the task table, the plan-review verdict and the open advisories, and ends with "Gate 1: comment `/approve`, or `/revise <notes>`".
+  - **Lite mode:** no plan or report file. The PR body holds the full plan and the report rows instead. The branch gets one `git commit --allow-empty -m "autopilot: plan for #<N>"` so the PR can be opened.
   - It also comments the PR link on the issue. **Stop there.**
 - **Gate 2:** the build job ends with `git push origin HEAD` (the PR branch only), `gh pr ready <N>`, the run report in the PR body, and a comment: "Gate 2: review the diff, then merge to deploy. Run `./api/mock-test.sh` after the deploy." **Never push to `main`, never merge, never approve your own PR.**
 
 **Differences from a local run:**
 - Worker worktree commits are cherry-picked onto the **PR branch**, not `main`.
-- The build job finds the plan with `git diff --name-only origin/main...HEAD -- docs/plans/`.
+- The build job finds the plan with `git diff --name-only origin/main...HEAD -- docs/plans/`. If there is none (lite mode), the plan and the report rows are in the PR body: read them with `gh pr view <N> --json body --jq .body`, and write the final report back with `gh pr edit <N> --body-file`.
 - `session.txt` is not written, because the runner is thrown away; the PR is the record.
 - The runner's `scratchpad/` is lost when the job ends, so the **report on the PR branch is the ledger**: each job writes its `## Runs` rows there, not only in `scratchpad/`. The build job finds the report with `git diff --name-only origin/main...HEAD -- docs/reports/`, reads it, and fills every remaining section of the template (Gate 2: "pending: owner merges"; CI + smoke: "n/a in CI: runs after merge").
 
@@ -115,7 +122,7 @@ Use the fallback when a skill call is refused, the skill is missing, or its `dis
 
 ### 1. Plan ⇄ Plan review (cap 3 rounds, D3)
 
-1. **Plan:** produce `docs/plans/plan-<slug>.md` + a `TASKS.md` section (repo convention). **Plan mode:** skip this step and go straight to Plan review on the given plan. A `revise` round edits **that** plan file in place, and only the open tasks may change; tasks that are already `[x]` stay as they are.
+1. **Plan:** produce `docs/plans/plan-<slug>.md` + a `TASKS.md` section (repo convention). **Lite mode:** no plan file; keep the plan in the conversation (see Scope Guard). **Plan mode:** skip this step and go straight to Plan review on the given plan. A `revise` round edits **that** plan file in place, and only the open tasks may change; tasks that are already `[x]` stay as they are.
 2. **Plan review:** review the plan, not code. Check that:
    - each task has acceptance criteria;
    - every fact cites `file:line`;
@@ -169,7 +176,7 @@ File: `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md`, started from `resources/
   - put the stage in `doing`, and move it to `done` when it finishes;
   - set `progress` to: plan ≈20, Gate 1 ≈30, implement+review ≈60, QA ≈80, landed 100.
 
-At the end, write the run report to `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` from `resources/report.template.md`. Keep every section of the template, local or headless; write "n/a" with the reason rather than dropping one. The plan artifact is **not** edited for this (owner preference, 2026-10-19).
+At the end, write the run report to `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` from `resources/report.template.md`. Keep every section of the template, local or headless; write "n/a" with the reason rather than dropping one. The plan artifact is **not** edited for this (owner preference, 2026-10-19). **Lite mode:** no report file; print the same sections in the final console summary (headless: the PR body).
 
 ## Stop Conditions
 
