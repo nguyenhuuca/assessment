@@ -196,6 +196,36 @@ Disciplines that used to live in skills are now **rules**, loaded in every sessi
 
 Task tracking uses **Claude Code's native task list** (in-session) plus `TASKS.md` / `docs/tracking.md` / GitHub Issues (durable). Beads (`bd`) is no longer used.
 
+### How the Agents Work Together
+
+- **The orchestrator is the main session (Opus).** It is the only agent that starts workers (workers have no `Agent` tool), owns the task list, merges their work, runs the gates and asks you at the gates.
+- **Each worker gets one focused prompt and returns a summary** (files changed, tests added, verdict block), not file dumps. Workers never share state with each other.
+- **`worker-builder` works in its own git worktree.** The orchestrator merges or cherry-picks its commits into `main`, then re-runs the gates itself.
+- **Reviewers are separate agents from builders.** Each ends with a verdict block (`approve` / `revise`). Only blocking findings send work back, at most 3 rounds.
+
+```
+                    You  (Start · Gate 1 · Gate 2)
+                              │
+               Orchestrator  (main session, Opus)
+     ┌──────────────┬─────────┴──────────┬──────────────────┐
+worker-explorer ×3  worker-reviewer     worker-builder ×2    worker-reviewer ×2
+(Haiku: find        (plan review)       (BE + FE, each in    (quality + security)
+ existing patterns)                      its own worktree)
+```
+
+**Example: the dynamic cron jobs run** ([report](../reports/autopilot-2026-10-19-dynamic-cron-jobs.md)):
+
+| Step | Agent(s) | Model | Result | Cost |
+|------|----------|-------|--------|------|
+| Explore | 3 × `worker-explorer`: Liquibase + entity patterns, backend admin patterns, webapp admin UI patterns | Haiku | Patterns for the plan; the orchestrator writes the plan + ADR-0023 | $0.03 |
+| Plan review | `worker-reviewer` | Sonnet | `approve`, 0 blocking, 7 advisory | $0.16 |
+| Gate 1 | you | — | approved | — |
+| Implement | 2 × `worker-builder` in parallel: BE (DJ-1..3), FE (DJ-4..5) | Sonnet | Committed in worktrees, cherry-picked onto `main` | $0.42 + $0.25 |
+| Code review | 2 × `worker-reviewer`: quality, security | Sonnet | `approve`, 0 blocking, 6 advisory | $0.17 + $0.15 |
+| QA ×2, gates, commit, CI + smoke | orchestrator | Opus | 84 tests pass twice, CI green, smoke 22/22 | $2.53 (whole run) |
+
+Total **$3.71**. The orchestrator is 68% of it; the 8 workers together cost $1.18.
+
 ### Swarm Patterns
 
 #### Pattern 1: Parallel Implementation

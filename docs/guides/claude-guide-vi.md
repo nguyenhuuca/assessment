@@ -196,6 +196,36 @@ Những kỷ luật trước đây nằm trong skill nay nằm trong **rules** (
 
 Task tracking dùng **task list có sẵn của Claude Code** (trong phiên) + `TASKS.md` / `docs/tracking.md` / GitHub Issues (lâu dài). Framework không còn dùng Beads (`bd`).
 
+### 🤝 Các agent làm việc với nhau thế nào
+
+- **Orchestrator là session chính (Opus).** Chỉ nó được tạo worker (worker không có tool `Agent`), giữ task list, gộp kết quả của worker, chạy gates và hỏi bạn ở các gate.
+- **Mỗi worker nhận một prompt tập trung và trả về bản tóm tắt** (file đã sửa, test đã thêm, khối verdict), không trả nguyên file. Các worker không chia sẻ state với nhau.
+- **`worker-builder` làm trong git worktree riêng.** Orchestrator merge hoặc cherry-pick commit của nó vào `main`, rồi tự chạy lại gates.
+- **Reviewer là agent khác với builder.** Mỗi reviewer kết thúc bằng khối verdict (`approve` / `revise`). Chỉ lỗi blocking mới bắt làm lại, tối đa 3 round.
+
+```
+                    Bạn  (Start · Gate 1 · Gate 2)
+                              │
+               Orchestrator  (session chính, Opus)
+     ┌──────────────┬─────────┴──────────┬──────────────────┐
+worker-explorer ×3  worker-reviewer     worker-builder ×2    worker-reviewer ×2
+(Haiku: tìm         (review plan)       (BE + FE, mỗi cái    (quality + security)
+ pattern có sẵn)                         một worktree)
+```
+
+**Ví dụ: run dynamic cron jobs** ([report](../reports/autopilot-2026-10-19-dynamic-cron-jobs.md)):
+
+| Bước | Agent | Model | Kết quả | Chi phí |
+|------|-------|-------|---------|---------|
+| Explore | 3 × `worker-explorer`: pattern Liquibase + entity, pattern admin BE, pattern admin UI webapp | Haiku | Pattern cho plan; orchestrator viết plan + ADR-0023 | $0.03 |
+| Plan review | `worker-reviewer` | Sonnet | `approve`, 0 blocking, 7 advisory | $0.16 |
+| Gate 1 | bạn | — | duyệt | — |
+| Implement | 2 × `worker-builder` song song: BE (DJ-1..3), FE (DJ-4..5) | Sonnet | Commit trong worktree, cherry-pick lên `main` | $0.42 + $0.25 |
+| Code review | 2 × `worker-reviewer`: quality, security | Sonnet | `approve`, 0 blocking, 6 advisory | $0.17 + $0.15 |
+| QA ×2, gates, commit, CI + smoke | orchestrator | Opus | 84 test pass 2 lần, CI xanh, smoke 22/22 | $2.53 (cả run) |
+
+Tổng **$3.71**. Orchestrator chiếm 68%; 8 worker cộng lại $1.18.
+
 ### 📊 Swarm Patterns
 
 #### Pattern 1: Parallel Implementation
