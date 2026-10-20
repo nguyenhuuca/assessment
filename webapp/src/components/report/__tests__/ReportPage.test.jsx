@@ -40,6 +40,15 @@ describe('ReportPage', () => {
     expect(screen.queryByLabelText('Autopilot')).toBeNull()
   })
 
+  it('the public-repo notice is an info alert, not an error alert', async () => {
+    renderPage()
+    await fill()
+    const note = screen.getByRole('note')
+    expect(note).toHaveTextContent(i18n.t('report:publicWarning'))
+    expect(note).toHaveClass('info')
+    expect(note).not.toHaveClass('error')
+  })
+
   it('SUPER_ADMIN sees the autopilot select', async () => {
     setRole('SUPER_ADMIN')
     renderPage()

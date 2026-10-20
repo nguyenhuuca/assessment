@@ -926,6 +926,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 }
 .app-alert.error   { background: rgba(185,41,2,0.2);  color: #ff8a7a; border: 1px solid rgba(185,41,2,0.3); }
 .app-alert.success { background: rgba(0,105,112,0.2); color: var(--accent-cyan); border: 1px solid var(--accent-cyan-glow); }
+.app-alert.info    { background: var(--accent-cyan-dim); color: var(--text); border: 1px solid var(--accent-cyan-glow); }
 
 /* ── App buttons ── */
 .app-btn {
