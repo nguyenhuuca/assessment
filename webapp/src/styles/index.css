@@ -950,6 +950,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 .app-btn.secondary{ background: var(--bg-high); color: var(--text-muted); }
 .app-btn.danger   { background: #b92902; color: #fff; }
 .app-btn.success  { background: #006940; color: #fff; }
+.app-btn.back     { background: var(--text); color: var(--bg); }
 
 /* ── App tabs ── */
 .app-tabs {

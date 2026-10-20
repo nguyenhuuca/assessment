@@ -194,7 +194,7 @@ function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComment
   const { t } = useTranslation('common')
   return (
     <div style={PLAYER_BOX}>
-      <button className="app-btn secondary" style={{ position: 'absolute', top: 12, left: 12, zIndex: 5 }} onClick={onBack}>
+      <button className="app-btn back" style={{ position: 'absolute', top: 12, left: 12, zIndex: 5 }} onClick={onBack}>
         <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> {t('back')}
       </button>
       <VideoSwiper
@@ -218,7 +218,7 @@ function CollectionPlayer({ collectionId, onBack, muted, onMutedChange, onShowCo
   if (error || videos.length === 0) {
     return (
       <div className="explore-root">
-        <button className="app-btn secondary" onClick={onBack}>
+        <button className="app-btn back" onClick={onBack}>
           <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> {t('library')}
         </button>
         {error
@@ -282,7 +282,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
     <div className="explore-root">
       <section className="explore-section">
         <div className="explore-section-header" style={{ gap: 8, flexWrap: 'wrap' }}>
-          <button className="app-btn secondary" onClick={onBack}>
+          <button className="app-btn back" onClick={onBack}>
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> {t('library')}
           </button>
           <h2 className="explore-section-title">{collection ? collectionName(collection) : t('collectionFallback')}</h2>

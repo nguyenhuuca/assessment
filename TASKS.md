@@ -343,3 +343,11 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **DJ-4** FE api + React Query hooks for jobs e7b53b4f
 - [x] **DJ-5** FE Admin "Scheduled jobs" tab (en + vi) + tests e7b53b4f
 - [x] **DJ-6** Cron editor modal (crontab.guru-style) + cron tooltip; `cronstrue` (ADR-0024); BE `GET /admin/jobs/preview`
+
+## Fix: Library back button style (2026-10-20, autopilot, issue #34)
+
+**Plan:** in the PR body (lite mode)
+
+- [x] **BACK-1** `.app-btn.back` in `index.css` (`background: var(--text); color: var(--bg)`)
+- [x] **BACK-2** `LibraryView.jsx` lines 197, 221, 285 use `app-btn back`
+- [x] **BACK-3** `LibraryView` test: back has `back`, Share keeps `secondary`

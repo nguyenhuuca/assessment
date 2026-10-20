@@ -67,6 +67,18 @@ describe('LibraryView', () => {
     expect(await screen.findByTestId('swiper')).toBeTruthy()
   })
 
+  it('styles the back button with the contrasting "back" class, not "secondary"', async () => {
+    renderView({ initialCollectionId: 'p1' })
+    await screen.findByLabelText('Clip')
+    const back = document.querySelector('button.app-btn.back')
+    expect(back).toBeTruthy()
+    expect(back).not.toHaveClass('secondary')
+    expect(back.textContent).toContain('arrow_back')
+    const others = [...document.querySelectorAll('button.app-btn.secondary')]
+    expect(others.length).toBeGreaterThan(0)
+    expect(others).not.toContain(back)
+  })
+
   it('pins "Xem sau" first and it cannot be deleted', async () => {
     auth = { isLoggedIn: true, user: { isAdmin: false } }
     renderView()
