@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.web;
 import com.canhlabs.funnyapp.dto.auth.JwtVerificationResultDto;
 import com.canhlabs.funnyapp.dto.notification.NotificationDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
+import com.canhlabs.funnyapp.enums.NotificationCategory;
 import com.canhlabs.funnyapp.enums.NotificationType;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.exception.UnauthorizedException;
@@ -40,6 +41,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -151,7 +154,7 @@ class NotificationControllerTest {
         NotificationDto dto = NotificationDto.builder().id(id).type(NotificationType.COMMENT_REPLY).videoId("22")
                 .actorDisplay("bob").actorCount(3).snippet("haha").read(false)
                 .updatedAt(Instant.parse("2026-10-02T10:00:00Z")).build();
-        when(notificationService.list(any(Pageable.class)))
+        when(notificationService.list(any(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(dto), PageRequest.of(0, 20), 1));
 
         mockMvc.perform(withPath(get(BASE).header("Authorization", TOKEN), BASE))
@@ -168,41 +171,60 @@ class NotificationControllerTest {
 
     @Test
     void list_defaultsToPage0Size20() throws Exception {
-        when(notificationService.list(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+        when(notificationService.list(any(), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         mockMvc.perform(withPath(get(BASE).header("Authorization", TOKEN), BASE)).andExpect(status().isOk());
 
         ArgumentCaptor<Pageable> cap = ArgumentCaptor.forClass(Pageable.class);
-        verify(notificationService).list(cap.capture());
+        verify(notificationService).list(isNull(), cap.capture());
         assertThat(cap.getValue().getPageNumber()).isZero();
         assertThat(cap.getValue().getPageSize()).isEqualTo(20);
     }
 
     @Test
     void list_pagingParamsPassedAndSizeIsCapped() throws Exception {
-        when(notificationService.list(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+        when(notificationService.list(any(), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         mockMvc.perform(withPath(get(BASE).param("page", "2").param("size", "1000")
                 .header("Authorization", TOKEN), BASE)).andExpect(status().isOk());
 
         ArgumentCaptor<Pageable> cap = ArgumentCaptor.forClass(Pageable.class);
-        verify(notificationService).list(cap.capture());
+        verify(notificationService).list(isNull(), cap.capture());
         assertThat(cap.getValue().getPageNumber()).isEqualTo(2);
         assertThat(cap.getValue().getPageSize()).isEqualTo(NotificationController.MAX_PAGE_SIZE);
     }
 
     @Test
     void list_negativePageAndZeroSize_areClamped_andClientSortIgnored() throws Exception {
-        when(notificationService.list(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+        when(notificationService.list(any(), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         mockMvc.perform(withPath(get(BASE).param("page", "-4").param("size", "0").param("sort", "userId,asc")
                 .header("Authorization", TOKEN), BASE)).andExpect(status().isOk());
 
         ArgumentCaptor<Pageable> cap = ArgumentCaptor.forClass(Pageable.class);
-        verify(notificationService).list(cap.capture());
+        verify(notificationService).list(isNull(), cap.capture());
         assertThat(cap.getValue().getPageNumber()).isZero();
         assertThat(cap.getValue().getPageSize()).isEqualTo(1);
         assertThat(cap.getValue().getSort().isSorted()).isFalse();
+    }
+
+    @Test
+    void list_categoryParamIsPassedToTheService() throws Exception {
+        when(notificationService.list(any(), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+
+        mockMvc.perform(withPath(get(BASE).param("category", "ADMIN").header("Authorization", TOKEN), BASE))
+                .andExpect(status().isOk());
+        mockMvc.perform(withPath(get(BASE).param("category", "GENERAL").header("Authorization", TOKEN), BASE))
+                .andExpect(status().isOk());
+
+        verify(notificationService).list(eq(NotificationCategory.ADMIN), any(Pageable.class));
+        verify(notificationService).list(eq(NotificationCategory.GENERAL), any(Pageable.class));
+    }
+
+    @Test
+    void list_unknownCategory_is400() throws Exception {
+        mockMvc.perform(withPath(get(BASE).param("category", "bogus").header("Authorization", TOKEN), BASE))
+                .andExpect(status().isBadRequest());
     }
 
     // ── unread count ──────────────────────────────────────────────────────────

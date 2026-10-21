@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.dto.notification.NotificationDto;
 import com.canhlabs.funnyapp.dto.notification.UnreadCountDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
+import com.canhlabs.funnyapp.enums.NotificationCategory;
 import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.service.NotificationService;
@@ -49,10 +50,11 @@ public class NotificationController {
     @GetMapping
     public ResponseEntity<ResultObjectInfo<Page<NotificationDto>>> list(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) NotificationCategory category) {
         // Fixed ordering (updated_at DESC) lives in the repository; client-supplied sort is not accepted
         PageRequest pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), MAX_PAGE_SIZE));
-        return ok(notificationService.list(pageable));
+        return ok(notificationService.list(category, pageable));
     }
 
     @Operation(summary = "Unread notification count")

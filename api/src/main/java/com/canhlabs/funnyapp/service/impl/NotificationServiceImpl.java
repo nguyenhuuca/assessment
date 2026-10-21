@@ -3,6 +3,8 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.dto.notification.NotificationDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.Notification;
+import com.canhlabs.funnyapp.enums.NotificationCategory;
+import com.canhlabs.funnyapp.enums.NotificationType;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.NotificationRepository;
 import com.canhlabs.funnyapp.service.NotificationService;
@@ -28,8 +30,17 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NotificationDto> list(Pageable pageable) {
-        return repository.findByUserIdOrderByUpdatedAtDesc(currentUserId(), pageable).map(NotificationServiceImpl::toDto);
+    public Page<NotificationDto> list(NotificationCategory category, Pageable pageable) {
+        Long userId = currentUserId();
+        Page<Notification> rows = category == null
+                ? repository.findByUserIdOrderByUpdatedAtDesc(userId, pageable)
+                : switch (category) {
+                    case ADMIN -> repository.findByUserIdAndTypeInOrderByUpdatedAtDesc(
+                            userId, NotificationType.ADMIN_TYPES, pageable);
+                    case GENERAL -> repository.findByUserIdAndTypeNotInOrderByUpdatedAtDesc(
+                            userId, NotificationType.ADMIN_TYPES, pageable);
+                };
+        return rows.map(NotificationServiceImpl::toDto);
     }
 
     @Override

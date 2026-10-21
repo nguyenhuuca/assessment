@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.repo;
 
 import com.canhlabs.funnyapp.entity.Notification;
+import com.canhlabs.funnyapp.enums.NotificationType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +22,12 @@ import java.util.UUID;
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
 
     Page<Notification> findByUserIdOrderByUpdatedAtDesc(Long userId, Pageable pageable);
+
+    Page<Notification> findByUserIdAndTypeInOrderByUpdatedAtDesc(Long userId, Collection<NotificationType> types,
+                                                                 Pageable pageable);
+
+    Page<Notification> findByUserIdAndTypeNotInOrderByUpdatedAtDesc(Long userId, Collection<NotificationType> types,
+                                                                    Pageable pageable);
 
     long countByUserIdAndReadAtIsNull(Long userId);
 

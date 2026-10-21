@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.dto.notification.NotificationDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.Notification;
+import com.canhlabs.funnyapp.enums.NotificationCategory;
 import com.canhlabs.funnyapp.enums.NotificationType;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.NotificationRepository;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.repository.query.parser.PartTree;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -77,7 +79,7 @@ class NotificationServiceImplTest {
         PageRequest pageable = PageRequest.of(1, 20);
         when(repository.findByUserIdOrderByUpdatedAtDesc(7L, pageable)).thenReturn(new PageImpl<>(List.of(n), pageable, 21));
 
-        Page<NotificationDto> page = service.list(pageable);
+        Page<NotificationDto> page = service.list(null, pageable);
 
         assertThat(page.getTotalElements()).isEqualTo(21);
         NotificationDto dto = page.getContent().get(0);
@@ -100,7 +102,7 @@ class NotificationServiceImplTest {
         n.setPayload(Map.of("reason", "SPAM"));
         when(repository.findByUserIdOrderByUpdatedAtDesc(eq(7L), any())).thenReturn(new PageImpl<>(List.of(n)));
 
-        NotificationDto dto = service.list(PageRequest.of(0, 20)).getContent().get(0);
+        NotificationDto dto = service.list(null, PageRequest.of(0, 20)).getContent().get(0);
 
         assertThat(dto.getReason()).isEqualTo("SPAM");
         assertThat(dto.getSnippet()).isNull();
@@ -113,7 +115,31 @@ class NotificationServiceImplTest {
         n.setPayload(null);
         when(repository.findByUserIdOrderByUpdatedAtDesc(eq(7L), any())).thenReturn(new PageImpl<>(List.of(n)));
 
-        assertThat(service.list(PageRequest.of(0, 20)).getContent().get(0).getSnippet()).isNull();
+        assertThat(service.list(null, PageRequest.of(0, 20)).getContent().get(0).getSnippet()).isNull();
+    }
+
+    @Test
+    void list_adminCategory_readsOnlyAdminTypes_generalReadsTheRest() {
+        PageRequest pageable = PageRequest.of(0, 20);
+        Notification closed = reply(false);
+        closed.setType(NotificationType.REPORT_CLOSED);
+        when(repository.findByUserIdAndTypeInOrderByUpdatedAtDesc(7L, NotificationType.ADMIN_TYPES, pageable))
+                .thenReturn(new PageImpl<>(List.of(closed)));
+        when(repository.findByUserIdAndTypeNotInOrderByUpdatedAtDesc(7L, NotificationType.ADMIN_TYPES, pageable))
+                .thenReturn(new PageImpl<>(List.of(reply(false))));
+
+        assertThat(service.list(NotificationCategory.ADMIN, pageable).getContent())
+                .extracting(NotificationDto::getType).containsExactly(NotificationType.REPORT_CLOSED);
+        assertThat(service.list(NotificationCategory.GENERAL, pageable).getContent())
+                .extracting(NotificationDto::getType).containsExactly(NotificationType.COMMENT_REPLY);
+        verify(repository, never()).findByUserIdOrderByUpdatedAtDesc(any(), any());
+    }
+
+    @Test
+    void adminTypes_areReportClosedOnly_andDerivedQueriesParse() {
+        assertThat(NotificationType.ADMIN_TYPES).containsExactly(NotificationType.REPORT_CLOSED);
+        new PartTree("findByUserIdAndTypeInOrderByUpdatedAtDesc", Notification.class);
+        new PartTree("findByUserIdAndTypeNotInOrderByUpdatedAtDesc", Notification.class);
     }
 
     @Test
