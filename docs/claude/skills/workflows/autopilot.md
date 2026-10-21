@@ -38,7 +38,7 @@ Plan: `docs/plans/plan-autopilot.md` (design decisions D1–D7 referenced below)
 **Lite mode** (owner preference, 2026-10-20: too many small md files fragment the docs). A request is **lite** when it is a small feature or fix, the estimate is **under 100 changed LOC not counting tests**, and it needs **no ADR**. A lite run writes **no `docs/plans/` file and no `docs/reports/` file**:
 - **Plan:** the task table (IDs, acceptance criteria, `file:line` facts) lives in the conversation. Local runs print it at Gate 1; headless runs put it in the PR body. Plan review gets the plan text in its prompt.
 - **Report:** the final summary (runs, gates, flaky, manual checks, cost) goes to the console, or to the PR body in headless mode.
-- **Still written:** the `TASKS.md` lines (one per task, `[x]` + hash when landed), `session.txt` with `plan: -`, and the scratchpad ledger.
+- **Still written:** the `TASKS.md` lines (one per task, `[x]` + hash when landed), `session.txt` with `plan: -`, the scratchpad ledger, and the run-metrics JSON (see Ledger: it is data, not a doc).
 - **Promote to full mode** when the diff (tests excluded) grows past ~100 LOC or an ADR turns up: write the plan file then and continue as a normal run.
 
 Write `session.txt` (`.claude/rules/session-file.md`) and create the ledger (see Ledger) before stage 1.
@@ -161,7 +161,7 @@ Show the plan path, the task table, the advisories that were left open, and the 
 ### 4. Land → Gate 2 → CI + smoke
 
 1. Run the full quality gates once, for whichever side changed: `mvn -f api/pom.xml verify` (coverage ≥ `api/.coverage-threshold`), then `npm --prefix webapp run test` and `npm --prefix webapp run lint`.
-2. Commit with explicit pathspecs. Flip the `TASKS.md` lines to `[x]` with the hash and update `docs/tracking.md` when the plan status changes.
+2. Commit with explicit pathspecs. Flip the `TASKS.md` lines to `[x]` with the hash and update `docs/tracking.md` when the plan status changes. **Every commit of the run** (local and headless) ends with the trailer `Autopilot-Run: <run id>` on its own line just before `Co-Authored-By:`; the run id is `<YYYY-MM-DD>-<slug>`, the same as the run-metrics file name. `scripts/agent-metrics.mjs` uses it to link later `fix:` commits and reverts back to the run.
 3. **Gate 2:** show the commits, the gate results, the flaky list, the manual checks, and the ledger total. Ask with `AskUserQuestion`: **Push / Don't push yet**. There is no auto-push and no `--yes`.
 4. **After a push:**
    - `git pull --rebase --autostash`, then push, and check that `git status` is in sync.
@@ -177,6 +177,8 @@ File: `scratchpad/autopilot/<YYYYMMDD-HHMM>-<slug>.md`, started from `resources/
 - **Update `session.txt` after every stage:**
   - put the stage in `doing`, and move it to `done` when it finishes;
   - set `progress` to: plan ≈20, Gate 1 ≈30, implement+review ≈60, QA ≈80, landed 100.
+
+**Run metrics (all modes, lite included).** At the end of the run, whatever the result (landed, blocked or stopped), write `docs/metrics/agent-runs/<run id>.json` from `resources/run-metrics.template.json` with the real values: rounds per loop, the last verdict of each review, `codeReviewSkipped`, total blocking and advisory findings, non-test LOC, the QA ×2 counts, and `costUsd` (local: the TOTAL from `claude-cost.mjs`; headless: `null`, the workflow posts cost separately). Commit it with the run's last commit (headless: on the PR branch, in the build job, which knows the PR number and sets `pr`; the plan job's blocked or stopped runs set it when the PR exists, else `null`). `node scripts/agent-metrics.mjs` turns these files plus git and GitHub history into `docs/reports/agent-metrics-<YYYY-MM>.md` (escaped defects, reverts, rounds, CI failures, cost).
 
 At the end, write the run report to `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` from `resources/report.template.md`. Keep every section of the template, local or headless; write "n/a" with the reason rather than dropping one. The plan artifact is **not** edited for this (owner preference, 2026-10-19). **Lite mode:** no report file; print the same sections in the final console summary (headless: the PR body).
 

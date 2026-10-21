@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "YYYY-MM-DD-<slug>",
+  "date": "YYYY-MM-DD",
+  "mode": "local | headless",
+  "lite": true,
+  "issue": null,
+  "pr": null,
+  "result": "landed | blocked | stopped",
+  "gate1": "approved | revised | auto",
+  "rounds": { "plan": 1, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 0,
+  "advisory": 0,
+  "locNonTest": 0,
+  "tests": { "passed": 0, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}

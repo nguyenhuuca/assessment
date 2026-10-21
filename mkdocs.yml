@@ -167,6 +167,7 @@ nav:
       - Video Import Setup (VI): guides/video-import-setup-vi.md
 
   - Reports:
+      - Agent Metrics 2026-10: reports/agent-metrics-2026-10.md
       - System Health 2026-05-30: reports/system-health-2026-05-30.md
       - System Health 2026-02-06: reports/system-health-2026-02-06.md
       - Architecture Quality 2025-07-13 EN: reports/architecture-quality-2025-07-13-en.md
