@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "signal": "defect:62526c97",
+  "run": "2026-10-19-dynamic-cron-jobs",
+  "base": "985ba5b508d547f6338b8600a4fdbb9ea230ab21^",
+  "head": "985ba5b508d547f6338b8600a4fdbb9ea230ab21",
+  "fix": "62526c9798cd95353edbf1eee151c286d4ba088a",
+  "summary": "DynamicJobScheduler records SUCCESS or FAILED from whether the job body throws, but the existing job bodies in AppScheduler catch and log every exception, so failed jobs show SUCCESS in Admin.",
+  "expect": {
+    "files": ["jobs/AppScheduler.java", "jobs/DynamicJobScheduler.java", "jobs/JobRegistry.java"],
+    "patterns": [
+      "swallow",
+      "(never|not|n't|no longer) (re-?)?throw",
+      "(not|never|n't) propagat",
+      "(record|report|mark|show|log)\\w* .{0,60}SUCCESS",
+      "SUCCESS.{0,60}(fail|error|exception)",
+      "catch\\w* .{0,80}(log|exception)"
+    ]
+  }
+}

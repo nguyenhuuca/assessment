@@ -22,6 +22,12 @@ Focused review agent for swarm execution. Supports focus modes: quality (default
 - **Never prefix Bash commands with shell comments** (`# comment\ncommand`). This breaks permission auto-approval pattern matching.
 - Prefer dedicated tools (Read, Grep, Glob) over Bash equivalents.
 
+## Checks Learned From Escaped Defects
+
+Added by the Evolve loop (ADR-0027); each line names the seeded eval case that proves it.
+
+- **Check what the new code assumes about code it did not change.** When new code relies on how existing code behaves (a callee throws, returns null, runs in a transaction, keeps an order, is idempotent), open that existing code and confirm it. A false assumption that breaks the new feature is a **blocking** finding on the file where it breaks, not an advisory. Example: a scheduler that records FAILED only when a job throws, while the existing job bodies catch and log every exception, so failures show SUCCESS. <!-- evolve:2026-10-19-swallowed-job-exceptions -->
+
 ## Output Format
 ```
 Summary: [Pass/Fail/Needs Work]
