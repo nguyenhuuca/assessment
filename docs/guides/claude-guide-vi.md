@@ -463,6 +463,25 @@ Observe (signals) → Diagnose (Five Whys → stage lẽ ra phải bắt) → Pr
   - Không bao giờ cắt: `AGENTS.md`, `security.md`, skill evolve, frontmatter, và mọi dòng mang luật an toàn (push, gate, merge, deny, secret, prod, smoke, Core Principles, "never …").
   - Gate: nhỏ hơn (context luôn load -5% hoặc file bị sửa -1 KiB), không thêm dòng trùng hay ref chết, mọi seeded case vẫn bắt được. Luôn là **draft** PR: bạn đọc từng dòng bị xoá.
   - Compress đầu tiên (`evolve/compress-2026-10`): phần cost trong `CLAUDE.md`, ba mục trùng nhau → một, -1.1 KB, gate PASS.
+  - **Cách dùng:**
+
+    ```bash
+    # 1. Xem có gì cắt được (chỉ là gợi ý; vài "dead ref" thật ra là ví dụ trong text)
+    node scripts/evolve.mjs lint-rules
+
+    # 2a. Để GitHub làm: Actions → "Agent Evolve" → Run workflow (hoặc đợi thứ Hai).
+    #     Mỗi tháng nó đề xuất một compress dưới dạng DRAFT PR label `evolve`.
+    # 2b. Hoặc chạy local: /evolve   (signal compress:<YYYY-MM> nằm trong danh sách; dừng trước khi push)
+
+    # 3. Tự cắt bằng tay trên branch? Kiểm tra bằng đúng gate mà workflow dùng
+    git switch -c evolve/compress-<YYYY-MM>
+    #    ... sửa CLAUDE.md / .claude/ rồi commit ...
+    node scripts/evolve.mjs check-paths --base main --head evolve/compress-<YYYY-MM> --kind compress
+    node scripts/evolve.mjs gate --base main --head evolve/compress-<YYYY-MM> --kind compress   # ~$0.15 mỗi seeded case
+    ```
+
+    - **Review draft PR:** đọc từng dòng bị xoá (`git diff main...<branch>`). Merge nếu mỗi chỗ cắt đúng là trùng lặp, ref chết hoặc lỗi thời; ngược lại thì đóng PR (signal của tháng đó không đề xuất lại).
+    - **Bỏ qua một tháng:** tạo issue label `evolve` có body chứa `<!-- evolve:signal=compress:<YYYY-MM> -->`.
 
 **Lần tiến hoá đầu tiên** (`fe36685d`): từ bug `62526c97` (job nuốt exception nên cron job lỗi vẫn hiện SUCCESS), reviewer có thêm rule *"kiểm tra code mới giả định gì về code cũ không đổi; giả định sai là blocking"*. Case `2026-10-19-swallowed-job-exceptions`: rule cũ bắt **0/3**, rule mới **3/3**, khoảng $0.15 mỗi lần chạy eval.
 

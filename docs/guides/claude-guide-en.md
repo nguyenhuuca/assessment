@@ -470,6 +470,25 @@ Observe (signals) → Diagnose (Five Whys → the stage that should have caught 
   - Never cut: `AGENTS.md`, `security.md`, the evolve skill, frontmatter, and any line carrying a safety rule (push, gates, merge, deny, secrets, prod, smoke, Core Principles, "never …").
   - Gate: smaller (always-loaded -5% or the touched files -1 KiB), no new duplicates or dead refs, every seeded case still caught. Always a **draft** PR: you read every removed line.
   - First compress (`evolve/compress-2026-10`): the cost section of `CLAUDE.md`, three overlapping sections → one, -1.1 KB, gate PASS.
+  - **How to use:**
+
+    ```bash
+    # 1. See what could be cut (hints, not orders; some "dead refs" are only examples in the text)
+    node scripts/evolve.mjs lint-rules
+
+    # 2a. Let GitHub do it: Actions → "Agent Evolve" → Run workflow (or wait for Monday).
+    #     Once a month it proposes one compress as a DRAFT PR labelled `evolve`.
+    # 2b. Or locally: /evolve   (the compress:<YYYY-MM> signal is in its list; it stops before any push)
+
+    # 3. Cutting by hand on a branch? Check it with the same gate the workflow uses
+    git switch -c evolve/compress-<YYYY-MM>
+    #    ... edit CLAUDE.md / .claude/ and commit ...
+    node scripts/evolve.mjs check-paths --base main --head evolve/compress-<YYYY-MM> --kind compress
+    node scripts/evolve.mjs gate --base main --head evolve/compress-<YYYY-MM> --kind compress   # ~$0.15 per seeded case
+    ```
+
+    - **Reviewing the draft PR:** read every removed line (`git diff main...<branch>`). Merge if each cut is a duplicate, a dead reference or stale; close it otherwise (that month's signal is not proposed again).
+    - **Skip a month:** open an issue labelled `evolve` whose body has `<!-- evolve:signal=compress:<YYYY-MM> -->`.
 
 **First evolution** (`fe36685d`): from defect `62526c97` (job bodies swallowed exceptions, so failed cron jobs showed SUCCESS), the reviewer got the rule *"check what new code assumes about code it did not change; a false assumption is blocking"*. Case `2026-10-19-swallowed-job-exceptions`: caught **0/3** with the old rules, **3/3** with the new one, about $0.15 per eval run.
 
