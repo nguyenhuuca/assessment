@@ -2,7 +2,8 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
-  decide, grade, handledIds, parseArgs, parseVerdict, pathViolations, pickSignals, removedLines, reviewPrompt, validateManifest,
+  compressViolations, decide, decideCompress, grade, handledIds, lintRules, parseArgs, parseVerdict, pathViolations, pickSignals,
+  removedLines, reviewPrompt, validateManifest,
 } from '../evolve.mjs'
 
 const reply = (lines, verdict = 'revise') => `prose\n\n\`\`\`verdict\nVERDICT: ${verdict}\nBLOCKING: 1\nADVISORY: 0\n${lines.join('\n')}\n\`\`\`\n`
@@ -144,4 +145,54 @@ test('validateManifest keeps only well-formed rows for trusted signals', () => {
 test('parseArgs rejects refs that look like options', () => {
   assert.throws(() => parseArgs(['gate', '--base', '--upload-pack=x']), /cannot start/)
   assert.throws(() => parseArgs(['check-paths', '--kind', 'other']), /kind/)
+})
+
+test('compress may edit CLAUDE.md and remove lines, but not protected files or lines', () => {
+  const f = (path, status = 'M') => [{ status, path }]
+  assert.deepEqual(compressViolations(f('CLAUDE.md'), { 'CLAUDE.md': ['- Use Haiku for searches', '1. Use Haiku for: grep, find'] }), [])
+  assert.match(compressViolations(f('CLAUDE.md'), { 'CLAUDE.md': ['6. Ship It — ask before every `git push`'] })[0], /protected line/)
+  assert.match(compressViolations(f('.claude/rules/security.md'))[0], /protected file/)
+  assert.match(compressViolations(f('.claude/skills/evolve/SKILL.md'))[0], /protected file/)
+  assert.match(compressViolations(f('AGENTS.md'))[0], /allowlist/)
+  assert.match(compressViolations(f('scripts/evolve.mjs'))[0], /allowlist/)
+  assert.match(compressViolations(f('.claude/rules/new.md', 'A'))[0], /existing files/)
+  assert.match(compressViolations(f('.claude/rules/code-quality.md'), {}, { '.claude/rules/code-quality.md': ['---\na: 1\n---', ''] })[0], /frontmatter/)
+  assert.equal(pathViolations(f('CLAUDE.md'), {}, {}, 'rule').length, 1, 'CLAUDE.md stays out of rule proposals')
+})
+
+test('lintRules finds duplicate lines, dead path references and the always-loaded size', () => {
+  const files = {
+    'CLAUDE.md': 'Use the cheapest model for each task and batch similar operations\nSee `docs/adr/0001-x.md` and `scripts/gone.sh`\n',
+    '.claude/rules/a.md': '- **Use the cheapest model** for each task and batch similar operations\n`api/src/A.java` `<id>/x.md` `scratchpad/x.md` `a@1.0/b.yml`\n',
+    '.claude/skills/s/SKILL.md': 'short line\n',
+  }
+  const l = lintRules(files, ['docs/adr/0001-x.md', 'api/src/A.java', 'CLAUDE.md'], ['CLAUDE.md', '.claude/rules/a.md'])
+  assert.equal(l.duplicates.length, 1)
+  assert.deepEqual(l.duplicates[0].at, ['CLAUDE.md:1', '.claude/rules/a.md:1'])
+  assert.deepEqual(l.deadRefs.map((d) => d.ref), ['scripts/gone.sh'])
+  assert.equal(l.alwaysLoadedBytes, Buffer.byteLength(files['CLAUDE.md']) + Buffer.byteLength(files['.claude/rules/a.md']))
+})
+
+test('decideCompress needs a real cut, no new lint findings and every case caught', () => {
+  const ok = { caught: true, error: null }
+  const size = (tb, th, ab, ah) => ({ touchedBase: tb, touchedHead: th, alwaysBase: ab, alwaysHead: ah })
+  const lint = (bd, hd, br = 0, hr = 0) => ({ base: { duplicates: bd, deadRefs: br }, head: { duplicates: hd, deadRefs: hr } })
+  assert.equal(decideCompress({ size: size(9000, 7000, 37000, 35000), lint: lint(5, 3), regress: { a: [ok] } }).pass, true)
+  assert.equal(decideCompress({ size: size(9000, 8900, 37000, 36900), lint: lint(5, 3), regress: { a: [ok] } }).pass, false, 'cut too small')
+  assert.equal(decideCompress({ size: size(9000, 9500, 37000, 37500), lint: lint(5, 3), regress: { a: [ok] } }).pass, false, 'grew')
+  assert.equal(decideCompress({ size: size(9000, 7000, 37000, 35000), lint: lint(5, 6), regress: { a: [ok] } }).pass, false, 'new duplicate')
+  assert.equal(decideCompress({ size: size(9000, 7000, 37000, 35000), lint: lint(5, 3, 1, 2), regress: { a: [ok] } }).pass, false, 'new dead ref')
+  assert.equal(decideCompress({ size: size(9000, 7000, 37000, 35000), lint: lint(5, 3), regress: { a: [{ caught: false }, { caught: false }] } }).pass, false, 'regression')
+  assert.equal(decideCompress({ size: size(9000, 7000, 37000, 35000), lint: lint(5, 3), regress: {} }).pass, false, 'no eval cases')
+  assert.equal(decideCompress({ size: size(9000, 7000, 37000, 35000), lint: lint(5, 3), regress: { a: [{ caught: true, error: 'x' }] } }).pass, false, 'errors')
+})
+
+test('validateManifest: compress rows use case "-", other kinds may not', () => {
+  const ids = ['compress:2026-10', 'defect:a']
+  const rows = [
+    { signal: 'compress:2026-10', branch: 'evolve/compress-2026-10', case: '-', kind: 'compress', body: 'evolve-out/c.md' },
+    { signal: 'defect:a', branch: 'evolve/defect-a', case: '-', kind: 'rule', body: 'evolve-out/a.md' },
+  ]
+  assert.deepEqual(validateManifest(rows, ids).rows.map((r) => r.kind), ['compress'])
+  assert.deepEqual(validateManifest([{ ...rows[0], case: 'x' }], ids).rows, [])
 })

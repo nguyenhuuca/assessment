@@ -84,6 +84,20 @@ weekly cron (or /evolve locally)
 - Every rule line added by Evolve ends with `<!-- evolve:<case id> -->`.
 - Quarterly (or when total rule size grows by more than 20% since the last prune), a run may propose **removing** one such line. It passes only when its case is still caught without it (D3 rule 2) and nothing regresses. This is the only path that deletes rule lines.
 
+### D6. Compress: removing text, not only adding it (amendment 2026-10-21)
+
+Adding rules alone makes every session pay for more context (`CLAUDE.md` + always-loaded rules ≈ 37 KB, loaded by every session and worker). Evolve may also **cut**:
+
+- **Signal:** `compress:<YYYY-MM>`, at most one a month, after the defect signals. It carries lint hints from `scripts/evolve.mjs lint-rules`: exact duplicate lines across rule files, dead path references, the always-loaded size.
+- **What may be cut:** duplicated text (keep one home, point to it), dead references, text that contradicts its source of truth, stale claims.
+- **Paths:** the D2 paths **plus `CLAUDE.md`**, existing files only, removals allowed. **Protected, never cut or edited:** `AGENTS.md`, `.claude/rules/security.md`, the evolve skill, `verdict.md`, frontmatter, and any line carrying a safety rule (push, gates, merge, deny, secrets, tokens, prod, smoke, security, Core Principles, "never …"), matched by a fixed pattern in `scripts/evolve.mjs`.
+- **Gate** (`gate --kind compress`):
+  - C1: the touched files shrink, and the always-loaded context drops ≥ 5% or the touched files lose ≥ 1 KiB;
+  - C2: no new duplicate lines or dead references;
+  - C3: every seeded case is still caught with the compressed rules (and there is at least one case).
+- **Always a draft PR.** With a small eval set the gate cannot prove that behavior outside it is unchanged, so the owner reads every removed line.
+- Rewriting a skill to work better (not just shorter) is a `rule` proposal: it needs a seeded case that the old text misses.
+
 ## Consequences
 
 - **Good:** every escaped defect becomes a regression eval for the agent, and each rule change has before/after evidence. The eval set grows with real bugs, never with invented ones.
@@ -107,3 +121,4 @@ weekly cron (or /evolve locally)
 ## Changelog
 
 - 2026-10-21: Proposed; accepted by the owner the same day. The eval runner lives in `scripts/evolve.mjs` (subcommands `signals`, `check-paths`, `eval`, `gate`).
+- 2026-10-21: D6 (compress) added at the owner's request: Evolve may also remove duplicate, dead or stale text, with protected lines and a size + eval gate.

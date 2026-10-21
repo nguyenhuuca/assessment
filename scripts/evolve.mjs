@@ -4,15 +4,18 @@
 // Usage: node scripts/evolve.mjs <command> [options]
 //   signals     [--from metrics.json] [--since YYYY-MM-DD] [--limit 3] [--out file]
 //               new signals from agent-metrics --json, minus ids that already have an `evolve` PR or issue or a seeded case
-//   check-paths --base <ref> --head <ref> [--kind rule|case-only|not-eval-proven]
+//   check-paths --base <ref> --head <ref> [--kind rule|case-only|not-eval-proven|compress]
 //               ADR D2 allowlist; rule files may only gain lines (or lose `<!-- evolve:` lines, the prune path);
-//               frontmatter is frozen; not-eval-proven may not touch the reviewer's rules
+//               frontmatter is frozen; not-eval-proven may not touch the reviewer's rules;
+//               compress (D6) may also edit CLAUDE.md and remove lines, but never protected files or lines
+//   lint-rules  [--rules <ref>] [--out file]   duplicate lines, dead path references, always-loaded context size (D6)
 //   manifest    --signals <trusted signals.json> --manifest <file> --rows <out.tsv> --unhandled <out.txt>
 //               validate the agent-written manifest (headless ship job)
 //   eval        --case <id> --rules <ref> [--case-ref <ref>] [--runs 1] [--budget 1]   (case from the working tree unless --case-ref)
 //               run the reviewer on the case diff with the .claude/ of <ref>, grade each run
 //   gate        --base <ref> --head <ref> --case <id> [--runs 3] [--budget 1] [--out file.md]
 //               ADR D3 rules 1-4; exit 0 = pass, 1 = fail
+//               --kind compress (no --case): D6 rules (smaller, no new lint findings, every case still caught)
 // Reviewer runs use `claude -p --agent worker-reviewer` (needs the claude CLI and a login or CLAUDE_CODE_OAUTH_TOKEN).
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -26,7 +29,7 @@ const SIGNAL_MARK = /<!-- evolve:signal=([^\s>]+) -->/g
 const RULE_MARK = '<!-- evolve:'
 const RULES_PATHS = ['.claude', 'CLAUDE.md', 'AGENTS.md', '.mcp.json']
 const SIGNAL_ID = /^[\w:.-]+$/
-const KINDS = ['rule', 'case-only', 'not-eval-proven']
+const KINDS = ['rule', 'case-only', 'not-eval-proven', 'compress']
 // Files that change what the code reviewer does; a rule there must be eval-proven
 const REVIEWER_RULES = [/^\.claude\/agents\/worker-reviewer\.md$/, /^\.claude\/skills\/swarm-review\//, /^\.claude\/skills\/autopilot\/resources\/verdict\.md$/]
 const NEW_SKILL_KEYS = new Set(['name', 'description', 'argument-hint', 'disable-model-invocation'])
@@ -39,6 +42,15 @@ const ALLOWED = [
   /^\.claude\/agents\/[^/]+\.md$/,
 ]
 const NEW_CASE = /^evals\/seeded\/[\w.-]+\/(case\.json|notes\.md)$/
+
+// ADR-0027 D6: compress proposals remove duplicate, dead or contradicting text. Wider paths and removals are allowed,
+// but protected files and lines that carry a safety rule are never removed or edited.
+const COMPRESS_ALLOWED = [...ALLOWED, /^CLAUDE\.md$/]
+const PROTECTED_FILES = [/^\.claude\/rules\/security\.md$/, /^\.claude\/skills\/evolve\//, /^\.claude\/skills\/autopilot\/resources\/verdict\.md$/]
+const PROTECTED_LINE = /git push|force-push|force push|ask before|\bgate [12]\b|never merge|auto-merge|permissions\.deny|\bdeny\b|denylist|secret|token|credential|untrusted|injection|\bprod\b|production|smoke|security|core principle|\bnever\b/i
+const RULE_FILES = (f) => /^(CLAUDE|AGENTS)\.md$/.test(f) || /^\.claude\/(rules|agents)\/[^/]+\.md$/.test(f) || /^\.claude\/skills\/.+\.md$/.test(f)
+const MIN_ALWAYS_CUT = 0.05
+const MIN_BYTES_CUT = 1024
 
 export function parseArgs(argv) {
   const [command, ...rest] = argv
@@ -86,6 +98,7 @@ const frontKeys = (fm) => fm.split('\n').slice(1, -1).map((l) => (/^([\w-]+)\s*:
 // files: [{ status, path }]; removed: { path: [removed lines] }; front: { path: [before, after] } (frontmatter of rule files)
 export function pathViolations(files, removed = {}, front = {}, kind = 'rule') {
   const v = []
+  if (kind === 'compress') return compressViolations(files, removed, front)
   if (kind === 'not-eval-proven') {
     for (const { path } of files) if (REVIEWER_RULES.some((re) => re.test(path))) v.push(`${path}: changes the code reviewer, so it must be eval-proven`)
   }
@@ -106,6 +119,101 @@ export function pathViolations(files, removed = {}, front = {}, kind = 'rule') {
     } else if (before !== after) v.push(`${path}: frontmatter cannot change`)
   }
   return v
+}
+
+// D6: removals allowed, protected files and lines are not; frontmatter frozen; no new files or cases
+export function compressViolations(files, removed = {}, front = {}) {
+  const v = []
+  for (const { status, path } of files) {
+    if (!COMPRESS_ALLOWED.some((re) => re.test(path))) { v.push(`${path}: outside the compress allowlist`); continue }
+    if (PROTECTED_FILES.some((re) => re.test(path))) { v.push(`${path}: protected file`); continue }
+    if (status !== 'M') { v.push(`${path}: compress may only edit existing files (status ${status})`); continue }
+    const hit = (removed[path] ?? []).filter((l) => PROTECTED_LINE.test(l))
+    if (hit.length) v.push(`${path}: ${hit.length} protected line(s) removed or edited, e.g. "${hit[0].trim().slice(0, 80)}"`)
+    const [before, after] = front[path] ?? ['', '']
+    if (before !== after) v.push(`${path}: frontmatter cannot change`)
+  }
+  return v
+}
+
+// ---- lint-rules (D6) ----
+
+const normLine = (l) => l.replace(/^[\s>#*|-]*(\d+\.\s+)?/, '').replace(/[`*_]/g, '').replace(/\s+/g, ' ').trim().toLowerCase()
+const PATHISH = /^[\w.-]+(\/[\w.-]+)*\/?$/
+const SKIP_REF = /^(scratchpad|evolve-out|node_modules|target|dist)\/|^~|^\.\.?\//
+
+// files: { path: text }; tracked: [paths in the tree]; alwaysLoaded: [paths]
+export function lintRules(files, tracked, alwaysLoaded) {
+  const seen = new Map()
+  const deadRefs = []
+  const exists = (t) => {
+    const x = t.replace(/\/$/, '')
+    return tracked.some((f) => f === x || f.startsWith(`${x}/`) || f.endsWith(`/${x}`) || f.includes(`/${x}/`))
+  }
+  for (const [path, text] of Object.entries(files)) {
+    text.split('\n').forEach((line, i) => {
+      if (/^\s*\|?\s*-{3,}/.test(line) || /^\s*```/.test(line)) return
+      const n = normLine(line)
+      if (n.length >= 40) { if (!seen.has(n)) seen.set(n, []); seen.get(n).push(`${path}:${i + 1}`) }
+      for (const m of line.matchAll(/`([^`\s]+)`/g)) {
+        const t = m[1].replace(/:\d+(-\d+)?$/, '')
+        if (!t.includes('/') || !PATHISH.test(t) || SKIP_REF.test(t) || /(NNNN|YYYY|<|\{|\*)/.test(t)) continue
+        if (!/\.\w{1,5}$/.test(t) && !t.endsWith('/')) continue
+        if (!exists(t)) deadRefs.push({ at: `${path}:${i + 1}`, ref: t })
+      }
+    })
+  }
+  const duplicates = [...seen.entries()].filter(([, at]) => at.length > 1).map(([text, at]) => ({ text: text.slice(0, 100), at }))
+  const alwaysLoadedBytes = alwaysLoaded.reduce((t, f) => t + Buffer.byteLength(files[f] ?? '', 'utf8'), 0)
+  return { duplicates, deadRefs, alwaysLoadedBytes }
+}
+
+function lintAt(root, ref) {
+  const tracked = git(root, ['ls-tree', '-r', '--name-only', ref]).split('\n').filter(Boolean)
+  const files = Object.fromEntries(tracked.filter(RULE_FILES).map((f) => [f, show(root, ref, f).replace(/\r/g, '')]))
+  // Always loaded = CLAUDE.md + rules without a `paths:` scope
+  const always = Object.keys(files).filter((f) => f === 'CLAUDE.md' || (/^\.claude\/rules\//.test(f) && !/^paths:/m.test(frontmatter(files[f]))))
+  return { ...lintRules(files, tracked, always), files }
+}
+
+// size: { touchedBase, touchedHead, alwaysBase, alwaysHead }; lint: { base, head } counts; regress: { caseId: [results] }
+export function decideCompress({ size, lint, regress }) {
+  const cut = size.touchedBase - size.touchedHead
+  const alwaysCut = size.alwaysBase ? (size.alwaysBase - size.alwaysHead) / size.alwaysBase : 0
+  const errors = Object.values(regress).flat().filter((r) => r.error)
+  const lost = Object.entries(regress).filter(([, rs]) => !rs.some((r) => r.caught)).map(([id]) => id)
+  const checks = [
+    { rule: 'C1. smaller: always-loaded context -5% or 1 KiB less in the touched files', ok: cut > 0 && (alwaysCut >= MIN_ALWAYS_CUT || cut >= MIN_BYTES_CUT),
+      detail: `touched ${size.touchedBase} → ${size.touchedHead} B, always-loaded ${size.alwaysBase} → ${size.alwaysHead} B (${(alwaysCut * 100).toFixed(1)}%)` },
+    { rule: 'C2. no new duplicate lines or dead references', ok: lint.head.duplicates <= lint.base.duplicates && lint.head.deadRefs <= lint.base.deadRefs,
+      detail: `duplicates ${lint.base.duplicates} → ${lint.head.duplicates}, dead refs ${lint.base.deadRefs} → ${lint.head.deadRefs}` },
+    { rule: 'C3. every seeded case still caught', ok: lost.length === 0 && Object.keys(regress).length > 0,
+      detail: lost.length ? `missed: ${lost.join(', ')}` : `${Object.keys(regress).length} case(s)` },
+  ]
+  if (errors.length) checks.push({ rule: 'runs completed', ok: false, detail: `${errors.length} reviewer run(s) failed` })
+  return { pass: checks.every((c) => c.ok), kind: 'compress', checks }
+}
+
+function compressGate(root, args) {
+  const { files, violations } = checkPaths(root, args.base, args.head, 'compress')
+  if (violations.length) throw new Error(`check-paths failed:\n${violations.join('\n')}`)
+  if (!files.length) throw new Error('the branch changes nothing')
+  const lb = lintAt(root, args.base)
+  const lh = lintAt(root, args.head)
+  const bytes = (l, ps) => ps.reduce((t, p) => t + Buffer.byteLength(l.files[p] ?? '', 'utf8'), 0)
+  const touched = files.map((f) => f.path)
+  const size = { touchedBase: bytes(lb, touched), touchedHead: bytes(lh, touched), alwaysBase: lb.alwaysLoadedBytes, alwaysHead: lh.alwaysLoadedBytes }
+  const regress = {}
+  for (const id of listCases(root, args.base)) {
+    const c = loadCase(root, args.base, id)
+    regress[id] = evalCase(root, c, args.head, 1, args.budget)
+    if (!regress[id][0].caught) regress[id].push(...evalCase(root, c, args.head, 1, args.budget).map((r) => ({ ...r, run: 2 })))
+  }
+  const d = decideCompress({
+    size, regress,
+    lint: { base: { duplicates: lb.duplicates.length, deadRefs: lb.deadRefs.length }, head: { duplicates: lh.duplicates.length, deadRefs: lh.deadRefs.length } },
+  })
+  return { d, md: renderGate('compress', d, { base: [], head: [] }, regress) }
 }
 
 // `git diff -U0` output → removed lines per file
@@ -141,7 +249,8 @@ export function validateManifest(rows, signalIds) {
   const seen = new Set()
   for (const r of Array.isArray(rows) ? rows : []) {
     if (!r || typeof r !== 'object') continue
-    const valid = signals.has(r.signal) && !seen.has(r.signal) && /^evolve\/[\w.-]+$/.test(r.branch ?? '') && CASE_ID.test(r.case ?? '')
+    const caseOk = r.kind === 'compress' ? r.case === '-' : CASE_ID.test(r.case ?? '') && r.case !== '-'
+    const valid = signals.has(r.signal) && !seen.has(r.signal) && /^evolve\/[\w.-]+$/.test(r.branch ?? '') && caseOk
       && KINDS.includes(r.kind) && /^evolve-out\/[\w.-]+\.md$/.test(r.body ?? '')
     if (valid) { seen.add(r.signal); ok.push({ signal: r.signal, branch: r.branch, case: r.case, kind: r.kind, body: r.body }) }
   }
@@ -329,7 +438,11 @@ function main() {
         : JSON.parse(execFileSync('node', [join(root, 'scripts/agent-metrics.mjs'), '--json', ...(args.since ? ['--since', args.since] : [])],
           { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }))
       const caseSignals = listCases(root, 'HEAD').map((id) => { try { return loadCase(root, 'HEAD', id).signal } catch { return null } })
-      const picked = pickSignals(metrics.signals ?? [], [...ghBodies('pr'), ...ghBodies('issue')], args.limit, caseSignals.filter(Boolean))
+      const lint = lintAt(root, 'HEAD')
+      const compress = { id: `compress:${new Date().toISOString().slice(0, 7)}`, kind: 'compress',
+        duplicates: lint.duplicates.slice(0, 20), deadRefs: lint.deadRefs.slice(0, 20), alwaysLoadedBytes: lint.alwaysLoadedBytes }
+      const all = [...(metrics.signals ?? []), compress]  // defects first; at most one compress proposal a month
+      const picked = pickSignals(all, [...ghBodies('pr'), ...ghBodies('issue')], args.limit, caseSignals.filter(Boolean))
       emit(args, `${JSON.stringify({ signals: picked }, null, 2)}\n`)
       break
     }
@@ -351,6 +464,12 @@ function main() {
       console.log(`manifest: ${res.rows.length} proposal(s), ${res.unhandled.length} signal(s) without one`)
       break
     }
+    case 'lint-rules': {
+      const l = lintAt(root, args.rules ?? 'HEAD')
+      delete l.files
+      emit(args, `${JSON.stringify(l, null, 2)}\n`)
+      break
+    }
     case 'eval': {
       need('case', 'rules')
       const c = loadCase(root, args.caseRef ?? null, args.case)
@@ -358,14 +477,15 @@ function main() {
       break
     }
     case 'gate': {
-      need('base', 'head', 'case')
-      const { d, md } = gate(root, args)
+      need('base', 'head')
+      if (args.kind !== 'compress') need('case')
+      const { d, md } = args.kind === 'compress' ? compressGate(root, args) : gate(root, args)
       emit(args, md)
       if (!d.pass) process.exit(1)
       break
     }
     default:
-      throw new Error('command must be one of: signals, check-paths, manifest, eval, gate')
+      throw new Error('command must be one of: signals, check-paths, manifest, lint-rules, eval, gate')
   }
 }
 

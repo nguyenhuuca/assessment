@@ -170,6 +170,14 @@ jobs:
             if [ "$kind" = "not-eval-proven" ]; then
               echo "**Not eval-proven:** this rule is for a stage the seeded evals cannot test (ADR-0027 Consequences)." > "$r.gate.md"
               echo pass-draft > "$r.status"
+            elif [ "$kind" = "compress" ]; then
+              # D6: always a draft PR, the owner reads every removed line
+              if node scripts/evolve.mjs gate --base "$MAIN" --head "$branch" --kind compress --out "$r.gate.md" 2> "$r.log"; then
+                echo pass-draft > "$r.status"
+              else
+                [ -s "$r.gate.md" ] || { echo "The compress gate did not complete:"; echo; sed 's/^/    /' "$r.log"; } > "$r.gate.md"
+                echo fail-gate > "$r.status"
+              fi
             elif node scripts/evolve.mjs gate --base "$MAIN" --head "$branch" --case "$case" --kind "$kind" --out "$r.gate.md" 2> "$r.log"; then
               echo pass > "$r.status"
             else

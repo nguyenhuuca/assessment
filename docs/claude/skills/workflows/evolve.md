@@ -31,7 +31,7 @@ Write the Five Whys (`swarm-review` "Root Cause Analysis") down to the **stage t
 |-------|-------------------|
 | Code review | `.claude/agents/worker-reviewer.md`, section "Checks Learned From Escaped Defects" |
 | Plan review | `.claude/skills/swarm-review/SKILL.md` or `.claude/skills/autopilot/SKILL.md` (plan review checks) |
-| QA / tests | `.claude/skills/testing/SKILL.md` or `.claude/skills/qa-engineer/SKILL.md` |
+| QA / tests | `.claude/skills/core-engineering/testing/SKILL.md` or `.claude/skills/qa-engineer/SKILL.md` |
 | Needs CI or a hook | not yours: write it as an **owner action** in the PR body |
 
 Signals other than defects: `blocked` → why the round cap was hit (task too big, vague criteria); `flaky` → the test and its cause; `review-skipped` → which instruction allowed the skip; `revise` → what the plan missed.
@@ -77,6 +77,19 @@ The body file (PR description) has, in this order:
 
 - **Local:** stop after the gate and ask with `AskUserQuestion`: **Push + open PR / Keep branch / Drop**. Never merge.
 - **Headless:** stop after writing the manifest. The workflow checks paths, runs the gate, pushes and opens the PR (or an `evolve` issue when it fails).
+
+## Compress (ADR-0027 D6)
+
+The signal `compress:<YYYY-MM>` comes once a month with lint hints (`duplicates`, `deadRefs`, `alwaysLoadedBytes` from `node scripts/evolve.mjs lint-rules`). Goal: **less text, same behavior**.
+
+- What to cut: duplicated text (keep one home, point to it), dead references (paths or commands that no longer exist), text that contradicts its source of truth (for example a model table that disagrees with agent frontmatter), and claims that are stale (numbers the repo now measures differently). The lint list is a hint, not the limit; `CLAUDE.md` and the always-loaded rules matter most, because every session pays for them.
+- Allowed: edit existing files in the D2 paths **plus `CLAUDE.md`**, removals included. Never: `AGENTS.md`, `.claude/rules/security.md`, this skill, `verdict.md`, frontmatter, new files, and **any line that carries a safety rule** (push, gates, merge, deny, secrets, tokens, prod, smoke, security, Core Principles, "never …"). `check-paths --kind compress` rejects those.
+- One branch `evolve/compress-<YYYY-MM>`, one commit, manifest row with `"kind": "compress"` and `"case": "-"`. The body lists every cut with its reason (duplicate of X, dead ref, contradicts Y).
+- Gate (`gate --kind compress`, no `--case`):
+  - C1: touched files shrink, and either the always-loaded context drops at least 5% or the touched files lose at least 1 KiB;
+  - C2: no new duplicate lines or dead references;
+  - C3: every seeded case is still caught with the compressed rules.
+- Not proven by the gate: that nothing **outside** the eval set got worse. The PR is the place for the owner to read each removed line.
 
 ## Pruning (ADR-0027 D5)
 
