@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import * as reportsApi from '../api/reports.js'
 
-export function useReports(page = 0) {
+export function useReports(page = 0, { enabled = true } = {}) {
   return useQuery({
     queryKey: ['admin', 'reports', page],
     queryFn: () => reportsApi.listReports({ page, size: 20 }),
     placeholderData: keepPreviousData,
+    enabled,
   })
 }
 

@@ -24,6 +24,7 @@ async function fill() {
   fireEvent.change(await screen.findByLabelText('Tiêu đề'), { target: { value: 'Broken' } })
   fireEvent.change(screen.getByLabelText('Mô tả'), { target: { value: 'It breaks' } })
 }
+const openRecent = () => fireEvent.click(screen.getByRole('tab', { name: i18n.t('report:list.title') }))
 const submitBtn = () => screen.getByRole('button', { name: /Gửi báo cáo|Đang gửi/ })
 
 beforeEach(async () => {
@@ -105,6 +106,7 @@ describe('ReportPage', () => {
       row({ id: 'r4', title: 'Failed one', status: 'FAILED', githubState: null, issueUrl: null, issueNumber: null }),
     ] } })
     renderPage()
+    openRecent()
     expect(await screen.findByText('Old bug')).toBeInTheDocument()
     expect(screen.getByText(i18n.t('report:state.OPEN'))).toBeInTheDocument()
     expect(screen.getByText(i18n.t('report:state.CLOSED'))).toBeInTheDocument()
@@ -120,6 +122,7 @@ describe('ReportPage', () => {
       row({ id: 'w3', title: 'New reason', githubState: 'CLOSED', githubStateReason: 'brand_new' }),
     ] } })
     renderPage()
+    openRecent()
     const closed = i18n.t('report:state.CLOSED')
     expect(await screen.findByText(`${closed} · ${i18n.t('report:stateReason.not_planned')}`)).toBeInTheDocument()
     expect(screen.getByText(closed)).toBeInTheDocument()
@@ -133,11 +136,13 @@ describe('ReportPage', () => {
     reportsApi.retryReport.mockResolvedValue({ data: row() })
     setRole('ADMIN', { userName: 'bob' })
     const first = renderPage()
+    openRecent()
     await screen.findByText('Old bug')
     expect(screen.queryByRole('button', { name: i18n.t('report:retry') })).toBeNull()
     first.unmount()
     setRole('ADMIN', { userName: 'alice' })
     renderPage()
+    openRecent()
     fireEvent.click(await screen.findByRole('button', { name: i18n.t('report:retry') }))
     await waitFor(() => expect(reportsApi.retryReport).toHaveBeenCalledWith('f1'))
   })
@@ -183,5 +188,63 @@ describe('ReportPage', () => {
     fireEvent.click(submitBtn())
     await waitFor(() => expect(submitBtn()).toBeDisabled())
     expect(submitBtn()).toHaveTextContent(i18n.t('report:submitting'))
+  })
+
+  it('opens on New report: form shown, list not fetched until the Recent tab', async () => {
+    renderPage()
+    const newTab = screen.getByRole('tab', { name: i18n.t('report:tabs.new') })
+    expect(newTab).toHaveAttribute('aria-selected', 'true')
+    expect(await screen.findByLabelText('Tiêu đề')).toBeVisible()
+    expect(screen.queryByRole('table')).toBeNull()
+    expect(reportsApi.listReports).not.toHaveBeenCalled()
+
+    openRecent()
+    expect(screen.getByRole('tab', { name: i18n.t('report:list.title') })).toHaveAttribute('aria-selected', 'true')
+    expect(await screen.findByRole('table')).toBeInTheDocument()
+    await waitFor(() => expect(reportsApi.listReports).toHaveBeenCalledTimes(1))
+    expect(screen.getByRole('tabpanel')).toHaveAttribute('id', 'report-panel-recent')
+  })
+
+  it('the narrow-screen select switches tabs too', async () => {
+    renderPage()
+    fireEvent.change(screen.getByRole('combobox', { name: i18n.t('report:tabs.label') }), { target: { value: 'recent' } })
+    expect(await screen.findByRole('table')).toBeInTheDocument()
+    await waitFor(() => expect(reportsApi.listReports).toHaveBeenCalled())
+  })
+
+  it('a typed draft survives switching tabs', async () => {
+    renderPage()
+    await fill()
+    openRecent()
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('report:tabs.new') }))
+    expect(screen.getByLabelText('Tiêu đề')).toHaveValue('Broken')
+    expect(screen.getByLabelText('Mô tả')).toHaveValue('It breaks')
+  })
+
+  it('submitting stays on New report and shows the created link', async () => {
+    reportsApi.createReport.mockResolvedValue({ data: { status: 'CREATED', issueNumber: 9, issueUrl: 'https://github.com/o/r/issues/9' } })
+    renderPage()
+    await fill()
+    fireEvent.click(submitBtn())
+    expect(await screen.findByRole('link', { name: i18n.t('report:created', { number: 9 }) })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: i18n.t('report:tabs.new') })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('a failed row Retry shows its error on the Recent tab, cleared on tab change', async () => {
+    reportsApi.listReports.mockResolvedValue({ data: { totalPages: 1, content: [
+      row({ id: 'f2', status: 'FAILED', githubState: null }),
+    ] } })
+    reportsApi.retryReport.mockRejectedValue(new Error('Too many requests'))
+    setRole('SUPER_ADMIN')
+    renderPage()
+    openRecent()
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('report:retry') }))
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Too many requests')
+    expect(screen.getByRole('tabpanel')).toContainElement(alert)
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('report:tabs.new') }))
+    openRecent()
+    expect(screen.queryByText('Too many requests')).toBeNull()
   })
 })

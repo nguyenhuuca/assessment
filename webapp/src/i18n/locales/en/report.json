@@ -1,5 +1,6 @@
 {
   "title": "Report",
+  "tabs": { "recent": "Recent reports", "new": "New report", "label": "Report sections" },
   "intro": "Report a bug, suggest an enhancement or raise an issue. It is sent to GitHub as an issue.",
   "typeLabel": "Type",
   "type": { "BUG": "Bug", "ENHANCEMENT": "Enhancement", "ISSUE": "Issue" },

@@ -1,5 +1,6 @@
 {
   "title": "Báo lỗi",
+  "tabs": { "recent": "Báo cáo gần đây", "new": "Báo cáo mới", "label": "Các mục báo cáo" },
   "intro": "Báo lỗi, đề xuất cải tiến hoặc nêu vấn đề. Nội dung sẽ được gửi lên GitHub dưới dạng issue.",
   "typeLabel": "Loại",
   "type": { "BUG": "Lỗi", "ENHANCEMENT": "Cải tiến", "ISSUE": "Vấn đề" },

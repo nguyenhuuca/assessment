@@ -1486,6 +1486,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 }
 
 .admin-tab-select { display: none; }
+/* Report page: the tab buttons sit in their own tablist, so the select stays outside it */
+.report-tablist { display: flex; gap: 2px; }
 
 @media (max-width: 1024px) {
   .admin-tabs {
@@ -1494,6 +1496,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
     padding-bottom: 12px;
   }
   .admin-tabs .admin-tab { display: none; }
+  .admin-tabs .report-tablist { display: none; }
   .admin-tab-select {
     display: block;
     flex: 1;
