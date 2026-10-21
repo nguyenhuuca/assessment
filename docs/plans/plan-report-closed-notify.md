@@ -1,6 +1,6 @@
 # Plan: Notify the Reporter When the Report's Issue Is Closed
 
-**Status:** Built (RN-1..RN-3, `801dcb9f`, `b3030e52`) · **ADR:** none (follows ADR-0017 notifications and ADR-0026 D7 webhook) · **Parent:** [plan-report-webhook-state](plan-report-webhook-state.md)
+**Status:** Done, deployed 2026-10-21 (RN-1..RN-3, `801dcb9f`, `b3030e52`); owner check of the bell pending · **ADR:** none (follows ADR-0017 notifications and ADR-0026 D7 webhook) · **Parent:** [plan-report-webhook-state](plan-report-webhook-state.md)
 
 > Started as an autopilot lite run; promoted to full mode when the diff passed ~100 LOC (tests excluded).
 > Implementation note: `ReportClosedEvent` carries `(issueNumber, reason)` instead of the report id; the listener looks the report up by issue number, so the webhook needs no extra query.

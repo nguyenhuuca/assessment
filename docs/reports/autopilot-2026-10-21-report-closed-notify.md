@@ -3,8 +3,8 @@
 - **Request:** notify user tao report khi issue duoc close
 - **Mode:** local (started lite, promoted to full when the diff passed ~100 LOC)
 - **Plan:** [plan-report-closed-notify](../plans/plan-report-closed-notify.md)
-- **Started:** 2026-10-21 10:43 · **Landed:** pending (Gate 2)
-- **Result:** committed `801dcb9f` (BE) + `b3030e52` (FE), waiting for push approval
+- **Started:** 2026-10-21 10:43 · **Landed:** 2026-10-21 11:10
+- **Result:** ✅ pushed `6d5fe722` (BE `801dcb9f`, FE `b3030e52`); CI green, smoke 22/22
 
 ## Pipeline
 
@@ -19,8 +19,8 @@
 | Local QA ×2 | `qa-twice.sh`: 64 tests, pass 64 · flaky 0 · fail 0 | 1 of 3 |
 | Fix | one test fix during implement (re-stubbing a throwing mock), split into two tests | — |
 | Land: full gates | `mvn verify`: 1,560 tests, 0 fail, LINE 96.68 % (≥ 90 %); `npm run test`: 532 pass; `npm run lint`: 0 errors (3 old warnings) | — |
-| Gate 2 (owner) | pending | — |
-| CI + smoke | pending: runs after push | — |
+| Gate 2 (owner) | push | — |
+| CI + smoke | Build and Deploy, Deploy Frontend, Publish Docs green; `mock-test.sh` 22/22; webhook still answers 401 to an unsigned POST | — |
 
 ## What changed
 
