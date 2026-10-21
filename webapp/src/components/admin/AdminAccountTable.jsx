@@ -28,6 +28,19 @@ export default function AdminAccountTable() {
 
   const [confirm, confirmDialog] = useConfirm()
 
+  // The capability list mirrors what ROLE_ADMIN unlocks server-side: AdminController, AdminReportController,
+  // AdminVideoSuggestionController, AdminVideoImportController (hasRole('ADMIN')); AdminJobController edit/run is SUPER_ADMIN only
+  const confirmGrantAdmin = (email) => confirm({
+    title: t('grantAdmin.title'),
+    message: t('grantAdmin.message', { email }),
+    confirmLabel: t('grantAdmin.confirm'),
+    children: (
+      <ul style={{ margin: 0, paddingLeft: 20 }}>
+        {t('grantAdmin.capabilities', { returnObjects: true }).map(c => <li key={c}>{c}</li>)}
+      </ul>
+    ),
+  })
+
   if (isLoading) return <div className="admin-loading"><div className="vid-spinner" /></div>
 
   return (
@@ -98,7 +111,10 @@ export default function AdminAccountTable() {
                         disabled={roleLocked}
                         aria-busy={isBusyFor(updateRole, a.id, x => x?.id)}
                         title={isSelf ? t('cannotChangeOwnRole') : (lockReason ?? (a.role === 'ADMIN' ? t('demote') : t('promote')))}
-                        onClick={() => updateRole.mutate({ id: a.id, role: nextRole })}
+                        onClick={async () => {
+                          if (nextRole === 'ADMIN' && !await confirmGrantAdmin(a.email)) return
+                          updateRole.mutate({ id: a.id, role: nextRole })
+                        }}
                       >
                         <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
                           {a.role === 'ADMIN' ? 'person_remove' : 'person_add'}
