@@ -8,7 +8,8 @@
 // run's last commit, touching a code file the run changed (docs, tests, TASKS.md and session.txt ignored).
 //
 // Usage: node scripts/agent-metrics.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--window 7]
-//                                       [--out docs/reports/agent-metrics-YYYY-MM.md] [--no-gh]
+//                                       [--out docs/reports/agent-metrics-YYYY-MM.md] [--no-gh] [--json]
+//   --json prints { summary, signals } for /evolve (ADR-0027) instead of markdown
 //   default --since = 30 days ago; without --out the markdown goes to stdout; --no-gh skips GitHub calls
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
@@ -31,6 +32,7 @@ export function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--no-gh') args.gh = false
+    else if (a === '--json') args.json = true
     else if (a === '--window') args.window = Number(value(++i, a))
     else if (['--since', '--until', '--out'].includes(a)) args[a.slice(2)] = value(++i, a)
     else throw new Error(`unknown argument: ${a}`)
@@ -173,6 +175,30 @@ export function summarize({ runs, defects, reverted, prs = null, builds = null, 
   return s
 }
 
+// Bad signals with stable ids, for /evolve (ADR-0027 D1). base/head = the run's diff (first commit's parent .. last commit)
+export function signals({ runs, defects, reverted, prs = null }) {
+  const span = (id) => {
+    const r = runs.find((x) => x.id === id)
+    return r ? { run: id, base: `${r.commits[0].sha}^`, head: r.commits.at(-1).sha } : { run: id }
+  }
+  const out = []
+  for (const d of defects) {
+    out.push({ id: `defect:${d.sha.slice(0, 8)}`, kind: 'defect', ...span(d.run), fix: d.sha, subject: d.subject, files: d.files })
+  }
+  for (const r of reverted) out.push({ id: `revert:${r.sha.slice(0, 8)}`, kind: 'revert', ...span(r.run), revert: r.sha, subject: r.subject })
+  for (const r of runs) {
+    const m = r.meta
+    if (!m) continue
+    if (m.result && m.result !== 'landed') out.push({ id: `blocked:${r.id}`, kind: 'blocked', ...span(r.id), result: m.result })
+    if ((m.tests?.flaky ?? 0) > 0) out.push({ id: `flaky:${r.id}`, kind: 'flaky', ...span(r.id), flaky: m.tests.flaky })
+    if (m.codeReviewSkipped) out.push({ id: `review-skipped:${r.id}`, kind: 'review-skipped', ...span(r.id) })
+  }
+  for (const p of prs ?? []) {
+    if ((p.comments ?? []).some((c) => /^\/revise/.test(c.body ?? ''))) out.push({ id: `revise:pr-${p.number}`, kind: 'revise', pr: p.number })
+  }
+  return out
+}
+
 export function weekly(runs, defects, builds) {
   const rows = new Map()
   const row = (k) => rows.get(k) ?? rows.set(k, { week: k, runs: 0, escaped: 0, ciRuns: 0, ciFail: 0 }).get(k)
@@ -303,6 +329,11 @@ function main() {
       ?.filter((b) => inPeriod(b.createdAt)) ?? null
   }
   const s = summarize({ runs, defects, reverted, prs, builds, autopilotRuns })
+  if (args.json) {
+    process.stdout.write(`${JSON.stringify({ since: args.since, until: args.until ?? null, summary: s, signals: signals({ runs, defects, reverted, prs }) }, null, 2)}
+`)
+    return
+  }
   const md = render({ args, s, weeks: weekly(runs, defects, builds), runs, defects, reverted })
   if (args.out) {
     const out = resolve(root, args.out)

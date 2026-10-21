@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
-  escapedDefects, findRuns, isCodeFile, isFix, parseArgs, parseGitLog, reportHashes, reverts, summarize, weekKey,
+  escapedDefects, findRuns, isCodeFile, isFix, parseArgs, parseGitLog, reportHashes, reverts, signals, summarize, weekKey,
 } from '../agent-metrics.mjs'
 
 const rec = (sha, date, subject, body, files) => `\x1e${sha}\x1f${date}\x1f${subject}\x1f${body}\x1f\n${files.join('\n')}\n`
@@ -142,4 +142,22 @@ test('parseArgs validates input', () => {
 test('findRuns ignores a trailer id with unsafe characters', () => {
   const runs = findRuns([commit('u1', '2026-10-05T00:00:00Z', 'feat: x', ['a.js'], 'Autopilot-Run: bad|id`x')])
   assert.equal(runs.length, 0)
+})
+
+test('signals give stable ids and the run diff span', () => {
+  const cs = [
+    commit('a1aaaaaaaa', '2026-10-01T00:00:00Z', 'feat: a', ['api/A.java'], 'Autopilot-Run: run-a'),
+    commit('a2aaaaaaaa', '2026-10-01T01:00:00Z', 'docs: a', ['TASKS.md'], 'Autopilot-Run: run-a'),
+    commit('f1ffffffff', '2026-10-03T00:00:00Z', 'fix: a broke', ['api/A.java']),
+    commit('b1bbbbbbbb', '2026-10-04T00:00:00Z', 'feat: b', ['b.js'], 'Autopilot-Run: run-b'),
+  ]
+  const runs = findRuns(cs, [{ id: 'run-b', result: 'blocked', tests: { flaky: 2 }, codeReviewSkipped: true }])
+  const sig = signals({
+    runs, defects: escapedDefects(runs, cs, 7), reverted: [],
+    prs: [{ number: 9, comments: [{ body: '/revise x' }] }, { number: 10, comments: [] }],
+  })
+  assert.deepEqual(sig.map((x) => x.id), ['defect:f1ffffff', 'blocked:run-b', 'flaky:run-b', 'review-skipped:run-b', 'revise:pr-9'])
+  assert.equal(sig[0].base, 'a1aaaaaaaa^')
+  assert.equal(sig[0].head, 'a2aaaaaaaa')
+  assert.equal(sig[0].run, 'run-a')
 })

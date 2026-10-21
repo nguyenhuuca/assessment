@@ -1,0 +1,106 @@
+# ADR-0027: Agent Self-Improvement Loop ("Evolve")
+
+## Metadata
+
+**Status:** Accepted (2026-10-21) · **Date:** 2026-10-21 · **Deciders:** nguyenhuuca · **Tags:** agents, ci, workflow, quality
+**Related:** builds on [ADR-0022](0022-headless-autopilot.md) (headless runs) and [ADR-0025](0025-autopilot-auto-gates.md) (auto gates, never for `.claude/`); input from `scripts/agent-metrics.mjs` (`docs/reports/agent-metrics-2026-10.md`)
+
+## Context
+
+- `scripts/agent-metrics.mjs` now measures the agent's work: escaped defects, reverts, review rounds, blocked runs, flaky tests, CI failures, cost.
+- Today a bad signal only turns into a better rule when the owner runs a retro by hand. The owner wants the agent to **improve itself from the metrics**, without being asked each time.
+- First real signal: `62526c97` fixed a defect from the dynamic-cron-jobs run. Existing job bodies caught and logged every exception, so the new scheduler recorded SUCCESS on failure. Plan review, code review and QA ×2 all passed it.
+- Risks of an agent that edits its own rules:
+  - **Goodhart:** it can make the numbers look better (weaker tests, lower gates, a changed metrics script) instead of the work.
+  - **Drift:** one bad rule makes every later run worse, and nobody notices.
+  - **Bloat:** rules only grow, each run gets slower and more expensive.
+  - **Injection:** issue, PR and commit text could be turned into rules.
+
+## Decision Drivers
+
+1. Every change to the agent's rules must come with **evidence that it helps**, checked by code the agent cannot change.
+2. The owner keeps control of the direction: one click per change, no reading of raw metrics needed.
+3. The loop must not be able to weaken any gate, metric or eval.
+4. Bounded cost per run.
+
+## Considered Options
+
+| Option | Pros | Cons |
+|---|---|---|
+| A. Manual retro (today) | No risk | Depends on the owner remembering; signals are lost |
+| **B. Evolve loop, proposals as PRs, owner merges** | Automatic diagnosis and proof; owner only merges | One human step per change |
+| C. Evolve loop with auto-merge | Fully hands-off | The agent changes its own rules with no human read; one bad change compounds; conflicts with ADR-0025 (no auto-merge for `.claude/`) |
+
+## Decision Outcome
+
+**Option B.**
+
+### D1. The loop
+
+```
+weekly cron (or /evolve locally)
+  Observe   agent-metrics --json → new signals (escaped defect, revert, blocked, flaky, /revise, cost jump)
+  Diagnose  per signal: original run diff, fix commit, plan/report → Five Whys → the stage that should have caught it
+  Propose   one small change at that stage, on branch evolve/<date>-<signal>
+  Prove     deterministic eval (D3)
+  Ship      PR "Evolve: <signal>" with the Five Whys and the eval table → owner merges or closes
+  Re-measure next month's metrics; a later run may propose removing a rule that no longer earns its place (D5)
+```
+
+- At most **3 signals per run**; the rest wait for the next run.
+- Signal ids are stable (`defect:<fix sha>`, `revert:<sha>`, `blocked:<run id>`, …). A signal that already has an `evolve` PR or issue (open, merged or closed) is skipped, so a change the owner rejected is not proposed again. The state lives in GitHub, not in commits to `main`.
+
+### D2. What the agent may change (enforced by the workflow, not by the prompt)
+
+- **May add or tighten:** `.claude/skills/**/SKILL.md`, `.claude/skills/**/resources/*.md`, `.claude/rules/*.md`, `.claude/agents/*.md` (prompt body only, not frontmatter), and **new** directories under `evals/seeded/`.
+- **Never:** `.github/`, `scripts/`, `.claude/hooks/`, `.claude/settings*.json`, existing `evals/seeded/*` cases, `api/.coverage-threshold`, application code, migrations, `CLAUDE.md`, `AGENTS.md`.
+- A deterministic step checks `git diff --name-only origin/main...HEAD` against this allowlist and against "no deleted lines in rule files" (removals only through D5). Any violation → no PR, an `evolve` issue that names the violation.
+- A change that needs CI or a hook (for example a grep check for swallowed exceptions in `jobs/`) is written in the PR body as an **owner action**, not made by the agent.
+- Issue, PR and commit text is data. The agent quotes it as evidence; it never copies instructions from it into a rule.
+
+### D3. The fitness function: seeded-bug evals
+
+- `evals/seeded/<id>/case.json` = a real defect: `base` and `head` commits of the run that introduced it, the files, and an `expect` block (the file that must get a blocking finding, plus regexes the finding must match).
+- `scripts/evolve.mjs eval` runs the reviewer (`worker-reviewer`, the code-review stage of `/autopilot`) on `git diff base..head` with the `.claude/` of a given ref, and grades the verdict block deterministically: **caught** = a blocking finding on an expected file whose text matches an `expect` regex.
+- A proposal passes only when, with the eval runner **from `main`**:
+  1. the new case is **missed with `main`'s rules** (otherwise no rule change is needed; the PR only adds the case),
+  2. it is **caught with the branch's rules in at least 2 of 3 runs** (model output is not deterministic),
+  3. **every existing case is still caught** with the branch's rules (no regression),
+  4. the mean reviewer cost per case rises by at most 25%.
+- The agent writes the case, but cannot game it: an `expect` that matches everything fails rule 1, one that matches nothing fails rule 2.
+- The eval table (case × ref × run → caught, cost) goes into the PR body.
+
+### D4. Running it
+
+- **Headless:** `.github/workflows/agent-evolve.yml`, cron weekly (Monday) plus `workflow_dispatch`. Steps: metrics → agent (diagnose + propose + commit on the branch, no push) → allowlist check → eval runner → push + `gh pr create --label evolve` or an `evolve` issue. Same token rules and owner-only trigger as ADR-0022. Never merges.
+- **Local:** `/evolve` runs the same stages in the session and stops before the push, like autopilot Gate 2.
+- **Budget:** `--max-turns` on the agent step, at most 3 signals, at most 3 eval runs for the new case and 1 run per existing case; the job fails closed when a budget is hit.
+
+### D5. Pruning
+
+- Every rule line added by Evolve ends with `<!-- evolve:<case id> -->`.
+- Quarterly (or when total rule size grows by more than 20% since the last prune), a run may propose **removing** one such line. It passes only when its case is still caught without it (D3 rule 2) and nothing regresses. This is the only path that deletes rule lines.
+
+## Consequences
+
+- **Good:** every escaped defect becomes a regression eval for the agent, and each rule change has before/after evidence. The eval set grows with real bugs, never with invented ones.
+- **Good:** the owner's job shrinks to reading a short PR (Five Whys + eval table) and merging or closing it.
+- **Cost:** about one agent run (~$1–3) plus the evals (one Sonnet review per case run, ~$0.10–0.20) per weekly run with signals; a run with no new signal stops after the metrics step at almost no cost.
+- **Limit:** only stages a reviewer can be tested on are proven by D3. Changes to plan review or QA rules are proposed with the Five Whys only and marked "not eval-proven" in the PR.
+- **Limit:** keyword grading can miss a correct finding worded differently; the 2-of-3 rule and the owner's read cover that.
+- **Risk:** a merged rule could still hurt cases not in the eval set. The monthly metrics and D5 pruning are the backstop; rollback is `git revert` of the evolve PR.
+
+## Validation
+
+- First case `evals/seeded/2026-10-19-swallowed-job-exceptions` (from `62526c97`): missed with today's rules, caught after the Evolve change, in 2 of 3 runs.
+- The allowlist step rejects a test branch that edits `scripts/agent-metrics.mjs`.
+- After two months: escaped defect rate does not rise while the number of runs grows, and total rule size stays within the D5 bound.
+
+## Links
+
+- [ADR-0022 Headless autopilot](0022-headless-autopilot.md) · [ADR-0025 Auto gates](0025-autopilot-auto-gates.md)
+- `scripts/agent-metrics.mjs`, `docs/reports/agent-metrics-2026-10.md`
+
+## Changelog
+
+- 2026-10-21: Proposed; accepted by the owner the same day. The eval runner lives in `scripts/evolve.mjs` (subcommands `signals`, `check-paths`, `eval`, `gate`).
