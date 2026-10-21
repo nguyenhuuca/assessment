@@ -47,7 +47,7 @@ const NEW_CASE = /^evals\/seeded\/[\w.-]+\/(case\.json|notes\.md)$/
 // but protected files and lines that carry a safety rule are never removed or edited.
 const COMPRESS_ALLOWED = [...ALLOWED, /^CLAUDE\.md$/]
 const PROTECTED_FILES = [/^\.claude\/rules\/security\.md$/, /^\.claude\/skills\/evolve\//, /^\.claude\/skills\/autopilot\/resources\/verdict\.md$/]
-const PROTECTED_LINE = /git push|force-push|force push|ask before|\bgate [12]\b|never merge|auto-merge|permissions\.deny|\bdeny\b|denylist|secret|token|credential|untrusted|injection|\bprod\b|production|smoke|security|core principle|\bnever\b/i
+const PROTECTED_LINE = /git push|force-push|force push|ask before|\bgate [12]\b|never merge|auto-merge|permissions\.deny|\bdeny\b|denylist|secret|_TOKEN|access token|\bapi key|credential|untrusted|injection|\bprod\b|production|smoke|security|core principle|\bnever\b/i
 const RULE_FILES = (f) => /^(CLAUDE|AGENTS)\.md$/.test(f) || /^\.claude\/(rules|agents)\/[^/]+\.md$/.test(f) || /^\.claude\/skills\/.+\.md$/.test(f)
 const MIN_ALWAYS_CUT = 0.05
 const MIN_BYTES_CUT = 1024
