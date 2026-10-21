@@ -425,3 +425,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **FE-1** Light-theme override for `.admin-badge.pending/.missing_local/.missing_db/.size_mismatch` (#7a4d00, >=4.5:1) c3f9a9d7
 - [x] **FE-2** `badgeContrast.test.js` computes WCAG contrast of the overrides c3f9a9d7
+
+## Docs: Mermaid sequence diagrams for PRD features (2026-10-21)
+
+- [x] **SQ-1** Rule + skills: sequence diagrams required for every feature with a PRD (`docs/sequence/`, `templates/artifacts/sequence.template.md`; CLAUDE.md, core-directives, scope, spec, swarm-plan) 36585edb
+- [x] **SQ-2** Backfill diagrams for the 11 active PRDs + `docs/sequence/index.md`, mkdocs nav, tracking Sequence column 36585edb

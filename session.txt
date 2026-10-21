@@ -1,8 +1,8 @@
-task: Autopilot (lite): notification dropdown tabs (General / Admin)
+task: Mermaid sequence diagrams for PRD features
 status: done
 progress: 100
-done: NT-1 BE category filter c5ad0a54; NT-2 FE tabs a7b4eb42; deployed, smoke 22/22
+done: SQ-1 rule + skills + template 36585edb; SQ-2 49 diagrams for 11 PRDs 36585edb
 doing: -
 next: -
 plan: -
-updated: 2026-10-21 12:35
+updated: 2026-10-21 16:27
