@@ -33,11 +33,12 @@ export function useUnreadCount() {
   })
 }
 
-export function useNotificationList(page = 0, { enabled = true } = {}) {
+export function useNotificationList(page = 0, { enabled = true, category } = {}) {
   return useQuery({
-    queryKey: [...LIST_KEY, page],
+    // Under LIST_KEY, so the existing invalidations refresh every category
+    queryKey: [...LIST_KEY, category ?? 'ALL', page],
     queryFn: async () => {
-      const res = await notificationsApi.list(page)
+      const res = await notificationsApi.list(page, 20, category)
       return res?.data ?? res
     },
     enabled,

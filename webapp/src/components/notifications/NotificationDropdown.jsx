@@ -1,20 +1,33 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useMarkAllRead, useMarkRead, useNotificationList } from '../../hooks/useNotifications.js'
+import { useMarkAllRead, useMarkRead, useNotificationList, useUnreadCount } from '../../hooks/useNotifications.js'
+import { useAuth } from '../../hooks/useAuth.js'
 import { notificationTitle } from '../../utils/notificationText.js'
 import { formatTime } from '../comments/commentUtils.js'
 
 const MAX_ITEMS = 10
+const TABS = ['GENERAL', 'ADMIN']
+
+const hasUnreadIn = list => (list.data?.content ?? []).some(n => !n.read)
 
 export default function NotificationDropdown({ onClose, onOpenNotification, anchorRef }) {
   const { t } = useTranslation('notifications')
   const rootRef = useRef(null)
-  const { data, isLoading, isError } = useNotificationList(0)
+  const { user } = useAuth()
+  // Admins get two tabs: admin-feature notifications (e.g. a closed report) apart from the rest
+  const admin = !!user?.isAdmin
+  const [tab, setTab] = useState('GENERAL')
+  const general = useNotificationList(0, { category: admin ? 'GENERAL' : undefined })
+  const adminList = useNotificationList(0, { category: 'ADMIN', enabled: admin })
+  const { data, isLoading, isError } = admin && tab === 'ADMIN' ? adminList : general
+  const { data: unread } = useUnreadCount()
   const markRead = useMarkRead()
   const markAllRead = useMarkAllRead()
 
   const items = (data?.content ?? []).slice(0, MAX_ITEMS)
-  const hasUnread = items.some(n => !n.read)
+  // Mark-all is global, so it follows the total unread count rather than the open tab
+  const hasUnread = (unread?.count ?? 0) > 0 || items.some(n => !n.read)
+  const tabDot = { GENERAL: hasUnreadIn(general), ADMIN: hasUnreadIn(adminList) }
 
   useEffect(() => {
     function onKey(e) {
@@ -55,7 +68,19 @@ export default function NotificationDropdown({ onClose, onOpenNotification, anch
         </button>
       </div>
 
-      <div className="notif-dropdown-list">
+      {admin && (
+        <div className="notif-tabs" role="tablist" aria-label={t('tabsLabel')}>
+          {TABS.map(key => (
+            <button key={key} type="button" role="tab" aria-selected={tab === key}
+              className={`notif-tab${tab === key ? ' active' : ''}`} onClick={() => setTab(key)}>
+              {t(key === 'ADMIN' ? 'tabAdmin' : 'tabGeneral')}
+              {tabDot[key] && <span className="notif-tab-dot" aria-label={t('tabUnread')} />}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="notif-dropdown-list" role={admin ? 'tabpanel' : undefined}>
         {isLoading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
             <div className="vid-spinner" />

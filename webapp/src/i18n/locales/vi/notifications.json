@@ -1,5 +1,9 @@
 {
   "title": "Thông báo",
+  "tabGeneral": "Chung",
+  "tabAdmin": "Admin",
+  "tabsLabel": "Các tab thông báo",
+  "tabUnread": "có thông báo chưa đọc",
   "bellLabel": "Thông báo, {{count}} chưa đọc",
   "markAllRead": "Đánh dấu đã đọc tất cả",
   "loadFailed": "Không tải được thông báo",

@@ -2341,6 +2341,13 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 }
 .notif-dropdown-title { font-size: 14px; font-weight: 700; color: var(--text); }
 .notif-dropdown-header .comment-action-link:disabled { opacity: 0.4; cursor: default; }
+.notif-tabs { display: flex; gap: 4px; padding: 0 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.notif-tab {
+  background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700;
+  padding: 8px 10px; cursor: pointer; border-bottom: 2px solid transparent; display: inline-flex; align-items: center; gap: 6px;
+}
+.notif-tab.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
+.notif-tab-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
 .notif-dropdown-list { overflow-y: auto; flex: 1; }
 .notif-list { list-style: none; margin: 0; padding: 0; }
 .notif-empty { padding: 32px 16px; text-align: center; font-size: 13px; color: var(--text-muted); }

@@ -15,8 +15,9 @@ vi.mock('../../../api/notifications.js', () => ({
     list: vi.fn(), unreadCount: vi.fn(), markRead: vi.fn(), markAllRead: vi.fn(),
   },
 }))
+const auth = vi.hoisted(() => ({ user: null }))
 vi.mock('../../../hooks/useAuth.js', () => ({
-  useAuth: () => ({ jwt: 'jwt-1', isLoggedIn: true }),
+  useAuth: () => ({ jwt: 'jwt-1', isLoggedIn: true, user: auth.user }),
 }))
 
 const reply = (over = {}) => ({
@@ -46,6 +47,7 @@ function renderBell(onOpen = vi.fn()) {
 let emit
 beforeEach(() => {
   vi.clearAllMocks()
+  auth.user = null
   emit = null
   openStream.mockImplementation(({ onEvent, signal }) => {
     emit = onEvent
@@ -192,5 +194,59 @@ describe('NotificationDropdown (English)', () => {
     expect(screen.getByText('amy and 2 others replied to your comment')).toBeTruthy()
     expect(screen.getByText('zed and 1 other replied to your comment')).toBeTruthy()
     expect(screen.getByText('Your comment was removed: Spam, advertising, repeated links')).toBeTruthy()
+  })
+})
+
+describe('NotificationDropdown tabs (admins)', () => {
+  const closed = (over = {}) => ({
+    id: 'a1', type: 'REPORT_CLOSED', videoId: null, commentId: null, actorDisplay: null, actorCount: 1,
+    snippet: 'Khó đọc', reason: 'completed', read: false, updatedAt: new Date().toISOString(), ...over,
+  })
+  const byCategory = (general, admin) => (page, size, category) =>
+    Promise.resolve({ data: { content: category === 'ADMIN' ? admin : general } })
+
+  it('a non-admin sees no tabs and requests every type', async () => {
+    notificationsApi.list.mockResolvedValue({ data: { content: [reply()] } })
+    renderBell()
+    fireEvent.click(await screen.findByRole('button', { name: /Thông báo/ }))
+    expect(await screen.findByText('bob đã trả lời bình luận của bạn')).toBeTruthy()
+    expect(screen.queryByRole('tablist')).toBeNull()
+    expect(notificationsApi.list).toHaveBeenCalledWith(0, 20, undefined)
+  })
+
+  it('an admin sees General first and Admin on click, each from its category', async () => {
+    auth.user = { isAdmin: true }
+    notificationsApi.list.mockImplementation(byCategory([reply({ read: true })], [closed()]))
+    renderBell()
+    fireEvent.click(await screen.findByRole('button', { name: /Thông báo/ }))
+
+    const general = await screen.findByRole('tab', { name: /Chung/ })
+    expect(general).toHaveAttribute('aria-selected', 'true')
+    expect(await screen.findByText('bob đã trả lời bình luận của bạn')).toBeTruthy()
+    expect(screen.queryByText(/Report của bạn đã được đóng/)).toBeNull()
+    expect(notificationsApi.list).toHaveBeenCalledWith(0, 20, 'GENERAL')
+    expect(notificationsApi.list).toHaveBeenCalledWith(0, 20, 'ADMIN')
+
+    fireEvent.click(screen.getByRole('tab', { name: /Admin/ }))
+    expect(await screen.findByText('Report của bạn đã được đóng: Khó đọc (Đã xong)')).toBeTruthy()
+    expect(screen.queryByText('bob đã trả lời bình luận của bạn')).toBeNull()
+  })
+
+  it('a tab with an unread item shows a dot; mark-all follows the total unread count', async () => {
+    auth.user = { isAdmin: true }
+    notificationsApi.unreadCount.mockResolvedValue({ data: { count: 1 } })
+    notificationsApi.list.mockImplementation(byCategory([reply({ read: true })], [closed()]))
+    renderBell()
+    fireEvent.click(await screen.findByRole('button', { name: /Thông báo/ }))
+
+    const adminTab = await screen.findByRole('tab', { name: /Admin/ })
+    await waitFor(() => expect(adminTab.querySelector('.notif-tab-dot')).not.toBeNull())
+    expect(screen.getByRole('tab', { name: /Chung/ }).querySelector('.notif-tab-dot')).toBeNull()
+
+    // General has nothing unread, but mark-all is global and stays enabled
+    const markAll = screen.getByRole('button', { name: 'Đánh dấu đã đọc tất cả' })
+    await waitFor(() => expect(markAll).not.toBeDisabled())
+    fireEvent.click(markAll)
+    await waitFor(() => expect(notificationsApi.markAllRead).toHaveBeenCalled())
   })
 })

@@ -1,5 +1,9 @@
 {
   "title": "Notifications",
+  "tabGeneral": "General",
+  "tabAdmin": "Admin",
+  "tabsLabel": "Notification tabs",
+  "tabUnread": "has unread",
   "bellLabel": "Notifications, {{count}} unread",
   "markAllRead": "Mark all as read",
   "loadFailed": "Couldn't load notifications",
