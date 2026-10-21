@@ -63,7 +63,7 @@ weekly cron (or /evolve locally)
 - `evals/seeded/<id>/case.json` = a real defect: `base` and `head` commits of the run that introduced it, the files, and an `expect` block (the file that must get a blocking finding, plus regexes the finding must match).
 - `scripts/evolve.mjs eval` runs the reviewer (`worker-reviewer`, the code-review stage of `/autopilot`) on `git diff base..head` with the `.claude/` of a given ref, and grades the verdict block deterministically: **caught** = a blocking finding on an expected file whose text matches an `expect` regex.
 - A proposal passes only when, with the eval runner **from `main`**:
-  1. the new case is **missed with `main`'s rules** (otherwise no rule change is needed; the PR only adds the case),
+  1. the new case is **missed with `main`'s rules in at least 2 of 3 runs** (otherwise no rule change is needed; the PR only adds the case, and that case-only PR needs `main` to catch it in 2 of 3),
   2. it is **caught with the branch's rules in at least 2 of 3 runs** (model output is not deterministic),
   3. **every existing case is still caught** with the branch's rules (no regression),
   4. the mean reviewer cost per case rises by at most 25%.
@@ -72,7 +72,10 @@ weekly cron (or /evolve locally)
 
 ### D4. Running it
 
-- **Headless:** `.github/workflows/agent-evolve.yml`, cron weekly (Monday) plus `workflow_dispatch`. Steps: metrics → agent (diagnose + propose + commit on the branch, no push) → allowlist check → eval runner → push + `gh pr create --label evolve` or an `evolve` issue. Same token rules and owner-only trigger as ADR-0022. Never merges.
+- **Headless:** `.github/workflows/agent-evolve.yml`, cron weekly (Monday) plus `workflow_dispatch`, owner-only like ADR-0022. Never merges. Two jobs, so the agent never holds a write token:
+  - **propose** (read-only token): signals (saved as an artifact **before** the agent runs) → agent commits on `evolve/*` branches with a narrowed git allowlist (no push, config, update-ref, `-c`) → branches leave as a git bundle, PR texts as an artifact.
+  - **ship** (write token): fresh checkout of the main SHA the signals were computed on → manifest validated against the saved signals → `check-paths` and `gate` with no GitHub token in the env → push + `gh pr create --label evolve`, or an `evolve` issue. A signal without a proposal is closed with an issue only when the agent step succeeded.
+- Gate hardening: the case must be added by the branch, its `base`/`head` must be commits on `main`, rule-file frontmatter is frozen (new skills: `name`, `description`, `argument-hint`, `disable-model-invocation` only), no new agents, and `not-eval-proven` proposals may not touch the reviewer's rules.
 - **Local:** `/evolve` runs the same stages in the session and stops before the push, like autopilot Gate 2.
 - **Budget:** `--max-turns` on the agent step, at most 3 signals, at most 3 eval runs for the new case and 1 run per existing case; the job fails closed when a budget is hit.
 

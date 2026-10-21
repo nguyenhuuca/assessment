@@ -139,6 +139,7 @@ nav:
       - In-App Report: plans/plan-in-app-report.md
       - Report Webhook State: plans/plan-report-webhook-state.md
       - Report Closed Notification: plans/plan-report-closed-notify.md
+      - Agent Evolve Loop: plans/plan-agent-evolve.md
 
   - Presentations:
       - presentations/index.md
@@ -202,6 +203,7 @@ nav:
           - /tailor: claude/skills/workflows/tailor.md
           - /task-resume: claude/skills/workflows/task-resume.md
           - /autopilot: claude/skills/workflows/autopilot.md
+          - /evolve: claude/skills/workflows/evolve.md
 
       - Skills — Architecture:
           - Designing Systems: claude/skills/architecture/designing-systems.md

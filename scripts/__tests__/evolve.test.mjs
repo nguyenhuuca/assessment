@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
-  decide, grade, handledIds, parseArgs, parseVerdict, pathViolations, pickSignals, removedLines, reviewPrompt,
+  decide, grade, handledIds, parseArgs, parseVerdict, pathViolations, pickSignals, removedLines, reviewPrompt, validateManifest,
 } from '../evolve.mjs'
 
 const reply = (lines, verdict = 'revise') => `prose\n\n\`\`\`verdict\nVERDICT: ${verdict}\nBLOCKING: 1\nADVISORY: 0\n${lines.join('\n')}\n\`\`\`\n`
@@ -69,6 +69,7 @@ test('signals already handled by an evolve PR or issue are skipped', () => {
   assert.deepEqual([...handledIds(bodies)], ['defect:62526c97', 'blocked:run-a'])
   const sig = ['defect:62526c97', 'defect:1', 'defect:2', 'defect:3', 'defect:4'].map((id) => ({ id }))
   assert.deepEqual(pickSignals(sig, bodies, 3).map((s) => s.id), ['defect:1', 'defect:2', 'defect:3'])
+  assert.deepEqual(pickSignals(sig, bodies, 2, ['defect:1']).map((s) => s.id), ['defect:2', 'defect:3'], 'seeded case on main')
 })
 
 const r = (caught, costUsd = 0.1, error = null) => ({ caught, costUsd, error })
@@ -105,4 +106,42 @@ test('parseArgs validates input', () => {
   assert.throws(() => parseArgs(['gate', '--runs', '0']), /positive/)
   assert.throws(() => parseArgs(['gate', '--base']), /needs a value/)
   assert.throws(() => parseArgs(['gate', '--rm']), /unknown/)
+})
+
+test('pathViolations freezes frontmatter and blocks new agents', () => {
+  const skill = '.claude/skills/testing/SKILL.md'
+  const fm = '---\nname: testing\ndescription: x\n---'
+  assert.deepEqual(pathViolations([{ status: 'M', path: skill }], {}, { [skill]: [fm, fm] }), [])
+  assert.equal(pathViolations([{ status: 'M', path: skill }], {}, { [skill]: [fm, '---\nname: testing\ndescription: x\nallowed-tools: Bash\n---'] }).length, 1)
+  const fresh = '.claude/skills/new/SKILL.md'
+  assert.deepEqual(pathViolations([{ status: 'A', path: fresh }], {}, { [fresh]: ['', '---\nname: new\ndescription: y\n---'] }), [])
+  assert.match(pathViolations([{ status: 'A', path: fresh }], {}, { [fresh]: ['', '---\nname: new\nhooks: x\n---'] })[0], /hooks/)
+  assert.match(pathViolations([{ status: 'A', path: '.claude/agents/worker-evil.md' }])[0], /new agents/)
+})
+
+test('pathViolations: not-eval-proven cannot touch the reviewer rules', () => {
+  const f = [{ status: 'M', path: '.claude/agents/worker-reviewer.md' }]
+  assert.deepEqual(pathViolations(f, {}, {}, 'rule'), [])
+  assert.equal(pathViolations(f, {}, {}, 'not-eval-proven').length, 1)
+  assert.deepEqual(pathViolations([{ status: 'M', path: '.claude/skills/testing/SKILL.md' }], {}, {}, 'not-eval-proven'), [])
+})
+
+test('validateManifest keeps only well-formed rows for trusted signals', () => {
+  const rows = [
+    { signal: 'defect:aaaa1111', branch: 'evolve/defect-aaaa1111', case: '2026-10-01-a', kind: 'rule', body: 'evolve-out/a.md' },
+    { signal: 'defect:aaaa1111', branch: 'evolve/dup', case: 'x', kind: 'rule', body: 'evolve-out/x.md' },
+    { signal: 'defect:bbbb2222', branch: 'evolve/b; rm -rf /', case: 'b', kind: 'rule', body: 'evolve-out/b.md' },
+    { signal: 'defect:cccc3333', branch: 'evolve/c', case: 'c', kind: 'rule', body: '../etc/passwd' },
+    { signal: 'defect:zzzz', branch: 'evolve/z', case: 'z', kind: 'rule', body: 'evolve-out/z.md' },
+    null,
+  ]
+  const res = validateManifest(rows, ['defect:aaaa1111', 'defect:bbbb2222', 'defect:cccc3333', 'bad id\n'])
+  assert.deepEqual(res.rows.map((r) => r.branch), ['evolve/defect-aaaa1111'])
+  assert.deepEqual(res.unhandled, ['defect:bbbb2222', 'defect:cccc3333'])
+  assert.deepEqual(validateManifest('not an array', ['defect:a']).unhandled, ['defect:a'])
+})
+
+test('parseArgs rejects refs that look like options', () => {
+  assert.throws(() => parseArgs(['gate', '--base', '--upload-pack=x']), /cannot start/)
+  assert.throws(() => parseArgs(['check-paths', '--kind', 'other']), /kind/)
 })

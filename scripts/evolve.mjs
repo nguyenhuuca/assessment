@@ -3,9 +3,12 @@
 //
 // Usage: node scripts/evolve.mjs <command> [options]
 //   signals     [--from metrics.json] [--since YYYY-MM-DD] [--limit 3] [--out file]
-//               new signals from agent-metrics --json, minus ids that already have an `evolve` PR or issue
-//   check-paths --base <ref> --head <ref>
-//               ADR D2 allowlist; rule files may only gain lines (or lose `<!-- evolve:` lines, the prune path)
+//               new signals from agent-metrics --json, minus ids that already have an `evolve` PR or issue or a seeded case
+//   check-paths --base <ref> --head <ref> [--kind rule|case-only|not-eval-proven]
+//               ADR D2 allowlist; rule files may only gain lines (or lose `<!-- evolve:` lines, the prune path);
+//               frontmatter is frozen; not-eval-proven may not touch the reviewer's rules
+//   manifest    --signals <trusted signals.json> --manifest <file> --rows <out.tsv> --unhandled <out.txt>
+//               validate the agent-written manifest (headless ship job)
 //   eval        --case <id> --rules <ref> [--case-ref <ref>] [--runs 1] [--budget 1]   (case from the working tree unless --case-ref)
 //               run the reviewer on the case diff with the .claude/ of <ref>, grade each run
 //   gate        --base <ref> --head <ref> --case <id> [--runs 3] [--budget 1] [--out file.md]
@@ -21,7 +24,12 @@ const CASES_DIR = 'evals/seeded'
 const CASE_ID = /^[\w.-]+$/
 const SIGNAL_MARK = /<!-- evolve:signal=([^\s>]+) -->/g
 const RULE_MARK = '<!-- evolve:'
-const RULES_PATHS = ['.claude', 'CLAUDE.md', 'AGENTS.md']
+const RULES_PATHS = ['.claude', 'CLAUDE.md', 'AGENTS.md', '.mcp.json']
+const SIGNAL_ID = /^[\w:.-]+$/
+const KINDS = ['rule', 'case-only', 'not-eval-proven']
+// Files that change what the code reviewer does; a rule there must be eval-proven
+const REVIEWER_RULES = [/^\.claude\/agents\/worker-reviewer\.md$/, /^\.claude\/skills\/swarm-review\//, /^\.claude\/skills\/autopilot\/resources\/verdict\.md$/]
+const NEW_SKILL_KEYS = new Set(['name', 'description', 'argument-hint', 'disable-model-invocation'])
 
 // ADR-0027 D2
 const ALLOWED = [
@@ -38,7 +46,8 @@ export function parseArgs(argv) {
   for (let i = 0; i < rest.length; i++) {
     const a = rest[i]
     const key = a.replace(/^--/, '').replace(/-(\w)/g, (_, c) => c.toUpperCase())
-    if (!['--from', '--since', '--limit', '--out', '--base', '--head', '--case', '--rules', '--case-ref', '--runs', '--budget'].includes(a)) {
+    if (!['--from', '--since', '--limit', '--out', '--base', '--head', '--case', '--rules', '--case-ref', '--runs', '--budget',
+      '--kind', '--signals', '--manifest', '--rows', '--unhandled'].includes(a)) {
       throw new Error(`unknown argument: ${a}`)
     }
     if (rest[i + 1] === undefined) throw new Error(`${a} needs a value`)
@@ -51,6 +60,8 @@ export function parseArgs(argv) {
     }
   }
   if (args.case && !CASE_ID.test(args.case)) throw new Error('--case must match [\\w.-]+')
+  if (args.kind && !KINDS.includes(args.kind)) throw new Error(`--kind must be one of ${KINDS.join(', ')}`)
+  for (const k of ['base', 'head', 'rules', 'caseRef']) if (args[k] && args[k].startsWith('-')) throw new Error(`--${k} cannot start with "-"`)
   return args
 }
 
@@ -60,8 +71,9 @@ export function handledIds(bodies) {
   return new Set(bodies.flatMap((b) => [...(b ?? '').matchAll(SIGNAL_MARK)].map((m) => m[1])))
 }
 
-export function pickSignals(signals, bodies, limit) {
-  const done = handledIds(bodies)
+// caseSignals: the `signal` of every seeded case already on main (a proposal merged without a PR marker)
+export function pickSignals(signals, bodies, limit, caseSignals = []) {
+  const done = new Set([...handledIds(bodies), ...caseSignals])
   return signals.filter((s) => !done.has(s.id)).slice(0, limit)
 }
 
@@ -69,9 +81,14 @@ export function pickSignals(signals, bodies, limit) {
 
 const frontmatter = (text) => (/^---\r?\n[\s\S]*?\r?\n---/.exec(text ?? '') ?? [''])[0]
 
-// files: [{ status, path }]; removed: { path: [removed lines] }; agentFront: { path: [before, after] }
-export function pathViolations(files, removed = {}, agentFront = {}) {
+const frontKeys = (fm) => fm.split('\n').slice(1, -1).map((l) => (/^([\w-]+)\s*:/.exec(l) ?? [])[1]).filter(Boolean)
+
+// files: [{ status, path }]; removed: { path: [removed lines] }; front: { path: [before, after] } (frontmatter of rule files)
+export function pathViolations(files, removed = {}, front = {}, kind = 'rule') {
   const v = []
+  if (kind === 'not-eval-proven') {
+    for (const { path } of files) if (REVIEWER_RULES.some((re) => re.test(path))) v.push(`${path}: changes the code reviewer, so it must be eval-proven`)
+  }
   for (const { status, path } of files) {
     if (NEW_CASE.test(path)) {
       if (status !== 'A') v.push(`${path}: existing eval cases cannot be changed or deleted (status ${status})`)
@@ -79,9 +96,14 @@ export function pathViolations(files, removed = {}, agentFront = {}) {
     }
     if (!ALLOWED.some((re) => re.test(path))) { v.push(`${path}: outside the Evolve allowlist`); continue }
     if (status === 'D') { v.push(`${path}: rule files cannot be deleted`); continue }
+    if (status === 'A' && /^\.claude\/agents\//.test(path)) { v.push(`${path}: new agents cannot be added`); continue }
     const lost = (removed[path] ?? []).filter((l) => l.trim() && !l.includes(RULE_MARK))
     if (lost.length) v.push(`${path}: ${lost.length} existing line(s) removed or edited; only additions (or removal of ${RULE_MARK} lines) are allowed`)
-    if (agentFront[path] && agentFront[path][0] !== agentFront[path][1]) v.push(`${path}: agent frontmatter cannot change`)
+    const [before, after] = front[path] ?? ['', '']
+    if (status === 'A') {
+      const extra = frontKeys(after).filter((k) => !NEW_SKILL_KEYS.has(k))
+      if (extra.length) v.push(`${path}: frontmatter keys not allowed in a new file: ${extra.join(', ')}`)
+    } else if (before !== after) v.push(`${path}: frontmatter cannot change`)
   }
   return v
 }
@@ -99,15 +121,31 @@ export function removedLines(patch) {
   return out
 }
 
-function checkPaths(root, base, head) {
+function checkPaths(root, base, head, kind = 'rule') {
   const names = git(root, ['diff', '--name-status', '--no-renames', `${base}...${head}`]).split('\n').filter(Boolean)
   const files = names.map((l) => { const [status, path] = l.split('\t'); return { status: status[0], path } })
   const removed = removedLines(git(root, ['diff', '-U0', '--no-renames', `${base}...${head}`, '--', ...files.map((f) => f.path)]))
-  const agentFront = {}
-  for (const f of files.filter((x) => /^\.claude\/agents\//.test(x.path) && x.status === 'M')) {
-    agentFront[f.path] = [frontmatter(show(root, base, f.path)), frontmatter(show(root, head, f.path))]
+  const front = {}
+  for (const f of files.filter((x) => /^\.claude\/.+\.md$/.test(x.path) && x.status !== 'D')) {
+    front[f.path] = [frontmatter(show(root, base, f.path)), frontmatter(show(root, head, f.path))].map((x) => x.replace(/\r/g, ''))
   }
-  return { files, violations: pathViolations(files, removed, agentFront) }
+  return { files, violations: pathViolations(files, removed, front, kind) }
+}
+
+// ---- manifest (headless ship job) ----
+
+// rows: agent-written manifest; signalIds: from the trusted copy taken before the agent step
+export function validateManifest(rows, signalIds) {
+  const signals = new Set(signalIds.filter((id) => SIGNAL_ID.test(id)))
+  const ok = []
+  const seen = new Set()
+  for (const r of Array.isArray(rows) ? rows : []) {
+    if (!r || typeof r !== 'object') continue
+    const valid = signals.has(r.signal) && !seen.has(r.signal) && /^evolve\/[\w.-]+$/.test(r.branch ?? '') && CASE_ID.test(r.case ?? '')
+      && KINDS.includes(r.kind) && /^evolve-out\/[\w.-]+\.md$/.test(r.body ?? '')
+    if (valid) { seen.add(r.signal); ok.push({ signal: r.signal, branch: r.branch, case: r.case, kind: r.kind, body: r.body }) }
+  }
+  return { rows: ok, unhandled: [...signals].filter((x) => !seen.has(x)) }
 }
 
 // ---- eval ----
@@ -150,7 +188,7 @@ function loadCase(root, ref, id) {
   const raw = ref ? show(root, ref, rel) : readFileSync(join(root, rel), 'utf8')
   if (!raw) throw new Error(`case ${id} not found at ${ref ?? 'the working tree'}`)
   const c = JSON.parse(raw)
-  for (const k of ['base', 'head']) if (typeof c[k] !== 'string' || !/^[\w^~./-]+$/.test(c[k])) throw new Error(`case ${id}: bad ${k}`)
+  for (const k of ['base', 'head']) if (typeof c[k] !== 'string' || !/^\w[\w^~./-]*$/.test(c[k])) throw new Error(`case ${id}: bad ${k}`)
   if (!c.expect?.files?.length || !c.expect?.patterns?.length) throw new Error(`case ${id}: expect.files and expect.patterns are required`)
   return { id, ...c }
 }
@@ -165,12 +203,16 @@ function runReviewer(root, c, rulesRef, budget) {
   const dir = mkdtempSync(join(tmpdir(), 'evolve-'))
   try {
     git(root, ['worktree', 'add', '--detach', '--force', dir, c.head])
-    for (const p of RULES_PATHS) rmSync(join(dir, p), { recursive: true, force: true })
-    git(dir, ['checkout', rulesRef, '--', ...RULES_PATHS])
+    for (const p of RULES_PATHS) {
+      rmSync(join(dir, p), { recursive: true, force: true })
+      if (p === '.claude' || show(root, rulesRef, p)) git(dir, ['checkout', rulesRef, '--', p])
+    }
+    // The reviewer never sees GitHub tokens
+    const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^(GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN)$/.test(k)))
     const out = execFileSync('claude', ['-p', '--agent', 'worker-reviewer', '--output-format', 'json',
       '--setting-sources', 'project', '--max-budget-usd', String(budget),
       '--allowedTools', 'Read', 'Grep', 'Glob', 'Bash(git diff:*)', 'Bash(git show:*)', 'Bash(git log:*)'],
-    { cwd: dir, input: reviewPrompt(c), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['pipe', 'pipe', 'pipe'] })
+    { cwd: dir, env, input: reviewPrompt(c), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['pipe', 'pipe', 'pipe'] })
     const r = JSON.parse(out)
     return { text: r.result ?? '', costUsd: r.total_cost_usd ?? 0, error: r.is_error ? (r.subtype ?? 'error') : null }
   } catch (e) {
@@ -218,6 +260,7 @@ export function decide({ target, regress, rulesChanged }) {
   }
   const lost = Object.entries(regress).filter(([, rs]) => !rs.some((r) => r.caught)).map(([id]) => id)
   checks.push({ rule: '3. existing cases still caught', ok: lost.length === 0, detail: lost.length ? `missed: ${lost.join(', ')}` : `${Object.keys(regress).length} case(s)` })
+  checks.sort((a, b) => a.rule.localeCompare(b.rule))
   return { pass: checks.every((c) => c.ok), kind: rulesChanged ? 'rule' : 'case-only', checks }
 }
 
@@ -234,8 +277,14 @@ export function renderGate(caseId, d, target, regress) {
 function gate(root, args) {
   const runs = args.runs ?? 3
   const c = loadCase(root, args.head, args.case)
-  const { files, violations } = checkPaths(root, args.base, args.head)
+  const { files, violations } = checkPaths(root, args.base, args.head, args.kind ?? 'rule')
   if (violations.length) throw new Error(`check-paths failed:\n${violations.join('\n')}`)
+  if (!files.some((f) => f.path === `${CASES_DIR}/${c.id}/case.json` && f.status === 'A')) throw new Error(`case ${c.id} must be added by this branch`)
+  for (const k of ['base', 'head']) {
+    try { git(root, ['merge-base', '--is-ancestor', c[k].replace(/[\^~].*$/, ''), args.base]) } catch {
+      throw new Error(`case ${c.id}: ${k} ${c[k]} is not a commit on ${args.base}`)
+    }
+  }
   const rulesChanged = files.some((f) => !NEW_CASE.test(f.path))
   const target = {
     base: evalCase(root, c, args.base, runs, args.budget),
@@ -279,15 +328,27 @@ function main() {
         ? JSON.parse(readFileSync(args.from, 'utf8'))
         : JSON.parse(execFileSync('node', [join(root, 'scripts/agent-metrics.mjs'), '--json', ...(args.since ? ['--since', args.since] : [])],
           { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }))
-      const picked = pickSignals(metrics.signals ?? [], [...ghBodies('pr'), ...ghBodies('issue')], args.limit)
+      const caseSignals = listCases(root, 'HEAD').map((id) => { try { return loadCase(root, 'HEAD', id).signal } catch { return null } })
+      const picked = pickSignals(metrics.signals ?? [], [...ghBodies('pr'), ...ghBodies('issue')], args.limit, caseSignals.filter(Boolean))
       emit(args, `${JSON.stringify({ signals: picked }, null, 2)}\n`)
       break
     }
     case 'check-paths': {
       need('base', 'head')
-      const { violations } = checkPaths(root, args.base, args.head)
+      const { violations } = checkPaths(root, args.base, args.head, args.kind ?? 'rule')
       if (violations.length) { console.error(violations.join('\n')); process.exit(1) }
       console.log('check-paths: ok')
+      break
+    }
+    case 'manifest': {
+      need('signals', 'manifest', 'rows', 'unhandled')
+      const ids = JSON.parse(readFileSync(args.signals, 'utf8')).signals.map((x) => x.id)
+      let rows = []
+      try { rows = JSON.parse(readFileSync(args.manifest, 'utf8')) } catch { rows = [] }
+      const res = validateManifest(rows, ids)
+      writeFileSync(args.rows, res.rows.map((r) => `${[r.signal, r.branch, r.case, r.kind, r.body].join('\t')}\n`).join(''))
+      writeFileSync(args.unhandled, res.unhandled.map((x) => `${x}\n`).join(''))
+      console.log(`manifest: ${res.rows.length} proposal(s), ${res.unhandled.length} signal(s) without one`)
       break
     }
     case 'eval': {
@@ -304,7 +365,7 @@ function main() {
       break
     }
     default:
-      throw new Error('command must be one of: signals, check-paths, eval, gate')
+      throw new Error('command must be one of: signals, check-paths, manifest, eval, gate')
   }
 }
 

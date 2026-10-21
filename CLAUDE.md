@@ -92,7 +92,7 @@ Distilled from `.claude/rules/` (auto-loaded); the rules and skills refer to the
 
 Ephemeral notes go to `./scratchpad/` (gitignored). `./artifacts/` holds design images (Stitch exports), not planning docs.
 
-**User-invoked skills**: `/swarm-plan`, `/swarm-execute`, `/swarm-review`, `/swarm-research`, `/architect`, `/builder`, `/qa-engineer`, `/security-auditor`, `/ui-ux-designer`, `/code-check`, `/land-the-plane`, `/tailor`, `/scope` (idea → PRD), `/spec` (PRD + ADR → spec + sequence diagrams), `/presentation` (doc → HTML deck), `/autopilot` (one small feature or fix: plan ⇄ review → your approval → build ⇄ review → QA tests ×2 → commit → your push approval; `docs/plans/plan-autopilot.md`), `/task-resume` (continue the unfinished task in `session.txt`; format and update rules in `.claude/rules/session-file.md`).
+**User-invoked skills**: `/swarm-plan`, `/swarm-execute`, `/swarm-review`, `/swarm-research`, `/architect`, `/builder`, `/qa-engineer`, `/security-auditor`, `/ui-ux-designer`, `/code-check`, `/land-the-plane`, `/tailor`, `/scope` (idea → PRD), `/spec` (PRD + ADR → spec + sequence diagrams), `/presentation` (doc → HTML deck), `/autopilot` (one small feature or fix: plan ⇄ review → your approval → build ⇄ review → QA tests ×2 → commit → your push approval; `docs/plans/plan-autopilot.md`), `/evolve` (agent improves its own rules from `scripts/agent-metrics.mjs` signals, each change proven by a seeded-bug eval and merged by you; ADR-0027), `/task-resume` (continue the unfinished task in `session.txt`; format and update rules in `.claude/rules/session-file.md`).
 
 ## Project Overview
 
