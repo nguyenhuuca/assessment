@@ -420,3 +420,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **NT-1** BE: admin category on `NotificationType`; optional `category` filter on `GET /notifications` c5ad0a54
 - [x] **NT-2** FE: General / Admin tabs in the dropdown for admins, unread dot per tab, en/vi a7b4eb42
+
+## Fix: Light-theme yellow admin badges (2026-10-21, autopilot lite, #48)
+
+- [x] **FE-1** Light-theme override for `.admin-badge.pending/.missing_local/.missing_db/.size_mismatch` (#7a4d00, >=4.5:1) c3f9a9d7
+- [x] **FE-2** `badgeContrast.test.js` computes WCAG contrast of the overrides c3f9a9d7
