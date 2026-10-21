@@ -2515,6 +2515,8 @@
       
         
       
+        
+      
     
     
     
@@ -3165,6 +3167,34 @@
     
   
     Report Closed Notification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-agent-evolve/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Evolve Loop
   
 
     
@@ -4562,6 +4592,8 @@
       
         
       
+        
+      
     
     
     
@@ -5044,6 +5076,34 @@
     
   
     /autopilot
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../claude/skills/workflows/evolve/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /evolve
   
 
     
@@ -7571,6 +7631,17 @@
 <td>—</td>
 <td>✅</td>
 <td>Report menu above Settings (ADMIN/SA) → GitHub issue with <code>autopilot</code> via the owner's fine-grained PAT; auto labels SA only; 5/h per user + 10 autopilot reports/24 h. Done IR-1..IR-7 (<code>ca21f28e</code>..<code>1cde69c8</code>); live on prod 2026-10-21. D7 webhook state (<a href="../plans/plan-report-webhook-state/">plan</a>): done WH-1..WH-5 (<code>5582b2fc</code>, <code>90dd0a78</code>), live 2026-10-21. Closed-issue notification to the reporter (<a href="../plans/plan-report-closed-notify/">plan</a>): built RN-1..RN-3 (<code>801dcb9f</code>, <code>b3030e52</code>)</td>
+</tr>
+<tr>
+<td><strong>Agent Evolve Loop (self-improvement)</strong></td>
+<td>—</td>
+<td><a href="../adr/0027-agent-self-improvement-loop/">0027 ✅</a></td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-agent-evolve/">Plan 🔄</a></td>
+<td>—</td>
+<td>🔄</td>
+<td>Weekly <code>agent-evolve.yml</code>: metrics signals → <code>/evolve</code> → path allowlist + seeded-bug eval gate (<code>scripts/evolve.mjs</code>) → PR for the owner. First evolution: reviewer rule for assumptions about unchanged code, case <code>2026-10-19-swallowed-job-exceptions</code> caught 0/3 → 3/3</td>
 </tr>
 </tbody>
 </table>
