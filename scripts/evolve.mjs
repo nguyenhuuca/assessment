@@ -1,5 +1,5 @@
-// Evolve loop helpers (ADR-0027). The headless workflow runs a copy of this file taken from `main` before the
-// agent step, so nothing the agent writes changes how its proposal is checked.
+// Evolve loop helpers (ADR-0027), used by the local /evolve skill. The checks are code, so a proposal cannot
+// change how it is judged: check-paths and gate run from the working tree's copy of this file on main.
 //
 // Usage: node scripts/evolve.mjs <command> [options]
 //   signals     [--from metrics.json] [--since YYYY-MM-DD] [--limit 3] [--out file]
@@ -9,8 +9,6 @@
 //               frontmatter is frozen; not-eval-proven may not touch the reviewer's rules;
 //               compress (D6) may also edit CLAUDE.md and remove lines, but never protected files or lines
 //   lint-rules  [--rules <ref>] [--out file]   duplicate lines, dead path references, always-loaded context size (D6)
-//   manifest    --signals <trusted signals.json> --manifest <file> --rows <out.tsv> --unhandled <out.txt>
-//               validate the agent-written manifest (headless ship job)
 //   eval        --case <id> --rules <ref> [--case-ref <ref>] [--runs 1] [--budget 1]   (case from the working tree unless --case-ref)
 //               run the reviewer on the case diff with the .claude/ of <ref>, grade each run
 //   gate        --base <ref> --head <ref> --case <id> [--runs 3] [--budget 1] [--out file.md]
@@ -28,7 +26,6 @@ const CASE_ID = /^[\w.-]+$/
 const SIGNAL_MARK = /<!-- evolve:signal=([^\s>]+) -->/g
 const RULE_MARK = '<!-- evolve:'
 const RULES_PATHS = ['.claude', 'CLAUDE.md', 'AGENTS.md', '.mcp.json']
-const SIGNAL_ID = /^[\w:.-]+$/
 const KINDS = ['rule', 'case-only', 'not-eval-proven', 'compress']
 // Files that change what the code reviewer does; a rule there must be eval-proven
 const REVIEWER_RULES = [/^\.claude\/agents\/worker-reviewer\.md$/, /^\.claude\/skills\/swarm-review\//, /^\.claude\/skills\/autopilot\/resources\/verdict\.md$/]
@@ -59,7 +56,7 @@ export function parseArgs(argv) {
     const a = rest[i]
     const key = a.replace(/^--/, '').replace(/-(\w)/g, (_, c) => c.toUpperCase())
     if (!['--from', '--since', '--limit', '--out', '--base', '--head', '--case', '--rules', '--case-ref', '--runs', '--budget',
-      '--kind', '--signals', '--manifest', '--rows', '--unhandled'].includes(a)) {
+      '--kind'].includes(a)) {
       throw new Error(`unknown argument: ${a}`)
     }
     if (rest[i + 1] === undefined) throw new Error(`${a} needs a value`)
@@ -140,7 +137,7 @@ export function compressViolations(files, removed = {}, front = {}) {
 
 const normLine = (l) => l.replace(/^[\s>#*|-]*(\d+\.\s+)?/, '').replace(/[`*_]/g, '').replace(/\s+/g, ' ').trim().toLowerCase()
 const PATHISH = /^[\w.-]+(\/[\w.-]+)*\/?$/
-const SKIP_REF = /^(scratchpad|evolve-out|node_modules|target|dist)\/|^~|^\.\.?\//
+const SKIP_REF = /^(scratchpad|node_modules|target|dist)\/|^~|^\.\.?\//
 
 // files: { path: text }; tracked: [paths in the tree]; alwaysLoaded: [paths]
 export function lintRules(files, tracked, alwaysLoaded) {
@@ -238,23 +235,6 @@ function checkPaths(root, base, head, kind = 'rule') {
     front[f.path] = [frontmatter(show(root, base, f.path)), frontmatter(show(root, head, f.path))].map((x) => x.replace(/\r/g, ''))
   }
   return { files, violations: pathViolations(files, removed, front, kind) }
-}
-
-// ---- manifest (headless ship job) ----
-
-// rows: agent-written manifest; signalIds: from the trusted copy taken before the agent step
-export function validateManifest(rows, signalIds) {
-  const signals = new Set(signalIds.filter((id) => SIGNAL_ID.test(id)))
-  const ok = []
-  const seen = new Set()
-  for (const r of Array.isArray(rows) ? rows : []) {
-    if (!r || typeof r !== 'object') continue
-    const caseOk = r.kind === 'compress' ? r.case === '-' : CASE_ID.test(r.case ?? '') && r.case !== '-'
-    const valid = signals.has(r.signal) && !seen.has(r.signal) && /^evolve\/[\w.-]+$/.test(r.branch ?? '') && caseOk
-      && KINDS.includes(r.kind) && /^evolve-out\/[\w.-]+\.md$/.test(r.body ?? '')
-    if (valid) { seen.add(r.signal); ok.push({ signal: r.signal, branch: r.branch, case: r.case, kind: r.kind, body: r.body }) }
-  }
-  return { rows: ok, unhandled: [...signals].filter((x) => !seen.has(x)) }
 }
 
 // ---- eval ----
@@ -453,17 +433,6 @@ function main() {
       console.log('check-paths: ok')
       break
     }
-    case 'manifest': {
-      need('signals', 'manifest', 'rows', 'unhandled')
-      const ids = JSON.parse(readFileSync(args.signals, 'utf8')).signals.map((x) => x.id)
-      let rows = []
-      try { rows = JSON.parse(readFileSync(args.manifest, 'utf8')) } catch { rows = [] }
-      const res = validateManifest(rows, ids)
-      writeFileSync(args.rows, res.rows.map((r) => `${[r.signal, r.branch, r.case, r.kind, r.body].join('\t')}\n`).join(''))
-      writeFileSync(args.unhandled, res.unhandled.map((x) => `${x}\n`).join(''))
-      console.log(`manifest: ${res.rows.length} proposal(s), ${res.unhandled.length} signal(s) without one`)
-      break
-    }
     case 'lint-rules': {
       const l = lintAt(root, args.rules ?? 'HEAD')
       delete l.files
@@ -485,7 +454,7 @@ function main() {
       break
     }
     default:
-      throw new Error('command must be one of: signals, check-paths, manifest, lint-rules, eval, gate')
+      throw new Error('command must be one of: signals, check-paths, lint-rules, eval, gate')
   }
 }
 

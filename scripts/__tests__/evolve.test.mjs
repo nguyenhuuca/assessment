@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
   compressViolations, decide, decideCompress, grade, handledIds, lintRules, parseArgs, parseVerdict, pathViolations, pickSignals,
-  removedLines, reviewPrompt, validateManifest,
+  removedLines, reviewPrompt,
 } from '../evolve.mjs'
 
 const reply = (lines, verdict = 'revise') => `prose\n\n\`\`\`verdict\nVERDICT: ${verdict}\nBLOCKING: 1\nADVISORY: 0\n${lines.join('\n')}\n\`\`\`\n`
@@ -127,20 +127,6 @@ test('pathViolations: not-eval-proven cannot touch the reviewer rules', () => {
   assert.deepEqual(pathViolations([{ status: 'M', path: '.claude/skills/testing/SKILL.md' }], {}, {}, 'not-eval-proven'), [])
 })
 
-test('validateManifest keeps only well-formed rows for trusted signals', () => {
-  const rows = [
-    { signal: 'defect:aaaa1111', branch: 'evolve/defect-aaaa1111', case: '2026-10-01-a', kind: 'rule', body: 'evolve-out/a.md' },
-    { signal: 'defect:aaaa1111', branch: 'evolve/dup', case: 'x', kind: 'rule', body: 'evolve-out/x.md' },
-    { signal: 'defect:bbbb2222', branch: 'evolve/b; rm -rf /', case: 'b', kind: 'rule', body: 'evolve-out/b.md' },
-    { signal: 'defect:cccc3333', branch: 'evolve/c', case: 'c', kind: 'rule', body: '../etc/passwd' },
-    { signal: 'defect:zzzz', branch: 'evolve/z', case: 'z', kind: 'rule', body: 'evolve-out/z.md' },
-    null,
-  ]
-  const res = validateManifest(rows, ['defect:aaaa1111', 'defect:bbbb2222', 'defect:cccc3333', 'bad id\n'])
-  assert.deepEqual(res.rows.map((r) => r.branch), ['evolve/defect-aaaa1111'])
-  assert.deepEqual(res.unhandled, ['defect:bbbb2222', 'defect:cccc3333'])
-  assert.deepEqual(validateManifest('not an array', ['defect:a']).unhandled, ['defect:a'])
-})
 
 test('parseArgs rejects refs that look like options', () => {
   assert.throws(() => parseArgs(['gate', '--base', '--upload-pack=x']), /cannot start/)
@@ -187,12 +173,3 @@ test('decideCompress needs a real cut, no new lint findings and every case caugh
   assert.equal(decideCompress({ size: size(9000, 7000, 37000, 35000), lint: lint(5, 3), regress: { a: [{ caught: true, error: 'x' }] } }).pass, false, 'errors')
 })
 
-test('validateManifest: compress rows use case "-", other kinds may not', () => {
-  const ids = ['compress:2026-10', 'defect:a']
-  const rows = [
-    { signal: 'compress:2026-10', branch: 'evolve/compress-2026-10', case: '-', kind: 'compress', body: 'evolve-out/c.md' },
-    { signal: 'defect:a', branch: 'evolve/defect-a', case: '-', kind: 'rule', body: 'evolve-out/a.md' },
-  ]
-  assert.deepEqual(validateManifest(rows, ids).rows.map((r) => r.kind), ['compress'])
-  assert.deepEqual(validateManifest([{ ...rows[0], case: 'x' }], ids).rows, [])
-})

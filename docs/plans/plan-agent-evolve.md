@@ -1,7 +1,7 @@
 # Plan: Agent self-improvement loop ("Evolve")
 
 - **ADR:** [ADR-0027](../adr/0027-agent-self-improvement-loop.md) (Accepted 2026-10-21)
-- **Status:** In progress
+- **Status:** Done (EV-5 headless workflow removed 2026-10-21, see ADR-0027 D4)
 
 ## Design (facts)
 
@@ -18,4 +18,4 @@
 | EV-2 | `scripts/evolve.mjs`: `signals` (minus ones with an `evolve` PR/issue marker, top 3), `check-paths` (ADR D2 allowlist + no deleted lines in rule files), `eval` (one case × ref × runs, deterministic grading), `gate` (ADR D3 rules 1–4) | node tests for grading, allowlist, gate decisions, signal filter |
 | EV-3 | First case `evals/seeded/2026-10-19-swallowed-job-exceptions/case.json` + `evals/README.md` | `eval` with `main` rules: missed in ≥2 of 3 |
 | EV-4 | `/evolve` skill (`.claude/skills/evolve/SKILL.md`): local + headless, manifest `evolve-out/manifest.json`, PR body format, `<!-- evolve:<case> -->` markers, prune rule; first evolution = the rule that catches EV-3 | `gate` passes for EV-3 (missed on main, caught ≥2/3 on the branch, no regressions) |
-| EV-5 | `.github/workflows/agent-evolve.yml`: weekly cron + dispatch; signals → agent → check-paths → gate → push + PR (label `evolve`) or issue | `actionlint`-clean YAML; dry run via `workflow_dispatch` after push (owner) |
+| EV-5 | ~~`.github/workflows/agent-evolve.yml`~~ (removed 2026-10-21): weekly cron + dispatch; signals → agent → check-paths → gate → push + PR (label `evolve`) or issue | `actionlint`-clean YAML; dry run via `workflow_dispatch` after push (owner) |

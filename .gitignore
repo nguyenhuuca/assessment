@@ -60,5 +60,3 @@ scratchpad/
 # Git Bash crash dumps
 *.stackdump
 
-# Evolve loop scratch output (ADR-0027)
-evolve-out/

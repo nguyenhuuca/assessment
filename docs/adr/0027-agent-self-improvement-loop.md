@@ -38,7 +38,7 @@
 ### D1. The loop
 
 ```
-weekly cron (or /evolve locally)
+/evolve (run by the owner)
   Observe   agent-metrics --json → new signals (escaped defect, revert, blocked, flaky, /revise, cost jump)
   Diagnose  per signal: original run diff, fix commit, plan/report → Five Whys → the stage that should have caught it
   Propose   one small change at that stage, on branch evolve/<date>-<signal>
@@ -72,12 +72,10 @@ weekly cron (or /evolve locally)
 
 ### D4. Running it
 
-- **Headless:** `.github/workflows/agent-evolve.yml`, cron weekly (Monday) plus `workflow_dispatch`, owner-only like ADR-0022. Never merges. Two jobs, so the agent never holds a write token:
-  - **propose** (read-only token): signals (saved as an artifact **before** the agent runs) → agent commits on `evolve/*` branches with a narrowed git allowlist (no push, config, update-ref, `-c`) → branches leave as a git bundle, PR texts as an artifact.
-  - **ship** (write token): fresh checkout of the main SHA the signals were computed on → manifest validated against the saved signals → `check-paths` and `gate` with no GitHub token in the env → push + `gh pr create --label evolve`, or an `evolve` issue. A signal without a proposal is closed with an issue only when the agent step succeeded.
-- Gate hardening: the case must be added by the branch, its `base`/`head` must be commits on `main`, rule-file frontmatter is frozen (new skills: `name`, `description`, `argument-hint`, `disable-model-invocation` only), no new agents, and `not-eval-proven` proposals may not touch the reviewer's rules.
-- **Local:** `/evolve` runs the same stages in the session and stops before the push, like autopilot Gate 2.
-- **Budget:** `--max-turns` on the agent step, at most 3 signals, at most 3 eval runs for the new case and 1 run per existing case; the job fails closed when a budget is hit.
+- **Local only:** the owner runs `/evolve`; it goes through the same stages in the session and asks before any push or merge, like autopilot Gate 2.
+- **Gate hardening:** the case must be added by the branch, its `base`/`head` must be commits on `main`, rule-file frontmatter is frozen (new skills: `name`, `description`, `argument-hint`, `disable-model-invocation` only), no new agents, and `not-eval-proven` proposals may not touch the reviewer's rules.
+- **Budget:** at most 3 signals per run, at most 3 eval runs for the new case and 1 run per existing case (retry once on a miss).
+- **Headless workflow removed (2026-10-21).** A weekly `.github/workflows/agent-evolve.yml` (propose job with a read-only token, ship job that checks and opens the PR) was built and then removed by the owner. Its first real run showed that headless Claude Code treats `.claude/` files as sensitive and asks for permission on every edit, which CI cannot grant, so the agent could not write a single proposal; a packaging bug then closed the month's signal with a wrong "no proposal" issue (#50). Running it headless again needs a new decision (for example: the agent writes encoded file copies outside `.claude/` and the ship job applies them).
 
 ### D5. Pruning
 
@@ -102,7 +100,7 @@ Adding rules alone makes every session pay for more context (`CLAUDE.md` + alway
 
 - **Good:** every escaped defect becomes a regression eval for the agent, and each rule change has before/after evidence. The eval set grows with real bugs, never with invented ones.
 - **Good:** the owner's job shrinks to reading a short PR (Five Whys + eval table) and merging or closing it.
-- **Cost:** about one agent run (~$1–3) plus the evals (one Sonnet review per case run, ~$0.10–0.20) per weekly run with signals; a run with no new signal stops after the metrics step at almost no cost.
+- **Cost:** about one agent run (~$1–3) plus the evals (one Sonnet review per case run, ~$0.10–0.20) per `/evolve` run with signals; with no new signal it stops after the metrics step.
 - **Limit:** only stages a reviewer can be tested on are proven by D3. Changes to plan review or QA rules are proposed with the Five Whys only and marked "not eval-proven" in the PR.
 - **Limit:** keyword grading can miss a correct finding worded differently; the 2-of-3 rule and the owner's read cover that.
 - **Risk:** a merged rule could still hurt cases not in the eval set. The monthly metrics and D5 pruning are the backstop; rollback is `git revert` of the evolve PR.
@@ -122,3 +120,4 @@ Adding rules alone makes every session pay for more context (`CLAUDE.md` + alway
 
 - 2026-10-21: Proposed; accepted by the owner the same day. The eval runner lives in `scripts/evolve.mjs` (subcommands `signals`, `check-paths`, `eval`, `gate`).
 - 2026-10-21: D6 (compress) added at the owner's request: Evolve may also remove duplicate, dead or stale text, with protected lines and a size + eval gate.
+- 2026-10-21: headless workflow `agent-evolve.yml` removed at the owner's request (D4); `/evolve` is local only. The `manifest` command went with it.

@@ -52,7 +52,7 @@ Dự án dùng Claude Code theo 7 cấp. Cấp càng cao, Claude tự làm càng
 | 4 | **`/autopilot` local:** plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke; tối đa 3 round mỗi vòng | 3 lần: Start, Gate 1, Gate 2 | Dynamic cron jobs (ADR-0023): BE + FE, CI xanh, smoke 22/22, $3.71 |
 | 5 | **Headless trên GitHub** ([ADR-0022](../adr/0022-headless-autopilot.md)): label `autopilot` → draft PR → `/approve` → build → bạn merge | Gắn label, `/approve`, merge | Issue #34 (màu nút quay lại) → PR #35 |
 | 6 | **Auto gates** ([ADR-0025](../adr/0025-autopilot-auto-gates.md)): thêm label `autopilot:auto` hoặc `autopilot:auto-merge`, workflow tự duyệt và tự merge sau khi tự kiểm tra | Chỉ gắn label | Issue #36 → PR #37 merged + deployed trong ~5 phút, build job $0.39 |
-| 7 | **Tự cải thiện** ([ADR-0027](../adr/0027-agent-self-improvement-loop.md)): `agent-metrics` tìm bug lọt, `/evolve` thêm rule được seeded-bug eval chứng minh, workflow chạy hàng tuần | Merge hoặc đóng PR `evolve` | Bug `62526c97` → rule cho reviewer, case bắt 0/3 → 3/3 |
+| 7 | **Tự cải thiện** ([ADR-0027](../adr/0027-agent-self-improvement-loop.md)): `agent-metrics` tìm bug lọt, `/evolve` thêm rule được seeded-bug eval chứng minh | Chạy `/evolve`, rồi duyệt merge | Bug `62526c97` → rule cho reviewer, case bắt 0/3 → 3/3 |
 
 **Chọn cấp nào:**
 - Chưa rõ nên làm gì, hoặc chỉ cần hiểu code → **cấp 1**.
@@ -60,7 +60,7 @@ Dự án dùng Claude Code theo 7 cấp. Cấp càng cao, Claude tự làm càng
 - Feature vừa/lớn (cần PRD, nhiều ngày) → **cấp 3**.
 - Feature nhỏ, fix, refactor có acceptance criteria rõ → **cấp 4**, hoặc **cấp 5** nếu không mở terminal.
 - Việc nhỏ, rủi ro thấp, không đụng migration hay config agent → **cấp 6**.
-- Cấp 7 tự chạy mỗi tuần; bạn chỉ review PR của nó. Xem [Đo chất lượng & Evolve](#o-chat-luong-evolve-agent-tu-cai-thien).
+- Cấp 7: thỉnh thoảng chạy `/evolve` (ví dụ mỗi tháng, hoặc sau một bug lọt); bạn chỉ duyệt đề xuất của nó. Xem [Đo chất lượng & Evolve](#o-chat-luong-evolve-agent-tu-cai-thien).
 
 ---
 
@@ -119,7 +119,7 @@ Phần lớn workflow skill chỉ chạy khi bạn gõ `/tên`. Ngoại lệ là
 | `/land-the-plane` | Finish-Line Protocol | Chạy gates → commit → (hỏi) push → kiểm CI | Commit đã push |
 | `/tailor` | Configuration Tailor | Phát hiện stack, đề xuất chỉnh cấu hình (chỉ đề xuất) | `scratchpad/tailor-proposal.md` |
 | `/autopilot <yêu cầu>` | Autopilot | Chạy trọn một feature nhỏ, fix hoặc refactor: plan → review → bạn duyệt → code → review → QA ×2 → bạn duyệt push | Code đã deploy + `docs/reports/autopilot-*.md` |
-| `/evolve [--since <ngày>]` | Self-Improver | Biến signal từ agent-metrics thành thay đổi rule có chứng minh (cũng chạy hàng tuần trên GitHub) | Branch `evolve/*` + PR, seeded case trong `evals/seeded/` |
+| `/evolve [--since <ngày>]` | Self-Improver | Biến signal từ agent-metrics thành thay đổi rule có chứng minh (chỉ chạy local) | Branch `evolve/*`, seeded case trong `evals/seeded/` |
 | `/task-resume [chỉ dẫn]` | Task Resumer | Làm tiếp task dở trong `session.txt` sau khi kiểm lại repo | Làm tiếp từ `next` |
 
 Ví dụ:
@@ -438,11 +438,11 @@ node scripts/agent-metrics.mjs --json            # signals cho /evolve
 - **Cách nhận ra run:** mọi commit của autopilot có trailer `Autopilot-Run: <YYYY-MM-DD>-<slug>`; run cũ hơn được nhận qua hash trong report hoặc tên PR headless.
 - **Baseline tháng 10** ([report](../reports/agent-metrics-2026-10.md)): 16 run, escaped defect rate **6%** (1/16: run dynamic-cron-jobs, sửa bởi `62526c97`), 0 revert, PR headless mở → merge trung vị 7 phút.
 
-### 🧬 Tiến hoá: `/evolve` và workflow hàng tuần
+### 🧬 Tiến hoá: `/evolve`
 
 ```
 Observe (signals) → Diagnose (Five Whys → stage lẽ ra phải bắt) → Propose (thêm một rule + một seeded case)
-  → Prove (eval gate) → Ship (PR label `evolve`) → bạn merge hoặc đóng
+  → Prove (eval gate) → Ship (bạn chọn: merge, mở PR, giữ branch hoặc bỏ)
 ```
 
 - **Signals:** `defect:<sha>`, `revert:<sha>`, `blocked:<run>`, `flaky:<run>`, `review-skipped:<run>`, `revise:pr-<N>`. Signal nào đã có PR hoặc issue `evolve` (kể cả cái bạn đã đóng) hoặc đã có seeded case thì không đề xuất lại. Tối đa 3 signal mỗi run.
@@ -453,15 +453,12 @@ Observe (signals) → Diagnose (Five Whys → stage lẽ ra phải bắt) → Pr
   3. mọi case cũ vẫn bắt được;
   4. chi phí reviewer tăng tối đa 25%.
 - **Agent được sửa gì:** chỉ được thêm dòng vào `.claude/skills/**`, `.claude/rules/*.md`, phần prompt của `.claude/agents/*.md`, và thêm case mới. Không bao giờ đụng `scripts/`, `.github/`, hooks, settings, case cũ, threshold hay code app. Frontmatter bị khoá. Do code kiểm tra (`check-paths`), không phải do prompt.
-- **Headless** (`.github/workflows/agent-evolve.yml`, thứ Hai 09:00 hoặc Actions → "Agent Evolve" → Run workflow):
-  - job **propose** chỉ có token đọc; agent commit lên branch `evolve/*`, branch rời job dưới dạng git bundle (chỉ là dữ liệu);
-  - job **ship** checkout `main` sạch, kiểm tra manifest của agent, chạy `check-paths` và gate khi không có GitHub token, rồi mở PR (pass) hoặc issue `evolve` (fail). **Không bao giờ merge**: bạn merge.
-- **Local:** `/evolve` chạy cùng các bước và hỏi bạn trước khi push.
+- **Cách chạy:** gõ `/evolve` (chỉ chạy local). Nó dừng ở bước Ship và hỏi bạn: merge vào `main`, push và mở PR, giữ branch, hay bỏ. Workflow headless chạy hàng tuần đã được thử rồi gỡ bỏ: Claude Code headless không sửa được file trong `.claude/` nếu không có người duyệt quyền ([ADR-0027](../adr/0027-agent-self-improvement-loop.md) D4).
 - **Dọn rule (prune):** mỗi rule do Evolve thêm kết thúc bằng `<!-- evolve:<case id> -->`; run sau có thể đề xuất gỡ một rule, chỉ khi case của nó vẫn bắt được khi không có rule đó.
 - **Compress** (ADR-0027 D6): mỗi tháng một lần (`compress:<YYYY-MM>`), Evolve được **cắt bớt** nội dung: trùng lặp, tham chiếu chết, nội dung mâu thuẫn với source of truth, số liệu lỗi thời, trong `.claude/` và `CLAUDE.md`.
   - `node scripts/evolve.mjs lint-rules` đưa gợi ý (dòng trùng, path chết, kích thước context luôn load, hiện khoảng 37 KB).
   - Không bao giờ cắt: `AGENTS.md`, `security.md`, skill evolve, frontmatter, và mọi dòng mang luật an toàn (push, gate, merge, deny, secret, prod, smoke, Core Principles, "never …").
-  - Gate: nhỏ hơn (context luôn load -5% hoặc file bị sửa -1 KiB), không thêm dòng trùng hay ref chết, mọi seeded case vẫn bắt được. Luôn là **draft** PR: bạn đọc từng dòng bị xoá.
+  - Gate: nhỏ hơn (context luôn load -5% hoặc file bị sửa -1 KiB), không thêm dòng trùng hay ref chết, mọi seeded case vẫn bắt được. Bạn đọc từng dòng bị xoá trước khi merge.
   - Compress đầu tiên (`evolve/compress-2026-10`): phần cost trong `CLAUDE.md`, ba mục trùng nhau → một, -1.1 KB, gate PASS.
   - **Cách dùng:**
 
@@ -469,9 +466,7 @@ Observe (signals) → Diagnose (Five Whys → stage lẽ ra phải bắt) → Pr
     # 1. Xem có gì cắt được (chỉ là gợi ý; vài "dead ref" thật ra là ví dụ trong text)
     node scripts/evolve.mjs lint-rules
 
-    # 2a. Để GitHub làm: Actions → "Agent Evolve" → Run workflow (hoặc đợi thứ Hai).
-    #     Mỗi tháng nó đề xuất một compress dưới dạng DRAFT PR label `evolve`.
-    # 2b. Hoặc chạy local: /evolve   (signal compress:<YYYY-MM> nằm trong danh sách; dừng trước khi push)
+    # 2. Chạy: /evolve   (mỗi tháng có signal compress:<YYYY-MM> trong danh sách; dừng trước khi push)
 
     # 3. Tự cắt bằng tay trên branch? Kiểm tra bằng đúng gate mà workflow dùng
     git switch -c evolve/compress-<YYYY-MM>
@@ -480,15 +475,15 @@ Observe (signals) → Diagnose (Five Whys → stage lẽ ra phải bắt) → Pr
     node scripts/evolve.mjs gate --base main --head evolve/compress-<YYYY-MM> --kind compress   # ~$0.15 mỗi seeded case
     ```
 
-    - **Review draft PR:** đọc từng dòng bị xoá (`git diff main...<branch>`). Merge nếu mỗi chỗ cắt đúng là trùng lặp, ref chết hoặc lỗi thời; ngược lại thì đóng PR (signal của tháng đó không đề xuất lại).
+    - **Review:** đọc từng dòng bị xoá (`git diff main...<branch>`). Merge nếu mỗi chỗ cắt đúng là trùng lặp, ref chết hoặc lỗi thời; ngược lại thì bỏ.
     - **Bỏ qua một tháng:** tạo issue label `evolve` có body chứa `<!-- evolve:signal=compress:<YYYY-MM> -->`.
 
 **Lần tiến hoá đầu tiên** (`fe36685d`): từ bug `62526c97` (job nuốt exception nên cron job lỗi vẫn hiện SUCCESS), reviewer có thêm rule *"kiểm tra code mới giả định gì về code cũ không đổi; giả định sai là blocking"*. Case `2026-10-19-swallowed-job-exceptions`: rule cũ bắt **0/3**, rule mới **3/3**, khoảng $0.15 mỗi lần chạy eval.
 
 | Chi phí | |
 |---------|---|
-| Tuần không có signal mới | gần như 0 (dừng sau bước metrics) |
-| Tuần có signal | ~$1–3 cho agent + ~$0.15 mỗi lần eval (6 lần mỗi đề xuất + 1 lần mỗi case cũ) |
+| `/evolve` không có signal mới | gần như 0 (dừng sau bước metrics) |
+| `/evolve` có signal | ~$1–3 cho agent + ~$0.15 mỗi lần eval (6 lần mỗi đề xuất + 1 lần mỗi case cũ) |
 
 ---
 

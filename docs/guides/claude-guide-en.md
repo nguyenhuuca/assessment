@@ -52,7 +52,7 @@ This project uses Claude Code at 7 levels. The higher the level, the more Claude
 | 4 | **Local `/autopilot`:** plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke; at most 3 rounds per loop | 3 times: Start, Gate 1, Gate 2 | Dynamic cron jobs (ADR-0023): BE + FE, CI green, smoke 22/22, $3.71 |
 | 5 | **Headless on GitHub** ([ADR-0022](../adr/0022-headless-autopilot.md)): label `autopilot` → draft PR → `/approve` → build → you merge | Add the label, `/approve`, merge | Issue #34 (back button color) → PR #35 |
 | 6 | **Auto gates** ([ADR-0025](../adr/0025-autopilot-auto-gates.md)): add `autopilot:auto` or `autopilot:auto-merge`; the workflow approves and merges after its own checks | Only add the label | Issue #36 → PR #37 merged and deployed in ~5 minutes, build job $0.39 |
-| 7 | **Self-improving** ([ADR-0027](../adr/0027-agent-self-improvement-loop.md)): `agent-metrics` finds escaped defects, `/evolve` adds a rule that a seeded-bug eval proves, weekly workflow | Merge or close an `evolve` PR | Defect `62526c97` → reviewer rule, case caught 0/3 → 3/3 |
+| 7 | **Self-improving** ([ADR-0027](../adr/0027-agent-self-improvement-loop.md)): `agent-metrics` finds escaped defects, `/evolve` adds a rule that a seeded-bug eval proves | Run `/evolve`, then approve the merge | Defect `62526c97` → reviewer rule, case caught 0/3 → 3/3 |
 
 **Which level to pick:**
 - Not sure what to do yet, or you only need to understand the code → **level 1**.
@@ -60,7 +60,7 @@ This project uses Claude Code at 7 levels. The higher the level, the more Claude
 - A medium or large feature (needs a PRD, several days) → **level 3**.
 - A small feature, fix or refactor with clear acceptance criteria → **level 4**, or **level 5** without a terminal.
 - Small, low-risk work that touches no migration or agent config → **level 6**.
-- Level 7 runs on its own every week; you only review its PRs. See [Quality Metrics & Evolve](#quality-metrics-evolve-the-agent-improves-itself).
+- Level 7: run `/evolve` now and then (for example once a month, or after an escaped defect); you only approve its proposals. See [Quality Metrics & Evolve](#quality-metrics-evolve-the-agent-improves-itself).
 
 ---
 
@@ -119,7 +119,7 @@ Most workflow skills run only when you type `/name`. The exceptions are the 5 sk
 | `/land-the-plane` | Finish-Line Protocol | Gates → commit → (ask) push → check CI | Pushed commit |
 | `/tailor` | Configuration Tailor | Detects the stack and proposes config changes (proposal only) | `scratchpad/tailor-proposal.md` |
 | `/autopilot <request>` | Autopilot | Run one small feature, fix or refactor end to end: plan → review → you approve → code → review → QA ×2 → you approve the push | Deployed code + `docs/reports/autopilot-*.md` |
-| `/evolve [--since <date>]` | Self-Improver | Turn agent-metrics signals into proven rule changes (also runs weekly on GitHub) | `evolve/*` branch + PR, seeded case in `evals/seeded/` |
+| `/evolve [--since <date>]` | Self-Improver | Turn agent-metrics signals into proven rule changes (local only) | `evolve/*` branch, seeded case in `evals/seeded/` |
 | `/task-resume [instruction]` | Task Resumer | Continues the unfinished task in `session.txt` after re-checking the repo | Work continued from `next` |
 
 Examples:
@@ -445,11 +445,11 @@ node scripts/agent-metrics.mjs --json            # signals for /evolve
 - **How runs are found:** every autopilot commit carries the trailer `Autopilot-Run: <YYYY-MM-DD>-<slug>`; older runs are found through their report hashes or the headless PR title.
 - **October baseline** ([report](../reports/agent-metrics-2026-10.md)): 16 runs, escaped defect rate **6%** (1 of 16: the dynamic-cron-jobs run, fixed by `62526c97`), 0 reverts, headless PR open → merge median 7 minutes.
 
-### 🧬 Evolving: `/evolve` and the weekly workflow
+### 🧬 Evolving: `/evolve`
 
 ```
 Observe (signals) → Diagnose (Five Whys → the stage that should have caught it) → Propose (one added rule + a seeded case)
-  → Prove (eval gate) → Ship (PR labelled `evolve`) → you merge or close
+  → Prove (eval gate) → Ship (you choose: merge, PR, keep or drop)
 ```
 
 - **Signals:** `defect:<sha>`, `revert:<sha>`, `blocked:<run>`, `flaky:<run>`, `review-skipped:<run>`, `revise:pr-<N>`. A signal that already has an `evolve` PR or issue (even one you closed) or a seeded case is never proposed again. At most 3 per run.
@@ -460,15 +460,12 @@ Observe (signals) → Diagnose (Five Whys → the stage that should have caught 
   3. every existing case is still caught;
   4. reviewer cost rises by at most 25%.
 - **What the agent may change:** only add lines to `.claude/skills/**`, `.claude/rules/*.md`, the prompt body of `.claude/agents/*.md`, and add a new case. Never `scripts/`, `.github/`, hooks, settings, existing cases, thresholds or app code. Frontmatter is frozen. Checked by code (`check-paths`), not by the prompt.
-- **Headless** (`.github/workflows/agent-evolve.yml`, Monday 09:00 or Actions → "Agent Evolve" → Run workflow):
-  - job **propose** has a read-only token; the agent commits on `evolve/*` branches, which leave the job as a git bundle (data);
-  - job **ship** checks out a fresh `main`, validates the agent's manifest, runs `check-paths` and the gate with no GitHub token in reach, then opens a PR (pass) or an `evolve` issue (fail). It **never merges**: you do.
-- **Local:** `/evolve` runs the same stages and asks you before pushing.
+- **How to run:** type `/evolve` (local only). It stops at Ship and asks you: merge into `main`, push a PR, keep the branch, or drop. A headless weekly workflow was tried and removed: headless Claude Code cannot edit `.claude/` files without a permission prompt ([ADR-0027](../adr/0027-agent-self-improvement-loop.md) D4).
 - **Pruning:** every Evolve rule ends with `<!-- evolve:<case id> -->`; a later run may propose removing one, only when its case is still caught without it.
 - **Compress** (ADR-0027 D6): once a month (`compress:<YYYY-MM>`) Evolve may also **cut** text: duplicates, dead references, text that contradicts its source of truth, stale claims, in `.claude/` and `CLAUDE.md`.
   - `node scripts/evolve.mjs lint-rules` gives the hints (duplicate lines, dead path refs, always-loaded size, about 37 KB today).
   - Never cut: `AGENTS.md`, `security.md`, the evolve skill, frontmatter, and any line carrying a safety rule (push, gates, merge, deny, secrets, prod, smoke, Core Principles, "never …").
-  - Gate: smaller (always-loaded -5% or the touched files -1 KiB), no new duplicates or dead refs, every seeded case still caught. Always a **draft** PR: you read every removed line.
+  - Gate: smaller (always-loaded -5% or the touched files -1 KiB), no new duplicates or dead refs, every seeded case still caught. You read every removed line before it is merged.
   - First compress (`evolve/compress-2026-10`): the cost section of `CLAUDE.md`, three overlapping sections → one, -1.1 KB, gate PASS.
   - **How to use:**
 
@@ -476,9 +473,7 @@ Observe (signals) → Diagnose (Five Whys → the stage that should have caught 
     # 1. See what could be cut (hints, not orders; some "dead refs" are only examples in the text)
     node scripts/evolve.mjs lint-rules
 
-    # 2a. Let GitHub do it: Actions → "Agent Evolve" → Run workflow (or wait for Monday).
-    #     Once a month it proposes one compress as a DRAFT PR labelled `evolve`.
-    # 2b. Or locally: /evolve   (the compress:<YYYY-MM> signal is in its list; it stops before any push)
+    # 2. Run it: /evolve   (the compress:<YYYY-MM> signal is in its list once a month; it stops before any push)
 
     # 3. Cutting by hand on a branch? Check it with the same gate the workflow uses
     git switch -c evolve/compress-<YYYY-MM>
@@ -487,15 +482,15 @@ Observe (signals) → Diagnose (Five Whys → the stage that should have caught 
     node scripts/evolve.mjs gate --base main --head evolve/compress-<YYYY-MM> --kind compress   # ~$0.15 per seeded case
     ```
 
-    - **Reviewing the draft PR:** read every removed line (`git diff main...<branch>`). Merge if each cut is a duplicate, a dead reference or stale; close it otherwise (that month's signal is not proposed again).
+    - **Reviewing:** read every removed line (`git diff main...<branch>`). Merge if each cut is a duplicate, a dead reference or stale; drop it otherwise.
     - **Skip a month:** open an issue labelled `evolve` whose body has `<!-- evolve:signal=compress:<YYYY-MM> -->`.
 
 **First evolution** (`fe36685d`): from defect `62526c97` (job bodies swallowed exceptions, so failed cron jobs showed SUCCESS), the reviewer got the rule *"check what new code assumes about code it did not change; a false assumption is blocking"*. Case `2026-10-19-swallowed-job-exceptions`: caught **0/3** with the old rules, **3/3** with the new one, about $0.15 per eval run.
 
 | Cost | |
 |------|---|
-| Week with no new signal | almost nothing (stops after the metrics step) |
-| Week with signals | ~$1–3 agent + ~$0.15 per eval run (6 runs per proposal + 1 per existing case) |
+| `/evolve` with no new signal | almost nothing (stops after the metrics step) |
+| `/evolve` with signals | ~$1–3 agent + ~$0.15 per eval run (6 runs per proposal + 1 per existing case) |
 
 ---
 
