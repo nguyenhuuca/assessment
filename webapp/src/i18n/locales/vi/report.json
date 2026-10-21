@@ -38,6 +38,7 @@
   "list": {
     "title": "Báo cáo gần đây",
     "empty": "Chưa có báo cáo nào.",
+    "loading": "Đang tải báo cáo...",
     "colIssue": "Issue",
     "colType": "Loại",
     "colTitle": "Tiêu đề",

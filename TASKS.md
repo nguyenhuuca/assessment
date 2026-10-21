@@ -445,3 +445,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **EV-3** First seeded case from `62526c97` + `evals/README.md` fe36685d, 426a1b9c
 - [x] **EV-4** `/evolve` skill + first evolution (reviewer rule; case caught 0/3 → 3/3) fe36685d, 426a1b9c
 - [x] **EV-5** `.github/workflows/agent-evolve.yml` (propose + ship jobs) 426a1b9c; removed 2026-10-21 by the owner (headless cannot edit `.claude/`), `/evolve` is local only
+
+## Report table loading indicator (#51, autopilot lite)
+
+- [x] **FIX-1** Loading row + `vid-spinner--sm` + `list.loading` (en, vi) on the Recent reports table
+- [x] **FIX-2** Tests: loading vs empty, page change keeps rows under the loading row
