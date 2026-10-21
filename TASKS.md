@@ -396,4 +396,4 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **WH-2** `GitHubWebhookService` (HMAC verify, closed/reopened, ordering) + `GitHubWebhookController` + whitelist + `GITHUB_WEBHOOK_SECRET` 5582b2fc
 - [x] **WH-3** List uses stored state; `ReportDto.githubStateReason` 5582b2fc
 - [x] **WH-4** FE badge shows reason + i18n 90dd0a78
-- [ ] **WH-5** Owner: repo webhook + `GITHUB_WEBHOOK_SECRET` on VM + prod check
+- [x] **WH-5** Owner: repo webhook + `GITHUB_WEBHOOK_SECRET` on VM + prod check (ping 204, #40 reopened/closed → APPLIED; no secret in logs) — 2026-10-21

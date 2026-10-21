@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status:** Built (WH-1..WH-4, `5582b2fc`, `90dd0a78`); WH-5 owner setup pending
+**Status:** Done (WH-1..WH-5; prod-checked 2026-10-21)
 **Date:** 2026-10-21
 **ADR:** [ADR-0026 D7](../adr/0026-in-app-report.md) · **Spec:** [spec-in-app-report v1.3](../specs/spec-in-app-report.md) (BR-9, BR-10, FR-8, EC-14..EC-17) · **Parent plan:** [plan-in-app-report](plan-in-app-report.md)
 **Size:** Small feature on top of In-App Report. 4 implementation tasks (~230 LOC non-test), plus owner setup (WH-5).
