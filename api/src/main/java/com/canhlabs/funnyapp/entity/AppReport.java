@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.entity;
 
+import com.canhlabs.funnyapp.enums.GitHubIssueState;
 import com.canhlabs.funnyapp.enums.ReportAutoLabel;
 import com.canhlabs.funnyapp.enums.ReportStatus;
 import com.canhlabs.funnyapp.enums.ReportType;
@@ -95,6 +96,18 @@ public class AppReport {
 
     @Column(name = "error", length = 64)
     private String error;
+
+    /** Last state pushed by the webhook; null until the first event (ADR-0026 D7). */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "github_state", length = 10)
+    private GitHubIssueState githubState;
+
+    @Column(name = "github_state_reason", length = 16)
+    private String githubStateReason;
+
+    /** The issue's updated_at from the event that set the state; orders late deliveries. */
+    @Column(name = "github_state_at")
+    private Instant githubStateAt;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

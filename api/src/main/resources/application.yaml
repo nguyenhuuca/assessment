@@ -145,6 +145,7 @@ app:
     token: ${GITHUB_REPORT_TOKEN:}
     owner: ${GITHUB_REPORT_OWNER:nguyenhuuca}
     repo: ${GITHUB_REPORT_REPO:assessment}
+    webhook-secret: ${GITHUB_WEBHOOK_SECRET:}
   email-setting:
       enable-preview-mode: false
       percentage: 10

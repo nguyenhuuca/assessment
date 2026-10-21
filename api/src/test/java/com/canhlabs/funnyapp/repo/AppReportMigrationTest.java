@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.repo;
 
 import com.canhlabs.funnyapp.entity.AppReport;
+import com.canhlabs.funnyapp.enums.GitHubIssueState;
 import com.canhlabs.funnyapp.enums.ReportAutoLabel;
 import com.canhlabs.funnyapp.enums.ReportStatus;
 import com.canhlabs.funnyapp.enums.ReportType;
@@ -15,7 +16,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.parser.PartTree;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -36,8 +40,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AppReportMigrationTest {
 
     private static String sql() throws Exception {
-        return new ClassPathResource("db/changelog/sql/202610200001-create-app-report.sql")
-                .getContentAsString(StandardCharsets.UTF_8);
+        return resource("db/changelog/sql/202610200001-create-app-report.sql");
+    }
+
+    /** ADR-0026 D7: webhook state columns added later. */
+    private static String stateSql() throws Exception {
+        return resource("db/changelog/sql/202610210001-app-report-github-state.sql");
+    }
+
+    private static String resource(String path) throws Exception {
+        return new ClassPathResource(path).getContentAsString(StandardCharsets.UTF_8);
     }
 
     private static List<String> checkValues(String sql, String column) {
@@ -76,8 +88,8 @@ class AppReportMigrationTest {
 
     @Test
     void entity_mapsEnumsAsStringAndEveryColumnExists() throws Exception {
-        String sql = sql();
-        for (String enumField : List.of("reporterRole", "type", "autoLabel", "status")) {
+        String sql = sql() + stateSql();
+        for (String enumField : List.of("reporterRole", "type", "autoLabel", "status", "githubState")) {
             Enumerated e = field(enumField).getAnnotation(Enumerated.class);
             assertThat(e).as(enumField).isNotNull();
             assertThat(e.value()).as(enumField).isEqualTo(EnumType.STRING);
@@ -87,7 +99,7 @@ class AppReportMigrationTest {
         for (Field f : AppReport.class.getDeclaredFields()) {
             Column c = f.getAnnotation(Column.class);
             if (c != null) {
-                assertThat(sql).as(c.name()).containsPattern("\\n\\s+" + c.name() + "\\s+");
+                assertThat(sql).as(c.name()).containsPattern("(\\n\\s+|ADD COLUMN )" + c.name() + "\\s+");
             }
         }
     }
@@ -129,5 +141,40 @@ class AppReportMigrationTest {
 
         assertThat(count.isCountProjection()).isTrue();
         assertThat(count.getParts()).hasSize(4);
+    }
+
+    @Test
+    void stateMigration_addsNullableColumnsAndIssueIndex() throws Exception {
+        String sql = stateSql();
+
+        assertThat(sql).contains("ALTER TABLE app_report");
+        assertThat(sql).doesNotContainPattern("ADD COLUMN [^\\n]*NOT NULL").doesNotContainIgnoringCase("DROP");
+        assertThat(sql).contains("ADD COLUMN github_state_reason VARCHAR(16)");
+        assertThat(sql).contains("ADD COLUMN github_state_at     TIMESTAMPTZ");
+        assertThat(sql).contains(
+                "CREATE INDEX idx_app_report_issue_number ON app_report (issue_number) WHERE issue_number IS NOT NULL");
+        assertThat(checkValues(sql, "github_state"))
+                .containsExactlyElementsOf(Arrays.stream(GitHubIssueState.values()).map(Enum::name).toList());
+    }
+
+    @Test
+    void repository_applyGithubStateIsATransactionalModifyingUpdate() throws Exception {
+        Method m = AppReportRepository.class.getMethod(
+                "applyGithubState", int.class, GitHubIssueState.class, String.class, Instant.class);
+
+        assertThat(m.getReturnType()).isEqualTo(int.class);
+        assertThat(m.getAnnotation(Modifying.class)).isNotNull();
+        assertThat(m.getAnnotation(Transactional.class)).isNotNull();
+        assertThat(m.getAnnotation(Query.class).value())
+                .contains("ReportStatus.CREATED")
+                .contains("r.githubStateAt IS NULL OR r.githubStateAt < :at");
+    }
+
+    @Test
+    void repository_existsByStatusAndIssueNumberResolves() {
+        PartTree exists = new PartTree("existsByStatusAndIssueNumber", AppReport.class);
+
+        assertThat(exists.isExistsProjection()).isTrue();
+        assertThat(exists.getParts()).hasSize(2);
     }
 }

@@ -35,5 +35,7 @@ public class ReportDto {
     private String reporter;
     /** OPEN, CLOSED or UNKNOWN for CREATED rows; null for FAILED rows. */
     private String githubState;
+    /** completed, not_planned, duplicate or reopened when the webhook stored one; else null (ADR-0026 D7). */
+    private String githubStateReason;
     private Instant createdAt;
 }

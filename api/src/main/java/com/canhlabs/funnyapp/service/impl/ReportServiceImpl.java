@@ -194,7 +194,7 @@ public class ReportServiceImpl implements ReportService {
         return used >= ADMIN_AUTOPILOT_CAP;
     }
 
-    /** One entry per row: null for FAILED rows, otherwise the cached or freshly fetched state. */
+    /** One entry per row: null for FAILED rows, else the webhook-stored state, else the cached or fetched one. */
     private List<IssueState> resolveStates(List<AppReport> rows) {
         IssueState[] states = new IssueState[rows.size()];
         List<Integer> missing = new ArrayList<>();
@@ -202,6 +202,10 @@ public class ReportServiceImpl implements ReportService {
         for (int i = 0; i < rows.size(); i++) {
             AppReport row = rows.get(i);
             if (row.getStatus() != ReportStatus.CREATED) {
+                continue;
+            }
+            if (row.getGithubState() != null) {
+                states[i] = IssueState.valueOf(row.getGithubState().name());
                 continue;
             }
             Integer number = row.getIssueNumber();
@@ -305,6 +309,7 @@ public class ReportServiceImpl implements ReportService {
                 .error(row.getError())
                 .reporter(row.getReporter() == null ? null : row.getReporter().getUserName())
                 .githubState(created ? githubState : null)
+                .githubStateReason(created ? row.getGithubStateReason() : null)
                 .createdAt(row.getCreatedAt())
                 .build();
     }

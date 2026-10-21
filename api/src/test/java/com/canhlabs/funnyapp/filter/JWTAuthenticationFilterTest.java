@@ -87,6 +87,19 @@ class JWTAuthenticationFilterTest {
     }
 
     @Test
+    void shouldNotFilter_githubWebhookPost_skipsJwt_butGetDoesNot() {
+        HttpServletRequest post = mock(HttpServletRequest.class);
+        when(post.getServletPath()).thenReturn("/v1/funny-app/webhooks/github");
+        when(post.getMethod()).thenReturn("POST");
+        HttpServletRequest get = mock(HttpServletRequest.class);
+        when(get.getServletPath()).thenReturn("/v1/funny-app/webhooks/github");
+        when(get.getMethod()).thenReturn("GET");
+
+        assertTrue(filter.shouldNotFilter(post));
+        assertFalse(filter.shouldNotFilter(get));
+    }
+
+    @Test
     void shouldNotFilter_shouldReturnTrue_forSwaggerDocPath() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getServletPath()).thenReturn("/swagger-ui/index.html");

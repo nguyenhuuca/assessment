@@ -49,6 +49,8 @@ public class AppConstant {
                 PathObject.builder().path("/user/verify-magic").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().path("/user/mfa/verify").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().path("/share-links").method(HttpMethod.GET.name()).build(),
+                // GitHub repo webhook, authenticated by its HMAC signature instead of a JWT (ADR-0026 D7)
+                PathObject.builder().path("/webhooks/github").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/health").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build()
 

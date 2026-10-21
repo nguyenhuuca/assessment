@@ -11,6 +11,7 @@ import com.canhlabs.funnyapp.dto.admin.ReportDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.AppReport;
 import com.canhlabs.funnyapp.entity.User;
+import com.canhlabs.funnyapp.enums.GitHubIssueState;
 import com.canhlabs.funnyapp.enums.ReportAutoLabel;
 import com.canhlabs.funnyapp.enums.ReportStatus;
 import com.canhlabs.funnyapp.enums.ReportType;
@@ -668,6 +669,31 @@ class ReportServiceImplTest {
                 .containsExactly("OPEN", "UNKNOWN", "UNKNOWN");
         assertThat(cache.get(21)).isEmpty();
         assertThat(cache.get(22)).isEmpty();
+    }
+
+    @Test
+    void list_storedWebhookState_usedWithoutGitHubCall_readThroughForTheRest() {
+        AppReport stored = createdRow(30, admin);
+        stored.setGithubState(GitHubIssueState.CLOSED);
+        stored.setGithubStateReason("not_planned");
+        AppReport reopened = createdRow(31, admin);
+        reopened.setGithubState(GitHubIssueState.OPEN);
+        reopened.setGithubStateReason("reopened");
+        AppReport legacy = createdRow(32, admin);
+        AppReport failed = failedRow(admin, UserRole.ADMIN);
+        failed.setGithubStateReason("completed");
+        when(client.state(32)).thenReturn(IssueState.CLOSED);
+        rows(stored, reopened, legacy, failed);
+
+        Page<ReportDto> page = service.list(0, 20);
+
+        assertThat(page.getContent()).extracting(ReportDto::getGithubState)
+                .containsExactly("CLOSED", "OPEN", "CLOSED", null);
+        assertThat(page.getContent()).extracting(ReportDto::getGithubStateReason)
+                .containsExactly("not_planned", "reopened", null, null);
+        verify(client, never()).state(30);
+        verify(client, never()).state(31);
+        verify(client).state(32);
     }
 
     @Test

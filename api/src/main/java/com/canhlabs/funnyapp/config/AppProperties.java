@@ -119,9 +119,15 @@ public class AppProperties {
         private String token = "";
         private String owner = "nguyenhuuca";
         private String repo = "assessment";
+        /** Shared secret of the repo webhook (ADR-0026 D7); blank turns the endpoint off. */
+        private String webhookSecret = "";
 
         public boolean isConfigured() {
             return token != null && !token.isBlank();
+        }
+
+        public boolean isWebhookConfigured() {
+            return webhookSecret != null && !webhookSecret.isBlank();
         }
     }
 
