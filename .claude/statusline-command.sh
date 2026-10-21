@@ -60,6 +60,12 @@ if [ -n "$proj_dir" ] && [ -s "$sess" ]; then
     t_col=$YEL; [ "$t_status" = "blocked" ] && t_col=$RED
     task_segment="task: ${BOLD}${t_name}${RST}${t_pct:+ ${t_col}${t_pct}%${RST}}"
     [ -n "$t_status" ] && task_segment="$task_segment ${t_col}(${t_status})${RST}"
+    # Subtask in flight (session.txt `doing:`); "-" or empty means nothing half-done
+    t_doing=$(sed -n 's/^doing:[[:space:]]*//p' "$sess" | head -1 | tr -d '\r')
+    if [ -n "$t_doing" ] && [ "$t_doing" != "-" ]; then
+      [ ${#t_doing} -gt 40 ] && t_doing="${t_doing:0:39}…"
+      task_segment="$task_segment ${DIM}→${RST} doing: ${CYN}${t_doing}${RST}"
+    fi
   fi
 fi
 
