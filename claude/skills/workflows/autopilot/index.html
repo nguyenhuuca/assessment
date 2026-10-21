@@ -441,7 +441,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../reports/system-health-2026-05-30/" class="md-tabs__link">
+        <a href="../../../../reports/agent-metrics-2026-10/" class="md-tabs__link">
           
   
   
@@ -3822,6 +3822,8 @@
       
         
       
+        
+      
     
     
     
@@ -3868,6 +3870,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../reports/agent-metrics-2026-10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Metrics 2026-10
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -7273,7 +7303,7 @@
 <p><strong>Lite mode</strong> (owner preference, 2026-10-20: too many small md files fragment the docs). A request is <strong>lite</strong> when it is a small feature or fix, the estimate is <strong>under 100 changed LOC not counting tests</strong>, and it needs <strong>no ADR</strong>. A lite run writes <strong>no <code>docs/plans/</code> file and no <code>docs/reports/</code> file</strong>:
 - <strong>Plan:</strong> the task table (IDs, acceptance criteria, <code>file:line</code> facts) lives in the conversation. Local runs print it at Gate 1; headless runs put it in the PR body. Plan review gets the plan text in its prompt.
 - <strong>Report:</strong> the final summary (runs, gates, flaky, manual checks, cost) goes to the console, or to the PR body in headless mode.
-- <strong>Still written:</strong> the <code>TASKS.md</code> lines (one per task, <code>[x]</code> + hash when landed), <code>session.txt</code> with <code>plan: -</code>, and the scratchpad ledger.
+- <strong>Still written:</strong> the <code>TASKS.md</code> lines (one per task, <code>[x]</code> + hash when landed), <code>session.txt</code> with <code>plan: -</code>, the scratchpad ledger, and the run-metrics JSON (see Ledger: it is data, not a doc).
 - <strong>Promote to full mode</strong> when the diff (tests excluded) grows past ~100 LOC or an ADR turns up: write the plan file then and continue as a normal run.</p>
 <p>Write <code>session.txt</code> (<code>.claude/rules/session-file.md</code>) and create the ledger (see Ledger) before stage 1.</p>
 <h2 id="headless-mode-adr-0022">Headless Mode (ADR-0022)<a class="headerlink" href="#headless-mode-adr-0022" title="Permanent link">&para;</a></h2>
@@ -7429,7 +7459,7 @@
 <h3 id="4-land-gate-2-ci-smoke">4. Land → Gate 2 → CI + smoke<a class="headerlink" href="#4-land-gate-2-ci-smoke" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Run the full quality gates once, for whichever side changed: <code>mvn -f api/pom.xml verify</code> (coverage ≥ <code>api/.coverage-threshold</code>), then <code>npm --prefix webapp run test</code> and <code>npm --prefix webapp run lint</code>.</li>
-<li>Commit with explicit pathspecs. Flip the <code>TASKS.md</code> lines to <code>[x]</code> with the hash and update <code>docs/tracking.md</code> when the plan status changes.</li>
+<li>Commit with explicit pathspecs. Flip the <code>TASKS.md</code> lines to <code>[x]</code> with the hash and update <code>docs/tracking.md</code> when the plan status changes. <strong>Every commit of the run</strong> (local and headless) ends with the trailer <code>Autopilot-Run: &lt;run id&gt;</code> on its own line just before <code>Co-Authored-By:</code>; the run id is <code>&lt;YYYY-MM-DD&gt;-&lt;slug&gt;</code>, the same as the run-metrics file name. <code>scripts/agent-metrics.mjs</code> uses it to link later <code>fix:</code> commits and reverts back to the run.</li>
 <li><strong>Gate 2:</strong> show the commits, the gate results, the flaky list, the manual checks, and the ledger total. Ask with <code>AskUserQuestion</code>: <strong>Push / Don't push yet</strong>. There is no auto-push and no <code>--yes</code>.</li>
 <li><strong>After a push:</strong></li>
 <li><code>git pull --rebase --autostash</code>, then push, and check that <code>git status</code> is in sync.</li>
@@ -7445,6 +7475,7 @@
 <li>put the stage in <code>doing</code>, and move it to <code>done</code> when it finishes;</li>
 <li>set <code>progress</code> to: plan ≈20, Gate 1 ≈30, implement+review ≈60, QA ≈80, landed 100.</li>
 </ul>
+<p><strong>Run metrics (all modes, lite included).</strong> At the end of the run, whatever the result (landed, blocked or stopped), write <code>docs/metrics/agent-runs/&lt;run id&gt;.json</code> from <code>resources/run-metrics.template.json</code> with the real values: rounds per loop, the last verdict of each review, <code>codeReviewSkipped</code>, total blocking and advisory findings, non-test LOC, the QA ×2 counts, and <code>costUsd</code> (local: the TOTAL from <code>claude-cost.mjs</code>; headless: <code>null</code>, the workflow posts cost separately). Commit it with the run's last commit (headless: on the PR branch, in the build job, which knows the PR number and sets <code>pr</code>; the plan job's blocked or stopped runs set it when the PR exists, else <code>null</code>). <code>node scripts/agent-metrics.mjs</code> turns these files plus git and GitHub history into <code>docs/reports/agent-metrics-&lt;YYYY-MM&gt;.md</code> (escaped defects, reverts, rounds, CI failures, cost).</p>
 <p>At the end, write the run report to <code>docs/reports/autopilot-&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md</code> from <code>resources/report.template.md</code>. Keep every section of the template, local or headless; write "n/a" with the reason rather than dropping one. The plan artifact is <strong>not</strong> edited for this (owner preference, 2026-10-19). <strong>Lite mode:</strong> no report file; print the same sections in the final console summary (headless: the PR body).</p>
 <h2 id="stop-conditions">Stop Conditions<a class="headerlink" href="#stop-conditions" title="Permanent link">&para;</a></h2>
 <p>Stop with <code>status: blocked</code> and a <code>blocker:</code> line in <code>session.txt</code> when:
