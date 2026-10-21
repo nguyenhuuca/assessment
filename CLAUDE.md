@@ -2,58 +2,11 @@
 
 This file provides guidance to Claude Code when working with this repository.
 
-## Cost Optimization - READ FIRST
+## Cost and Model Choice
 
-**Always use the cheapest model for each task:**
-
-- **Haiku** (cheapest): File searches, reading code, finding patterns, listing files
-- **Sonnet** (default): Writing code, refactoring, debugging, tests
-- **Opus** (expensive): Architecture decisions only, use sparingly
-
-**Examples:**
-```
-✅ "Use Haiku to find all service files"
-✅ "Use Sonnet to refactor UserService"
-❌ "Find and refactor all services" (uses expensive model for search)
-```
-
-**Cost target: $0.10-0.15/hour** with proper model selection.
-
-
-## Claude Code Rules for Cost Optimization
-
-### Prompt Caching
-- Always enable prompt caching for CLAUDE.md
-- Cache system instructions and project context
-- Minimize cache breaks by keeping file structure stable
-
-### Model Selection Priority
-1. Use Haiku for: grep, find, ls, cat, reading files, pattern matching
-2. Use Sonnet for: write, edit, refactor, test, debug
-3. Use Opus ONLY when explicitly requested for architecture
-
-### Token Optimization
-- Batch similar operations in one request
-- Use glob patterns to filter files before reading
-- Request specific files instead of "analyze everything"
-- Keep responses focused and concise
-
-### Cost Targets
-- Search/explore tasks: <$0.01
-- Implementation tasks: $0.05-0.20
-- Daily budget: <$0.50 for normal development
-
-### Anti-patterns to Avoid
-❌ Reading entire codebase without filtering
-❌ Using Sonnet/Opus for simple searches
-❌ Repeating same analysis multiple times
-❌ Loading unnecessary context
-
-## Efficient Workflows
-✅ "Use Haiku to find X, then read specific files"
-✅ "Use glob to filter, then analyze matches with Sonnet"
-✅ Batch read multiple files in one request
-✅ Use grep before opening files
+- **Model per worker** is pinned in each agent's frontmatter (`.claude/agents/`), the single source of truth: Haiku for search and reading, Sonnet for code, tests and review, Opus only for architecture decisions.
+- **Filter before reading:** grep or glob first, then read the specific files; batch similar operations; do not load the whole codebase or repeat the same analysis.
+- **Measure, do not guess:** `node scripts/claude-cost.mjs` gives the exact cost of a session, `node scripts/agent-metrics.mjs` the cost and quality of autopilot runs.
 
 ## Task Tracking
 - Track all tasks in TASKS.md
