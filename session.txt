@@ -1,8 +1,8 @@
 task: Autopilot (lite): Report page split into two tabs (New report / Recent reports)
-status: in_progress
-progress: 90
-done: RT-1 tabs 3d5232f8
-doing: Gate 2 (push approval)
-next: push; watch Deploy Frontend
+status: done
+progress: 100
+done: RT-1 tabs 3d5232f8; Deploy Frontend green
+doing: -
+next: -
 plan: -
-updated: 2026-10-21 11:12
+updated: 2026-10-21 11:39
