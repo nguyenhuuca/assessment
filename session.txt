@@ -1,8 +1,8 @@
 task: Autopilot (lite): notification dropdown tabs (General / Admin)
-status: in_progress
-progress: 90
-done: NT-1 BE category filter c5ad0a54; NT-2 FE tabs a7b4eb42
-doing: Gate 2 (push approval)
-next: push; watch CI + smoke
+status: done
+progress: 100
+done: NT-1 BE category filter c5ad0a54; NT-2 FE tabs a7b4eb42; deployed, smoke 22/22
+doing: -
+next: -
 plan: -
-updated: 2026-10-21 12:28
+updated: 2026-10-21 12:35
