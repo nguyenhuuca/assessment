@@ -42,7 +42,7 @@ Hai quy ước riêng của repo này cần nhớ:
 
 ## Các cấp độ sử dụng Claude
 
-Dự án dùng Claude Code theo 7 cấp. Cấp càng cao, Claude tự làm càng nhiều và bạn chạm vào càng ít. Rules, hooks và quality gates ở cấp thấp vẫn áp dụng ở mọi cấp trên.
+Dự án dùng Claude Code theo 6 cấp. Cấp càng cao, Claude tự làm càng nhiều và bạn chạm vào càng ít. Rules, hooks và quality gates ở cấp thấp vẫn áp dụng ở mọi cấp trên.
 
 | Cấp | Cách dùng | Bạn tham gia | Ví dụ thật trong repo |
 |-----|-----------|--------------|------------------------|
@@ -52,7 +52,6 @@ Dự án dùng Claude Code theo 7 cấp. Cấp càng cao, Claude tự làm càng
 | 4 | **`/autopilot` local:** plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke; tối đa 3 round mỗi vòng | 3 lần: Start, Gate 1, Gate 2 | Dynamic cron jobs (ADR-0023): BE + FE, CI xanh, smoke 22/22, $3.71 |
 | 5 | **Headless trên GitHub** ([ADR-0022](../adr/0022-headless-autopilot.md)): label `autopilot` → draft PR → `/approve` → build → bạn merge | Gắn label, `/approve`, merge | Issue #34 (màu nút quay lại) → PR #35 |
 | 6 | **Auto gates** ([ADR-0025](../adr/0025-autopilot-auto-gates.md)): thêm label `autopilot:auto` hoặc `autopilot:auto-merge`, workflow tự duyệt và tự merge sau khi tự kiểm tra | Chỉ gắn label | Issue #36 → PR #37 merged + deployed trong ~5 phút, build job $0.39 |
-| 7 | **Tự cải thiện** ([ADR-0027](../adr/0027-agent-self-improvement-loop.md)): `agent-metrics` tìm bug lọt, `/evolve` thêm rule được seeded-bug eval chứng minh | Chạy `/evolve`, rồi duyệt merge | Bug `62526c97` → rule cho reviewer, case bắt 0/3 → 3/3 |
 
 **Chọn cấp nào:**
 - Chưa rõ nên làm gì, hoặc chỉ cần hiểu code → **cấp 1**.
@@ -60,7 +59,6 @@ Dự án dùng Claude Code theo 7 cấp. Cấp càng cao, Claude tự làm càng
 - Feature vừa/lớn (cần PRD, nhiều ngày) → **cấp 3**.
 - Feature nhỏ, fix, refactor có acceptance criteria rõ → **cấp 4**, hoặc **cấp 5** nếu không mở terminal.
 - Việc nhỏ, rủi ro thấp, không đụng migration hay config agent → **cấp 6**.
-- Cấp 7: thỉnh thoảng chạy `/evolve` (ví dụ mỗi tháng, hoặc sau một bug lọt); bạn chỉ duyệt đề xuất của nó. Xem [Đo chất lượng & Evolve](#o-chat-luong-evolve-agent-tu-cai-thien).
 
 ---
 

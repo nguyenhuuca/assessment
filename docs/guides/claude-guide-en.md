@@ -42,7 +42,7 @@ Two conventions specific to this repo:
 
 ## Levels of Using Claude
 
-This project uses Claude Code at 7 levels. The higher the level, the more Claude does on its own and the less you touch. Rules, hooks and quality gates from the lower levels still apply at every level above.
+This project uses Claude Code at 6 levels. The higher the level, the more Claude does on its own and the less you touch. Rules, hooks and quality gates from the lower levels still apply at every level above.
 
 | Level | How | You take part | Real example in this repo |
 |-------|-----|---------------|---------------------------|
@@ -52,7 +52,6 @@ This project uses Claude Code at 7 levels. The higher the level, the more Claude
 | 4 | **Local `/autopilot`:** plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke; at most 3 rounds per loop | 3 times: Start, Gate 1, Gate 2 | Dynamic cron jobs (ADR-0023): BE + FE, CI green, smoke 22/22, $3.71 |
 | 5 | **Headless on GitHub** ([ADR-0022](../adr/0022-headless-autopilot.md)): label `autopilot` → draft PR → `/approve` → build → you merge | Add the label, `/approve`, merge | Issue #34 (back button color) → PR #35 |
 | 6 | **Auto gates** ([ADR-0025](../adr/0025-autopilot-auto-gates.md)): add `autopilot:auto` or `autopilot:auto-merge`; the workflow approves and merges after its own checks | Only add the label | Issue #36 → PR #37 merged and deployed in ~5 minutes, build job $0.39 |
-| 7 | **Self-improving** ([ADR-0027](../adr/0027-agent-self-improvement-loop.md)): `agent-metrics` finds escaped defects, `/evolve` adds a rule that a seeded-bug eval proves | Run `/evolve`, then approve the merge | Defect `62526c97` → reviewer rule, case caught 0/3 → 3/3 |
 
 **Which level to pick:**
 - Not sure what to do yet, or you only need to understand the code → **level 1**.
@@ -60,7 +59,6 @@ This project uses Claude Code at 7 levels. The higher the level, the more Claude
 - A medium or large feature (needs a PRD, several days) → **level 3**.
 - A small feature, fix or refactor with clear acceptance criteria → **level 4**, or **level 5** without a terminal.
 - Small, low-risk work that touches no migration or agent config → **level 6**.
-- Level 7: run `/evolve` now and then (for example once a month, or after an escaped defect); you only approve its proposals. See [Quality Metrics & Evolve](#quality-metrics-evolve-the-agent-improves-itself).
 
 ---
 
