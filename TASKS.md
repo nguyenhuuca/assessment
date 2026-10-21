@@ -397,3 +397,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **WH-3** List uses stored state; `ReportDto.githubStateReason` 5582b2fc
 - [x] **WH-4** FE badge shows reason + i18n 90dd0a78
 - [x] **WH-5** Owner: repo webhook + `GITHUB_WEBHOOK_SECRET` on VM + prod check (ping 204, #40 reopened/closed → APPLIED; no secret in logs) — 2026-10-21
+
+## Issue #46 — History tab pills hard to see (autopilot, lite)
+
+- [x] **FE-1** `.hist-pill` inactive: `--bg-card` fill + visible border (dark and light)
+- [x] **FE-2** `.hist-pill.active`: `--bg-high` fill; light override teal border/icon
+- [x] **FE-3** Existing tests + lint green; owner checks /history in both themes

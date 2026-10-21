@@ -2629,12 +2629,12 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 .hist-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; }
 .hist-pill {
   display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; padding: 8px 16px; border-radius: 999px;
-  background: var(--bg-surface); color: var(--text-muted); border: 1px solid transparent;
+  background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-subtle);
   font-size: 13px; font-weight: 700; transition: background var(--transition), color var(--transition), border-color var(--transition);
 }
 .hist-pill .material-symbols-outlined { font-size: 16px; }
 .hist-pill:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.12); }
-.hist-pill.active { color: var(--text); background: var(--bg-elevated); border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(0, 238, 252, 0.3); }
+.hist-pill.active { color: var(--text); background: var(--bg-high); border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(0, 238, 252, 0.3); }
 .hist-pill.active .material-symbols-outlined { color: var(--accent-cyan); }
 
 .hist-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
@@ -2722,8 +2722,10 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 [data-theme="light"] .hist-action.primary { background: rgba(184, 0, 53, 0.08); border-color: rgba(184, 0, 53, 0.25); }
 [data-theme="light"] .hist-url-input { background: #fff; border-color: rgba(25, 28, 29, 0.15); }
 [data-theme="light"] .hist-submit-btn { color: #fff; box-shadow: none; }
-[data-theme="light"] .hist-pill:hover { border-color: rgba(25, 28, 29, 0.15); }
-[data-theme="light"] .hist-pill.active { box-shadow: none; }
+[data-theme="light"] .hist-pill { border-color: rgba(25, 28, 29, 0.2); }
+[data-theme="light"] .hist-pill:hover { border-color: rgba(25, 28, 29, 0.3); }
+[data-theme="light"] .hist-pill.active { background: var(--bg-surface); border-color: #006970; box-shadow: none; }
+[data-theme="light"] .hist-pill.active .material-symbols-outlined { color: #006970; }
 [data-theme="light"] .hist-card { border-color: rgba(25, 28, 29, 0.08); }
 [data-theme="light"] .hist-thumb { background: var(--bg-elevated); border-color: rgba(25, 28, 29, 0.08); }
 [data-theme="light"] .hist-platform.youtube { color: #c4001a; }
