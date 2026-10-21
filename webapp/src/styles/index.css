@@ -2471,6 +2471,11 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 .admin-badge.queued,
 .admin-badge.saving        { background: rgba(0, 238, 252, 0.12); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
 .admin-badge.skipped_busy  { background: rgba(173, 170, 170, 0.13); color: var(--text-muted); border: 1px solid var(--text-muted); }
+/* Yellow (#ffd600) is ~1.4:1 on the light surface; use a dark amber there. */
+[data-theme="light"] .admin-badge.pending,
+[data-theme="light"] .admin-badge.missing_local,
+[data-theme="light"] .admin-badge.missing_db,
+[data-theme="light"] .admin-badge.size_mismatch { background: rgba(178, 106, 0, 0.12); color: #7a4d00; border-color: #b26a00; }
 @media (max-width: 768px) {
   .drive-sync-run-item { grid-template-columns: 1fr; }
 }
