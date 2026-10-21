@@ -415,3 +415,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 ## Feature: Report page tabs (2026-10-21, autopilot lite)
 
 - [x] **RT-1** `ReportPage` split into tabs "New report" (form + result) and "Recent reports" (list + paging + Retry); list fetched only on its tab; en/vi keys; tests 3d5232f8
+
+## Feature: Notification dropdown tabs (2026-10-21, autopilot lite)
+
+- [x] **NT-1** BE: admin category on `NotificationType`; optional `category` filter on `GET /notifications` c5ad0a54
+- [x] **NT-2** FE: General / Admin tabs in the dropdown for admins, unread dot per tab, en/vi a7b4eb42

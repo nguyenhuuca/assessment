@@ -1,8 +1,8 @@
-task: Autopilot (lite): Report page split into two tabs (New report / Recent reports)
-status: done
-progress: 100
-done: RT-1 tabs 3d5232f8; Deploy Frontend green
-doing: -
-next: -
+task: Autopilot (lite): notification dropdown tabs (General / Admin)
+status: in_progress
+progress: 90
+done: NT-1 BE category filter c5ad0a54; NT-2 FE tabs a7b4eb42
+doing: Gate 2 (push approval)
+next: push; watch CI + smoke
 plan: -
-updated: 2026-10-21 11:39
+updated: 2026-10-21 12:28
