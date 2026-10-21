@@ -144,6 +144,23 @@ class NotificationDigestServiceTest {
         assertThat(body).contains("Your suggestion \"\" was approved").contains("Your suggested video \"\" is now live");
     }
 
+    @Test
+    void body_reportClosedRendersWithAndWithoutReason_inBothLanguages() {
+        List<Notification> rows = List.of(
+                suggestion(NotificationType.REPORT_CLOSED, "Text is hard to read", "completed"),
+                suggestion(NotificationType.REPORT_CLOSED, "Old idea", null),
+                suggestion(NotificationType.REPORT_CLOSED, "New reason", "brand_new"));
+
+        assertThat(service.body(rows, I18nConfig.EN))
+                .contains("- Your report \"Text is hard to read\" was closed (completed)\n")
+                .contains("- Your report \"Old idea\" was closed\n")
+                .contains("- Your report \"New reason\" was closed (brand_new)\n")
+                .doesNotContain("replied");
+        assertThat(service.body(rows, I18nConfig.VI))
+                .contains("- Report \"Text is hard to read\" của bạn đã được đóng (đã xong)\n")
+                .contains("- Report \"Old idea\" của bạn đã được đóng\n");
+    }
+
     // ── digest ────────────────────────────────────────────────────────────────
 
     @Test

@@ -129,6 +129,9 @@ public class NotificationDigestService {
                 || n.getType() == NotificationType.SUGGESTION_LIVE) {
             return describeSuggestion(n, locale);
         }
+        if (n.getType() == NotificationType.REPORT_CLOSED) {
+            return describeReportClosed(n, locale);
+        }
         if (n.getType() == NotificationType.COMMENT_REMOVED) {
             Object reason = n.getPayload() == null ? null : n.getPayload().get("reason");
             return reason == null ? msg("mail.digest.item.removed", locale)
@@ -153,6 +156,17 @@ public class NotificationDigestService {
             default -> reason == null ? msg("mail.digest.item.suggestionRejected", locale, title)
                     : msg("mail.digest.item.suggestionRejectedReason", locale, title, reason.toString());
         };
+    }
+
+    private String describeReportClosed(Notification n, Locale locale) {
+        Map<String, Object> payload = n.getPayload() == null ? Map.of() : n.getPayload();
+        String title = payload.get("snippet") == null ? "" : payload.get("snippet").toString();
+        Object reason = payload.get("reason");
+        if (reason == null) {
+            return msg("mail.digest.item.reportClosed", locale, title);
+        }
+        String label = messageSource.getMessage("mail.digest.reportReason." + reason, null, reason.toString(), locale);
+        return msg("mail.digest.item.reportClosedReason", locale, title, label);
     }
 
     private String msg(String key, Locale locale, String... args) {

@@ -46,4 +46,8 @@ public interface AppReportRepository extends JpaRepository<AppReport, UUID> {
                          @Param("reason") String reason, @Param("at") Instant at);
 
     boolean existsByStatusAndIssueNumber(ReportStatus status, Integer issueNumber);
+
+    /** The report behind an issue, with its reporter, for the closed notification (ADR-0026 D7). */
+    @EntityGraph(attributePaths = "reporter")
+    Optional<AppReport> findFirstWithReporterByStatusAndIssueNumber(ReportStatus status, Integer issueNumber);
 }

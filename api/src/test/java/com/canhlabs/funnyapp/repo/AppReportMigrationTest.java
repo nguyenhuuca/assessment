@@ -177,4 +177,15 @@ class AppReportMigrationTest {
         assertThat(exists.isExistsProjection()).isTrue();
         assertThat(exists.getParts()).hasSize(2);
     }
+
+    @Test
+    void repository_closedNotificationLookupLoadsReporter() throws Exception {
+        Method m = AppReportRepository.class.getMethod(
+                "findFirstWithReporterByStatusAndIssueNumber", ReportStatus.class, Integer.class);
+        PartTree tree = new PartTree("findFirstWithReporterByStatusAndIssueNumber", AppReport.class);
+
+        assertThat(m.getAnnotation(EntityGraph.class).attributePaths()).containsExactly("reporter");
+        assertThat(tree.isLimiting()).isTrue();
+        assertThat(tree.getParts()).hasSize(2);
+    }
 }

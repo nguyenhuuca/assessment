@@ -6,6 +6,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.enums.GitHubIssueState;
 import com.canhlabs.funnyapp.enums.ReportStatus;
+import com.canhlabs.funnyapp.event.ReportClosedEvent;
 import com.canhlabs.funnyapp.repo.AppReportRepository;
 import com.canhlabs.funnyapp.service.GitHubWebhookService.Outcome;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -32,6 +34,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 class GitHubWebhookServiceImplTest {
@@ -41,6 +44,7 @@ class GitHubWebhookServiceImplTest {
 
     private AppProperties props;
     private AppReportRepository repository;
+    private ApplicationEventPublisher events;
     private GitHubWebhookServiceImpl service;
     private Logger logger;
     private ListAppender<ILoggingEvent> logs;
@@ -50,7 +54,8 @@ class GitHubWebhookServiceImplTest {
         props = new AppProperties();
         props.getGithub().setWebhookSecret(SECRET);
         repository = mock(AppReportRepository.class);
-        service = new GitHubWebhookServiceImpl(props, repository, new ObjectMapper());
+        events = mock(ApplicationEventPublisher.class);
+        service = new GitHubWebhookServiceImpl(props, repository, new ObjectMapper(), events);
         logger = (Logger) LoggerFactory.getLogger(GitHubWebhookServiceImpl.class);
         logs = new ListAppender<>();
         logs.start();
@@ -232,5 +237,42 @@ class GitHubWebhookServiceImplTest {
         assertThat(GitHubWebhookServiceImpl.safe("abc\r\nFAKE log=1")).isEqualTo("abcFAKElog1");
         assertThat(GitHubWebhookServiceImpl.safe("x".repeat(100))).hasSize(64);
         assertThat(GitHubWebhookServiceImpl.safe(null)).isNull();
+    }
+
+    // --- closed notification event (report-closed notify) -------------------------
+
+    @Test
+    void handle_appliedClose_publishesReportClosedWithReason() {
+        when(repository.applyGithubState(anyInt(), any(), any(), any())).thenReturn(1);
+
+        service.handle("issues", "d-10", closed("not_planned"));
+
+        verify(events).publishEvent(new ReportClosedEvent(40, "not_planned"));
+    }
+
+    @Test
+    void handle_appliedClose_unknownReason_publishesNullReason() {
+        when(repository.applyGithubState(anyInt(), any(), any(), any())).thenReturn(1);
+
+        service.handle("issues", "d-11", closed("something_new_and_long"));
+
+        verify(events).publishEvent(new ReportClosedEvent(40, null));
+    }
+
+    @Test
+    void handle_reopenStaleUnknownIgnored_publishNothing() {
+        when(repository.applyGithubState(eq(40), eq(GitHubIssueState.OPEN), any(), any())).thenReturn(1);
+        service.handle("issues", "d-12", payload("reopened", "open", "reopened", "nguyenhuuca/assessment"));
+
+        when(repository.applyGithubState(eq(40), eq(GitHubIssueState.CLOSED), any(), any())).thenReturn(0);
+        when(repository.existsByStatusAndIssueNumber(ReportStatus.CREATED, 40)).thenReturn(true);
+        service.handle("issues", "d-13", closed("completed"));
+        when(repository.existsByStatusAndIssueNumber(ReportStatus.CREATED, 40)).thenReturn(false);
+        service.handle("issues", "d-14", closed("completed"));
+
+        service.handle("issues", "d-15", payload("closed", "closed", "completed", "someone/else"));
+        service.handle("ping", "d-16", "{}".getBytes(StandardCharsets.UTF_8));
+
+        verifyNoMoreInteractions(events);
     }
 }

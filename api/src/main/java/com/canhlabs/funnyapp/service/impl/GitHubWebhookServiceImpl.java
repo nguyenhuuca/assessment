@@ -3,11 +3,13 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.enums.GitHubIssueState;
 import com.canhlabs.funnyapp.enums.ReportStatus;
+import com.canhlabs.funnyapp.event.ReportClosedEvent;
 import com.canhlabs.funnyapp.repo.AppReportRepository;
 import com.canhlabs.funnyapp.service.GitHubWebhookService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
@@ -34,11 +36,14 @@ public class GitHubWebhookServiceImpl implements GitHubWebhookService {
     private final AppProperties props;
     private final AppReportRepository repository;
     private final ObjectMapper mapper;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public GitHubWebhookServiceImpl(AppProperties props, AppReportRepository repository, ObjectMapper mapper) {
+    public GitHubWebhookServiceImpl(AppProperties props, AppReportRepository repository, ObjectMapper mapper,
+                                    ApplicationEventPublisher eventPublisher) {
         this.props = props;
         this.repository = repository;
         this.mapper = mapper;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -74,11 +79,15 @@ public class GitHubWebhookServiceImpl implements GitHubWebhookService {
             return logged(deliveryId, event, action, number, Outcome.IGNORED);
         }
         Instant at = updatedAt(issue);
-        String reason = issue.path("state_reason").asText(null);
-        int changed = repository.applyGithubState(number, state, REASONS.contains(reason) ? reason : null, at);
+        String raw = issue.path("state_reason").asText(null);
+        String reason = REASONS.contains(raw) ? raw : null;
+        int changed = repository.applyGithubState(number, state, reason, at);
         Outcome outcome = changed > 0 ? Outcome.APPLIED
                 : repository.existsByStatusAndIssueNumber(ReportStatus.CREATED, number) ? Outcome.STALE
                 : Outcome.UNKNOWN_ISSUE;
+        if (outcome == Outcome.APPLIED && state == GitHubIssueState.CLOSED) {
+            eventPublisher.publishEvent(new ReportClosedEvent(number, reason));
+        }
         return logged(deliveryId, event, action, number, outcome);
     }
 
