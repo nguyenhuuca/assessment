@@ -3,8 +3,8 @@
 - **Request:** GitHub webhook stores report issue state (ADR-0026 D7, spec v1.3 BR-9, BR-10, FR-8, EC-14..EC-17)
 - **Mode:** local
 - **Plan:** [plan-report-webhook-state](../plans/plan-report-webhook-state.md)
-- **Started:** 2026-10-21 09:15 · **Landed:** pending (Gate 2)
-- **Result:** committed `5582b2fc` (BE) + `90dd0a78` (FE), waiting for push approval
+- **Started:** 2026-10-21 09:15 · **Landed:** 2026-10-21 09:50
+- **Result:** ✅ pushed `c966dd46` (BE `5582b2fc`, FE `90dd0a78`); CI green, smoke 22/22
 
 ## Pipeline
 
@@ -19,8 +19,8 @@
 | Local QA ×2 | `qa-twice.sh`: 115 tests, pass 115 · flaky 0 · fail 0 | 1 of 3 |
 | Fix | review advisories: `issue.number < 1` → 400; fixed-text WARN on 401 | — |
 | Land: full gates | `mvn verify`: 1,548 tests, 0 fail, LINE coverage 96.65 % (≥ 90 %); `npm run test`: 529 pass; `npm run lint`: 0 errors (3 old warnings outside `report/`) | — |
-| Gate 2 (owner) | pending | — |
-| CI + smoke | pending: runs after push | — |
+| Gate 2 (owner) | push | — |
+| CI + smoke | Build and Deploy, Deploy Frontend, Publish Docs green; `mock-test.sh` 22/22; prod probe: unsigned POST → 503 (secret not set yet), foreign Origin → 403 (CORS, browsers only), admin list without JWT → 401 | — |
 
 ## What changed
 

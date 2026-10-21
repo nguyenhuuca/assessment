@@ -1,8 +1,9 @@
 task: Autopilot: report issue state by GitHub webhook (ADR-0026 D7)
-status: in_progress
-progress: 90
-done: ADR D7 + spec v1.3 92b4dd36; WH-1..WH-3 BE 5582b2fc; WH-4 FE 90dd0a78
-doing: Gate 2 (push approval)
-next: push; watch CI + smoke; owner WH-5 (repo webhook + GITHUB_WEBHOOK_SECRET)
+status: blocked
+progress: 95
+done: ADR D7 + spec v1.3 92b4dd36; WH-1..WH-3 BE 5582b2fc; WH-4 FE 90dd0a78; deployed, smoke 22/22
+doing: -
+next: owner WH-5: repo webhook (Issues only) + GITHUB_WEBHOOK_SECRET in VM env, restart, close a test issue
+blocker: owner must add the repo webhook and set GITHUB_WEBHOOK_SECRET on the VM
 plan: docs/plans/plan-report-webhook-state.md
-updated: 2026-10-21 09:36
+updated: 2026-10-21 09:52
