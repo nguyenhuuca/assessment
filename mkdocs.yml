@@ -124,6 +124,7 @@ nav:
       - Admin Drive Force Sync: plans/plan-admin-drive-force-sync.md
       - In-App Report: plans/plan-in-app-report.md
       - Report Webhook State: plans/plan-report-webhook-state.md
+      - Report Closed Notification: plans/plan-report-closed-notify.md
 
   - Presentations:
       - presentations/index.md

@@ -403,3 +403,11 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **FE-1** `.hist-pill` inactive: `--bg-card` fill + visible border (dark and light)
 - [x] **FE-2** `.hist-pill.active`: `--bg-high` fill; light override teal border/icon
 - [x] **FE-3** Existing tests + lint green; owner checks /history in both themes
+
+## Feature: Notify the reporter when the report's issue is closed (2026-10-21)
+
+**Plan:** `docs/plans/plan-report-closed-notify.md`
+
+- [x] **RN-1** `REPORT_CLOSED` type + `ReportClosedEvent` from the webhook (APPLIED + CLOSED) + `ReportNotificationListener` (upsert, SSE) 801dcb9f
+- [x] **RN-2** Digest email line `mail.digest.item.reportClosed` (en/vi) 801dcb9f
+- [x] **RN-3** FE notification text + click opens Report page (en/vi) b3030e52

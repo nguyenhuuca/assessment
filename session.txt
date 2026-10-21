@@ -1,8 +1,8 @@
-task: Autopilot: report issue state by GitHub webhook (ADR-0026 D7)
-status: done
-progress: 100
-done: ADR D7 + spec v1.3 92b4dd36; WH-1..WH-3 BE 5582b2fc; WH-4 FE 90dd0a78; WH-5 webhook live, #40 events APPLIED
-doing: -
-next: -
-plan: docs/plans/plan-report-webhook-state.md
-updated: 2026-10-21 10:07
+task: Autopilot: notify the reporter when the report's issue is closed
+status: in_progress
+progress: 90
+done: RN-1 event+listener, RN-2 digest 801dcb9f; RN-3 FE b3030e52
+doing: Gate 2 (push approval)
+next: push; watch CI + smoke; owner closes an app-created issue and checks the bell
+plan: docs/plans/plan-report-closed-notify.md
+updated: 2026-10-21 11:00
