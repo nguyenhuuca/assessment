@@ -1,9 +1,8 @@
-task: In-App Report (swarm-execute IR-1..IR-6)
-status: blocked
-progress: 95
-done: IR-1..IR-4 BE ca21f28e..c1c3760a; review fixes 65991c6b; startup hotfix e1f87eac; IR-5/IR-6 FE deployed 1a110631
+task: In-App Report (swarm-execute IR-1..IR-7)
+status: done
+progress: 100
+done: IR-1..IR-4 BE ca21f28e..c1c3760a; IR-5/IR-6 FE 1a110631; startup hotfix e1f87eac; 500 fix 1cde69c8; IR-7 owner setup + prod check
 doing: -
-next: IR-7 owner: label report, PAT (Issues r/w), GITHUB_REPORT_TOKEN in /opt/funnyapp/.env, restart, send one report
-blocker: owner must create the PAT and set GITHUB_REPORT_TOKEN on the VM
+next: -
 plan: docs/plans/plan-in-app-report.md
-updated: 2026-10-20 21:07
+updated: 2026-10-21 07:12

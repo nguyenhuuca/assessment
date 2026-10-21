@@ -374,7 +374,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **IR-4** `AdminReportController` (POST, GET paged, POST retry) + `@AuditLog`/`@RateLimited`; permission + contract tests c1c3760a
 - [x] **IR-5** FE `api/reports.js` + hooks + `__APP_BUILD__` define + i18n `report.json`/`navReport`; tests 932991b1
 - [x] **IR-6** FE `ReportPage` + AppShell nav above Settings (desktop + mobile); component tests d49f51fb
-- [ ] **IR-7** Owner: label `report`, PAT, `GITHUB_REPORT_TOKEN` in `/opt/funnyapp/.env`, prod check
+- [x] **IR-7** Owner: label `report`, PAT, `GITHUB_REPORT_TOKEN` in `/opt/funnyapp/.env`, prod check (issue #40 from prod; 500 fix 1cde69c8; token not in logs) — 2026-10-21
 
 ## Issue #42 — Report notice unreadable (autopilot, lite)
 
