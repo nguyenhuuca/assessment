@@ -381,3 +381,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **FE-1** `.app-alert.info` rule in `index.css`
 - [x] **FE-2** `ReportPage.jsx` notice `app-alert error` → `app-alert info`
 - [x] **FE-3** Vitest: notice has class `info`, not `error`
+
+## Issue #44 — Confirm dialog when granting ADMIN (autopilot, lite)
+
+- [x] **FE-1** `AdminAccountTable`: promote to ADMIN opens a confirm dialog with the capability list
+- [x] **FE-2** i18n `grantAdmin.*` in `en` and `vi` `admin.json`
+- [x] **FE-3** Vitest: promote waits for Confirm, Cancel/Escape make no call, demote has no dialog

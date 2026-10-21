@@ -68,6 +68,18 @@
   "cannotChangeOwnRole": "Cannot change own role",
   "demote": "Demote to USER",
   "promote": "Promote to ADMIN",
+  "grantAdmin": {
+    "title": "Grant ADMIN role",
+    "message": "Make {{email}} an ADMIN? They will be able to:",
+    "confirm": "Grant ADMIN",
+    "capabilities": [
+      "Review, hide, prioritise and delete videos",
+      "Moderate and hard-delete comments",
+      "Manage accounts ranked below them: change roles and permissions, delete accounts",
+      "Approve or reject video suggestions, and manage video imports",
+      "Handle reports and view scheduled jobs (editing and running jobs is SUPER_ADMIN only)"
+    ]
+  },
   "cannotDeleteSelf": "Cannot delete own account",
   "deleteAccount": "Delete account",
   "deleteAccountMessage": "Delete account {{email}}? This cannot be undone.",

@@ -49,3 +49,44 @@ describe('AdminAccountTable permissions column', () => {
     for (const b of await chips('boss@x.com')) expect(b).toBeDisabled()
   })
 })
+
+describe('AdminAccountTable role change', () => {
+  beforeEach(() => adminApi.updateAccountRole.mockResolvedValue({}))
+
+  const openPromote = async () => {
+    renderTable([account({ id: 5, email: 'u@x.com', role: 'USER' })])
+    fireEvent.click(await screen.findByTitle('Nâng lên ADMIN'))
+    return screen.findByRole('dialog')
+  }
+
+  it('promote lists what an admin can do and calls the API only after Confirm', async () => {
+    const dialog = await openPromote()
+    expect(within(dialog).getByText(/u@x.com/)).toBeInTheDocument()
+    expect(within(dialog).getAllByRole('listitem')).toHaveLength(5)
+    expect(adminApi.updateAccountRole).not.toHaveBeenCalled()
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Cấp ADMIN' }))
+    await waitFor(() => expect(adminApi.updateAccountRole).toHaveBeenCalledTimes(1))
+    expect(adminApi.updateAccountRole).toHaveBeenCalledWith(5, 'ADMIN')
+  })
+
+  it('Cancel makes no API call', async () => {
+    const dialog = await openPromote()
+    fireEvent.click(within(dialog).getAllByRole('button').find(b => b.classList.contains('secondary')))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(adminApi.updateAccountRole).not.toHaveBeenCalled()
+  })
+
+  it('Escape makes no API call', async () => {
+    await openPromote()
+    fireEvent.keyDown(window, { key: 'Escape' })
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(adminApi.updateAccountRole).not.toHaveBeenCalled()
+  })
+
+  it('demote has no dialog', async () => {
+    renderTable([account({ id: 6, email: 'a@x.com', role: 'ADMIN' })])
+    fireEvent.click(await screen.findByTitle('Hạ xuống USER'))
+    await waitFor(() => expect(adminApi.updateAccountRole).toHaveBeenCalledWith(6, 'USER'))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+})

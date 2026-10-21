@@ -68,6 +68,18 @@
   "cannotChangeOwnRole": "Không thể đổi vai trò của chính mình",
   "demote": "Hạ xuống USER",
   "promote": "Nâng lên ADMIN",
+  "grantAdmin": {
+    "title": "Cấp vai trò ADMIN",
+    "message": "Nâng {{email}} lên ADMIN? Tài khoản này sẽ có thể:",
+    "confirm": "Cấp ADMIN",
+    "capabilities": [
+      "Duyệt, ẩn, đặt ưu tiên và xoá video",
+      "Kiểm duyệt và xoá vĩnh viễn bình luận",
+      "Quản lý tài khoản có vai trò thấp hơn: đổi vai trò, quyền và xoá tài khoản",
+      "Duyệt hoặc từ chối video đề xuất, và quản lý việc nhập video",
+      "Xử lý báo cáo và xem các tác vụ định kỳ (chỉ SUPER_ADMIN được sửa và chạy tác vụ)"
+    ]
+  },
   "cannotDeleteSelf": "Không thể xoá tài khoản của chính mình",
   "deleteAccount": "Xoá tài khoản",
   "deleteAccountMessage": "Xoá tài khoản {{email}}? Thao tác này không thể hoàn tác.",
