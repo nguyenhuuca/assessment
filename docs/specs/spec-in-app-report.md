@@ -89,12 +89,20 @@ Rules for the body:
 
 `reporter_id` is set to `NULL` when the user is deleted (FK `ON DELETE SET NULL`). The report stays in the list as "Deleted user", and only a `SUPER_ADMIN` can retry it.
 
-### BR-9: GitHub state is read-through
+### BR-9: GitHub state: stored first, read-through as fallback
 
-- The list shows `githubState`: `OPEN`, `CLOSED` or `UNKNOWN`.
-- It is fetched from GitHub per `CREATED` row on the requested page and cached for 5 minutes.
-- `FAILED` rows have `githubState = null`.
-- No webhook and no background refresh.
+- The list shows `githubState`: `OPEN`, `CLOSED` or `UNKNOWN`, plus `githubStateReason` (`completed`, `not_planned`, `duplicate`, `reopened` or `null`).
+- A `CREATED` row with a stored `github_state` (BR-10) uses it; no GitHub call.
+- A `CREATED` row without one is fetched from GitHub and cached for 5 minutes, as before; `githubStateReason` is then `null`. The read-through result is not stored.
+- `FAILED` rows have `githubState = null` and `githubStateReason = null`.
+- No background refresh.
+
+### BR-10: Webhook stores the state (ADR-0026 D7)
+
+- `POST /v1/funny-app/webhooks/github` accepts a delivery only when `X-Hub-Signature-256` equals `sha256=` + hex HMAC-SHA256 of the raw body with `GITHUB_WEBHOOK_SECRET`, compared in constant time.
+- Only `X-GitHub-Event: issues` with `action` `closed` or `reopened` changes anything. It sets `github_state` from `issue.state` (`open` → `OPEN`, `closed` → `CLOSED`), `github_state_reason` from `issue.state_reason`, and `github_state_at` from `issue.updated_at`, on the `CREATED` report whose `issue_number` = `issue.number`.
+- The update applies only when `issue.updated_at` is after the stored `github_state_at` (or none is stored), so an older delivery that arrives late cannot overwrite a newer state.
+- The repository in the payload (`repository.full_name`) must equal the configured `owner/repo`; otherwise nothing changes.
 
 ---
 
@@ -156,6 +164,14 @@ A `GitHubIssueClient` interface in `client`, implemented with `java.net.http.Htt
 It has two methods:
 - `create(title, body, labels)` returns the issue number and `html_url`;
 - `state(number)` returns `OPEN`, `CLOSED` or `UNKNOWN`. It maps any non-200 response or exception to `UNKNOWN`.
+
+### FR-8: Webhook receiver
+
+The webhook endpoint must:
+- read the body as raw bytes and verify the signature **before** parsing JSON;
+- return 503 when `GITHUB_WEBHOOK_SECRET` is blank, 401 on a missing or wrong signature, 400 on unparseable JSON from a valid signature, and 204 otherwise (applied or ignored);
+- log the delivery id, event, action, issue number and outcome (`applied`, `ignored`, `stale`, `unknown-issue`) at INFO; never log the secret, the signature or the body;
+- finish without any outbound call (GitHub expects an answer within 10 s).
 
 ### FR-7: Configuration
 
@@ -278,9 +294,28 @@ When GitHub fails, the response is the same with `"status": "FAILED"`, `issueNum
 | 409 | `error.report.alreadyCreated` | This report already has a GitHub issue | `status = CREATED` |
 | 429 | (existing) | Rate limit exceeded. Please try again later. | BR-5 |
 
+#### POST /v1/funny-app/webhooks/github
+
+**Description:** GitHub repo webhook for the "Issues" event (BR-10, FR-8).
+
+**Auth:** No JWT (listed in `WHITE_LIST_PATH`, `utils/AppConstant.java:45`). HMAC signature with `GITHUB_WEBHOOK_SECRET`.
+**Rate limit:** none (no user; the signature check comes first and is cheap).
+
+**Request:** headers `X-GitHub-Event`, `X-GitHub-Delivery`, `X-Hub-Signature-256`; JSON body from GitHub. Fields read: `action`, `issue.number`, `issue.state`, `issue.state_reason`, `issue.updated_at`, `repository.full_name`.
+
+**Response — Success:** 204, empty body, for applied and for ignored deliveries.
+
+**Response — Error**
+
+| Status | Condition |
+|--------|-----------|
+| 400 | Valid signature, body is not JSON or lacks `issue.number` for an `issues` event |
+| 401 | `X-Hub-Signature-256` missing, not `sha256=<hex>`, or wrong |
+| 503 | `GITHUB_WEBHOOK_SECRET` not configured |
+
 ### Modified Endpoints
 
-None.
+- `GET /v1/funny-app/admin/reports`: `ReportDto` gains `githubStateReason` (string or `null`); `githubState` follows BR-9.
 
 ---
 
@@ -326,7 +361,16 @@ CREATE INDEX idx_app_report_autopilot_cap ON app_report (created_at)
 
 ### Modified Tables
 
-None.
+```sql
+-- Issue state pushed by the GitHub webhook (ADR-0026 D7).
+ALTER TABLE app_report
+    ADD COLUMN github_state        VARCHAR(10) CHECK (github_state IN ('OPEN', 'CLOSED')),
+    ADD COLUMN github_state_reason VARCHAR(16),
+    ADD COLUMN github_state_at     TIMESTAMPTZ;
+CREATE INDEX idx_app_report_issue_number ON app_report (issue_number) WHERE issue_number IS NOT NULL;
+```
+
+> Migration file: `api/src/main/resources/db/changelog/sql/202610210001-app-report-github-state.sql`. All columns are nullable, so existing rows keep working through the read-through path.
 
 ---
 
@@ -334,7 +378,7 @@ None.
 
 ### Authentication
 
-All three endpoints require a JWT. None are public.
+The three admin endpoints require a JWT. The webhook endpoint is public and is authenticated only by its HMAC signature (BR-10); `GITHUB_WEBHOOK_SECRET` is a separate secret from `GITHUB_REPORT_TOKEN`, set in the server's env file, never logged and never returned.
 
 ### Authorization
 
@@ -529,6 +573,22 @@ No `AppScheduler` or `scheduled_job` change.
 
 ---
 
+### EC-14: Webhook deliveries out of order
+
+A `reopened` event with `updated_at` T1 arrives after a `closed` event with T2 > T1. The stored state stays `CLOSED` (BR-10).
+
+### EC-15: Webhook for an issue the app did not create
+
+No `CREATED` report has that `issue_number` → 204, nothing stored, outcome `unknown-issue`.
+
+### EC-16: Webhook redelivered
+
+The same delivery sent twice: the second has the same `updated_at`, which is not after the stored value, so nothing changes (outcome `stale`); the response is still 204.
+
+### EC-17: `ping` and other events
+
+`X-GitHub-Event: ping`, or `issues` with an action other than `closed`/`reopened` → 204, nothing stored, outcome `ignored`.
+
 ## Acceptance Criteria
 
 - [ ] An ADMIN and the SUPER_ADMIN see **Report** above Settings on desktop and mobile; a USER does not (FR-1).
@@ -547,6 +607,11 @@ No `AppScheduler` or `scheduled_job` change.
 - [ ] The text boundaries in EC-10 hold.
 - [ ] The token never appears in logs, audit output or responses (verified by a test with a fake token string).
 - [ ] The GitHub client is tested against a local stub (`HttpServer`, like `HttpRedirectProbeTest`). No test calls the real GitHub.
+- [ ] Webhook: a signed `closed` event with `state_reason: completed` stores `CLOSED`/`completed`, and the list shows it without calling GitHub (BR-9, BR-10).
+- [ ] Webhook: a missing or wrong signature → 401 and nothing stored; no secret → 503 (FR-8).
+- [ ] Webhook: EC-14 to EC-17 hold; a payload for another repository changes nothing.
+- [ ] Webhook: the secret, signature and body never appear in logs.
+- [ ] FE: a `CLOSED` badge shows the reason when one is stored ("Closed · completed" / "Closed · not planned").
 - [ ] Existing flows are unaffected (regression).
 - [ ] `mvn verify` passes with the coverage gate met; `npm run test` and `npm run lint` pass.
 
@@ -554,8 +619,9 @@ No `AppScheduler` or `scheduled_job` change.
 
 ## Open Questions
 
-- [ ] **Owner setup:** create the missing label `report` (`gh label create report`). `bug`, `enhancement` and the three `autopilot*` labels already exist; GitHub would also create `report` on first use, with a default color.
-- [ ] **Owner setup:** create the fine-grained PAT (this repo, Issues read/write) and set `GITHUB_REPORT_TOKEN` on the server, through the deploy environment and secrets.
+- [x] **Owner setup:** create the missing label `report` (`gh label create report`). `bug`, `enhancement` and the three `autopilot*` labels already exist; GitHub would also create `report` on first use, with a default color.
+- [ ] **Owner setup (D7):** add the repo webhook (Settings → Webhooks: payload URL `https://canh-labs.com/api/v1/funny-app/webhooks/github`, content type `application/json`, a random secret, "Issues" events only) and set `GITHUB_WEBHOOK_SECRET` to the same secret in the server's env file, then restart.
+- [x] **Owner setup:** create the fine-grained PAT (this repo, Issues read/write) and set `GITHUB_REPORT_TOKEN` on the server, through the deploy environment and secrets.
 
 ---
 
@@ -566,3 +632,4 @@ No `AppScheduler` or `scheduled_job` change.
 | 1.0 | 2026-10-20 | nguyenhuuca | Initial draft from `/spec` |
 | 1.1 | 2026-10-20 | nguyenhuuca | Planning fixes: list returns `Page<ReportDto>` like other admin lists; `navReport` lives in `shell.json` |
 | 1.2 | 2026-10-20 | nguyenhuuca | Review fixes: context and title reject control characters; retry checks ownership before 409; retry auto label and cap follow the caller's current role |
+| 1.3 | 2026-10-21 | nguyenhuuca | ADR-0026 D7: HMAC-verified GitHub webhook stores the issue state and reason (BR-9 changed, BR-10, FR-8, EC-14..EC-17, new columns) |

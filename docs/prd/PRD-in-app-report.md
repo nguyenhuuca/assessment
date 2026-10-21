@@ -131,7 +131,7 @@ The issues end up thin: they rarely say which page, which build or which browser
 ### Out of Scope
 
 - **CONTRIBUTOR role**: v1 is ADMIN and SUPER_ADMIN only. The access check is built so the role can be added later (NFR-8).
-- **Sync back from GitHub**: no webhook, and no in-app notification when the issue gets a comment, a PR or is closed. The state is only read when the list opens.
+- **Sync back from GitHub**: no in-app notification when the issue gets a comment, a PR or is closed. (2026-10-21: the closed/reopened state and its reason are now stored by webhook, see ADR-0026 D7.)
 
 > **Assumption:** Screenshot upload and editing or deleting a report after it is sent are not in v1. Neither was picked for v1 or for later; edits are done on GitHub.
 

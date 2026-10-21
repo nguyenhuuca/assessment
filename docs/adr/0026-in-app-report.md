@@ -2,7 +2,7 @@
 
 ## Metadata
 
-**Status:** Accepted (2026-10-20) · **Date:** 2026-10-20 · **Deciders:** nguyenhuuca · **Tags:** api, integration, security, agents
+**Status:** Accepted (2026-10-20), amended 2026-10-21 (D7 webhook) · **Date:** 2026-10-20 · **Deciders:** nguyenhuuca · **Tags:** api, integration, security, agents
 **Related:** [PRD-in-app-report](../prd/PRD-in-app-report.md) · amends the trust model of [ADR-0022](0022-headless-autopilot.md) D2 · works with [ADR-0025](0025-autopilot-auto-gates.md)
 
 ## Context
@@ -96,7 +96,7 @@
   - one `GET` per issue on the page, in parallel on virtual threads;
   - cached in Guava for 5 min;
   - a failure shows `unknown`.
-  - No webhook (PRD out of scope).
+  - Superseded for issues with a stored state by D7: the list reads the state from the table and calls GitHub only for rows that have none.
 - **List scope:** every admin sees all reports, newest first, paged, with the reporter's display name. The issues are public anyway.
 
 ### D5. Issue body (public repo)
@@ -117,6 +117,31 @@
   - add a migration if the `role` column has a check constraint;
   - leave the auto-label rule (SUPER_ADMIN only) unchanged.
 
+### D7. Issue state by webhook (amendment, 2026-10-21)
+
+The owner asked for the closed state to be pushed to the app and stored, and to tell "done" from "closed, not planned".
+
+- **Endpoint:** `POST /v1/funny-app/webhooks/github`, added to `WHITE_LIST_PATH` (`utils/AppConstant.java:45`), so no JWT. GitHub is the only intended caller.
+- **Authentication:** the HMAC-SHA256 signature in `X-Hub-Signature-256` over the **raw body**, with the shared secret from the env var `GITHUB_WEBHOOK_SECRET`.
+  - Compared in constant time (`MessageDigest.isEqual`) before the body is parsed.
+  - Missing or wrong signature → 401. Secret not configured → 503, so the endpoint is off until the owner sets it.
+  - The secret is never logged; the delivery id (`X-GitHub-Delivery`) is logged at INFO.
+- **Events:** only `X-GitHub-Event: issues` with action `closed` or `reopened`. `ping` and every other event or action → 204 and nothing stored.
+- **Storage:** new columns on `app_report`: `github_state` (`OPEN`/`CLOSED`), `github_state_reason` (`completed`, `not_planned`, `duplicate`, `reopened`, or null), `github_state_at` (the issue's `updated_at` from the payload), plus an index on `issue_number`.
+  - The row is found by `issue_number` among `CREATED` reports. An issue that was not created by the app → 204, nothing stored.
+  - **Out-of-order deliveries:** an event is applied only when its `updated_at` is newer than the stored `github_state_at`.
+- **List:** a row with a stored state uses it, with no GitHub call. A row without one (created before D7, or no event yet) keeps the D4 read-through.
+- **Missed deliveries:** GitHub does not retry a failed delivery on its own. The stored state can then stay stale until the next event or a manual redeliver from the repo's webhook settings. Accepted.
+- **Owner setup:** repo Settings → Webhooks → payload URL above, content type `application/json`, secret, "Issues" events only; `GITHUB_WEBHOOK_SECRET` in the VM's env file, then restart.
+
+#### Options considered for D7
+
+| Option | Pros | Cons | Verdict |
+|--------|------|------|---------|
+| **A. Repo webhook, HMAC-verified, state stored on `app_report`** | Push, no polling; `state_reason` comes with the event; one public endpoint | A new unauthenticated endpoint (guarded by HMAC); a second secret; GitHub does not retry | **Chosen** |
+| B. Scheduled job polls GitHub for open reports | No public endpoint | Uses API quota; state is late by up to the poll interval; another job | Rejected |
+| C. Keep read-through only, add `state_reason` to the GET | Smallest change | Nothing stored; still one call per row on a cold cache | Rejected: the owner wants the state stored |
+
 ## Consequences
 
 ### Positive
@@ -132,6 +157,7 @@
 - **The owner-only gate of ADR-0022 is wider.** Any ADMIN can start paid runs, capped at 10 a day. An admin account compromise now reaches autopilot; prod is still reachable only through `autopilot:auto`, which is SUPER_ADMIN only.
 - **The PAT lives on the server** alongside other secrets. A server compromise leaks it, limited to creating and reading issues in one repo.
 - **Status calls add latency** to the list: up to one GitHub call per row on a cold cache.
+- **D7 adds a public endpoint.** Its only guard is the HMAC secret; a leaked secret lets anyone set report states (display only, no other effect). Rotate it in both GitHub and the env file.
 - **The per-user limit is in memory.** It resets on deploy, which is acceptable at one replica. Moving to Redis follows ADR-0003 if the app scales out.
 
 ## Validation
@@ -158,3 +184,4 @@
 |------|--------|
 | 2026-10-20 | Proposed |
 | 2026-10-20 | Accepted by the owner |
+| 2026-10-21 | D7: issue state by HMAC-verified webhook, stored on `app_report` (owner request) |
