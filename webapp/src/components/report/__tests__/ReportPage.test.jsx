@@ -113,6 +113,19 @@ describe('ReportPage', () => {
     expect(screen.getByText(i18n.t('report:list.failedBadge'))).toBeInTheDocument()
   })
 
+  it('CLOSED badge shows the webhook reason; no reason shows the state only', async () => {
+    reportsApi.listReports.mockResolvedValue({ data: { totalPages: 1, content: [
+      row({ id: 'w1', title: 'Not planned one', githubState: 'CLOSED', githubStateReason: 'not_planned' }),
+      row({ id: 'w2', title: 'Plain closed', githubState: 'CLOSED' }),
+      row({ id: 'w3', title: 'New reason', githubState: 'CLOSED', githubStateReason: 'brand_new' }),
+    ] } })
+    renderPage()
+    const closed = i18n.t('report:state.CLOSED')
+    expect(await screen.findByText(`${closed} · ${i18n.t('report:stateReason.not_planned')}`)).toBeInTheDocument()
+    expect(screen.getByText(closed)).toBeInTheDocument()
+    expect(screen.getByText(`${closed} · brand_new`)).toBeInTheDocument()
+  })
+
   it('Retry on a list row: SUPER_ADMIN or the reporter only', async () => {
     reportsApi.listReports.mockResolvedValue({ data: { totalPages: 1, content: [
       row({ id: 'f1', status: 'FAILED', githubState: null, reporter: 'alice' }),

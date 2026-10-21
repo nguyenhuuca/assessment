@@ -49,5 +49,6 @@
     "next": "Next page",
     "failedBadge": "Failed"
   },
-  "state": { "OPEN": "Open", "CLOSED": "Closed", "UNKNOWN": "Unknown" }
+  "state": { "OPEN": "Open", "CLOSED": "Closed", "UNKNOWN": "Unknown" },
+  "stateReason": { "completed": "Completed", "not_planned": "Not planned", "duplicate": "Duplicate", "reopened": "Reopened" }
 }

@@ -36,7 +36,12 @@ function StateBadge({ report, t }) {
     return <span className="admin-badge removed">{t('list.failedBadge')}</span>
   }
   const cls = report.githubState === 'OPEN' ? 'published' : report.githubState === 'CLOSED' ? 'pending' : 'removed'
-  return <span className={`admin-badge ${cls}`}>{t(`state.${report.githubState}`, { defaultValue: report.githubState })}</span>
+  const state = t(`state.${report.githubState}`, { defaultValue: report.githubState })
+  // Reason is stored by the GitHub webhook (ADR-0026 D7); read-through rows have none.
+  const reason = report.githubStateReason
+    ? ` · ${t(`stateReason.${report.githubStateReason}`, { defaultValue: report.githubStateReason })}`
+    : ''
+  return <span className={`admin-badge ${cls}`}>{state}{reason}</span>
 }
 
 export default function ReportPage({ fromPage }) {

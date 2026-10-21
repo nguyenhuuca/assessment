@@ -49,5 +49,6 @@
     "next": "Trang sau",
     "failedBadge": "Thất bại"
   },
-  "state": { "OPEN": "Đang mở", "CLOSED": "Đã đóng", "UNKNOWN": "Không rõ" }
+  "state": { "OPEN": "Đang mở", "CLOSED": "Đã đóng", "UNKNOWN": "Không rõ" },
+  "stateReason": { "completed": "Đã xong", "not_planned": "Không làm", "duplicate": "Trùng lặp", "reopened": "Mở lại" }
 }
