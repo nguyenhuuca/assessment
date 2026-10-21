@@ -1,8 +1,8 @@
-task: Agent quality metrics (run JSON + trailer, agent-metrics script)
-status: done
-progress: 100
-done: AM-1 trailer + run-metrics JSON b8e6f917; AM-2 agent-metrics.mjs + baseline b8e6f917
+task: Evolve loop (agent self-improvement, ADR-0027)
+status: in_progress
+progress: 90
+done: EV-1 signals bda91628; EV-2 evolve.mjs 426a1b9c; EV-3 first case fe36685d; EV-4 skill + first rule 426a1b9c; EV-5 workflow 426a1b9c
 doing: -
-next: -
-plan: -
-updated: 2026-10-21 16:49
+next: owner approves push; then workflow_dispatch dry run of Agent Evolve
+plan: docs/plans/plan-agent-evolve.md
+updated: 2026-10-21 18:16

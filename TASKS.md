@@ -435,3 +435,13 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **AM-1** `/autopilot` records every run: `Autopilot-Run: <id>` commit trailer + `docs/metrics/agent-runs/<id>.json` (`resources/run-metrics.template.json`) b8e6f917
 - [x] **AM-2** `scripts/agent-metrics.mjs` (escaped defects, reverts, rounds, CI, PR lead time, cost) + node tests; baseline `docs/reports/agent-metrics-2026-10.md` b8e6f917
+
+## Feature: Agent self-improvement loop "Evolve" (2026-10-21, ADR-0027)
+
+**Plan:** `docs/plans/plan-agent-evolve.md`
+
+- [x] **EV-1** `agent-metrics.mjs --json` signals with stable ids bda91628
+- [x] **EV-2** `scripts/evolve.mjs` (signals, check-paths, manifest, eval, gate) + tests bda91628, 426a1b9c
+- [x] **EV-3** First seeded case from `62526c97` + `evals/README.md` fe36685d, 426a1b9c
+- [x] **EV-4** `/evolve` skill + first evolution (reviewer rule; case caught 0/3 → 3/3) fe36685d, 426a1b9c
+- [x] **EV-5** `.github/workflows/agent-evolve.yml` (propose + ship jobs) 426a1b9c; owner: dispatch dry run after push
