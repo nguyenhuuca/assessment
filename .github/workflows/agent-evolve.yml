@@ -123,7 +123,6 @@ jobs:
       issues: write
     env:
       MAIN: ${{ needs.propose.outputs.main_sha }}
-      T: ${{ runner.temp }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -144,6 +143,7 @@ jobs:
           path: ${{ runner.temp }}/proposal
       - name: Read the proposals
         run: |
+          T="$RUNNER_TEMP"
           mkdir -p "$T/ship"
           if [ -f "$T/proposal/evolve.bundle" ]; then
             git bundle verify "$T/proposal/evolve.bundle"
@@ -159,6 +159,7 @@ jobs:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           set -u
+          T="$RUNNER_TEMP"
           while IFS=$'\t' read -r signal branch case kind body || [ -n "$signal" ]; do
             slug=${branch#evolve/}; r="$T/ship/$slug"
             if ! git rev-parse --verify --quiet "refs/heads/$branch" >/dev/null; then
@@ -193,6 +194,7 @@ jobs:
           AGENT: ${{ needs.propose.outputs.agent }}
         run: |
           set -u
+          T="$RUNNER_TEMP"
           rc=0
           gh label create evolve --color 5319e7 --description "Agent self-improvement (ADR-0027)" --force || rc=1
           text() {  # agent-written PR text: regular file, at most 64 KiB, dedupe markers removed
