@@ -38,6 +38,7 @@
   "list": {
     "title": "Recent reports",
     "empty": "No reports yet.",
+    "loading": "Loading reports...",
     "colIssue": "Issue",
     "colType": "Type",
     "colTitle": "Title",

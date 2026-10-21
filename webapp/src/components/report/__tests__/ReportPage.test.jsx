@@ -247,4 +247,43 @@ describe('ReportPage', () => {
     openRecent()
     expect(screen.queryByText('Too many requests')).toBeNull()
   })
+
+  it('Recent tab shows a loading row, not the empty text, until the list resolves', async () => {
+    let resolve
+    reportsApi.listReports.mockReturnValue(new Promise(r => { resolve = r }))
+    renderPage()
+    openRecent()
+    expect(await screen.findByText(i18n.t('report:list.loading'))).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(i18n.t('report:list.loading'))
+    expect(screen.queryByText(i18n.t('report:list.empty'))).toBeNull()
+
+    resolve({ data: { totalPages: 1, content: [row({ title: 'Loaded bug' })] } })
+    expect(await screen.findByText('Loaded bug')).toBeInTheDocument()
+    expect(screen.queryByText(i18n.t('report:list.loading'))).toBeNull()
+  })
+
+  it('shows the empty text after loading an empty list', async () => {
+    renderPage()
+    openRecent()
+    expect(await screen.findByText(i18n.t('report:list.empty'))).toBeInTheDocument()
+    expect(screen.queryByText(i18n.t('report:list.loading'))).toBeNull()
+  })
+
+  it('a page change shows the loading row above the previous rows', async () => {
+    reportsApi.listReports.mockResolvedValueOnce({ data: { totalPages: 2, content: [row({ title: 'Page one bug' })] } })
+    renderPage()
+    openRecent()
+    await screen.findByText('Page one bug')
+    expect(screen.queryByText(i18n.t('report:list.loading'))).toBeNull()
+
+    let resolve
+    reportsApi.listReports.mockReturnValueOnce(new Promise(r => { resolve = r }))
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('report:list.next') }))
+    expect(await screen.findByText(i18n.t('report:list.loading'))).toBeInTheDocument()
+    expect(screen.getByText('Page one bug')).toBeInTheDocument()
+
+    resolve({ data: { totalPages: 2, content: [row({ id: 'r2', title: 'Page two bug' })] } })
+    expect(await screen.findByText('Page two bug')).toBeInTheDocument()
+    expect(screen.queryByText(i18n.t('report:list.loading'))).toBeNull()
+  })
 })

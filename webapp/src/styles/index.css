@@ -361,6 +361,14 @@ body {
   border-top-color: var(--accent-cyan);
   animation: spin 0.75s linear infinite;
 }
+/* Fits inside a table cell or a line of text */
+.vid-spinner--sm {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+  vertical-align: middle;
+}
 
 /* ── Inline admin field save indicator ── */
 .admin-save-spin {

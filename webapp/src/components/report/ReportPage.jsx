@@ -62,7 +62,7 @@ export default function ReportPage({ fromPage }) {
   const create = useCreateReport()
   const retry = useRetryReport()
   // The list (and the server's GitHub state calls) loads only when its tab is open
-  const { data } = useReports(page, { enabled: tab === 'recent' })
+  const { data, isFetching } = useReports(page, { enabled: tab === 'recent' })
 
   const rows = data?.data?.content ?? []
   const totalPages = data?.data?.totalPages ?? 0
@@ -219,7 +219,16 @@ export default function ReportPage({ fromPage }) {
                 </tr>
               </thead>
               <tbody>
-                {rows.length === 0 && <tr><td colSpan={7} className="admin-cell-muted">{t('list.empty')}</td></tr>}
+                {isFetching && (
+                  <tr>
+                    <td colSpan={7} className="admin-cell-muted">
+                      <span role="status">
+                        <span className="vid-spinner vid-spinner--sm" aria-hidden="true" /> {t('list.loading')}
+                      </span>
+                    </td>
+                  </tr>
+                )}
+                {!isFetching && rows.length === 0 && <tr><td colSpan={7} className="admin-cell-muted">{t('list.empty')}</td></tr>}
                 {rows.map(r => (
                   <tr key={r.id} className="admin-table-row">
                     <td>{r.title}</td>

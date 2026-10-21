@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-21-report-table-loading",
+  "date": "2026-10-21",
+  "mode": "headless",
+  "lite": true,
+  "issue": 51,
+  "pr": 52,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 0,
+  "advisory": 6,
+  "locNonTest": 25,
+  "tests": { "passed": 21, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}
