@@ -387,3 +387,13 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **FE-1** `AdminAccountTable`: promote to ADMIN opens a confirm dialog with the capability list
 - [x] **FE-2** i18n `grantAdmin.*` in `en` and `vi` `admin.json`
 - [x] **FE-3** Vitest: promote waits for Confirm, Cancel/Escape make no call, demote has no dialog
+
+## Feature: Report issue state by GitHub webhook (2026-10-21)
+
+**Plan:** `docs/plans/plan-report-webhook-state.md` · **Spec:** `docs/specs/spec-in-app-report.md` v1.3 · **ADR:** `docs/adr/0026-in-app-report.md` D7
+
+- [x] **WH-1** Migration `github_state*` columns + `AppReport` fields + `GitHubIssueState` enum + repo conditional update 5582b2fc
+- [x] **WH-2** `GitHubWebhookService` (HMAC verify, closed/reopened, ordering) + `GitHubWebhookController` + whitelist + `GITHUB_WEBHOOK_SECRET` 5582b2fc
+- [x] **WH-3** List uses stored state; `ReportDto.githubStateReason` 5582b2fc
+- [x] **WH-4** FE badge shows reason + i18n 90dd0a78
+- [ ] **WH-5** Owner: repo webhook + `GITHUB_WEBHOOK_SECRET` on VM + prod check

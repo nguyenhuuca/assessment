@@ -100,7 +100,7 @@ Rules for the body:
 ### BR-10: Webhook stores the state (ADR-0026 D7)
 
 - `POST /v1/funny-app/webhooks/github` accepts a delivery only when `X-Hub-Signature-256` equals `sha256=` + hex HMAC-SHA256 of the raw body with `GITHUB_WEBHOOK_SECRET`, compared in constant time.
-- Only `X-GitHub-Event: issues` with `action` `closed` or `reopened` changes anything. It sets `github_state` from `issue.state` (`open` → `OPEN`, `closed` → `CLOSED`), `github_state_reason` from `issue.state_reason`, and `github_state_at` from `issue.updated_at`, on the `CREATED` report whose `issue_number` = `issue.number`.
+- Only `X-GitHub-Event: issues` with `action` `closed` or `reopened` changes anything. It sets `github_state` from `issue.state` (`open` → `OPEN`, `closed` → `CLOSED`), `github_state_reason` from `issue.state_reason` (only `completed`, `not_planned`, `duplicate` or `reopened`; any other value is stored as null), and `github_state_at` from `issue.updated_at`, on the `CREATED` report whose `issue_number` = `issue.number`.
 - The update applies only when `issue.updated_at` is after the stored `github_state_at` (or none is stored), so an older delivery that arrives late cannot overwrite a newer state.
 - The repository in the payload (`repository.full_name`) must equal the configured `owner/repo`; otherwise nothing changes.
 
@@ -311,6 +311,7 @@ When GitHub fails, the response is the same with `"status": "FAILED"`, `issueNum
 |--------|-----------|
 | 400 | Valid signature, body is not JSON or lacks `issue.number` for an `issues` event |
 | 401 | `X-Hub-Signature-256` missing, not `sha256=<hex>`, or wrong |
+| 413 | Body larger than 1 MiB (checked before the signature) |
 | 503 | `GITHUB_WEBHOOK_SECRET` not configured |
 
 ### Modified Endpoints
@@ -584,6 +585,8 @@ No `CREATED` report has that `issue_number` → 204, nothing stored, outcome `un
 ### EC-16: Webhook redelivered
 
 The same delivery sent twice: the second has the same `updated_at`, which is not after the stored value, so nothing changes (outcome `stale`); the response is still 204.
+
+> **Accepted limit:** GitHub's `updated_at` has second resolution, so a close and a reopen in the same second keep the first state stored. The next event or a manual redeliver fixes it. The endpoint has no per-IP rate limit; the 1 MiB cap and the HMAC check keep the cost per request small (edge limits apply).
 
 ### EC-17: `ping` and other events
 

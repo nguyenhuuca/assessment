@@ -1,8 +1,8 @@
-task: In-App Report (swarm-execute IR-1..IR-7)
-status: done
-progress: 100
-done: IR-1..IR-4 BE ca21f28e..c1c3760a; IR-5/IR-6 FE 1a110631; startup hotfix e1f87eac; 500 fix 1cde69c8; IR-7 owner setup + prod check
-doing: -
-next: -
-plan: docs/plans/plan-in-app-report.md
-updated: 2026-10-21 07:12
+task: Autopilot: report issue state by GitHub webhook (ADR-0026 D7)
+status: in_progress
+progress: 90
+done: ADR D7 + spec v1.3 92b4dd36; WH-1..WH-3 BE 5582b2fc; WH-4 FE 90dd0a78
+doing: Gate 2 (push approval)
+next: push; watch CI + smoke; owner WH-5 (repo webhook + GITHUB_WEBHOOK_SECRET)
+plan: docs/plans/plan-report-webhook-state.md
+updated: 2026-10-21 09:36
