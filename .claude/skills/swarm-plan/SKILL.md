@@ -45,17 +45,26 @@ Two independent axes: **PRD/PR-FAQ scale with feature size**; **an ADR is trigge
 
 **Medium Feature (1-2 weeks)**
 - `docs/prd/PRD-<feature>.md` — Requirements
+- `docs/sequence/sequence-<feature>.md` — Mermaid sequence diagrams (see below)
 - `docs/plans/plan-<feature>.md` — Implementation steps
 
 **Large Feature (2+ weeks)**
 - `docs/prd/PR-FAQ-<feature>.md` — Vision and customer value
 - `docs/prd/PRD-<feature>.md` — Detailed requirements
+- `docs/sequence/sequence-<feature>.md` — Mermaid sequence diagrams (see below)
 - `docs/plans/plan-<feature>.md` — Implementation steps
 
 **ADR — any size** (`docs/adr/NNNN-<topic>.md`; format: `writing-adrs` skill; template bundled with `designing-systems` at `resources/adr.template.md`)
 - Required when the work contains a One-Way Door (High) decision (Decision Framework above), or a decision on the `writing-adrs` "When to Write an ADR" list (framework/library, database or storage, a new API pattern, a coding convention, infrastructure, anything affecting multiple components)
 - One-Way Door (Medium) decisions: record the RFC/design excerpt in the plan's design section instead of a separate ADR
 - Following an existing pattern (another endpoint, another Liquibase column) is not a new decision and needs no ADR
+
+**Sequence diagrams — every feature with a PRD** (`docs/sequence/sequence-<feature>.md`, slug = PRD slug; template `templates/artifacts/sequence.template.md`)
+- Mermaid `sequenceDiagram` blocks only (mkdocs renders them); one diagram per main flow: happy path first, then the failure, async/event and scheduled-job paths that matter
+- Participants are real names from the code or the ADR/spec (page/hook, controller, service, repository, external system)
+- Write it before the plan (`/spec` writes it when it runs; otherwise this skill does). If it is missing, create it as part of planning. Plan tasks cite it in the plan's architecture section
+- Small features without a PRD need none. When the as-built flow changes, update the diagram in the same commit as the code
+- Link it from `docs/tracking.md` (Sequence column) and `mkdocs.yml` (nav "Sequence Diagrams")
 
 ## Worker Types
 
@@ -137,7 +146,7 @@ Link dependencies with `TaskUpdate` (addBlockedBy): Task 2 gets Task 1 added to 
 ## Output
 
 Every planning session MUST produce:
-1. Artifact(s) in `docs/` following naming conventions
+1. Artifact(s) in `docs/` following naming conventions (including `docs/sequence/sequence-<feature>.md` when the feature has a PRD)
 2. Tasks (via `TaskCreate`) for all implementation work, each with acceptance criteria
    - **This repo:** also add a `## Feature: <name>` section to `TASKS.md` with one `- [ ] **<ID>**` line per task (the native list is machine-local; `TASKS.md` is the durable record). If `TaskCreate` is unavailable, `TASKS.md` + the plan's task table are the record.
 3. Dependency graph showing task order (via `blockedBy`)

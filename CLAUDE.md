@@ -75,7 +75,7 @@ Distilled from `.claude/rules/` (auto-loaded); the rules and skills refer to the
 
 ## Workflow & Artifacts
 
-**Planning flow**: PR-FAQ → PRD → ADR → Spec (+ Design spec for UI) → Plan → implementation; ceremony scales with scope (`core-directives.md` Rule 6): PRD by feature size, ADR by decision type at any size. Skills and templates (`templates/artifacts/`) use these names; if one disagrees, this table wins:
+**Planning flow**: PR-FAQ → PRD → ADR → Spec (+ Design spec for UI) → Sequence diagrams → Plan → implementation; ceremony scales with scope (`core-directives.md` Rule 6): PRD by feature size, ADR by decision type at any size, and **every feature with a PRD gets Mermaid sequence diagrams** before its plan. Skills and templates (`templates/artifacts/`) use these names; if one disagrees, this table wins:
 
 | Type | Location | Example |
 |------|----------|---------|
@@ -85,13 +85,14 @@ Distilled from `.claude/rules/` (auto-loaded); the rules and skills refer to the
 | Spec | `docs/specs/spec-<feature>.md` | `docs/specs/spec-user-settings.md` |
 | Design spec (UI) | `docs/specs/design-spec-<component>.md` | — |
 | System design | `docs/architecture/system-design-<component>.md` | — |
+| Sequence diagrams (Mermaid, required with a PRD) | `docs/sequence/sequence-<feature>.md` (slug = PRD slug) | `docs/sequence/sequence-watch-history-v2.md` |
 | Plan / roadmap | `docs/plans/plan-<feature>.md`, `docs/plans/roadmap-<project>.md` | `docs/plans/plan-watch-history-v2.md` |
 | Security audit / postmortem | `docs/reports/security-audit-<YYYY-MM-DD>.md`, `docs/reports/postmortem-<YYYY-MM-DD>-<incident>.md` | `docs/reports/system-health-2026-05-30.md` |
 | Feature status | `docs/tracking.md` | — |
 
 Ephemeral notes go to `./scratchpad/` (gitignored). `./artifacts/` holds design images (Stitch exports), not planning docs.
 
-**User-invoked skills**: `/swarm-plan`, `/swarm-execute`, `/swarm-review`, `/swarm-research`, `/architect`, `/builder`, `/qa-engineer`, `/security-auditor`, `/ui-ux-designer`, `/code-check`, `/land-the-plane`, `/tailor`, `/scope` (idea → PRD), `/spec` (PRD + ADR → spec), `/presentation` (doc → HTML deck), `/autopilot` (one small feature or fix: plan ⇄ review → your approval → build ⇄ review → QA tests ×2 → commit → your push approval; `docs/plans/plan-autopilot.md`), `/task-resume` (continue the unfinished task in `session.txt`; format and update rules in `.claude/rules/session-file.md`).
+**User-invoked skills**: `/swarm-plan`, `/swarm-execute`, `/swarm-review`, `/swarm-research`, `/architect`, `/builder`, `/qa-engineer`, `/security-auditor`, `/ui-ux-designer`, `/code-check`, `/land-the-plane`, `/tailor`, `/scope` (idea → PRD), `/spec` (PRD + ADR → spec + sequence diagrams), `/presentation` (doc → HTML deck), `/autopilot` (one small feature or fix: plan ⇄ review → your approval → build ⇄ review → QA tests ×2 → commit → your push approval; `docs/plans/plan-autopilot.md`), `/task-resume` (continue the unfinished task in `session.txt`; format and update rules in `.claude/rules/session-file.md`).
 
 ## Project Overview
 

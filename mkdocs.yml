@@ -102,6 +102,20 @@ nav:
       - User Settings: specs/spec-user-settings.md
       - In-App Report: specs/spec-in-app-report.md
 
+  - Sequence Diagrams:
+      - Overview: sequence/index.md
+      - Admin Video Import: sequence/sequence-admin-video-import.md
+      - Bookmark / Collections: sequence/sequence-bookmark-feature.md
+      - Hot Video Priority: sequence/sequence-hot-video-priority.md
+      - i18n: sequence/sequence-i18n.md
+      - In-App Report: sequence/sequence-in-app-report.md
+      - Password Login: sequence/sequence-password-login.md
+      - React Migration: sequence/sequence-react-migration.md
+      - User Notifications: sequence/sequence-user-notifications.md
+      - User Settings: sequence/sequence-user-settings.md
+      - Video Suggestions: sequence/sequence-video-suggestions.md
+      - Watch History (v2): sequence/sequence-watch-history-v2.md
+
   - Plans:
       - HLS Migration: plans/plan-hls-migration.md
       - React Migration: plans/plan-react-migration.md

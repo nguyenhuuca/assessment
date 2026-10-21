@@ -99,8 +99,9 @@ After writing the PRD, offer:
 1. Create **ADR** (`docs/adr/00NN-{slug}.md`) using `templates/artifacts/adr.template.md`
    - Key sections to fill: Metadata, Context, Decision Drivers, Considered Options (pros/cons per option), Decision Outcome, Consequences, Validation, Links, Changelog
    - Do NOT include Technical Details or Implementation Steps in the ADR — those go in the Plan
-2. Create **Implementation Plan** (`docs/plans/plan-{slug}.md`) using `templates/artifacts/plan.template.md`
-3. Add entries to **`mkdocs.yml`** nav
+2. Run **`/spec`**, which also writes the required **sequence diagrams** (`docs/sequence/sequence-{slug}.md`, Mermaid, from `templates/artifacts/sequence.template.md`). Every feature with a PRD needs them before its plan
+3. Create **Implementation Plan** (`docs/plans/plan-{slug}.md`) using `templates/artifacts/plan.template.md`
+4. Add entries to **`mkdocs.yml`** nav
 
 Do not auto-create these — wait for the user to confirm.
 

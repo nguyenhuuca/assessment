@@ -128,12 +128,16 @@ Fill every section. Where information comes from assumption rather than user inp
 - Edge Cases — EC-1, EC-2... with exact expected behavior
 - Acceptance Criteria — testable checklist QA can use directly
 
+### Step 4b — Write the sequence diagrams
+
+Create (or update) `docs/sequence/sequence-{kebab-slug}.md` from `templates/artifacts/sequence.template.md`: Mermaid `sequenceDiagram` blocks, one per main flow in the spec (happy path, then the error, async/event and scheduled-job paths from FR / EC). Use the endpoint paths, status codes and component names from the spec, so the diagrams and the spec agree. Link the file from the spec's Overview.
+
 ### Step 5 — Update tracking and offer next steps
 
 After writing the Spec:
-1. Update `docs/tracking.md` — set Spec column for this feature to link + 📋
+1. Update `docs/tracking.md` — set Spec column for this feature to link + 📋, and the Sequence column to the diagram link
 2. Offer to create **Implementation Plan** (`docs/plans/plan-{slug}.md`) via `/swarm-plan`
-3. Offer to add entry to **`mkdocs.yml`** nav under Specs
+3. Offer to add entries to **`mkdocs.yml`** nav under Specs and Sequence Diagrams
 
 Do not auto-create these — wait for the user to confirm.
 
