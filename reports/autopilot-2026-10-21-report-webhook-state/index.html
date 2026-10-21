@@ -6504,8 +6504,8 @@
 <li><strong>Request:</strong> GitHub webhook stores report issue state (ADR-0026 D7, spec v1.3 BR-9, BR-10, FR-8, EC-14..EC-17)</li>
 <li><strong>Mode:</strong> local</li>
 <li><strong>Plan:</strong> <a href="../../plans/plan-report-webhook-state/">plan-report-webhook-state</a></li>
-<li><strong>Started:</strong> 2026-10-21 09:15 · <strong>Landed:</strong> pending (Gate 2)</li>
-<li><strong>Result:</strong> committed <code>5582b2fc</code> (BE) + <code>90dd0a78</code> (FE), waiting for push approval</li>
+<li><strong>Started:</strong> 2026-10-21 09:15 · <strong>Landed:</strong> 2026-10-21 09:50</li>
+<li><strong>Result:</strong> ✅ pushed <code>c966dd46</code> (BE <code>5582b2fc</code>, FE <code>90dd0a78</code>); CI green, smoke 22/22</li>
 </ul>
 <h2 id="pipeline">Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h2>
 <table>
@@ -6564,12 +6564,12 @@
 </tr>
 <tr>
 <td>Gate 2 (owner)</td>
-<td>pending</td>
+<td>push</td>
 <td>—</td>
 </tr>
 <tr>
 <td>CI + smoke</td>
-<td>pending: runs after push</td>
+<td>Build and Deploy, Deploy Frontend, Publish Docs green; <code>mock-test.sh</code> 22/22; prod probe: unsigned POST → 503 (secret not set yet), foreign Origin → 403 (CORS, browsers only), admin list without JWT → 401</td>
 <td>—</td>
 </tr>
 </tbody>
