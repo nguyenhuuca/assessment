@@ -6534,8 +6534,8 @@
 <li><strong>Request:</strong> notify user tao report khi issue duoc close</li>
 <li><strong>Mode:</strong> local (started lite, promoted to full when the diff passed ~100 LOC)</li>
 <li><strong>Plan:</strong> <a href="../../plans/plan-report-closed-notify/">plan-report-closed-notify</a></li>
-<li><strong>Started:</strong> 2026-10-21 10:43 · <strong>Landed:</strong> pending (Gate 2)</li>
-<li><strong>Result:</strong> committed <code>801dcb9f</code> (BE) + <code>b3030e52</code> (FE), waiting for push approval</li>
+<li><strong>Started:</strong> 2026-10-21 10:43 · <strong>Landed:</strong> 2026-10-21 11:10</li>
+<li><strong>Result:</strong> ✅ pushed <code>6d5fe722</code> (BE <code>801dcb9f</code>, FE <code>b3030e52</code>); CI green, smoke 22/22</li>
 </ul>
 <h2 id="pipeline">Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h2>
 <table>
@@ -6594,12 +6594,12 @@
 </tr>
 <tr>
 <td>Gate 2 (owner)</td>
-<td>pending</td>
+<td>push</td>
 <td>—</td>
 </tr>
 <tr>
 <td>CI + smoke</td>
-<td>pending: runs after push</td>
+<td>Build and Deploy, Deploy Frontend, Publish Docs green; <code>mock-test.sh</code> 22/22; webhook still answers 401 to an unsigned POST</td>
 <td>—</td>
 </tr>
 </tbody>

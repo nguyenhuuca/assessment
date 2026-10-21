@@ -6575,7 +6575,7 @@
 
 
 <h1 id="plan-notify-the-reporter-when-the-reports-issue-is-closed">Plan: Notify the Reporter When the Report's Issue Is Closed<a class="headerlink" href="#plan-notify-the-reporter-when-the-reports-issue-is-closed" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Built (RN-1..RN-3, <code>801dcb9f</code>, <code>b3030e52</code>) · <strong>ADR:</strong> none (follows ADR-0017 notifications and ADR-0026 D7 webhook) · <strong>Parent:</strong> <a href="../plan-report-webhook-state/">plan-report-webhook-state</a></p>
+<p><strong>Status:</strong> Done, deployed 2026-10-21 (RN-1..RN-3, <code>801dcb9f</code>, <code>b3030e52</code>); owner check of the bell pending · <strong>ADR:</strong> none (follows ADR-0017 notifications and ADR-0026 D7 webhook) · <strong>Parent:</strong> <a href="../plan-report-webhook-state/">plan-report-webhook-state</a></p>
 <blockquote>
 <p>Started as an autopilot lite run; promoted to full mode when the diff passed ~100 LOC (tests excluded).
 Implementation note: <code>ReportClosedEvent</code> carries <code>(issueNumber, reason)</code> instead of the report id; the listener looks the report up by issue number, so the webhook needs no extra query.</p>
