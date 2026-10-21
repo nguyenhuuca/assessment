@@ -7193,7 +7193,7 @@
 <h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
 <p><strong>Option B.</strong></p>
 <h3 id="d1-the-loop">D1. The loop<a class="headerlink" href="#d1-the-loop" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>weekly cron (or /evolve locally)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/evolve (run by the owner)
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  Observe   agent-metrics --json → new signals (escaped defect, revert, blocked, flaky, /revise, cost jump)
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  Diagnose  per signal: original run diff, fix commit, plan/report → Five Whys → the stage that should have caught it
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  Propose   one small change at that stage, on branch evolve/&lt;date&gt;-&lt;signal&gt;
@@ -7227,12 +7227,10 @@
 </ul>
 <h3 id="d4-running-it">D4. Running it<a class="headerlink" href="#d4-running-it" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Headless:</strong> <code>.github/workflows/agent-evolve.yml</code>, cron weekly (Monday) plus <code>workflow_dispatch</code>, owner-only like ADR-0022. Never merges. Two jobs, so the agent never holds a write token:</li>
-<li><strong>propose</strong> (read-only token): signals (saved as an artifact <strong>before</strong> the agent runs) → agent commits on <code>evolve/*</code> branches with a narrowed git allowlist (no push, config, update-ref, <code>-c</code>) → branches leave as a git bundle, PR texts as an artifact.</li>
-<li><strong>ship</strong> (write token): fresh checkout of the main SHA the signals were computed on → manifest validated against the saved signals → <code>check-paths</code> and <code>gate</code> with no GitHub token in the env → push + <code>gh pr create --label evolve</code>, or an <code>evolve</code> issue. A signal without a proposal is closed with an issue only when the agent step succeeded.</li>
-<li>Gate hardening: the case must be added by the branch, its <code>base</code>/<code>head</code> must be commits on <code>main</code>, rule-file frontmatter is frozen (new skills: <code>name</code>, <code>description</code>, <code>argument-hint</code>, <code>disable-model-invocation</code> only), no new agents, and <code>not-eval-proven</code> proposals may not touch the reviewer's rules.</li>
-<li><strong>Local:</strong> <code>/evolve</code> runs the same stages in the session and stops before the push, like autopilot Gate 2.</li>
-<li><strong>Budget:</strong> <code>--max-turns</code> on the agent step, at most 3 signals, at most 3 eval runs for the new case and 1 run per existing case; the job fails closed when a budget is hit.</li>
+<li><strong>Local only:</strong> the owner runs <code>/evolve</code>; it goes through the same stages in the session and asks before any push or merge, like autopilot Gate 2.</li>
+<li><strong>Gate hardening:</strong> the case must be added by the branch, its <code>base</code>/<code>head</code> must be commits on <code>main</code>, rule-file frontmatter is frozen (new skills: <code>name</code>, <code>description</code>, <code>argument-hint</code>, <code>disable-model-invocation</code> only), no new agents, and <code>not-eval-proven</code> proposals may not touch the reviewer's rules.</li>
+<li><strong>Budget:</strong> at most 3 signals per run, at most 3 eval runs for the new case and 1 run per existing case (retry once on a miss).</li>
+<li><strong>Headless workflow removed (2026-10-21).</strong> A weekly <code>.github/workflows/agent-evolve.yml</code> (propose job with a read-only token, ship job that checks and opens the PR) was built and then removed by the owner. Its first real run showed that headless Claude Code treats <code>.claude/</code> files as sensitive and asks for permission on every edit, which CI cannot grant, so the agent could not write a single proposal; a packaging bug then closed the month's signal with a wrong "no proposal" issue (#50). Running it headless again needs a new decision (for example: the agent writes encoded file copies outside <code>.claude/</code> and the ship job applies them).</li>
 </ul>
 <h3 id="d5-pruning">D5. Pruning<a class="headerlink" href="#d5-pruning" title="Permanent link">&para;</a></h3>
 <ul>
@@ -7256,7 +7254,7 @@
 <ul>
 <li><strong>Good:</strong> every escaped defect becomes a regression eval for the agent, and each rule change has before/after evidence. The eval set grows with real bugs, never with invented ones.</li>
 <li><strong>Good:</strong> the owner's job shrinks to reading a short PR (Five Whys + eval table) and merging or closing it.</li>
-<li><strong>Cost:</strong> about one agent run (~$1–3) plus the evals (one Sonnet review per case run, ~$0.10–0.20) per weekly run with signals; a run with no new signal stops after the metrics step at almost no cost.</li>
+<li><strong>Cost:</strong> about one agent run (~$1–3) plus the evals (one Sonnet review per case run, ~$0.10–0.20) per <code>/evolve</code> run with signals; with no new signal it stops after the metrics step.</li>
 <li><strong>Limit:</strong> only stages a reviewer can be tested on are proven by D3. Changes to plan review or QA rules are proposed with the Five Whys only and marked "not eval-proven" in the PR.</li>
 <li><strong>Limit:</strong> keyword grading can miss a correct finding worded differently; the 2-of-3 rule and the owner's read cover that.</li>
 <li><strong>Risk:</strong> a merged rule could still hurt cases not in the eval set. The monthly metrics and D5 pruning are the backstop; rollback is <code>git revert</code> of the evolve PR.</li>
@@ -7276,6 +7274,7 @@
 <ul>
 <li>2026-10-21: Proposed; accepted by the owner the same day. The eval runner lives in <code>scripts/evolve.mjs</code> (subcommands <code>signals</code>, <code>check-paths</code>, <code>eval</code>, <code>gate</code>).</li>
 <li>2026-10-21: D6 (compress) added at the owner's request: Evolve may also remove duplicate, dead or stale text, with protected lines and a size + eval gate.</li>
+<li>2026-10-21: headless workflow <code>agent-evolve.yml</code> removed at the owner's request (D4); <code>/evolve</code> is local only. The <code>manifest</code> command went with it.</li>
 </ul>
 
 

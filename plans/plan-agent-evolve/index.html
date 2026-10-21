@@ -7073,7 +7073,7 @@
 <h1 id="plan-agent-self-improvement-loop-evolve">Plan: Agent self-improvement loop ("Evolve")<a class="headerlink" href="#plan-agent-self-improvement-loop-evolve" title="Permanent link">&para;</a></h1>
 <ul>
 <li><strong>ADR:</strong> <a href="../../adr/0027-agent-self-improvement-loop/">ADR-0027</a> (Accepted 2026-10-21)</li>
-<li><strong>Status:</strong> In progress</li>
+<li><strong>Status:</strong> Done (EV-5 headless workflow removed 2026-10-21, see ADR-0027 D4)</li>
 </ul>
 <h2 id="design-facts">Design (facts)<a class="headerlink" href="#design-facts" title="Permanent link">&para;</a></h2>
 <ul>
@@ -7114,7 +7114,7 @@
 </tr>
 <tr>
 <td>EV-5</td>
-<td><code>.github/workflows/agent-evolve.yml</code>: weekly cron + dispatch; signals → agent → check-paths → gate → push + PR (label <code>evolve</code>) or issue</td>
+<td>~~<code>.github/workflows/agent-evolve.yml</code>~~ (removed 2026-10-21): weekly cron + dispatch; signals → agent → check-paths → gate → push + PR (label <code>evolve</code>) or issue</td>
 <td><code>actionlint</code>-clean YAML; dry run via <code>workflow_dispatch</code> after push (owner)</td>
 </tr>
 </tbody>

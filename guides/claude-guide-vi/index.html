@@ -3953,10 +3953,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tien-hoa-evolve-va-workflow-hang-tuan" class="md-nav__link">
+  <a href="#tien-hoa-evolve" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🧬 Tiến hoá: /evolve và workflow hàng tuần
+        🧬 Tiến hoá: /evolve
       
     </span>
   </a>
@@ -8040,10 +8040,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tien-hoa-evolve-va-workflow-hang-tuan" class="md-nav__link">
+  <a href="#tien-hoa-evolve" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🧬 Tiến hoá: /evolve và workflow hàng tuần
+        🧬 Tiến hoá: /evolve
       
     </span>
   </a>
@@ -8519,7 +8519,7 @@
 </ol>
 <hr />
 <h2 id="cac-cap-o-su-dung-claude">Các cấp độ sử dụng Claude<a class="headerlink" href="#cac-cap-o-su-dung-claude" title="Permanent link">&para;</a></h2>
-<p>Dự án dùng Claude Code theo 7 cấp. Cấp càng cao, Claude tự làm càng nhiều và bạn chạm vào càng ít. Rules, hooks và quality gates ở cấp thấp vẫn áp dụng ở mọi cấp trên.</p>
+<p>Dự án dùng Claude Code theo 6 cấp. Cấp càng cao, Claude tự làm càng nhiều và bạn chạm vào càng ít. Rules, hooks và quality gates ở cấp thấp vẫn áp dụng ở mọi cấp trên.</p>
 <table>
 <thead>
 <tr>
@@ -8566,12 +8566,6 @@
 <td>Chỉ gắn label</td>
 <td>Issue #36 → PR #37 merged + deployed trong ~5 phút, build job $0.39</td>
 </tr>
-<tr>
-<td>7</td>
-<td><strong>Tự cải thiện</strong> (<a href="../../adr/0027-agent-self-improvement-loop/">ADR-0027</a>): <code>agent-metrics</code> tìm bug lọt, <code>/evolve</code> thêm rule được seeded-bug eval chứng minh, workflow chạy hàng tuần</td>
-<td>Merge hoặc đóng PR <code>evolve</code></td>
-<td>Bug <code>62526c97</code> → rule cho reviewer, case bắt 0/3 → 3/3</td>
-</tr>
 </tbody>
 </table>
 <p><strong>Chọn cấp nào:</strong>
@@ -8579,8 +8573,7 @@
 - Sửa nhỏ, cần bạn nhìn từng bước → <strong>cấp 2</strong>.
 - Feature vừa/lớn (cần PRD, nhiều ngày) → <strong>cấp 3</strong>.
 - Feature nhỏ, fix, refactor có acceptance criteria rõ → <strong>cấp 4</strong>, hoặc <strong>cấp 5</strong> nếu không mở terminal.
-- Việc nhỏ, rủi ro thấp, không đụng migration hay config agent → <strong>cấp 6</strong>.
-- Cấp 7 tự chạy mỗi tuần; bạn chỉ review PR của nó. Xem <a href="#o-chat-luong-evolve-agent-tu-cai-thien">Đo chất lượng &amp; Evolve</a>.</p>
+- Việc nhỏ, rủi ro thấp, không đụng migration hay config agent → <strong>cấp 6</strong>.</p>
 <hr />
 <h2 id="cau-hinh-co-san">Cấu hình có sẵn<a class="headerlink" href="#cau-hinh-co-san" title="Permanent link">&para;</a></h2>
 <h3 id="cau-truc-thu-muc">📁 Cấu trúc thư mục<a class="headerlink" href="#cau-truc-thu-muc" title="Permanent link">&para;</a></h3>
@@ -8717,8 +8710,8 @@
 <tr>
 <td><code>/evolve [--since &lt;ngày&gt;]</code></td>
 <td>Self-Improver</td>
-<td>Biến signal từ agent-metrics thành thay đổi rule có chứng minh (cũng chạy hàng tuần trên GitHub)</td>
-<td>Branch <code>evolve/*</code> + PR, seeded case trong <code>evals/seeded/</code></td>
+<td>Biến signal từ agent-metrics thành thay đổi rule có chứng minh (chỉ chạy local)</td>
+<td>Branch <code>evolve/*</code>, seeded case trong <code>evals/seeded/</code></td>
 </tr>
 <tr>
 <td><code>/task-resume [chỉ dẫn]</code></td>
@@ -9427,9 +9420,9 @@
 <li><strong>Cách nhận ra run:</strong> mọi commit của autopilot có trailer <code>Autopilot-Run: &lt;YYYY-MM-DD&gt;-&lt;slug&gt;</code>; run cũ hơn được nhận qua hash trong report hoặc tên PR headless.</li>
 <li><strong>Baseline tháng 10</strong> (<a href="../../reports/agent-metrics-2026-10/">report</a>): 16 run, escaped defect rate <strong>6%</strong> (1/16: run dynamic-cron-jobs, sửa bởi <code>62526c97</code>), 0 revert, PR headless mở → merge trung vị 7 phút.</li>
 </ul>
-<h3 id="tien-hoa-evolve-va-workflow-hang-tuan">🧬 Tiến hoá: <code>/evolve</code> và workflow hàng tuần<a class="headerlink" href="#tien-hoa-evolve-va-workflow-hang-tuan" title="Permanent link">&para;</a></h3>
+<h3 id="tien-hoa-evolve">🧬 Tiến hoá: <code>/evolve</code><a class="headerlink" href="#tien-hoa-evolve" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Observe (signals) → Diagnose (Five Whys → stage lẽ ra phải bắt) → Propose (thêm một rule + một seeded case)
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>  → Prove (eval gate) → Ship (PR label `evolve`) → bạn merge hoặc đóng
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>  → Prove (eval gate) → Ship (bạn chọn: merge, mở PR, giữ branch hoặc bỏ)
 </code></pre></div>
 <ul>
 <li><strong>Signals:</strong> <code>defect:&lt;sha&gt;</code>, <code>revert:&lt;sha&gt;</code>, <code>blocked:&lt;run&gt;</code>, <code>flaky:&lt;run&gt;</code>, <code>review-skipped:&lt;run&gt;</code>, <code>revise:pr-&lt;N&gt;</code>. Signal nào đã có PR hoặc issue <code>evolve</code> (kể cả cái bạn đã đóng) hoặc đã có seeded case thì không đề xuất lại. Tối đa 3 signal mỗi run.</li>
@@ -9440,33 +9433,28 @@
 <li>mọi case cũ vẫn bắt được;</li>
 <li>chi phí reviewer tăng tối đa 25%.</li>
 <li><strong>Agent được sửa gì:</strong> chỉ được thêm dòng vào <code>.claude/skills/**</code>, <code>.claude/rules/*.md</code>, phần prompt của <code>.claude/agents/*.md</code>, và thêm case mới. Không bao giờ đụng <code>scripts/</code>, <code>.github/</code>, hooks, settings, case cũ, threshold hay code app. Frontmatter bị khoá. Do code kiểm tra (<code>check-paths</code>), không phải do prompt.</li>
-<li><strong>Headless</strong> (<code>.github/workflows/agent-evolve.yml</code>, thứ Hai 09:00 hoặc Actions → "Agent Evolve" → Run workflow):</li>
-<li>job <strong>propose</strong> chỉ có token đọc; agent commit lên branch <code>evolve/*</code>, branch rời job dưới dạng git bundle (chỉ là dữ liệu);</li>
-<li>job <strong>ship</strong> checkout <code>main</code> sạch, kiểm tra manifest của agent, chạy <code>check-paths</code> và gate khi không có GitHub token, rồi mở PR (pass) hoặc issue <code>evolve</code> (fail). <strong>Không bao giờ merge</strong>: bạn merge.</li>
-<li><strong>Local:</strong> <code>/evolve</code> chạy cùng các bước và hỏi bạn trước khi push.</li>
+<li><strong>Cách chạy:</strong> gõ <code>/evolve</code> (chỉ chạy local). Nó dừng ở bước Ship và hỏi bạn: merge vào <code>main</code>, push và mở PR, giữ branch, hay bỏ. Workflow headless chạy hàng tuần đã được thử rồi gỡ bỏ: Claude Code headless không sửa được file trong <code>.claude/</code> nếu không có người duyệt quyền (<a href="../../adr/0027-agent-self-improvement-loop/">ADR-0027</a> D4).</li>
 <li><strong>Dọn rule (prune):</strong> mỗi rule do Evolve thêm kết thúc bằng <code>&lt;!-- evolve:&lt;case id&gt; --&gt;</code>; run sau có thể đề xuất gỡ một rule, chỉ khi case của nó vẫn bắt được khi không có rule đó.</li>
 <li><strong>Compress</strong> (ADR-0027 D6): mỗi tháng một lần (<code>compress:&lt;YYYY-MM&gt;</code>), Evolve được <strong>cắt bớt</strong> nội dung: trùng lặp, tham chiếu chết, nội dung mâu thuẫn với source of truth, số liệu lỗi thời, trong <code>.claude/</code> và <code>CLAUDE.md</code>.</li>
 <li><code>node scripts/evolve.mjs lint-rules</code> đưa gợi ý (dòng trùng, path chết, kích thước context luôn load, hiện khoảng 37 KB).</li>
 <li>Không bao giờ cắt: <code>AGENTS.md</code>, <code>security.md</code>, skill evolve, frontmatter, và mọi dòng mang luật an toàn (push, gate, merge, deny, secret, prod, smoke, Core Principles, "never …").</li>
-<li>Gate: nhỏ hơn (context luôn load -5% hoặc file bị sửa -1 KiB), không thêm dòng trùng hay ref chết, mọi seeded case vẫn bắt được. Luôn là <strong>draft</strong> PR: bạn đọc từng dòng bị xoá.</li>
+<li>Gate: nhỏ hơn (context luôn load -5% hoặc file bị sửa -1 KiB), không thêm dòng trùng hay ref chết, mọi seeded case vẫn bắt được. Bạn đọc từng dòng bị xoá trước khi merge.</li>
 <li>Compress đầu tiên (<code>evolve/compress-2026-10</code>): phần cost trong <code>CLAUDE.md</code>, ba mục trùng nhau → một, -1.1 KB, gate PASS.</li>
 <li>
 <p><strong>Cách dùng:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># 1. Xem có gì cắt được (chỉ là gợi ý; vài "dead ref" thật ra là ví dụ trong text)</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>node<span class="w"> </span>scripts/evolve.mjs<span class="w"> </span>lint-rules
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># 2a. Để GitHub làm: Actions → "Agent Evolve" → Run workflow (hoặc đợi thứ Hai).</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1">#     Mỗi tháng nó đề xuất một compress dưới dạng DRAFT PR label `evolve`.</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1"># 2b. Hoặc chạy local: /evolve   (signal compress:&lt;YYYY-MM&gt; nằm trong danh sách; dừng trước khi push)</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c1"># 3. Tự cắt bằng tay trên branch? Kiểm tra bằng đúng gate mà workflow dùng</span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>git<span class="w"> </span>switch<span class="w"> </span>-c<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="c1">#    ... sửa CLAUDE.md / .claude/ rồi commit ...</span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>node<span class="w"> </span>scripts/evolve.mjs<span class="w"> </span>check-paths<span class="w"> </span>--base<span class="w"> </span>main<span class="w"> </span>--head<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;<span class="w"> </span>--kind<span class="w"> </span>compress
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>node<span class="w"> </span>scripts/evolve.mjs<span class="w"> </span>gate<span class="w"> </span>--base<span class="w"> </span>main<span class="w"> </span>--head<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;<span class="w"> </span>--kind<span class="w"> </span>compress<span class="w">   </span><span class="c1"># ~$0.15 mỗi seeded case</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># 2. Chạy: /evolve   (mỗi tháng có signal compress:&lt;YYYY-MM&gt; trong danh sách; dừng trước khi push)</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1"># 3. Tự cắt bằng tay trên branch? Kiểm tra bằng đúng gate mà workflow dùng</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>git<span class="w"> </span>switch<span class="w"> </span>-c<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c1">#    ... sửa CLAUDE.md / .claude/ rồi commit ...</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>node<span class="w"> </span>scripts/evolve.mjs<span class="w"> </span>check-paths<span class="w"> </span>--base<span class="w"> </span>main<span class="w"> </span>--head<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;<span class="w"> </span>--kind<span class="w"> </span>compress
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>node<span class="w"> </span>scripts/evolve.mjs<span class="w"> </span>gate<span class="w"> </span>--base<span class="w"> </span>main<span class="w"> </span>--head<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;<span class="w"> </span>--kind<span class="w"> </span>compress<span class="w">   </span><span class="c1"># ~$0.15 mỗi seeded case</span>
 </code></pre></div>
 <ul>
-<li><strong>Review draft PR:</strong> đọc từng dòng bị xoá (<code>git diff main...&lt;branch&gt;</code>). Merge nếu mỗi chỗ cắt đúng là trùng lặp, ref chết hoặc lỗi thời; ngược lại thì đóng PR (signal của tháng đó không đề xuất lại).</li>
+<li><strong>Review:</strong> đọc từng dòng bị xoá (<code>git diff main...&lt;branch&gt;</code>). Merge nếu mỗi chỗ cắt đúng là trùng lặp, ref chết hoặc lỗi thời; ngược lại thì bỏ.</li>
 <li><strong>Bỏ qua một tháng:</strong> tạo issue label <code>evolve</code> có body chứa <code>&lt;!-- evolve:signal=compress:&lt;YYYY-MM&gt; --&gt;</code>.</li>
 </ul>
 </li>
@@ -9481,11 +9469,11 @@
 </thead>
 <tbody>
 <tr>
-<td>Tuần không có signal mới</td>
+<td><code>/evolve</code> không có signal mới</td>
 <td>gần như 0 (dừng sau bước metrics)</td>
 </tr>
 <tr>
-<td>Tuần có signal</td>
+<td><code>/evolve</code> có signal</td>
 <td>~$1–3 cho agent + ~$0.15 mỗi lần eval (6 lần mỗi đề xuất + 1 lần mỗi case cũ)</td>
 </tr>
 </tbody>

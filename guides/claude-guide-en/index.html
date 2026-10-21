@@ -3925,10 +3925,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#evolving-evolve-and-the-weekly-workflow" class="md-nav__link">
+  <a href="#evolving-evolve" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🧬 Evolving: /evolve and the weekly workflow
+        🧬 Evolving: /evolve
       
     </span>
   </a>
@@ -8040,10 +8040,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#evolving-evolve-and-the-weekly-workflow" class="md-nav__link">
+  <a href="#evolving-evolve" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🧬 Evolving: /evolve and the weekly workflow
+        🧬 Evolving: /evolve
       
     </span>
   </a>
@@ -8519,7 +8519,7 @@
 </ol>
 <hr />
 <h2 id="levels-of-using-claude">Levels of Using Claude<a class="headerlink" href="#levels-of-using-claude" title="Permanent link">&para;</a></h2>
-<p>This project uses Claude Code at 7 levels. The higher the level, the more Claude does on its own and the less you touch. Rules, hooks and quality gates from the lower levels still apply at every level above.</p>
+<p>This project uses Claude Code at 6 levels. The higher the level, the more Claude does on its own and the less you touch. Rules, hooks and quality gates from the lower levels still apply at every level above.</p>
 <table>
 <thead>
 <tr>
@@ -8566,12 +8566,6 @@
 <td>Only add the label</td>
 <td>Issue #36 → PR #37 merged and deployed in ~5 minutes, build job $0.39</td>
 </tr>
-<tr>
-<td>7</td>
-<td><strong>Self-improving</strong> (<a href="../../adr/0027-agent-self-improvement-loop/">ADR-0027</a>): <code>agent-metrics</code> finds escaped defects, <code>/evolve</code> adds a rule that a seeded-bug eval proves, weekly workflow</td>
-<td>Merge or close an <code>evolve</code> PR</td>
-<td>Defect <code>62526c97</code> → reviewer rule, case caught 0/3 → 3/3</td>
-</tr>
 </tbody>
 </table>
 <p><strong>Which level to pick:</strong>
@@ -8579,8 +8573,7 @@
 - A small change you want to watch step by step → <strong>level 2</strong>.
 - A medium or large feature (needs a PRD, several days) → <strong>level 3</strong>.
 - A small feature, fix or refactor with clear acceptance criteria → <strong>level 4</strong>, or <strong>level 5</strong> without a terminal.
-- Small, low-risk work that touches no migration or agent config → <strong>level 6</strong>.
-- Level 7 runs on its own every week; you only review its PRs. See <a href="#quality-metrics-evolve-the-agent-improves-itself">Quality Metrics &amp; Evolve</a>.</p>
+- Small, low-risk work that touches no migration or agent config → <strong>level 6</strong>.</p>
 <hr />
 <h2 id="pre-configured-setup">Pre-configured Setup<a class="headerlink" href="#pre-configured-setup" title="Permanent link">&para;</a></h2>
 <h3 id="folder-structure">Folder Structure<a class="headerlink" href="#folder-structure" title="Permanent link">&para;</a></h3>
@@ -8717,8 +8710,8 @@
 <tr>
 <td><code>/evolve [--since &lt;date&gt;]</code></td>
 <td>Self-Improver</td>
-<td>Turn agent-metrics signals into proven rule changes (also runs weekly on GitHub)</td>
-<td><code>evolve/*</code> branch + PR, seeded case in <code>evals/seeded/</code></td>
+<td>Turn agent-metrics signals into proven rule changes (local only)</td>
+<td><code>evolve/*</code> branch, seeded case in <code>evals/seeded/</code></td>
 </tr>
 <tr>
 <td><code>/task-resume [instruction]</code></td>
@@ -9436,9 +9429,9 @@
 <li><strong>How runs are found:</strong> every autopilot commit carries the trailer <code>Autopilot-Run: &lt;YYYY-MM-DD&gt;-&lt;slug&gt;</code>; older runs are found through their report hashes or the headless PR title.</li>
 <li><strong>October baseline</strong> (<a href="../../reports/agent-metrics-2026-10/">report</a>): 16 runs, escaped defect rate <strong>6%</strong> (1 of 16: the dynamic-cron-jobs run, fixed by <code>62526c97</code>), 0 reverts, headless PR open → merge median 7 minutes.</li>
 </ul>
-<h3 id="evolving-evolve-and-the-weekly-workflow">🧬 Evolving: <code>/evolve</code> and the weekly workflow<a class="headerlink" href="#evolving-evolve-and-the-weekly-workflow" title="Permanent link">&para;</a></h3>
+<h3 id="evolving-evolve">🧬 Evolving: <code>/evolve</code><a class="headerlink" href="#evolving-evolve" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Observe (signals) → Diagnose (Five Whys → the stage that should have caught it) → Propose (one added rule + a seeded case)
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>  → Prove (eval gate) → Ship (PR labelled `evolve`) → you merge or close
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>  → Prove (eval gate) → Ship (you choose: merge, PR, keep or drop)
 </code></pre></div>
 <ul>
 <li><strong>Signals:</strong> <code>defect:&lt;sha&gt;</code>, <code>revert:&lt;sha&gt;</code>, <code>blocked:&lt;run&gt;</code>, <code>flaky:&lt;run&gt;</code>, <code>review-skipped:&lt;run&gt;</code>, <code>revise:pr-&lt;N&gt;</code>. A signal that already has an <code>evolve</code> PR or issue (even one you closed) or a seeded case is never proposed again. At most 3 per run.</li>
@@ -9449,33 +9442,28 @@
 <li>every existing case is still caught;</li>
 <li>reviewer cost rises by at most 25%.</li>
 <li><strong>What the agent may change:</strong> only add lines to <code>.claude/skills/**</code>, <code>.claude/rules/*.md</code>, the prompt body of <code>.claude/agents/*.md</code>, and add a new case. Never <code>scripts/</code>, <code>.github/</code>, hooks, settings, existing cases, thresholds or app code. Frontmatter is frozen. Checked by code (<code>check-paths</code>), not by the prompt.</li>
-<li><strong>Headless</strong> (<code>.github/workflows/agent-evolve.yml</code>, Monday 09:00 or Actions → "Agent Evolve" → Run workflow):</li>
-<li>job <strong>propose</strong> has a read-only token; the agent commits on <code>evolve/*</code> branches, which leave the job as a git bundle (data);</li>
-<li>job <strong>ship</strong> checks out a fresh <code>main</code>, validates the agent's manifest, runs <code>check-paths</code> and the gate with no GitHub token in reach, then opens a PR (pass) or an <code>evolve</code> issue (fail). It <strong>never merges</strong>: you do.</li>
-<li><strong>Local:</strong> <code>/evolve</code> runs the same stages and asks you before pushing.</li>
+<li><strong>How to run:</strong> type <code>/evolve</code> (local only). It stops at Ship and asks you: merge into <code>main</code>, push a PR, keep the branch, or drop. A headless weekly workflow was tried and removed: headless Claude Code cannot edit <code>.claude/</code> files without a permission prompt (<a href="../../adr/0027-agent-self-improvement-loop/">ADR-0027</a> D4).</li>
 <li><strong>Pruning:</strong> every Evolve rule ends with <code>&lt;!-- evolve:&lt;case id&gt; --&gt;</code>; a later run may propose removing one, only when its case is still caught without it.</li>
 <li><strong>Compress</strong> (ADR-0027 D6): once a month (<code>compress:&lt;YYYY-MM&gt;</code>) Evolve may also <strong>cut</strong> text: duplicates, dead references, text that contradicts its source of truth, stale claims, in <code>.claude/</code> and <code>CLAUDE.md</code>.</li>
 <li><code>node scripts/evolve.mjs lint-rules</code> gives the hints (duplicate lines, dead path refs, always-loaded size, about 37 KB today).</li>
 <li>Never cut: <code>AGENTS.md</code>, <code>security.md</code>, the evolve skill, frontmatter, and any line carrying a safety rule (push, gates, merge, deny, secrets, prod, smoke, Core Principles, "never …").</li>
-<li>Gate: smaller (always-loaded -5% or the touched files -1 KiB), no new duplicates or dead refs, every seeded case still caught. Always a <strong>draft</strong> PR: you read every removed line.</li>
+<li>Gate: smaller (always-loaded -5% or the touched files -1 KiB), no new duplicates or dead refs, every seeded case still caught. You read every removed line before it is merged.</li>
 <li>First compress (<code>evolve/compress-2026-10</code>): the cost section of <code>CLAUDE.md</code>, three overlapping sections → one, -1.1 KB, gate PASS.</li>
 <li>
 <p><strong>How to use:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># 1. See what could be cut (hints, not orders; some "dead refs" are only examples in the text)</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>node<span class="w"> </span>scripts/evolve.mjs<span class="w"> </span>lint-rules
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># 2a. Let GitHub do it: Actions → "Agent Evolve" → Run workflow (or wait for Monday).</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1">#     Once a month it proposes one compress as a DRAFT PR labelled `evolve`.</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1"># 2b. Or locally: /evolve   (the compress:&lt;YYYY-MM&gt; signal is in its list; it stops before any push)</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c1"># 3. Cutting by hand on a branch? Check it with the same gate the workflow uses</span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>git<span class="w"> </span>switch<span class="w"> </span>-c<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="c1">#    ... edit CLAUDE.md / .claude/ and commit ...</span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>node<span class="w"> </span>scripts/evolve.mjs<span class="w"> </span>check-paths<span class="w"> </span>--base<span class="w"> </span>main<span class="w"> </span>--head<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;<span class="w"> </span>--kind<span class="w"> </span>compress
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>node<span class="w"> </span>scripts/evolve.mjs<span class="w"> </span>gate<span class="w"> </span>--base<span class="w"> </span>main<span class="w"> </span>--head<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;<span class="w"> </span>--kind<span class="w"> </span>compress<span class="w">   </span><span class="c1"># ~$0.15 per seeded case</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># 2. Run it: /evolve   (the compress:&lt;YYYY-MM&gt; signal is in its list once a month; it stops before any push)</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1"># 3. Cutting by hand on a branch? Check it with the same gate the workflow uses</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>git<span class="w"> </span>switch<span class="w"> </span>-c<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c1">#    ... edit CLAUDE.md / .claude/ and commit ...</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>node<span class="w"> </span>scripts/evolve.mjs<span class="w"> </span>check-paths<span class="w"> </span>--base<span class="w"> </span>main<span class="w"> </span>--head<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;<span class="w"> </span>--kind<span class="w"> </span>compress
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>node<span class="w"> </span>scripts/evolve.mjs<span class="w"> </span>gate<span class="w"> </span>--base<span class="w"> </span>main<span class="w"> </span>--head<span class="w"> </span>evolve/compress-&lt;YYYY-MM&gt;<span class="w"> </span>--kind<span class="w"> </span>compress<span class="w">   </span><span class="c1"># ~$0.15 per seeded case</span>
 </code></pre></div>
 <ul>
-<li><strong>Reviewing the draft PR:</strong> read every removed line (<code>git diff main...&lt;branch&gt;</code>). Merge if each cut is a duplicate, a dead reference or stale; close it otherwise (that month's signal is not proposed again).</li>
+<li><strong>Reviewing:</strong> read every removed line (<code>git diff main...&lt;branch&gt;</code>). Merge if each cut is a duplicate, a dead reference or stale; drop it otherwise.</li>
 <li><strong>Skip a month:</strong> open an issue labelled <code>evolve</code> whose body has <code>&lt;!-- evolve:signal=compress:&lt;YYYY-MM&gt; --&gt;</code>.</li>
 </ul>
 </li>
@@ -9490,11 +9478,11 @@
 </thead>
 <tbody>
 <tr>
-<td>Week with no new signal</td>
+<td><code>/evolve</code> with no new signal</td>
 <td>almost nothing (stops after the metrics step)</td>
 </tr>
 <tr>
-<td>Week with signals</td>
+<td><code>/evolve</code> with signals</td>
 <td>~$1–3 agent + ~$0.15 per eval run (6 runs per proposal + 1 per existing case)</td>
 </tr>
 </tbody>
