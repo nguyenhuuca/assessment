@@ -9,15 +9,16 @@
 1. [Introduction](#introduction)
 2. [Levels of Using Claude](#levels-of-using-claude)
 3. [Pre-configured Setup](#pre-configured-setup)
-4. [Workflow Skills — 16 Commands](#workflow-skills-16-commands)
+4. [Workflow Skills — 17 Commands](#workflow-skills-17-commands)
 5. [Library Skills — Loaded Automatically](#library-skills-loaded-automatically)
 6. [Swarm — Multi-Agent Parallel Execution](#swarm-multi-agent-parallel-execution)
 7. [Autopilot — Run One Task End to End](#autopilot-run-one-task-end-to-end)
-8. [Session File (session.txt)](#session-file-sessiontxt)
-9. [Hooks & Permissions](#hooks-permissions)
-10. [Real-World Workflows](#real-world-workflows)
-11. [Available Templates](#available-templates)
-12. [Tips & Tricks](#tips-tricks)
+8. [Quality Metrics & Evolve — the Agent Improves Itself](#quality-metrics-evolve-the-agent-improves-itself)
+9. [Session File (session.txt)](#session-file-sessiontxt)
+10. [Hooks & Permissions](#hooks-permissions)
+11. [Real-World Workflows](#real-world-workflows)
+12. [Available Templates](#available-templates)
+13. [Tips & Tricks](#tips-tricks)
 
 ---
 
@@ -25,7 +26,7 @@
 
 This project uses the **[Claude Agentic Framework](https://github.com/dralgorhythm/claude-agentic-framework) v5**, adapted for Funny Movies (see [Claude Workspace](../claude/index.md)):
 
-- ✅ **16 workflow skills** you invoke as `/name` (scope, spec, architect, builder, swarm, autopilot…)
+- ✅ **17 workflow skills** you invoke as `/name` (scope, spec, architect, builder, swarm, autopilot, evolve…)
 - ✅ **10 library skills** Claude loads on its own when a task matches (testing, ADRs, threat modeling…)
 - ✅ **5 worker agents** for swarms, each with a pinned model, `maxTurns` and tool allowlist
 - ✅ **Rules** loaded in every session: core directives, code quality, security, tech strategy, debugging protocol
@@ -34,14 +35,14 @@ This project uses the **[Claude Agentic Framework](https://github.com/dralgorhyt
 
 Two conventions specific to this repo:
 
-1. **Planning docs live in `docs/`**: `docs/adr/`, `docs/prd/`, `docs/specs/`, `docs/plans/`, with status in `docs/tracking.md`.
+1. **Planning docs live in `docs/`**: `docs/adr/`, `docs/prd/`, `docs/specs/`, `docs/sequence/` (Mermaid sequence diagrams, required for every feature with a PRD), `docs/plans/`, with status in `docs/tracking.md`.
 2. **Work is committed on `main`, and Claude always asks before every `git push`**, because CI deploys from `main`.
 
 ---
 
 ## Levels of Using Claude
 
-This project uses Claude Code at 6 levels. The higher the level, the more Claude does on its own and the less you touch. Rules, hooks and quality gates from the lower levels still apply at every level above.
+This project uses Claude Code at 7 levels. The higher the level, the more Claude does on its own and the less you touch. Rules, hooks and quality gates from the lower levels still apply at every level above.
 
 | Level | How | You take part | Real example in this repo |
 |-------|-----|---------------|---------------------------|
@@ -51,6 +52,7 @@ This project uses Claude Code at 6 levels. The higher the level, the more Claude
 | 4 | **Local `/autopilot`:** plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke; at most 3 rounds per loop | 3 times: Start, Gate 1, Gate 2 | Dynamic cron jobs (ADR-0023): BE + FE, CI green, smoke 22/22, $3.71 |
 | 5 | **Headless on GitHub** ([ADR-0022](../adr/0022-headless-autopilot.md)): label `autopilot` → draft PR → `/approve` → build → you merge | Add the label, `/approve`, merge | Issue #34 (back button color) → PR #35 |
 | 6 | **Auto gates** ([ADR-0025](../adr/0025-autopilot-auto-gates.md)): add `autopilot:auto` or `autopilot:auto-merge`; the workflow approves and merges after its own checks | Only add the label | Issue #36 → PR #37 merged and deployed in ~5 minutes, build job $0.39 |
+| 7 | **Self-improving** ([ADR-0027](../adr/0027-agent-self-improvement-loop.md)): `agent-metrics` finds escaped defects, `/evolve` adds a rule that a seeded-bug eval proves, weekly workflow | Merge or close an `evolve` PR | Defect `62526c97` → reviewer rule, case caught 0/3 → 3/3 |
 
 **Which level to pick:**
 - Not sure what to do yet, or you only need to understand the code → **level 1**.
@@ -58,6 +60,7 @@ This project uses Claude Code at 6 levels. The higher the level, the more Claude
 - A medium or large feature (needs a PRD, several days) → **level 3**.
 - A small feature, fix or refactor with clear acceptance criteria → **level 4**, or **level 5** without a terminal.
 - Small, low-risk work that touches no migration or agent config → **level 6**.
+- Level 7 runs on its own every week; you only review its PRs. See [Quality Metrics & Evolve](#quality-metrics-evolve-the-agent-improves-itself).
 
 ---
 
@@ -68,7 +71,7 @@ This project uses Claude Code at 6 levels. The higher the level, the more Claude
 ```
 .claude/
 ├── skills/
-│   ├── <name>/SKILL.md          # 16 workflow skills: invoke as /name
+│   ├── <name>/SKILL.md          # 17 workflow skills: invoke as /name
 │   ├── architecture/            # designing-systems, writing-adrs
 │   ├── core-engineering/        # testing, dependency-upgrade, review-steering
 │   ├── design/                  # presentation
@@ -83,6 +86,8 @@ This project uses Claude Code at 6 levels. The higher the level, the more Claude
 └── settings.json                # Permission allow/deny lists + hook registration
 
 session.txt                      # The one task in flight (committed; see Session File)
+evals/seeded/                    # Seeded-bug evals for the reviewer (Evolve, ADR-0027)
+scripts/agent-metrics.mjs        # Agent quality metrics; scripts/evolve.mjs = Evolve signals + eval gate
 AGENTS.md                        # "Landing the Plane": how a work session finishes
 templates/
 ├── artifacts/                   # PRD, ADR, spec, plan, design spec, postmortem…
@@ -93,14 +98,14 @@ templates/
 
 ---
 
-## Workflow Skills — 16 Commands
+## Workflow Skills — 17 Commands
 
 Most workflow skills run only when you type `/name`. The exceptions are the 5 skills `/autopilot` chains (`swarm-plan`, `swarm-review`, `swarm-execute`, `qa-engineer`, `land-the-plane`): they have `disable-model-invocation: false`, so Claude may also invoke them when a request matches. See [Autopilot](#autopilot-run-one-task-end-to-end).
 
 | Command | Role | Use when | Output |
 |---------|------|----------|--------|
 | `/scope <idea>` | PRD Generator | An idea is still vague: asks clarifying questions, then writes the PRD | `docs/prd/PRD-{slug}.md` |
-| `/spec <PRD> [ADR]` | Spec Generator | Turns an approved PRD (+ ADR when there is one) into a behavior contract | `docs/specs/spec-{slug}.md` |
+| `/spec <PRD> [ADR]` | Spec Generator | Turns an approved PRD (+ ADR when there is one) into a behavior contract, plus the Mermaid sequence diagrams | `docs/specs/spec-{slug}.md` + `docs/sequence/sequence-{slug}.md` |
 | `/architect <topic>` | Principal Architect | System design; records decisions as ADRs | `docs/adr/NNNN-{slug}.md` |
 | `/builder <task>` | Builder | Implementation, debugging, refactoring with tests | Code + tests |
 | `/qa-engineer <component>` | QA Engineer | Test strategy, E2E, accessibility gate | Test plan / tests |
@@ -114,6 +119,7 @@ Most workflow skills run only when you type `/name`. The exceptions are the 5 sk
 | `/land-the-plane` | Finish-Line Protocol | Gates → commit → (ask) push → check CI | Pushed commit |
 | `/tailor` | Configuration Tailor | Detects the stack and proposes config changes (proposal only) | `scratchpad/tailor-proposal.md` |
 | `/autopilot <request>` | Autopilot | Run one small feature, fix or refactor end to end: plan → review → you approve → code → review → QA ×2 → you approve the push | Deployed code + `docs/reports/autopilot-*.md` |
+| `/evolve [--since <date>]` | Self-Improver | Turn agent-metrics signals into proven rule changes (also runs weekly on GitHub) | `evolve/*` branch + PR, seeded case in `evals/seeded/` |
 | `/task-resume [instruction]` | Task Resumer | Continues the unfinished task in `session.txt` after re-checking the repo | Work continued from `next` |
 
 Examples:
@@ -336,6 +342,7 @@ A stopped run can be continued with `/task-resume`, which reads `session.txt` an
 | `docs/plans/plan-<slug>.md` | The plan approved at Gate 1. The report is **not** written into the plan |
 | `TASKS.md` | One section per feature; tasks flipped to `[x]` with the commit hash |
 | `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` | The report, same sections local or headless (`.claude/skills/autopilot/resources/report.template.md`):<br>• result per stage<br>• ledger table<br>• cost per agent (local) or per job (headless, added by the workflow)<br>• CI + smoke result (headless: after merge)<br>• manual checks and open advisories |
+| `docs/metrics/agent-runs/<run id>.json` | Run metrics for `agent-metrics.mjs` (rounds, verdicts, LOC, QA counts, cost); every run commit also carries `Autopilot-Run: <run id>` |
 | `scratchpad/autopilot/<timestamp>-<slug>.md` | The live ledger (gitignored) |
 | `session.txt` | Current stage, progress, and a `blocker` when stopped |
 
@@ -416,6 +423,58 @@ gh secret set AUTOPILOT_MERGE_TOKEN
 
 ---
 
+## Quality Metrics & Evolve — the Agent Improves Itself
+
+Two layers on top of autopilot: **measure** the agent's work over time, then let the agent **improve its own rules** from what the numbers show ([ADR-0027](../adr/0027-agent-self-improvement-loop.md)).
+
+### 📊 Measuring: `scripts/agent-metrics.mjs`
+
+```bash
+node scripts/agent-metrics.mjs --since 2026-10-01 --until 2026-10-31 --out docs/reports/agent-metrics-2026-10.md
+node scripts/agent-metrics.mjs --json            # signals for /evolve
+```
+
+| Metric | How it is measured |
+|--------|--------------------|
+| **Escaped defect rate** (the one that matters most) | A later `fix:` commit, not part of the run, within 7 days, touching a code file the run changed |
+| Reverts | `This reverts commit <sha>` pointing at an agent commit |
+| Review rounds, blocked runs, flaky tests, skipped reviews, cost | `docs/metrics/agent-runs/<run id>.json`, written by `/autopilot` at the end of every run |
+| `/revise` count, PRs closed unmerged, open → merge time | GitHub (headless PRs) |
+| CI failure rate (all pushes and agent head commits) | GitHub Actions runs |
+
+- **How runs are found:** every autopilot commit carries the trailer `Autopilot-Run: <YYYY-MM-DD>-<slug>`; older runs are found through their report hashes or the headless PR title.
+- **October baseline** ([report](../reports/agent-metrics-2026-10.md)): 16 runs, escaped defect rate **6%** (1 of 16: the dynamic-cron-jobs run, fixed by `62526c97`), 0 reverts, headless PR open → merge median 7 minutes.
+
+### 🧬 Evolving: `/evolve` and the weekly workflow
+
+```
+Observe (signals) → Diagnose (Five Whys → the stage that should have caught it) → Propose (one added rule + a seeded case)
+  → Prove (eval gate) → Ship (PR labelled `evolve`) → you merge or close
+```
+
+- **Signals:** `defect:<sha>`, `revert:<sha>`, `blocked:<run>`, `flaky:<run>`, `review-skipped:<run>`, `revise:pr-<N>`. A signal that already has an `evolve` PR or issue (even one you closed) or a seeded case is never proposed again. At most 3 per run.
+- **Seeded-bug evals** (`evals/seeded/<id>/case.json`): each real escaped defect becomes a regression test **for the agent**: the reviewer is run on the original buggy diff and graded deterministically (a blocking finding on the expected file matching the expected wording).
+- **Eval gate** (`scripts/evolve.mjs gate`), all four must hold:
+  1. today's rules on `main` **miss** the case (at least 2 of 3 runs);
+  2. the new rule **catches** it in at least 2 of 3 runs;
+  3. every existing case is still caught;
+  4. reviewer cost rises by at most 25%.
+- **What the agent may change:** only add lines to `.claude/skills/**`, `.claude/rules/*.md`, the prompt body of `.claude/agents/*.md`, and add a new case. Never `scripts/`, `.github/`, hooks, settings, existing cases, thresholds or app code. Frontmatter is frozen. Checked by code (`check-paths`), not by the prompt.
+- **Headless** (`.github/workflows/agent-evolve.yml`, Monday 09:00 or Actions → "Agent Evolve" → Run workflow):
+  - job **propose** has a read-only token; the agent commits on `evolve/*` branches, which leave the job as a git bundle (data);
+  - job **ship** checks out a fresh `main`, validates the agent's manifest, runs `check-paths` and the gate with no GitHub token in reach, then opens a PR (pass) or an `evolve` issue (fail). It **never merges**: you do.
+- **Local:** `/evolve` runs the same stages and asks you before pushing.
+- **Pruning:** every Evolve rule ends with `<!-- evolve:<case id> -->`; a later run may propose removing one, only when its case is still caught without it.
+
+**First evolution** (`fe36685d`): from defect `62526c97` (job bodies swallowed exceptions, so failed cron jobs showed SUCCESS), the reviewer got the rule *"check what new code assumes about code it did not change; a false assumption is blocking"*. Case `2026-10-19-swallowed-job-exceptions`: caught **0/3** with the old rules, **3/3** with the new one, about $0.15 per eval run.
+
+| Cost | |
+|------|---|
+| Week with no new signal | almost nothing (stops after the metrics step) |
+| Week with signals | ~$1–3 agent + ~$0.15 per eval run (6 runs per proposal + 1 per existing case) |
+
+---
+
 ## Session File (session.txt)
 
 `session.txt` at the repo root records the **one** task in flight, so the next session (on this machine or another) can pick it up. Full rule: `.claude/rules/session-file.md`. Durable status still lives in `TASKS.md` and `docs/tracking.md`.
@@ -481,7 +540,7 @@ Hooks are bash scripts in `.claude/hooks/`, registered in `.claude/settings.json
 # Step 2: Architect — technical decisions, create the ADR
 /architect docs/prd/PRD-video-recommendation.md
 
-# Step 3: Spec — precise behavior contract
+# Step 3: Spec — precise behavior contract + Mermaid sequence diagrams (docs/sequence/)
 /spec docs/prd/PRD-video-recommendation.md docs/adr/NNNN-video-recommendation.md
 
 # Step 4: Plan — break the spec into tasks
@@ -563,6 +622,7 @@ In `templates/artifacts/` (used by `/scope`, `/spec`, `/swarm-plan`):
 | **prd.template.md** | Product Requirements Document | `docs/prd/PRD-{slug}.md` |
 | **adr.template.md** | Architecture Decision Record | `docs/adr/NNNN-{slug}.md` |
 | **spec.template.md** | Feature Specification | `docs/specs/spec-{slug}.md` |
+| **sequence.template.md** | Mermaid sequence diagrams (required with a PRD) | `docs/sequence/sequence-{slug}.md` |
 | **plan.template.md** | Implementation plan | `docs/plans/plan-{slug}.md` |
 | **design_spec.template.md** | Design specification | `docs/` |
 | **pr_faq.template.md** | Press Release FAQ | `docs/` |

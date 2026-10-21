@@ -9,15 +9,16 @@
 1. [Giới thiệu](#gioi-thieu)
 2. [Các cấp độ sử dụng Claude](#cac-cap-o-su-dung-claude)
 3. [Cấu hình có sẵn](#cau-hinh-co-san)
-4. [Workflow skills - 16 lệnh](#workflow-skills-16-lenh)
+4. [Workflow skills - 17 lệnh](#workflow-skills-17-lenh)
 5. [Library skills - tự động load](#library-skills-tu-ong-load)
 6. [Swarm - Multi-agent parallel execution](#swarm-multi-agent-parallel-execution)
 7. [Autopilot - chạy trọn một task](#autopilot-chay-tron-mot-task)
-8. [Session file (session.txt)](#session-file-sessiontxt)
-9. [Hooks & permissions](#hooks-permissions)
-10. [Workflows thực tế](#workflows-thuc-te)
-11. [Templates có sẵn](#templates-co-san)
-12. [Tips & Tricks](#tips-tricks)
+8. [Đo chất lượng & Evolve - agent tự cải thiện](#o-chat-luong-evolve-agent-tu-cai-thien)
+9. [Session file (session.txt)](#session-file-sessiontxt)
+10. [Hooks & permissions](#hooks-permissions)
+11. [Workflows thực tế](#workflows-thuc-te)
+12. [Templates có sẵn](#templates-co-san)
+13. [Tips & Tricks](#tips-tricks)
 
 ---
 
@@ -25,7 +26,7 @@
 
 Project này dùng **[Claude Agentic Framework](https://github.com/dralgorhythm/claude-agentic-framework) v5**, đã chỉnh cho Funny Movies (xem [Claude Workspace](../claude/index.md)):
 
-- ✅ **16 workflow skills** gọi bằng `/tên` (scope, spec, architect, builder, swarm, autopilot…)
+- ✅ **17 workflow skills** gọi bằng `/tên` (scope, spec, architect, builder, swarm, autopilot, evolve…)
 - ✅ **10 library skills** Claude tự load khi task phù hợp (testing, ADR, threat modeling…)
 - ✅ **5 worker agents** cho swarm, mỗi agent có model, `maxTurns` và tools cố định
 - ✅ **Rules** nạp vào mọi session: core directives, code quality, security, tech strategy, debugging protocol
@@ -34,14 +35,14 @@ Project này dùng **[Claude Agentic Framework](https://github.com/dralgorhythm/
 
 Hai quy ước riêng của repo này cần nhớ:
 
-1. **Tài liệu planning nằm trong `docs/`**: `docs/adr/`, `docs/prd/`, `docs/specs/`, `docs/plans/`, trạng thái ở `docs/tracking.md`.
+1. **Tài liệu planning nằm trong `docs/`**: `docs/adr/`, `docs/prd/`, `docs/specs/`, `docs/sequence/` (sequence diagram Mermaid, bắt buộc với mọi feature có PRD), `docs/plans/`, trạng thái ở `docs/tracking.md`.
 2. **Commit trên `main`, và Claude luôn hỏi trước mỗi lần `git push`**, vì CI deploy từ `main`.
 
 ---
 
 ## Các cấp độ sử dụng Claude
 
-Dự án dùng Claude Code theo 6 cấp. Cấp càng cao, Claude tự làm càng nhiều và bạn chạm vào càng ít. Rules, hooks và quality gates ở cấp thấp vẫn áp dụng ở mọi cấp trên.
+Dự án dùng Claude Code theo 7 cấp. Cấp càng cao, Claude tự làm càng nhiều và bạn chạm vào càng ít. Rules, hooks và quality gates ở cấp thấp vẫn áp dụng ở mọi cấp trên.
 
 | Cấp | Cách dùng | Bạn tham gia | Ví dụ thật trong repo |
 |-----|-----------|--------------|------------------------|
@@ -51,6 +52,7 @@ Dự án dùng Claude Code theo 6 cấp. Cấp càng cao, Claude tự làm càng
 | 4 | **`/autopilot` local:** plan ⇄ review → Gate 1 → implement ⇄ review → QA ×2 → commit → Gate 2 → CI + smoke; tối đa 3 round mỗi vòng | 3 lần: Start, Gate 1, Gate 2 | Dynamic cron jobs (ADR-0023): BE + FE, CI xanh, smoke 22/22, $3.71 |
 | 5 | **Headless trên GitHub** ([ADR-0022](../adr/0022-headless-autopilot.md)): label `autopilot` → draft PR → `/approve` → build → bạn merge | Gắn label, `/approve`, merge | Issue #34 (màu nút quay lại) → PR #35 |
 | 6 | **Auto gates** ([ADR-0025](../adr/0025-autopilot-auto-gates.md)): thêm label `autopilot:auto` hoặc `autopilot:auto-merge`, workflow tự duyệt và tự merge sau khi tự kiểm tra | Chỉ gắn label | Issue #36 → PR #37 merged + deployed trong ~5 phút, build job $0.39 |
+| 7 | **Tự cải thiện** ([ADR-0027](../adr/0027-agent-self-improvement-loop.md)): `agent-metrics` tìm bug lọt, `/evolve` thêm rule được seeded-bug eval chứng minh, workflow chạy hàng tuần | Merge hoặc đóng PR `evolve` | Bug `62526c97` → rule cho reviewer, case bắt 0/3 → 3/3 |
 
 **Chọn cấp nào:**
 - Chưa rõ nên làm gì, hoặc chỉ cần hiểu code → **cấp 1**.
@@ -58,6 +60,7 @@ Dự án dùng Claude Code theo 6 cấp. Cấp càng cao, Claude tự làm càng
 - Feature vừa/lớn (cần PRD, nhiều ngày) → **cấp 3**.
 - Feature nhỏ, fix, refactor có acceptance criteria rõ → **cấp 4**, hoặc **cấp 5** nếu không mở terminal.
 - Việc nhỏ, rủi ro thấp, không đụng migration hay config agent → **cấp 6**.
+- Cấp 7 tự chạy mỗi tuần; bạn chỉ review PR của nó. Xem [Đo chất lượng & Evolve](#o-chat-luong-evolve-agent-tu-cai-thien).
 
 ---
 
@@ -68,7 +71,7 @@ Dự án dùng Claude Code theo 6 cấp. Cấp càng cao, Claude tự làm càng
 ```
 .claude/
 ├── skills/
-│   ├── <name>/SKILL.md          # 16 workflow skills: gọi bằng /name
+│   ├── <name>/SKILL.md          # 17 workflow skills: gọi bằng /name
 │   ├── architecture/            # designing-systems, writing-adrs
 │   ├── core-engineering/        # testing, dependency-upgrade, review-steering
 │   ├── design/                  # presentation
@@ -83,6 +86,8 @@ Dự án dùng Claude Code theo 6 cấp. Cấp càng cao, Claude tự làm càng
 └── settings.json                # Permissions allow/deny + đăng ký hooks
 
 session.txt                      # Task đang làm (được commit; xem Session file)
+evals/seeded/                    # Seeded-bug evals cho reviewer (Evolve, ADR-0027)
+scripts/agent-metrics.mjs        # Metric chất lượng agent; scripts/evolve.mjs = signals + eval gate của Evolve
 AGENTS.md                        # "Landing the Plane": cách kết thúc một phiên làm việc
 templates/
 ├── artifacts/                   # PRD, ADR, spec, plan, design spec, postmortem...
@@ -93,14 +98,14 @@ templates/
 
 ---
 
-## Workflow skills - 16 lệnh
+## Workflow skills - 17 lệnh
 
 Phần lớn workflow skill chỉ chạy khi bạn gõ `/tên`. Ngoại lệ là 5 skill mà `/autopilot` nối với nhau (`swarm-plan`, `swarm-review`, `swarm-execute`, `qa-engineer`, `land-the-plane`): chúng đặt `disable-model-invocation: false`, nên Claude cũng có thể tự gọi khi yêu cầu khớp. Xem [Autopilot](#autopilot-chay-tron-mot-task).
 
 | Lệnh | Vai trò | Dùng khi | Output |
 |------|---------|----------|--------|
 | `/scope <ý tưởng>` | PRD Generator | Ý tưởng còn mơ hồ: hỏi lại cho rõ rồi viết PRD | `docs/prd/PRD-{slug}.md` |
-| `/spec <PRD> [ADR]` | Spec Generator | Biến PRD đã duyệt (+ ADR nếu có) thành behavior contract | `docs/specs/spec-{slug}.md` |
+| `/spec <PRD> [ADR]` | Spec Generator | Biến PRD đã duyệt (+ ADR nếu có) thành behavior contract, kèm sequence diagram Mermaid | `docs/specs/spec-{slug}.md` + `docs/sequence/sequence-{slug}.md` |
 | `/architect <chủ đề>` | Principal Architect | Thiết kế hệ thống, ghi quyết định thành ADR | `docs/adr/NNNN-{slug}.md` |
 | `/builder <task>` | Builder | Implement, debug, refactor có test | Code + tests |
 | `/qa-engineer <component>` | QA Engineer | Test strategy, E2E, accessibility gate | Test plan / tests |
@@ -114,6 +119,7 @@ Phần lớn workflow skill chỉ chạy khi bạn gõ `/tên`. Ngoại lệ là
 | `/land-the-plane` | Finish-Line Protocol | Chạy gates → commit → (hỏi) push → kiểm CI | Commit đã push |
 | `/tailor` | Configuration Tailor | Phát hiện stack, đề xuất chỉnh cấu hình (chỉ đề xuất) | `scratchpad/tailor-proposal.md` |
 | `/autopilot <yêu cầu>` | Autopilot | Chạy trọn một feature nhỏ, fix hoặc refactor: plan → review → bạn duyệt → code → review → QA ×2 → bạn duyệt push | Code đã deploy + `docs/reports/autopilot-*.md` |
+| `/evolve [--since <ngày>]` | Self-Improver | Biến signal từ agent-metrics thành thay đổi rule có chứng minh (cũng chạy hàng tuần trên GitHub) | Branch `evolve/*` + PR, seeded case trong `evals/seeded/` |
 | `/task-resume [chỉ dẫn]` | Task Resumer | Làm tiếp task dở trong `session.txt` sau khi kiểm lại repo | Làm tiếp từ `next` |
 
 Ví dụ:
@@ -333,6 +339,7 @@ Run bị dừng có thể làm tiếp bằng `/task-resume`, dựa vào `session
 | `docs/plans/plan-<slug>.md` | Plan đã duyệt ở Gate 1. Report **không** được ghi vào plan |
 | `TASKS.md` | Một section cho feature, task đánh `[x]` kèm commit hash |
 | `docs/reports/autopilot-<YYYY-MM-DD>-<slug>.md` | Report, cùng các section khi chạy local hay headless (`.claude/skills/autopilot/resources/report.template.md`): kết quả từng bước, bảng ledger, chi phí theo agent (local) hoặc theo job (headless, workflow tự thêm), CI + smoke (headless: sau khi merge), manual check, advisory còn mở |
+| `docs/metrics/agent-runs/<run id>.json` | Metric của run cho `agent-metrics.mjs` (round, verdict, LOC, kết quả QA, chi phí); mọi commit của run có trailer `Autopilot-Run: <run id>` |
 | `scratchpad/autopilot/<timestamp>-<slug>.md` | Ledger trong lúc chạy (gitignored) |
 | `session.txt` | Bước đang chạy, progress, và `blocker` khi dừng |
 
@@ -409,6 +416,58 @@ gh secret set AUTOPILOT_MERGE_TOKEN
 
 ---
 
+## Đo chất lượng & Evolve - agent tự cải thiện
+
+Hai lớp nằm trên autopilot: **đo** chất lượng việc agent làm theo thời gian, rồi để agent **tự sửa rule của chính nó** dựa trên số liệu ([ADR-0027](../adr/0027-agent-self-improvement-loop.md)).
+
+### 📊 Đo: `scripts/agent-metrics.mjs`
+
+```bash
+node scripts/agent-metrics.mjs --since 2026-10-01 --until 2026-10-31 --out docs/reports/agent-metrics-2026-10.md
+node scripts/agent-metrics.mjs --json            # signals cho /evolve
+```
+
+| Metric | Cách đo |
+|--------|---------|
+| **Escaped defect rate** (quan trọng nhất) | Một commit `fix:` sau đó, không thuộc run, trong vòng 7 ngày, sửa file code mà run đã đụng |
+| Revert | `This reverts commit <sha>` trỏ vào commit của agent |
+| Số round review, run blocked, flaky test, review bị bỏ qua, chi phí | `docs/metrics/agent-runs/<run id>.json`, `/autopilot` ghi ở cuối mỗi run |
+| Số `/revise`, PR đóng không merge, thời gian mở → merge | GitHub (PR headless) |
+| Tỉ lệ CI fail (mọi push và commit của agent) | GitHub Actions runs |
+
+- **Cách nhận ra run:** mọi commit của autopilot có trailer `Autopilot-Run: <YYYY-MM-DD>-<slug>`; run cũ hơn được nhận qua hash trong report hoặc tên PR headless.
+- **Baseline tháng 10** ([report](../reports/agent-metrics-2026-10.md)): 16 run, escaped defect rate **6%** (1/16: run dynamic-cron-jobs, sửa bởi `62526c97`), 0 revert, PR headless mở → merge trung vị 7 phút.
+
+### 🧬 Tiến hoá: `/evolve` và workflow hàng tuần
+
+```
+Observe (signals) → Diagnose (Five Whys → stage lẽ ra phải bắt) → Propose (thêm một rule + một seeded case)
+  → Prove (eval gate) → Ship (PR label `evolve`) → bạn merge hoặc đóng
+```
+
+- **Signals:** `defect:<sha>`, `revert:<sha>`, `blocked:<run>`, `flaky:<run>`, `review-skipped:<run>`, `revise:pr-<N>`. Signal nào đã có PR hoặc issue `evolve` (kể cả cái bạn đã đóng) hoặc đã có seeded case thì không đề xuất lại. Tối đa 3 signal mỗi run.
+- **Seeded-bug evals** (`evals/seeded/<id>/case.json`): mỗi bug lọt thật thành một regression test **cho agent**: chạy reviewer trên đúng diff có bug và chấm cố định (có finding blocking ở đúng file, đúng cách mô tả bug).
+- **Eval gate** (`scripts/evolve.mjs gate`), phải đủ cả 4:
+  1. rule hiện tại trên `main` **bỏ sót** case (ít nhất 2/3 lần);
+  2. rule mới **bắt được** ít nhất 2/3 lần;
+  3. mọi case cũ vẫn bắt được;
+  4. chi phí reviewer tăng tối đa 25%.
+- **Agent được sửa gì:** chỉ được thêm dòng vào `.claude/skills/**`, `.claude/rules/*.md`, phần prompt của `.claude/agents/*.md`, và thêm case mới. Không bao giờ đụng `scripts/`, `.github/`, hooks, settings, case cũ, threshold hay code app. Frontmatter bị khoá. Do code kiểm tra (`check-paths`), không phải do prompt.
+- **Headless** (`.github/workflows/agent-evolve.yml`, thứ Hai 09:00 hoặc Actions → "Agent Evolve" → Run workflow):
+  - job **propose** chỉ có token đọc; agent commit lên branch `evolve/*`, branch rời job dưới dạng git bundle (chỉ là dữ liệu);
+  - job **ship** checkout `main` sạch, kiểm tra manifest của agent, chạy `check-paths` và gate khi không có GitHub token, rồi mở PR (pass) hoặc issue `evolve` (fail). **Không bao giờ merge**: bạn merge.
+- **Local:** `/evolve` chạy cùng các bước và hỏi bạn trước khi push.
+- **Dọn rule (prune):** mỗi rule do Evolve thêm kết thúc bằng `<!-- evolve:<case id> -->`; run sau có thể đề xuất gỡ một rule, chỉ khi case của nó vẫn bắt được khi không có rule đó.
+
+**Lần tiến hoá đầu tiên** (`fe36685d`): từ bug `62526c97` (job nuốt exception nên cron job lỗi vẫn hiện SUCCESS), reviewer có thêm rule *"kiểm tra code mới giả định gì về code cũ không đổi; giả định sai là blocking"*. Case `2026-10-19-swallowed-job-exceptions`: rule cũ bắt **0/3**, rule mới **3/3**, khoảng $0.15 mỗi lần chạy eval.
+
+| Chi phí | |
+|---------|---|
+| Tuần không có signal mới | gần như 0 (dừng sau bước metrics) |
+| Tuần có signal | ~$1–3 cho agent + ~$0.15 mỗi lần eval (6 lần mỗi đề xuất + 1 lần mỗi case cũ) |
+
+---
+
 ## Session file (session.txt)
 
 `session.txt` ở root repo ghi **một** task đang làm, để session sau (trên máy này hay máy khác) làm tiếp được. Rule đầy đủ: `.claude/rules/session-file.md`. Trạng thái lâu dài vẫn nằm ở `TASKS.md` và `docs/tracking.md`.
@@ -474,7 +533,7 @@ Hooks là script bash trong `.claude/hooks/`, đăng ký trong `.claude/settings
 # Step 2: Architect — quyết định kỹ thuật, tạo ADR
 /architect docs/prd/PRD-video-recommendation.md
 
-# Step 3: Spec — behavior contract chính xác, tạo Spec
+# Step 3: Spec — behavior contract chính xác, tạo Spec + sequence diagram Mermaid (docs/sequence/)
 /spec docs/prd/PRD-video-recommendation.md docs/adr/NNNN-video-recommendation.md
 
 # Step 4: Plan — chia task từ Spec
@@ -556,6 +615,7 @@ Nằm trong `templates/artifacts/` (dùng bởi `/scope`, `/spec`, `/swarm-plan`
 | **prd.template.md** | Product Requirements Document | `docs/prd/PRD-{slug}.md` |
 | **adr.template.md** | Architecture Decision Record | `docs/adr/NNNN-{slug}.md` |
 | **spec.template.md** | Feature Specification | `docs/specs/spec-{slug}.md` |
+| **sequence.template.md** | Sequence diagram Mermaid (bắt buộc khi có PRD) | `docs/sequence/sequence-{slug}.md` |
 | **plan.template.md** | Implementation plan | `docs/plans/plan-{slug}.md` |
 | **design_spec.template.md** | Design specification | `docs/` |
 | **pr_faq.template.md** | Press Release FAQ | `docs/` |
