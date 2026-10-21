@@ -411,3 +411,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **RN-1** `REPORT_CLOSED` type + `ReportClosedEvent` from the webhook (APPLIED + CLOSED) + `ReportNotificationListener` (upsert, SSE) 801dcb9f
 - [x] **RN-2** Digest email line `mail.digest.item.reportClosed` (en/vi) 801dcb9f
 - [x] **RN-3** FE notification text + click opens Report page (en/vi) b3030e52
+
+## Feature: Report page tabs (2026-10-21, autopilot lite)
+
+- [x] **RT-1** `ReportPage` split into tabs "New report" (form + result) and "Recent reports" (list + paging + Retry); list fetched only on its tab; en/vi keys; tests 3d5232f8

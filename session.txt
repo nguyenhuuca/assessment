@@ -1,8 +1,8 @@
-task: Autopilot: notify the reporter when the report's issue is closed
-status: done
-progress: 100
-done: RN-1 event+listener, RN-2 digest 801dcb9f; RN-3 FE b3030e52; deployed, smoke 22/22
-doing: -
-next: owner: close an app-created issue and check the bell (manual)
-plan: docs/plans/plan-report-closed-notify.md
-updated: 2026-10-21 11:10
+task: Autopilot (lite): Report page split into two tabs (New report / Recent reports)
+status: in_progress
+progress: 90
+done: RT-1 tabs 3d5232f8
+doing: Gate 2 (push approval)
+next: push; watch Deploy Frontend
+plan: -
+updated: 2026-10-21 11:12
