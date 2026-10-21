@@ -49,7 +49,7 @@ Ephemeral notes go to `./scratchpad/` (gitignored). `./artifacts/` holds design 
 
 ## Project Overview
 
-**Funny Movies** - Java 24 video streaming app with Spring Boot 3.x, PostgreSQL, Virtual Threads (Loom), YouTube API integration, and passwordless auth.
+**Funny Movies** - Java 24 video streaming app with Spring Boot 3.x, PostgreSQL, Virtual Threads (Loom), YouTube API integration, and passwordless auth. Stack and prohibited patterns: `.claude/rules/tech-strategy.md`; frontend notes: `webapp/CLAUDE.md`; Docker and database setup: `api/CLAUDE.md`.
 
 ## Essential Commands
 
@@ -62,92 +62,19 @@ mvn verify                   # Tests + coverage
 mvn test -Dtest=ClassName    # Single test
 ```
 
-**Frontend (webapp):**
-```bash
-cd webapp
-npm install                  # Install dependencies
-npm run dev                  # Dev server (Vite)
-npm run build                # Production build → dist/
-npm run test                 # Run Vitest tests
-npm run lint                 # ESLint check
-```
-
 **Environment setup:**
 ```bash
 cp api/.env.example api/.env
 # Required: DB_PASS, DB_HOST, GOOGLE_KEY, GPT_KEY, JWT_SECRET, EMAIL_SENDER, EMAIL_PASS
 ```
 
-**Database:**
-```bash
-createdb funnyapp
-psql -d funnyapp -f db/dump.sql
-```
-
-**Docker:**
-```bash
-cd api
-mvn clean package
-docker build -t funny-app .
-docker run -p 8081:8081 --env-file env.local funny-app
-```
-
 **API endpoints:**
 - Swagger: http://localhost:8081/swagger-ui/ (dev profile)
 - Health: http://localhost:8081/actuator/health
 
-## Project Structure
-
-```
-api/
-├── src/main/java/com/canhlabs/funnyapp/
-│   ├── web/          # REST controllers
-│   ├── service/      # Business logic
-│   ├── repo/         # JPA repositories
-│   ├── entity/       # JPA entities
-│   ├── dto/          # Data Transfer Objects
-│   ├── client/       # External APIs (YouTube)
-│   ├── config/       # Spring configuration
-│   ├── cache/        # Guava LRU cache
-│   ├── aop/          # Aspects (audit, rate limit, masking)
-│   ├── jobs/         # Scheduled tasks
-│   └── utils/        # Utilities
-├── src/main/resources/
-│   ├── application.yaml       # Config
-│   └── db/changelog/          # Liquibase migrations
-└── pom.xml
-webapp/         # Frontend (React 19 + Vite)
-helm/           # Kubernetes charts
-docs/adr/       # Architecture decisions
-```
-
-## Key Architecture
-
-**Virtual Threads:** Java 24 with `spring.threads.virtual.enabled=true`, uses `StructuredTaskScope` for concurrency
-
-**Caching:** Guava LRU (in-memory) for video metadata, chunks, stats. Config: `cache.type=guava`
-
-**Auth:** Passwordless magic links + optional MFA (TOTP)
-
-**Database:** PostgreSQL + JPA (`ddl-auto: none`) + Liquibase
-
-**External APIs:**
-- YouTube API via `YouTubeApiClient`
-- ChatGPT via `ChatGptService`
-- Email via Spring Mail (Gmail SMTP)
-
-**AOP Features:**
-- `@AuditLog`: Audit logging with masking
-- `@RateLimited`: Rate limiting
-
 ## Development Patterns
 
 **Error handling:** `@ControllerAdvice` + custom exceptions extending `Error`
-
-**API responses:**
-- `ResultObjectInfo<T>`: Single object
-- `ResultListInfo<T>`: List
-- `ResultErrorInfo`: Errors
 
 **Services:** Interface in `service/`, impl in `service/impl/`
 
@@ -161,31 +88,6 @@ ContractDSL.of(value).notNull().inRange(min, max);
 
 **Coverage:** CI requires LINE coverage >= the fixed minimum in `api/.coverage-threshold` (currently 90%)
 
-**CI Pipeline:** Build → Test → Coverage → Docker → Deploy
-- Version in `api/.funny-app.version` (auto-incremented)
-- Docker image pushed to Docker Hub
-- Deployed via SSH/SCP or Kubernetes Helm
-
 **Java 24 Preview:** Requires `--enable-preview` flag in compiler and runtime
 
-## Configuration Notes
-
-**Profiles:**
-- `dev`: Swagger enabled
-- `prod`: Swagger disabled (default)
-
-**Spring config:** All in `application.yaml`, override via environment variables
-
-**Critical env vars:** See `.env.example` for required keys
-
-## Quick Reference
-
-**Find entity/DTO:** Check `api/src/main/java/com/canhlabs/funnyapp/entity/` or `/dto/`
-
-**Add endpoint:** Controller in `web/`, service in `service/`, repo in `repo/`
-
-**Add migration:** Create file in `src/main/resources/db/changelog/`
-
-**View logs:** Check AOP audit logs (sensitive fields auto-masked)
-
-**Architecture docs:** See `docs/adr/` for decisions, `docs/architecture/` and `docs/puml/` for diagrams
+**Architecture docs:** `docs/adr/` for decisions, `docs/architecture/` and `docs/puml/` for diagrams
