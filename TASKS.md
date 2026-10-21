@@ -400,6 +400,6 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Issue #46 — History tab pills hard to see (autopilot, lite)
 
-- [ ] **FE-1** `.hist-pill` inactive: `--bg-card` fill + visible border (dark and light)
-- [ ] **FE-2** `.hist-pill.active`: `--bg-high` fill; light override teal border/icon
-- [ ] **FE-3** Existing tests + lint green; owner checks /history in both themes
+- [x] **FE-1** `.hist-pill` inactive: `--bg-card` fill + visible border (dark and light)
+- [x] **FE-2** `.hist-pill.active`: `--bg-high` fill; light override teal border/icon
+- [x] **FE-3** Existing tests + lint green; owner checks /history in both themes
