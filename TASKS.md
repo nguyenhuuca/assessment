@@ -430,3 +430,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **SQ-1** Rule + skills: sequence diagrams required for every feature with a PRD (`docs/sequence/`, `templates/artifacts/sequence.template.md`; CLAUDE.md, core-directives, scope, spec, swarm-plan) 36585edb
 - [x] **SQ-2** Backfill diagrams for the 11 active PRDs + `docs/sequence/index.md`, mkdocs nav, tracking Sequence column 36585edb
+
+## Tooling: Agent quality metrics (2026-10-21)
+
+- [x] **AM-1** `/autopilot` records every run: `Autopilot-Run: <id>` commit trailer + `docs/metrics/agent-runs/<id>.json` (`resources/run-metrics.template.json`) b8e6f917
+- [x] **AM-2** `scripts/agent-metrics.mjs` (escaped defects, reverts, rounds, CI, PR lead time, cost) + node tests; baseline `docs/reports/agent-metrics-2026-10.md` b8e6f917

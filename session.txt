@@ -1,8 +1,8 @@
-task: Mermaid sequence diagrams for PRD features
+task: Agent quality metrics (run JSON + trailer, agent-metrics script)
 status: done
 progress: 100
-done: SQ-1 rule + skills + template 36585edb; SQ-2 49 diagrams for 11 PRDs 36585edb
+done: AM-1 trailer + run-metrics JSON b8e6f917; AM-2 agent-metrics.mjs + baseline b8e6f917
 doing: -
 next: -
 plan: -
-updated: 2026-10-21 16:27
+updated: 2026-10-21 16:49
