@@ -5076,6 +5076,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#compress-adr-0027-d6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compress (ADR-0027 D6)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pruning-adr-0027-d5" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7170,6 +7181,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#compress-adr-0027-d6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compress (ADR-0027 D6)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pruning-adr-0027-d5" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7248,7 +7270,7 @@
 </tr>
 <tr>
 <td>QA / tests</td>
-<td><code>.claude/skills/testing/SKILL.md</code> or <code>.claude/skills/qa-engineer/SKILL.md</code></td>
+<td><code>.claude/skills/core-engineering/testing/SKILL.md</code> or <code>.claude/skills/qa-engineer/SKILL.md</code></td>
 </tr>
 <tr>
 <td>Needs CI or a hook</td>
@@ -7292,6 +7314,18 @@
 <ul>
 <li><strong>Local:</strong> stop after the gate and ask with <code>AskUserQuestion</code>: <strong>Push + open PR / Keep branch / Drop</strong>. Never merge.</li>
 <li><strong>Headless:</strong> stop after writing the manifest. The workflow checks paths, runs the gate, pushes and opens the PR (or an <code>evolve</code> issue when it fails).</li>
+</ul>
+<h2 id="compress-adr-0027-d6">Compress (ADR-0027 D6)<a class="headerlink" href="#compress-adr-0027-d6" title="Permanent link">&para;</a></h2>
+<p>The signal <code>compress:&lt;YYYY-MM&gt;</code> comes once a month with lint hints (<code>duplicates</code>, <code>deadRefs</code>, <code>alwaysLoadedBytes</code> from <code>node scripts/evolve.mjs lint-rules</code>). Goal: <strong>less text, same behavior</strong>.</p>
+<ul>
+<li>What to cut: duplicated text (keep one home, point to it), dead references (paths or commands that no longer exist), text that contradicts its source of truth (for example a model table that disagrees with agent frontmatter), and claims that are stale (numbers the repo now measures differently). The lint list is a hint, not the limit; <code>CLAUDE.md</code> and the always-loaded rules matter most, because every session pays for them.</li>
+<li>Allowed: edit existing files in the D2 paths <strong>plus <code>CLAUDE.md</code></strong>, removals included. Never: <code>AGENTS.md</code>, <code>.claude/rules/security.md</code>, this skill, <code>verdict.md</code>, frontmatter, new files, and <strong>any line that carries a safety rule</strong> (push, gates, merge, deny, secrets, tokens, prod, smoke, security, Core Principles, "never …"). <code>check-paths --kind compress</code> rejects those.</li>
+<li>One branch <code>evolve/compress-&lt;YYYY-MM&gt;</code>, one commit, manifest row with <code>"kind": "compress"</code> and <code>"case": "-"</code>. The body lists every cut with its reason (duplicate of X, dead ref, contradicts Y).</li>
+<li>Gate (<code>gate --kind compress</code>, no <code>--case</code>):</li>
+<li>C1: touched files shrink, and either the always-loaded context drops at least 5% or the touched files lose at least 1 KiB;</li>
+<li>C2: no new duplicate lines or dead references;</li>
+<li>C3: every seeded case is still caught with the compressed rules.</li>
+<li>Not proven by the gate: that nothing <strong>outside</strong> the eval set got worse. The PR is the place for the owner to read each removed line.</li>
 </ul>
 <h2 id="pruning-adr-0027-d5">Pruning (ADR-0027 D5)<a class="headerlink" href="#pruning-adr-0027-d5" title="Permanent link">&para;</a></h2>
 <p>When the run's argument is <code>--prune</code>, or total <code>.claude/</code> rule size grew by more than 20% since the last prune: pick one <code>&lt;!-- evolve:</code> line, remove it on a branch, and run <code>gate</code> with its case. It passes only when the case is still caught without it. This is the only way an Evolve rule is removed.</p>

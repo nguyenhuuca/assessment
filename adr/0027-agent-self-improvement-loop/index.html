@@ -7056,6 +7056,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#d6-compress-removing-text-not-only-adding-it-amendment-2026-10-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D6. Compress: removing text, not only adding it (amendment 2026-10-21)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -7228,6 +7239,19 @@
 <li>Every rule line added by Evolve ends with <code>&lt;!-- evolve:&lt;case id&gt; --&gt;</code>.</li>
 <li>Quarterly (or when total rule size grows by more than 20% since the last prune), a run may propose <strong>removing</strong> one such line. It passes only when its case is still caught without it (D3 rule 2) and nothing regresses. This is the only path that deletes rule lines.</li>
 </ul>
+<h3 id="d6-compress-removing-text-not-only-adding-it-amendment-2026-10-21">D6. Compress: removing text, not only adding it (amendment 2026-10-21)<a class="headerlink" href="#d6-compress-removing-text-not-only-adding-it-amendment-2026-10-21" title="Permanent link">&para;</a></h3>
+<p>Adding rules alone makes every session pay for more context (<code>CLAUDE.md</code> + always-loaded rules ≈ 37 KB, loaded by every session and worker). Evolve may also <strong>cut</strong>:</p>
+<ul>
+<li><strong>Signal:</strong> <code>compress:&lt;YYYY-MM&gt;</code>, at most one a month, after the defect signals. It carries lint hints from <code>scripts/evolve.mjs lint-rules</code>: exact duplicate lines across rule files, dead path references, the always-loaded size.</li>
+<li><strong>What may be cut:</strong> duplicated text (keep one home, point to it), dead references, text that contradicts its source of truth, stale claims.</li>
+<li><strong>Paths:</strong> the D2 paths <strong>plus <code>CLAUDE.md</code></strong>, existing files only, removals allowed. <strong>Protected, never cut or edited:</strong> <code>AGENTS.md</code>, <code>.claude/rules/security.md</code>, the evolve skill, <code>verdict.md</code>, frontmatter, and any line carrying a safety rule (push, gates, merge, deny, secrets, tokens, prod, smoke, security, Core Principles, "never …"), matched by a fixed pattern in <code>scripts/evolve.mjs</code>.</li>
+<li><strong>Gate</strong> (<code>gate --kind compress</code>):</li>
+<li>C1: the touched files shrink, and the always-loaded context drops ≥ 5% or the touched files lose ≥ 1 KiB;</li>
+<li>C2: no new duplicate lines or dead references;</li>
+<li>C3: every seeded case is still caught with the compressed rules (and there is at least one case).</li>
+<li><strong>Always a draft PR.</strong> With a small eval set the gate cannot prove that behavior outside it is unchanged, so the owner reads every removed line.</li>
+<li>Rewriting a skill to work better (not just shorter) is a <code>rule</code> proposal: it needs a seeded case that the old text misses.</li>
+</ul>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Good:</strong> every escaped defect becomes a regression eval for the agent, and each rule change has before/after evidence. The eval set grows with real bugs, never with invented ones.</li>
@@ -7251,6 +7275,7 @@
 <h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
 <ul>
 <li>2026-10-21: Proposed; accepted by the owner the same day. The eval runner lives in <code>scripts/evolve.mjs</code> (subcommands <code>signals</code>, <code>check-paths</code>, <code>eval</code>, <code>gate</code>).</li>
+<li>2026-10-21: D6 (compress) added at the owner's request: Evolve may also remove duplicate, dead or stale text, with protected lines and a size + eval gate.</li>
 </ul>
 
 
