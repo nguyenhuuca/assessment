@@ -465,6 +465,11 @@ Observe (signals) → Diagnose (Five Whys → the stage that should have caught 
   - job **ship** checks out a fresh `main`, validates the agent's manifest, runs `check-paths` and the gate with no GitHub token in reach, then opens a PR (pass) or an `evolve` issue (fail). It **never merges**: you do.
 - **Local:** `/evolve` runs the same stages and asks you before pushing.
 - **Pruning:** every Evolve rule ends with `<!-- evolve:<case id> -->`; a later run may propose removing one, only when its case is still caught without it.
+- **Compress** (ADR-0027 D6): once a month (`compress:<YYYY-MM>`) Evolve may also **cut** text: duplicates, dead references, text that contradicts its source of truth, stale claims, in `.claude/` and `CLAUDE.md`.
+  - `node scripts/evolve.mjs lint-rules` gives the hints (duplicate lines, dead path refs, always-loaded size, about 37 KB today).
+  - Never cut: `AGENTS.md`, `security.md`, the evolve skill, frontmatter, and any line carrying a safety rule (push, gates, merge, deny, secrets, prod, smoke, Core Principles, "never …").
+  - Gate: smaller (always-loaded -5% or the touched files -1 KiB), no new duplicates or dead refs, every seeded case still caught. Always a **draft** PR: you read every removed line.
+  - First compress (`evolve/compress-2026-10`): the cost section of `CLAUDE.md`, three overlapping sections → one, -1.1 KB, gate PASS.
 
 **First evolution** (`fe36685d`): from defect `62526c97` (job bodies swallowed exceptions, so failed cron jobs showed SUCCESS), the reviewer got the rule *"check what new code assumes about code it did not change; a false assumption is blocking"*. Case `2026-10-19-swallowed-job-exceptions`: caught **0/3** with the old rules, **3/3** with the new one, about $0.15 per eval run.
 

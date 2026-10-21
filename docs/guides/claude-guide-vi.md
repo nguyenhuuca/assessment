@@ -458,6 +458,11 @@ Observe (signals) → Diagnose (Five Whys → stage lẽ ra phải bắt) → Pr
   - job **ship** checkout `main` sạch, kiểm tra manifest của agent, chạy `check-paths` và gate khi không có GitHub token, rồi mở PR (pass) hoặc issue `evolve` (fail). **Không bao giờ merge**: bạn merge.
 - **Local:** `/evolve` chạy cùng các bước và hỏi bạn trước khi push.
 - **Dọn rule (prune):** mỗi rule do Evolve thêm kết thúc bằng `<!-- evolve:<case id> -->`; run sau có thể đề xuất gỡ một rule, chỉ khi case của nó vẫn bắt được khi không có rule đó.
+- **Compress** (ADR-0027 D6): mỗi tháng một lần (`compress:<YYYY-MM>`), Evolve được **cắt bớt** nội dung: trùng lặp, tham chiếu chết, nội dung mâu thuẫn với source of truth, số liệu lỗi thời, trong `.claude/` và `CLAUDE.md`.
+  - `node scripts/evolve.mjs lint-rules` đưa gợi ý (dòng trùng, path chết, kích thước context luôn load, hiện khoảng 37 KB).
+  - Không bao giờ cắt: `AGENTS.md`, `security.md`, skill evolve, frontmatter, và mọi dòng mang luật an toàn (push, gate, merge, deny, secret, prod, smoke, Core Principles, "never …").
+  - Gate: nhỏ hơn (context luôn load -5% hoặc file bị sửa -1 KiB), không thêm dòng trùng hay ref chết, mọi seeded case vẫn bắt được. Luôn là **draft** PR: bạn đọc từng dòng bị xoá.
+  - Compress đầu tiên (`evolve/compress-2026-10`): phần cost trong `CLAUDE.md`, ba mục trùng nhau → một, -1.1 KB, gate PASS.
 
 **Lần tiến hoá đầu tiên** (`fe36685d`): từ bug `62526c97` (job nuốt exception nên cron job lỗi vẫn hiện SUCCESS), reviewer có thêm rule *"kiểm tra code mới giả định gì về code cũ không đổi; giả định sai là blocking"*. Case `2026-10-19-swallowed-job-exceptions`: rule cũ bắt **0/3**, rule mới **3/3**, khoảng $0.15 mỗi lần chạy eval.
 
