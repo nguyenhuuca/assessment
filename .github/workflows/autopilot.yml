@@ -24,8 +24,17 @@ on:
         required: true
         type: number
 
+# One autopilot run at a time. GitHub keeps one pending run per group and a newer pending run replaces it,
+# so every event that cannot start a job (other labels, ordinary comments) gets its own group: it is skipped
+# by the job `if` and never displaces a real run waiting in the queue (issue #46: 3 labels at once).
 concurrency:
-  group: autopilot
+  group: >-
+    ${{ (github.event_name == 'workflow_dispatch' ||
+    (github.event.sender.login == github.repository_owner &&
+    ((github.event_name == 'issues' && github.event.label.name == 'autopilot') ||
+    (github.event_name == 'issue_comment' &&
+    (startsWith(github.event.comment.body, '/approve') || startsWith(github.event.comment.body, '/revise'))))))
+    && 'autopilot' || format('autopilot-noop-{0}', github.run_id) }}
   cancel-in-progress: false
 
 jobs:
