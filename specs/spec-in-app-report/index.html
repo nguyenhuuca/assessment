@@ -2050,10 +2050,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#br-9-github-state-is-read-through" class="md-nav__link">
+  <a href="#br-9-github-state-stored-first-read-through-as-fallback" class="md-nav__link">
     <span class="md-ellipsis">
       
-        BR-9: GitHub state is read-through
+        BR-9: GitHub state: stored first, read-through as fallback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-10-webhook-stores-the-state-adr-0026-d7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-10: Webhook stores the state (ADR-0026 D7)
       
     </span>
   </a>
@@ -2144,6 +2155,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#fr-8-webhook-receiver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-8: Webhook receiver
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#fr-7-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2210,6 +2232,17 @@
     <span class="md-ellipsis">
       
         POST /v1/funny-app/admin/reports/{id}/retry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-v1funny-appwebhooksgithub" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /v1/funny-app/webhooks/github
       
     </span>
   </a>
@@ -2642,6 +2675,50 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ec-14-webhook-deliveries-out-of-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-14: Webhook deliveries out of order
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-15-webhook-for-an-issue-the-app-did-not-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-15: Webhook for an issue the app did not create
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-16-webhook-redelivered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-16: Webhook redelivered
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-17-ping-and-other-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-17: ping and other events
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2704,6 +2781,8 @@
   
     
     
+      
+        
       
         
       
@@ -3339,6 +3418,34 @@
     
   
     In-App Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-report-webhook-state/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Report Webhook State
   
 
     
@@ -7299,10 +7406,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#br-9-github-state-is-read-through" class="md-nav__link">
+  <a href="#br-9-github-state-stored-first-read-through-as-fallback" class="md-nav__link">
     <span class="md-ellipsis">
       
-        BR-9: GitHub state is read-through
+        BR-9: GitHub state: stored first, read-through as fallback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-10-webhook-stores-the-state-adr-0026-d7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-10: Webhook stores the state (ADR-0026 D7)
       
     </span>
   </a>
@@ -7393,6 +7511,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#fr-8-webhook-receiver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-8: Webhook receiver
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#fr-7-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7459,6 +7588,17 @@
     <span class="md-ellipsis">
       
         POST /v1/funny-app/admin/reports/{id}/retry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-v1funny-appwebhooksgithub" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /v1/funny-app/webhooks/github
       
     </span>
   </a>
@@ -7891,6 +8031,50 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ec-14-webhook-deliveries-out-of-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-14: Webhook deliveries out of order
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-15-webhook-for-an-issue-the-app-did-not-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-15: Webhook for an issue the app did not create
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-16-webhook-redelivered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-16: Webhook redelivered
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-17-ping-and-other-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-17: ping and other events
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -8046,12 +8230,20 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 </blockquote>
 <h3 id="br-8-reporter-deleted">BR-8: Reporter deleted<a class="headerlink" href="#br-8-reporter-deleted" title="Permanent link">&para;</a></h3>
 <p><code>reporter_id</code> is set to <code>NULL</code> when the user is deleted (FK <code>ON DELETE SET NULL</code>). The report stays in the list as "Deleted user", and only a <code>SUPER_ADMIN</code> can retry it.</p>
-<h3 id="br-9-github-state-is-read-through">BR-9: GitHub state is read-through<a class="headerlink" href="#br-9-github-state-is-read-through" title="Permanent link">&para;</a></h3>
+<h3 id="br-9-github-state-stored-first-read-through-as-fallback">BR-9: GitHub state: stored first, read-through as fallback<a class="headerlink" href="#br-9-github-state-stored-first-read-through-as-fallback" title="Permanent link">&para;</a></h3>
 <ul>
-<li>The list shows <code>githubState</code>: <code>OPEN</code>, <code>CLOSED</code> or <code>UNKNOWN</code>.</li>
-<li>It is fetched from GitHub per <code>CREATED</code> row on the requested page and cached for 5 minutes.</li>
-<li><code>FAILED</code> rows have <code>githubState = null</code>.</li>
-<li>No webhook and no background refresh.</li>
+<li>The list shows <code>githubState</code>: <code>OPEN</code>, <code>CLOSED</code> or <code>UNKNOWN</code>, plus <code>githubStateReason</code> (<code>completed</code>, <code>not_planned</code>, <code>duplicate</code>, <code>reopened</code> or <code>null</code>).</li>
+<li>A <code>CREATED</code> row with a stored <code>github_state</code> (BR-10) uses it; no GitHub call.</li>
+<li>A <code>CREATED</code> row without one is fetched from GitHub and cached for 5 minutes, as before; <code>githubStateReason</code> is then <code>null</code>. The read-through result is not stored.</li>
+<li><code>FAILED</code> rows have <code>githubState = null</code> and <code>githubStateReason = null</code>.</li>
+<li>No background refresh.</li>
+</ul>
+<h3 id="br-10-webhook-stores-the-state-adr-0026-d7">BR-10: Webhook stores the state (ADR-0026 D7)<a class="headerlink" href="#br-10-webhook-stores-the-state-adr-0026-d7" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>POST /v1/funny-app/webhooks/github</code> accepts a delivery only when <code>X-Hub-Signature-256</code> equals <code>sha256=</code> + hex HMAC-SHA256 of the raw body with <code>GITHUB_WEBHOOK_SECRET</code>, compared in constant time.</li>
+<li>Only <code>X-GitHub-Event: issues</code> with <code>action</code> <code>closed</code> or <code>reopened</code> changes anything. It sets <code>github_state</code> from <code>issue.state</code> (<code>open</code> → <code>OPEN</code>, <code>closed</code> → <code>CLOSED</code>), <code>github_state_reason</code> from <code>issue.state_reason</code> (only <code>completed</code>, <code>not_planned</code>, <code>duplicate</code> or <code>reopened</code>; any other value is stored as null), and <code>github_state_at</code> from <code>issue.updated_at</code>, on the <code>CREATED</code> report whose <code>issue_number</code> = <code>issue.number</code>.</li>
+<li>The update applies only when <code>issue.updated_at</code> is after the stored <code>github_state_at</code> (or none is stored), so an older delivery that arrives late cannot overwrite a newer state.</li>
+<li>The repository in the payload (<code>repository.full_name</code>) must equal the configured <code>owner/repo</code>; otherwise nothing changes.</li>
 </ul>
 <hr />
 <h2 id="functional-requirements">Functional Requirements<a class="headerlink" href="#functional-requirements" title="Permanent link">&para;</a></h2>
@@ -8098,6 +8290,12 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <p>It has two methods:
 - <code>create(title, body, labels)</code> returns the issue number and <code>html_url</code>;
 - <code>state(number)</code> returns <code>OPEN</code>, <code>CLOSED</code> or <code>UNKNOWN</code>. It maps any non-200 response or exception to <code>UNKNOWN</code>.</p>
+<h3 id="fr-8-webhook-receiver">FR-8: Webhook receiver<a class="headerlink" href="#fr-8-webhook-receiver" title="Permanent link">&para;</a></h3>
+<p>The webhook endpoint must:
+- read the body as raw bytes and verify the signature <strong>before</strong> parsing JSON;
+- return 503 when <code>GITHUB_WEBHOOK_SECRET</code> is blank, 401 on a missing or wrong signature, 400 on unparseable JSON from a valid signature, and 204 otherwise (applied or ignored);
+- log the delivery id, event, action, issue number and outcome (<code>applied</code>, <code>ignored</code>, <code>stale</code>, <code>unknown-issue</code>) at INFO; never log the secret, the signature or the body;
+- finish without any outbound call (GitHub expects an answer within 10 s).</p>
 <h3 id="fr-7-configuration">FR-7: Configuration<a class="headerlink" href="#fr-7-configuration" title="Permanent link">&para;</a></h3>
 <p><code>AppProperties.github</code> has three fields:
 - <code>token</code>, from env <code>GITHUB_REPORT_TOKEN</code>, no default;
@@ -8307,8 +8505,43 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 </tr>
 </tbody>
 </table>
+<h4 id="post-v1funny-appwebhooksgithub">POST /v1/funny-app/webhooks/github<a class="headerlink" href="#post-v1funny-appwebhooksgithub" title="Permanent link">&para;</a></h4>
+<p><strong>Description:</strong> GitHub repo webhook for the "Issues" event (BR-10, FR-8).</p>
+<p><strong>Auth:</strong> No JWT (listed in <code>WHITE_LIST_PATH</code>, <code>utils/AppConstant.java:45</code>). HMAC signature with <code>GITHUB_WEBHOOK_SECRET</code>.
+<strong>Rate limit:</strong> none (no user; the signature check comes first and is cheap).</p>
+<p><strong>Request:</strong> headers <code>X-GitHub-Event</code>, <code>X-GitHub-Delivery</code>, <code>X-Hub-Signature-256</code>; JSON body from GitHub. Fields read: <code>action</code>, <code>issue.number</code>, <code>issue.state</code>, <code>issue.state_reason</code>, <code>issue.updated_at</code>, <code>repository.full_name</code>.</p>
+<p><strong>Response — Success:</strong> 204, empty body, for applied and for ignored deliveries.</p>
+<p><strong>Response — Error</strong></p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>400</td>
+<td>Valid signature, body is not JSON or lacks <code>issue.number</code> for an <code>issues</code> event</td>
+</tr>
+<tr>
+<td>401</td>
+<td><code>X-Hub-Signature-256</code> missing, not <code>sha256=&lt;hex&gt;</code>, or wrong</td>
+</tr>
+<tr>
+<td>413</td>
+<td>Body larger than 1 MiB (checked before the signature)</td>
+</tr>
+<tr>
+<td>503</td>
+<td><code>GITHUB_WEBHOOK_SECRET</code> not configured</td>
+</tr>
+</tbody>
+</table>
 <h3 id="modified-endpoints">Modified Endpoints<a class="headerlink" href="#modified-endpoints" title="Permanent link">&para;</a></h3>
-<p>None.</p>
+<ul>
+<li><code>GET /v1/funny-app/admin/reports</code>: <code>ReportDto</code> gains <code>githubStateReason</code> (string or <code>null</code>); <code>githubState</code> follows BR-9.</li>
+</ul>
 <hr />
 <h2 id="database-changes">Database Changes<a class="headerlink" href="#database-changes" title="Permanent link">&para;</a></h2>
 <h3 id="new-tables">New Tables<a class="headerlink" href="#new-tables" title="Permanent link">&para;</a></h3>
@@ -8349,11 +8582,20 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <li><code>labels</code> is a comma-separated copy of what was sent to GitHub.</li>
 </ul>
 <h3 id="modified-tables">Modified Tables<a class="headerlink" href="#modified-tables" title="Permanent link">&para;</a></h3>
-<p>None.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- Issue state pushed by the GitHub webhook (ADR-0026 D7).</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">app_report</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">github_state</span><span class="w">        </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">(</span><span class="n">github_state</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">'OPEN'</span><span class="p">,</span><span class="w"> </span><span class="s1">'CLOSED'</span><span class="p">)),</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">github_state_reason</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">github_state_at</span><span class="w">     </span><span class="n">TIMESTAMPTZ</span><span class="p">;</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_app_report_issue_number</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">app_report</span><span class="w"> </span><span class="p">(</span><span class="n">issue_number</span><span class="p">)</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">issue_number</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span>
+</code></pre></div>
+<blockquote>
+<p>Migration file: <code>api/src/main/resources/db/changelog/sql/202610210001-app-report-github-state.sql</code>. All columns are nullable, so existing rows keep working through the read-through path.</p>
+</blockquote>
 <hr />
 <h2 id="security-requirements">Security Requirements<a class="headerlink" href="#security-requirements" title="Permanent link">&para;</a></h2>
 <h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h3>
-<p>All three endpoints require a JWT. None are public.</p>
+<p>The three admin endpoints require a JWT. The webhook endpoint is public and is authenticated only by its HMAC signature (BR-10); <code>GITHUB_WEBHOOK_SECRET</code> is a separate secret from <code>GITHUB_REPORT_TOKEN</code>, set in the server's env file, never logged and never returned.</p>
 <h3 id="authorization">Authorization<a class="headerlink" href="#authorization" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Class level:</strong> <code>@PreAuthorize("hasRole('ADMIN')")</code>. The role hierarchy lets SUPER_ADMIN through (<code>filter/WebSecurityConfig.java:81-88</code>).</li>
@@ -8507,11 +8749,11 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <p><strong>Assumption:</strong> The webapp has no version today (<code>package.json</code> is <code>0.0.1</code>). The deploy commit's short SHA is the build id. Locally it is <code>dev</code>.</p>
 </blockquote>
 <h3 id="state-management">State Management<a class="headerlink" href="#state-management" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// Query keys</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="p">[</span><span class="s1">'admin'</span><span class="p">,</span><span class="w"> </span><span class="s1">'reports'</span><span class="p">,</span><span class="w"> </span><span class="nx">page</span><span class="p">]</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">// useCreateReport / useRetryReport onSuccess</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nx">queryClient</span><span class="p">.</span><span class="nx">invalidateQueries</span><span class="p">({</span><span class="w"> </span><span class="nx">queryKey</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'admin'</span><span class="p">,</span><span class="w"> </span><span class="s1">'reports'</span><span class="p">]</span><span class="w"> </span><span class="p">})</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// Query keys</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p">[</span><span class="s1">'admin'</span><span class="p">,</span><span class="w"> </span><span class="s1">'reports'</span><span class="p">,</span><span class="w"> </span><span class="nx">page</span><span class="p">]</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1">// useCreateReport / useRetryReport onSuccess</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nx">queryClient</span><span class="p">.</span><span class="nx">invalidateQueries</span><span class="p">({</span><span class="w"> </span><span class="nx">queryKey</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'admin'</span><span class="p">,</span><span class="w"> </span><span class="s1">'reports'</span><span class="p">]</span><span class="w"> </span><span class="p">})</span>
 </code></pre></div>
 <hr />
 <h2 id="event-job-changes">Event / Job Changes<a class="headerlink" href="#event-job-changes" title="Permanent link">&para;</a></h2>
@@ -8631,6 +8873,17 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 - The UI disables Submit while the request is pending, so normally only one request is sent.
 - If two requests still arrive, both are processed: two rows and two issues, each counted by BR-5.</p>
 <hr />
+<h3 id="ec-14-webhook-deliveries-out-of-order">EC-14: Webhook deliveries out of order<a class="headerlink" href="#ec-14-webhook-deliveries-out-of-order" title="Permanent link">&para;</a></h3>
+<p>A <code>reopened</code> event with <code>updated_at</code> T1 arrives after a <code>closed</code> event with T2 &gt; T1. The stored state stays <code>CLOSED</code> (BR-10).</p>
+<h3 id="ec-15-webhook-for-an-issue-the-app-did-not-create">EC-15: Webhook for an issue the app did not create<a class="headerlink" href="#ec-15-webhook-for-an-issue-the-app-did-not-create" title="Permanent link">&para;</a></h3>
+<p>No <code>CREATED</code> report has that <code>issue_number</code> → 204, nothing stored, outcome <code>unknown-issue</code>.</p>
+<h3 id="ec-16-webhook-redelivered">EC-16: Webhook redelivered<a class="headerlink" href="#ec-16-webhook-redelivered" title="Permanent link">&para;</a></h3>
+<p>The same delivery sent twice: the second has the same <code>updated_at</code>, which is not after the stored value, so nothing changes (outcome <code>stale</code>); the response is still 204.</p>
+<blockquote>
+<p><strong>Accepted limit:</strong> GitHub's <code>updated_at</code> has second resolution, so a close and a reopen in the same second keep the first state stored. The next event or a manual redeliver fixes it. The endpoint has no per-IP rate limit; the 1 MiB cap and the HMAC check keep the cost per request small (edge limits apply).</p>
+</blockquote>
+<h3 id="ec-17-ping-and-other-events">EC-17: <code>ping</code> and other events<a class="headerlink" href="#ec-17-ping-and-other-events" title="Permanent link">&para;</a></h3>
+<p><code>X-GitHub-Event: ping</code>, or <code>issues</code> with an action other than <code>closed</code>/<code>reopened</code> → 204, nothing stored, outcome <code>ignored</code>.</p>
 <h2 id="acceptance-criteria">Acceptance Criteria<a class="headerlink" href="#acceptance-criteria" title="Permanent link">&para;</a></h2>
 <ul>
 <li>[ ] An ADMIN and the SUPER_ADMIN see <strong>Report</strong> above Settings on desktop and mobile; a USER does not (FR-1).</li>
@@ -8649,14 +8902,20 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <li>[ ] The text boundaries in EC-10 hold.</li>
 <li>[ ] The token never appears in logs, audit output or responses (verified by a test with a fake token string).</li>
 <li>[ ] The GitHub client is tested against a local stub (<code>HttpServer</code>, like <code>HttpRedirectProbeTest</code>). No test calls the real GitHub.</li>
+<li>[ ] Webhook: a signed <code>closed</code> event with <code>state_reason: completed</code> stores <code>CLOSED</code>/<code>completed</code>, and the list shows it without calling GitHub (BR-9, BR-10).</li>
+<li>[ ] Webhook: a missing or wrong signature → 401 and nothing stored; no secret → 503 (FR-8).</li>
+<li>[ ] Webhook: EC-14 to EC-17 hold; a payload for another repository changes nothing.</li>
+<li>[ ] Webhook: the secret, signature and body never appear in logs.</li>
+<li>[ ] FE: a <code>CLOSED</code> badge shows the reason when one is stored ("Closed · completed" / "Closed · not planned").</li>
 <li>[ ] Existing flows are unaffected (regression).</li>
 <li>[ ] <code>mvn verify</code> passes with the coverage gate met; <code>npm run test</code> and <code>npm run lint</code> pass.</li>
 </ul>
 <hr />
 <h2 id="open-questions">Open Questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] <strong>Owner setup:</strong> create the missing label <code>report</code> (<code>gh label create report</code>). <code>bug</code>, <code>enhancement</code> and the three <code>autopilot*</code> labels already exist; GitHub would also create <code>report</code> on first use, with a default color.</li>
-<li>[ ] <strong>Owner setup:</strong> create the fine-grained PAT (this repo, Issues read/write) and set <code>GITHUB_REPORT_TOKEN</code> on the server, through the deploy environment and secrets.</li>
+<li>[x] <strong>Owner setup:</strong> create the missing label <code>report</code> (<code>gh label create report</code>). <code>bug</code>, <code>enhancement</code> and the three <code>autopilot*</code> labels already exist; GitHub would also create <code>report</code> on first use, with a default color.</li>
+<li>[ ] <strong>Owner setup (D7):</strong> add the repo webhook (Settings → Webhooks: payload URL <code>https://canh-labs.com/api/v1/funny-app/webhooks/github</code>, content type <code>application/json</code>, a random secret, "Issues" events only) and set <code>GITHUB_WEBHOOK_SECRET</code> to the same secret in the server's env file, then restart.</li>
+<li>[x] <strong>Owner setup:</strong> create the fine-grained PAT (this repo, Issues read/write) and set <code>GITHUB_REPORT_TOKEN</code> on the server, through the deploy environment and secrets.</li>
 </ul>
 <hr />
 <h2 id="version-history">Version History<a class="headerlink" href="#version-history" title="Permanent link">&para;</a></h2>
@@ -8687,6 +8946,12 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <td>2026-10-20</td>
 <td>nguyenhuuca</td>
 <td>Review fixes: context and title reject control characters; retry checks ownership before 409; retry auto label and cap follow the caller's current role</td>
+</tr>
+<tr>
+<td>1.3</td>
+<td>2026-10-21</td>
+<td>nguyenhuuca</td>
+<td>ADR-0026 D7: HMAC-verified GitHub webhook stores the issue state and reason (BR-9 changed, BR-10, FR-8, EC-14..EC-17, new columns)</td>
 </tr>
 </tbody>
 </table>

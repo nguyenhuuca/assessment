@@ -1936,6 +1936,8 @@
       
         
       
+        
+      
     
     
     
@@ -2530,6 +2532,34 @@
     
   
     In-App Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-report-webhook-state/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Report Webhook State
   
 
     
@@ -6517,6 +6547,34 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#d7-issue-state-by-webhook-amendment-2026-10-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D7. Issue state by webhook (amendment, 2026-10-21)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="D7. Issue state by webhook (amendment, 2026-10-21)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options-considered-for-d7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options considered for D7
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -6621,7 +6679,7 @@
 
 <h1 id="adr-0026-in-app-report-creates-github-issues-with-the-owners-token">ADR-0026: In-App Report Creates GitHub Issues With the Owner's Token<a class="headerlink" href="#adr-0026-in-app-report-creates-github-issues-with-the-owners-token" title="Permanent link">&para;</a></h1>
 <h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
-<p><strong>Status:</strong> Accepted (2026-10-20) · <strong>Date:</strong> 2026-10-20 · <strong>Deciders:</strong> nguyenhuuca · <strong>Tags:</strong> api, integration, security, agents
+<p><strong>Status:</strong> Accepted (2026-10-20), amended 2026-10-21 (D7 webhook) · <strong>Date:</strong> 2026-10-20 · <strong>Deciders:</strong> nguyenhuuca · <strong>Tags:</strong> api, integration, security, agents
 <strong>Related:</strong> <a href="../../prd/PRD-in-app-report/">PRD-in-app-report</a> · amends the trust model of <a href="../0022-headless-autopilot/">ADR-0022</a> D2 · works with <a href="../0025-autopilot-auto-gates/">ADR-0025</a></p>
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
 <ul>
@@ -6762,7 +6820,7 @@
 <li>one <code>GET</code> per issue on the page, in parallel on virtual threads;</li>
 <li>cached in Guava for 5 min;</li>
 <li>a failure shows <code>unknown</code>.</li>
-<li>No webhook (PRD out of scope).</li>
+<li>Superseded for issues with a stored state by D7: the list reads the state from the table and calls GitHub only for rows that have none.</li>
 <li><strong>List scope:</strong> every admin sees all reports, newest first, paged, with the reporter's display name. The issues are public anyway.</li>
 </ul>
 <h3 id="d5-issue-body-public-repo">D5. Issue body (public repo)<a class="headerlink" href="#d5-issue-body-public-repo" title="Permanent link">&para;</a></h3>
@@ -6783,6 +6841,53 @@
 <li>add a migration if the <code>role</code> column has a check constraint;</li>
 <li>leave the auto-label rule (SUPER_ADMIN only) unchanged.</li>
 </ul>
+<h3 id="d7-issue-state-by-webhook-amendment-2026-10-21">D7. Issue state by webhook (amendment, 2026-10-21)<a class="headerlink" href="#d7-issue-state-by-webhook-amendment-2026-10-21" title="Permanent link">&para;</a></h3>
+<p>The owner asked for the closed state to be pushed to the app and stored, and to tell "done" from "closed, not planned".</p>
+<ul>
+<li><strong>Endpoint:</strong> <code>POST /v1/funny-app/webhooks/github</code>, added to <code>WHITE_LIST_PATH</code> (<code>utils/AppConstant.java:45</code>), so no JWT. GitHub is the only intended caller.</li>
+<li><strong>Authentication:</strong> the HMAC-SHA256 signature in <code>X-Hub-Signature-256</code> over the <strong>raw body</strong>, with the shared secret from the env var <code>GITHUB_WEBHOOK_SECRET</code>.</li>
+<li>Compared in constant time (<code>MessageDigest.isEqual</code>) before the body is parsed.</li>
+<li>Missing or wrong signature → 401. Secret not configured → 503, so the endpoint is off until the owner sets it.</li>
+<li>The secret is never logged; the delivery id (<code>X-GitHub-Delivery</code>) is logged at INFO.</li>
+<li><strong>Events:</strong> only <code>X-GitHub-Event: issues</code> with action <code>closed</code> or <code>reopened</code>. <code>ping</code> and every other event or action → 204 and nothing stored.</li>
+<li><strong>Storage:</strong> new columns on <code>app_report</code>: <code>github_state</code> (<code>OPEN</code>/<code>CLOSED</code>), <code>github_state_reason</code> (<code>completed</code>, <code>not_planned</code>, <code>duplicate</code>, <code>reopened</code>, or null), <code>github_state_at</code> (the issue's <code>updated_at</code> from the payload), plus an index on <code>issue_number</code>.</li>
+<li>The row is found by <code>issue_number</code> among <code>CREATED</code> reports. An issue that was not created by the app → 204, nothing stored.</li>
+<li><strong>Out-of-order deliveries:</strong> an event is applied only when its <code>updated_at</code> is newer than the stored <code>github_state_at</code>.</li>
+<li><strong>List:</strong> a row with a stored state uses it, with no GitHub call. A row without one (created before D7, or no event yet) keeps the D4 read-through.</li>
+<li><strong>Missed deliveries:</strong> GitHub does not retry a failed delivery on its own. The stored state can then stay stale until the next event or a manual redeliver from the repo's webhook settings. Accepted.</li>
+<li><strong>Owner setup:</strong> repo Settings → Webhooks → payload URL above, content type <code>application/json</code>, secret, "Issues" events only; <code>GITHUB_WEBHOOK_SECRET</code> in the VM's env file, then restart.</li>
+</ul>
+<h4 id="options-considered-for-d7">Options considered for D7<a class="headerlink" href="#options-considered-for-d7" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Repo webhook, HMAC-verified, state stored on <code>app_report</code></strong></td>
+<td>Push, no polling; <code>state_reason</code> comes with the event; one public endpoint</td>
+<td>A new unauthenticated endpoint (guarded by HMAC); a second secret; GitHub does not retry</td>
+<td><strong>Chosen</strong></td>
+</tr>
+<tr>
+<td>B. Scheduled job polls GitHub for open reports</td>
+<td>No public endpoint</td>
+<td>Uses API quota; state is late by up to the poll interval; another job</td>
+<td>Rejected</td>
+</tr>
+<tr>
+<td>C. Keep read-through only, add <code>state_reason</code> to the GET</td>
+<td>Smallest change</td>
+<td>Nothing stored; still one call per row on a cold cache</td>
+<td>Rejected: the owner wants the state stored</td>
+</tr>
+</tbody>
+</table>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <h3 id="positive">Positive<a class="headerlink" href="#positive" title="Permanent link">&para;</a></h3>
 <ul>
@@ -6797,6 +6902,7 @@
 <li><strong>The owner-only gate of ADR-0022 is wider.</strong> Any ADMIN can start paid runs, capped at 10 a day. An admin account compromise now reaches autopilot; prod is still reachable only through <code>autopilot:auto</code>, which is SUPER_ADMIN only.</li>
 <li><strong>The PAT lives on the server</strong> alongside other secrets. A server compromise leaks it, limited to creating and reading issues in one repo.</li>
 <li><strong>Status calls add latency</strong> to the list: up to one GitHub call per row on a cold cache.</li>
+<li><strong>D7 adds a public endpoint.</strong> Its only guard is the HMAC secret; a leaked secret lets anyone set report states (display only, no other effect). Rotate it in both GitHub and the env file.</li>
 <li><strong>The per-user limit is in memory.</strong> It resets on deploy, which is acceptable at one replica. Moving to Redis follows ADR-0003 if the app scales out.</li>
 </ul>
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
@@ -6833,6 +6939,10 @@
 <tr>
 <td>2026-10-20</td>
 <td>Accepted by the owner</td>
+</tr>
+<tr>
+<td>2026-10-21</td>
+<td>D7: issue state by HMAC-verified webhook, stored on <code>app_report</code> (owner request)</td>
 </tr>
 </tbody>
 </table>

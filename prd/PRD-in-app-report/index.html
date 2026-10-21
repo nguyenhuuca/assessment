@@ -2264,6 +2264,8 @@
       
         
       
+        
+      
     
     
     
@@ -2858,6 +2860,34 @@
     
   
     In-App Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-report-webhook-state/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Report Webhook State
   
 
     
@@ -7233,7 +7263,7 @@ Related Skills: scope, planning-artifacts
 <h3 id="out-of-scope">Out of Scope<a class="headerlink" href="#out-of-scope" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>CONTRIBUTOR role</strong>: v1 is ADMIN and SUPER_ADMIN only. The access check is built so the role can be added later (NFR-8).</li>
-<li><strong>Sync back from GitHub</strong>: no webhook, and no in-app notification when the issue gets a comment, a PR or is closed. The state is only read when the list opens.</li>
+<li><strong>Sync back from GitHub</strong>: no in-app notification when the issue gets a comment, a PR or is closed. (2026-10-21: the closed/reopened state and its reason are now stored by webhook, see ADR-0026 D7.)</li>
 </ul>
 <blockquote>
 <p><strong>Assumption:</strong> Screenshot upload and editing or deleting a report after it is sent are not in v1. Neither was picked for v1 or for later; edits are done on GitHub.</p>
