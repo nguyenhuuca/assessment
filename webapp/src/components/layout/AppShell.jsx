@@ -23,6 +23,7 @@ import LanguageSwitcher from '../common/LanguageSwitcher.jsx'
 import NotificationBell from '../notifications/NotificationBell.jsx'
 import { useNotificationStream } from '../../hooks/useNotifications.js'
 import { useLocaleSync } from '../../hooks/useLocaleSync.js'
+import { notificationNav } from '../../utils/notificationText.js'
 
 // Mobile bottom nav (no side nav on mobile). Secondary actions live in the
 // settings menu (MobileNavMenu), shown once logged in.
@@ -99,10 +100,12 @@ export default function AppShell() {
 
   // Notification click: jump to the video, open its comments and highlight the comment
   function openNotification(n) {
-    if (n?.type === 'SUGGESTION_APPROVED' || n?.type === 'SUGGESTION_REJECTED') {
-      goNav('history')
+    const nav = notificationNav(n, user?.isAdmin)
+    if (nav) {
+      goNav(nav)
       return
     }
+    if (n?.type === 'REPORT_CLOSED') return
     if (!n?.videoId) return
     if (n.type === 'SUGGESTION_LIVE') {
       playVideo(n.videoId)

@@ -12,5 +12,7 @@
   "suggestionApproved": "Your suggestion was approved: {{title}}",
   "suggestionRejected": "Your suggestion was rejected: {{title}} ({{reason}})",
   "suggestionLive": "The video you suggested is now live: {{title}}",
+  "reportClosed": "Your report was closed: {{title}}",
+  "reportClosedReason": "Your report was closed: {{title}} ({{reason}})",
   "suggestionUntitled": "video"
 }

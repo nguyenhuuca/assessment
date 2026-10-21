@@ -12,6 +12,11 @@ export function notificationTitle(n) {
       reason: n.reason ? i18n.t(`suggestions:rejectReason.${n.reason}`, { defaultValue: n.reason }) : '',
     })
   }
+  if (n.type === 'REPORT_CLOSED') {
+    if (!n.reason) return i18n.t('notifications:reportClosed', { title: n.snippet ?? '' })
+    const reason = i18n.t(`report:stateReason.${n.reason}`, { defaultValue: n.reason })
+    return i18n.t('notifications:reportClosedReason', { title: n.snippet ?? '', reason })
+  }
   if (n.type === 'COMMENT_REMOVED') {
     return i18n.t('notifications:removed', { reason: reasonLabel(n.reason) })
   }
@@ -20,6 +25,13 @@ export function notificationTitle(n) {
   return others > 0
     ? i18n.t('notifications:replyMany', { actor, count: others })
     : i18n.t('notifications:replyOne', { actor })
+}
+
+/** Nav key a notification opens, or null when it opens a video (or nothing). The report page is admin-only. */
+export function notificationNav(n, isAdmin) {
+  if (n?.type === 'SUGGESTION_APPROVED' || n?.type === 'SUGGESTION_REJECTED') return 'history'
+  if (n?.type === 'REPORT_CLOSED') return isAdmin ? 'report' : null
+  return null
 }
 
 export function badgeLabel(count) {

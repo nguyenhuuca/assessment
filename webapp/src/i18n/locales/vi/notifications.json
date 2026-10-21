@@ -11,5 +11,7 @@
   "suggestionApproved": "Đề xuất của bạn đã được duyệt: {{title}}",
   "suggestionRejected": "Đề xuất của bạn bị từ chối: {{title}} ({{reason}})",
   "suggestionLive": "Video bạn đề xuất đã lên app: {{title}}",
+  "reportClosed": "Report của bạn đã được đóng: {{title}}",
+  "reportClosedReason": "Report của bạn đã được đóng: {{title}} ({{reason}})",
   "suggestionUntitled": "video"
 }
