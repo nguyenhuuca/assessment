@@ -2421,6 +2421,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 }
 .import-radios { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin: 4px 0; }
 .import-radios label { display: flex; gap: 6px; align-items: center; cursor: pointer; font-size: 13px; }
+.import-schedule { max-width: 220px; }
+.import-schedule-idle { visibility: hidden; }
 .import-title-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .import-title-row .app-input { flex: 1; min-width: 180px; }
 .import-line-list { margin: 0; padding-left: 18px; font-size: 13px; }

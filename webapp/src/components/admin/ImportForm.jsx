@@ -98,17 +98,15 @@ export default function ImportForm() {
       <div className="import-radios" role="radiogroup" aria-label={t('importWhen')}>
         <label><input type="radio" name="import-mode" checked={mode === 'NOW'} onChange={() => setMode('NOW')} /> {t('importNow')}</label>
         <label><input type="radio" name="import-mode" checked={mode === 'LATER'} onChange={() => setMode('LATER')} /> {t('importLater')}</label>
-        {mode === 'LATER' && (
-          <input
-            type="datetime-local"
-            step={SCHEDULE_STEP_MINUTES * 60}
-            className="app-input"
-            style={{ maxWidth: 220 }}
-            aria-label={t('scheduleAria')}
-            value={when}
-            onChange={e => setWhen(e.target.value)}
-          />
-        )}
+        <input
+          type="datetime-local"
+          step={SCHEDULE_STEP_MINUTES * 60}
+          className={mode === 'LATER' ? 'app-input import-schedule' : 'app-input import-schedule import-schedule-idle'}
+          disabled={mode !== 'LATER'}
+          aria-label={t('scheduleAria')}
+          value={when}
+          onChange={e => setWhen(e.target.value)}
+        />
       </div>
       {errors.length > 0 && (
         <div className="app-alert error" role="alert">
