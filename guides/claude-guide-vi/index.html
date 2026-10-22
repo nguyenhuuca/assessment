@@ -9214,7 +9214,7 @@
 <p>Run bị dừng có thể làm tiếp bằng <code>/task-resume</code>, dựa vào <code>session.txt</code> và ledger trong <code>scratchpad/autopilot/</code>.</p>
 <h3 id="nhung-ieu-autopilot-khong-bao-gio-lam">🔒 Những điều autopilot không bao giờ làm<a class="headerlink" href="#nhung-ieu-autopilot-khong-bao-gio-lam" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Bỏ qua Gate 1 hoặc Gate 2. Không có <code>--yes</code>; duyệt gate này không thay cho gate kia hay cho run sau.</li>
+<li>Tự bỏ qua Gate 1 hoặc Gate 2. Không có <code>--yes</code>; duyệt gate này không thay cho gate kia hay cho run sau. Chỉ flag bạn gõ trong lệnh mới bỏ qua được gate (<code>--auto</code>, <code>--auto-push</code>, xem Cách gọi).</li>
 <li>Push trước Gate 2, force-push, hoặc mở PR trong lúc đang chạy.</li>
 <li>Ghi dữ liệu prod. <code>api/Mock-Test.http</code> chỉ chạy GET và login.</li>
 <li>Sửa test cũ khi đang refactor để test pass.</li>
@@ -9373,10 +9373,13 @@
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/autopilot<span class="w"> </span>refactor:<span class="w"> </span>gom<span class="w"> </span>luật<span class="w"> </span>chuyển<span class="w"> </span>trạng<span class="w"> </span>thái<span class="w"> </span>suggestion<span class="w"> </span>vào<span class="w"> </span>một<span class="w"> </span>chỗ,<span class="w"> </span>không<span class="w"> </span>đổi<span class="w"> </span>behavior
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>/autopilot<span class="w"> </span>fix:<span class="w"> </span>nút<span class="w"> </span>Reopen<span class="w"> </span>chưa<span class="w"> </span>disable<span class="w"> </span>khi<span class="w"> </span>đang<span class="w"> </span>gửi<span class="w"> </span>request
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>/autopilot<span class="w"> </span>docs/plans/plan-&lt;feature&gt;.md<span class="w">               </span><span class="c1"># chạy trên plan có sẵn (plan mode)</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>/autopilot<span class="w"> </span>--auto-push<span class="w"> </span>fix:<span class="w"> </span>&lt;...&gt;<span class="w">                     </span><span class="c1"># Gate 2 tự push khi check pass</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>/autopilot<span class="w"> </span>--auto<span class="w"> </span>fix:<span class="w"> </span>&lt;...&gt;<span class="w">                          </span><span class="c1"># tự qua cả 2 gate (Gate 1 cần plan review approve)</span>
 </code></pre></div>
 <ul>
 <li><code>autopilot</code> đặt <code>disable-model-invocation: true</code>: Claude chỉ chạy khi bạn <strong>gõ <code>/autopilot</code></strong>. Nếu bạn yêu cầu bằng lời trong chat ("chạy autopilot cho việc X"), Claude đọc <code>SKILL.md</code> và làm theo từng bước, vẫn đủ hai gate.</li>
 <li>5 skill được nối trong chuỗi (<code>swarm-plan</code>, <code>swarm-review</code>, <code>swarm-execute</code>, <code>qa-engineer</code>, <code>land-the-plane</code>) đặt <code>disable-model-invocation: false</code> để orchestrator gọi được. Đổi lại <code>true</code> lúc nào cũng được; khi đó bước đó tự chuyển sang fallback và report ghi rõ bước nào đi đường nào.</li>
+<li><strong>Auto gates (<a href="../../adr/0028-local-autopilot-auto-gates/">ADR-0028</a>):</strong> <code>--auto-push</code> chỉ tự push khi <code>scripts/claude-autopilot-autopush-check.sh</code> pass: không đụng <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>scripts/claude-*</code>, migration hay <code>.env</code>, và ≤ 400 dòng thay đổi ngoài test và docs. Thiếu điều kiện thì vẫn hỏi bạn như thường. Flag chỉ có hiệu lực cho run đó; <code>/task-resume</code> sẽ hỏi lại ở các gate còn lại.</li>
 <li>Chi tiết thiết kế: <a href="../../plans/plan-autopilot/">plan-autopilot</a>.</li>
 </ul>
 <hr />
