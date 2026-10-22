@@ -7276,6 +7276,7 @@
 <li>2026-10-21: D6 (compress) added at the owner's request: Evolve may also remove duplicate, dead or stale text, with protected lines and a size + eval gate.</li>
 <li>2026-10-21: headless workflow <code>agent-evolve.yml</code> removed at the owner's request (D4); <code>/evolve</code> is local only. The <code>manifest</code> command went with it.</li>
 <li>2026-10-22: signal <code>bug:#&lt;N&gt;</code>: a closed <code>bug</code> issue (in-app report, ADR-0026) whose fix changed lines an agent run wrote (<code>git blame</code> on the fix's parent). Autopilot fixes are titled <code>Autopilot: …</code>, not <code>fix:</code>, so these were not counted before. A fix that only adds lines is not linked.</li>
+<li>2026-10-22: <code>bug:#&lt;N&gt;</code> also links to a commit co-authored by Claude in a normal session when no autopilot run wrote the lines (<code>origin: session</code>, span = that commit). About 72% of the month's commits are Claude-co-authored but under 10% belong to autopilot runs, and all 5 bug reports so far came from session code.</li>
 <li>2026-10-22: headless workflow back with staged proposals outside <code>.claude/</code> and an <code>apply</code> command (<a href="../0029-headless-evolve-staging/">ADR-0029</a>).</li>
 </ul>
 
