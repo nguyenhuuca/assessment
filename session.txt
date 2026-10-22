@@ -1,7 +1,7 @@
 task: Autopilot --auto: video action bar icon-only (tooltip, no text labels)
 status: done
 progress: 100
-done: IC-1..IC-3 icon-only action bar 62ea1c71; pushed
-next: owner: check autopush-check ignores .claude/settings.local.json
+done: IC-1..IC-3 icon-only action bar 62ea1c71; autopush check ignores settings.local.json dee8b5bc; pushed
+next: owner: next /autopilot --auto-push run should push without asking
 plan: -
-updated: 2026-10-22 17:54
+updated: 2026-10-22 18:05
