@@ -76,7 +76,7 @@ The build and revise jobs also require:
 - Workers run in the foreground: `settings: {"env":{"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS":"1"}}`. In `-p` mode the session ends with the turn, so a background worker's result is lost. This was found on the first run for issue #26: the plan job ended "waiting for the review" without a PR.
 
 - Each job has `timeout-minutes: 60`.
-- `concurrency: autopilot` with `cancel-in-progress: false`: one run at a time, others wait.
+- One run at a time, first come first served: a `queue` job waits until every older active run of the workflow is done, and `plan` / `build` need it. Amended 2026-10-22: it replaces `concurrency: autopilot` (`cancel-in-progress: false`), because GitHub keeps only one pending run per group and cancels it when a newer one queues, so the middle of three issues labeled at once was lost.
 - `--max-turns` per job.
 - The skill's round caps (3) still apply. After each job, `scripts/claude-autopilot-cost.sh` (run from `main`, so a PR branch cannot change it) posts the job's cost from the action's result and appends it to the run report on the PR branch.
 

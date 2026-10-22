@@ -24,21 +24,43 @@ on:
         required: true
         type: number
 
-# One autopilot run at a time. GitHub keeps one pending run per group and a newer pending run replaces it,
-# so every event that cannot start a job (other labels, ordinary comments) gets its own group: it is skipped
-# by the job `if` and never displaces a real run waiting in the queue (issue #46: 3 labels at once).
-concurrency:
-  group: >-
-    ${{ (github.event_name == 'workflow_dispatch' ||
-    (github.event.sender.login == github.repository_owner &&
-    ((github.event_name == 'issues' && github.event.label.name == 'autopilot') ||
-    (github.event_name == 'issue_comment' &&
-    (startsWith(github.event.comment.body, '/approve') || startsWith(github.event.comment.body, '/revise'))))))
-    && 'autopilot' || format('autopilot-noop-{0}', github.run_id) }}
-  cancel-in-progress: false
-
+# One autopilot run at a time, first come first served. Not a `concurrency` group: GitHub keeps only one
+# pending run per group and cancels it when a newer one queues, so with three issues labeled at once the
+# middle one was lost. The queue job waits instead until every older active run of this workflow is done.
+# Run ids grow with time, so the oldest waiting run always goes next and two runs never wait on each other.
 jobs:
+  queue:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.sender.login == github.repository_owner && (
+        (github.event_name == 'issues' && github.event.label.name == 'autopilot') ||
+        (github.event_name == 'issue_comment' && github.event.issue.pull_request &&
+         (startsWith(github.event.comment.body, '/approve') || startsWith(github.event.comment.body, '/revise')))))
+    runs-on: ubuntu-latest
+    timeout-minutes: 340  # 5 runs of 60 min ahead; the hosted-runner limit is 360
+    permissions:
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      ME: ${{ github.run_id }}
+    steps:
+      - name: Wait for older autopilot runs
+        run: |
+          # Runs whose jobs are all skipped (other labels, ordinary comments) finish in seconds and only delay a poll.
+          # A failed API call waits and asks again: it must neither fail the run nor let it skip the queue.
+          while :; do
+            if ! ahead=$(gh run list --workflow autopilot.yml --limit 100 --json databaseId,status --jq \
+              "[.[] | select(.databaseId < $ME and (.status | IN(\"queued\",\"in_progress\",\"waiting\",\"pending\",\"requested\")))] | map(.databaseId) | sort | join(\" \")"); then
+              echo "gh run list failed, retrying"; sleep 60; continue
+            fi
+            [ -z "$ahead" ] && break
+            echo "waiting for older runs: $ahead"
+            sleep 60
+          done
+
   plan:
+    needs: queue
     if: >-
       github.event.sender.login == github.repository_owner && (
         (github.event_name == 'issues' && github.event.label.name == 'autopilot') ||
@@ -121,6 +143,7 @@ jobs:
           path: ${{ steps.claude.outputs.execution_file }}
           retention-days: 3
   build:
+    needs: queue
     # workflow_dispatch: sent by the plan job's auto gate 1 (github-actions[bot]) or by the owner by hand
     if: >-
       (github.event_name == 'workflow_dispatch' &&

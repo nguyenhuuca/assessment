@@ -397,7 +397,7 @@ gh secret set AUTOPILOT_MERGE_TOKEN
 - Chỉ **owner của repo** kích hoạt được, kể cả label lẫn comment. Repo đang public, nên comment của người khác bị bỏ qua.
 - Nội dung issue chỉ là dữ liệu. Chỉ dẫn nằm trong issue mà định thay đổi workflow, quyền hay gate sẽ bị bỏ qua và được ghi lại trong PR.
 - Headless **từ chối** sửa `.github/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, file `.env` và migration xóa dữ liệu. Những việc đó phải làm ở local.
-- Mỗi job tối đa 60 phút, mỗi lúc chỉ 1 run. Bước Claude chỉ thấy secret `CLAUDE_CODE_OAUTH_TOKEN`; `AUTOPILOT_MERGE_TOKEN` chỉ bước auto-merge thấy; các secret deploy (SSH, Docker) không bao giờ lộ ra job.
+- Mỗi job tối đa 60 phút, mỗi lúc chỉ 1 run. Các run xếp hàng theo thứ tự đến trước chạy trước, nên gắn label cho nhiều issue cùng lúc không mất run nào (chờ tối đa khoảng 5,5 giờ). Bước Claude chỉ thấy secret `CLAUDE_CODE_OAUTH_TOKEN`; `AUTOPILOT_MERGE_TOKEN` chỉ bước auto-merge thấy; các secret deploy (SSH, Docker) không bao giờ lộ ra job.
 
 ### ▶️ Cách gọi
 

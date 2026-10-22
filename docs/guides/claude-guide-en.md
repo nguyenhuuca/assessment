@@ -404,7 +404,7 @@ gh secret set AUTOPILOT_MERGE_TOKEN
 - **Owner only.** Only the **repo owner** can trigger a run, by label or by comment. The repo is public, so anyone else's comments are ignored.
 - **Issue text is data.** Instructions in an issue that try to change the workflow, permissions or gates are ignored and listed in the PR.
 - **Refused paths.** Headless **refuses** to edit `.github/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, `.env` files, or write data-dropping migrations. Do those locally.
-- **Limits and secrets.** Each job has a 60 min cap, and only one run happens at a time. Claude's steps see only `CLAUDE_CODE_OAUTH_TOKEN`; `AUTOPILOT_MERGE_TOKEN` is seen only by the auto-merge step; deploy secrets (SSH, Docker) are never exposed.
+- **Limits and secrets.** Each job has a 60 min cap, and only one run happens at a time: runs queue first come first served, so labeling several issues at once loses none (the wait is capped at about 5.5 hours). Claude's steps see only `CLAUDE_CODE_OAUTH_TOKEN`; `AUTOPILOT_MERGE_TOKEN` is seen only by the auto-merge step; deploy secrets (SSH, Docker) are never exposed.
 
 ### ▶️ How to Call It
 

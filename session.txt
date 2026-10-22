@@ -1,8 +1,8 @@
-task: Evolve loop (agent self-improvement, ADR-0027)
-status: done
-progress: 100
-done: EV-1..EV-5 bda91628..f3b60d53; guide docs 72c26bc6
-doing: -
-next: owner: Actions > Agent Evolve > Run workflow (dry run)
-plan: docs/plans/plan-agent-evolve.md
-updated: 2026-10-21 18:32
+task: Autopilot FIFO queue (no lost runs when many issues are labeled)
+status: blocked
+progress: 70
+done: Q-1 queue job in autopilot.yml; Q-2 ADR-0022 + guide notes
+next: Q-3 push (owner approval), then label 3 test issues at once and check all 3 runs
+plan: -
+blocker: owner approval to push to main
+updated: 2026-10-22 09:24
