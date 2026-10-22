@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.entity.ShareLink;
 import com.canhlabs.funnyapp.entity.User;
+import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.user.UserInfoDto;
@@ -109,5 +110,13 @@ class ConverterTest {
         assertThat(dto.getEmbedLink()).isEqualTo("embed");
         assertThat(dto.getUrlLink()).isEqualTo("url");
         assertThat(dto.getUserShared()).isEqualTo("user5@example.com");
+    }
+
+    @Test
+    void toVideoDto_storedVideoHasNoUser_usesDefaultOwner() {
+        VideoSource source = new VideoSource();
+        source.setSourceId("abc");
+
+        assertThat(Converter.toVideoDto(source).getUserShared()).isEqualTo("funnyapp");
     }
 }

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-22-unknown-owner-tag",
+  "date": "2026-10-22",
+  "mode": "headless",
+  "lite": true,
+  "issue": 56,
+  "pr": 57,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 0,
+  "advisory": 5,
+  "locNonTest": 4,
+  "tests": { "passed": 26, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}

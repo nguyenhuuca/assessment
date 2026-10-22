@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Converter {
+    /** Shown as the owner of stored videos, which have no sharing user. */
+    private static final String DEFAULT_OWNER = "funnyapp";
+
     private Converter(){}
     public static UserInfoDto toUserInfo(User user, String token, String action, String sessionToken) {
         return UserInfoDto.builder()
@@ -63,7 +66,7 @@ public class Converter {
         VideoDto dto = new VideoDto();
         dto.setId(source.getId());
         dto.setFileId(source.getSourceId());
-        dto.setUserShared("unknown"); // set nếu có user info
+        dto.setUserShared(DEFAULT_OWNER);
         dto.setTitle(source.getTitle());
         dto.setDesc(source.getDesc());
         dto.setViewCount(source.getViewCount());
