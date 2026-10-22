@@ -7171,7 +7171,7 @@
 <li>
 <p>Each job has <code>timeout-minutes: 60</code>.</p>
 </li>
-<li><code>concurrency: autopilot</code> with <code>cancel-in-progress: false</code>: one run at a time, others wait.</li>
+<li>One run at a time, first come first served: a <code>queue</code> job waits until every older active run of the workflow is done, and <code>plan</code> / <code>build</code> need it. Amended 2026-10-22: it replaces <code>concurrency: autopilot</code> (<code>cancel-in-progress: false</code>), because GitHub keeps only one pending run per group and cancels it when a newer one queues, so the middle of three issues labeled at once was lost.</li>
 <li><code>--max-turns</code> per job.</li>
 <li>The skill's round caps (3) still apply. After each job, <code>scripts/claude-autopilot-cost.sh</code> (run from <code>main</code>, so a PR branch cannot change it) posts the job's cost from the action's result and appends it to the run report on the PR branch.</li>
 </ul>
