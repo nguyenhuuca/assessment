@@ -7641,7 +7641,7 @@
 <td><a href="../plans/plan-agent-evolve/">Plan ✅</a></td>
 <td>—</td>
 <td>✅</td>
-<td>Local <code>/evolve</code>: metrics signals → path allowlist + seeded-bug eval gate (<code>scripts/evolve.mjs</code>) → owner approves. Compress (D6) cuts duplicate/dead/stale text. Headless weekly workflow removed 2026-10-21 (ADR D4). First evolution: reviewer rule for assumptions about unchanged code, case <code>2026-10-19-swallowed-job-exceptions</code> caught 0/3 → 3/3</td>
+<td>Local <code>/evolve</code>: metrics signals → path allowlist + seeded-bug eval gate (<code>scripts/evolve.mjs</code>) → owner approves. Compress (D6) cuts duplicate/dead/stale text. Weekly headless workflow back 2026-10-22 with staged proposals (<a href="../adr/0029-headless-evolve-staging/">ADR-0029</a>). First evolution: reviewer rule for assumptions about unchanged code, case <code>2026-10-19-swallowed-job-exceptions</code> caught 0/3 → 3/3</td>
 </tr>
 </tbody>
 </table>
@@ -7841,10 +7841,15 @@
 <td>Opt-in Auto Gates for Local Autopilot</td>
 <td>✅ Accepted</td>
 </tr>
+<tr>
+<td>0029</td>
+<td>Headless Evolve With Staged Proposals</td>
+<td>✅ Accepted</td>
+</tr>
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-22 — opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 

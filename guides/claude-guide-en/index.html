@@ -8710,7 +8710,7 @@
 <tr>
 <td><code>/evolve [--since &lt;date&gt;]</code></td>
 <td>Self-Improver</td>
-<td>Turn agent-metrics signals into proven rule changes (local only)</td>
+<td>Turn agent-metrics signals into proven rule changes (local, or weekly in CI)</td>
 <td><code>evolve/*</code> branch, seeded case in <code>evals/seeded/</code></td>
 </tr>
 <tr>
@@ -9445,7 +9445,8 @@
 <li>every existing case is still caught;</li>
 <li>reviewer cost rises by at most 25%.</li>
 <li><strong>What the agent may change:</strong> only add lines to <code>.claude/skills/**</code>, <code>.claude/rules/*.md</code>, the prompt body of <code>.claude/agents/*.md</code>, and add a new case. Never <code>scripts/</code>, <code>.github/</code>, hooks, settings, existing cases, thresholds or app code. Frontmatter is frozen. Checked by code (<code>check-paths</code>), not by the prompt.</li>
-<li><strong>How to run:</strong> type <code>/evolve</code> (local only). It stops at Ship and asks you: merge into <code>main</code>, push a PR, keep the branch, or drop. A headless weekly workflow was tried and removed: headless Claude Code cannot edit <code>.claude/</code> files without a permission prompt (<a href="../../adr/0027-agent-self-improvement-loop/">ADR-0027</a> D4).</li>
+<li><strong>How to run:</strong> type <code>/evolve</code>. It stops at Ship and asks you: merge into <code>main</code>, push a PR, keep the branch, or drop.</li>
+<li><strong>Weekly in CI:</strong> <code>.github/workflows/agent-evolve.yml</code> runs every Monday 09:00 (or Actions → Agent Evolve → Run workflow). The agent writes staged file copies under <code>evolve-out/</code>, never <code>.claude/</code>. The ship job builds the <code>evolve/*</code> branch with <code>scripts/evolve.mjs apply</code>, runs the same gate and opens a PR labelled <code>evolve</code>; you merge it (<a href="../../adr/0029-headless-evolve-staging/">ADR-0029</a>).</li>
 <li><strong>Pruning:</strong> every Evolve rule ends with <code>&lt;!-- evolve:&lt;case id&gt; --&gt;</code>; a later run may propose removing one, only when its case is still caught without it.</li>
 <li><strong>Compress</strong> (ADR-0027 D6): once a month (<code>compress:&lt;YYYY-MM&gt;</code>) Evolve may also <strong>cut</strong> text: duplicates, dead references, text that contradicts its source of truth, stale claims, in <code>.claude/</code> and <code>CLAUDE.md</code>.</li>
 <li><code>node scripts/evolve.mjs lint-rules</code> gives the hints (duplicate lines, dead path refs, always-loaded size, about 37 KB today).</li>

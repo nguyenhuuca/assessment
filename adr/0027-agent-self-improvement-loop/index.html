@@ -7227,7 +7227,7 @@
 </ul>
 <h3 id="d4-running-it">D4. Running it<a class="headerlink" href="#d4-running-it" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Local only:</strong> the owner runs <code>/evolve</code>; it goes through the same stages in the session and asks before any push or merge, like autopilot Gate 2.</li>
+<li><strong>Local only:</strong> the owner runs <code>/evolve</code>; it goes through the same stages in the session and asks before any push or merge, like autopilot Gate 2. Since <a href="../0029-headless-evolve-staging/">ADR-0029</a> a weekly headless workflow is a second way in.</li>
 <li><strong>Gate hardening:</strong> the case must be added by the branch, its <code>base</code>/<code>head</code> must be commits on <code>main</code>, rule-file frontmatter is frozen (new skills: <code>name</code>, <code>description</code>, <code>argument-hint</code>, <code>disable-model-invocation</code> only), no new agents, and <code>not-eval-proven</code> proposals may not touch the reviewer's rules.</li>
 <li><strong>Budget:</strong> at most 3 signals per run, at most 3 eval runs for the new case and 1 run per existing case (retry once on a miss).</li>
 <li><strong>Headless workflow removed (2026-10-21).</strong> A weekly <code>.github/workflows/agent-evolve.yml</code> (propose job with a read-only token, ship job that checks and opens the PR) was built and then removed by the owner. Its first real run showed that headless Claude Code treats <code>.claude/</code> files as sensitive and asks for permission on every edit, which CI cannot grant, so the agent could not write a single proposal; a packaging bug then closed the month's signal with a wrong "no proposal" issue (#50). Running it headless again needs a new decision (for example: the agent writes encoded file copies outside <code>.claude/</code> and the ship job applies them).</li>
@@ -7275,6 +7275,7 @@
 <li>2026-10-21: Proposed; accepted by the owner the same day. The eval runner lives in <code>scripts/evolve.mjs</code> (subcommands <code>signals</code>, <code>check-paths</code>, <code>eval</code>, <code>gate</code>).</li>
 <li>2026-10-21: D6 (compress) added at the owner's request: Evolve may also remove duplicate, dead or stale text, with protected lines and a size + eval gate.</li>
 <li>2026-10-21: headless workflow <code>agent-evolve.yml</code> removed at the owner's request (D4); <code>/evolve</code> is local only. The <code>manifest</code> command went with it.</li>
+<li>2026-10-22: headless workflow back with staged proposals outside <code>.claude/</code> and an <code>apply</code> command (<a href="../0029-headless-evolve-staging/">ADR-0029</a>).</li>
 </ul>
 
 

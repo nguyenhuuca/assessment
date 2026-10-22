@@ -5087,6 +5087,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#headless-mode-adr-0029" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Headless Mode (ADR-0029)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pruning-adr-0027-d5" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7192,6 +7203,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#headless-mode-adr-0029" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Headless Mode (ADR-0029)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pruning-adr-0027-d5" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7239,7 +7261,7 @@
 
 
 <h1 id="evolve">Evolve<a class="headerlink" href="#evolve" title="Permanent link">&para;</a></h1>
-<p>The self-improvement loop of ADR-0027 (<code>docs/adr/0027-agent-self-improvement-loop.md</code>). Input: <code>$ARGUMENTS</code>. It runs <strong>locally only</strong>: the headless GitHub workflow was removed (ADR-0027 D4).</p>
+<p>The self-improvement loop of ADR-0027 (<code>docs/adr/0027-agent-self-improvement-loop.md</code>). Input: <code>$ARGUMENTS</code>. It runs locally, or weekly in <code>.github/workflows/agent-evolve.yml</code> with <code>--headless</code> (see Headless Mode, ADR-0029).</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Observe → Diagnose (Five Whys) → Propose (one small change) → Prove (eval gate) → Ship (ask the owner)
 </code></pre></div>
 <p>The <strong>gate is code, not you</strong>: <code>scripts/evolve.mjs check-paths</code> and <code>gate</code> decide whether a proposal is shipped. Your job is a good diagnosis, a small general rule, and an honest seeded case.</p>
@@ -7313,11 +7335,26 @@
 <li>C3: every seeded case is still caught with the compressed rules.</li>
 <li>Not proven by the gate: that nothing <strong>outside</strong> the eval set got worse. Show the owner every removed line before asking.</li>
 </ul>
+<h2 id="headless-mode-adr-0029">Headless Mode (ADR-0029)<a class="headerlink" href="#headless-mode-adr-0029" title="Permanent link">&para;</a></h2>
+<p>Used when the input is <code>--headless --signals &lt;file&gt;</code>. The signals are already picked; skip <strong>Observe</strong> and read them from that file. Diagnose as above. Then, instead of Propose / Prove / Ship:</p>
+<ul>
+<li><strong>No git and no <code>.claude/</code> edits.</strong> Headless Claude Code asks permission for every <code>.claude/</code> edit and CI cannot answer. Read with the <code>Read</code>, <code>Grep</code> and <code>Glob</code> tools and read-only <code>git diff/show/log</code>; write only under <code>evolve-out/</code> (the workflow allows nothing else).</li>
+<li><strong>Stage the full new content</strong> of each file you would change at <code>evolve-out/&lt;slug&gt;/tree/&lt;path&gt;.staged</code>, where <code>&lt;slug&gt;</code> is the signal id with <code>:</code> replaced by <code>-</code>, and a leading <code>.claude/</code> becomes <code>dot-claude/</code>:</li>
+<li><code>.claude/agents/worker-reviewer.md</code> → <code>evolve-out/&lt;slug&gt;/tree/dot-claude/agents/worker-reviewer.md.staged</code></li>
+<li><code>evals/seeded/&lt;case id&gt;/case.json</code> → <code>evolve-out/&lt;slug&gt;/tree/evals/seeded/&lt;case id&gt;/case.json.staged</code></li>
+<li><code>CLAUDE.md</code> (compress only) → <code>evolve-out/&lt;slug&gt;/tree/CLAUDE.md.staged</code></li>
+<li>Copy the current file first, then make the same change you would make locally (the Propose rules and ADR-0027 D2 still apply). A file cannot be deleted.</li>
+<li>Write the PR text (what Ship would show the owner) to <code>evolve-out/&lt;slug&gt;.md</code>.</li>
+<li>Write <code>evolve-out/manifest.json</code>: a JSON array with <strong>one row for every signal</strong> in the file:</li>
+<li>proposal: <code>{"signal", "slug", "case", "kind", "body": "evolve-out/&lt;slug&gt;.md", "message": "evolve: &lt;one line&gt;"}</code>, where <code>kind</code> is <code>rule</code>, <code>case-only</code>, <code>not-eval-proven</code> or <code>compress</code> (<code>case</code> is <code>-</code> for compress);</li>
+<li>no proposal: <code>{"signal", "kind": "none", "body": "evolve-out/&lt;slug&gt;.md"}</code> with the reason in that file. Only this row closes the signal; a signal you leave out is retried next week.</li>
+<li>Do not run <code>check-paths</code> or <code>gate</code>; the ship job builds the branch from your staged files and runs both (<code>scripts/evolve.mjs apply</code>). End your turn when the manifest is written.</li>
+</ul>
 <h2 id="pruning-adr-0027-d5">Pruning (ADR-0027 D5)<a class="headerlink" href="#pruning-adr-0027-d5" title="Permanent link">&para;</a></h2>
 <p>When the run's argument is <code>--prune</code>, or total <code>.claude/</code> rule size grew by more than 20% since the last prune: pick one <code>&lt;!-- evolve:</code> line, remove it on a branch, and run <code>gate</code> with its case. It passes only when the case is still caught without it. This is the only way an Evolve rule is removed.</p>
 <h2 id="constraints">Constraints<a class="headerlink" href="#constraints" title="Permanent link">&para;</a></h2>
 <ul>
-<li>NEVER push, merge or open a PR without the owner's answer at Ship.</li>
+<li>NEVER push, merge or open a PR without the owner's answer at Ship. Headless: never push or open a PR at all; the ship job opens it and the owner merges.</li>
 <li>NEVER change how proposals are checked: <code>scripts/</code>, <code>evals/seeded/</code> cases that exist, <code>.github/</code>, thresholds.</li>
 <li>NEVER more than 3 signals per run, or more than one rule per signal.</li>
 </ul>

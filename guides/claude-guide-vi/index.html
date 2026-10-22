@@ -8710,7 +8710,7 @@
 <tr>
 <td><code>/evolve [--since &lt;ngày&gt;]</code></td>
 <td>Self-Improver</td>
-<td>Biến signal từ agent-metrics thành thay đổi rule có chứng minh (chỉ chạy local)</td>
+<td>Biến signal từ agent-metrics thành thay đổi rule có chứng minh (local, hoặc chạy hàng tuần trên CI)</td>
 <td>Branch <code>evolve/*</code>, seeded case trong <code>evals/seeded/</code></td>
 </tr>
 <tr>
@@ -9436,7 +9436,8 @@
 <li>mọi case cũ vẫn bắt được;</li>
 <li>chi phí reviewer tăng tối đa 25%.</li>
 <li><strong>Agent được sửa gì:</strong> chỉ được thêm dòng vào <code>.claude/skills/**</code>, <code>.claude/rules/*.md</code>, phần prompt của <code>.claude/agents/*.md</code>, và thêm case mới. Không bao giờ đụng <code>scripts/</code>, <code>.github/</code>, hooks, settings, case cũ, threshold hay code app. Frontmatter bị khoá. Do code kiểm tra (<code>check-paths</code>), không phải do prompt.</li>
-<li><strong>Cách chạy:</strong> gõ <code>/evolve</code> (chỉ chạy local). Nó dừng ở bước Ship và hỏi bạn: merge vào <code>main</code>, push và mở PR, giữ branch, hay bỏ. Workflow headless chạy hàng tuần đã được thử rồi gỡ bỏ: Claude Code headless không sửa được file trong <code>.claude/</code> nếu không có người duyệt quyền (<a href="../../adr/0027-agent-self-improvement-loop/">ADR-0027</a> D4).</li>
+<li><strong>Cách chạy:</strong> gõ <code>/evolve</code>. Nó dừng ở bước Ship và hỏi bạn: merge vào <code>main</code>, push và mở PR, giữ branch, hay bỏ.</li>
+<li><strong>Chạy hàng tuần trên CI:</strong> <code>.github/workflows/agent-evolve.yml</code> chạy 9:00 thứ Hai (hoặc Actions → Agent Evolve → Run workflow). Agent ghi bản sao file vào <code>evolve-out/</code>, không sửa <code>.claude/</code>. Ship job dựng branch <code>evolve/*</code> bằng <code>scripts/evolve.mjs apply</code>, chạy cùng gate rồi mở PR có label <code>evolve</code>; bạn là người merge (<a href="../../adr/0029-headless-evolve-staging/">ADR-0029</a>).</li>
 <li><strong>Dọn rule (prune):</strong> mỗi rule do Evolve thêm kết thúc bằng <code>&lt;!-- evolve:&lt;case id&gt; --&gt;</code>; run sau có thể đề xuất gỡ một rule, chỉ khi case của nó vẫn bắt được khi không có rule đó.</li>
 <li><strong>Compress</strong> (ADR-0027 D6): mỗi tháng một lần (<code>compress:&lt;YYYY-MM&gt;</code>), Evolve được <strong>cắt bớt</strong> nội dung: trùng lặp, tham chiếu chết, nội dung mâu thuẫn với source of truth, số liệu lỗi thời, trong <code>.claude/</code> và <code>CLAUDE.md</code>.</li>
 <li><code>node scripts/evolve.mjs lint-rules</code> đưa gợi ý (dòng trùng, path chết, kích thước context luôn load, hiện khoảng 37 KB).</li>
