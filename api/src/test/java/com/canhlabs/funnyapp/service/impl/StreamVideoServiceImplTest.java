@@ -306,7 +306,7 @@ class StreamVideoServiceImplTest {
         String expectedUrl = "https://canh-labs.com/api/v1/funny-app/video-stream/stream/abc123";
         assertEquals(expectedUrl, dto.getUrlLink());
         assertEquals(expectedUrl, dto.getEmbedLink());
-        assertEquals("unknown", dto.getUserShared());
+        assertEquals("funnyapp", dto.getUserShared());
     }
 
     @Test

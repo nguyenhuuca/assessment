@@ -470,6 +470,11 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **FIX-1** Always render the schedule input in `ImportForm` (disabled + `import-schedule-idle` in NOW mode) and add `.import-schedule` CSS
 - [x] **FIX-2** Test: input present+disabled in NOW, enabled after switching to LATER, disabled again on switch back
 
+## Stored video owner shown as @unknown (#56, autopilot lite)
+
+- [x] **FIX-1** `Converter.toVideoDto`: `DEFAULT_OWNER = "funnyapp"` instead of the `"unknown"` literal
+- [x] **FIX-2** Tests: `StreamVideoServiceImplTest` expects `funnyapp`; new `ConverterTest.toVideoDto` case (fails without the fix)
+
 ## Video action bar icon-only (autopilot lite)
 
 - [x] **IC-1** `VideoSwiper` action bar: drop word labels (Comment, Save, Share, Delete), keep `title` tooltip, add `aria-label` + `aria-hidden` icons (nav arrows too)
