@@ -1,8 +1,7 @@
 task: Autopilot FIFO queue (no lost runs when many issues are labeled)
-status: blocked
-progress: 70
-done: Q-1 queue job in autopilot.yml; Q-2 ADR-0022 + guide notes
-next: Q-3 push (owner approval), then label 3 test issues at once and check all 3 runs
+status: done
+progress: 100
+done: Q-1 queue job in autopilot.yml 2a0f3a50; Q-2 ADR-0022 + guide notes 2a0f3a50; Q-3 verified on issue #53
+next: optional: build job rebases on origin/main before QA (owner declined for now)
 plan: -
-blocker: owner approval to push to main
-updated: 2026-10-22 09:24
+updated: 2026-10-22 10:05
