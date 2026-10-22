@@ -9,7 +9,8 @@ deny() { echo "auto-push refused: $1"; exit 1; }
 
 git fetch -q origin main || deny "git fetch origin main failed"
 [ -n "$(git rev-list origin/main..HEAD)" ] || deny "no commits ahead of origin/main"
-[ -z "$(git status --porcelain --untracked-files=no)" ] || deny "uncommitted changes to tracked files"
+# A local edit to settings.local.json (it changes whenever a permission is allowed) does not block
+[ -z "$(git status --porcelain --untracked-files=no -- . ':!.claude/settings.local.json')" ] || deny "uncommitted changes to tracked files"
 
 paths=$(git diff --name-only origin/main...HEAD)
 bad=$(grep -E '^(\.github/|\.claude/|CLAUDE\.md$|AGENTS\.md$|scripts/claude-|api/src/main/resources/db/changelog/)|(^|/)\.env' <<<"$paths" | head -5 | tr '\n' ' ')
