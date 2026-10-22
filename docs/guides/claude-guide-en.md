@@ -117,7 +117,7 @@ Most workflow skills run only when you type `/name`. The exceptions are the 5 sk
 | `/land-the-plane` | Finish-Line Protocol | Gates → commit → (ask) push → check CI | Pushed commit |
 | `/tailor` | Configuration Tailor | Detects the stack and proposes config changes (proposal only) | `scratchpad/tailor-proposal.md` |
 | `/autopilot <request>` | Autopilot | Run one small feature, fix or refactor end to end: plan → review → you approve → code → review → QA ×2 → you approve the push | Deployed code + `docs/reports/autopilot-*.md` |
-| `/evolve [--since <date>]` | Self-Improver | Turn agent-metrics signals into proven rule changes (local only) | `evolve/*` branch, seeded case in `evals/seeded/` |
+| `/evolve [--since <date>]` | Self-Improver | Turn agent-metrics signals into proven rule changes (local, or weekly in CI) | `evolve/*` branch, seeded case in `evals/seeded/` |
 | `/task-resume [instruction]` | Task Resumer | Continues the unfinished task in `session.txt` after re-checking the repo | Work continued from `next` |
 
 Examples:
@@ -461,7 +461,8 @@ Observe (signals) → Diagnose (Five Whys → the stage that should have caught 
   3. every existing case is still caught;
   4. reviewer cost rises by at most 25%.
 - **What the agent may change:** only add lines to `.claude/skills/**`, `.claude/rules/*.md`, the prompt body of `.claude/agents/*.md`, and add a new case. Never `scripts/`, `.github/`, hooks, settings, existing cases, thresholds or app code. Frontmatter is frozen. Checked by code (`check-paths`), not by the prompt.
-- **How to run:** type `/evolve` (local only). It stops at Ship and asks you: merge into `main`, push a PR, keep the branch, or drop. A headless weekly workflow was tried and removed: headless Claude Code cannot edit `.claude/` files without a permission prompt ([ADR-0027](../adr/0027-agent-self-improvement-loop.md) D4).
+- **How to run:** type `/evolve`. It stops at Ship and asks you: merge into `main`, push a PR, keep the branch, or drop.
+- **Weekly in CI:** `.github/workflows/agent-evolve.yml` runs every Monday 09:00 (or Actions → Agent Evolve → Run workflow). The agent writes staged file copies under `evolve-out/`, never `.claude/`. The ship job builds the `evolve/*` branch with `scripts/evolve.mjs apply`, runs the same gate and opens a PR labelled `evolve`; you merge it ([ADR-0029](../adr/0029-headless-evolve-staging.md)).
 - **Pruning:** every Evolve rule ends with `<!-- evolve:<case id> -->`; a later run may propose removing one, only when its case is still caught without it.
 - **Compress** (ADR-0027 D6): once a month (`compress:<YYYY-MM>`) Evolve may also **cut** text: duplicates, dead references, text that contradicts its source of truth, stale claims, in `.claude/` and `CLAUDE.md`.
   - `node scripts/evolve.mjs lint-rules` gives the hints (duplicate lines, dead path refs, always-loaded size, about 37 KB today).

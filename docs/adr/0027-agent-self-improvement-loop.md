@@ -72,7 +72,7 @@
 
 ### D4. Running it
 
-- **Local only:** the owner runs `/evolve`; it goes through the same stages in the session and asks before any push or merge, like autopilot Gate 2.
+- **Local only:** the owner runs `/evolve`; it goes through the same stages in the session and asks before any push or merge, like autopilot Gate 2. Since [ADR-0029](0029-headless-evolve-staging.md) a weekly headless workflow is a second way in.
 - **Gate hardening:** the case must be added by the branch, its `base`/`head` must be commits on `main`, rule-file frontmatter is frozen (new skills: `name`, `description`, `argument-hint`, `disable-model-invocation` only), no new agents, and `not-eval-proven` proposals may not touch the reviewer's rules.
 - **Budget:** at most 3 signals per run, at most 3 eval runs for the new case and 1 run per existing case (retry once on a miss).
 - **Headless workflow removed (2026-10-21).** A weekly `.github/workflows/agent-evolve.yml` (propose job with a read-only token, ship job that checks and opens the PR) was built and then removed by the owner. Its first real run showed that headless Claude Code treats `.claude/` files as sensitive and asks for permission on every edit, which CI cannot grant, so the agent could not write a single proposal; a packaging bug then closed the month's signal with a wrong "no proposal" issue (#50). Running it headless again needs a new decision (for example: the agent writes encoded file copies outside `.claude/` and the ship job applies them).
@@ -121,3 +121,4 @@ Adding rules alone makes every session pay for more context (`CLAUDE.md` + alway
 - 2026-10-21: Proposed; accepted by the owner the same day. The eval runner lives in `scripts/evolve.mjs` (subcommands `signals`, `check-paths`, `eval`, `gate`).
 - 2026-10-21: D6 (compress) added at the owner's request: Evolve may also remove duplicate, dead or stale text, with protected lines and a size + eval gate.
 - 2026-10-21: headless workflow `agent-evolve.yml` removed at the owner's request (D4); `/evolve` is local only. The `manifest` command went with it.
+- 2026-10-22: headless workflow back with staged proposals outside `.claude/` and an `apply` command ([ADR-0029](0029-headless-evolve-staging.md)).

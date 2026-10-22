@@ -60,3 +60,6 @@ scratchpad/
 # Git Bash crash dumps
 *.stackdump
 
+
+# Evolve headless staging output (ADR-0029)
+evolve-out/

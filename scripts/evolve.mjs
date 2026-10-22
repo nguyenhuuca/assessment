@@ -1,5 +1,5 @@
-// Evolve loop helpers (ADR-0027), used by the local /evolve skill. The checks are code, so a proposal cannot
-// change how it is judged: check-paths and gate run from the working tree's copy of this file on main.
+// Evolve loop helpers (ADR-0027), used by the local /evolve skill and the headless workflow (ADR-0029). The checks are
+// code, so a proposal cannot change how it is judged: check-paths and gate run from the working tree's copy on main.
 //
 // Usage: node scripts/evolve.mjs <command> [options]
 //   signals     [--from metrics.json] [--since YYYY-MM-DD] [--limit 3] [--out file]
@@ -9,6 +9,10 @@
 //               frontmatter is frozen; not-eval-proven may not touch the reviewer's rules;
 //               compress (D6) may also edit CLAUDE.md and remove lines, but never protected files or lines
 //   lint-rules  [--rules <ref>] [--out file]   duplicate lines, dead path references, always-loaded context size (D6)
+//   manifest    --signals <trusted signals.json> --manifest <file> --rows <out.tsv> --none <out.tsv>
+//               validate the agent-written manifest (headless ship job, ADR-0029 D2)
+//   apply       --dir evolve-out/<slug> --base <ref> --branch evolve/<slug> --message <one line>
+//               turn staged file copies into one commit on a new branch; the working tree is not touched (ADR-0029 D3)
 //   eval        --case <id> --rules <ref> [--case-ref <ref>] [--runs 1] [--budget 1]   (case from the working tree unless --case-ref)
 //               run the reviewer on the case diff with the .claude/ of <ref>, grade each run
 //   gate        --base <ref> --head <ref> --case <id> [--runs 3] [--budget 1] [--out file.md]
@@ -16,7 +20,7 @@
 //               --kind compress (no --case): D6 rules (smaller, no new lint findings, every case still caught)
 // Reviewer runs use `claude -p --agent worker-reviewer` (needs the claude CLI and a login or CLAUDE_CODE_OAUTH_TOKEN).
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { lstatSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -27,6 +31,9 @@ const SIGNAL_MARK = /<!-- evolve:signal=([^\s>]+) -->/g
 const RULE_MARK = '<!-- evolve:'
 const RULES_PATHS = ['.claude', 'CLAUDE.md', 'AGENTS.md', '.mcp.json']
 const KINDS = ['rule', 'case-only', 'not-eval-proven', 'compress']
+const SIGNAL_ID = /^[\w:.-]+$/
+const SLUG = /^[A-Za-z0-9](?:[\w-]|\.(?!\.))*$/  // a git branch name part: no leading dot, no '..', no .lock
+const STAGED_MAX = 64 * 1024
 // Files that change what the code reviewer does; a rule there must be eval-proven
 const REVIEWER_RULES = [/^\.claude\/agents\/worker-reviewer\.md$/, /^\.claude\/skills\/swarm-review\//, /^\.claude\/skills\/autopilot\/resources\/verdict\.md$/]
 const NEW_SKILL_KEYS = new Set(['name', 'description', 'argument-hint', 'disable-model-invocation'])
@@ -56,7 +63,7 @@ export function parseArgs(argv) {
     const a = rest[i]
     const key = a.replace(/^--/, '').replace(/-(\w)/g, (_, c) => c.toUpperCase())
     if (!['--from', '--since', '--limit', '--out', '--base', '--head', '--case', '--rules', '--case-ref', '--runs', '--budget',
-      '--kind'].includes(a)) {
+      '--kind', '--signals', '--manifest', '--rows', '--none', '--dir', '--branch', '--message'].includes(a)) {
       throw new Error(`unknown argument: ${a}`)
     }
     if (rest[i + 1] === undefined) throw new Error(`${a} needs a value`)
@@ -70,6 +77,7 @@ export function parseArgs(argv) {
   }
   if (args.case && !CASE_ID.test(args.case)) throw new Error('--case must match [\\w.-]+')
   if (args.kind && !KINDS.includes(args.kind)) throw new Error(`--kind must be one of ${KINDS.join(', ')}`)
+  if (args.branch && !/^evolve\/[\w.-]+$/.test(args.branch)) throw new Error('--branch must match evolve/<slug>')
   for (const k of ['base', 'head', 'rules', 'caseRef']) if (args[k] && args[k].startsWith('-')) throw new Error(`--${k} cannot start with "-"`)
   return args
 }
@@ -137,7 +145,7 @@ export function compressViolations(files, removed = {}, front = {}) {
 
 const normLine = (l) => l.replace(/^[\s>#*|-]*(\d+\.\s+)?/, '').replace(/[`*_]/g, '').replace(/\s+/g, ' ').trim().toLowerCase()
 const PATHISH = /^[\w.-]+(\/[\w.-]+)*\/?$/
-const SKIP_REF = /^(scratchpad|node_modules|target|dist)\/|^~|^\.\.?\//
+const SKIP_REF = /^(scratchpad|evolve-out|node_modules|target|dist)\/|^~|^\.\.?\//
 
 // files: { path: text }; tracked: [paths in the tree]; alwaysLoaded: [paths]
 export function lintRules(files, tracked, alwaysLoaded) {
@@ -235,6 +243,84 @@ function checkPaths(root, base, head, kind = 'rule') {
     front[f.path] = [frontmatter(show(root, base, f.path)), frontmatter(show(root, head, f.path))].map((x) => x.replace(/\r/g, ''))
   }
   return { files, violations: pathViolations(files, removed, front, kind) }
+}
+
+// ---- headless staging (ADR-0029) ----
+
+// rows: agent-written manifest; signalIds: from the trusted copy taken before the agent step.
+// A signal with no valid row is left for the next run; only a `none` row closes it (D2).
+export function validateManifest(rows, signalIds) {
+  const signals = new Set(signalIds.filter((id) => SIGNAL_ID.test(id)))
+  const ok = []
+  const none = []
+  const seen = new Set()
+  const slugs = new Set()
+  const bodyOk = (b) => /^evolve-out\/[\w.-]+\.md$/.test(b ?? '')
+  for (const r of Array.isArray(rows) ? rows : []) {
+    if (!r || typeof r !== 'object' || !signals.has(r.signal) || seen.has(r.signal) || !bodyOk(r.body)) continue
+    if (r.kind === 'none') { seen.add(r.signal); none.push({ signal: r.signal, body: r.body }); continue }
+    const caseOk = r.kind === 'compress' ? r.case === '-' : CASE_ID.test(r.case ?? '') && r.case !== '-'
+    const valid = KINDS.includes(r.kind) && caseOk && SLUG.test(r.slug ?? '') && !/\.lock$/.test(r.slug) && !slugs.has(r.slug)
+      && /^[^\t\r\n]{1,200}$/.test(r.message ?? '')
+    if (valid) {
+      seen.add(r.signal); slugs.add(r.slug)
+      ok.push({ signal: r.signal, slug: r.slug, case: r.case, kind: r.kind, body: r.body, message: r.message })
+    }
+  }
+  return { rows: ok, none, unhandled: [...signals].filter((x) => !seen.has(x)) }
+}
+
+// entries: [{ rel (posix, under tree/), size, file (regular file, not a symlink) }] -> repo paths to write
+export function stagedFiles(entries) {
+  const files = []
+  const errors = []
+  for (const { rel, size, file } of entries) {
+    const segs = rel.split('/')
+    const path = rel.replace(/\.staged$/, '').replace(/^dot-claude\//, '.claude/')
+    if (!file) errors.push(`${rel}: not a regular file`)
+    else if (!rel.endsWith('.staged')) errors.push(`${rel}: staged files end in .staged`)
+    else if (segs.some((x) => x === '' || x === '..' || x.startsWith('.'))) errors.push(`${rel}: bad path segment`)
+    else if (size > STAGED_MAX) errors.push(`${rel}: larger than ${STAGED_MAX} bytes`)
+    else if (![...COMPRESS_ALLOWED, NEW_CASE].some((re) => re.test(path))) errors.push(`${path}: outside the Evolve allowlist`)
+    else files.push({ path, rel })
+  }
+  if (!entries.length) errors.push('no staged files')
+  return { files, errors }
+}
+
+function walk(dir, prefix = '') {
+  const out = []
+  for (const name of readdirSync(dir)) {
+    const st = lstatSync(join(dir, name))
+    const rel = prefix ? `${prefix}/${name}` : name
+    if (st.isDirectory()) out.push(...walk(join(dir, name), rel))
+    else out.push({ rel, size: st.size, file: st.isFile() })
+  }
+  return out
+}
+
+function applyStaged(root, dir, base, branch, message) {
+  const tree = join(dir, 'tree')
+  const { files, errors } = stagedFiles(walk(tree))
+  if (errors.length) throw new Error(`apply: ${errors.join('; ')}`)
+  const tmp = mkdtempSync(join(tmpdir(), 'evolve-index-'))
+  const env = { ...process.env, GIT_INDEX_FILE: join(tmp, 'index') }
+  try {
+    const g = (argv) => execFileSync('git', ['-C', root, ...argv], { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+    const baseSha = g(['rev-parse', '--verify', `${base}^{commit}`])
+    g(['read-tree', baseSha])
+    for (const f of files) {
+      const blob = g(['hash-object', '-w', '--', join(tree, f.rel)])
+      g(['update-index', '--add', '--cacheinfo', `100644,${blob},${f.path}`])
+    }
+    const newTree = g(['write-tree'])
+    if (newTree === g(['rev-parse', `${baseSha}^{tree}`])) throw new Error('apply: the staged files change nothing')
+    const commit = g(['commit-tree', newTree, '-p', baseSha, '-m', message])
+    g(['update-ref', `refs/heads/${branch}`, commit, ''])  // empty old value: the branch must not exist yet
+    return { commit, files: files.map((f) => f.path) }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true })
+  }
 }
 
 // ---- eval ----
@@ -433,6 +519,23 @@ function main() {
       console.log('check-paths: ok')
       break
     }
+    case 'manifest': {
+      need('signals', 'manifest', 'rows', 'none')
+      const ids = JSON.parse(readFileSync(args.signals, 'utf8')).signals.map((x) => x.id)
+      let rows = []
+      try { rows = JSON.parse(readFileSync(args.manifest, 'utf8')) } catch { rows = [] }
+      const res = validateManifest(rows, ids)
+      writeFileSync(args.rows, res.rows.map((r) => `${[r.signal, r.slug, r.case, r.kind, r.body, r.message].join('\t')}\n`).join(''))
+      writeFileSync(args.none, res.none.map((r) => `${r.signal}\t${r.body}\n`).join(''))
+      console.log(`manifest: ${res.rows.length} proposal(s), ${res.none.length} without one, ${res.unhandled.length} left for the next run`)
+      break
+    }
+    case 'apply': {
+      need('dir', 'base', 'branch', 'message')
+      const r = applyStaged(root, resolve(args.dir), args.base, args.branch, args.message)
+      console.log(`apply: ${args.branch} ${r.commit.slice(0, 8)} (${r.files.join(', ')})`)
+      break
+    }
     case 'lint-rules': {
       const l = lintAt(root, args.rules ?? 'HEAD')
       delete l.files
@@ -454,7 +557,7 @@ function main() {
       break
     }
     default:
-      throw new Error('command must be one of: signals, check-paths, lint-rules, eval, gate')
+      throw new Error('command must be one of: signals, check-paths, manifest, apply, lint-rules, eval, gate')
   }
 }
 

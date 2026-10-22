@@ -1,0 +1,244 @@
+# Evolve loop (ADR-0027, headless since ADR-0029): the agent improves its own rules from its quality metrics. Two jobs,
+# so the agent never holds a write token and nothing it does to the runner can change how its proposals are checked:
+#   propose (read-only token): signals → /evolve --headless writes staged file copies under evolve-out/<slug>/tree/
+#            (no .claude/ edits, no git) + one manifest row per signal → uploaded as an artifact (data only)
+#   ship    (write token): fresh checkout of the main SHA the signals were computed on → validate the manifest against the
+#            signals saved before the agent ran → apply (staged files → one commit on evolve/<slug>) → check-paths (D2) +
+#            eval gate (D3) with no GitHub token in the env → a pass becomes a PR labelled `evolve` for the owner to merge,
+#            a fail becomes an `evolve` issue. Nothing is merged. A signal with no manifest row is retried next week.
+name: Agent Evolve
+
+on:
+  schedule:
+    - cron: "0 2 * * 1"  # Monday 09:00 Asia/Ho_Chi_Minh
+  workflow_dispatch:
+    inputs:
+      since:
+        description: Metrics start date (YYYY-MM-DD); default 30 days ago
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-evolve
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    if: github.event_name == 'schedule' || github.actor == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    outputs:
+      main_sha: ${{ steps.base.outputs.sha }}
+      count: ${{ steps.signals.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - id: base
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Signals
+        id: signals
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SINCE: ${{ inputs.since }}
+        run: |
+          node scripts/evolve.mjs signals ${SINCE:+--since "$SINCE"} --out "$RUNNER_TEMP/signals.json"
+          cat "$RUNNER_TEMP/signals.json"
+          echo "count=$(node -e 'console.log(require(process.argv[1]).signals.length)' "$RUNNER_TEMP/signals.json")" >> "$GITHUB_OUTPUT"
+          mkdir -p evolve-out
+          cp "$RUNNER_TEMP/signals.json" evolve-out/signals.json
+      - name: Save the signals before the agent runs (the ship job trusts only this copy)
+        if: steps.signals.outputs.count != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: evolve-signals
+          path: ${{ runner.temp }}/signals.json
+          retention-days: 7
+      - id: claude
+        if: steps.signals.outputs.count != '0'
+        uses: anthropics/claude-code-action@v1
+        env:
+          # git ignores any config the agent might plant outside .git/ (it cannot write .git/: Edit is scoped below)
+          GIT_CONFIG_NOSYSTEM: "1"
+          GIT_CONFIG_GLOBAL: /dev/null
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          display_report: "false"
+          settings: '{"env":{"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS":"1"}}'
+          prompt: /evolve --headless --signals evolve-out/signals.json
+          claude_args: >-
+            --max-turns 150
+            --allowedTools "Read,Glob,Grep,Skill,TodoWrite,Write(evolve-out/**),Edit(evolve-out/**),Bash(git diff:*),Bash(git show:*),Bash(git log:*),Bash(git rev-parse:*),Bash(git ls-files:*)"
+            --disallowedTools "Edit(.git/**),Edit(.gitattributes),Edit(.claude/**),Read(//proc/**),Read(//sys/**),Bash(git switch:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git config:*),Bash(git update-ref:*),Bash(git -c:*),Bash(git -C:*),Bash(gh:*),Bash(node:*),Bash(cat:*),Bash(grep:*),Bash(head:*),Bash(tail:*),WebFetch,WebSearch"
+      - name: Package the proposals as data
+        if: always() && steps.signals.outputs.count != '0'
+        run: |
+          p="$RUNNER_TEMP/proposal"; mkdir -p "$p"
+          # regular files only (find -type f skips symlinks), at most 64 KiB each; apply re-checks every path
+          find evolve-out -type f -size -65k \( -name manifest.json -o -name '*.md' -o -path 'evolve-out/*/tree/*' \) \
+            -exec cp --parents {} "$p/" \;
+          find "$p" -type f | sort
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.signals.outputs.count != '0'
+        with:
+          name: evolve-proposal
+          path: ${{ runner.temp }}/proposal
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Keep the Claude transcript for diagnosis
+        if: always() && steps.claude.outputs.execution_file != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: evolve-transcript-${{ github.run_id }}
+          path: ${{ steps.claude.outputs.execution_file }}
+          retention-days: 14
+
+  ship:
+    needs: propose
+    if: always() && needs.propose.result != 'skipped' && needs.propose.outputs.count != '' && needs.propose.outputs.count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    env:
+      MAIN: ${{ needs.propose.outputs.main_sha }}
+      GIT_AUTHOR_NAME: github-actions[bot]
+      GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+      GIT_COMMITTER_NAME: github-actions[bot]
+      GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.propose.outputs.main_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: evolve-signals
+          path: ${{ runner.temp }}/trusted
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: evolve-proposal
+          path: ${{ runner.temp }}/proposal
+      - name: Read the manifest and build the branches
+        run: |
+          set -u
+          T="$RUNNER_TEMP"
+          mkdir -p "$T/ship" "$T/proposal/evolve-out"
+          node scripts/evolve.mjs manifest --signals "$T/trusted/signals.json" --manifest "$T/proposal/evolve-out/manifest.json" \
+            --rows "$T/ship/rows.tsv" --none "$T/ship/none.tsv"
+          while IFS=$'\t' read -r signal slug case kind body message || [ -n "$signal" ]; do
+            r="$T/ship/$slug"
+            if [ ! -d "$T/proposal/evolve-out/$slug/tree" ]; then
+              echo skip > "$r.status"; echo "$signal: no staged files, left for the next run"; continue
+            fi
+            if node scripts/evolve.mjs apply --dir "$T/proposal/evolve-out/$slug" --base "$MAIN" --branch "evolve/$slug" \
+                --message "$message" > "$r.apply" 2>&1; then
+              cat "$r.apply"
+            else
+              echo fail-apply > "$r.status"; cat "$r.apply"
+            fi
+          done < "$T/ship/rows.tsv"
+      - name: Install the claude CLI for the eval gate
+        run: npm install -g @anthropic-ai/claude-code@2.1.304
+      - name: Check paths and run the eval gate (no GitHub token here)
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          set -u
+          T="$RUNNER_TEMP"
+          while IFS=$'\t' read -r signal slug case kind body message || [ -n "$signal" ]; do
+            r="$T/ship/$slug"; branch="evolve/$slug"
+            [ -f "$r.status" ] && continue
+            if ! node scripts/evolve.mjs check-paths --base "$MAIN" --head "$branch" --kind "$kind" > "$r.paths" 2>&1; then
+              echo fail-paths > "$r.status"; continue
+            fi
+            if [ "$kind" = "not-eval-proven" ]; then
+              echo "**Not eval-proven:** this rule is for a stage the seeded evals cannot test (ADR-0027 Consequences)." > "$r.gate.md"
+              echo pass-draft > "$r.status"
+            elif [ "$kind" = "compress" ]; then
+              # D6: always a draft PR, the owner reads every removed line
+              if node scripts/evolve.mjs gate --base "$MAIN" --head "$branch" --kind compress --out "$r.gate.md" 2> "$r.log"; then
+                echo pass-draft > "$r.status"
+              else
+                [ -s "$r.gate.md" ] || { echo "The compress gate did not complete:"; echo; sed 's/^/    /' "$r.log"; } > "$r.gate.md"
+                echo fail-gate > "$r.status"
+              fi
+            elif node scripts/evolve.mjs gate --base "$MAIN" --head "$branch" --case "$case" --kind "$kind" --out "$r.gate.md" 2> "$r.log"; then
+              echo pass > "$r.status"
+            else
+              [ -s "$r.gate.md" ] || { echo "The eval gate did not complete:"; echo; sed 's/^/    /' "$r.log"; } > "$r.gate.md"
+              echo fail-gate > "$r.status"
+            fi
+          done < "$T/ship/rows.tsv"
+      - name: Publish PRs and issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -u
+          T="$RUNNER_TEMP"
+          rc=0
+          gh label create evolve --color 5319e7 --description "Agent self-improvement (ADR-0027)" --force || rc=1
+          text() {  # agent-written text: regular file, at most 64 KiB, dedupe markers removed
+            f="$T/proposal/$1"
+            if [ -f "$f" ] && [ ! -L "$f" ] && [ "$(wc -c < "$f")" -le 65536 ]; then sed '/<!-- evolve:signal=/d' "$f"; fi
+          }
+          redact() {  # token shapes never reach a public issue or PR
+            sed -E 's/(sk-ant-[A-Za-z0-9_-]+|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_.-]+)/[redacted]/g'
+          }
+          issue() {  # signal, title, body file
+            { printf '<!-- evolve:signal=%s -->\n\n' "$1"; redact < "$3"; printf '\n\nRun: %s\n' "$RUN_URL"; } > "$T/ship/issue.md"
+            gh issue create --label evolve --title "$2" --body-file "$T/ship/issue.md" < /dev/null || rc=1
+          }
+          while IFS=$'\t' read -r signal slug case kind body message || [ -n "$signal" ]; do
+            r="$T/ship/$slug"; branch="evolve/$slug"
+            case "$(cat "$r.status" 2>/dev/null)" in
+              skip) ;;
+              fail-apply)
+                { echo "The staged files for \`$slug\` could not be applied (ADR-0029 D3):"; echo; sed 's/^/    /' "$r.apply"; } > "$r.why"
+                issue "$signal" "Evolve: rejected proposal for $signal (staging)" "$r.why" ;;
+              fail-paths)
+                { echo "The proposal on \`$branch\` breaks the Evolve allowlist (ADR-0027 D2):"; echo; sed 's/^/    /' "$r.paths"; } > "$r.why"
+                issue "$signal" "Evolve: rejected proposal for $signal (paths)" "$r.why" ;;
+              fail-gate)
+                issue "$signal" "Evolve: proposal for $signal failed the eval gate" "$r.gate.md" ;;
+              pass|pass-draft)
+                draft=""; [ "$(cat "$r.status")" = "pass-draft" ] && draft="--draft"
+                { printf '<!-- evolve:signal=%s -->\n\n' "$signal"; text "$body"; printf '\n\n'; cat "$r.gate.md"
+                  printf '\n\nRun: %s\nMerge to adopt the rule; close to reject it (the signal is not proposed again).\n' "$RUN_URL"; } | redact > "$r.pr.md"
+                if git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "refs/heads/$branch:refs/heads/$branch" < /dev/null; then
+                  # shellcheck disable=SC2086
+                  gh pr create $draft --base main --head "$branch" --label evolve --title "Evolve: $signal" --body-file "$r.pr.md" < /dev/null || rc=1
+                else
+                  rc=1
+                fi ;;
+              *) echo "no gate result for $branch"; rc=1 ;;
+            esac
+          done < "$T/ship/rows.tsv"
+          # ADR-0029 D2: only the agent's explicit "none" row closes a signal; a missing row is retried next week
+          while IFS=$'\t' read -r signal body || [ -n "$signal" ]; do
+            [ -n "$signal" ] || continue
+            { echo "The agent made no proposal for this signal. Its reason:"; echo; text "$body"; } > "$T/ship/none.md"
+            issue "$signal" "Evolve: no proposal for $signal" "$T/ship/none.md"
+          done < "$T/ship/none.tsv"
+          exit $rc

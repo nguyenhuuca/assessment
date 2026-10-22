@@ -117,7 +117,7 @@ Phần lớn workflow skill chỉ chạy khi bạn gõ `/tên`. Ngoại lệ là
 | `/land-the-plane` | Finish-Line Protocol | Chạy gates → commit → (hỏi) push → kiểm CI | Commit đã push |
 | `/tailor` | Configuration Tailor | Phát hiện stack, đề xuất chỉnh cấu hình (chỉ đề xuất) | `scratchpad/tailor-proposal.md` |
 | `/autopilot <yêu cầu>` | Autopilot | Chạy trọn một feature nhỏ, fix hoặc refactor: plan → review → bạn duyệt → code → review → QA ×2 → bạn duyệt push | Code đã deploy + `docs/reports/autopilot-*.md` |
-| `/evolve [--since <ngày>]` | Self-Improver | Biến signal từ agent-metrics thành thay đổi rule có chứng minh (chỉ chạy local) | Branch `evolve/*`, seeded case trong `evals/seeded/` |
+| `/evolve [--since <ngày>]` | Self-Improver | Biến signal từ agent-metrics thành thay đổi rule có chứng minh (local, hoặc chạy hàng tuần trên CI) | Branch `evolve/*`, seeded case trong `evals/seeded/` |
 | `/task-resume [chỉ dẫn]` | Task Resumer | Làm tiếp task dở trong `session.txt` sau khi kiểm lại repo | Làm tiếp từ `next` |
 
 Ví dụ:
@@ -454,7 +454,8 @@ Observe (signals) → Diagnose (Five Whys → stage lẽ ra phải bắt) → Pr
   3. mọi case cũ vẫn bắt được;
   4. chi phí reviewer tăng tối đa 25%.
 - **Agent được sửa gì:** chỉ được thêm dòng vào `.claude/skills/**`, `.claude/rules/*.md`, phần prompt của `.claude/agents/*.md`, và thêm case mới. Không bao giờ đụng `scripts/`, `.github/`, hooks, settings, case cũ, threshold hay code app. Frontmatter bị khoá. Do code kiểm tra (`check-paths`), không phải do prompt.
-- **Cách chạy:** gõ `/evolve` (chỉ chạy local). Nó dừng ở bước Ship và hỏi bạn: merge vào `main`, push và mở PR, giữ branch, hay bỏ. Workflow headless chạy hàng tuần đã được thử rồi gỡ bỏ: Claude Code headless không sửa được file trong `.claude/` nếu không có người duyệt quyền ([ADR-0027](../adr/0027-agent-self-improvement-loop.md) D4).
+- **Cách chạy:** gõ `/evolve`. Nó dừng ở bước Ship và hỏi bạn: merge vào `main`, push và mở PR, giữ branch, hay bỏ.
+- **Chạy hàng tuần trên CI:** `.github/workflows/agent-evolve.yml` chạy 9:00 thứ Hai (hoặc Actions → Agent Evolve → Run workflow). Agent ghi bản sao file vào `evolve-out/`, không sửa `.claude/`. Ship job dựng branch `evolve/*` bằng `scripts/evolve.mjs apply`, chạy cùng gate rồi mở PR có label `evolve`; bạn là người merge ([ADR-0029](../adr/0029-headless-evolve-staging.md)).
 - **Dọn rule (prune):** mỗi rule do Evolve thêm kết thúc bằng `<!-- evolve:<case id> -->`; run sau có thể đề xuất gỡ một rule, chỉ khi case của nó vẫn bắt được khi không có rule đó.
 - **Compress** (ADR-0027 D6): mỗi tháng một lần (`compress:<YYYY-MM>`), Evolve được **cắt bớt** nội dung: trùng lặp, tham chiếu chết, nội dung mâu thuẫn với source of truth, số liệu lỗi thời, trong `.claude/` và `CLAUDE.md`.
   - `node scripts/evolve.mjs lint-rules` đưa gợi ý (dòng trùng, path chết, kích thước context luôn load, hiện khoảng 37 KB).

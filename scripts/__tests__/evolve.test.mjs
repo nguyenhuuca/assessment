@@ -1,9 +1,14 @@
 // Run: node --test scripts/__tests__/evolve.test.mjs
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
 import { test } from 'node:test'
+import { fileURLToPath } from 'node:url'
 import {
   compressViolations, decide, decideCompress, grade, handledIds, lintRules, parseArgs, parseVerdict, pathViolations, pickSignals,
-  removedLines, reviewPrompt,
+  removedLines, reviewPrompt, stagedFiles, validateManifest,
 } from '../evolve.mjs'
 
 const reply = (lines, verdict = 'revise') => `prose\n\n\`\`\`verdict\nVERDICT: ${verdict}\nBLOCKING: 1\nADVISORY: 0\n${lines.join('\n')}\n\`\`\`\n`
@@ -173,3 +178,73 @@ test('decideCompress needs a real cut, no new lint findings and every case caugh
   assert.equal(decideCompress({ size: size(9000, 7000, 37000, 35000), lint: lint(5, 3), regress: { a: [{ caught: true, error: 'x' }] } }).pass, false, 'errors')
 })
 
+
+test('validateManifest keeps well-formed rows; only a none row closes a signal', () => {
+  const ok = { signal: 'defect:aaaa1111', slug: 'defect-aaaa1111', case: '2026-10-01-a', kind: 'rule', body: 'evolve-out/a.md', message: 'evolve: rule' }
+  const rows = [
+    ok,
+    { ...ok, slug: 'dup' },
+    { ...ok, signal: 'defect:bbbb2222', slug: 'b; rm -rf /' },
+    { ...ok, signal: 'defect:cccc3333', slug: 'c', body: '../etc/passwd' },
+    { ...ok, signal: 'defect:dddd4444', slug: 'defect-aaaa1111' },
+    { ...ok, signal: 'defect:eeee5555', slug: 'e', message: 'two\nlines' },
+    { signal: 'defect:ffff6666', kind: 'none', body: 'evolve-out/f.md' },
+    { signal: 'compress:2026-10', slug: 'compress-2026-10', case: '-', kind: 'compress', body: 'evolve-out/c.md', message: 'evolve: compress' },
+    { signal: 'defect:zzzz', slug: 'z', case: 'z', kind: 'rule', body: 'evolve-out/z.md', message: 'm' },
+    null,
+  ]
+  const ids = ['defect:aaaa1111', 'defect:bbbb2222', 'defect:cccc3333', 'defect:dddd4444', 'defect:eeee5555', 'defect:ffff6666', 'compress:2026-10', 'defect:gggg7777', 'bad id\n']
+  const res = validateManifest(rows, ids)
+  assert.deepEqual(res.rows.map((r) => r.slug), ['defect-aaaa1111', 'compress-2026-10'])
+  assert.deepEqual(res.none, [{ signal: 'defect:ffff6666', body: 'evolve-out/f.md' }])
+  assert.deepEqual(res.unhandled, ['defect:bbbb2222', 'defect:cccc3333', 'defect:dddd4444', 'defect:eeee5555', 'defect:gggg7777'])
+  assert.deepEqual(validateManifest('not an array', ['defect:a']).unhandled, ['defect:a'])
+  assert.deepEqual(validateManifest([{ ...rows[7], case: 'x' }], ids).rows, [])
+  for (const slug of ['.', '..', 'a..b', '.hidden', 'x.lock', '-x']) assert.deepEqual(validateManifest([{ ...ok, slug }], ids).rows, [], slug)
+  assert.equal(validateManifest([{ ...ok, slug: 'defect-a.1' }], ids).rows.length, 1)
+})
+
+test('stagedFiles decodes allowed paths and rejects the rest', () => {
+  const f = (rel, size = 10, file = true) => ({ rel, size, file })
+  const res = stagedFiles([
+    f('dot-claude/agents/worker-reviewer.md.staged'),
+    f('CLAUDE.md.staged'),
+    f('evals/seeded/2026-10-01-a/case.json.staged'),
+    f('dot-claude/rules/x.md'),
+    f('dot-claude/../.github/workflows/x.yml.staged'),
+    f('.claude/rules/x.md.staged'),
+    f('scripts/evolve.mjs.staged'),
+    f('dot-claude/rules/big.md.staged', 70000),
+    f('dot-claude/rules/link.md.staged', 10, false),
+  ])
+  assert.deepEqual(res.files.map((x) => x.path), ['.claude/agents/worker-reviewer.md', 'CLAUDE.md', 'evals/seeded/2026-10-01-a/case.json'])
+  assert.equal(res.errors.length, 6)
+  assert.deepEqual(stagedFiles([]).errors, ['no staged files'])
+})
+
+test('apply commits staged files on a new branch without touching the working tree', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'evolve-apply-'))
+  const script = join(dirname(fileURLToPath(import.meta.url)), '..', 'evolve.mjs')
+  const env = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t' }
+  const g = (...a) => execFileSync('git', ['-C', dir, ...a], { env, encoding: 'utf8' }).trim()
+  const run = (...a) => execFileSync('node', [script, ...a], { cwd: dir, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+  try {
+    g('init', '-q', '-b', 'main')
+    mkdirSync(join(dir, '.claude/rules'), { recursive: true })
+    writeFileSync(join(dir, '.claude/rules/x.md'), 'one\n')
+    g('add', '.'); g('commit', '-qm', 'base')
+    const stage = join(dir, 'evolve-out/p/tree/dot-claude/rules')
+    mkdirSync(stage, { recursive: true })
+    writeFileSync(join(stage, 'x.md.staged'), 'one\ntwo\n')
+    run('apply', '--dir', 'evolve-out/p', '--base', 'main', '--branch', 'evolve/p', '--message', 'evolve: add two')
+    assert.equal(g('show', 'evolve/p:.claude/rules/x.md'), 'one\ntwo')
+    assert.equal(g('log', '-1', '--format=%s', 'evolve/p'), 'evolve: add two')
+    assert.equal(g('rev-parse', 'evolve/p^'), g('rev-parse', 'main'))
+    assert.equal(g('status', '--porcelain', '--untracked-files=no'), '')
+    assert.throws(() => run('apply', '--dir', 'evolve-out/p', '--base', 'main', '--branch', 'evolve/p', '--message', 'again'))
+    writeFileSync(join(stage, 'x.md.staged'), 'one\n')
+    assert.throws(() => run('apply', '--dir', 'evolve-out/p', '--base', 'main', '--branch', 'evolve/q', '--message', 'noop'), /change nothing/)
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})

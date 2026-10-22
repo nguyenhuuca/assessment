@@ -446,6 +446,14 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **EV-4** `/evolve` skill + first evolution (reviewer rule; case caught 0/3 → 3/3) fe36685d, 426a1b9c
 - [x] **EV-5** `.github/workflows/agent-evolve.yml` (propose + ship jobs) 426a1b9c; removed 2026-10-21 by the owner (headless cannot edit `.claude/`), `/evolve` is local only
 
+## Headless Evolve with staged proposals (2026-10-22, ADR-0029)
+
+- [x] **EH-1** ADR-0029: agent stages file copies under `evolve-out/`, ship job applies them
+- [x] **EH-2** `evolve.mjs manifest` (one row per signal, `none` closes) + `apply` (git plumbing, allowlist) + tests
+- [x] **EH-3** `.github/workflows/agent-evolve.yml` restored on the staging design
+- [x] **EH-4** `/evolve` Headless Mode section, mirror, guides EN/VI, ADR-0027 D4, tracking
+- [ ] **EH-5** Owner: first `workflow_dispatch` run; confirm the agent writes `evolve-out/` with no permission prompt
+
 ## Report table loading indicator (#51, autopilot lite)
 
 - [x] **FIX-1** Loading row + `vid-spinner--sm` + `list.loading` (en, vi) on the Recent reports table

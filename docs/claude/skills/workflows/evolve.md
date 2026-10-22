@@ -1,13 +1,13 @@
 ---
 name: evolve
 description: Improve the agent's own rules from its quality metrics — find new bad signals, Five Whys each one, propose one small rule change, prove it with a seeded-bug eval, and hand it over as a PR. A user-invoked workflow (ADR-0027).
-argument-hint: "[--since YYYY-MM-DD] [--prune]"
+argument-hint: "[--since YYYY-MM-DD] [--prune] | --headless --signals <file>"
 disable-model-invocation: true
 ---
 
 # Evolve
 
-The self-improvement loop of ADR-0027 (`docs/adr/0027-agent-self-improvement-loop.md`). Input: `$ARGUMENTS`. It runs **locally only**: the headless GitHub workflow was removed (ADR-0027 D4).
+The self-improvement loop of ADR-0027 (`docs/adr/0027-agent-self-improvement-loop.md`). Input: `$ARGUMENTS`. It runs locally, or weekly in `.github/workflows/agent-evolve.yml` with `--headless` (see Headless Mode, ADR-0029).
 
 ```
 Observe → Diagnose (Five Whys) → Propose (one small change) → Prove (eval gate) → Ship (ask the owner)
@@ -76,12 +76,28 @@ The signal `compress:<YYYY-MM>` comes once a month with lint hints (`duplicates`
   - C3: every seeded case is still caught with the compressed rules.
 - Not proven by the gate: that nothing **outside** the eval set got worse. Show the owner every removed line before asking.
 
+## Headless Mode (ADR-0029)
+
+Used when the input is `--headless --signals <file>`. The signals are already picked; skip **Observe** and read them from that file. Diagnose as above. Then, instead of Propose / Prove / Ship:
+
+- **No git and no `.claude/` edits.** Headless Claude Code asks permission for every `.claude/` edit and CI cannot answer. Read with the `Read`, `Grep` and `Glob` tools and read-only `git diff/show/log`; write only under `evolve-out/` (the workflow allows nothing else).
+- **Stage the full new content** of each file you would change at `evolve-out/<slug>/tree/<path>.staged`, where `<slug>` is the signal id with `:` replaced by `-`, and a leading `.claude/` becomes `dot-claude/`:
+  - `.claude/agents/worker-reviewer.md` → `evolve-out/<slug>/tree/dot-claude/agents/worker-reviewer.md.staged`
+  - `evals/seeded/<case id>/case.json` → `evolve-out/<slug>/tree/evals/seeded/<case id>/case.json.staged`
+  - `CLAUDE.md` (compress only) → `evolve-out/<slug>/tree/CLAUDE.md.staged`
+- Copy the current file first, then make the same change you would make locally (the Propose rules and ADR-0027 D2 still apply). A file cannot be deleted.
+- Write the PR text (what Ship would show the owner) to `evolve-out/<slug>.md`.
+- Write `evolve-out/manifest.json`: a JSON array with **one row for every signal** in the file:
+  - proposal: `{"signal", "slug", "case", "kind", "body": "evolve-out/<slug>.md", "message": "evolve: <one line>"}`, where `kind` is `rule`, `case-only`, `not-eval-proven` or `compress` (`case` is `-` for compress);
+  - no proposal: `{"signal", "kind": "none", "body": "evolve-out/<slug>.md"}` with the reason in that file. Only this row closes the signal; a signal you leave out is retried next week.
+- Do not run `check-paths` or `gate`; the ship job builds the branch from your staged files and runs both (`scripts/evolve.mjs apply`). End your turn when the manifest is written.
+
 ## Pruning (ADR-0027 D5)
 
 When the run's argument is `--prune`, or total `.claude/` rule size grew by more than 20% since the last prune: pick one `<!-- evolve:` line, remove it on a branch, and run `gate` with its case. It passes only when the case is still caught without it. This is the only way an Evolve rule is removed.
 
 ## Constraints
 
-- NEVER push, merge or open a PR without the owner's answer at Ship.
+- NEVER push, merge or open a PR without the owner's answer at Ship. Headless: never push or open a PR at all; the ship job opens it and the owner merges.
 - NEVER change how proposals are checked: `scripts/`, `evals/seeded/` cases that exist, `.github/`, thresholds.
 - NEVER more than 3 signals per run, or more than one rule per signal.
