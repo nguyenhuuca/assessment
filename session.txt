@@ -1,7 +1,7 @@
 task: Evolve bug signal: also link to Claude-co-authored session commits (option A)
-status: in_progress
-progress: 90
-done: BG-4 session fallback + tests 36/36; skill/ADR/guides; 4 of 5 bug reports now signals
-next: owner: approve push; next Evolve run picks bug:#56, #53, #51
+status: done
+progress: 100
+done: BG-4 session fallback + tests 36/36; skill/ADR/guides; 4 of 5 bug reports now signals; 63e64e4c pushed
+next: owner: trigger Agent Evolve to get proposals for bug:#56, #53, #51
 plan: docs/adr/0027-agent-self-improvement-loop.md
-updated: 2026-10-22 22:02
+updated: 2026-10-22 22:03
