@@ -1,8 +1,7 @@
-task: Local autopilot opt-in auto gates (--auto, --auto-push)
-status: blocked
-progress: 85
-done: AG-1 ADR-0028; AG-2 autopush check script (6 cases pass); AG-3 SKILL.md, core-directives, AGENTS, CLAUDE.md, mirrors; AG-4 guides, tracking
-next: push (owner approval); first real run /autopilot --auto-push <small fix>
-plan: docs/adr/0028-local-autopilot-auto-gates.md
-blocker: owner approval to push to main
-updated: 2026-10-22 16:58
+task: Autopilot --auto: video action bar icon-only (tooltip, no text labels)
+status: done
+progress: 100
+done: IC-1..IC-3 icon-only action bar 62ea1c71; pushed
+next: owner: check autopush-check ignores .claude/settings.local.json
+plan: -
+updated: 2026-10-22 17:54
