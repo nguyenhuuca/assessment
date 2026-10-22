@@ -9,7 +9,8 @@
 //
 // Bug report = a closed GitHub issue labelled `bug` (in-app reports, ADR-0026). It is linked to a run when a line its
 // fix removed or changed was written by that run (`git blame` on the fix's parent), so a shared file such as
-// index.css does not blame every run that touched it. A fix that only adds lines (a missing feature) is not linked.
+// index.css does not blame every run that touched it. When no run wrote those lines, a commit co-authored by Claude
+// in a normal session counts too (`session:<sha>`, span = that commit). A fix that only adds lines is not linked.
 //
 // Usage: node scripts/agent-metrics.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--window 7]
 //                                       [--out docs/reports/agent-metrics-YYYY-MM.md] [--no-gh] [--json]
@@ -143,14 +144,22 @@ export function fixCommitsFor(issue, commits) {
   })
 }
 
-// bugs: [{ number, title, fix: commit, blamed: [shas of the lines the fix removed or changed] }]
+export const isClaudeCoAuthored = (body) => /^Co-Authored-By:\s*Claude\b/im.test(body ?? '')
+
+// bugs: [{ number, title, fix: commit, blamed: [shas of the lines the fix removed or changed],
+//          agentCommits: [{ sha, date }] = the blamed commits co-authored by Claude }]
 export function linkBugs(bugs, runs, defects = []) {
   const runOf = new Map(runs.flatMap((r) => r.commits.map((c) => [c.sha, r])))
   const defectShas = new Set(defects.map((d) => d.sha))
   return bugs.map((b) => {
     const hit = b.blamed.map((sha) => runOf.get(sha)).filter((r) => r && r.end < b.fix.date && !r.commits.includes(b.fix))
     const run = hit.sort((x, y) => y.end - x.end)[0] ?? null  // the latest run whose lines the fix had to change
-    return { number: b.number, title: b.title, sha: b.fix.sha, run: run?.id ?? null, dup: defectShas.has(b.fix.sha), files: b.files ?? [] }
+    const session = run ? null
+      : (b.agentCommits ?? []).filter((c) => !runOf.has(c.sha) && c.date < b.fix.date).sort((x, y) => y.date - x.date)[0] ?? null
+    return {
+      number: b.number, title: b.title, sha: b.fix.sha, run: run?.id ?? (session ? `session:${session.sha.slice(0, 8)}` : null),
+      commit: session?.sha ?? null, dup: defectShas.has(b.fix.sha), files: b.files ?? [],
+    }
   })
 }
 
@@ -212,6 +221,7 @@ export function summarize({ runs, defects, reverted, prs = null, builds = null, 
   if (bugs) {
     s.bugReports = bugs.length
     s.bugReportsLinked = bugs.filter((b) => b.run).length
+    s.bugReportsSession = bugs.filter((b) => b.commit).length
   }
   if (autopilotRuns) {
     s.autopilotJobs = Object.entries(autopilotRuns.reduce((t, r) => ({ ...t, [r.conclusion || 'running']: (t[r.conclusion || 'running'] ?? 0) + 1 }), {}))
@@ -232,7 +242,8 @@ export function signals({ runs, defects, reverted, prs = null, bugs = null }) {
   }
   for (const b of bugs ?? []) {
     if (!b.run || b.dup) continue  // a fix: commit is already a defect signal
-    out.push({ id: `bug:#${b.number}`, kind: 'bug', ...span(b.run), fix: b.sha, issue: b.number, title: b.title.slice(0, 120), files: b.files })
+    const where = b.commit ? { run: b.run, base: `${b.commit}^`, head: b.commit, origin: 'session' } : { ...span(b.run), origin: 'autopilot' }
+    out.push({ id: `bug:#${b.number}`, kind: 'bug', ...where, fix: b.sha, issue: b.number, title: b.title.slice(0, 120), files: b.files })
   }
   for (const r of reverted) out.push({ id: `revert:${r.sha.slice(0, 8)}`, kind: 'revert', ...span(r.run), revert: r.sha, subject: r.subject })
   for (const r of runs) {
@@ -288,7 +299,7 @@ export function render({ args, s, weeks, runs, defects, reverted, bugs = null })
     rows.push(['CI build failure rate (all pushes)', s.ciFailRate])
     rows.push(['CI build failure rate (agent head commits)', `${s.ciAgentFailRate} of ${s.ciAgentRuns}`])
   }
-  if (s.bugReports != null) rows.push(['Bug reports closed (label `bug`)', `${s.bugReports} (${s.bugReportsLinked} linked to the agent run that wrote the fixed lines)`])
+  if (s.bugReports != null) rows.push(['Bug reports closed (label `bug`)', `${s.bugReports} (${s.bugReportsLinked} linked to agent-written lines: ${s.bugReportsLinked - s.bugReportsSession} autopilot run, ${s.bugReportsSession} session commit)`])
   if (s.autopilotJobs) rows.push(['Headless autopilot jobs', s.autopilotJobs])
   for (const [k, v] of rows) L.push(`| ${k} | ${v} |`)
   L.push('', '## By week', '', '| Week (Mon) | Agent runs | Runs with escaped defect | CI builds | CI failures |', '|---|---|---|---|---|')
@@ -299,7 +310,7 @@ export function render({ args, s, weeks, runs, defects, reverted, bugs = null })
   if (bugs) {
     L.push('', '## Bug reports', '')
     if (!bugs.length) L.push('- none')
-    for (const b of bugs) L.push(`- #${b.number} → \`${b.sha.slice(0, 8)}\` ${b.run ? `run \`${b.run}\`` : 'no run (fix only adds lines, or the lines are not agent-written)'}`)
+    for (const b of bugs) L.push(`- #${b.number} → \`${b.sha.slice(0, 8)}\` ${b.run ? `run \`${b.run}\`` : 'not linked (fix only adds lines, or the lines are not agent-written)'}`)
   }
   L.push('', '## Reverts', '')
   if (!reverted.length) L.push('- none')
@@ -356,7 +367,15 @@ function loadBugs(root, commits, args) {
   return issues.filter((i) => i.closedAt && i.closedAt.slice(0, 10) >= args.since && (!args.until || i.closedAt.slice(0, 10) <= args.until))
     .flatMap((i) => {
       const fix = fixCommitsFor(i, commits).sort((a, b) => b.date - a.date)[0]
-      return fix ? [{ number: i.number, title: i.title ?? '', fix, blamed: blameFix(root, fix), files: fix.files.filter(isCodeFile) }] : []
+      if (!fix) return []
+      const blamed = blameFix(root, fix)
+      const agentCommits = blamed.flatMap((sha) => {
+        try {
+          const [date, ...body] = sh('git', ['-C', root, 'log', '-1', '--format=%cI%n%B', sha]).split('\n')
+          return isClaudeCoAuthored(body.join('\n')) ? [{ sha, date: new Date(date) }] : []
+        } catch { return [] }
+      })
+      return [{ number: i.number, title: i.title ?? '', fix, blamed, agentCommits, files: fix.files.filter(isCodeFile) }]
     })
 }
 

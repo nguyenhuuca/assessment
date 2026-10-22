@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
-  changedOldRanges, escapedDefects, findRuns, fixCommitsFor, isCodeFile, isFix, linkBugs, parseArgs, parseGitLog, reportHashes, reverts,
+  changedOldRanges, escapedDefects, findRuns, fixCommitsFor, isClaudeCoAuthored, isCodeFile, isFix, linkBugs, parseArgs, parseGitLog, reportHashes, reverts,
   signals, summarize, weekKey,
 } from '../agent-metrics.mjs'
 
@@ -200,6 +200,7 @@ test('linkBugs blames the latest run whose lines the fix changed; signals skip u
     { number: 13, title: 'adds only', fix: cs[3], blamed: [] },
   ], runs, [{ sha: 'fx2', run: 'run-2' }])
   assert.deepEqual(bugs.map((b) => [b.number, b.run, b.dup]), [[9, 'run-2', false], [11, null, false], [12, 'run-2', true], [13, null, false]])
+  assert.equal(bugs[0].commit, null, 'an autopilot run wins over a session commit')
   const sig = signals({ runs, defects: [], reverted: [], bugs })
   assert.deepEqual(sig.map((x) => x.id), ['bug:#9'])
   assert.equal(sig[0].base, 'r2a^')
@@ -208,4 +209,29 @@ test('linkBugs blames the latest run whose lines the fix changed; signals skip u
   const s = summarize({ runs, defects: [], reverted: [], bugs })
   assert.equal(s.bugReports, 4)
   assert.equal(s.bugReportsLinked, 2)
+})
+
+test('linkBugs falls back to the latest Claude-co-authored session commit when no run wrote the lines', () => {
+  assert.ok(isClaudeCoAuthored('feat: x\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>'))
+  assert.ok(!isClaudeCoAuthored('feat: x\n\nCo-Authored-By: Alice <a@x>'))
+  const cs = [
+    commit('r1', '2026-10-01T10:00:00Z', 'feat: a', ['api/A.java'], 'Autopilot-Run: run-1'),
+    commit('fx', '2026-10-20T10:00:00Z', 'Autopilot: Issue (#56) (#57)', ['api/A.java'], 'Autopilot-Run: run-9'),
+  ]
+  const runs = findRuns(cs)
+  const s1 = { sha: '50ade4e1aaaa', date: new Date('2026-10-13T10:00:00Z') }
+  const s0 = { sha: '11112222bbbb', date: new Date('2026-10-05T10:00:00Z') }
+  const later = { sha: '99990000cccc', date: new Date('2026-10-25T10:00:00Z') }
+  const bugs = linkBugs([
+    { number: 56, title: '@unknown', fix: cs[1], blamed: [s0.sha, s1.sha, 'human'], agentCommits: [s0, s1, later], files: ['api/A.java'] },
+    { number: 60, title: 'run and session', fix: cs[1], blamed: ['r1', s1.sha], agentCommits: [s1] },
+  ], runs)
+  assert.deepEqual(bugs.map((b) => [b.run, b.commit]), [['session:50ade4e1', s1.sha], ['run-1', null]])
+  const sig = signals({ runs, defects: [], reverted: [], bugs })
+  assert.deepEqual(sig.map((x) => [x.id, x.origin, x.base, x.head]), [
+    ['bug:#56', 'session', '50ade4e1aaaa^', '50ade4e1aaaa'],
+    ['bug:#60', 'autopilot', 'r1^', 'r1'],
+  ])
+  const s = summarize({ runs, defects: [], reverted: [], bugs })
+  assert.deepEqual([s.bugReportsLinked, s.bugReportsSession], [2, 1])
 })

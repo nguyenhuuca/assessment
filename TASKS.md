@@ -459,6 +459,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **BG-1** `agent-metrics.mjs`: `bug:#N` signal, closed `bug` issue → fix commit → `git blame` of the changed lines → agent run; summary + report section
 - [x] **BG-2** Tests: `changedOldRanges`, `fixCommitsFor`, `linkBugs` + signal/summary
 - [x] **BG-3** `/evolve` skill + mirror, ADR-0027, guides EN/VI
+- [x] **BG-4** Link to Claude-co-authored session commits when no run wrote the lines (`origin: session`); today 4 of 5 bug reports become signals (#42, #51, #53, #56)
 
 ## Report table loading indicator (#51, autopilot lite)
 

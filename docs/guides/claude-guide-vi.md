@@ -446,7 +446,7 @@ Observe (signals) → Diagnose (Five Whys → stage lẽ ra phải bắt) → Pr
   → Prove (eval gate) → Ship (bạn chọn: merge, mở PR, giữ branch hoặc bỏ)
 ```
 
-- **Signals:** `defect:<sha>`, `bug:#<N>` (bug report từ app mà bản sửa phải đổi các dòng do một run của agent viết, tìm bằng `git blame`), `revert:<sha>`, `blocked:<run>`, `flaky:<run>`, `review-skipped:<run>`, `revise:pr-<N>`. Signal nào đã có PR hoặc issue `evolve` (kể cả cái bạn đã đóng) hoặc đã có seeded case thì không đề xuất lại. Tối đa 3 signal mỗi run.
+- **Signals:** `defect:<sha>`, `bug:#<N>` (bug report từ app mà bản sửa phải đổi các dòng do agent viết, trong run autopilot hoặc commit có `Co-Authored-By: Claude` ở session thường, tìm bằng `git blame`), `revert:<sha>`, `blocked:<run>`, `flaky:<run>`, `review-skipped:<run>`, `revise:pr-<N>`. Signal nào đã có PR hoặc issue `evolve` (kể cả cái bạn đã đóng) hoặc đã có seeded case thì không đề xuất lại. Tối đa 3 signal mỗi run.
 - **Seeded-bug evals** (`evals/seeded/<id>/case.json`): mỗi bug lọt thật thành một regression test **cho agent**: chạy reviewer trên đúng diff có bug và chấm cố định (có finding blocking ở đúng file, đúng cách mô tả bug).
 - **Eval gate** (`scripts/evolve.mjs gate`), phải đủ cả 4:
   1. rule hiện tại trên `main` **bỏ sót** case (ít nhất 2/3 lần);
