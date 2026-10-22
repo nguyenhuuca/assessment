@@ -1,10 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getDriveSyncFiles, updateVideoStatus, bulkModerateComments, getJobs, updateJob, runJob, previewJobCron } from '../admin.js'
+import { getDriveSyncFiles, updateVideoStatus, bulkModerateComments, getJobs, updateJob, runJob, previewJobCron, deleteVideo } from '../admin.js'
 import { api } from '../client.js'
 
-vi.mock('../client.js', () => ({ api: { get: vi.fn(), patch: vi.fn(), post: vi.fn() } }))
+vi.mock('../client.js', () => ({ api: { get: vi.fn(), patch: vi.fn(), post: vi.fn(), delete: vi.fn() } }))
 
 beforeEach(() => vi.clearAllMocks())
+
+describe('deleteVideo', () => {
+  it('sends no query by default', async () => {
+    await deleteVideo(5)
+    expect(api.delete).toHaveBeenLastCalledWith('/admin/videos/5')
+  })
+
+  it('sends only the checked file flags', async () => {
+    await deleteVideo(5, { deleteLocalFile: true })
+    expect(api.delete).toHaveBeenLastCalledWith('/admin/videos/5?deleteLocalFile=true')
+    await deleteVideo(5, { deleteLocalFile: true, deleteDriveFile: true })
+    expect(api.delete).toHaveBeenLastCalledWith('/admin/videos/5?deleteLocalFile=true&deleteDriveFile=true')
+  })
+})
 
 describe('getDriveSyncFiles', () => {
   it('calls the bare path without params', async () => {

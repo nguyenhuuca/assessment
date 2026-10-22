@@ -120,8 +120,12 @@ public class AdminController {
     }
 
     @DeleteMapping("/videos/{id}")
-    public ResponseEntity<ResultObjectInfo<String>> deleteVideo(@PathVariable Long id) {
-        adminVideoService.deleteVideo(id);
+    @AuditLog("deleteVideo")
+    public ResponseEntity<ResultObjectInfo<String>> deleteVideo(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "false") boolean deleteLocalFile,
+            @RequestParam(defaultValue = "false") boolean deleteDriveFile) {
+        adminVideoService.deleteVideo(id, deleteLocalFile, deleteDriveFile);
         return ResponseEntity.ok(ResultObjectInfo.<String>builder()
                 .status(ResultStatus.SUCCESS)
                 .message("Deleted")

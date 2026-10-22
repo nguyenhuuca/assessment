@@ -134,13 +134,20 @@ class AdminControllerTest {
 
     @Test
     void deleteVideo_returnsOk() {
-        doNothing().when(adminVideoService).deleteVideo(3L);
+        doNothing().when(adminVideoService).deleteVideo(3L, false, false);
 
-        ResponseEntity<ResultObjectInfo<String>> response = controller.deleteVideo(3L);
+        ResponseEntity<ResultObjectInfo<String>> response = controller.deleteVideo(3L, false, false);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
-        verify(adminVideoService).deleteVideo(3L);
+        verify(adminVideoService).deleteVideo(3L, false, false);
+    }
+
+    @Test
+    void deleteVideo_passesFileFlags() {
+        controller.deleteVideo(3L, true, true);
+
+        verify(adminVideoService).deleteVideo(3L, true, true);
     }
 
     // ── GET /accounts ──────────────────────────────────────────────────────────

@@ -484,6 +484,6 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Admin delete video with local + Drive cleanup (#58, autopilot lite)
 
-- [ ] **DEL-1** `VideoStorageService.deleteDriveFile` (404 = gone, other failure -> error) + sourceId guard `[A-Za-z0-9_-]+` for the local path and the Drive call
-- [ ] **DEL-2** `AdminVideoService.deleteVideo(id, deleteLocal, deleteDrive)`, `DELETE /admin/videos/{id}?deleteLocalFile&deleteDriveFile` (default false), `@AuditLog`; Drive first, then local, then row
-- [ ] **DEL-3** Webapp: dialog checkboxes in `AdminVideoTable`, `deleteVideo(id, opts)`, en + vi strings, tests
+- [x] **DEL-1** (PR #59) `VideoStorageService.deleteDriveFile` (404 = gone, other failure -> error) + sourceId guard `[A-Za-z0-9_-]+` for the local path and the Drive call
+- [x] **DEL-2** (PR #59) `AdminVideoService.deleteVideo(id, deleteLocal, deleteDrive)`, `DELETE /admin/videos/{id}?deleteLocalFile&deleteDriveFile` (default false), `@AuditLog`; Drive first, then local, then row
+- [x] **DEL-3** (PR #59) Webapp: dialog checkboxes in `AdminVideoTable`, `deleteVideo(id, opts)`, en + vi strings, tests

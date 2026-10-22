@@ -11,6 +11,7 @@ public interface AdminVideoService {
     void updateStatus(Long id, VideoStatus status);
     void updatePriority(Long id, int priority);
     void updateHidden(Long id, boolean hidden);
-    void deleteVideo(Long id);
+    /** Drive file first (a failure keeps the row), then the local file, then the row. */
+    void deleteVideo(Long id, boolean deleteLocalFile, boolean deleteDriveFile);
     AdminStatsDto getStats();
 }

@@ -16,7 +16,12 @@ export const getVideos         = (params) => api.get(buildUrl('/admin/videos', p
 export const updateVideoStatus = (id, status) => patch(`/admin/videos/${id}/status`, { status })
 export const updateVideoPriority = (id, priority) => patch(`/admin/videos/${id}/priority`, { priority })
 export const updateVideoVisibility = (id, hidden) => patch(`/admin/videos/${id}/visibility`, { hidden })
-export const deleteVideo       = (id) => api.delete(`/admin/videos/${id}`)
+// File flags are sent only when checked; the server defaults both to false.
+export const deleteVideo       = (id, { deleteLocalFile = false, deleteDriveFile = false } = {}) =>
+  api.delete(buildUrl(`/admin/videos/${id}`, {
+    deleteLocalFile: deleteLocalFile || null,
+    deleteDriveFile: deleteDriveFile || null,
+  }))
 export const getAccounts       = (params) => api.get(buildUrl('/admin/accounts', params))
 export const updateAccountRole = (id, role) => patch(`/admin/accounts/${id}/role`, { role })
 export const updateAccountPermissions = (id, permissions) => patch(`/admin/accounts/${id}/permissions`, { permissions })

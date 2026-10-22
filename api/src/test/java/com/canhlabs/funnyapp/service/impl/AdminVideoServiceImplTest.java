@@ -8,6 +8,7 @@ import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
+import com.canhlabs.funnyapp.service.VideoStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -31,12 +32,14 @@ class AdminVideoServiceImplTest {
     @Mock VideoSourceRepository videoSourceRepository;
     @Mock UserRepo userRepo;
     @Mock VideoCommentRepository commentRepository;
+    @Mock VideoStorageService videoStorageService;
 
     @InjectMocks AdminVideoServiceImpl service;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        service.injectVideoStorageService(videoStorageService);
         service.injectVideoSourceRepository(videoSourceRepository);
         service.injectUserRepo(userRepo);
         service.injectVideoCommentRepository(commentRepository);
@@ -162,10 +165,75 @@ class AdminVideoServiceImplTest {
 
     // ── deleteVideo ───────────────────────────────────────────────────────────
 
+    private VideoSource source(String type, String sourceId) {
+        VideoSource s = new VideoSource();
+        s.setSourceType(type);
+        s.setSourceId(sourceId);
+        return s;
+    }
+
     @Test
-    void deleteVideo_callsDeleteById() {
-        service.deleteVideo(7L);
+    void deleteVideo_defaults_deletesRowOnly() {
+        when(videoSourceRepository.findById(7L)).thenReturn(Optional.of(source("google_drive", "abc")));
+
+        service.deleteVideo(7L, false, false);
+
         verify(videoSourceRepository).deleteById(7L);
+        verifyNoInteractions(videoStorageService);
+    }
+
+    @Test
+    void deleteVideo_localOnly_deletesLocalFile() {
+        when(videoSourceRepository.findById(7L)).thenReturn(Optional.of(source("google_drive", "abc")));
+
+        service.deleteVideo(7L, true, false);
+
+        verify(videoStorageService).deleteIfEligible("abc");
+        verify(videoStorageService, never()).deleteDriveFile(any());
+        verify(videoSourceRepository).deleteById(7L);
+    }
+
+    @Test
+    void deleteVideo_driveOnly_deletesDriveFile() {
+        when(videoSourceRepository.findById(7L)).thenReturn(Optional.of(source("google_drive", "abc")));
+
+        service.deleteVideo(7L, false, true);
+
+        verify(videoStorageService).deleteDriveFile("abc");
+        verify(videoStorageService, never()).deleteIfEligible(any());
+        verify(videoSourceRepository).deleteById(7L);
+    }
+
+    @Test
+    void deleteVideo_nonDriveRow_skipsDrive() {
+        when(videoSourceRepository.findById(7L)).thenReturn(Optional.of(source("youtube", "yt1")));
+
+        service.deleteVideo(7L, false, true);
+
+        verify(videoStorageService, never()).deleteDriveFile(any());
+        verify(videoSourceRepository).deleteById(7L);
+    }
+
+    @Test
+    void deleteVideo_driveFailure_keepsRow() {
+        when(videoSourceRepository.findById(7L)).thenReturn(Optional.of(source("google_drive", "abc")));
+        doThrow(new IllegalStateException("403")).when(videoStorageService).deleteDriveFile("abc");
+
+        assertThrows(IllegalStateException.class, () -> service.deleteVideo(7L, true, true));
+
+        verify(videoStorageService, never()).deleteIfEligible(any());
+        verify(videoSourceRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void deleteVideo_unknownId_throws() {
+        when(videoSourceRepository.findById(7L)).thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.deleteVideo(7L, true, true));
+
+        assertEquals("Video not found: 7", ex.getMessage());
+        verify(videoSourceRepository, never()).deleteById(any());
     }
 
     // ── getStats ──────────────────────────────────────────────────────────────

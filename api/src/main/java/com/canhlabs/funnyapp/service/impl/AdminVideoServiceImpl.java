@@ -9,6 +9,7 @@ import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.AdminVideoService;
+import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.utils.Contract;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,17 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AdminVideoServiceImpl implements AdminVideoService {
 
+    private static final String DRIVE_SOURCE = "google_drive";
+
     private VideoSourceRepository videoSourceRepository;
     private UserRepo userRepo;
     private VideoCommentRepository commentRepository;
+    private VideoStorageService videoStorageService;
+
+    @Autowired
+    public void injectVideoStorageService(VideoStorageService videoStorageService) {
+        this.videoStorageService = videoStorageService;
+    }
 
     @Autowired
     public void injectVideoSourceRepository(VideoSourceRepository videoSourceRepository) {
@@ -73,7 +82,15 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     }
 
     @Override
-    public void deleteVideo(Long id) {
+    public void deleteVideo(Long id, boolean deleteLocalFile, boolean deleteDriveFile) {
+        VideoSource source = videoSourceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
+        if (deleteDriveFile && DRIVE_SOURCE.equals(source.getSourceType())) {
+            videoStorageService.deleteDriveFile(source.getSourceId());
+        }
+        if (deleteLocalFile) {
+            videoStorageService.deleteIfEligible(source.getSourceId());
+        }
         videoSourceRepository.deleteById(id);
     }
 

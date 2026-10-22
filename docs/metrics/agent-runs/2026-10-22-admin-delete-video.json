@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-22-admin-delete-video",
+  "date": "2026-10-22",
+  "mode": "headless",
+  "lite": true,
+  "issue": 58,
+  "pr": 59,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 0,
+  "advisory": 11,
+  "locNonTest": 110,
+  "tests": { "passed": 65, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}

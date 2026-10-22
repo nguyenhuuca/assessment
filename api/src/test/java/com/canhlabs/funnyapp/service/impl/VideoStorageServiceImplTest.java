@@ -9,6 +9,9 @@ import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.DriveVideoDownloader;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.utils.AppConstant;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpResponseException;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -101,6 +104,85 @@ class VideoStorageServiceImplTest {
         // (can't easily override AppConstant.CACHE_DIR, but we test the no-exception path)
         service.deleteIfEligible("some_file");
         // No exception = success
+    }
+
+    @Test
+    void deleteIfEligible_invalidId_rejected() {
+        assertThatThrownBy(() -> service.deleteIfEligible("../etc/passwd"))
+                .hasMessageContaining("Invalid file id");
+    }
+
+    @Test
+    void deleteIfEligible_fileBeingSynced_throws() {
+        driveFileLocks.tryClaim("busy");
+        try {
+            assertThatThrownBy(() -> service.deleteIfEligible("busy"))
+                    .isInstanceOf(IllegalStateException.class);
+        } finally {
+            driveFileLocks.release("busy");
+        }
+    }
+
+    // ── deleteDriveFile ─────────────────────────────────────────────────────────
+
+    @Test
+    void deleteDriveFile_success_callsDrive() throws IOException {
+        Drive.Files driveFiles = mock(Drive.Files.class);
+        Drive.Files.Delete del = mock(Drive.Files.Delete.class);
+        when(drive.files()).thenReturn(driveFiles);
+        when(driveFiles.delete("abc-1")).thenReturn(del);
+
+        service.deleteDriveFile("abc-1");
+
+        verify(del).execute();
+    }
+
+    @Test
+    void deleteDriveFile_notFound_isIgnored() throws IOException {
+        Drive.Files driveFiles = mock(Drive.Files.class);
+        Drive.Files.Delete del = mock(Drive.Files.Delete.class);
+        when(drive.files()).thenReturn(driveFiles);
+        when(driveFiles.delete("abc")).thenReturn(del);
+        doThrow(driveError(404)).when(del).execute();
+
+        service.deleteDriveFile("abc");
+    }
+
+    @Test
+    void deleteDriveFile_forbidden_throwsIllegalState() throws IOException {
+        Drive.Files driveFiles = mock(Drive.Files.class);
+        Drive.Files.Delete del = mock(Drive.Files.Delete.class);
+        when(drive.files()).thenReturn(driveFiles);
+        when(driveFiles.delete("abc")).thenReturn(del);
+        doThrow(driveError(403)).when(del).execute();
+
+        assertThatThrownBy(() -> service.deleteDriveFile("abc"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("403");
+    }
+
+    @Test
+    void deleteDriveFile_ioError_throwsIllegalState() throws IOException {
+        Drive.Files driveFiles = mock(Drive.Files.class);
+        Drive.Files.Delete del = mock(Drive.Files.Delete.class);
+        when(drive.files()).thenReturn(driveFiles);
+        when(driveFiles.delete("abc")).thenReturn(del);
+        doThrow(new IOException("boom")).when(del).execute();
+
+        assertThatThrownBy(() -> service.deleteDriveFile("abc"))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void deleteDriveFile_invalidId_rejectedWithoutDriveCall() {
+        assertThatThrownBy(() -> service.deleteDriveFile("a/b"))
+                .hasMessageContaining("Invalid file id");
+        verify(drive, never()).files();
+    }
+
+    private static GoogleJsonResponseException driveError(int status) {
+        return new GoogleJsonResponseException(
+                new HttpResponseException.Builder(status, "err", new HttpHeaders()), null);
     }
 
     // ── saveInfo ────────────────────────────────────────────────────────────────
