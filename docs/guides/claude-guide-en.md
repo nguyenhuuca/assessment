@@ -328,7 +328,7 @@ A stopped run can be continued with `/task-resume`, which reads `session.txt` an
 
 ### 🔒 What Autopilot Never Does
 
-- **Skip Gate 1 or Gate 2.** There is no `--yes`, and approving one gate never covers the other or a later run.
+- **Skip Gate 1 or Gate 2 on its own.** There is no `--yes`, and approving one gate never covers the other or a later run. Only a flag you type in the command skips a gate (`--auto`, `--auto-push`, see How to Call It).
 - **Push early.** It never pushes before Gate 2, never force-pushes and never opens a PR mid-run.
 - **Write prod data.** `api/Mock-Test.http` runs only GET and login.
 - **Edit existing tests to make a refactor pass.**
@@ -413,10 +413,13 @@ gh secret set AUTOPILOT_MERGE_TOKEN
 /autopilot refactor: put the suggestion status transition rules in one place, no behavior change
 /autopilot fix: the Reopen button is not disabled while the request is pending
 /autopilot docs/plans/plan-<feature>.md               # run on an existing plan (plan mode)
+/autopilot --auto-push fix: <...>                     # Gate 2 pushes on its own when the check passes
+/autopilot --auto fix: <...>                          # both gates on their own (Gate 1 needs a plan-review approve)
 ```
 
 - **Typed command only.** `autopilot` has `disable-model-invocation: true`, so Claude starts it only when you **type `/autopilot`**. If you ask in chat instead ("run autopilot for X"), Claude reads the `SKILL.md` and follows it step by step, gates included.
 - **The chained skills.** `swarm-plan`, `swarm-review`, `swarm-execute`, `qa-engineer` and `land-the-plane` have `disable-model-invocation: false`, so the orchestrator can call them. You can flip any of them back to `true` at any time. That stage then uses its fallback, and the report records which path each stage took.
+- **Auto gates ([ADR-0028](../adr/0028-local-autopilot-auto-gates.md)).** `--auto-push` pushes on its own only when `scripts/claude-autopilot-autopush-check.sh` passes: no change to `.github/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, `scripts/claude-*`, migrations or `.env`, and ≤ 400 changed lines outside tests and docs. Otherwise Gate 2 asks as usual. The flag covers that run only; `/task-resume` asks at every gate left.
 - **Design details:** [plan-autopilot](../plans/plan-autopilot.md).
 
 ---

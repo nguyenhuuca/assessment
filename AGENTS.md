@@ -36,7 +36,7 @@ An isolated worker runs in its own throwaway git worktree, not the shared checko
 
 ### Mode B — Non-isolated agents and sessions
 
-`/autopilot` runs this mode as its Land stage; its Gate 2 is the "ask before push" step below.
+`/autopilot` runs this mode as its Land stage; its Gate 2 is the "ask before push" step below (skipped only for a run the owner started with `--auto` / `--auto-push` whose check passes, ADR-0028).
 
 1. **File follow-ups** — anything left over goes to `TASKS.md` or a GitHub Issue
 2. **Run quality gates** (if code changed)

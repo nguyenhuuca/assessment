@@ -325,7 +325,7 @@ Run bị dừng có thể làm tiếp bằng `/task-resume`, dựa vào `session
 
 ### 🔒 Những điều autopilot không bao giờ làm
 
-- Bỏ qua Gate 1 hoặc Gate 2. Không có `--yes`; duyệt gate này không thay cho gate kia hay cho run sau.
+- Tự bỏ qua Gate 1 hoặc Gate 2. Không có `--yes`; duyệt gate này không thay cho gate kia hay cho run sau. Chỉ flag bạn gõ trong lệnh mới bỏ qua được gate (`--auto`, `--auto-push`, xem Cách gọi).
 - Push trước Gate 2, force-push, hoặc mở PR trong lúc đang chạy.
 - Ghi dữ liệu prod. `api/Mock-Test.http` chỉ chạy GET và login.
 - Sửa test cũ khi đang refactor để test pass.
@@ -406,10 +406,13 @@ gh secret set AUTOPILOT_MERGE_TOKEN
 /autopilot refactor: gom luật chuyển trạng thái suggestion vào một chỗ, không đổi behavior
 /autopilot fix: nút Reopen chưa disable khi đang gửi request
 /autopilot docs/plans/plan-<feature>.md               # chạy trên plan có sẵn (plan mode)
+/autopilot --auto-push fix: <...>                     # Gate 2 tự push khi check pass
+/autopilot --auto fix: <...>                          # tự qua cả 2 gate (Gate 1 cần plan review approve)
 ```
 
 - `autopilot` đặt `disable-model-invocation: true`: Claude chỉ chạy khi bạn **gõ `/autopilot`**. Nếu bạn yêu cầu bằng lời trong chat ("chạy autopilot cho việc X"), Claude đọc `SKILL.md` và làm theo từng bước, vẫn đủ hai gate.
 - 5 skill được nối trong chuỗi (`swarm-plan`, `swarm-review`, `swarm-execute`, `qa-engineer`, `land-the-plane`) đặt `disable-model-invocation: false` để orchestrator gọi được. Đổi lại `true` lúc nào cũng được; khi đó bước đó tự chuyển sang fallback và report ghi rõ bước nào đi đường nào.
+- **Auto gates ([ADR-0028](../adr/0028-local-autopilot-auto-gates.md)):** `--auto-push` chỉ tự push khi `scripts/claude-autopilot-autopush-check.sh` pass: không đụng `.github/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, `scripts/claude-*`, migration hay `.env`, và ≤ 400 dòng thay đổi ngoài test và docs. Thiếu điều kiện thì vẫn hỏi bạn như thường. Flag chỉ có hiệu lực cho run đó; `/task-resume` sẽ hỏi lại ở các gate còn lại.
 - Chi tiết thiết kế: [plan-autopilot](../plans/plan-autopilot.md).
 
 ---

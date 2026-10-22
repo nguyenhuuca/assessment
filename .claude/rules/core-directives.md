@@ -8,7 +8,7 @@ These directives translate the Core Principles into concrete, day-to-day operati
 
 ## Constraints
 
-- Branching (this repo): work is committed on `main`, and CI deploys from `main` ("Funny App Build and Deploy", "Deploy Frontend"). **Always ask the user before `git push`** — approval for one push does not carry over to the next. Use a short-lived branch + PR only when the user asks for one. Never force-push. Exception: on an issue the owner labels `autopilot:auto-merge` or `autopilot:auto`, the headless workflow may merge that one PR after its own checks (ADR-0025); local sessions still ask.
+- Branching (this repo): work is committed on `main`, and CI deploys from `main` ("Funny App Build and Deploy", "Deploy Frontend"). **Always ask the user before `git push`** — approval for one push does not carry over to the next. Use a short-lived branch + PR only when the user asks for one. Never force-push. Exception: on an issue the owner labels `autopilot:auto-merge` or `autopilot:auto`, the headless workflow may merge that one PR after its own checks (ADR-0025). Local exception: when the owner types `--auto` or `--auto-push` in a `/autopilot` command, that run may push after `scripts/claude-autopilot-autopush-check.sh` passes (ADR-0028). Every other local push still asks.
 - Verify artifacts exist before proceeding to the next phase in the planning flow
 - Consult `tech-strategy.md` for all technology choices — do not deviate without explicit instruction
 - Ship It: work is not complete until pushed (after the user approves) and CI is green — mechanical protocol lives in AGENTS.md "Landing the Plane" (canonical detail-level home)

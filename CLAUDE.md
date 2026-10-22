@@ -23,7 +23,7 @@ Distilled from `.claude/rules/` (auto-loaded); the rules and skills refer to the
 3. **Keep It Safe** — no secrets in code, validate input, parameterized queries, least privilege, flag vulnerabilities immediately.
 4. **Keep It Simple** — single responsibility, no premature abstraction, delete dead code, fix warnings before committing.
 5. **Don't Repeat Yourself** — check `.claude/skills/` before ad-hoc solutions; one source of truth for business logic.
-6. **Ship It** — commit on `main`, **ask before every `git push`** (CI deploys from `main`), then watch CI and smoke-test prod. Protocol: AGENTS.md "Landing the Plane".
+6. **Ship It** — commit on `main`, **ask before every `git push`** (CI deploys from `main`; only opt-in autopilot auto gates skip it, ADR-0025/0028), then watch CI and smoke-test prod. Protocol: AGENTS.md "Landing the Plane".
 7. **Leave a Trail** — artifacts in `docs/` (table below), status in `docs/tracking.md`, decisions in ADRs.
 
 ## Workflow & Artifacts
