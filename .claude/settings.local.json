@@ -35,7 +35,10 @@
       "Bash(ls -la .eslint*)",
       "Bash(mvn -q test)",
       "Bash(mvn -q -Dtest=UserSettingsServiceImplTest,UserSettingsControllerTest test)",
-      "Bash(mvn -Dtest=UserSettingsServiceImplTest,UserSettingsControllerTest test)"
+      "Bash(mvn -Dtest=UserSettingsServiceImplTest,UserSettingsControllerTest test)",
+      "Bash(find docs *)",
+      "Bash(ssh *)",
+      "Bash(./run-all.sh)"
     ]
   },
   "enableAllProjectMcpServers": false,
