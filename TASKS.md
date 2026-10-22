@@ -481,3 +481,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **IC-1** `VideoSwiper` action bar: drop word labels (Comment, Save, Share, Delete), keep `title` tooltip, add `aria-label` + `aria-hidden` icons (nav arrows too)
 - [x] **IC-2** `VoteButtons`: drop the Dislike label, keep the Like count; `aria-label` (Like includes the count)
 - [x] **IC-3** Tests: `VideoSwiper.actions.test.jsx`, VoteButtons icon-only case (both failed before the change)
+
+## Admin delete video with local + Drive cleanup (#58, autopilot lite)
+
+- [ ] **DEL-1** `VideoStorageService.deleteDriveFile` (404 = gone, other failure -> error) + sourceId guard `[A-Za-z0-9_-]+` for the local path and the Drive call
+- [ ] **DEL-2** `AdminVideoService.deleteVideo(id, deleteLocal, deleteDrive)`, `DELETE /admin/videos/{id}?deleteLocalFile&deleteDriveFile` (default false), `@AuditLog`; Drive first, then local, then row
+- [ ] **DEL-3** Webapp: dialog checkboxes in `AdminVideoTable`, `deleteVideo(id, opts)`, en + vi strings, tests
