@@ -1,7 +1,7 @@
 task: Evolve signal bug:#N from in-app bug reports (git blame to the run)
-status: in_progress
-progress: 90
-done: BG-1 bug signal via line blame; BG-2 tests 35/35; BG-3 skill+ADR-0027+guides; EH-5 first headless run
-next: owner: approve push
+status: done
+progress: 100
+done: BG-1 bug signal via line blame; BG-2 tests 35/35; BG-3 skill+ADR-0027+guides; EH-5 first headless run; 0193cde3 pushed
+next: owner: next weekly Evolve run picks up bug:#N signals
 plan: docs/adr/0027-agent-self-improvement-loop.md
-updated: 2026-10-22 20:31
+updated: 2026-10-22 20:48
