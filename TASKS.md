@@ -452,7 +452,13 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **EH-2** `evolve.mjs manifest` (one row per signal, `none` closes) + `apply` (git plumbing, allowlist) + tests
 - [x] **EH-3** `.github/workflows/agent-evolve.yml` restored on the staging design
 - [x] **EH-4** `/evolve` Headless Mode section, mirror, guides EN/VI, ADR-0027 D4, tracking
-- [ ] **EH-5** Owner: first `workflow_dispatch` run; confirm the agent writes `evolve-out/` with no permission prompt
+- [x] **EH-5** First `workflow_dispatch` run 39777667911: agent wrote `evolve-out/` with no prompt, apply built the branch, check-paths rejected a compress proposal that edited protected lines (#55)
+
+## Evolve signal from in-app bug reports (2026-10-22, ADR-0027 amended)
+
+- [x] **BG-1** `agent-metrics.mjs`: `bug:#N` signal, closed `bug` issue → fix commit → `git blame` of the changed lines → agent run; summary + report section
+- [x] **BG-2** Tests: `changedOldRanges`, `fixCommitsFor`, `linkBugs` + signal/summary
+- [x] **BG-3** `/evolve` skill + mirror, ADR-0027, guides EN/VI
 
 ## Report table loading indicator (#51, autopilot lite)
 

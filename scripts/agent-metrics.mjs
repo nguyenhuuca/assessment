@@ -7,6 +7,10 @@
 // Escaped defect = a later `fix:` / `fix(...)` commit, not part of the run, within --window days after the
 // run's last commit, touching a code file the run changed (docs, tests, TASKS.md and session.txt ignored).
 //
+// Bug report = a closed GitHub issue labelled `bug` (in-app reports, ADR-0026). It is linked to a run when a line its
+// fix removed or changed was written by that run (`git blame` on the fix's parent), so a shared file such as
+// index.css does not blame every run that touched it. A fix that only adds lines (a missing feature) is not linked.
+//
 // Usage: node scripts/agent-metrics.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--window 7]
 //                                       [--out docs/reports/agent-metrics-YYYY-MM.md] [--no-gh] [--json]
 //   --json prints { summary, signals } for /evolve (ADR-0027) instead of markdown
@@ -113,6 +117,43 @@ export function escapedDefects(runs, commits, windowDays) {
   return out
 }
 
+// `git diff -U0` output -> the changed line ranges of the old side, per file (pure additions have count 0, skipped)
+export function changedOldRanges(patch) {
+  const out = []
+  let file = null
+  for (const line of patch.split('\n')) {
+    const f = /^--- (?:a\/(.+)|\/dev\/null)$/.exec(line)
+    if (f) { file = f[1] ?? null; continue }
+    const h = /^@@ -(\d+)(?:,(\d+))? \+/.exec(line)
+    if (h && file) {
+      const count = h[2] === undefined ? 1 : Number(h[2])
+      if (count > 0) out.push({ file, start: Number(h[1]), count })
+    }
+  }
+  return out
+}
+
+// Commits that fixed an issue: subject ends with the closing PR's "(#N)" (squash merge), or the body says "Fixes #<issue>"
+export function fixCommitsFor(issue, commits) {
+  const prs = new Set((issue.closedByPullRequestsReferences ?? []).map((x) => x.number))
+  const closes = new RegExp(`\\b(close[sd]?|fix(e[sd])?|resolve[sd]?) #${issue.number}\\b`, 'i')
+  return commits.filter((c) => {
+    const pr = /\(#(\d+)\)\s*$/.exec(c.subject)
+    return (pr && prs.has(Number(pr[1]))) || closes.test(c.body ?? '')
+  })
+}
+
+// bugs: [{ number, title, fix: commit, blamed: [shas of the lines the fix removed or changed] }]
+export function linkBugs(bugs, runs, defects = []) {
+  const runOf = new Map(runs.flatMap((r) => r.commits.map((c) => [c.sha, r])))
+  const defectShas = new Set(defects.map((d) => d.sha))
+  return bugs.map((b) => {
+    const hit = b.blamed.map((sha) => runOf.get(sha)).filter((r) => r && r.end < b.fix.date && !r.commits.includes(b.fix))
+    const run = hit.sort((x, y) => y.end - x.end)[0] ?? null  // the latest run whose lines the fix had to change
+    return { number: b.number, title: b.title, sha: b.fix.sha, run: run?.id ?? null, dup: defectShas.has(b.fix.sha), files: b.files ?? [] }
+  })
+}
+
 export function reverts(runs, commits) {
   const owner = new Map(runs.flatMap((r) => r.commits.map((c) => [c.sha, r.id])))
   return commits.flatMap((c) => {
@@ -136,7 +177,7 @@ const median = (xs) => {
   return s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2
 }
 
-export function summarize({ runs, defects, reverted, prs = null, builds = null, autopilotRuns = null }) {
+export function summarize({ runs, defects, reverted, prs = null, builds = null, autopilotRuns = null, bugs = null }) {
   const metas = runs.map((r) => r.meta).filter(Boolean)
   const defectRuns = new Set(defects.map((d) => d.run))
   const agentShas = new Set(runs.flatMap((r) => r.commits.map((c) => c.sha)))
@@ -168,6 +209,10 @@ export function summarize({ runs, defects, reverted, prs = null, builds = null, 
     s.ciAgentFailRate = pct(agent.filter((b) => b.conclusion === 'failure').length, agent.length)
     s.ciAgentRuns = agent.length
   }
+  if (bugs) {
+    s.bugReports = bugs.length
+    s.bugReportsLinked = bugs.filter((b) => b.run).length
+  }
   if (autopilotRuns) {
     s.autopilotJobs = Object.entries(autopilotRuns.reduce((t, r) => ({ ...t, [r.conclusion || 'running']: (t[r.conclusion || 'running'] ?? 0) + 1 }), {}))
       .map(([k, v]) => `${k} ${v}`).join(', ')
@@ -176,7 +221,7 @@ export function summarize({ runs, defects, reverted, prs = null, builds = null, 
 }
 
 // Bad signals with stable ids, for /evolve (ADR-0027 D1). base/head = the run's diff (first commit's parent .. last commit)
-export function signals({ runs, defects, reverted, prs = null }) {
+export function signals({ runs, defects, reverted, prs = null, bugs = null }) {
   const span = (id) => {
     const r = runs.find((x) => x.id === id)
     return r ? { run: id, base: `${r.commits[0].sha}^`, head: r.commits.at(-1).sha } : { run: id }
@@ -184,6 +229,10 @@ export function signals({ runs, defects, reverted, prs = null }) {
   const out = []
   for (const d of defects) {
     out.push({ id: `defect:${d.sha.slice(0, 8)}`, kind: 'defect', ...span(d.run), fix: d.sha, subject: d.subject, files: d.files })
+  }
+  for (const b of bugs ?? []) {
+    if (!b.run || b.dup) continue  // a fix: commit is already a defect signal
+    out.push({ id: `bug:#${b.number}`, kind: 'bug', ...span(b.run), fix: b.sha, issue: b.number, title: b.title.slice(0, 120), files: b.files })
   }
   for (const r of reverted) out.push({ id: `revert:${r.sha.slice(0, 8)}`, kind: 'revert', ...span(r.run), revert: r.sha, subject: r.subject })
   for (const r of runs) {
@@ -214,7 +263,7 @@ export function weekly(runs, defects, builds) {
   return [...rows.values()].sort((a, b) => a.week.localeCompare(b.week))
 }
 
-export function render({ args, s, weeks, runs, defects, reverted }) {
+export function render({ args, s, weeks, runs, defects, reverted, bugs = null }) {
   const L = []
   const period = `${args.since} → ${args.until ?? new Date().toISOString().slice(0, 10)}`
   L.push(`# Agent Quality Metrics (${period})`, '')
@@ -239,6 +288,7 @@ export function render({ args, s, weeks, runs, defects, reverted }) {
     rows.push(['CI build failure rate (all pushes)', s.ciFailRate])
     rows.push(['CI build failure rate (agent head commits)', `${s.ciAgentFailRate} of ${s.ciAgentRuns}`])
   }
+  if (s.bugReports != null) rows.push(['Bug reports closed (label `bug`)', `${s.bugReports} (${s.bugReportsLinked} linked to the agent run that wrote the fixed lines)`])
   if (s.autopilotJobs) rows.push(['Headless autopilot jobs', s.autopilotJobs])
   for (const [k, v] of rows) L.push(`| ${k} | ${v} |`)
   L.push('', '## By week', '', '| Week (Mon) | Agent runs | Runs with escaped defect | CI builds | CI failures |', '|---|---|---|---|---|')
@@ -246,6 +296,11 @@ export function render({ args, s, weeks, runs, defects, reverted }) {
   L.push('', '## Escaped defects', '')
   if (!defects.length) L.push('- none')
   for (const d of defects) L.push(`- \`${d.run}\` → \`${d.sha.slice(0, 8)}\` ${d.subject.replace(/\|/g, '\\|')} (${d.files.join(', ')})`)
+  if (bugs) {
+    L.push('', '## Bug reports', '')
+    if (!bugs.length) L.push('- none')
+    for (const b of bugs) L.push(`- #${b.number} → \`${b.sha.slice(0, 8)}\` ${b.run ? `run \`${b.run}\`` : 'no run (fix only adds lines, or the lines are not agent-written)'}`)
+  }
   L.push('', '## Reverts', '')
   if (!reverted.length) L.push('- none')
   for (const r of reverted) L.push(`- \`${r.run}\` → \`${r.sha.slice(0, 8)}\` ${r.subject}`)
@@ -257,7 +312,7 @@ export function render({ args, s, weeks, runs, defects, reverted }) {
   }
   L.push('', '## Data gaps', '')
   L.push('- Runs before the `Autopilot-Run` trailer are found only through their report hashes or the headless PR title; local lite runs from that time are missed.')
-  L.push('- A follow-up fix done by a later autopilot run whose subject is not `fix:` is not counted.')
+  L.push('- A follow-up fix done by a later autopilot run whose subject is not `fix:` is not counted as an escaped defect; when it closes a `bug` issue it is counted under Bug reports.')
   L.push(`- Runs that ended less than ${args.window} days before the report date have not had their full fix window yet.`)
   L.push('- Headless runs have no cost in their run-metrics file; the workflow posts it on the PR.')
   return L.join('\n') + '\n'
@@ -276,6 +331,33 @@ function ghJson(argv) {
     console.error(`gh ${argv.slice(0, 2).join(' ')} failed, section skipped: ${e.message.split('\n')[0]}`)
     return null
   }
+}
+
+// Lines a fix removed or changed -> the commits that wrote them (blame on the fix's parent)
+function blameFix(root, c) {
+  const files = c.files.filter(isCodeFile)
+  if (!files.length) return []
+  let patch = ''
+  try { patch = sh('git', ['-C', root, 'diff', '-U0', '--no-color', '--no-renames', `${c.sha}^`, c.sha, '--', ...files]) } catch { return [] }
+  const shas = new Set()
+  for (const r of changedOldRanges(patch)) {
+    try {
+      const out = sh('git', ['-C', root, 'blame', '--porcelain', '-L', `${r.start},+${r.count}`, `${c.sha}^`, '--', r.file])
+      for (const m of out.matchAll(/^([0-9a-f]{40}) \d+ \d+/gm)) shas.add(m[1])
+    } catch { /* file or range missing on the parent */ }
+  }
+  return [...shas]
+}
+
+function loadBugs(root, commits, args) {
+  const issues = ghJson(['issue', 'list', '--label', 'bug', '--state', 'closed', '--limit', String(GH_LIMIT),
+    '--json', 'number,title,closedAt,closedByPullRequestsReferences'])
+  if (!issues) return null
+  return issues.filter((i) => i.closedAt && i.closedAt.slice(0, 10) >= args.since && (!args.until || i.closedAt.slice(0, 10) <= args.until))
+    .flatMap((i) => {
+      const fix = fixCommitsFor(i, commits).sort((a, b) => b.date - a.date)[0]
+      return fix ? [{ number: i.number, title: i.title ?? '', fix, blamed: blameFix(root, fix), files: fix.files.filter(isCodeFile) }] : []
+    })
 }
 
 function loadRunFiles(root) {
@@ -317,7 +399,7 @@ function main() {
   const runs = findRuns(commits, loadRunFiles(root), loadReports(root)).filter((r) => !untilEnd || r.end <= untilEnd)
   const defects = escapedDefects(runs, commits, args.window)
   const reverted = reverts(runs, commits)
-  let prs = null; let builds = null; let autopilotRuns = null
+  let prs = null; let builds = null; let autopilotRuns = null; let bugs = null
   if (args.gh) {
     const inPeriod = (d) => d.slice(0, 10) >= args.since && (!args.until || d.slice(0, 10) <= args.until)
     prs = ghJson(['pr', 'list', '--state', 'all', '--search', 'Autopilot in:title', '--limit', String(GH_LIMIT),
@@ -327,14 +409,16 @@ function main() {
       ?.filter((b) => inPeriod(b.createdAt)) ?? null
     autopilotRuns = ghJson(['run', 'list', '--workflow', AUTOPILOT_WORKFLOW, '--limit', String(GH_LIMIT), '--json', 'conclusion,createdAt'])
       ?.filter((b) => inPeriod(b.createdAt)) ?? null
+    const found = loadBugs(root, commits, args)
+    bugs = found && linkBugs(found, runs, defects)
   }
-  const s = summarize({ runs, defects, reverted, prs, builds, autopilotRuns })
+  const s = summarize({ runs, defects, reverted, prs, builds, autopilotRuns, bugs })
   if (args.json) {
-    process.stdout.write(`${JSON.stringify({ since: args.since, until: args.until ?? null, summary: s, signals: signals({ runs, defects, reverted, prs }) }, null, 2)}
+    process.stdout.write(`${JSON.stringify({ since: args.since, until: args.until ?? null, summary: s, signals: signals({ runs, defects, reverted, prs, bugs }) }, null, 2)}
 `)
     return
   }
-  const md = render({ args, s, weeks: weekly(runs, defects, builds), runs, defects, reverted })
+  const md = render({ args, s, weeks: weekly(runs, defects, builds), runs, defects, reverted, bugs })
   if (args.out) {
     const out = resolve(root, args.out)
     if (relative(root, out).startsWith('..') || isAbsolute(relative(root, out))) throw new Error('--out must stay inside the repo')

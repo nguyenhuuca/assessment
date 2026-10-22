@@ -2,7 +2,8 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
-  escapedDefects, findRuns, isCodeFile, isFix, parseArgs, parseGitLog, reportHashes, reverts, signals, summarize, weekKey,
+  changedOldRanges, escapedDefects, findRuns, fixCommitsFor, isCodeFile, isFix, linkBugs, parseArgs, parseGitLog, reportHashes, reverts,
+  signals, summarize, weekKey,
 } from '../agent-metrics.mjs'
 
 const rec = (sha, date, subject, body, files) => `\x1e${sha}\x1f${date}\x1f${subject}\x1f${body}\x1f\n${files.join('\n')}\n`
@@ -160,4 +161,51 @@ test('signals give stable ids and the run diff span', () => {
   assert.equal(sig[0].base, 'a1aaaaaaaa^')
   assert.equal(sig[0].head, 'a2aaaaaaaa')
   assert.equal(sig[0].run, 'run-a')
+})
+
+test('changedOldRanges keeps changed or removed old lines, skips pure additions', () => {
+  const patch = [
+    'diff --git a/a.jsx b/a.jsx', '--- a/a.jsx', '+++ b/a.jsx',
+    '@@ -10,2 +10,3 @@ x', '-old', '-old', '+new', '+new', '+new',
+    '@@ -20,0 +22,4 @@', '+added',
+    '@@ -30 +34 @@', '-one', '+one',
+    'diff --git a/n.css b/n.css', '--- /dev/null', '+++ b/n.css', '@@ -0,0 +1,2 @@', '+a',
+  ].join('\n')
+  assert.deepEqual(changedOldRanges(patch), [{ file: 'a.jsx', start: 10, count: 2 }, { file: 'a.jsx', start: 30, count: 1 }])
+})
+
+test('fixCommitsFor finds the squash commit of the closing PR or a Fixes line', () => {
+  const cs = [
+    commit('s1', '2026-10-21T10:00:00Z', 'Autopilot: Issue x (#53) (#54)', ['a.jsx']),
+    commit('s2', '2026-10-21T11:00:00Z', 'fix: y', ['b.jsx'], 'Fixes #53'),
+    commit('s3', '2026-10-21T12:00:00Z', 'feat: z (#540)', ['c.jsx'], 'fixes #530'),
+  ]
+  assert.deepEqual(fixCommitsFor({ number: 53, closedByPullRequestsReferences: [{ number: 54 }] }, cs).map((c) => c.sha), ['s1', 's2'])
+  assert.deepEqual(fixCommitsFor({ number: 7 }, cs), [])
+})
+
+test('linkBugs blames the latest run whose lines the fix changed; signals skip unlinked and fix: duplicates', () => {
+  const cs = [
+    commit('r1a', '2026-10-01T10:00:00Z', 'feat: a', ['webapp/src/A.jsx'], 'Autopilot-Run: run-1'),
+    commit('r2a', '2026-10-05T10:00:00Z', 'feat: b', ['webapp/src/A.jsx'], 'Autopilot-Run: run-2'),
+    commit('h1', '2026-10-06T10:00:00Z', 'feat: human', ['webapp/src/A.jsx']),
+    commit('fx', '2026-10-10T10:00:00Z', 'Autopilot: Issue bug (#9) (#10)', ['webapp/src/A.jsx'], 'Autopilot-Run: run-3'),
+    commit('fx2', '2026-10-11T10:00:00Z', 'fix: other', ['webapp/src/A.jsx']),
+  ]
+  const runs = findRuns(cs)
+  const bugs = linkBugs([
+    { number: 9, title: 'Nút khó nhìn', fix: cs[3], blamed: ['r1a', 'r2a', 'h1'], files: ['webapp/src/A.jsx'] },
+    { number: 11, title: 'human bug', fix: cs[3], blamed: ['h1'] },
+    { number: 12, title: 'already a defect', fix: cs[4], blamed: ['r2a'] },
+    { number: 13, title: 'adds only', fix: cs[3], blamed: [] },
+  ], runs, [{ sha: 'fx2', run: 'run-2' }])
+  assert.deepEqual(bugs.map((b) => [b.number, b.run, b.dup]), [[9, 'run-2', false], [11, null, false], [12, 'run-2', true], [13, null, false]])
+  const sig = signals({ runs, defects: [], reverted: [], bugs })
+  assert.deepEqual(sig.map((x) => x.id), ['bug:#9'])
+  assert.equal(sig[0].base, 'r2a^')
+  assert.equal(sig[0].head, 'r2a')
+  assert.equal(sig[0].issue, 9)
+  const s = summarize({ runs, defects: [], reverted: [], bugs })
+  assert.equal(s.bugReports, 4)
+  assert.equal(s.bugReportsLinked, 2)
 })

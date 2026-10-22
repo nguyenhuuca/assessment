@@ -39,7 +39,7 @@
 
 ```
 /evolve (run by the owner)
-  Observe   agent-metrics --json → new signals (escaped defect, revert, blocked, flaky, /revise, cost jump)
+  Observe   agent-metrics --json → new signals (escaped defect, user bug report, revert, blocked, flaky, /revise, cost jump)
   Diagnose  per signal: original run diff, fix commit, plan/report → Five Whys → the stage that should have caught it
   Propose   one small change at that stage, on branch evolve/<date>-<signal>
   Prove     deterministic eval (D3)
@@ -121,4 +121,5 @@ Adding rules alone makes every session pay for more context (`CLAUDE.md` + alway
 - 2026-10-21: Proposed; accepted by the owner the same day. The eval runner lives in `scripts/evolve.mjs` (subcommands `signals`, `check-paths`, `eval`, `gate`).
 - 2026-10-21: D6 (compress) added at the owner's request: Evolve may also remove duplicate, dead or stale text, with protected lines and a size + eval gate.
 - 2026-10-21: headless workflow `agent-evolve.yml` removed at the owner's request (D4); `/evolve` is local only. The `manifest` command went with it.
+- 2026-10-22: signal `bug:#<N>`: a closed `bug` issue (in-app report, ADR-0026) whose fix changed lines an agent run wrote (`git blame` on the fix's parent). Autopilot fixes are titled `Autopilot: …`, not `fix:`, so these were not counted before. A fix that only adds lines is not linked.
 - 2026-10-22: headless workflow back with staged proposals outside `.claude/` and an `apply` command ([ADR-0029](0029-headless-evolve-staging.md)).

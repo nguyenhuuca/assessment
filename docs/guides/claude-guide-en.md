@@ -453,7 +453,7 @@ Observe (signals) → Diagnose (Five Whys → the stage that should have caught 
   → Prove (eval gate) → Ship (you choose: merge, PR, keep or drop)
 ```
 
-- **Signals:** `defect:<sha>`, `revert:<sha>`, `blocked:<run>`, `flaky:<run>`, `review-skipped:<run>`, `revise:pr-<N>`. A signal that already has an `evolve` PR or issue (even one you closed) or a seeded case is never proposed again. At most 3 per run.
+- **Signals:** `defect:<sha>`, `bug:#<N>` (an in-app bug report whose fix changed lines an agent run wrote, found with `git blame`), `revert:<sha>`, `blocked:<run>`, `flaky:<run>`, `review-skipped:<run>`, `revise:pr-<N>`. A signal that already has an `evolve` PR or issue (even one you closed) or a seeded case is never proposed again. At most 3 per run.
 - **Seeded-bug evals** (`evals/seeded/<id>/case.json`): each real escaped defect becomes a regression test **for the agent**: the reviewer is run on the original buggy diff and graded deterministically (a blocking finding on the expected file matching the expected wording).
 - **Eval gate** (`scripts/evolve.mjs gate`), all four must hold:
   1. today's rules on `main` **miss** the case (at least 2 of 3 runs);
