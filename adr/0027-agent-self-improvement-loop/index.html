@@ -7194,7 +7194,7 @@
 <p><strong>Option B.</strong></p>
 <h3 id="d1-the-loop">D1. The loop<a class="headerlink" href="#d1-the-loop" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/evolve (run by the owner)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  Observe   agent-metrics --json → new signals (escaped defect, revert, blocked, flaky, /revise, cost jump)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  Observe   agent-metrics --json → new signals (escaped defect, user bug report, revert, blocked, flaky, /revise, cost jump)
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  Diagnose  per signal: original run diff, fix commit, plan/report → Five Whys → the stage that should have caught it
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  Propose   one small change at that stage, on branch evolve/&lt;date&gt;-&lt;signal&gt;
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  Prove     deterministic eval (D3)
@@ -7275,6 +7275,7 @@
 <li>2026-10-21: Proposed; accepted by the owner the same day. The eval runner lives in <code>scripts/evolve.mjs</code> (subcommands <code>signals</code>, <code>check-paths</code>, <code>eval</code>, <code>gate</code>).</li>
 <li>2026-10-21: D6 (compress) added at the owner's request: Evolve may also remove duplicate, dead or stale text, with protected lines and a size + eval gate.</li>
 <li>2026-10-21: headless workflow <code>agent-evolve.yml</code> removed at the owner's request (D4); <code>/evolve</code> is local only. The <code>manifest</code> command went with it.</li>
+<li>2026-10-22: signal <code>bug:#&lt;N&gt;</code>: a closed <code>bug</code> issue (in-app report, ADR-0026) whose fix changed lines an agent run wrote (<code>git blame</code> on the fix's parent). Autopilot fixes are titled <code>Autopilot: …</code>, not <code>fix:</code>, so these were not counted before. A fix that only adds lines is not linked.</li>
 <li>2026-10-22: headless workflow back with staged proposals outside <code>.claude/</code> and an <code>apply</code> command (<a href="../0029-headless-evolve-staging/">ADR-0029</a>).</li>
 </ul>
 

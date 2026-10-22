@@ -9428,7 +9428,7 @@
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>  → Prove (eval gate) → Ship (bạn chọn: merge, mở PR, giữ branch hoặc bỏ)
 </code></pre></div>
 <ul>
-<li><strong>Signals:</strong> <code>defect:&lt;sha&gt;</code>, <code>revert:&lt;sha&gt;</code>, <code>blocked:&lt;run&gt;</code>, <code>flaky:&lt;run&gt;</code>, <code>review-skipped:&lt;run&gt;</code>, <code>revise:pr-&lt;N&gt;</code>. Signal nào đã có PR hoặc issue <code>evolve</code> (kể cả cái bạn đã đóng) hoặc đã có seeded case thì không đề xuất lại. Tối đa 3 signal mỗi run.</li>
+<li><strong>Signals:</strong> <code>defect:&lt;sha&gt;</code>, <code>bug:#&lt;N&gt;</code> (bug report từ app mà bản sửa phải đổi các dòng do một run của agent viết, tìm bằng <code>git blame</code>), <code>revert:&lt;sha&gt;</code>, <code>blocked:&lt;run&gt;</code>, <code>flaky:&lt;run&gt;</code>, <code>review-skipped:&lt;run&gt;</code>, <code>revise:pr-&lt;N&gt;</code>. Signal nào đã có PR hoặc issue <code>evolve</code> (kể cả cái bạn đã đóng) hoặc đã có seeded case thì không đề xuất lại. Tối đa 3 signal mỗi run.</li>
 <li><strong>Seeded-bug evals</strong> (<code>evals/seeded/&lt;id&gt;/case.json</code>): mỗi bug lọt thật thành một regression test <strong>cho agent</strong>: chạy reviewer trên đúng diff có bug và chấm cố định (có finding blocking ở đúng file, đúng cách mô tả bug).</li>
 <li><strong>Eval gate</strong> (<code>scripts/evolve.mjs gate</code>), phải đủ cả 4:</li>
 <li>rule hiện tại trên <code>main</code> <strong>bỏ sót</strong> case (ít nhất 2/3 lần);</li>
