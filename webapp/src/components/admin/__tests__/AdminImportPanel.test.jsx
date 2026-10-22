@@ -56,6 +56,19 @@ describe('ImportForm', () => {
     expect(adminApi.createImports).not.toHaveBeenCalled()
   })
 
+  it('keeps the schedule input mounted but idle in NOW mode (no layout shift)', () => {
+    renderPanel()
+    const input = screen.getByLabelText(/Thời gian hẹn giờ/)
+    expect(input).toBeDisabled()
+    expect(input).toHaveClass('import-schedule-idle')
+    fireEvent.click(screen.getByLabelText('Hẹn giờ'))
+    expect(input).toBeEnabled()
+    expect(input).not.toHaveClass('import-schedule-idle')
+    fireEvent.click(screen.getByLabelText('Tải ngay'))
+    expect(input).toBeDisabled()
+    expect(input).toHaveClass('import-schedule-idle')
+  })
+
   it('blocks a schedule in the past', () => {
     renderPanel()
     type('https://youtu.be/a')

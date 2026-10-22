@@ -453,5 +453,5 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Import schedule input layout shift (#53, autopilot lite)
 
-- [ ] **FIX-1** Always render the schedule input in `ImportForm` (disabled + `import-schedule-idle` in NOW mode) and add `.import-schedule` CSS
-- [ ] **FIX-2** Test: input present+disabled in NOW, enabled after switching to LATER, disabled again on switch back
+- [x] **FIX-1** Always render the schedule input in `ImportForm` (disabled + `import-schedule-idle` in NOW mode) and add `.import-schedule` CSS
+- [x] **FIX-2** Test: input present+disabled in NOW, enabled after switching to LATER, disabled again on switch back
