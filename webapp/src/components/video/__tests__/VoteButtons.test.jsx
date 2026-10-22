@@ -157,6 +157,15 @@ describe('VoteButtons', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Không lưu được, thử lại sau')
   })
 
+  it('shows icons only, keeping the like count and accessible names', async () => {
+    renderButtons({ id: 'v1' })
+    await screen.findByText('5')
+    expect(screen.getByRole('button', { name: 'Thích 5' })).toBe(likeBtn())
+    expect(screen.getByRole('button', { name: 'Không thích' })).toBe(dislikeBtn())
+    expect(dislikeBtn().querySelector('.label')).toBeNull()
+    expect(screen.queryByText('Không thích')).toBeNull()
+  })
+
   it('resets when the video changes', async () => {
     reactionsApi.get.mockImplementation(async (id) => (id === 'v1' ? summary(5, 2, 'LIKE') : summary(10, 3, null)))
     const { rerenderVideo } = renderButtons({ id: 'v1' })

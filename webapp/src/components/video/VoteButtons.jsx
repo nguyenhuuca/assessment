@@ -41,8 +41,9 @@ export default function VoteButtons({ video }) {
         onClick={() => toggle('LIKE')}
         disabled={isPending}
         title={t('like')}
+        aria-label={`${t('like')} ${compactNumber(likeCount)}`}
       >
-        <span className="icon material-symbols-outlined">favorite</span>
+        <span className="icon material-symbols-outlined" aria-hidden="true">favorite</span>
         <span className="label">{compactNumber(likeCount)}</span>
       </button>
 
@@ -51,9 +52,9 @@ export default function VoteButtons({ video }) {
         onClick={() => toggle('DISLIKE')}
         disabled={isPending}
         title={t('dislike')}
+        aria-label={t('dislike')}
       >
-        <span className="icon material-symbols-outlined">thumb_down</span>
-        <span className="label">{t('dislike')}</span>
+        <span className="icon material-symbols-outlined" aria-hidden="true">thumb_down</span>
       </button>
 
       {hint && <span className="vote-hint" role="status">{hint}</span>}

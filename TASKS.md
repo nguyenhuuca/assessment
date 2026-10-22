@@ -455,3 +455,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **FIX-1** Always render the schedule input in `ImportForm` (disabled + `import-schedule-idle` in NOW mode) and add `.import-schedule` CSS
 - [x] **FIX-2** Test: input present+disabled in NOW, enabled after switching to LATER, disabled again on switch back
+
+## Video action bar icon-only (autopilot lite)
+
+- [x] **IC-1** `VideoSwiper` action bar: drop word labels (Comment, Save, Share, Delete), keep `title` tooltip, add `aria-label` + `aria-hidden` icons (nav arrows too)
+- [x] **IC-2** `VoteButtons`: drop the Dislike label, keep the Like count; `aria-label` (Like includes the count)
+- [x] **IC-3** Tests: `VideoSwiper.actions.test.jsx`, VoteButtons icon-only case (both failed before the change)

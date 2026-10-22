@@ -160,21 +160,20 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, resume = nu
         <VoteButtons video={video} />
 
         {/* Comments */}
-        <button className="action-btn" onClick={() => onShowComments?.(video)} title={t('comment')}>
-          <span className="icon material-symbols-outlined">comment</span>
-          <span className="label">{t('comment')}</span>
+        <button className="action-btn" onClick={() => onShowComments?.(video)} title={t('comment')} aria-label={t('comment')}>
+          <span className="icon material-symbols-outlined" aria-hidden="true">comment</span>
         </button>
 
         {/* Save to collection */}
-        <button className="action-btn" onClick={() => setSaveVideo(video)} title={t('save')}>
-          <span className="icon material-symbols-outlined">bookmark_add</span>
-          <span className="label">{t('save')}</span>
+        <button className="action-btn" onClick={() => setSaveVideo(video)} title={t('save')} aria-label={t('save')}>
+          <span className="icon material-symbols-outlined" aria-hidden="true">bookmark_add</span>
         </button>
 
         {/* Share — generates ?v={id} deep-link URL */}
         <button
           className="action-btn"
           title={t('share')}
+          aria-label={t('share')}
           onClick={() => {
             const shareUrl = `${window.location.origin}${window.location.pathname}?v=${video?.id}`
             if (navigator.share) {
@@ -184,8 +183,7 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, resume = nu
             }
           }}
         >
-          <span className="icon material-symbols-outlined">share</span>
-          <span className="label">{t('share')}</span>
+          <span className="icon material-symbols-outlined" aria-hidden="true">share</span>
         </button>
 
         {/* Delete — only for private videos owned by current user */}
@@ -195,19 +193,19 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, resume = nu
             style={{ color: '#ff6b6b' }}
             onClick={() => onDeleteVideo?.(video)}
             title={t('delete')}
+            aria-label={t('delete')}
           >
-            <span className="icon material-symbols-outlined">delete</span>
-            <span className="label">{t('delete')}</span>
+            <span className="icon material-symbols-outlined" aria-hidden="true">delete</span>
           </button>
         )}
 
         {/* Navigate up / down — grouped together */}
         <div className="nav-arrows">
-          <button className="action-btn" onClick={prev} disabled={index === 0} title={t('previous')}>
-            <span className="icon material-symbols-outlined">keyboard_arrow_up</span>
+          <button className="action-btn" onClick={prev} disabled={index === 0} title={t('previous')} aria-label={t('previous')}>
+            <span className="icon material-symbols-outlined" aria-hidden="true">keyboard_arrow_up</span>
           </button>
-          <button className="action-btn" onClick={next} disabled={index === total - 1} title={t('next')}>
-            <span className="icon material-symbols-outlined">keyboard_arrow_down</span>
+          <button className="action-btn" onClick={next} disabled={index === total - 1} title={t('next')} aria-label={t('next')}>
+            <span className="icon material-symbols-outlined" aria-hidden="true">keyboard_arrow_down</span>
           </button>
         </div>
 
