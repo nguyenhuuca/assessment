@@ -11,6 +11,8 @@ import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import com.canhlabs.funnyapp.utils.LimitedInputStream;
+import com.canhlabs.funnyapp.utils.Contract;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.FileList;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
@@ -34,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.StructuredTaskScope;
+import java.util.regex.Pattern;
 
 
 @Slf4j
@@ -41,6 +44,7 @@ import java.util.concurrent.StructuredTaskScope;
 public class VideoStorageServiceImpl implements VideoStorageService {
 
     public static final String EXTENSION = ".full";
+    private static final Pattern SAFE_ID = Pattern.compile("[A-Za-z0-9_-]+");
     private StatsCache statsCache;
     private VideoAccessService videoAccessService;
     private DriveVideoDownloader driveVideoDownloader;
@@ -160,13 +164,43 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     @WithSpan
     @Override
     public void deleteIfEligible(String fileId) {
-        // AppConstant.CACHE_DIR, file.getId().concat(EXTENSION)
-        Path filePath = Paths.get(AppConstant.CACHE_DIR, fileId.concat(EXTENSION));
+        requireSafeId(fileId);
+        Path cacheDir = Paths.get(AppConstant.CACHE_DIR).toAbsolutePath().normalize();
+        Path filePath = cacheDir.resolve(fileId.concat(EXTENSION)).normalize();
+        Contract.require(filePath.startsWith(cacheDir), "File is outside the cache directory");
+        if (!driveFileLocks.tryClaim(fileId)) {
+            throw new IllegalStateException("File " + fileId + " is being synced, try again later");
+        }
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
             log.error("Failed to delete file {}: {}", filePath, e.getMessage(), e);
+            throw new IllegalStateException("Could not delete local file " + fileId, e);
+        } finally {
+            driveFileLocks.release(fileId);
         }
+    }
+
+    @WithSpan
+    @Override
+    public void deleteDriveFile(String fileId) {
+        requireSafeId(fileId);
+        try {
+            drive.files().delete(fileId).execute();
+        } catch (GoogleJsonResponseException e) {
+            if (e.getStatusCode() == 404) {
+                log.info("Drive file {} is already gone", fileId);
+                return;
+            }
+            throw new IllegalStateException("Could not delete Drive file " + fileId
+                    + " (HTTP " + e.getStatusCode() + ")", e);
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not delete Drive file " + fileId, e);
+        }
+    }
+
+    private static void requireSafeId(String fileId) {
+        Contract.require(fileId != null && SAFE_ID.matcher(fileId).matches(), "Invalid file id");
     }
 
     @WithSpan

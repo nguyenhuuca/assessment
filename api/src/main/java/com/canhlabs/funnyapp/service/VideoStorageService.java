@@ -28,6 +28,13 @@ public interface VideoStorageService {
     void deleteIfEligible(String fileId);
 
     /**
+     * Permanently deletes the file from Google Drive. A file that is already gone (404) is not an error.
+     *
+     * @throws IllegalStateException when Drive refuses or fails (e.g. 403: the service account does not own the file)
+     */
+    void deleteDriveFile(String fileId);
+
+    /**
      * Inserts the Drive video row, or refreshes title and thumbnail of the existing one (force sync).
      * A ChatGPT description is generated only when the row has none.
      */

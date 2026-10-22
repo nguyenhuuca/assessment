@@ -52,7 +52,7 @@ export function useUpdateVideoVisibility() {
 export function useDeleteVideo() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id) => adminApi.deleteVideo(id),
+    mutationFn: ({ id, ...opts }) => adminApi.deleteVideo(id, opts),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'videos'] }),
   })
 }

@@ -12,6 +12,35 @@ const STATUS_COLORS = {
 
 const STATUSES = ['PUBLISHED', 'PENDING', 'FLAGGED']
 
+// Checkboxes inside the delete dialog. The confirm promise only resolves to a boolean,
+// so the checked state is written into the caller's `opts` object.
+function DeleteFileOptions({ opts }) {
+  const { t } = useTranslation('admin')
+  const [local, setLocal] = useState(false)
+  const [drive, setDrive] = useState(false)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <input
+          type="checkbox"
+          checked={local}
+          onChange={e => { opts.deleteLocalFile = e.target.checked; setLocal(e.target.checked) }}
+        />
+        {t('deleteLocalFile')}
+      </label>
+      <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <input
+          type="checkbox"
+          checked={drive}
+          onChange={e => { opts.deleteDriveFile = e.target.checked; setDrive(e.target.checked) }}
+        />
+        {t('deleteDriveFile')}
+      </label>
+      <span className="admin-cell-muted">{t('deleteDriveFileHint')}</span>
+    </div>
+  )
+}
+
 // Small inline indicator so admins can see whether a field edit actually saved.
 // Reserves a fixed-size slot at all times so the icon appearing/disappearing
 // doesn't resize the surrounding cell/table.
@@ -198,7 +227,15 @@ export default function AdminVideoTable({ statusFilter }) {
                       className="admin-action-btn danger"
                       aria-busy={isBusyFor(deleteVideo, v.id)}
                       onClick={async () => {
-                        if (await confirm({ title: t('deleteVideoTitle'), message: t('deleteVideoMessage', { title: v.title }), confirmLabel: t('delete'), danger: true })) deleteVideo.mutate(v.id)
+                        const opts = { deleteLocalFile: false, deleteDriveFile: false }
+                        const ok = await confirm({
+                          title: t('deleteVideoTitle'),
+                          message: t('deleteVideoMessage', { title: v.title }),
+                          confirmLabel: t('delete'),
+                          danger: true,
+                          children: <DeleteFileOptions opts={opts} />,
+                        })
+                        if (ok) deleteVideo.mutate({ id: v.id, ...opts })
                       }}
                       title={t('delete')}
                     >
