@@ -7172,8 +7172,8 @@
 <li><strong>Request:</strong> <code>/autopilot docs/plans/plan-contributor-autopilot-permissions.md</code> (plan mode, CA-1..CA-6)</li>
 <li><strong>Mode:</strong> local</li>
 <li><strong>Plan:</strong> <a href="../../plans/plan-contributor-autopilot-permissions/">plan-contributor-autopilot-permissions</a></li>
-<li><strong>Started:</strong> 2026-10-23 21:14 · <strong>Landed:</strong> pending (Gate 2)</li>
-<li><strong>Result:</strong> pending Gate 2 (push)</li>
+<li><strong>Started:</strong> 2026-10-23 21:14 · <strong>Landed:</strong> 2026-10-23 21:44</li>
+<li><strong>Result:</strong> ✅ pushed <code>a6a2f086</code></li>
 </ul>
 <h2 id="pipeline">Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h2>
 <table>
@@ -7232,12 +7232,12 @@
 </tr>
 <tr>
 <td>Gate 2 (owner)</td>
-<td>pending</td>
+<td>push (<code>a89ee852..a6a2f086</code>)</td>
 <td>—</td>
 </tr>
 <tr>
 <td>CI + smoke</td>
-<td>pending: runs after the push</td>
+<td>CI green (Funny App Build and Deploy, Deploy Frontend, Publish Docs). <code>mock-test.sh</code> 22/22 on the 3rd and 4th runs; runs 1–2 right after the restart had 1 transient <code>ECONNRESET</code> each (<code>/admin/comments</code>), not an assertion failure</td>
 <td>—</td>
 </tr>
 </tbody>
