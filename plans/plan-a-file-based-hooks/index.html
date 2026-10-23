@@ -8111,29 +8111,29 @@
 <ol>
 <li>
 <p><strong>Install Claude Code CLI:</strong>
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@anthropic/claude-code
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@anthropic/claude-code
 </code></pre></div></p>
 </li>
 <li>
 <p><strong>Create directories:</strong>
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>~/.claude/tasks/<span class="o">{</span>pending,processing,completed<span class="o">}</span>
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>~/.claude/tasks/<span class="o">{</span>pending,processing,completed<span class="o">}</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>~/.claude/hooks
 </code></pre></div></p>
 </li>
 <li>
 <p><strong>Install hook script:</strong>
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>cp<span class="w"> </span>hooks/on-startup.sh<span class="w"> </span>~/.claude/hooks/
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>cp<span class="w"> </span>hooks/on-startup.sh<span class="w"> </span>~/.claude/hooks/
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>chmod<span class="w"> </span>+x<span class="w"> </span>~/.claude/hooks/on-startup.sh
 </code></pre></div></p>
 </li>
 <li>
 <p><strong>Start watcher:</strong>
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>~/.claude/hooks/on-startup.sh<span class="w"> </span><span class="p">&amp;</span>
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>~/.claude/hooks/on-startup.sh<span class="w"> </span><span class="p">&amp;</span>
 </code></pre></div></p>
 </li>
 <li>
 <p><strong>Configure Spring Boot:</strong>
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># In api/.env</span>
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># In api/.env</span>
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nv">CLAUDE_TASKS_DIR</span><span class="o">=</span><span class="nv">$HOME</span>/.claude/tasks
 </code></pre></div></p>
 </li>
@@ -8142,13 +8142,13 @@
 <ol>
 <li>
 <p><strong>Install dependencies:</strong>
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>inotify-tools<span class="w"> </span>jq
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>inotify-tools<span class="w"> </span>jq
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@anthropic/claude-code
 </code></pre></div></p>
 </li>
 <li>
 <p><strong>Setup systemd service:</strong>
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>claude-task-watcher.service<span class="w"> </span>/etc/systemd/system/
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>claude-task-watcher.service<span class="w"> </span>/etc/systemd/system/
 <a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload
 <a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>claude-task-watcher
 <a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>claude-task-watcher
@@ -8156,7 +8156,7 @@
 </li>
 <li>
 <p><strong>Configure Trello webhook:</strong>
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"https://api.trello.com/1/webhooks/"</span><span class="w"> </span><span class="se">\</span>
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"https://api.trello.com/1/webhooks/"</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{</span>
 <a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="s1">    "key": "YOUR_TRELLO_API_KEY",</span>
@@ -8308,30 +8308,32 @@
 <ol>
 <li>
 <p><strong>File permissions:</strong>
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span>~/.claude/tasks/
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span>~/.claude/tasks/
 <a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>~/.claude/tasks/*/*.json
 </code></pre></div></p>
 </li>
 <li>
 <p><strong>Input validation:</strong></p>
-</li>
+<ul>
 <li>Sanitize task descriptions (prevent code injection)</li>
 <li>Validate JSON schema before processing</li>
-<li>
-<p>Limit file size (max 100KB per task)</p>
+<li>Limit file size (max 100KB per task)</li>
+</ul>
 </li>
 <li>
 <p><strong>Rate limiting:</strong></p>
-</li>
+<ul>
 <li>Max 10 tasks per minute</li>
-<li>
-<p>Max 100 tasks per hour</p>
+<li>Max 100 tasks per hour</li>
+</ul>
 </li>
 <li>
 <p><strong>Isolation:</strong></p>
-</li>
+<ul>
 <li>Run watcher as dedicated user</li>
 <li>Use Docker container for Claude Code execution</li>
+</ul>
+</li>
 </ol>
 <h2 id="scalability">Scalability<a class="headerlink" href="#scalability" title="Permanent link">&para;</a></h2>
 <h3 id="single-server">Single Server<a class="headerlink" href="#single-server" title="Permanent link">&para;</a></h3>
@@ -8345,10 +8347,12 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>Trello → Spring Boot → Redis Queue → Multiple Workers → Claude Code
 </code></pre></div></p>
 <h2 id="cost-estimation">Cost Estimation<a class="headerlink" href="#cost-estimation" title="Permanent link">&para;</a></h2>
-<p><strong>Assumptions:</strong>
-- 10 tasks/day
-- Average 2000 tokens input + 4000 tokens output per task
-- Claude Sonnet 4.5 pricing</p>
+<p><strong>Assumptions:</strong></p>
+<ul>
+<li>10 tasks/day</li>
+<li>Average 2000 tokens input + 4000 tokens output per task</li>
+<li>Claude Sonnet 4.5 pricing</li>
+</ul>
 <p><strong>Monthly cost:</strong> ~$5-10</p>
 <h2 id="alternative-polling-instead-of-file-watching">Alternative: Polling Instead of File Watching<a class="headerlink" href="#alternative-polling-instead-of-file-watching" title="Permanent link">&para;</a></h2>
 <p>If file watching is complex, use polling from Spring Boot:</p>
@@ -8363,15 +8367,19 @@
 <a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<p><strong>Best for:</strong>
-- ✅ Production systems with high reliability needs
-- ✅ Multiple task sources (Trello, Jira, Slack, etc.)
-- ✅ Audit trail and status tracking required
-- ✅ Decoupled architecture</p>
-<p><strong>Not ideal for:</strong>
-- ❌ Simple use cases (overkill)
-- ❌ Instant response needed (&lt;1 second)
-- ❌ Serverless environments</p>
+<p><strong>Best for:</strong></p>
+<ul>
+<li>✅ Production systems with high reliability needs</li>
+<li>✅ Multiple task sources (Trello, Jira, Slack, etc.)</li>
+<li>✅ Audit trail and status tracking required</li>
+<li>✅ Decoupled architecture</li>
+</ul>
+<p><strong>Not ideal for:</strong></p>
+<ul>
+<li>❌ Simple use cases (overkill)</li>
+<li>❌ Instant response needed (&lt;1 second)</li>
+<li>❌ Serverless environments</li>
+</ul>
 
 
 

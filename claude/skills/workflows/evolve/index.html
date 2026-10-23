@@ -7306,10 +7306,12 @@
 <ul>
 <li>One branch per signal from <code>main</code>: <code>git switch -c evolve/&lt;signal id with : replaced by -&gt;</code>.</li>
 <li><strong>One</strong> rule, <strong>added</strong> (ADR-0027 D2: rule files may only gain lines). Make it general (a class of bug), keep the concrete example as one sentence, and end the line with <code>&lt;!-- evolve:&lt;case id&gt; --&gt;</code>.</li>
-<li>Add the seeded case <code>evals/seeded/&lt;YYYY-MM-DD&gt;-&lt;slug&gt;/case.json</code> (date = the run that introduced the defect), same shape as <code>evals/seeded/2026-10-19-swallowed-job-exceptions/case.json</code>:</li>
+<li>Add the seeded case <code>evals/seeded/&lt;YYYY-MM-DD&gt;-&lt;slug&gt;/case.json</code> (date = the run that introduced the defect), same shape as <code>evals/seeded/2026-10-19-swallowed-job-exceptions/case.json</code>:<ul>
 <li><code>base</code> / <code>head</code>: the smallest commit range that contains the defect (often one commit of the run).</li>
 <li><code>expect.files</code>: where a reviewer should put the blocking finding (path suffixes).</li>
 <li><code>expect.patterns</code>: 3–6 case-insensitive regexes for wordings of <strong>this</strong> defect. Not so broad that any finding matches (the gate checks that <code>main</code> misses it), not so narrow that a correct finding fails.</li>
+</ul>
+</li>
 <li>Only a seeded case for <strong>code review</strong> can be eval-proven. For other stages, still add the rule, say "not eval-proven" in the summary, and skip <code>gate</code>.</li>
 <li>Allowed paths and forbidden changes: ADR-0027 D2. Never edit <code>scripts/</code>, <code>.github/</code>, <code>.claude/hooks/</code>, settings, existing cases, thresholds or app code.</li>
 <li>Commit on the branch: <code>evolve: &lt;one line&gt;</code> with the signal id and the case id in the body. <strong>Do not push.</strong></li>
@@ -7330,25 +7332,31 @@
 <li>What to cut: duplicated text (keep one home, point to it), dead references (paths or commands that no longer exist), text that contradicts its source of truth (for example a model table that disagrees with agent frontmatter), and claims that are stale (numbers the repo now measures differently). The lint list is a hint, not the limit; <code>CLAUDE.md</code> and the always-loaded rules matter most, because every session pays for them.</li>
 <li>Allowed: edit existing files in the D2 paths <strong>plus <code>CLAUDE.md</code></strong>, removals included. Never: <code>AGENTS.md</code>, <code>.claude/rules/security.md</code>, this skill, <code>verdict.md</code>, frontmatter, new files, and <strong>any line that carries a safety rule</strong> (push, gates, merge, deny, secrets, tokens, prod, smoke, security, Core Principles, "never …"). <code>check-paths --kind compress</code> rejects those.</li>
 <li>One branch <code>evolve/compress-&lt;YYYY-MM&gt;</code>, one commit. The summary lists every cut with its reason (duplicate of X, dead ref, contradicts Y).</li>
-<li>Gate (<code>gate --kind compress</code>, no <code>--case</code>):</li>
+<li>Gate (<code>gate --kind compress</code>, no <code>--case</code>):<ul>
 <li>C1: touched files shrink, and either the always-loaded context drops at least 5% or the touched files lose at least 1 KiB;</li>
 <li>C2: no new duplicate lines or dead references;</li>
 <li>C3: every seeded case is still caught with the compressed rules.</li>
+</ul>
+</li>
 <li>Not proven by the gate: that nothing <strong>outside</strong> the eval set got worse. Show the owner every removed line before asking.</li>
 </ul>
 <h2 id="headless-mode-adr-0029">Headless Mode (ADR-0029)<a class="headerlink" href="#headless-mode-adr-0029" title="Permanent link">&para;</a></h2>
 <p>Used when the input is <code>--headless --signals &lt;file&gt;</code>. The signals are already picked; skip <strong>Observe</strong> and read them from that file. Diagnose as above. Then, instead of Propose / Prove / Ship:</p>
 <ul>
 <li><strong>No git and no <code>.claude/</code> edits.</strong> Headless Claude Code asks permission for every <code>.claude/</code> edit and CI cannot answer. Read with the <code>Read</code>, <code>Grep</code> and <code>Glob</code> tools and read-only <code>git diff/show/log</code>; write only under <code>evolve-out/</code> (the workflow allows nothing else).</li>
-<li><strong>Stage the full new content</strong> of each file you would change at <code>evolve-out/&lt;slug&gt;/tree/&lt;path&gt;.staged</code>, where <code>&lt;slug&gt;</code> is the signal id with <code>:</code> replaced by <code>-</code>, and a leading <code>.claude/</code> becomes <code>dot-claude/</code>:</li>
+<li><strong>Stage the full new content</strong> of each file you would change at <code>evolve-out/&lt;slug&gt;/tree/&lt;path&gt;.staged</code>, where <code>&lt;slug&gt;</code> is the signal id with <code>:</code> replaced by <code>-</code>, and a leading <code>.claude/</code> becomes <code>dot-claude/</code>:<ul>
 <li><code>.claude/agents/worker-reviewer.md</code> → <code>evolve-out/&lt;slug&gt;/tree/dot-claude/agents/worker-reviewer.md.staged</code></li>
 <li><code>evals/seeded/&lt;case id&gt;/case.json</code> → <code>evolve-out/&lt;slug&gt;/tree/evals/seeded/&lt;case id&gt;/case.json.staged</code></li>
 <li><code>CLAUDE.md</code> (compress only) → <code>evolve-out/&lt;slug&gt;/tree/CLAUDE.md.staged</code></li>
+</ul>
+</li>
 <li>Copy the current file first, then make the same change you would make locally (the Propose rules and ADR-0027 D2 still apply). A file cannot be deleted.</li>
 <li>Write the PR text (what Ship would show the owner) to <code>evolve-out/&lt;slug&gt;.md</code>.</li>
-<li>Write <code>evolve-out/manifest.json</code>: a JSON array with <strong>one row for every signal</strong> in the file:</li>
+<li>Write <code>evolve-out/manifest.json</code>: a JSON array with <strong>one row for every signal</strong> in the file:<ul>
 <li>proposal: <code>{"signal", "slug", "case", "kind", "body": "evolve-out/&lt;slug&gt;.md", "message": "evolve: &lt;one line&gt;"}</code>, where <code>kind</code> is <code>rule</code>, <code>case-only</code>, <code>not-eval-proven</code> or <code>compress</code> (<code>case</code> is <code>-</code> for compress);</li>
 <li>no proposal: <code>{"signal", "kind": "none", "body": "evolve-out/&lt;slug&gt;.md"}</code> with the reason in that file. Only this row closes the signal; a signal you leave out is retried next week.</li>
+</ul>
+</li>
 <li>Do not run <code>check-paths</code> or <code>gate</code>; the ship job builds the branch from your staged files and runs both (<code>scripts/evolve.mjs apply</code>). End your turn when the manifest is written.</li>
 </ul>
 <h2 id="pruning-adr-0027-d5">Pruning (ADR-0027 D5)<a class="headerlink" href="#pruning-adr-0027-d5" title="Permanent link">&para;</a></h2>

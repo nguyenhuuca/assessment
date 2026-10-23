@@ -7209,21 +7209,27 @@
 <p>Run every step, in order, for every upgrade. Urgency (CVE) changes queue position, never skips a step.</p>
 <ol>
 <li><strong>Read the changelog / breaking notes for the target version before touching a manifest.</strong> This is a gate, not a courtesy.</li>
-<li><strong>Verify the target version or tag exists upstream. Never trust a version string</strong> typed from memory, a doc, or a bot's PR title.</li>
+<li><strong>Verify the target version or tag exists upstream. Never trust a version string</strong> typed from memory, a doc, or a bot's PR title.<ul>
 <li>Git refs (GitHub Actions, git dependencies): <code>git ls-remote --tags &lt;repo-url&gt;</code> and confirm the exact tag string.</li>
 <li>Registry packages: check the registry directly (<code>npm view &lt;pkg&gt; versions</code>, <code>pip index versions &lt;pkg&gt;</code>, etc.).</li>
 <li>For GitHub Actions, prefer resolving the verified tag to its full 40-char commit SHA and pinning that, with
-     the version as a trailing comment (<code>uses: owner/action@&lt;sha&gt;  # vX.Y.Z</code>) — tags are mutable and can be
-     retargeted upstream; a SHA cannot. Tag verification still applies to what the SHA was resolved from.</li>
+      the version as a trailing comment (<code>uses: owner/action@&lt;sha&gt;  # vX.Y.Z</code>) — tags are mutable and can be
+      retargeted upstream; a SHA cannot. Tag verification still applies to what the SHA was resolved from.</li>
 <li><strong>Lesson from this repo</strong>: a CI workflow once pinned <code>aquasecurity/trivy-action@0.28.0</code> — the real tag was <code>v0.28.0</code>. Offline/text review graded the missing <code>v</code> a style nit ("should SHA-pin"); only a live run failing with "unable to resolve action" caught that the ref didn't exist at all. Text review can't catch this — network verification can.</li>
-<li><strong>For composite/meta packages, inspect their own internal pins.</strong> A pin at the top level is not a pin all the way down.</li>
+</ul>
+</li>
+<li><strong>For composite/meta packages, inspect their own internal pins.</strong> A pin at the top level is not a pin all the way down.<ul>
 <li>Read the action's <code>action.yml</code> (or the package's manifest) for dependencies it resolves at run/install time; prefer releases that SHA-pin their own internals.</li>
 <li><strong>Lesson from this repo</strong>: <code>aquasecurity/trivy-action@v0.28.0</code> SHA-pinned itself but internally depended on <code>aquasecurity/setup-trivy@v0.2.1</code> — a tag aquasecurity later deleted upstream. The job broke at action-resolution time in CI, months after the pin landed clean. The fix was <code>v0.36.0</code>, a release that SHA-pins its own <code>setup-trivy</code> dependency (see <code>.github/workflows/framework-invariants.yml</code>). Same rule for anything that resolves further dependencies at run/install time: composite Actions, lockfile-less installers, <code>go install</code>'d tools.</li>
-<li><strong>Regenerate the lockfile with the ecosystem's own manager — never hand-edit one:</strong></li>
+</ul>
+</li>
+<li><strong>Regenerate the lockfile with the ecosystem's own manager — never hand-edit one:</strong><ul>
 <li>TypeScript/JavaScript: <code>pnpm install</code></li>
 <li>Python: <code>uv lock</code></li>
 <li>Go: <code>go mod tidy</code></li>
 <li>Rust: <code>cargo update</code></li>
+</ul>
+</li>
 <li><strong>Run the full quality gate suite</strong> — tests, linter, type checker, build — not just the touched package's own tests.</li>
 <li><strong>If anything fails, root-cause it before proceeding.</strong> Never stack a second upgrade on top of an unexplained gate failure; you lose the ability to tell which change caused which break.</li>
 </ol>

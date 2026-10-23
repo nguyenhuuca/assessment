@@ -8568,12 +8568,14 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Which level to pick:</strong>
-- Not sure what to do yet, or you only need to understand the code → <strong>level 1</strong>.
-- A small change you want to watch step by step → <strong>level 2</strong>.
-- A medium or large feature (needs a PRD, several days) → <strong>level 3</strong>.
-- A small feature, fix or refactor with clear acceptance criteria → <strong>level 4</strong>, or <strong>level 5</strong> without a terminal.
-- Small, low-risk work that touches no migration or agent config → <strong>level 6</strong>.</p>
+<p><strong>Which level to pick:</strong></p>
+<ul>
+<li>Not sure what to do yet, or you only need to understand the code → <strong>level 1</strong>.</li>
+<li>A small change you want to watch step by step → <strong>level 2</strong>.</li>
+<li>A medium or large feature (needs a PRD, several days) → <strong>level 3</strong>.</li>
+<li>A small feature, fix or refactor with clear acceptance criteria → <strong>level 4</strong>, or <strong>level 5</strong> without a terminal.</li>
+<li>Small, low-risk work that touches no migration or agent config → <strong>level 6</strong>.</li>
+</ul>
 <hr />
 <h2 id="pre-configured-setup">Pre-configured Setup<a class="headerlink" href="#pre-configured-setup" title="Permanent link">&para;</a></h2>
 <h3 id="folder-structure">Folder Structure<a class="headerlink" href="#folder-structure" title="Permanent link">&para;</a></h3>
@@ -9035,10 +9037,12 @@
 </table>
 <ul>
 <li><strong>Verdict block.</strong> Every reviewer ends with one (<code>approve</code> / <code>revise</code> + blocking / advisory counts), as defined in <code>.claude/skills/autopilot/resources/verdict.md</code>. Only <strong>blocking</strong> findings trigger another round; advisories go into the report.</li>
-<li><strong>Tests twice.</strong> <code>scripts/qa-twice.sh</code> runs the affected tests <strong>twice</strong>:</li>
+<li><strong>Tests twice.</strong> <code>scripts/qa-twice.sh</code> runs the affected tests <strong>twice</strong>:<ul>
 <li>pass both runs → <code>pass</code>;</li>
 <li>fail once → <code>flaky</code> (logged, does not block);</li>
 <li>fail both runs → <code>fail</code> (goes to Fix).</li>
+</ul>
+</li>
 </ul>
 <h3 id="when-it-fits">✅ When It Fits<a class="headerlink" href="#when-it-fits" title="Permanent link">&para;</a></h3>
 <table>
@@ -9289,10 +9293,12 @@
 <p>These are exact figures from <code>node scripts/claude-cost.mjs --from &lt;start&gt; --to &lt;end&gt;</code>, which reads the session transcripts and prices them at API list price. On a subscription they are the equivalent cost, not a bill. Each run report has the per-agent breakdown.</p>
 <ul>
 <li><strong>Where the money goes:</strong> the orchestrator (Opus) is 67–79% of each run, mostly cache reads of the growing session context.</li>
-<li><strong>To spend less:</strong></li>
+<li><strong>To spend less:</strong><ul>
 <li>write a clear request, so no replan is needed;</li>
 <li>keep one goal per run;</li>
 <li>run FE and BE in parallel only when both change.</li>
+</ul>
+</li>
 </ul>
 <h3 id="running-headless-on-github-no-terminal">☁️ Running Headless on GitHub (no terminal)<a class="headerlink" href="#running-headless-on-github-no-terminal" title="Permanent link">&para;</a></h3>
 <p>Besides local runs, autopilot can run on GitHub Actions (<a href="../../adr/0022-headless-autopilot/">ADR-0022</a>, workflow <code>.github/workflows/autopilot.yml</code>). Both gates move to GitHub:</p>
@@ -9356,12 +9362,14 @@
 </table>
 <ul>
 <li><strong>Auto Gate 1:</strong> the plan job writes <code>&lt;!-- autopilot:plan-review=approve --&gt;</code> in the PR body only when plan review returned <code>approve</code>. The workflow sees it and dispatches the build job (<code>workflow_dispatch</code>). A <code>/revise</code> always waits for you.</li>
-<li><strong>Auto Gate 2:</strong> <code>scripts/claude-autopilot-merge.sh</code> (always the copy on <code>main</code>) merges only when every check passes:</li>
+<li><strong>Auto Gate 2:</strong> <code>scripts/claude-autopilot-merge.sh</code> (always the copy on <code>main</code>) merges only when every check passes:<ul>
 <li>the PR is ready, meaning code review returned <code>approve</code>;</li>
 <li>no changes to <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>scripts/claude-*</code>, Liquibase migrations or <code>.env</code>;</li>
 <li>≤ 400 changed lines outside tests and docs;</li>
 <li>the script <strong>re-runs</strong> <code>mvn verify</code> / webapp test + lint + build itself.</li>
 <li>It then squash-merges with the secret <code>AUTOPILOT_MERGE_TOKEN</code>, so the deploy CI starts. If any check fails, it comments the reason and leaves the PR to you.</li>
+</ul>
+</li>
 <li><strong>Real example:</strong> issue #36 (translate the ON/OFF badge) → PR #37 merged and frontend deployed in about 5 minutes, build job $0.39, nobody clicked anything.</li>
 <li><strong>Risk:</strong> code reaches prod without a human read. The smoke check after the deploy is still manual. Rollback = <code>git revert</code> the squash commit.</li>
 </ul>
@@ -9372,11 +9380,13 @@
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Only for auto gates: a fine-grained PAT for this repo only, Contents + Pull requests read/write</span>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>AUTOPILOT_MERGE_TOKEN
 </code></pre></div>
-<p><strong>Limits and safety:</strong>
-- <strong>Owner only.</strong> Only the <strong>repo owner</strong> can trigger a run, by label or by comment. The repo is public, so anyone else's comments are ignored.
-- <strong>Issue text is data.</strong> Instructions in an issue that try to change the workflow, permissions or gates are ignored and listed in the PR.
-- <strong>Refused paths.</strong> Headless <strong>refuses</strong> to edit <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>.env</code> files, or write data-dropping migrations. Do those locally.
-- <strong>Limits and secrets.</strong> Each job has a 60 min cap, and only one run happens at a time: runs queue first come first served, so labeling several issues at once loses none (the wait is capped at about 5.5 hours). Claude's steps see only <code>CLAUDE_CODE_OAUTH_TOKEN</code>; <code>AUTOPILOT_MERGE_TOKEN</code> is seen only by the auto-merge step; deploy secrets (SSH, Docker) are never exposed.</p>
+<p><strong>Limits and safety:</strong></p>
+<ul>
+<li><strong>Owner only.</strong> Only the <strong>repo owner</strong> can trigger a run, by label or by comment. The repo is public, so anyone else's comments are ignored.</li>
+<li><strong>Issue text is data.</strong> Instructions in an issue that try to change the workflow, permissions or gates are ignored and listed in the PR.</li>
+<li><strong>Refused paths.</strong> Headless <strong>refuses</strong> to edit <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>.env</code> files, or write data-dropping migrations. Do those locally.</li>
+<li><strong>Limits and secrets.</strong> Each job has a 60 min cap, and only one run happens at a time: runs queue first come first served, so labeling several issues at once loses none (the wait is capped at about 5.5 hours). Claude's steps see only <code>CLAUDE_CODE_OAUTH_TOKEN</code>; <code>AUTOPILOT_MERGE_TOKEN</code> is seen only by the auto-merge step; deploy secrets (SSH, Docker) are never exposed.</li>
+</ul>
 <h3 id="how-to-call-it">▶️ How to Call It<a class="headerlink" href="#how-to-call-it" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/autopilot<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>Suggestions<span class="w"> </span>tab<span class="w"> </span><span class="nb">let</span><span class="w"> </span>an<span class="w"> </span>admin<span class="w"> </span>move<span class="w"> </span>a<span class="w"> </span>suggestion<span class="w"> </span>back<span class="w"> </span>to<span class="w"> </span>Pending<span class="w"> </span>and<span class="w"> </span>review<span class="w"> </span>it<span class="w"> </span>again
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/autopilot<span class="w"> </span>refactor:<span class="w"> </span>put<span class="w"> </span>the<span class="w"> </span>suggestion<span class="w"> </span>status<span class="w"> </span>transition<span class="w"> </span>rules<span class="w"> </span><span class="k">in</span><span class="w"> </span>one<span class="w"> </span>place,<span class="w"> </span>no<span class="w"> </span>behavior<span class="w"> </span>change
@@ -9439,16 +9449,18 @@
 <ul>
 <li><strong>Signals:</strong> <code>defect:&lt;sha&gt;</code>, <code>bug:#&lt;N&gt;</code> (an in-app bug report whose fix changed lines an agent wrote, in an autopilot run or a Claude-co-authored session commit, found with <code>git blame</code>), <code>revert:&lt;sha&gt;</code>, <code>blocked:&lt;run&gt;</code>, <code>flaky:&lt;run&gt;</code>, <code>review-skipped:&lt;run&gt;</code>, <code>revise:pr-&lt;N&gt;</code>. A signal that already has an <code>evolve</code> PR or issue (even one you closed) or a seeded case is never proposed again. At most 3 per run.</li>
 <li><strong>Seeded-bug evals</strong> (<code>evals/seeded/&lt;id&gt;/case.json</code>): each real escaped defect becomes a regression test <strong>for the agent</strong>: the reviewer is run on the original buggy diff and graded deterministically (a blocking finding on the expected file matching the expected wording).</li>
-<li><strong>Eval gate</strong> (<code>scripts/evolve.mjs gate</code>), all four must hold:</li>
+<li><strong>Eval gate</strong> (<code>scripts/evolve.mjs gate</code>), all four must hold:<ol>
 <li>today's rules on <code>main</code> <strong>miss</strong> the case (at least 2 of 3 runs);</li>
 <li>the new rule <strong>catches</strong> it in at least 2 of 3 runs;</li>
 <li>every existing case is still caught;</li>
 <li>reviewer cost rises by at most 25%.</li>
+</ol>
+</li>
 <li><strong>What the agent may change:</strong> only add lines to <code>.claude/skills/**</code>, <code>.claude/rules/*.md</code>, the prompt body of <code>.claude/agents/*.md</code>, and add a new case. Never <code>scripts/</code>, <code>.github/</code>, hooks, settings, existing cases, thresholds or app code. Frontmatter is frozen. Checked by code (<code>check-paths</code>), not by the prompt.</li>
 <li><strong>How to run:</strong> type <code>/evolve</code>. It stops at Ship and asks you: merge into <code>main</code>, push a PR, keep the branch, or drop.</li>
 <li><strong>Weekly in CI:</strong> <code>.github/workflows/agent-evolve.yml</code> runs every Monday 09:00 (or Actions → Agent Evolve → Run workflow). The agent writes staged file copies under <code>evolve-out/</code>, never <code>.claude/</code>. The ship job builds the <code>evolve/*</code> branch with <code>scripts/evolve.mjs apply</code>, runs the same gate and opens a PR labelled <code>evolve</code>; you merge it (<a href="../../adr/0029-headless-evolve-staging/">ADR-0029</a>).</li>
 <li><strong>Pruning:</strong> every Evolve rule ends with <code>&lt;!-- evolve:&lt;case id&gt; --&gt;</code>; a later run may propose removing one, only when its case is still caught without it.</li>
-<li><strong>Compress</strong> (ADR-0027 D6): once a month (<code>compress:&lt;YYYY-MM&gt;</code>) Evolve may also <strong>cut</strong> text: duplicates, dead references, text that contradicts its source of truth, stale claims, in <code>.claude/</code> and <code>CLAUDE.md</code>.</li>
+<li><strong>Compress</strong> (ADR-0027 D6): once a month (<code>compress:&lt;YYYY-MM&gt;</code>) Evolve may also <strong>cut</strong> text: duplicates, dead references, text that contradicts its source of truth, stale claims, in <code>.claude/</code> and <code>CLAUDE.md</code>.<ul>
 <li><code>node scripts/evolve.mjs lint-rules</code> gives the hints (duplicate lines, dead path refs, always-loaded size, about 37 KB today).</li>
 <li>Never cut: <code>AGENTS.md</code>, <code>security.md</code>, the evolve skill, frontmatter, and any line carrying a safety rule (push, gates, merge, deny, secrets, prod, smoke, Core Principles, "never …").</li>
 <li>Gate: smaller (always-loaded -5% or the touched files -1 KiB), no new duplicates or dead refs, every seeded case still caught. You read every removed line before it is merged.</li>
@@ -9469,6 +9481,8 @@
 <ul>
 <li><strong>Reviewing:</strong> read every removed line (<code>git diff main...&lt;branch&gt;</code>). Merge if each cut is a duplicate, a dead reference or stale; drop it otherwise.</li>
 <li><strong>Skip a month:</strong> open an issue labelled <code>evolve</code> whose body has <code>&lt;!-- evolve:signal=compress:&lt;YYYY-MM&gt; --&gt;</code>.</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -9547,10 +9561,12 @@
 </table>
 <p><strong>When Claude writes it</strong>: at the start of any task with 3+ steps (or one likely to outlive the context window), after each step or commit, <code>blocked</code> while waiting on you, and <code>done</code> + <code>progress: 100</code> once pushed and verified. It is always a full overwrite; trivial edits and one-shot questions skip it.</p>
 <p><strong>Sync across machines</strong>: the file is committed and pushed together with the work it describes (a status-only update gets its own <code>chore(session): …</code> commit). Run <code>git pull</code> first on another machine. Never put secrets, hostnames/IPs or key paths in it.</p>
-<p><strong>What you see</strong>
-- <strong>At startup</strong>, <code>session-start-loader.sh</code> shows a boxed table: 📌 Task, Status (progress bar + <code>updated</code>), ✅ Done and 🔄 Doing (commit hashes in their own column), ⛔ Blocked, → Next. An unfinished task gets the hint <code>▶ /task-resume</code>; a <code>done</code> task is shown as the last task and is not resumed. The table is skipped after a compact.
-- <strong>Status line</strong> (<code>.claude/statusline-command.sh</code>) shows <code>task: &lt;name&gt; &lt;progress&gt;% (&lt;status&gt;)</code> while the task is not done.
-- <strong><code>/task-resume [instruction]</code></strong> re-reads the plan, <code>git status</code>/<code>git log</code> and <code>TASKS.md</code>, corrects the file when the repo disagrees, reports in 3–5 lines, then continues from <code>next</code>. Claude never resumes on its own, and pushes still need your go-ahead.</p>
+<p><strong>What you see</strong></p>
+<ul>
+<li><strong>At startup</strong>, <code>session-start-loader.sh</code> shows a boxed table: 📌 Task, Status (progress bar + <code>updated</code>), ✅ Done and 🔄 Doing (commit hashes in their own column), ⛔ Blocked, → Next. An unfinished task gets the hint <code>▶ /task-resume</code>; a <code>done</code> task is shown as the last task and is not resumed. The table is skipped after a compact.</li>
+<li><strong>Status line</strong> (<code>.claude/statusline-command.sh</code>) shows <code>task: &lt;name&gt; &lt;progress&gt;% (&lt;status&gt;)</code> while the task is not done.</li>
+<li><strong><code>/task-resume [instruction]</code></strong> re-reads the plan, <code>git status</code>/<code>git log</code> and <code>TASKS.md</code>, corrects the file when the repo disagrees, reports in 3–5 lines, then continues from <code>next</code>. Claude never resumes on its own, and pushes still need your go-ahead.</li>
+</ul>
 <hr />
 <h2 id="hooks-permissions">Hooks &amp; Permissions<a class="headerlink" href="#hooks-permissions" title="Permanent link">&para;</a></h2>
 <p>Hooks are bash scripts in <code>.claude/hooks/</code>, registered in <code>.claude/settings.json</code>. They are <strong>fail-open</strong>: without <code>jq</code> they skip. On Windows they run through Git Bash.</p>

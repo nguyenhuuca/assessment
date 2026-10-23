@@ -7265,13 +7265,15 @@
 <h2 id="method">Method<a class="headerlink" href="#method" title="Permanent link">&para;</a></h2>
 <p>Design-spec structure follows <code>resources/design-framework.template.md</code> (bundled with this skill — design tokens, component anatomy, responsive breakpoints). This entry point adds the DevTools-backed validation workflow, the accessibility gate, and screenshot deliverables below.</p>
 <h2 id="mcp-tools">MCP Tools<a class="headerlink" href="#mcp-tools" title="Permanent link">&para;</a></h2>
-<p><strong>Chrome DevTools</strong> (design validation):
-- Test responsive layouts across breakpoints
-- Run Lighthouse accessibility audits
-- Capture screenshots at multiple viewport sizes
-- Inspect computed styles and layout
-- Verify color contrast ratios
-- Test keyboard navigation</p>
+<p><strong>Chrome DevTools</strong> (design validation):</p>
+<ul>
+<li>Test responsive layouts across breakpoints</li>
+<li>Run Lighthouse accessibility audits</li>
+<li>Capture screenshots at multiple viewport sizes</li>
+<li>Inspect computed styles and layout</li>
+<li>Verify color contrast ratios</li>
+<li>Test keyboard navigation</li>
+</ul>
 <h2 id="design-workflow">Design Workflow<a class="headerlink" href="#design-workflow" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>Design</strong> — Create specifications and wireframes</li>
@@ -7285,11 +7287,13 @@
 <p>Every design spec must clear WCAG 2.1 AA before handoff:</p>
 <ol>
 <li><strong>Automated</strong> — Run a Lighthouse accessibility audit via Chrome DevTools against the build/prototype</li>
-<li><strong>Manual</strong> — automated tools miss real usability issues; verify by hand:</li>
+<li><strong>Manual</strong> — automated tools miss real usability issues; verify by hand:<ul>
 <li>Keyboard-only navigation reaches every interactive element in a logical order</li>
 <li>Focus indicator is visible at each stop</li>
 <li>Color contrast meets 4.5:1 (text) / 3:1 (large text, UI components), verified with the DevTools color picker</li>
 <li>Color is never the sole indicator of state (pair with icon/text)</li>
+</ul>
+</li>
 </ol>
 <h2 id="deliverables">Deliverables<a class="headerlink" href="#deliverables" title="Permanent link">&para;</a></h2>
 <ul>

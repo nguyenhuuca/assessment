@@ -8734,9 +8734,11 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <h3 id="br-3-autopilot-label-and-the-daily-cap">BR-3: Autopilot label and the daily cap<a class="headerlink" href="#br-3-autopilot-label-and-the-daily-cap" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Default:</strong> every issue gets <code>autopilot</code>, unless the daily cap applies.</li>
-<li><strong>The cap:</strong> when the reporter is an <code>ADMIN</code>, the server counts the stored reports with <code>status = CREATED</code>, <code>autopilot = true</code>, <code>reporter_role = ADMIN</code> and <code>created_at</code> in the last 24 hours.</li>
+<li><strong>The cap:</strong> when the reporter is an <code>ADMIN</code>, the server counts the stored reports with <code>status = CREATED</code>, <code>autopilot = true</code>, <code>reporter_role = ADMIN</code> and <code>created_at</code> in the last 24 hours.<ul>
 <li>If the count is <strong>≥ 10</strong>, the issue is created <strong>without</strong> <code>autopilot</code>, and the response has <code>capReached = true</code>.</li>
 <li>Reports from a <code>SUPER_ADMIN</code> are neither limited nor counted.</li>
+</ul>
+</li>
 <li><strong>When it is checked:</strong> each time the server calls GitHub, so on create and on every retry. <code>FAILED</code> reports never count.</li>
 </ul>
 <h3 id="br-4-auto-labels">BR-4: Auto labels<a class="headerlink" href="#br-4-auto-labels" title="Permanent link">&para;</a></h3>
@@ -8761,18 +8763,22 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <p>The issue <code>title</code> is the report title as typed. The issue <code>body</code> is, in order:</p>
 <ol>
 <li>the description as typed;</li>
-<li>a <code>### Context</code> section with the following lines; a missing value is printed as <code>unknown</code>:</li>
+<li>a <code>### Context</code> section with the following lines; a missing value is printed as <code>unknown</code>:<ul>
 <li><code>Page: &lt;page&gt;</code></li>
 <li><code>Path: &lt;path&gt;</code></li>
 <li><code>App: &lt;appVersion&gt;</code></li>
 <li><code>Browser: &lt;userAgent&gt;</code></li>
 <li><code>Screen: &lt;screenWidth&gt;px</code></li>
+</ul>
+</li>
 <li>a footer: <code>Reported in-app by an ADMIN · report &lt;first 8 chars of id&gt;</code> (or <code>the SUPER_ADMIN</code>);</li>
 <li>a final line: <code>&lt;!-- app-report:&lt;id&gt; --&gt;</code>.</li>
 </ol>
-<p>Rules for the body:
-- <strong>No email, user name or user id</strong> appears in the issue.
-- <strong>No query string or fragment</strong> in the path. The server removes everything from the first <code>?</code> or <code>#</code>, even if the client already did.</p>
+<p>Rules for the body:</p>
+<ul>
+<li><strong>No email, user name or user id</strong> appears in the issue.</li>
+<li><strong>No query string or fragment</strong> in the path. The server removes everything from the first <code>?</code> or <code>#</code>, even if the client already did.</li>
+</ul>
 <blockquote>
 <p><strong>Assumption:</strong> The PRD said "display name". <code>User</code> has no display-name field, only <code>id</code> and <code>userName</code> (<code>entity/User.java:33-36</code>), and <code>userName</code> may be an email, so the footer names the role instead.</p>
 </blockquote>
@@ -8802,53 +8808,69 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <li><strong>Visibility:</strong> shown only when the user is ADMIN or SUPER_ADMIN (<code>isAdminRole</code>, <code>webapp/src/utils/roles.js:2</code>).</li>
 </ul>
 <h3 id="fr-2-create-a-report">FR-2: Create a report<a class="headerlink" href="#fr-2-create-a-report" title="Permanent link">&para;</a></h3>
-<p>The form must have three inputs:
-- type, as a segmented control: Bug / Enhancement / Issue;
-- title, required, 1–120 characters after trimming;
-- description, required, 1–5,000 characters after trimming.</p>
+<p>The form must have three inputs:</p>
+<ul>
+<li>type, as a segmented control: Bug / Enhancement / Issue;</li>
+<li>title, required, 1–120 characters after trimming;</li>
+<li>description, required, 1–5,000 characters after trimming.</li>
+</ul>
 <p>A SUPER_ADMIN must also see an "Autopilot" select: None / Auto-merge / Full auto. An ADMIN must not see it.</p>
-<p>Beside the form, the page must show the context it will send, read-only:
-- <code>page</code>: the nav key the user was on before opening Report;
-- <code>path</code>: <code>window.location.pathname</code>;
-- <code>appVersion</code>: the build id, see FE;
-- <code>userAgent</code>: <code>navigator.userAgent</code>;
-- <code>screenWidth</code>: <code>window.innerWidth</code>.</p>
-<p>The page must show the public-repo warning (PRD FR-10). On submit, the client calls <code>POST /admin/reports</code>, then:
-- <strong><code>CREATED</code>:</strong> shows "Issue #N created" with a link that opens in a new tab;
-- <strong><code>capReached</code>:</strong> adds "Autopilot quota reached for today; the owner can add the label";
-- <strong><code>FAILED</code>:</strong> shows the error and a <strong>Retry</strong> button.</p>
+<p>Beside the form, the page must show the context it will send, read-only:</p>
+<ul>
+<li><code>page</code>: the nav key the user was on before opening Report;</li>
+<li><code>path</code>: <code>window.location.pathname</code>;</li>
+<li><code>appVersion</code>: the build id, see FE;</li>
+<li><code>userAgent</code>: <code>navigator.userAgent</code>;</li>
+<li><code>screenWidth</code>: <code>window.innerWidth</code>.</li>
+</ul>
+<p>The page must show the public-repo warning (PRD FR-10). On submit, the client calls <code>POST /admin/reports</code>, then:</p>
+<ul>
+<li><strong><code>CREATED</code>:</strong> shows "Issue #N created" with a link that opens in a new tab;</li>
+<li><strong><code>capReached</code>:</strong> adds "Autopilot quota reached for today; the owner can add the label";</li>
+<li><strong><code>FAILED</code>:</strong> shows the error and a <strong>Retry</strong> button.</li>
+</ul>
 <h3 id="fr-3-store-then-call-github">FR-3: Store, then call GitHub<a class="headerlink" href="#fr-3-store-then-call-github" title="Permanent link">&para;</a></h3>
-<p>The server must:
-1. validate the request (Security → Data Validation);
-2. insert the <code>app_report</code> row with <code>status = FAILED</code> and <code>error = 'pending'</code>;
-3. compute the labels (BR-2 to BR-4);
-4. call <code>POST https://api.github.com/repos/{owner}/{repo}/issues</code> with <code>{title, body, labels}</code>;
-5. on a 201 response, update the row with <code>status = CREATED</code>, <code>issue_number</code>, <code>issue_url</code> (the <code>html_url</code> from the response), <code>labels</code> and <code>autopilot</code>, and clear <code>error</code>;
-6. on any failure, keep <code>FAILED</code> with a short <code>error</code> code (EC-1, EC-2);
-7. return the stored report.</p>
+<p>The server must:</p>
+<ol>
+<li>validate the request (Security → Data Validation);</li>
+<li>insert the <code>app_report</code> row with <code>status = FAILED</code> and <code>error = 'pending'</code>;</li>
+<li>compute the labels (BR-2 to BR-4);</li>
+<li>call <code>POST https://api.github.com/repos/{owner}/{repo}/issues</code> with <code>{title, body, labels}</code>;</li>
+<li>on a 201 response, update the row with <code>status = CREATED</code>, <code>issue_number</code>, <code>issue_url</code> (the <code>html_url</code> from the response), <code>labels</code> and <code>autopilot</code>, and clear <code>error</code>;</li>
+<li>on any failure, keep <code>FAILED</code> with a short <code>error</code> code (EC-1, EC-2);</li>
+<li>return the stored report.</li>
+</ol>
 <h3 id="fr-4-list-reports">FR-4: List reports<a class="headerlink" href="#fr-4-list-reports" title="Permanent link">&para;</a></h3>
 <p><code>GET /admin/reports?page&amp;size</code> must return the reports newest first, paged with a default size of 20 and a maximum of 50. Each row has the reporter's <code>userName</code>, which is shown in the app only and never sent to GitHub, plus the <code>githubState</code> from BR-9.</p>
 <h3 id="fr-5-retry">FR-5: Retry<a class="headerlink" href="#fr-5-retry" title="Permanent link">&para;</a></h3>
 <p><code>POST /admin/reports/{id}/retry</code> must repeat FR-3 steps 3 to 7 for the stored row, after the checks in BR-6.</p>
 <h3 id="fr-6-github-client">FR-6: GitHub client<a class="headerlink" href="#fr-6-github-client" title="Permanent link">&para;</a></h3>
-<p>A <code>GitHubIssueClient</code> interface in <code>client</code>, implemented with <code>java.net.http.HttpClient</code>. It must:
-- send <code>Authorization: Bearer &lt;token&gt;</code>, <code>Accept: application/vnd.github+json</code> and <code>X-GitHub-Api-Version: 2022-11-28</code>;
-- use a 5 s connect timeout and a 10 s request timeout;
-- never log the token or the response body.</p>
-<p>It has two methods:
-- <code>create(title, body, labels)</code> returns the issue number and <code>html_url</code>;
-- <code>state(number)</code> returns <code>OPEN</code>, <code>CLOSED</code> or <code>UNKNOWN</code>. It maps any non-200 response or exception to <code>UNKNOWN</code>.</p>
+<p>A <code>GitHubIssueClient</code> interface in <code>client</code>, implemented with <code>java.net.http.HttpClient</code>. It must:</p>
+<ul>
+<li>send <code>Authorization: Bearer &lt;token&gt;</code>, <code>Accept: application/vnd.github+json</code> and <code>X-GitHub-Api-Version: 2022-11-28</code>;</li>
+<li>use a 5 s connect timeout and a 10 s request timeout;</li>
+<li>never log the token or the response body.</li>
+</ul>
+<p>It has two methods:</p>
+<ul>
+<li><code>create(title, body, labels)</code> returns the issue number and <code>html_url</code>;</li>
+<li><code>state(number)</code> returns <code>OPEN</code>, <code>CLOSED</code> or <code>UNKNOWN</code>. It maps any non-200 response or exception to <code>UNKNOWN</code>.</li>
+</ul>
 <h3 id="fr-8-webhook-receiver">FR-8: Webhook receiver<a class="headerlink" href="#fr-8-webhook-receiver" title="Permanent link">&para;</a></h3>
-<p>The webhook endpoint must:
-- read the body as raw bytes and verify the signature <strong>before</strong> parsing JSON;
-- return 503 when <code>GITHUB_WEBHOOK_SECRET</code> is blank, 401 on a missing or wrong signature, 400 on unparseable JSON from a valid signature, and 204 otherwise (applied or ignored);
-- log the delivery id, event, action, issue number and outcome (<code>applied</code>, <code>ignored</code>, <code>stale</code>, <code>unknown-issue</code>) at INFO; never log the secret, the signature or the body;
-- finish without any outbound call (GitHub expects an answer within 10 s).</p>
+<p>The webhook endpoint must:</p>
+<ul>
+<li>read the body as raw bytes and verify the signature <strong>before</strong> parsing JSON;</li>
+<li>return 503 when <code>GITHUB_WEBHOOK_SECRET</code> is blank, 401 on a missing or wrong signature, 400 on unparseable JSON from a valid signature, and 204 otherwise (applied or ignored);</li>
+<li>log the delivery id, event, action, issue number and outcome (<code>applied</code>, <code>ignored</code>, <code>stale</code>, <code>unknown-issue</code>) at INFO; never log the secret, the signature or the body;</li>
+<li>finish without any outbound call (GitHub expects an answer within 10 s).</li>
+</ul>
 <h3 id="fr-7-configuration">FR-7: Configuration<a class="headerlink" href="#fr-7-configuration" title="Permanent link">&para;</a></h3>
-<p><code>AppProperties.github</code> has three fields:
-- <code>token</code>, from env <code>GITHUB_REPORT_TOKEN</code>, no default;
-- <code>owner</code>, default <code>nguyenhuuca</code>;
-- <code>repo</code>, default <code>assessment</code>.</p>
+<p><code>AppProperties.github</code> has three fields:</p>
+<ul>
+<li><code>token</code>, from env <code>GITHUB_REPORT_TOKEN</code>, no default;</li>
+<li><code>owner</code>, default <code>nguyenhuuca</code>;</li>
+<li><code>repo</code>, default <code>assessment</code>.</li>
+</ul>
 <p>A blank token means "not configured" (EC-1). The app must start either way.</p>
 <hr />
 <h2 id="api-changes">API Changes<a class="headerlink" href="#api-changes" title="Permanent link">&para;</a></h2>
@@ -9147,9 +9169,11 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <h3 id="authorization">Authorization<a class="headerlink" href="#authorization" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Class level:</strong> <code>@PreAuthorize("hasRole('ADMIN')")</code>. The role hierarchy lets SUPER_ADMIN through (<code>filter/WebSecurityConfig.java:81-88</code>).</li>
-<li><strong>Service checks:</strong></li>
+<li><strong>Service checks:</strong><ul>
 <li>an ADMIN sending a non-null <code>autoLabel</code> is rejected (BR-4);</li>
 <li>a retry by someone other than the reporter or the SUPER_ADMIN is rejected (BR-6).</li>
+</ul>
+</li>
 <li><strong>Future CONTRIBUTOR (ADR-0026 D6):</strong> the class annotation becomes <code>hasRole('CONTRIBUTOR')</code>. The service checks stay as they are.</li>
 </ul>
 <h3 id="data-validation">Data Validation<a class="headerlink" href="#data-validation" title="Permanent link">&para;</a></h3>
@@ -9361,9 +9385,11 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <h3 id="availability">Availability<a class="headerlink" href="#availability" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>GitHub outage or missing token:</strong> existing features are not affected. Reports are stored as <code>FAILED</code> (EC-1, EC-2), and the list shows <code>UNKNOWN</code>.</li>
-<li><strong>Rollback:</strong></li>
+<li><strong>Rollback:</strong><ul>
 <li>remove the nav item and the controller;</li>
 <li>the <code>app_report</code> table can stay, because nothing else reads it.</li>
+</ul>
+</li>
 </ul>
 <h3 id="scalability">Scalability<a class="headerlink" href="#scalability" title="Permanent link">&para;</a></h3>
 <ul>
@@ -9374,11 +9400,13 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <h2 id="edge-cases">Edge Cases<a class="headerlink" href="#edge-cases" title="Permanent link">&para;</a></h2>
 <h3 id="ec-1-token-not-configured">EC-1: Token not configured<a class="headerlink" href="#ec-1-token-not-configured" title="Permanent link">&para;</a></h3>
 <p><strong>Condition:</strong> <code>GITHUB_REPORT_TOKEN</code> is blank.
-<strong>Expected:</strong>
-- No HTTP call is made.
-- The row stays <code>FAILED</code> with <code>error = 'github.notConfigured'</code>, and the response is 200 with that row.
-- The UI shows "GitHub is not configured" plus Retry.
-- The list shows <code>githubState = UNKNOWN</code> for older <code>CREATED</code> rows.</p>
+<strong>Expected:</strong></p>
+<ul>
+<li>No HTTP call is made.</li>
+<li>The row stays <code>FAILED</code> with <code>error = 'github.notConfigured'</code>, and the response is 200 with that row.</li>
+<li>The UI shows "GitHub is not configured" plus Retry.</li>
+<li>The list shows <code>githubState = UNKNOWN</code> for older <code>CREATED</code> rows.</li>
+</ul>
 <h3 id="ec-2-github-error-or-timeout">EC-2: GitHub error or timeout<a class="headerlink" href="#ec-2-github-error-or-timeout" title="Permanent link">&para;</a></h3>
 <p><strong>Condition:</strong> GitHub returns a non-201 response on create, or the call times out or throws.
 <strong>Expected:</strong> the row is <code>FAILED</code> with <code>error = 'github.http.&lt;status&gt;'</code> or <code>'github.timeout'</code>, and the response is 200 with that row. Nothing from the response body is stored or logged.</p>
@@ -9417,9 +9445,11 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 </blockquote>
 <h3 id="ec-13-same-user-two-quick-submits">EC-13: Same user, two quick submits<a class="headerlink" href="#ec-13-same-user-two-quick-submits" title="Permanent link">&para;</a></h3>
 <p><strong>Condition:</strong> the user double-clicks Submit.
-<strong>Expected:</strong>
-- The UI disables Submit while the request is pending, so normally only one request is sent.
-- If two requests still arrive, both are processed: two rows and two issues, each counted by BR-5.</p>
+<strong>Expected:</strong></p>
+<ul>
+<li>The UI disables Submit while the request is pending, so normally only one request is sent.</li>
+<li>If two requests still arrive, both are processed: two rows and two issues, each counted by BR-5.</li>
+</ul>
 <hr />
 <h3 id="ec-14-webhook-deliveries-out-of-order">EC-14: Webhook deliveries out of order<a class="headerlink" href="#ec-14-webhook-deliveries-out-of-order" title="Permanent link">&para;</a></h3>
 <p>A <code>reopened</code> event with <code>updated_at</code> T1 arrives after a <code>closed</code> event with T2 &gt; T1. The stored state stays <code>CLOSED</code> (BR-10).</p>

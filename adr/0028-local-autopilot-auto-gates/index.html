@@ -7105,9 +7105,11 @@
 <p>The orchestrator pushes without asking only when every check holds:</p>
 <ul>
 <li>The last code review returned <code>approve</code>, QA ×2 exited 0 and the full gates are green. These already gate the commit.</li>
-<li><code>bash scripts/claude-autopilot-autopush-check.sh</code> exits 0. It checks the run's commits (<code>origin/main..HEAD</code>) with the same limits as the headless auto-merge (<code>scripts/claude-autopilot-merge.sh</code>):</li>
+<li><code>bash scripts/claude-autopilot-autopush-check.sh</code> exits 0. It checks the run's commits (<code>origin/main..HEAD</code>) with the same limits as the headless auto-merge (<code>scripts/claude-autopilot-merge.sh</code>):<ul>
 <li>no change under <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>scripts/claude-</code>, Liquibase changelogs or <code>.env</code>;</li>
 <li>at most 400 changed lines outside tests and docs.</li>
+</ul>
+</li>
 </ul>
 <p>A failed check falls back to the normal Gate 2 question, with the reason. The push itself is unchanged: <code>git pull --rebase --autostash</code>, never force, a rebase conflict stops the run. CI and the smoke test run after the push as before.</p>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>

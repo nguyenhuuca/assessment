@@ -7761,16 +7761,16 @@ File: <code>db/changelog/sql/202504300002-add-video-status.sql</code>
 <h3 id="be-6-jwtauthenticationfilter">BE-6: JWTAuthenticationFilter<a class="headerlink" href="#be-6-jwtauthenticationfilter" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Replace <code>Collections.emptyList()</code> with:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleGrantedAuthority</span><span class="p">(</span><span class="s">"ROLE_"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="na">getRole</span><span class="p">()))</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleGrantedAuthority</span><span class="p">(</span><span class="s">"ROLE_"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="na">getRole</span><span class="p">()))</span>
 </code></pre></div></li>
 </ul>
 <h3 id="be-7-websecurityconfig">BE-7: WebSecurityConfig<a class="headerlink" href="#be-7-websecurityconfig" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Change:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">.</span><span class="na">requestMatchers</span><span class="p">(</span><span class="s">"/admin/**"</span><span class="p">).</span><span class="na">authenticated</span><span class="p">()</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">.</span><span class="na">requestMatchers</span><span class="p">(</span><span class="s">"/admin/**"</span><span class="p">).</span><span class="na">authenticated</span><span class="p">()</span>
 </code></pre></div>
-  To:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">.</span><span class="na">requestMatchers</span><span class="p">(</span><span class="s">"/admin/**"</span><span class="p">).</span><span class="na">hasRole</span><span class="p">(</span><span class="s">"ADMIN"</span><span class="p">)</span>
+    To:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">.</span><span class="na">requestMatchers</span><span class="p">(</span><span class="s">"/admin/**"</span><span class="p">).</span><span class="na">hasRole</span><span class="p">(</span><span class="s">"ADMIN"</span><span class="p">)</span>
 </code></pre></div></li>
 </ul>
 <hr />
@@ -7782,15 +7782,19 @@ File: <code>db/changelog/sql/202504300002-add-video-status.sql</code>
 <li><code>dto/AdminStatsDto.java</code> — <code>totalVideos, totalUsers, pendingCount, flaggedCount</code></li>
 </ul>
 <h3 id="be-9-adminvideoservice">BE-9: AdminVideoService<a class="headerlink" href="#be-9-adminvideoservice" title="Permanent link">&para;</a></h3>
-<p>Interface + impl:
-- <code>Page&lt;AdminVideoDto&gt; getVideos(Pageable pageable, VideoStatus status)</code>
-- <code>void updateStatus(Long id, VideoStatus status)</code>
-- <code>void deleteVideo(Long id)</code></p>
+<p>Interface + impl:</p>
+<ul>
+<li><code>Page&lt;AdminVideoDto&gt; getVideos(Pageable pageable, VideoStatus status)</code></li>
+<li><code>void updateStatus(Long id, VideoStatus status)</code></li>
+<li><code>void deleteVideo(Long id)</code></li>
+</ul>
 <h3 id="be-10-adminaccountservice">BE-10: AdminAccountService<a class="headerlink" href="#be-10-adminaccountservice" title="Permanent link">&para;</a></h3>
-<p>Interface + impl:
-- <code>Page&lt;AdminAccountDto&gt; getAccounts(Pageable pageable)</code>
-- <code>void updateRole(Long targetId, Long currentUserId, UserRole role)</code> — guard: cannot change own role
-- <code>void deleteAccount(Long targetId, Long currentUserId)</code> — guard: cannot delete self</p>
+<p>Interface + impl:</p>
+<ul>
+<li><code>Page&lt;AdminAccountDto&gt; getAccounts(Pageable pageable)</code></li>
+<li><code>void updateRole(Long targetId, Long currentUserId, UserRole role)</code> — guard: cannot change own role</li>
+<li><code>void deleteAccount(Long targetId, Long currentUserId)</code> — guard: cannot delete self</li>
+</ul>
 <h3 id="be-11-admincontroller">BE-11: AdminController<a class="headerlink" href="#be-11-admincontroller" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>@RestController
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>@RequestMapping("/admin")
@@ -7815,12 +7819,16 @@ File: <code>db/changelog/sql/202504300002-add-video-status.sql</code>
 </ul>
 <h3 id="fe-2-appshell-admin-nav-item-guard">FE-2: AppShell — admin nav item + guard<a class="headerlink" href="#fe-2-appshell-admin-nav-item-guard" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Add to <code>SIDE_NAV</code>:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s1">'admin'</span><span class="p">,</span><span class="w"> </span><span class="nx">icon</span><span class="o">:</span><span class="w"> </span><span class="s1">'admin_panel_settings'</span><span class="p">,</span><span class="w"> </span><span class="nx">label</span><span class="o">:</span><span class="w"> </span><span class="s1">'Admin'</span><span class="p">,</span><span class="w"> </span><span class="nx">requiresAdmin</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
-</code></pre></div></li>
-<li>Filter: <code>SIDE_NAV.filter(item =&gt; !item.requiresAdmin || user?.isAdmin)</code></li>
+<li>
+<p>Add to <code>SIDE_NAV</code>:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s1">'admin'</span><span class="p">,</span><span class="w"> </span><span class="nx">icon</span><span class="o">:</span><span class="w"> </span><span class="s1">'admin_panel_settings'</span><span class="p">,</span><span class="w"> </span><span class="nx">label</span><span class="o">:</span><span class="w"> </span><span class="s1">'Admin'</span><span class="p">,</span><span class="w"> </span><span class="nx">requiresAdmin</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div></p>
+</li>
+<li>
+<p>Filter: <code>SIDE_NAV.filter(item =&gt; !item.requiresAdmin || user?.isAdmin)</code></p>
+</li>
 <li>Render guard in main content:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span><span class="nx">activeNav</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'admin'</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">user</span><span class="o">?</span><span class="p">.</span><span class="nx">isAdmin</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">AdminView</span><span class="w"> </span><span class="p">/&gt;}</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span><span class="nx">activeNav</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'admin'</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">user</span><span class="o">?</span><span class="p">.</span><span class="nx">isAdmin</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">AdminView</span><span class="w"> </span><span class="p">/&gt;}</span>
 </code></pre></div></li>
 </ul>
 <h3 id="fe-3-apiadminjs-new-file">FE-3: api/admin.js (new file)<a class="headerlink" href="#fe-3-apiadminjs-new-file" title="Permanent link">&para;</a></h3>
@@ -7864,11 +7872,13 @@ File: <code>db/changelog/sql/202504300002-add-video-status.sql</code>
 <li>Guard: disable action buttons for own account row</li>
 </ul>
 <h3 id="fe-8-css-in-indexcss">FE-8: CSS in index.css<a class="headerlink" href="#fe-8-css-in-indexcss" title="Permanent link">&para;</a></h3>
-<p>New <code>.admin-*</code> classes:
-- <code>.admin-table</code> — dark surface, monospace-style header cells
-- <code>.admin-badge.published/pending/flagged/admin/user</code> — status/role color badges
-- <code>.admin-stat-card</code> — bottom stat cards (dark surface, neon label)
-- <code>.admin-action-btn</code> — small icon buttons in table rows</p>
+<p>New <code>.admin-*</code> classes:</p>
+<ul>
+<li><code>.admin-table</code> — dark surface, monospace-style header cells</li>
+<li><code>.admin-badge.published/pending/flagged/admin/user</code> — status/role color badges</li>
+<li><code>.admin-stat-card</code> — bottom stat cards (dark surface, neon label)</li>
+<li><code>.admin-action-btn</code> — small icon buttons in table rows</li>
+</ul>
 <hr />
 <h2 id="files-changed-created">Files Changed / Created<a class="headerlink" href="#files-changed-created" title="Permanent link">&para;</a></h2>
 <h3 id="backend-new">Backend — New<a class="headerlink" href="#backend-new" title="Permanent link">&para;</a></h3>

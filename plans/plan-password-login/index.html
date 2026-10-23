@@ -7355,11 +7355,13 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer), Security Auditor (/s
 <h3 id="phase-2-login-endpoint-lockout-1-d-pw-2-after-pw-1">Phase 2 — Login endpoint &amp; lockout (1 d) — <code>PW-2</code> (after PW-1)<a class="headerlink" href="#phase-2-login-endpoint-lockout-1-d-pw-2-after-pw-1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>[ ] <code>POST /user/login</code> in <code>UserController</code> (<code>@RateLimited(permit = 10)</code>, <code>@AuditLog</code>), <code>PasswordLoginRequest {@Sensitive email, @Sensitive password}</code></li>
-<li>[ ] Service <code>PasswordLoginService.login</code>:</li>
+<li>[ ] Service <code>PasswordLoginService.login</code>:<ul>
 <li>flag off → 404</li>
 <li>find user; if null / password null / DEACTIVATED / <code>locked_until &gt; now</code> → run a dummy BCrypt match (timing) → throw <code>INVALID_CREDENTIALS</code></li>
 <li>BCrypt match fail → <code>failed_login_count++</code>; at 5 → <code>locked_until = now + 15m</code>, reset count → <code>INVALID_CREDENTIALS</code></li>
 <li>success → reset count/lock; MFA → existing <code>MFA_REQUIRED</code> flow; else JWT</li>
+</ul>
+</li>
 <li>[ ] All failures → identical <code>401 {"error":{"message":"INVALID_CREDENTIALS"}}</code> via <code>CustomException(UNAUTHORIZED)</code></li>
 <li>[ ] Remove legacy branch in <code>UserController.signIn</code> (<code>joinSystem</code>) — <code>/user/join</code> = magic link only; delete/deprecate <code>joinSystem</code> + <code>toEntity</code></li>
 <li>[ ] Tests: success, wrong password, unknown email, null password, deactivated, locked, 5th failure locks, success resets, MFA path, identical error body for every failure, flag off</li>

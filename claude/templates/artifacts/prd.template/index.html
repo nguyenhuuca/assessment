@@ -7627,14 +7627,18 @@ Related Skills: scope, planning-artifacts
 <p>[What problem are we solving? Who has this problem? Why does it matter?]</p>
 <h3 id="evidence">Evidence<a class="headerlink" href="#evidence" title="Permanent link">&para;</a></h3>
 <p>Great PRDs prove problems exist with evidence. Include both types:</p>
-<p><strong>Quantitative Evidence</strong> (numbers that demonstrate impact):
-- [Financial metric: e.g., "$X lost per month due to..."]
-- [Behavioral data: e.g., "Y% of users abandon at step Z"]
-- [Volume indicator: e.g., "N support tickets/week about..."]</p>
-<p><strong>Qualitative Evidence</strong> (insights that explain the human side):
-- [User quote: "Direct feedback from user research..."]
-- [Support insight: "Common complaint pattern..."]
-- [Observation: "During usability testing, we saw..."]</p>
+<p><strong>Quantitative Evidence</strong> (numbers that demonstrate impact):</p>
+<ul>
+<li>[Financial metric: e.g., "$X lost per month due to..."]</li>
+<li>[Behavioral data: e.g., "Y% of users abandon at step Z"]</li>
+<li>[Volume indicator: e.g., "N support tickets/week about..."]</li>
+</ul>
+<p><strong>Qualitative Evidence</strong> (insights that explain the human side):</p>
+<ul>
+<li>[User quote: "Direct feedback from user research..."]</li>
+<li>[Support insight: "Common complaint pattern..."]</li>
+<li>[Observation: "During usability testing, we saw..."]</li>
+</ul>
 <h2 id="goals-success-metrics">Goals &amp; Success Metrics<a class="headerlink" href="#goals-success-metrics" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -7660,6 +7664,7 @@ Related Skills: scope, planning-artifacts
 <h2 id="user-stories">User Stories<a class="headerlink" href="#user-stories" title="Permanent link">&para;</a></h2>
 <!--
 Use INVEST criteria for all stories:
+
 - Independent: Self-contained
 - Negotiable: Not a contract
 - Valuable: Delivers value
@@ -7670,15 +7675,21 @@ Use INVEST criteria for all stories:
 
 <h3 id="persona-1">[Persona 1]<a class="headerlink" href="#persona-1" title="Permanent link">&para;</a></h3>
 <ul>
-<li>As a [persona], I want [capability] so that [benefit]</li>
+<li>As a [persona], I want [capability] so that [benefit]<ul>
 <li>Acceptance: [Testable criteria]</li>
-<li>As a [persona], I want [capability] so that [benefit]</li>
+</ul>
+</li>
+<li>As a [persona], I want [capability] so that [benefit]<ul>
 <li>Acceptance: [Testable criteria]</li>
+</ul>
+</li>
 </ul>
 <h3 id="persona-2">[Persona 2]<a class="headerlink" href="#persona-2" title="Permanent link">&para;</a></h3>
 <ul>
-<li>As a [persona], I want [capability] so that [benefit]</li>
+<li>As a [persona], I want [capability] so that [benefit]<ul>
 <li>Acceptance: [Testable criteria]</li>
+</ul>
+</li>
 </ul>
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <h3 id="functional-requirements">Functional Requirements<a class="headerlink" href="#functional-requirements" title="Permanent link">&para;</a></h3>
@@ -7834,34 +7845,40 @@ Use INVEST criteria for all stories:
 <h2 id="next-steps-handoffs">Next Steps &amp; Handoffs<a class="headerlink" href="#next-steps-handoffs" title="Permanent link">&para;</a></h2>
 <p>After PRD approval:</p>
 <ol>
-<li>[ ] <strong>Architect Review</strong>: Technical feasibility assessment</li>
-<li>Trigger: <code>/architect</code></li>
 <li>
-<p>Output: ADR (<code>docs/adr/NNNN-&lt;topic&gt;.md</code>)</p>
+<p>[ ] <strong>Architect Review</strong>: Technical feasibility assessment</p>
+<ul>
+<li>Trigger: <code>/architect</code></li>
+<li>Output: ADR (<code>docs/adr/NNNN-&lt;topic&gt;.md</code>)</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>UI/UX Designer</strong>: Visual design and wireframes</p>
-</li>
+<ul>
 <li>Trigger: <code>/ui-ux-designer</code></li>
-<li>
-<p>Output: Design Spec (<code>docs/specs/design-spec-&lt;component&gt;.md</code>)</p>
+<li>Output: Design Spec (<code>docs/specs/design-spec-&lt;component&gt;.md</code>)</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>Engineering Estimate</strong>: Effort estimation and decomposition</p>
-</li>
+<ul>
 <li>Trigger: <code>/builder</code> or <code>/architect</code></li>
-<li>
-<p>Output: Implementation Plan (<code>docs/plans/plan-&lt;feature&gt;.md</code>)</p>
+<li>Output: Implementation Plan (<code>docs/plans/plan-&lt;feature&gt;.md</code>)</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>Track it</strong>: add the feature row to <code>docs/tracking.md</code></p>
-</li>
+<ul>
 <li>Then decompose: <code>/swarm-plan &lt;spec or PRD path&gt;</code></li>
+</ul>
+</li>
 </ol>
-<p><strong>Related Artifacts</strong>:
-- ADR: [Link after architect review]
-- Design Spec: [Link after designer review]
-- Implementation Plan: [Link after decomposition]</p>
+<p><strong>Related Artifacts</strong>:</p>
+<ul>
+<li>ADR: [Link after architect review]</li>
+<li>Design Spec: [Link after designer review]</li>
+<li>Implementation Plan: [Link after decomposition]</li>
+</ul>
 <hr />
 <h2 id="version-history">Version History<a class="headerlink" href="#version-history" title="Permanent link">&para;</a></h2>
 <table>

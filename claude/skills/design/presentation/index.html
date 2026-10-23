@@ -7326,39 +7326,41 @@ extension).</p>
 <h2 id="0-golden-rules">0. Golden rules<a class="headerlink" href="#0-golden-rules" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Input is exactly one <code>.md</code> file.</strong> If none is given, ask for the path. Good
-  defaults: <code>docs/prd/PRD-*.md</code>, <code>docs/specs/spec-*.md</code>, <code>docs/adr/0xxx-*.md</code>,
-  <code>docs/plans/plan-*.md</code>.</li>
+    defaults: <code>docs/prd/PRD-*.md</code>, <code>docs/specs/spec-*.md</code>, <code>docs/adr/0xxx-*.md</code>,
+    <code>docs/plans/plan-*.md</code>.</li>
 <li><strong>Output is exactly one <code>.html</code> file.</strong> Render only — never add, drop, or
-  reinterpret content. Keep wording, decisions, tables, code blocks, diagrams,
-  and estimates faithful. You may compress prose into bullets, but no new facts.</li>
+    reinterpret content. Keep wording, decisions, tables, code blocks, diagrams,
+    and estimates faithful. You may compress prose into bullets, but no new facts.</li>
 <li><strong>Reuse the template's classes only.</strong> Build from <code>template-tabbar.html</code> in
-  this skill folder. Do not invent new CSS.</li>
+    this skill folder. Do not invent new CSS.</li>
 <li><strong>Do not open the browser / run <code>Start-Process</code></strong> unless the user asks.</li>
 </ul>
 <h2 id="1-workflow">1. Workflow<a class="headerlink" href="#1-workflow" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>Read the source <code>.md</code></strong> and detect its type from the title / <code>## Metadata</code>
-   / heading shape:</li>
+      / heading shape:<ul>
 <li><code># PRD:</code> or <code>## Problem Statement</code> + <code>## Goals &amp; Success Metrics</code> + <code>## User Stories</code> → <strong>PRD</strong></li>
 <li><code># Feature Specification:</code> or <code>## Functional Requirements</code> → <strong>Spec</strong></li>
 <li><code># ADR-</code> / <code>## Decision Drivers</code> / <code>## Considered Options</code> → <strong>ADR</strong></li>
 <li><code># Plan:</code> / <code>## Implementation Steps</code> / <code>### Phase N</code> → <strong>Plan</strong></li>
 <li>If ambiguous, pick the closest mapping below; don't ask unless truly unclear.</li>
+</ul>
+</li>
 <li><strong>Copy <code>template-tabbar.html</code></strong> to the output path (see §3).</li>
 <li><strong>Fill the <code>&lt;header class="hero"&gt;</code></strong>: eyebrow = type + id (e.g. <code>ADR-0006</code>),
-   <code>&lt;h1&gt;</code> = document title, chips = Status / Date / Owner / Version pulled from
-   <code>## Metadata</code> when present. Keep the <code>.back-link</code> (<code>← Presentations</code>) anchor
-   from the template — it links to
-   <code>https://nguyenhuuca.github.io/assessment/presentations/</code>.</li>
+      <code>&lt;h1&gt;</code> = document title, chips = Status / Date / Owner / Version pulled from
+      <code>## Metadata</code> when present. Keep the <code>.back-link</code> (<code>← Presentations</code>) anchor
+      from the template — it links to
+      <code>https://nguyenhuuca.github.io/assessment/presentations/</code>.</li>
 <li><strong>Map sections to tabs</strong> — one <code>.tab-btn</code> + matching <code>.panel</code> per major <code>##</code>
-   section, using the type-specific maps below. First tab gets <code>active</code> / first
-   panel gets <code>show</code>.</li>
+      section, using the type-specific maps below. First tab gets <code>active</code> / first
+      panel gets <code>show</code>.</li>
 <li><strong>Fill panels with cards.</strong> One <code>.card</code> per logical unit. Use accent colors
-   to encode meaning (see §2). Put long rationale, alternatives, and code inside
-   <code>&lt;details&gt;</code>. Keep tables as <code>&lt;table&gt;</code>, ASCII diagrams and code as <code>&lt;pre&gt;</code>.</li>
+      to encode meaning (see §2). Put long rationale, alternatives, and code inside
+      <code>&lt;details&gt;</code>. Keep tables as <code>&lt;table&gt;</code>, ASCII diagrams and code as <code>&lt;pre&gt;</code>.</li>
 <li><strong>Verify</strong> the <code>.html</code> exists and every <code>data-tab</code> has a matching panel <code>id</code>.</li>
 <li><strong>Summarize</strong> for the user: output location + navigation (← / → to switch
-   sections, click 🔎 to expand details).</li>
+      sections, click 🔎 to expand details).</li>
 </ol>
 <h2 id="2-color-block-conventions-consistent-across-all-types">2. Color &amp; block conventions (consistent across all types)<a class="headerlink" href="#2-color-block-conventions-consistent-across-all-types" title="Permanent link">&para;</a></h2>
 <table>
@@ -7416,44 +7418,54 @@ If the user prefers a dedicated folder, use <code>docs/presentations/&lt;doc-nam
 <p><code>🎯 Overview</code> · <code>❓ Problem</code> · <code>📈 Goals &amp; Metrics</code> · <code>👤 User Stories</code> ·
 <code>✅ Requirements</code> · <code>🧭 Scope</code> · <code>🔗 Dependencies</code> · <code>⚠️ Risks</code> (include only
 sections present; fold Open Questions / Appendix / Approval / Version History
-into the nearest panel or a final <code>📌 Notes</code> tab).
-- <strong>Overview / Problem Statement</strong> → <code>.card.blue</code> + <code>.hl.goal</code>.
-- <strong>Goals &amp; Success Metrics</strong> → metrics in a <code>&lt;table&gt;</code>; goals as green bullets.
-- <strong>User Stories</strong> → one <code>.card.cyan</code> per story (or a list), role/need/value.
-- <strong>Requirements</strong> → <code>.card.cyan</code> cards; tag must-have vs nice-to-have with <code>.tag</code>.
-- <strong>Scope</strong> → In-Scope (green bullets) vs Out-of-Scope (muted) in one card.
-- <strong>Risks &amp; Mitigations</strong> → <code>&lt;table&gt;</code> (risk, impact, mitigation) in <code>.card.amber</code>.</p>
+into the nearest panel or a final <code>📌 Notes</code> tab).</p>
+<ul>
+<li><strong>Overview / Problem Statement</strong> → <code>.card.blue</code> + <code>.hl.goal</code>.</li>
+<li><strong>Goals &amp; Success Metrics</strong> → metrics in a <code>&lt;table&gt;</code>; goals as green bullets.</li>
+<li><strong>User Stories</strong> → one <code>.card.cyan</code> per story (or a list), role/need/value.</li>
+<li><strong>Requirements</strong> → <code>.card.cyan</code> cards; tag must-have vs nice-to-have with <code>.tag</code>.</li>
+<li><strong>Scope</strong> → In-Scope (green bullets) vs Out-of-Scope (muted) in one card.</li>
+<li><strong>Risks &amp; Mitigations</strong> → <code>&lt;table&gt;</code> (risk, impact, mitigation) in <code>.card.amber</code>.</li>
+</ul>
 <h3 id="spec-tabs">📐 Spec → tabs<a class="headerlink" href="#spec-tabs" title="Permanent link">&para;</a></h3>
 <p><code>🎯 Overview</code> · <code>📐 Business Rules</code> · <code>✅ Requirements (FR-*)</code> · <code>🔌 API Changes</code>
-· <code>🗄️ Data / DB</code> · <code>🔒 Security</code> · <code>🧪 Testing</code> (include only sections present).
-- Each <strong>FR-N</strong> → one <code>.card.cyan</code> with a <code>.tag</code> (<code>FR-1</code>) and its acceptance
-  criteria as a bullet list. Group several FRs per panel if short.
-- Each <strong>Rule</strong> → a row in a card or a <code>.prompt</code>.
-- <strong>API endpoints</strong> → a <code>&lt;table&gt;</code> (method, path, auth, purpose).
-- <strong>DB changes</strong> → <code>&lt;pre&gt;</code> for the DDL / table sketch in a <code>.card.violet</code>.</p>
+· <code>🗄️ Data / DB</code> · <code>🔒 Security</code> · <code>🧪 Testing</code> (include only sections present).</p>
+<ul>
+<li>Each <strong>FR-N</strong> → one <code>.card.cyan</code> with a <code>.tag</code> (<code>FR-1</code>) and its acceptance
+    criteria as a bullet list. Group several FRs per panel if short.</li>
+<li>Each <strong>Rule</strong> → a row in a card or a <code>.prompt</code>.</li>
+<li><strong>API endpoints</strong> → a <code>&lt;table&gt;</code> (method, path, auth, purpose).</li>
+<li><strong>DB changes</strong> → <code>&lt;pre&gt;</code> for the DDL / table sketch in a <code>.card.violet</code>.</li>
+</ul>
 <h3 id="adr-tabs">⚖️ ADR → tabs<a class="headerlink" href="#adr-tabs" title="Permanent link">&para;</a></h3>
 <p><code>📌 Context</code> · <code>🎚️ Decision Drivers</code> · <code>⚖️ Options</code> · <code>✅ Decision</code> · <code>📊 Consequences</code>
-· <code>🔗 Links</code> (and <code>📜 Changelog</code> only if useful).
-- <strong>Considered Options</strong> → one <code>.card</code> per option; the <strong>chosen</strong> one is
-  <code>.card.green</code> with a <code>Chosen</code> <code>.tag</code>, rejected ones <code>.card.red</code>/<code>.amber</code>.
-  Pros/cons as sub-lists; put deep analysis in <code>&lt;details&gt;</code>.
-- <strong>Decision Outcome / Quantified Impact</strong> → <code>.card.green</code> + <code>.hl.prod</code>, metrics
-  in a <code>&lt;table&gt;</code>.
-- <strong>Consequences</strong> → split positive (<code>.card.green</code>) vs negative (<code>.card.amber</code>).</p>
+· <code>🔗 Links</code> (and <code>📜 Changelog</code> only if useful).</p>
+<ul>
+<li><strong>Considered Options</strong> → one <code>.card</code> per option; the <strong>chosen</strong> one is
+    <code>.card.green</code> with a <code>Chosen</code> <code>.tag</code>, rejected ones <code>.card.red</code>/<code>.amber</code>.
+    Pros/cons as sub-lists; put deep analysis in <code>&lt;details&gt;</code>.</li>
+<li><strong>Decision Outcome / Quantified Impact</strong> → <code>.card.green</code> + <code>.hl.prod</code>, metrics
+    in a <code>&lt;table&gt;</code>.</li>
+<li><strong>Consequences</strong> → split positive (<code>.card.green</code>) vs negative (<code>.card.amber</code>).</li>
+</ul>
 <h3 id="plan-tabs">🪜 Plan → tabs<a class="headerlink" href="#plan-tabs" title="Permanent link">&para;</a></h3>
 <p><code>🎯 Objective</code> · <code>🧭 Scope</code> · <code>🏗️ Technical Approach</code> · <code>🪜 Phases</code> · <code>📁 Files</code>
-· <code>⚠️ Risks / Dependencies</code> (include only what exists).
-- <strong>Scope</strong> → one card with In-Scope (green bullets) and Out-of-Scope (muted).
-- <strong>Implementation Steps / Phase N</strong> → each phase a <code>.card</code>, phase number as
-  <code>.tag</code>, the time estimate as <code>.time</code> (e.g. <code>1.5d</code>). Long phase detail/code in
-  <code>&lt;details&gt;</code>. If there are many phases, one panel listing all phases as cards.
-- <strong>Files to Create / Modify</strong> → a <code>&lt;table&gt;</code> (path, action, note).</p>
+· <code>⚠️ Risks / Dependencies</code> (include only what exists).</p>
+<ul>
+<li><strong>Scope</strong> → one card with In-Scope (green bullets) and Out-of-Scope (muted).</li>
+<li><strong>Implementation Steps / Phase N</strong> → each phase a <code>.card</code>, phase number as
+    <code>.tag</code>, the time estimate as <code>.time</code> (e.g. <code>1.5d</code>). Long phase detail/code in
+    <code>&lt;details&gt;</code>. If there are many phases, one panel listing all phases as cards.</li>
+<li><strong>Files to Create / Modify</strong> → a <code>&lt;table&gt;</code> (path, action, note).</li>
+</ul>
 <h2 id="5-handoff">5. Handoff<a class="headerlink" href="#5-handoff" title="Permanent link">&para;</a></h2>
-<p>After rendering, leave <code>&lt;doc-name&gt;.html</code> at the output path. Tell the user:
-- <strong>Open:</strong> double-click the <code>.html</code> (renders in any browser, no server).
-- <strong>Navigate:</strong> click a tab, or press <kbd>←</kbd> / <kbd>→</kbd>; click 🔎 to
-  expand details.
-- <strong>Update:</strong> when the source <code>.md</code> changes, re-run this skill to regenerate.</p>
+<p>After rendering, leave <code>&lt;doc-name&gt;.html</code> at the output path. Tell the user:</p>
+<ul>
+<li><strong>Open:</strong> double-click the <code>.html</code> (renders in any browser, no server).</li>
+<li><strong>Navigate:</strong> click a tab, or press <kbd>←</kbd> / <kbd>→</kbd>; click 🔎 to
+    expand details.</li>
+<li><strong>Update:</strong> when the source <code>.md</code> changes, re-run this skill to regenerate.</li>
+</ul>
 <h2 id="6-related-skills">6. Related skills<a class="headerlink" href="#6-related-skills" title="Permanent link">&para;</a></h2>
 <p>Pipeline: <code>scope</code> (PRD) → <code>spec</code> (Spec) / <code>architect</code> (ADR) / <code>swarm-plan</code>
 (Plan) → <strong><code>presentation</code></strong> (export <code>.html</code> deck). Any stage's artifact — PRD,

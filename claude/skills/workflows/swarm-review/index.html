@@ -7307,16 +7307,20 @@
 <h1 id="adversarial-reviewer">Adversarial Reviewer<a class="headerlink" href="#adversarial-reviewer" title="Permanent link">&para;</a></h1>
 <p>Multi-perspective code review with root cause analysis and security focus.</p>
 <h2 id="mcp-tools">MCP Tools<a class="headerlink" href="#mcp-tools" title="Permanent link">&para;</a></h2>
-<p><strong>Sequential Thinking</strong> (analysis):
-- Root cause investigation
-- Trade-off evaluation
-- Risk assessment</p>
+<p><strong>Sequential Thinking</strong> (analysis):</p>
+<ul>
+<li>Root cause investigation</li>
+<li>Trade-off evaluation</li>
+<li>Risk assessment</li>
+</ul>
 <h2 id="cli-tools">CLI Tools<a class="headerlink" href="#cli-tools" title="Permanent link">&para;</a></h2>
-<p><strong>gh</strong> (GitHub CLI):
-- Use <code>gh pr diff</code> to fetch PR diffs
-- Use <code>gh pr view --json commits</code> for commit history
-- Use <code>gh pr review</code> to approve or request changes
-- Use <code>gh pr comment</code> for inline feedback</p>
+<p><strong>gh</strong> (GitHub CLI):</p>
+<ul>
+<li>Use <code>gh pr diff</code> to fetch PR diffs</li>
+<li>Use <code>gh pr view --json commits</code> for commit history</li>
+<li>Use <code>gh pr review</code> to approve or request changes</li>
+<li>Use <code>gh pr comment</code> for inline feedback</li>
+</ul>
 <h2 id="review-workflow">Review Workflow<a class="headerlink" href="#review-workflow" title="Permanent link">&para;</a></h2>
 <p>Route review depth by the PR template's Risk Tier field: <strong>risk:high</strong> → full multi-perspective review (all perspectives below); <strong>risk:low</strong> → lite pass, where <strong>lite = single-perspective quality review; skip the security/performance/architecture panel</strong>; <strong>risk:medium</strong> → use judgment, defaulting to full when unsure.</p>
 <ol>
@@ -7327,30 +7331,40 @@
 <li><strong>Verdict</strong> — Approve or request changes with clear feedback</li>
 </ol>
 <h2 id="parallel-review-perspectives">Parallel Review Perspectives<a class="headerlink" href="#parallel-review-perspectives" title="Permanent link">&para;</a></h2>
-<p>Launch worker-reviewer agents for each perspective:
-- Security review — See <code>security.md</code> for OWASP Top 10 and severity classification
-- Performance review — See <code>code-quality.md</code> for performance checklist (N+1 queries, blocking I/O, memory allocations, pagination, algorithms, caching)
-- Architecture review — See <code>code-quality.md</code> for SOLID principles
-- Test coverage review
-- Code quality review
-- Scope adherence review — does this diff exceed its stated task?
-  - Flag unrequested refactors, drive-by edits outside the task/plan's acceptance criteria, and dead code left behind
-  - Compare the diff against the task/plan's AC and the PR template's stated scope and Risk Tier field
-  - Cite the <code>diff-size</code> CI job's &gt;400-LOC advisory (<code>framework-invariants.yml</code>) as the size signal — a mechanized proxy, not a substitute for reading the diff</p>
+<p>Launch worker-reviewer agents for each perspective:</p>
+<ul>
+<li>Security review — See <code>security.md</code> for OWASP Top 10 and severity classification</li>
+<li>Performance review — See <code>code-quality.md</code> for performance checklist (N+1 queries, blocking I/O, memory allocations, pagination, algorithms, caching)</li>
+<li>Architecture review — See <code>code-quality.md</code> for SOLID principles</li>
+<li>Test coverage review</li>
+<li>Code quality review</li>
+<li>Scope adherence review — does this diff exceed its stated task?<ul>
+<li>Flag unrequested refactors, drive-by edits outside the task/plan's acceptance criteria, and dead code left behind</li>
+<li>Compare the diff against the task/plan's AC and the PR template's stated scope and Risk Tier field</li>
+<li>Cite the <code>diff-size</code> CI job's &gt;400-LOC advisory (<code>framework-invariants.yml</code>) as the size signal — a mechanized proxy, not a substitute for reading the diff</li>
+</ul>
+</li>
+</ul>
 <h2 id="adversarial-questions">Adversarial Questions<a class="headerlink" href="#adversarial-questions" title="Permanent link">&para;</a></h2>
-<p><strong>Challenge Assumptions</strong>
-- "What if this assumption is wrong?"
-- "Under what conditions would this fail?"
-- "What edge cases weren't considered?"
-- "What in this diff did nobody ask for?" (scope adherence — see Parallel Review Perspectives)</p>
-<p><strong>Question Design</strong>
-- "Why this approach over alternatives?"
-- "What are the hidden costs?"
-- "How does this scale?"</p>
-<p><strong>Probe Weaknesses</strong>
-- "What happens when [X] fails?"
-- "How does this behave under load?"
-- "What if the input is malicious?"</p>
+<p><strong>Challenge Assumptions</strong></p>
+<ul>
+<li>"What if this assumption is wrong?"</li>
+<li>"Under what conditions would this fail?"</li>
+<li>"What edge cases weren't considered?"</li>
+<li>"What in this diff did nobody ask for?" (scope adherence — see Parallel Review Perspectives)</li>
+</ul>
+<p><strong>Question Design</strong></p>
+<ul>
+<li>"Why this approach over alternatives?"</li>
+<li>"What are the hidden costs?"</li>
+<li>"How does this scale?"</li>
+</ul>
+<p><strong>Probe Weaknesses</strong></p>
+<ul>
+<li>"What happens when [X] fails?"</li>
+<li>"How does this behave under load?"</li>
+<li>"What if the input is malicious?"</li>
+</ul>
 <h2 id="root-cause-analysis-five-whys">Root Cause Analysis (Five Whys)<a class="headerlink" href="#root-cause-analysis-five-whys" title="Permanent link">&para;</a></h2>
 <p>Apply until reaching systemic cause (may be 3-7 whys):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gs">**Issue**</span>: [Describe the problem]
@@ -7364,16 +7378,20 @@
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="gs">**Systemic Fix**</span>: [What prevents recurrence]
 </code></pre></div>
 <h2 id="verdict-framework">Verdict Framework<a class="headerlink" href="#verdict-framework" title="Permanent link">&para;</a></h2>
-<p><strong>Approve</strong> when:
-- All Critical/High issues resolved
-- Change improves codebase health
-- Tests pass and coverage adequate
-- Matches project conventions</p>
-<p><strong>Request Changes</strong> when:
-- Security vulnerabilities present
-- Breaking changes without migration
-- Tests missing for new logic
-- Architectural violations</p>
+<p><strong>Approve</strong> when:</p>
+<ul>
+<li>All Critical/High issues resolved</li>
+<li>Change improves codebase health</li>
+<li>Tests pass and coverage adequate</li>
+<li>Matches project conventions</li>
+</ul>
+<p><strong>Request Changes</strong> when:</p>
+<ul>
+<li>Security vulnerabilities present</li>
+<li>Breaking changes without migration</li>
+<li>Tests missing for new logic</li>
+<li>Architectural violations</li>
+</ul>
 <h2 id="output-format">Output Format<a class="headerlink" href="#output-format" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gu">## Code Review: [Branch/PR]</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>

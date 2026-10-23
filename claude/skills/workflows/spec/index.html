@@ -7283,9 +7283,11 @@ Ask clarifying questions before writing — the spec must be unambiguous.</p>
 <hr />
 <h2 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Permanent link">&para;</a></h2>
 <h3 id="step-1-read-inputs">Step 1 — Read inputs<a class="headerlink" href="#step-1-read-inputs" title="Permanent link">&para;</a></h3>
-<p>Read the files from <code>$ARGUMENTS</code>:
-- <strong>PRD</strong> — extract: feature name, functional requirements, user stories, scope, NFRs
-- <strong>ADR</strong> (if given) — extract: chosen approach, schema sketch, API sketch, constraints, consequences</p>
+<p>Read the files from <code>$ARGUMENTS</code>:</p>
+<ul>
+<li><strong>PRD</strong> — extract: feature name, functional requirements, user stories, scope, NFRs</li>
+<li><strong>ADR</strong> (if given) — extract: chosen approach, schema sketch, API sketch, constraints, consequences</li>
+</ul>
 <p>Derive the kebab slug from the PRD filename (e.g. <code>PRD-bookmark-feature.md</code> → <code>bookmark-feature</code>).</p>
 <h3 id="step-2-identify-gaps-and-ask-questions-one-at-a-time">Step 2 — Identify gaps and ask questions one at a time<a class="headerlink" href="#step-2-identify-gaps-and-ask-questions-one-at-a-time" title="Permanent link">&para;</a></h3>
 <p>The PRD and ADR answer the "why" and "how". The Spec must answer the "exactly what".
@@ -7332,12 +7334,14 @@ Ask ONLY for what is genuinely unclear or not stated in the inputs.</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Rules:</strong>
-- Ask questions <strong>one at a time</strong> — use <code>AskUserQuestion</code> for each, wait for the answer, then ask the next
-- Work through Q1 → Q6 in order, skipping any already answered in the PRD/ADR
-- For each question, provide <strong>3–4 contextually relevant options</strong> derived from the feature. Mark best guess <code>(Recommended)</code>.
-- After each answer, acknowledge it in one sentence before asking the next
-- If the user says "just write it" or "use your best judgment", proceed with clearly labeled assumptions</p>
+<p><strong>Rules:</strong></p>
+<ul>
+<li>Ask questions <strong>one at a time</strong> — use <code>AskUserQuestion</code> for each, wait for the answer, then ask the next</li>
+<li>Work through Q1 → Q6 in order, skipping any already answered in the PRD/ADR</li>
+<li>For each question, provide <strong>3–4 contextually relevant options</strong> derived from the feature. Mark best guess <code>(Recommended)</code>.</li>
+<li>After each answer, acknowledge it in one sentence before asking the next</li>
+<li>If the user says "just write it" or "use your best judgment", proceed with clearly labeled assumptions</li>
+</ul>
 <p><strong>Example — asking Q1 for a bookmark feature:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>AskUserQuestion({
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  questions: [{
@@ -7369,42 +7373,50 @@ Ask ONLY for what is genuinely unclear or not stated in the inputs.</p>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>})
 </code></pre></div></p>
 <h3 id="step-3-read-codebase-context">Step 3 — Read codebase context<a class="headerlink" href="#step-3-read-codebase-context" title="Permanent link">&para;</a></h3>
-<p>Use Glob/Grep to verify:
-- Existing entities related to the feature (field names, types)
-- Existing error handling patterns (<code>ResultErrorInfo</code>, exception classes)
-- Migration naming convention (latest file in <code>db/changelog/sql/</code>)
-- Frontend API module pattern (<code>webapp/src/api/</code>)</p>
+<p>Use Glob/Grep to verify:</p>
+<ul>
+<li>Existing entities related to the feature (field names, types)</li>
+<li>Existing error handling patterns (<code>ResultErrorInfo</code>, exception classes)</li>
+<li>Migration naming convention (latest file in <code>db/changelog/sql/</code>)</li>
+<li>Frontend API module pattern (<code>webapp/src/api/</code>)</li>
+</ul>
 <p>This ensures the spec reflects the actual codebase, not assumptions.</p>
 <h3 id="step-4-write-the-spec">Step 4 — Write the Spec<a class="headerlink" href="#step-4-write-the-spec" title="Permanent link">&para;</a></h3>
 <p>Create <code>docs/specs/spec-{kebab-slug}.md</code> using <code>templates/artifacts/spec.template.md</code>.</p>
 <p>Fill every section. Where information comes from assumption rather than user input, mark with <code>&gt; **Assumption:** ...</code>.</p>
-<p><strong>Project-specific conventions:</strong>
-- API base path: <code>/v1/funny-app</code> (from <code>AppConstant.API.BASE_URL</code>)
-- Response wrappers: <code>ResultObjectInfo&lt;T&gt;</code> for single objects, <code>ResultListInfo&lt;T&gt;</code> for lists
-- Error response format: <code>{ status: "ERROR", code: "...", message: "..." }</code> via <code>ResultErrorInfo</code>
-- Auth: JWT Bearer — extracted from <code>SecurityContextHolder</code> in service layer
-- DB migrations: <code>api/src/main/resources/db/changelog/sql/YYYYMMDDHHMM-description.sql</code>
-- UUID primary keys for new entities (matches recent VideoComment pattern)
-- Frontend queries: <code>['resource', 'filter']</code> key convention with React Query</p>
-<p><strong>Sections to fill (never leave placeholder text):</strong>
-- Overview — 1–3 sentences, system-level outcome
-- Business Rules — numbered, each independently testable
-- Functional Requirements — FR-1, FR-2... with "must"/"must not"
-- API Changes — exact request/response/error table per endpoint
-- Database Changes — final SQL with indexes
-- Security Requirements — auth, roles, masking
-- Caching Impact — which Guava caches are affected
-- Frontend Changes — new routes, components, React Query keys
-- Non-Functional Requirements — latency targets per operation
-- Edge Cases — EC-1, EC-2... with exact expected behavior
-- Acceptance Criteria — testable checklist QA can use directly</p>
+<p><strong>Project-specific conventions:</strong></p>
+<ul>
+<li>API base path: <code>/v1/funny-app</code> (from <code>AppConstant.API.BASE_URL</code>)</li>
+<li>Response wrappers: <code>ResultObjectInfo&lt;T&gt;</code> for single objects, <code>ResultListInfo&lt;T&gt;</code> for lists</li>
+<li>Error response format: <code>{ status: "ERROR", code: "...", message: "..." }</code> via <code>ResultErrorInfo</code></li>
+<li>Auth: JWT Bearer — extracted from <code>SecurityContextHolder</code> in service layer</li>
+<li>DB migrations: <code>api/src/main/resources/db/changelog/sql/YYYYMMDDHHMM-description.sql</code></li>
+<li>UUID primary keys for new entities (matches recent VideoComment pattern)</li>
+<li>Frontend queries: <code>['resource', 'filter']</code> key convention with React Query</li>
+</ul>
+<p><strong>Sections to fill (never leave placeholder text):</strong></p>
+<ul>
+<li>Overview — 1–3 sentences, system-level outcome</li>
+<li>Business Rules — numbered, each independently testable</li>
+<li>Functional Requirements — FR-1, FR-2... with "must"/"must not"</li>
+<li>API Changes — exact request/response/error table per endpoint</li>
+<li>Database Changes — final SQL with indexes</li>
+<li>Security Requirements — auth, roles, masking</li>
+<li>Caching Impact — which Guava caches are affected</li>
+<li>Frontend Changes — new routes, components, React Query keys</li>
+<li>Non-Functional Requirements — latency targets per operation</li>
+<li>Edge Cases — EC-1, EC-2... with exact expected behavior</li>
+<li>Acceptance Criteria — testable checklist QA can use directly</li>
+</ul>
 <h3 id="step-4b-write-the-sequence-diagrams">Step 4b — Write the sequence diagrams<a class="headerlink" href="#step-4b-write-the-sequence-diagrams" title="Permanent link">&para;</a></h3>
 <p>Create (or update) <code>docs/sequence/sequence-{kebab-slug}.md</code> from <code>templates/artifacts/sequence.template.md</code>: Mermaid <code>sequenceDiagram</code> blocks, one per main flow in the spec (happy path, then the error, async/event and scheduled-job paths from FR / EC). Use the endpoint paths, status codes and component names from the spec, so the diagrams and the spec agree. Link the file from the spec's Overview.</p>
 <h3 id="step-5-update-tracking-and-offer-next-steps">Step 5 — Update tracking and offer next steps<a class="headerlink" href="#step-5-update-tracking-and-offer-next-steps" title="Permanent link">&para;</a></h3>
-<p>After writing the Spec:
-1. Update <code>docs/tracking.md</code> — set Spec column for this feature to link + 📋, and the Sequence column to the diagram link
-2. Offer to create <strong>Implementation Plan</strong> (<code>docs/plans/plan-{slug}.md</code>) via <code>/swarm-plan</code>
-3. Offer to add entries to <strong><code>mkdocs.yml</code></strong> nav under Specs and Sequence Diagrams</p>
+<p>After writing the Spec:</p>
+<ol>
+<li>Update <code>docs/tracking.md</code> — set Spec column for this feature to link + 📋, and the Sequence column to the diagram link</li>
+<li>Offer to create <strong>Implementation Plan</strong> (<code>docs/plans/plan-{slug}.md</code>) via <code>/swarm-plan</code></li>
+<li>Offer to add entries to <strong><code>mkdocs.yml</code></strong> nav under Specs and Sequence Diagrams</li>
+</ol>
 <p>Do not auto-create these — wait for the user to confirm.</p>
 <hr />
 <h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>

@@ -7587,11 +7587,13 @@
 </table>
 <hr />
 <h2 id="design-decision-int-over-long">Design Decision: <code>int</code> over <code>long</code><a class="headerlink" href="#design-decision-int-over-long" title="Permanent link">&para;</a></h2>
-<p>All permission fields use <strong><code>int</code></strong> (not <code>long</code>). Rationale:
-- 32 bits = 32 possible permissions — far more than this app needs
-- No <code>L</code> suffix noise in enum
-- PostgreSQL <code>INT</code> instead of <code>BIGINT</code> — cleaner schema
-- Since all files are uncommitted, now is the right time to align</p>
+<p>All permission fields use <strong><code>int</code></strong> (not <code>long</code>). Rationale:</p>
+<ul>
+<li>32 bits = 32 possible permissions — far more than this app needs</li>
+<li>No <code>L</code> suffix noise in enum</li>
+<li>PostgreSQL <code>INT</code> instead of <code>BIGINT</code> — cleaner schema</li>
+<li>Since all files are uncommitted, now is the right time to align</li>
+</ul>
 <p><strong>Affects:</strong> <code>Permission.java</code>, <code>PermissionService.java</code>, <code>PermissionServiceImpl.java</code>, <code>User.java</code>, <code>UserDetailDto.java</code>, <code>AppUserDetails.java</code>, SQL column type.</p>
 <hr />
 <h2 id="gap-analysis">Gap Analysis<a class="headerlink" href="#gap-analysis" title="Permanent link">&para;</a></h2>
@@ -7648,10 +7650,12 @@ Spring's <code>User</code> has no <code>permissions</code> field → <code>authe
 <h3 id="issue-4-wrong-method-in-spel-expression">Issue 4 — Wrong method in SpEL expression<a class="headerlink" href="#issue-4-wrong-method-in-spel-expression" title="Permanent link">&para;</a></h3>
 <p><code>@HasPermission</code> annotation:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@PreAuthorize</span><span class="p">(</span><span class="s">"@permissionServiceImpl.hasPermission(authentication.principal.permissions, #perms)"</span><span class="p">)</span>
-</code></pre></div>
-- <code>#perms</code> is <code>Permission[]</code> (array — from <code>Permission[] perms()</code>)
-- <code>hasPermission(long, Permission)</code> takes a <strong>single</strong> <code>Permission</code>
-- Result: <code>MethodResolutionException</code> at runtime</p>
+</code></pre></div></p>
+<ul>
+<li><code>#perms</code> is <code>Permission[]</code> (array — from <code>Permission[] perms()</code>)</li>
+<li><code>hasPermission(long, Permission)</code> takes a <strong>single</strong> <code>Permission</code></li>
+<li>Result: <code>MethodResolutionException</code> at runtime</li>
+</ul>
 <hr />
 <h2 id="implementation-steps">Implementation Steps<a class="headerlink" href="#implementation-steps" title="Permanent link">&para;</a></h2>
 <h3 id="step-1-fix-sql-seed-data">Step 1 — Fix SQL seed data<a class="headerlink" href="#step-1-fix-sql-seed-data" title="Permanent link">&para;</a></h3>

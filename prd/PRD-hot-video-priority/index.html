@@ -7657,15 +7657,19 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
 <p>All videos are displayed in a flat, unordered list. Users have no signal about which videos are trending or popular — leading to poor content discovery and lower engagement. Users who want to watch something good must manually browse without any curation.</p>
 <h3 id="evidence">Evidence<a class="headerlink" href="#evidence" title="Permanent link">&para;</a></h3>
-<p><strong>Quantitative Evidence:</strong>
-- No trending signal exists — 100% of content discovery is manual browsing
-- <code>VideoAccessStats</code> table exists and tracks <code>hitCount</code> + <code>lastAccessedAt</code>, but <code>recordAccess()</code> is <strong>commented out</strong> — zero access data is being written
-- <code>ShareLink</code> table tracks share events but is not used for ranking
-- <code>VideoCacheImpl</code> already promotes videos with ≥5 cache hits — evidence that popularity signals are valuable</p>
-<p><strong>Qualitative Evidence:</strong>
-- Users who want to watch "something good" have no starting point other than scrolling
-- Hot content buried in a flat list reduces the chance of viral spread
-- Pre-caching popular videos is already partially designed in <code>VideoCacheImpl</code> — the infrastructure anticipates this need</p>
+<p><strong>Quantitative Evidence:</strong></p>
+<ul>
+<li>No trending signal exists — 100% of content discovery is manual browsing</li>
+<li><code>VideoAccessStats</code> table exists and tracks <code>hitCount</code> + <code>lastAccessedAt</code>, but <code>recordAccess()</code> is <strong>commented out</strong> — zero access data is being written</li>
+<li><code>ShareLink</code> table tracks share events but is not used for ranking</li>
+<li><code>VideoCacheImpl</code> already promotes videos with ≥5 cache hits — evidence that popularity signals are valuable</li>
+</ul>
+<p><strong>Qualitative Evidence:</strong></p>
+<ul>
+<li>Users who want to watch "something good" have no starting point other than scrolling</li>
+<li>Hot content buried in a flat list reduces the chance of viral spread</li>
+<li>Pre-caching popular videos is already partially designed in <code>VideoCacheImpl</code> — the infrastructure anticipates this need</li>
+</ul>
 <hr />
 <h2 id="goals-success-metrics">Goals &amp; Success Metrics<a class="headerlink" href="#goals-success-metrics" title="Permanent link">&para;</a></h2>
 <table>
@@ -7703,19 +7707,29 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 <h2 id="user-stories">User Stories<a class="headerlink" href="#user-stories" title="Permanent link">&para;</a></h2>
 <h3 id="viewer">Viewer<a class="headerlink" href="#viewer" title="Permanent link">&para;</a></h3>
 <ul>
-<li>As a <strong>viewer</strong>, I want to see a "Trending Now" section at the top of the home page so that I can quickly find popular content without browsing.</li>
+<li>As a <strong>viewer</strong>, I want to see a "Trending Now" section at the top of the home page so that I can quickly find popular content without browsing.<ul>
 <li>Acceptance: A "🔥 Trending Now" section shows top 5 hot videos above the main feed.</li>
-<li>As a <strong>viewer</strong>, I want hot videos to be visually marked so that I know at a glance which content is currently popular.</li>
+</ul>
+</li>
+<li>As a <strong>viewer</strong>, I want hot videos to be visually marked so that I know at a glance which content is currently popular.<ul>
 <li>Acceptance: Video cards with <code>isHot = true</code> display a 🔥 badge.</li>
-<li>As a <strong>viewer</strong>, I want hot videos to start playing faster so that I don't wait when choosing trending content.</li>
+</ul>
+</li>
+<li>As a <strong>viewer</strong>, I want hot videos to start playing faster so that I don't wait when choosing trending content.<ul>
 <li>Acceptance: Top 10 hot videos are pre-warmed in cache; first-frame latency &lt; 500ms.</li>
+</ul>
+</li>
 </ul>
 <h3 id="content-viewer-api-consumer">Content Viewer (API consumer)<a class="headerlink" href="#content-viewer-api-consumer" title="Permanent link">&para;</a></h3>
 <ul>
-<li>As an <strong>API consumer</strong>, I want a dedicated <code>/api/videos/trending</code> endpoint so that I can build trending feeds in any client.</li>
+<li>As an <strong>API consumer</strong>, I want a dedicated <code>/api/videos/trending</code> endpoint so that I can build trending feeds in any client.<ul>
 <li>Acceptance: <code>GET /api/videos/trending?limit=N</code> returns top N videos sorted by <code>hotScore DESC</code>.</li>
-<li>As an <strong>API consumer</strong>, I want to sort the main video list by hotness so that I can offer multiple sort options without a separate endpoint.</li>
+</ul>
+</li>
+<li>As an <strong>API consumer</strong>, I want to sort the main video list by hotness so that I can offer multiple sort options without a separate endpoint.<ul>
 <li>Acceptance: <code>GET /api/videos?sort=hot</code> returns all videos sorted by <code>hotScore DESC</code>; existing calls without <code>sort</code> are unchanged.</li>
+</ul>
+</li>
 </ul>
 <hr />
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
@@ -8035,33 +8049,39 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 <h2 id="next-steps-handoffs">Next Steps &amp; Handoffs<a class="headerlink" href="#next-steps-handoffs" title="Permanent link">&para;</a></h2>
 <p>After PRD approval:</p>
 <ol>
-<li>[x] <strong>Architect Review</strong>: Technical feasibility assessment</li>
 <li>
-<p>Output: <a href="../../adr/0011-hot-video-priority/">ADR-0011</a></p>
+<p>[x] <strong>Architect Review</strong>: Technical feasibility assessment</p>
+<ul>
+<li>Output: <a href="../../adr/0011-hot-video-priority/">ADR-0011</a></li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>UI/UX Designer</strong>: Wireframes for Trending Now section + Hot badge</p>
-</li>
+<ul>
 <li>Trigger: <code>/ui-ux-designer</code></li>
-<li>
-<p>Output: Design Spec (<code>artifacts/design_spec_hot-video.md</code>)</p>
+<li>Output: Design Spec (<code>artifacts/design_spec_hot-video.md</code>)</li>
+</ul>
 </li>
 <li>
 <p>[x] <strong>Engineering Estimate</strong>: Effort estimation and decomposition</p>
-</li>
-<li>
-<p>Output: <a href="../../plans/plan-hot-video-priority/">plan-hot-video-priority</a></p>
+<ul>
+<li>Output: <a href="../../plans/plan-hot-video-priority/">plan-hot-video-priority</a></li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>Create Beads Issues</strong>: Decompose into trackable work items</p>
-</li>
+<ul>
 <li>Command: <code>bd create "Hot Video Priority" -t feature</code></li>
+</ul>
+</li>
 </ol>
-<p><strong>Related Artifacts:</strong>
-- ADR: <a href="../../adr/0011-hot-video-priority/">ADR-0011 — Hot Video Priority Scoring</a>
-- Implementation Plan: <a href="../../plans/plan-hot-video-priority/">plan-hot-video-priority</a>
-- Cache Strategy: <a href="../../adr/0003-use-cache/">ADR-0003</a>
-- LRU Cache: <a href="../../adr/0005-use_lru_cache_video_streaming/">ADR-0005</a></p>
+<p><strong>Related Artifacts:</strong></p>
+<ul>
+<li>ADR: <a href="../../adr/0011-hot-video-priority/">ADR-0011 — Hot Video Priority Scoring</a></li>
+<li>Implementation Plan: <a href="../../plans/plan-hot-video-priority/">plan-hot-video-priority</a></li>
+<li>Cache Strategy: <a href="../../adr/0003-use-cache/">ADR-0003</a></li>
+<li>LRU Cache: <a href="../../adr/0005-use_lru_cache_video_streaming/">ADR-0005</a></li>
+</ul>
 <hr />
 <h2 id="version-history">Version History<a class="headerlink" href="#version-history" title="Permanent link">&para;</a></h2>
 <table>

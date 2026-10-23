@@ -7125,9 +7125,11 @@
 <ul>
 <li>Change a job's cron, zone or on/off state <strong>without a deploy</strong>, and see it take effect immediately.</li>
 <li>No new library and no new infrastructure.</li>
-<li>Safe on 1 vCPU:</li>
+<li>Safe on 1 vCPU:<ul>
 <li>a job can never run twice at the same time;</li>
 <li>an admin cannot schedule a job every second.</li>
+</ul>
+</li>
 <li>Destructive or costly controls are restricted to SUPER_ADMIN.</li>
 </ul>
 <h2 id="decisions">Decisions<a class="headerlink" href="#decisions" title="Permanent link">&para;</a></h2>
@@ -7151,12 +7153,16 @@
 <h3 id="d3-dynamicjobscheduler-uses-springs-taskscheduler-crontrigger">D3. <code>DynamicJobScheduler</code> uses Spring's <code>TaskScheduler</code> + <code>CronTrigger</code><a class="headerlink" href="#d3-dynamicjobscheduler-uses-springs-taskscheduler-crontrigger" title="Permanent link">&para;</a></h3>
 <ul>
 <li>On <code>ApplicationReadyEvent</code>, it loads all rows and schedules the enabled ones.</li>
-<li>It keeps a <code>ConcurrentHashMap&lt;String, ScheduledFuture&lt;?&gt;&gt;</code>.</li>
+<li>It keeps a <code>ConcurrentHashMap&lt;String, ScheduledFuture&lt;?&gt;&gt;</code>.<ul>
 <li><code>reschedule(job)</code> runs inside <code>map.compute(name, …)</code>, which is atomic per key: cancel the old future (<code>cancel(false)</code>), then schedule a new one if enabled.</li>
 <li>Two concurrent PATCHes therefore cannot leave two schedules for one job. No <code>synchronized</code> is used.</li>
-<li><strong>Overlap guard:</strong> a <code>ConcurrentHashMap&lt;String, AtomicBoolean&gt;</code> per job.</li>
+</ul>
+</li>
+<li><strong>Overlap guard:</strong> a <code>ConcurrentHashMap&lt;String, AtomicBoolean&gt;</code> per job.<ul>
 <li>A run starts only if <code>compareAndSet(false, true)</code> succeeds; otherwise it is skipped and logged.</li>
 <li>This covers a scheduled fire, a "run now", and a slow previous run alike.</li>
+</ul>
+</li>
 <li>Each run is wrapped in <code>try/catch</code>, so one failing job does not affect the scheduler. The result goes to the in-memory status.</li>
 </ul>
 <h3 id="d4-admin-api-under-v1funny-appadminjobs">D4. Admin API under <code>/v1/funny-app/admin/jobs</code><a class="headerlink" href="#d4-admin-api-under-v1funny-appadminjobs" title="Permanent link">&para;</a></h3>
@@ -7190,24 +7196,30 @@
 </tr>
 </tbody>
 </table>
-<p>Validation, with errors as <code>CustomException</code> + i18n keys:
-- <strong>cron:</strong> must pass <code>CronExpression.isValidExpression</code>. Its <strong>seconds field must also be a single number (0–59)</strong>, which means at most once per minute and prevents <code>* * * * * *</code>.
-- <strong>zone:</strong> must pass <code>ZoneId.of</code>.
-- <strong>name:</strong> an unknown name gets 404.</p>
+<p>Validation, with errors as <code>CustomException</code> + i18n keys:</p>
+<ul>
+<li><strong>cron:</strong> must pass <code>CronExpression.isValidExpression</code>. Its <strong>seconds field must also be a single number (0–59)</strong>, which means at most once per minute and prevents <code>* * * * * *</code>.</li>
+<li><strong>zone:</strong> must pass <code>ZoneId.of</code>.</li>
+<li><strong>name:</strong> an unknown name gets 404.</li>
+</ul>
 <h3 id="d5-one-replica-no-distributed-lock">D5. One replica → no distributed lock<a class="headerlink" href="#d5-one-replica-no-distributed-lock" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A schedule change applies to the pod that served the PATCH, and it persists to the DB for the next start. With one replica, that is all pods.</li>
-<li><strong>When HPA max &gt; 1</strong>, a new ADR must add one of two options:</li>
+<li><strong>When HPA max &gt; 1</strong>, a new ADR must add one of two options:<ul>
 <li><strong>ShedLock</strong> (JDBC provider, one lock row per job), which is enough for "run once across pods";</li>
 <li><strong>Quartz</strong> with a JDBC job store, if clustered misfire handling or run history is needed.</li>
+</ul>
+</li>
 <li>At the same time, schedule changes must reach the other pods, e.g. through a DB poll of <code>updated_at</code>.</li>
 <li>Until then, a rolling deploy can briefly run two pods. That is the same exposure as today's <code>@Scheduled</code>, so it is unchanged.</li>
 </ul>
 <h3 id="d6-out-of-scope">D6. Out of scope<a class="headerlink" href="#d6-out-of-scope" title="Permanent link">&para;</a></h3>
-<p>These are infrastructure timers, not business jobs:
-- the SSE heartbeat (<code>InMemorySsePublisher.java:89</code>);
-- the import poll (<code>VideoImportWorker.java:110</code>);
-- the one-off thumbnail runner (<code>AppScheduler.java:63-67</code>).</p>
+<p>These are infrastructure timers, not business jobs:</p>
+<ul>
+<li>the SSE heartbeat (<code>InMemorySsePublisher.java:89</code>);</li>
+<li>the import poll (<code>VideoImportWorker.java:110</code>);</li>
+<li>the one-off thumbnail runner (<code>AppScheduler.java:63-67</code>).</li>
+</ul>
 <h2 id="options-considered">Options Considered<a class="headerlink" href="#options-considered" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -7245,12 +7257,16 @@
 </table>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Positive:</strong></li>
+<li><strong>Positive:</strong><ul>
 <li>Schedules can be edited, paused or run on demand from the Admin UI, and every change is audit-logged.</li>
 <li>The wrong comments disappear.</li>
-<li><strong>Negative:</strong></li>
+</ul>
+</li>
+<li><strong>Negative:</strong><ul>
 <li>A bad but valid cron (e.g. 03:00 vs 15:00) now takes effect without code review. Mitigations: the change is audit-logged and restricted to SUPER_ADMIN, and the UI shows <code>nextRunAt</code> before and after the change.</li>
 <li>Last-run state is lost on restart.</li>
+</ul>
+</li>
 <li><strong>Reversibility:</strong> Two-way door. Putting <code>@Scheduled</code> back and dropping the table restores today's behavior.</li>
 </ul>
 

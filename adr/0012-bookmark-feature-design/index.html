@@ -7570,11 +7570,13 @@ Related Skills: designing-systems, designing-apis, domain-driven-design
 <p>Two architectural questions have non-obvious answers and warrant an explicit decision record:</p>
 <p><strong>Q1 — Bookmark state delivery</strong>: How does each video card know whether the current user has bookmarked it? The naive approach (enriching video list responses) conflicts with the existing Guava LRU cache, which stores video metadata without user context. Introducing user-specific data into cached responses would either break caching or require user-keyed cache variants.</p>
 <p><strong>Q2 — FK strategy</strong>: The existing <code>VideoComment</code> entity stores <code>userId</code> and <code>videoId</code> as <code>String</code> columns (no FK constraints) to support guest commenting. Should bookmarks follow the same pattern for consistency, or use actual FK constraints given that bookmarks have different integrity requirements?</p>
-<p>Additional decisions made (rationale in Decision Outcome):
-- ID type: UUID (matches VideoComment pattern)
-- Collection storage: three-table relational
-- Toggle API: video-centric (POST add + DELETE by videoId, not bookmark ID)
-- ON DELETE video_id: SET NULL</p>
+<p>Additional decisions made (rationale in Decision Outcome):</p>
+<ul>
+<li>ID type: UUID (matches VideoComment pattern)</li>
+<li>Collection storage: three-table relational</li>
+<li>Toggle API: video-centric (POST add + DELETE by videoId, not bookmark ID)</li>
+<li>ON DELETE video_id: SET NULL</li>
+</ul>
 <hr />
 <h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
 <ul>
@@ -7799,18 +7801,24 @@ Related Skills: designing-systems, designing-apis, domain-driven-design
 </table>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Guava LRU cache for video lists is completely unaffected — no cache architecture changes
-- Bookmark state is correct for all video cards, including paginated / infinite-scroll results, without extra requests
-- DB integrity is enforced at the schema level — no defensive application logic needed for orphan rows
-- Video-centric API (<code>?videoId=X</code>) matches how the frontend naturally thinks about the feature</p>
-<p><strong>Negative:</strong>
-- Bookmark entity deviates from VideoComment's string-FK pattern — developers must be aware of the distinction
-- Nullable <code>video_id</code> (after <code>ON DELETE SET NULL</code>) requires null handling in the JPA entity (<code>@ManyToOne(optional = true)</code>) and in the API response DTO
-- <code>GET /bookmarks/ids</code> result is stale if bookmarks change in another browser tab — acceptable for this use case</p>
-<p><strong>Risks:</strong>
-- If the 500-bookmark cap is removed in future, the "all IDs at page load" approach must be re-evaluated. Cap enforcement in the service layer is the guard. → If removed, migrate to Option 1B (bulk status endpoint).
-- <code>ON DELETE SET NULL</code> on video_id requires the frontend to handle <code>videoId: null</code> bookmarks gracefully (show placeholder, not crash). → API contract must document this; frontend must treat null videoId as a special case.</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>Guava LRU cache for video lists is completely unaffected — no cache architecture changes</li>
+<li>Bookmark state is correct for all video cards, including paginated / infinite-scroll results, without extra requests</li>
+<li>DB integrity is enforced at the schema level — no defensive application logic needed for orphan rows</li>
+<li>Video-centric API (<code>?videoId=X</code>) matches how the frontend naturally thinks about the feature</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Bookmark entity deviates from VideoComment's string-FK pattern — developers must be aware of the distinction</li>
+<li>Nullable <code>video_id</code> (after <code>ON DELETE SET NULL</code>) requires null handling in the JPA entity (<code>@ManyToOne(optional = true)</code>) and in the API response DTO</li>
+<li><code>GET /bookmarks/ids</code> result is stale if bookmarks change in another browser tab — acceptable for this use case</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li>If the 500-bookmark cap is removed in future, the "all IDs at page load" approach must be re-evaluated. Cap enforcement in the service layer is the guard. → If removed, migrate to Option 1B (bulk status endpoint).</li>
+<li><code>ON DELETE SET NULL</code> on video_id requires the frontend to handle <code>videoId: null</code> bookmarks gracefully (show placeholder, not crash). → API contract must document this; frontend must treat null videoId as a special case.</li>
+</ul>
 <hr />
 <h2 id="schema-reference">Schema Reference<a class="headerlink" href="#schema-reference" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">-- Migration: 202605310001-create-bookmark-tables.sql</span>
@@ -7852,11 +7860,13 @@ Related Skills: designing-systems, designing-apis, domain-driven-design
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>POST   /api/v1/bookmarks/collections/{id}/items   body: { bookmarkId }
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>DELETE /api/v1/bookmarks/collections/{id}/items/{bookmarkId} → 204
 </code></pre></div>
-<p>Notes:
-- All endpoints require <code>Authorization: Bearer &lt;jwt&gt;</code> — Spring Security filter enforces this
-- <code>BookmarkDto.videoId</code> may be <code>null</code> when source video has been deleted (ON DELETE SET NULL)
-- <code>POST /bookmarks</code> returns 200 if already exists (idempotent), 201 if created
-- <code>POST /bookmarks</code> returns 409 if user has reached the 500-bookmark cap</p>
+<p>Notes:</p>
+<ul>
+<li>All endpoints require <code>Authorization: Bearer &lt;jwt&gt;</code> — Spring Security filter enforces this</li>
+<li><code>BookmarkDto.videoId</code> may be <code>null</code> when source video has been deleted (ON DELETE SET NULL)</li>
+<li><code>POST /bookmarks</code> returns 200 if already exists (idempotent), 201 if created</li>
+<li><code>POST /bookmarks</code> returns 409 if user has reached the 500-bookmark cap</li>
+</ul>
 <hr />
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>

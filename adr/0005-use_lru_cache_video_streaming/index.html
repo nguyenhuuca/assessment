@@ -7461,14 +7461,20 @@
 <p>N/A — no concrete before/after metrics available at decision time.</p>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Cache automatically evicts least recently accessed chunks when the memory limit is reached
-- Performance remains stable under typical streaming usage patterns
-- Fast implementation path using Guava with low operational complexity</p>
-<p><strong>Negative:</strong>
-- Frequently accessed but not recently accessed chunks may be evicted, reducing hit rate under certain access patterns</p>
-<p><strong>Risks:</strong>
-- If production workloads exhibit cache churn or degraded hit rates due to frequent eviction of hot chunks, a switch to LFU (Caffeine) or a hybrid strategy such as W-TinyLFU may be required; this should be driven by chunk access telemetry</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>Cache automatically evicts least recently accessed chunks when the memory limit is reached</li>
+<li>Performance remains stable under typical streaming usage patterns</li>
+<li>Fast implementation path using Guava with low operational complexity</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Frequently accessed but not recently accessed chunks may be evicted, reducing hit rate under certain access patterns</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li>If production workloads exhibit cache churn or degraded hit rates due to frequent eviction of hot chunks, a switch to LFU (Caffeine) or a hybrid strategy such as W-TinyLFU may be required; this should be driven by chunk access telemetry</li>
+</ul>
 <hr />
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>

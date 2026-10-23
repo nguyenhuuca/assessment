@@ -7592,20 +7592,30 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 </blockquote>
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
 <p>Funny Movies users have <strong>no self-service screen to manage their account or preferences</strong>. Today there is no UI surface to view profile details, manage sign-in/MFA security, control notifications, set playback defaults, manage privacy of their watch history, or delete their account. Any such change requires developer intervention or is simply impossible.</p>
-<p>This matters because:
-- Users cannot independently secure their account (enable MFA, manage sign-in).
-- Preferences (notifications, default playback quality, watch-history privacy) cannot be expressed or persisted, so the product feels static and impersonal.
-- Account deletion / data control is a baseline expectation (and a privacy-compliance concern) with no current path.</p>
+<p>This matters because:</p>
+<ul>
+<li>Users cannot independently secure their account (enable MFA, manage sign-in).</li>
+<li>Preferences (notifications, default playback quality, watch-history privacy) cannot be expressed or persisted, so the product feels static and impersonal.</li>
+<li>Account deletion / data control is a baseline expectation (and a privacy-compliance concern) with no current path.</li>
+</ul>
 <h3 id="evidence">Evidence<a class="headerlink" href="#evidence" title="Permanent link">&para;</a></h3>
 <blockquote>
 <p><strong>Assumption:</strong> No formal analytics or ticket data was supplied for this assessment feature. The evidence below is illustrative and should be validated before approval.</p>
 </blockquote>
-<p><strong>Quantitative Evidence:</strong>
-- 0 of the existing screens expose any account/preference controls (verified against <code>webapp/src/</code>).
-- The <code>User</code> entity stores only <code>userName</code>, <code>password</code>, <code>mfaEnabled</code>, <code>mfaSecret</code>, <code>role</code>, <code>permissions</code> — no preference fields exist (<code>api/.../entity/User.java</code>), so no preference is currently persistable.</p>
-<p><strong>Qualitative Evidence:</strong>
-- &gt; <strong>Assumption:</strong> "I enabled MFA once but there's no way to see or change it" — representative user expectation for a streaming product.
-- Competitive baseline: every comparable video platform (YouTube, Vimeo) ships an account-settings surface; its absence is a noticeable gap.</p>
+<p><strong>Quantitative Evidence:</strong></p>
+<ul>
+<li>0 of the existing screens expose any account/preference controls (verified against <code>webapp/src/</code>).</li>
+<li>The <code>User</code> entity stores only <code>userName</code>, <code>password</code>, <code>mfaEnabled</code>, <code>mfaSecret</code>, <code>role</code>, <code>permissions</code> — no preference fields exist (<code>api/.../entity/User.java</code>), so no preference is currently persistable.</li>
+</ul>
+<p><strong>Qualitative Evidence:</strong></p>
+<ul>
+<li>
+<blockquote>
+<p><strong>Assumption:</strong> "I enabled MFA once but there's no way to see or change it" — representative user expectation for a streaming product.</p>
+</blockquote>
+</li>
+<li>Competitive baseline: every comparable video platform (YouTube, Vimeo) ships an account-settings surface; its absence is a noticeable gap.</li>
+</ul>
 <h2 id="goals-success-metrics">Goals &amp; Success Metrics<a class="headerlink" href="#goals-success-metrics" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -7636,23 +7646,37 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 <h2 id="user-stories">User Stories<a class="headerlink" href="#user-stories" title="Permanent link">&para;</a></h2>
 <h3 id="authenticated-user-primary-persona">Authenticated User (primary persona)<a class="headerlink" href="#authenticated-user-primary-persona" title="Permanent link">&para;</a></h3>
 <ul>
-<li>As a logged-in user, I want to <strong>view my profile (email/username) and account status</strong>, so that I can confirm who I'm signed in as.</li>
+<li>As a logged-in user, I want to <strong>view my profile (email/username) and account status</strong>, so that I can confirm who I'm signed in as.<ul>
 <li>Acceptance: Settings page shows the authenticated user's email/username and (display-only) subscription/account status.</li>
-<li>As a logged-in user, I want to <strong>manage my sign-in security (MFA, and password where applicable)</strong>, so that I can keep my account secure.</li>
+</ul>
+</li>
+<li>As a logged-in user, I want to <strong>manage my sign-in security (MFA, and password where applicable)</strong>, so that I can keep my account secure.<ul>
 <li>Acceptance: User can enable/disable MFA; security actions require the user to be authenticated and re-verify per existing flows.</li>
-<li>As a logged-in user, I want to <strong>toggle notification preferences</strong>, so that I only receive alerts I care about.</li>
+</ul>
+</li>
+<li>As a logged-in user, I want to <strong>toggle notification preferences</strong>, so that I only receive alerts I care about.<ul>
 <li>Acceptance: Each toggle persists server-side and is reflected on reload.</li>
-<li>As a logged-in user, I want to <strong>set a default playback quality</strong>, so that videos start at my preferred resolution.</li>
+</ul>
+</li>
+<li>As a logged-in user, I want to <strong>set a default playback quality</strong>, so that videos start at my preferred resolution.<ul>
 <li>Acceptance: Selected quality persists and is applied on next playback.</li>
-<li>As a logged-in user, I want to <strong>control the privacy of my watch history</strong> (e.g. Incognito / pause history), so that my activity isn't recorded when I don't want it to be.</li>
+</ul>
+</li>
+<li>As a logged-in user, I want to <strong>control the privacy of my watch history</strong> (e.g. Incognito / pause history), so that my activity isn't recorded when I don't want it to be.<ul>
 <li>Acceptance: Toggling privacy stops new watch-history entries while active; ties into the existing watch-history feature.</li>
-<li>As a logged-in user, I want to <strong>delete my account</strong>, so that I can remove my data from the platform.</li>
+</ul>
+</li>
+<li>As a logged-in user, I want to <strong>delete my account</strong>, so that I can remove my data from the platform.<ul>
 <li>Acceptance: A confirmed, explicit Danger Zone action removes/deactivates the account; behavior governed by the resolution of Open Question OQ-1.</li>
+</ul>
+</li>
 </ul>
 <h3 id="admin-secondary-persona">Admin (secondary persona)<a class="headerlink" href="#admin-secondary-persona" title="Permanent link">&para;</a></h3>
 <ul>
-<li>As an admin, I want account deletions to follow a defined data-handling policy, so that we stay compliant and auditable.</li>
+<li>As an admin, I want account deletions to follow a defined data-handling policy, so that we stay compliant and auditable.<ul>
 <li>Acceptance: Deletion path is audit-logged (<code>@AuditLog</code>) and follows the soft/hard-delete decision in OQ-1.</li>
+</ul>
+</li>
 </ul>
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <h3 id="functional-requirements">Functional Requirements<a class="headerlink" href="#functional-requirements" title="Permanent link">&para;</a></h3>
@@ -7927,28 +7951,34 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 <h2 id="next-steps-handoffs">Next Steps &amp; Handoffs<a class="headerlink" href="#next-steps-handoffs" title="Permanent link">&para;</a></h2>
 <p>After PRD approval:</p>
 <ol>
-<li>[ ] <strong>Architect Review</strong>: Technical feasibility + <code>user_settings</code> schema/API design</li>
-<li>Trigger: <code>/architect</code></li>
 <li>
-<p>Output: ADR (<code>docs/adr/00NN-user-settings.md</code>)</p>
+<p>[ ] <strong>Architect Review</strong>: Technical feasibility + <code>user_settings</code> schema/API design</p>
+<ul>
+<li>Trigger: <code>/architect</code></li>
+<li>Output: ADR (<code>docs/adr/00NN-user-settings.md</code>)</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>UI/UX Designer</strong>: Adapt Stitch layout to Funny Movies branding &amp; realistic sections</p>
-</li>
+<ul>
 <li>Trigger: <code>/ui-ux-designer</code></li>
-<li>
-<p>Output: Design Spec</p>
+<li>Output: Design Spec</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>Engineering Estimate</strong>: Decompose into work items</p>
-</li>
+<ul>
 <li>Trigger: <code>/builder</code> or <code>/architect</code></li>
 <li>Output: Implementation Plan (<code>docs/plans/plan-user-settings.md</code>)</li>
+</ul>
+</li>
 </ol>
-<p><strong>Related Artifacts</strong>:
-- ADR: [Link after architect review]
-- Spec: [Link after <code>/spec</code>]
-- Implementation Plan: [Link after decomposition]</p>
+<p><strong>Related Artifacts</strong>:</p>
+<ul>
+<li>ADR: [Link after architect review]</li>
+<li>Spec: [Link after <code>/spec</code>]</li>
+<li>Implementation Plan: [Link after decomposition]</li>
+</ul>
 <hr />
 <h2 id="version-history">Version History<a class="headerlink" href="#version-history" title="Permanent link">&para;</a></h2>
 <table>

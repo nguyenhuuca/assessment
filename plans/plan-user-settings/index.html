@@ -7904,31 +7904,45 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <h2 id="implementation-steps">Implementation Steps<a class="headerlink" href="#implementation-steps" title="Permanent link">&para;</a></h2>
 <h3 id="phase-1-database-domain-foundation">Phase 1: Database &amp; Domain Foundation<a class="headerlink" href="#phase-1-database-domain-foundation" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>Step 1.1:</strong> Create <code>user_settings</code> migration</li>
+<li>[ ] <strong>Step 1.1:</strong> Create <code>user_settings</code> migration<ul>
 <li>Files: <code>api/src/main/resources/db/changelog/sql/202606200001-create-user-settings.sql</code></li>
 <li>Details: Exact DDL from spec (BIGINT PK/FK, defaults, <code>updated_at</code>). Auto-included via <code>includeAll</code>.</li>
-<li>[ ] <strong>Step 1.2:</strong> Create <code>users</code> lifecycle migration</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 1.2:</strong> Create <code>users</code> lifecycle migration<ul>
 <li>Files: <code>api/src/main/resources/db/changelog/sql/202606200002-add-user-account-lifecycle.sql</code></li>
 <li>Details: <code>ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE'</code>, <code>ADD COLUMN deleted_at TIMESTAMPTZ NULL</code>.</li>
-<li>[ ] <strong>Step 1.3:</strong> <code>UserSettings</code> entity</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 1.3:</strong> <code>UserSettings</code> entity<ul>
 <li>Files: <code>api/.../entity/UserSettings.java</code></li>
 <li>Details: Lombok <code>@Getter @Setter @SuperBuilder @NoArgsConstructor @Entity @Table(name="user_settings")</code>; <code>@Id Long userId</code>; <code>@UpdateTimestamp updatedAt</code>. <code>default_quality</code> as <code>String</code> (validated in service).</li>
-<li>[ ] <strong>Step 1.4:</strong> Extend <code>User</code> entity + <code>UserStatus</code> enum</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 1.4:</strong> Extend <code>User</code> entity + <code>UserStatus</code> enum<ul>
 <li>Files: <code>api/.../entity/User.java</code>, <code>api/.../enums/UserStatus.java</code></li>
 <li>Details: Add <code>status</code> (enum <code>ACTIVE|DEACTIVATED</code>, <code>@Enumerated(STRING)</code>) and <code>Instant deletedAt</code>.</li>
-<li>[ ] <strong>Step 1.5:</strong> <code>UserSettingsRepository</code></li>
+</ul>
+</li>
+<li>[ ] <strong>Step 1.5:</strong> <code>UserSettingsRepository</code><ul>
 <li>Files: <code>api/.../repo/UserSettingsRepository.java</code></li>
 <li>Details: <code>extends JpaRepository&lt;UserSettings, Long&gt;</code>.</li>
 </ul>
+</li>
+</ul>
 <h3 id="phase-2-backend-service-dtos">Phase 2: Backend Service &amp; DTOs<a class="headerlink" href="#phase-2-backend-service-dtos" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>Step 2.1:</strong> DTOs in <code>dto/usersettings/</code></li>
+<li>[ ] <strong>Step 2.1:</strong> DTOs in <code>dto/usersettings/</code><ul>
 <li>Files: <code>UserSettingsDto.java</code> (response incl. capabilities + <code>accountStatus</code>), <code>UpdateUserSettingsRequest.java</code> (all fields nullable <code>Boolean</code>/<code>String</code> for partial PATCH), <code>DeleteAccountRequest.java</code> (<code>otp</code>, <code>confirmation</code>), <code>AccountStatusDto.java</code> (<code>plan</code>, <code>renewsAt</code>).</li>
 <li>Details: Lombok POJOs with <code>@Builder</code> (codebase uses classes, not records, for DTOs). Use <code>@Sensitive</code> on <code>otp</code>/<code>confirmation</code> (belt-and-suspenders with masking config).</li>
-<li>[ ] <strong>Step 2.2:</strong> <code>DefaultQuality</code> enum + validation helper</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 2.2:</strong> <code>DefaultQuality</code> enum + validation helper<ul>
 <li>Files: <code>api/.../enums/DefaultQuality.java</code> (<code>AUTO, Q1080P, Q4K</code> mapping to <code>AUTO/1080P/4K</code>)</li>
 <li>Details: Used to validate PATCH <code>defaultQuality</code>; invalid → <code>CustomException</code> 400.</li>
-<li>[ ] <strong>Step 2.3:</strong> <code>UserSettingsService</code> impl</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 2.3:</strong> <code>UserSettingsService</code> impl<ul>
 <li>Files: <code>api/.../service/impl/UserSettingsServiceImpl.java</code> (+ optional <code>service/UserSettingsService.java</code> interface)</li>
 <li>Methods:<ul>
 <li><code>getSettings()</code> — resolve user via <code>AppUtils.getCurrentUser()</code>; lazy-create defaults row if absent (<code>@Transactional</code>).</li>
@@ -7937,30 +7951,44 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 </ul>
 </li>
 <li>Details: Build <code>accountStatus</code> from <code>AppProperties</code> flag (Step 2.4); capability fields from <code>appProperties.isUsePasswordless()</code> + <code>user.isMfaEnabled()</code>.</li>
-<li>[ ] <strong>Step 2.4:</strong> Subscription feature flag</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 2.4:</strong> Subscription feature flag<ul>
 <li>Files: <code>api/.../config/AppProperties.java</code>, <code>application.yaml</code></li>
 <li>Details: Add <code>boolean subscriptionStatusEnabled</code> (default false) under <code>app.*</code>. When false, <code>accountStatus = null</code>.</li>
 </ul>
+</li>
+</ul>
 <h3 id="phase-3-backend-controller-auth-guard-cross-cutting">Phase 3: Backend Controller, Auth Guard &amp; Cross-Cutting<a class="headerlink" href="#phase-3-backend-controller-auth-guard-cross-cutting" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>Step 3.1:</strong> <code>UserSettingsController</code></li>
+<li>[ ] <strong>Step 3.1:</strong> <code>UserSettingsController</code><ul>
 <li>Files: <code>api/.../web/UserSettingsController.java</code></li>
 <li>Details: <code>@RestController @RequestMapping(AppConstant.API.BASE_URL + "/user")</code> (or <code>/user/settings</code> + <code>/user/account</code>); constructor injection; <code>@AuditLog</code> at class level; <code>GET /settings</code>, <code>PATCH /settings</code> (<code>@RateLimited(permit=20)</code>), <code>DELETE /account</code> (<code>@RateLimited(permit=3)</code>, returns <code>204</code>). Wrap success in <code>ResultObjectInfo</code>. <strong>Note:</strong> DELETE returns <code>ResponseEntity&lt;Void&gt;</code> 204, not a wrapper.</li>
-<li>[ ] <strong>Step 3.2:</strong> Deactivated-user auth guard</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 3.2:</strong> Deactivated-user auth guard<ul>
 <li>Files: <code>api/.../service/impl/UserServiceImpl.java</code> (join, <code>joinSystemPaswordless</code>, <code>verifyMfa</code>), and/or <code>filter</code>/<code>AppUserDetails</code> load path</li>
 <li>Details: Reject <code>status == DEACTIVATED</code> with 403 <code>Account deactivated</code>. Verify magic-link redemption + login + MFA verify all covered (Spec FR-5 / EC-8).</li>
-<li>[ ] <strong>Step 3.3:</strong> Capability fields on identity</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 3.3:</strong> Capability fields on identity<ul>
 <li>Files: <code>api/.../dto/user/UserDetailDto.java</code>, <code>UserServiceImpl.getCurrent()</code></li>
 <li>Details: Add <code>passwordEnabled</code> (= <code>!usePasswordless</code>), <code>mfaEnabled</code>, <code>mfaAvailable</code>. Additive; keep existing fields.</li>
-<li>[ ] <strong>Step 3.4:</strong> Add <code>confirmation</code> to masking</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 3.4:</strong> Add <code>confirmation</code> to masking<ul>
 <li>Files: <code>api/src/main/resources/application.yaml</code> (<code>logging.masking.fields</code>)</li>
 <li>Details: Append <code>confirmation</code> (otp already present).</li>
 </ul>
+</li>
+</ul>
 <h3 id="phase-4-frontend">Phase 4: Frontend<a class="headerlink" href="#phase-4-frontend" title="Permanent link">&para;</a></h3>
 <h4 id="design-css-sourcing-read-before-building-ui">Design &amp; CSS Sourcing (read before building UI)<a class="headerlink" href="#design-css-sourcing-read-before-building-ui" title="Permanent link">&para;</a></h4>
-<p><strong>Design source (do NOT re-fetch — already downloaded):</strong>
-- <code>artifacts/stitch_settings_web.png</code> — mockup; use for layout/spacing/visual reference.
-- <code>artifacts/stitch_settings_web.html</code> — reference markup; use for structure (bento grid, section order, toggle/quality-selector anatomy) and the source color palette. From Stitch project <code>11227470478146862224</code>, screen <code>d4111b49ad524dee8e0b6096b0f3e75c</code>.</p>
+<p><strong>Design source (do NOT re-fetch — already downloaded):</strong></p>
+<ul>
+<li><code>artifacts/stitch_settings_web.png</code> — mockup; use for layout/spacing/visual reference.</li>
+<li><code>artifacts/stitch_settings_web.html</code> — reference markup; use for structure (bento grid, section order, toggle/quality-selector anatomy) and the source color palette. From Stitch project <code>11227470478146862224</code>, screen <code>d4111b49ad524dee8e0b6096b0f3e75c</code>.</li>
+</ul>
 <p><strong>CSS source &amp; rule:</strong> The app does <strong>not</strong> use Tailwind. All styling lives in <code>webapp/src/styles/index.css</code> as CSS custom properties + <code>.app-*</code> classes. <strong>Translate</strong> the Stitch design into those tokens — never import Tailwind or copy <code>tailwind.config</code>/utility classes from the Stitch HTML.</p>
 <p><strong>Color mapping (Stitch → app token in <code>index.css</code>):</strong></p>
 <table>
@@ -8085,48 +8113,72 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 </tbody>
 </table>
 <ul>
-<li>[ ] <strong>Step 4.0:</strong> Add Settings CSS to design system</li>
-<li>Files: <code>webapp/src/styles/index.css</code></li>
 <li>
-<p>Details: Verify/add <code>--danger</code> token; add <code>.settings-card</code>, <code>.settings-toggle</code>, <code>.settings-segment</code>, <code>.settings-grid</code> using existing tokens only. No Tailwind. Mirror visual from <code>artifacts/stitch_settings_web.png</code>.</p>
+<p>[ ] <strong>Step 4.0:</strong> Add Settings CSS to design system</p>
+<ul>
+<li>Files: <code>webapp/src/styles/index.css</code></li>
+<li>Details: Verify/add <code>--danger</code> token; add <code>.settings-card</code>, <code>.settings-toggle</code>, <code>.settings-segment</code>, <code>.settings-grid</code> using existing tokens only. No Tailwind. Mirror visual from <code>artifacts/stitch_settings_web.png</code>.</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>Step 4.1:</strong> API module + re-export</p>
-</li>
+<ul>
 <li>Files: <code>webapp/src/api/settings.js</code>, <code>webapp/src/api/index.js</code></li>
 <li>Details: <code>settingsApi = { get: () =&gt; api.get('/user/settings'), patch: (d) =&gt; api.patch('/user/settings', d), deleteAccount: (b) =&gt; api.delete('/user/account', b) }</code>. <strong>Check <code>client.js</code> supports PATCH + DELETE-with-body</strong>; add methods if missing (Step 4.1a).</li>
-<li>[ ] <strong>Step 4.1a:</strong> Extend Axios client if needed</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 4.1a:</strong> Extend Axios client if needed<ul>
 <li>Files: <code>webapp/src/api/client.js</code></li>
 <li>Details: Ensure <code>api.patch</code> exists and <code>api.delete</code> can send a JSON body (delete-account needs <code>otp</code>/<code>confirmation</code>).</li>
-<li>[ ] <strong>Step 4.2:</strong> React Query hooks</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 4.2:</strong> React Query hooks<ul>
 <li>Files: <code>webapp/src/hooks/useSettings.js</code></li>
 <li>Details: <code>useSettings()</code> → <code>['settings']</code>; <code>useUpdateSettings()</code> mutation, <code>onSuccess</code> writes returned full object into <code>['settings']</code>; <code>useDeleteAccount()</code> mutation.</li>
-<li>[ ] <strong>Step 4.3:</strong> <code>SettingsPage</code> component</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 4.3:</strong> <code>SettingsPage</code> component<ul>
 <li>Files: <code>webapp/src/components/settings/SettingsPage.jsx</code></li>
 <li>Details: Five sections following <code>artifacts/stitch_settings_web.{png,html}</code>, using the <code>.app-*</code> + <code>.settings-*</code> classes from Step 4.0 (no Tailwind). Each toggle autosaves via PATCH of its single field; revert + <code>.app-alert.error</code> on failure. "Change Password" rendered only when <code>passwordEnabled</code>. <code>accountStatus</code> panel only when present.</li>
-<li>[ ] <strong>Step 4.4:</strong> <code>DeleteAccountModal</code></li>
+</ul>
+</li>
+<li>[ ] <strong>Step 4.4:</strong> <code>DeleteAccountModal</code><ul>
 <li>Files: <code>webapp/src/components/settings/DeleteAccountModal.jsx</code></li>
 <li>Details: If <code>mfaEnabled</code> → OTP input; else → type-email-to-confirm input. On success: <code>logout()</code> from <code>useAuth()</code> + redirect home.</li>
-<li>[ ] <strong>Step 4.5:</strong> Wire into nav</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 4.5:</strong> Wire into nav<ul>
 <li>Files: <code>webapp/src/components/layout/AppShell.jsx</code></li>
 <li>Details: Replace the existing <code>settings</code> <code>&lt;ComingSoon&gt;</code> branch with <code>activeNav === 'settings' &amp;&amp; isLoggedIn ? &lt;SettingsPage/&gt;</code>. Reuse existing Settings nav button.</li>
 </ul>
+</li>
+</ul>
 <h3 id="phase-5-testing-docs">Phase 5: Testing &amp; Docs<a class="headerlink" href="#phase-5-testing-docs" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>Step 5.1:</strong> Service unit tests</li>
+<li>[ ] <strong>Step 5.1:</strong> Service unit tests<ul>
 <li>Files: <code>api/src/test/java/.../service/impl/UserSettingsServiceImplTest.java</code></li>
 <li>Coverage: lazy-create, atomic-reject, partial update, delete OTP/confirmation/409, anonymization. <code>@Mock</code>+<code>@InjectMocks</code>, AssertJ; mock <code>AppUtils.getCurrentUser()</code> via <code>mockStatic</code>.</li>
-<li>[ ] <strong>Step 5.2:</strong> Controller tests</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 5.2:</strong> Controller tests<ul>
 <li>Files: <code>api/src/test/java/.../web/UserSettingsControllerTest.java</code></li>
 <li>Coverage: <code>@WebMvcTest</code> + MockMvc; assert <code>$.status</code>/<code>$.data</code>; rate-limit annotations present; 400/403/409/204 paths.</li>
-<li>[ ] <strong>Step 5.3:</strong> Auth-guard regression test</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 5.3:</strong> Auth-guard regression test<ul>
 <li>Files: extend <code>UserServiceImplTest</code></li>
 <li>Coverage: deactivated user blocked on join/magic-link/mfa-verify (EC-8).</li>
-<li>[ ] <strong>Step 5.4:</strong> Frontend tests</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 5.4:</strong> Frontend tests<ul>
 <li>Files: <code>webapp/src/components/settings/__tests__/SettingsPage.test.jsx</code></li>
 <li>Coverage: toggle autosave calls PATCH; delete flow calls logout; error alert shows on failure.</li>
-<li>[ ] <strong>Step 5.5:</strong> Docs/tracking</li>
+</ul>
+</li>
+<li>[ ] <strong>Step 5.5:</strong> Docs/tracking<ul>
 <li>Files: <code>docs/tracking.md</code> (Plan column), <code>mkdocs.yml</code> nav (PRD/ADR/Spec/Plan)</li>
+</ul>
+</li>
 </ul>
 <h2 id="files-to-modify">Files to Modify<a class="headerlink" href="#files-to-modify" title="Permanent link">&para;</a></h2>
 <table>

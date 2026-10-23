@@ -7150,11 +7150,13 @@
 <li><code>scripts/agent-metrics.mjs</code> now measures the agent's work: escaped defects, reverts, review rounds, blocked runs, flaky tests, CI failures, cost.</li>
 <li>Today a bad signal only turns into a better rule when the owner runs a retro by hand. The owner wants the agent to <strong>improve itself from the metrics</strong>, without being asked each time.</li>
 <li>First real signal: <code>62526c97</code> fixed a defect from the dynamic-cron-jobs run. Existing job bodies caught and logged every exception, so the new scheduler recorded SUCCESS on failure. Plan review, code review and QA ×2 all passed it.</li>
-<li>Risks of an agent that edits its own rules:</li>
+<li>Risks of an agent that edits its own rules:<ul>
 <li><strong>Goodhart:</strong> it can make the numbers look better (weaker tests, lower gates, a changed metrics script) instead of the work.</li>
 <li><strong>Drift:</strong> one bad rule makes every later run worse, and nobody notices.</li>
 <li><strong>Bloat:</strong> rules only grow, each run gets slower and more expensive.</li>
 <li><strong>Injection:</strong> issue, PR and commit text could be turned into rules.</li>
+</ul>
+</li>
 </ul>
 <h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
 <ol>
@@ -7217,11 +7219,13 @@
 <ul>
 <li><code>evals/seeded/&lt;id&gt;/case.json</code> = a real defect: <code>base</code> and <code>head</code> commits of the run that introduced it, the files, and an <code>expect</code> block (the file that must get a blocking finding, plus regexes the finding must match).</li>
 <li><code>scripts/evolve.mjs eval</code> runs the reviewer (<code>worker-reviewer</code>, the code-review stage of <code>/autopilot</code>) on <code>git diff base..head</code> with the <code>.claude/</code> of a given ref, and grades the verdict block deterministically: <strong>caught</strong> = a blocking finding on an expected file whose text matches an <code>expect</code> regex.</li>
-<li>A proposal passes only when, with the eval runner <strong>from <code>main</code></strong>:</li>
+<li>A proposal passes only when, with the eval runner <strong>from <code>main</code></strong>:<ol>
 <li>the new case is <strong>missed with <code>main</code>'s rules in at least 2 of 3 runs</strong> (otherwise no rule change is needed; the PR only adds the case, and that case-only PR needs <code>main</code> to catch it in 2 of 3),</li>
 <li>it is <strong>caught with the branch's rules in at least 2 of 3 runs</strong> (model output is not deterministic),</li>
 <li><strong>every existing case is still caught</strong> with the branch's rules (no regression),</li>
 <li>the mean reviewer cost per case rises by at most 25%.</li>
+</ol>
+</li>
 <li>The agent writes the case, but cannot game it: an <code>expect</code> that matches everything fails rule 1, one that matches nothing fails rule 2.</li>
 <li>The eval table (case × ref × run → caught, cost) goes into the PR body.</li>
 </ul>
@@ -7243,10 +7247,12 @@
 <li><strong>Signal:</strong> <code>compress:&lt;YYYY-MM&gt;</code>, at most one a month, after the defect signals. It carries lint hints from <code>scripts/evolve.mjs lint-rules</code>: exact duplicate lines across rule files, dead path references, the always-loaded size.</li>
 <li><strong>What may be cut:</strong> duplicated text (keep one home, point to it), dead references, text that contradicts its source of truth, stale claims.</li>
 <li><strong>Paths:</strong> the D2 paths <strong>plus <code>CLAUDE.md</code></strong>, existing files only, removals allowed. <strong>Protected, never cut or edited:</strong> <code>AGENTS.md</code>, <code>.claude/rules/security.md</code>, the evolve skill, <code>verdict.md</code>, frontmatter, and any line carrying a safety rule (push, gates, merge, deny, secrets, tokens, prod, smoke, security, Core Principles, "never …"), matched by a fixed pattern in <code>scripts/evolve.mjs</code>.</li>
-<li><strong>Gate</strong> (<code>gate --kind compress</code>):</li>
+<li><strong>Gate</strong> (<code>gate --kind compress</code>):<ul>
 <li>C1: the touched files shrink, and the always-loaded context drops ≥ 5% or the touched files lose ≥ 1 KiB;</li>
 <li>C2: no new duplicate lines or dead references;</li>
 <li>C3: every seeded case is still caught with the compressed rules (and there is at least one case).</li>
+</ul>
+</li>
 <li><strong>Always a draft PR.</strong> With a small eval set the gate cannot prove that behavior outside it is unchanged, so the owner reads every removed line.</li>
 <li>Rewriting a skill to work better (not just shorter) is a <code>rule</code> proposal: it needs a seeded case that the old text misses.</li>
 </ul>

@@ -7091,12 +7091,14 @@ Handoff to: Builder (/swarm-execute)
 <strong>Plan:</strong> <a href="../../plans/plan-watch-history-v2/">plan-watch-history-v2</a>
 <strong>Design:</strong> Stitch "History &amp; My Suggestions" (<code>artifacts/stitch_history/</code>)
 <strong>Supersedes:</strong> <a href="../PRD-watch-history/">PRD-watch-history</a> and <a href="../PRD-watch-history-opus/">PRD-watch-history-opus</a> (June 2026 drafts, never implemented).</p>
-<p>The History page gets a <strong>"Lịch sử xem" / "Watch history"</strong> tab next to "Đề xuất của tôi". It is a private, per-user list of the videos the user watched, with these features:
-- grouping by day
-- progress and resume
-- search
-- removing one entry or clearing all
-- a "pause history" switch</p>
+<p>The History page gets a <strong>"Lịch sử xem" / "Watch history"</strong> tab next to "Đề xuất của tôi". It is a private, per-user list of the videos the user watched, with these features:</p>
+<ul>
+<li>grouping by day</li>
+<li>progress and resume</li>
+<li>search</li>
+<li>removing one entry or clearing all</li>
+<li>a "pause history" switch</li>
+</ul>
 <p>The feed marks the videos already watched.</p>
 <hr />
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
@@ -7140,13 +7142,15 @@ Handoff to: Builder (/swarm-execute)
 </table>
 <hr />
 <h2 id="users-stories">Users &amp; Stories<a class="headerlink" href="#users-stories" title="Permanent link">&para;</a></h2>
-<p><strong>Logged-in user:</strong>
-- I open History → <strong>Lịch sử xem</strong> and see my videos, newest first, grouped <strong>Hôm nay / Hôm qua / Trước đó</strong>. Each card shows the thumbnail, title, views, "Đã xem 2 giờ trước" and a progress bar, or "Đã xem hết".
-- I tap a card and the video plays from where I stopped. A finished video starts from the beginning.
-- I search my history by title.
-- I remove one entry from its "⋮" menu. I clear all entries after a confirmation.
-- I switch <strong>"Tạm dừng lịch sử"</strong> on, and nothing I watch is recorded until I switch it off. It is the same switch as Settings → Incognito.
-- In the feed and in Explore, videos I already watched show a small <strong>"Đã xem"</strong> badge, or a progress line if I watched only part.</p>
+<p><strong>Logged-in user:</strong></p>
+<ul>
+<li>I open History → <strong>Lịch sử xem</strong> and see my videos, newest first, grouped <strong>Hôm nay / Hôm qua / Trước đó</strong>. Each card shows the thumbnail, title, views, "Đã xem 2 giờ trước" and a progress bar, or "Đã xem hết".</li>
+<li>I tap a card and the video plays from where I stopped. A finished video starts from the beginning.</li>
+<li>I search my history by title.</li>
+<li>I remove one entry from its "⋮" menu. I clear all entries after a confirmation.</li>
+<li>I switch <strong>"Tạm dừng lịch sử"</strong> on, and nothing I watch is recorded until I switch it off. It is the same switch as Settings → Incognito.</li>
+<li>In the feed and in Explore, videos I already watched show a small <strong>"Đã xem"</strong> badge, or a progress line if I watched only part.</li>
+</ul>
 <p><strong>Guest:</strong> has no watch history. The History tab shows a sign-in hint, as it does today.</p>
 <hr />
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>

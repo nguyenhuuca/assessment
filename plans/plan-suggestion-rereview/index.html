@@ -7130,7 +7130,7 @@ Handoff to: Builder, QA Engineer
 </table>
 <h2 id="design-decisions">Design Decisions<a class="headerlink" href="#design-decisions" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>D1 — What an admin can reopen.</strong></li>
+<li><strong>D1 — What an admin can reopen.</strong><ul>
 <li><strong>REJECTED → PENDING</strong> is always allowed.</li>
 <li><strong>APPROVED → PENDING</strong> is allowed only when its import job is <code>FAILED</code> or <code>CANCELLED</code>. Any other job state, or a missing job, gets 409 <code>error.suggestion.cannotReopen</code>. This prevents a live video or a running download from sitting behind a "pending" suggestion. Re-approving then creates a fresh import job.</li>
 <li><strong>PENDING</strong> gets 409 <code>error.suggestion.alreadyPending</code>.</li>
@@ -7139,8 +7139,10 @@ Handoff to: Builder, QA Engineer
 <li><strong>Reopen commits first:</strong> the retry still runs on the now-detached job. The suggestion stays PENDING. A later approve then hits the existing <code>BLOCKING_IMPORT_STATUSES</code> check in <code>createResolved</code> and returns 409 <code>error.import.duplicateActive</code>, so the system <strong>never creates a second job or a duplicate video</strong>. The admin can then reject it as DUPLICATE. This is accepted behavior: a retry after reopen is an explicit admin action on the import tab.</li>
 </ul>
 </li>
+</ul>
+</li>
 <li><strong>D2 — Reopen clears the decision.</strong> <code>rejectReason</code>, <code>rejectNote</code>, <code>reviewedBy</code>, <code>reviewedAt</code>, <code>importJobId</code> are set to null and <code>status</code> to PENDING. The trail stays in <code>@AuditLog</code> on both endpoints, and the old import job row is kept.</li>
-<li><strong>D3 — User re-review request.</strong></li>
+<li><strong>D3 — User re-review request.</strong><ul>
 <li>Only the <strong>owner</strong> of a <strong>REJECTED</strong> suggestion can request one. Not the owner → 404, so other users' ids are not revealed. Not REJECTED → 409 <code>error.suggestion.notRejected</code>.</li>
 <li>Each suggestion allows at most <strong>2</strong> user re-review requests: new column <code>rereview_count INT NOT NULL DEFAULT 0</code>. Over the limit → 409 <code>error.suggestion.rereviewLimit</code>.</li>
 <li>The user may add an optional message. It comes in a new <code>RereviewSuggestionRequest</code> DTO (<code>dto/suggestion/</code>, like <code>SubmitSuggestionRequest.java:18</code>) with <code>@Size(max = 300)</code>, and the controller takes <code>@Valid @RequestBody(required = false)</code>. The service applies the same handling as submit's note (<code>VideoSuggestionServiceImpl.java:124</code>): trim, and a blank becomes null. The message <strong>replaces</strong> <code>note</code>, so the admin sees why the user is asking again. The UI renders it as React text only, with no <code>dangerouslySetInnerHTML</code> (CWE-79). A test checks that markup is shown as literal text.</li>
@@ -7148,6 +7150,8 @@ Handoff to: Builder, QA Engineer
 <li>Anti-abuse (CWE-770): 2 requests per suggestion, plus <code>@RateLimited(10)</code> per user on the endpoint. The daily submit quota already limits how many suggestions a user can create. Together these keep re-review traffic on the order of the user's own rejected suggestions.</li>
 <li>The endpoint has <code>@RateLimited(permit=10)</code> + <code>@AuditLog</code>. It does not count toward the daily submit quota.</li>
 <li>An admin reopen does <strong>not</strong> increase <code>rereview_count</code>.</li>
+</ul>
+</li>
 <li><strong>D4 — Duplicates on reopen.</strong> Both paths run the <code>submit</code> duplicate check: another PENDING suggestion for the URL, or an import job in <code>BLOCKING_IMPORT_STATUSES</code>. They also map <code>DataIntegrityViolationException</code> from the partial unique index to 409 <code>error.suggestion.duplicate</code>. Both paths take the PESSIMISTIC_WRITE lock.</li>
 <li><strong>D5 — No new notification type (accepted).</strong> Neither path sends a notification: an admin reopen tells nobody, and a user re-review request does not notify admins. The admin pending-count badge already shows the suggestion again. The next approve or reject sends the existing notification.</li>
 <li><strong>D6 — DTO.</strong> <code>SuggestionDto</code> gains <code>rereviewCount</code> and <code>canRequestRereview</code>. <code>canRequestRereview</code> is true when the status is REJECTED and the count is &lt; 2, so the UI does not repeat the rule. The admin DTO gains <code>canReopen</code>, which applies the D1 rule on the server. For APPROVED rows the job statuses come from <strong>one batched query</strong> per page (<code>findAllById(jobIds)</code> → map), the same approach as the existing live-ref lookup (<code>VideoSuggestionRepository.findLiveRefs</code> <code>:91</code>). There is no per-row query (no N+1).</li>

@@ -7614,21 +7614,25 @@ Everyone sees like/dislike counts; logged-in users see their own reaction persis
 <li>[ ] Migration <code>api/src/main/resources/db/changelog/sql/202610010001-create-video-reactions.sql</code> (schema above; <code>includeAll</code> picks it up)</li>
 <li>[ ] <code>enums/ReactionType.java</code> (<code>LIKE</code>, <code>DISLIKE</code>)</li>
 <li>[ ] <code>entity/VideoReaction.java</code> + <code>@Embeddable VideoReactionId(userId, videoId)</code>; <code>@Enumerated(STRING)</code></li>
-<li>[ ] <code>repo/VideoReactionRepository.java</code></li>
+<li>[ ] <code>repo/VideoReactionRepository.java</code><ul>
 <li><code>upsert(userId, videoId, reaction)</code> — <code>@Modifying @Query(nativeQuery = true)</code> with <code>ON CONFLICT … DO UPDATE SET reaction = EXCLUDED.reaction, updated_at = now()</code></li>
 <li><code>deleteByIdUserIdAndIdVideoId(userId, videoId)</code></li>
 <li><code>findReaction(userId, videoId)</code> → <code>Optional&lt;ReactionType&gt;</code></li>
 <li><code>countByReaction(videoId)</code> → <code>List&lt;ReactionCount&gt;</code> projection (<code>GROUP BY reaction</code>)</li>
+</ul>
+</li>
 </ul>
 <p><strong>AC:</strong> app starts, Liquibase applies migration on clean DB and on DB from <code>db/dump.sql</code>.</p>
 <h3 id="phase-2-service-05-day-be-r2-depends-on-be-r1">Phase 2: Service (0.5 day) — <code>BE-R2</code> (depends on BE-R1)<a class="headerlink" href="#phase-2-service-05-day-be-r2-depends-on-be-r1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>[ ] <code>dto/reaction/ReactionSummaryDto.java</code> (<code>videoId, likeCount, dislikeCount, myReaction</code>)</li>
 <li>[ ] <code>dto/reaction/ReactionRequest.java</code> (<code>@NotNull ReactionType reaction</code>)</li>
-<li>[ ] <code>service/VideoReactionService.java</code> + <code>service/impl/VideoReactionServiceImpl.java</code></li>
+<li>[ ] <code>service/VideoReactionService.java</code> + <code>service/impl/VideoReactionServiceImpl.java</code><ul>
 <li><code>getSummary(videoId)</code> — <code>@Transactional(readOnly = true)</code>; myReaction only if a user is authenticated</li>
 <li><code>react(videoId, type)</code> — <code>@Transactional</code>; verify video exists &amp; not hidden (<code>VideoSourceRepository.existsById…</code>) else 404; upsert; return summary</li>
 <li><code>removeReaction(videoId)</code> — <code>@Transactional</code>; idempotent delete; return summary</li>
+</ul>
+</li>
 <li>[ ] <code>VideoReactionServiceImplTest</code> (Mockito): like, dislike, switch like→dislike, remove, remove when none, unknown video, unauthenticated write, guest summary has <code>myReaction=null</code></li>
 </ul>
 <p><strong>AC:</strong> all service tests green; no raw SQL in service.</p>
@@ -7650,12 +7654,14 @@ Everyone sees like/dislike counts; logged-in users see their own reaction persis
 </ul>
 <h3 id="phase-5-frontend-ui-05-day-fe-r2-depends-on-fe-r1">Phase 5: Frontend UI (0.5 day) — <code>FE-R2</code> (depends on FE-R1)<a class="headerlink" href="#phase-5-frontend-ui-05-day-fe-r2-depends-on-fe-r1" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] Rewrite <code>components/video/VoteButtons.jsx</code> using the hook:</li>
+<li>[ ] Rewrite <code>components/video/VoteButtons.jsx</code> using the hook:<ul>
 <li>Like: <code>none|DISLIKE → set(LIKE)</code>, <code>LIKE → remove()</code> (unlike)</li>
 <li>Dislike: <code>none|LIKE → set(DISLIKE)</code>, <code>DISLIKE → remove()</code></li>
 <li>Show <code>likeCount</code>; dislike shows label (optionally count)</li>
 <li>Not logged in → buttons don't call API; show hint "Đăng nhập để thích video" (same guard style as comments <code>isLoggedIn</code>)</li>
 <li>Disable while mutation pending; error → rollback (no silent <code>catch {}</code>)</li>
+</ul>
+</li>
 <li>[ ] Rewrite <code>__tests__/VoteButtons.test.jsx</code>: like, unlike, dislike, switch, guest guard, rollback on API error, reset on video change</li>
 <li>[ ] <code>npm run lint &amp;&amp; npm run test &amp;&amp; npm run build</code></li>
 </ul>

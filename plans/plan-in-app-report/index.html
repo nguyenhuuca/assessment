@@ -7726,11 +7726,13 @@
 <h3 id="in-scope">In Scope<a class="headerlink" href="#in-scope" title="Permanent link">&para;</a></h3>
 <p>Everything in the spec's FR-1..FR-7, BR-1..BR-9 and EC-1..EC-13.</p>
 <h3 id="out-of-scope">Out of Scope<a class="headerlink" href="#out-of-scope" title="Permanent link">&para;</a></h3>
-<p>As in the spec and PRD:
-- CONTRIBUTOR role;
-- webhook or sync back from GitHub;
-- screenshots;
-- editing or deleting a report.</p>
+<p>As in the spec and PRD:</p>
+<ul>
+<li>CONTRIBUTOR role;</li>
+<li>webhook or sync back from GitHub;</li>
+<li>screenshots;</li>
+<li>editing or deleting a report.</li>
+</ul>
 <h2 id="technical-approach">Technical Approach<a class="headerlink" href="#technical-approach" title="Permanent link">&para;</a></h2>
 <h3 id="architecture-changes">Architecture Changes<a class="headerlink" href="#architecture-changes" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ReportPage (FE) ──► AdminReportController ──► ReportServiceImpl ──► AppReportRepository (app_report)
@@ -7738,9 +7740,11 @@
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                                                      ├─► GitHubIssueClient (client, java.net.http) ──► api.github.com
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                                                      └─► GitHubIssueStateCache (Guava, 5 min)
 </code></pre></div>
-<p>Dependency directions stay layered, so the <code>aic</code> check keeps reporting no cycle:
-- <code>web → service → client, repo, cache</code>;
-- <code>client → config</code> (<code>AppProperties</code>).</p>
+<p>Dependency directions stay layered, so the <code>aic</code> check keeps reporting no cycle:</p>
+<ul>
+<li><code>web → service → client, repo, cache</code>;</li>
+<li><code>client → config</code> (<code>AppProperties</code>).</li>
+</ul>
 <h3 id="key-decisions">Key Decisions<a class="headerlink" href="#key-decisions" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>No new ADR.</strong> ADR-0026 covers the token, the trust model, the caps and the storage. Everything else follows existing patterns.</li>
@@ -7821,9 +7825,11 @@
 <ul>
 <li><strong>Backend:</strong> IR-1 and IR-2 are independent and can merge in either order. IR-3 comes after both, then IR-4.</li>
 <li><strong>Frontend:</strong> IR-5 and IR-6 merge after IR-4 is deployed, so the menu never points at a missing API.</li>
-<li><strong>Every unit merges to <code>main</code> on its own:</strong></li>
+<li><strong>Every unit merges to <code>main</code> on its own:</strong><ul>
 <li>IR-1..IR-3 add no endpoint, so they are dark until IR-4.</li>
 <li>IR-5 adds no UI.</li>
+</ul>
+</li>
 </ul>
 <h3 id="phases">Phases<a class="headerlink" href="#phases" title="Permanent link">&para;</a></h3>
 <ul>

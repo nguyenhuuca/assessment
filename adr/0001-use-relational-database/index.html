@@ -7474,17 +7474,23 @@
 </table>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Schema evolution is managed safely through Liquibase versioned migrations
-- Relational data (video to comments to replies) is modeled naturally with foreign keys
-- Complex reporting queries and aggregations are efficient with SQL
-- ACID guarantees prevent partial writes and data corruption</p>
-<p><strong>Negative:</strong>
-- Schema must be designed upfront; structural changes require migration files
-- Horizontal scaling requires additional configuration such as read replicas and connection pooling</p>
-<p><strong>Risks:</strong>
-- Poorly written migrations could cause downtime during schema changes on production
-- Unbounded JOIN complexity could degrade query performance at scale without indexing discipline</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>Schema evolution is managed safely through Liquibase versioned migrations</li>
+<li>Relational data (video to comments to replies) is modeled naturally with foreign keys</li>
+<li>Complex reporting queries and aggregations are efficient with SQL</li>
+<li>ACID guarantees prevent partial writes and data corruption</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Schema must be designed upfront; structural changes require migration files</li>
+<li>Horizontal scaling requires additional configuration such as read replicas and connection pooling</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li>Poorly written migrations could cause downtime during schema changes on production</li>
+<li>Unbounded JOIN complexity could degrade query performance at scale without indexing discipline</li>
+</ul>
 <hr />
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>

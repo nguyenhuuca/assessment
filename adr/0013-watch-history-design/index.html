@@ -7643,11 +7643,13 @@
 <p><strong>Re-watch behavior</strong> — When a user watches a video they have already seen, should the entry move to the top of the list (update timestamp) or stay at its original position?</p>
 </li>
 </ol>
-<p>Patterns shared with ADR-0012 and applied without re-analysis:
-- Watched state delivery: <code>GET /watch-history/ids</code> at page load → client-side <code>Set.has()</code> per card
-- Schema: <code>source_video_id BIGINT NOT NULL</code> for uniqueness stability under <code>ON DELETE SET NULL</code>
-- FK strategy: actual FK constraints (<code>user_id CASCADE</code>, <code>video_id SET NULL</code>)
-- ID type: UUID</p>
+<p>Patterns shared with ADR-0012 and applied without re-analysis:</p>
+<ul>
+<li>Watched state delivery: <code>GET /watch-history/ids</code> at page load → client-side <code>Set.has()</code> per card</li>
+<li>Schema: <code>source_video_id BIGINT NOT NULL</code> for uniqueness stability under <code>ON DELETE SET NULL</code></li>
+<li>FK strategy: actual FK constraints (<code>user_id CASCADE</code>, <code>video_id SET NULL</code>)</li>
+<li>ID type: UUID</li>
+</ul>
 <hr />
 <h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
 <ul>
@@ -7877,18 +7879,24 @@
 </table>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Recording works identically for YouTube and local videos
-- No playback latency impact
-- History cap is invisible to users — graceful degradation
-- Re-watch moves entry to top — history stays sorted by recency naturally</p>
-<p><strong>Negative:</strong>
-- Fire-and-forget means if the POST fails (network error), the watch is not recorded — no retry
-- First-watch timestamp is lost on re-watch (acceptable trade-off)
-- Auto-evict requires an extra DELETE query when cap is full; not atomic with INSERT without a transaction</p>
-<p><strong>Risks:</strong>
-- Concurrent play events (two tabs): both fire POST simultaneously → UPSERT handles gracefully (last write wins for watched_at)
-- If fire-and-forget POST rate becomes high (popular video + many users), write pressure on <code>watch_history</code> table → mitigated by keeping writes lightweight (single UPSERT)</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>Recording works identically for YouTube and local videos</li>
+<li>No playback latency impact</li>
+<li>History cap is invisible to users — graceful degradation</li>
+<li>Re-watch moves entry to top — history stays sorted by recency naturally</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Fire-and-forget means if the POST fails (network error), the watch is not recorded — no retry</li>
+<li>First-watch timestamp is lost on re-watch (acceptable trade-off)</li>
+<li>Auto-evict requires an extra DELETE query when cap is full; not atomic with INSERT without a transaction</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li>Concurrent play events (two tabs): both fire POST simultaneously → UPSERT handles gracefully (last write wins for watched_at)</li>
+<li>If fire-and-forget POST rate becomes high (popular video + many users), write pressure on <code>watch_history</code> table → mitigated by keeping writes lightweight (single UPSERT)</li>
+</ul>
 <hr />
 <h2 id="schema-reference">Schema Reference<a class="headerlink" href="#schema-reference" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">-- Migration: 202605310002-create-watch-history-table.sql</span>

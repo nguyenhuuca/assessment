@@ -7967,8 +7967,9 @@
 <h2 id="implementation-steps">Implementation Steps<a class="headerlink" href="#implementation-steps" title="Permanent link">&para;</a></h2>
 <h3 id="phase-1-database-migration-05-day">Phase 1: Database Migration (0.5 day)<a class="headerlink" href="#phase-1-database-migration-05-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>1.1</strong> Create <code>api/src/main/resources/db/changelog/sql/202606010001-create-watch-history-table.sql</code>
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">watch_history</span><span class="w"> </span><span class="p">(</span>
+<li>
+<p>[ ] <strong>1.1</strong> Create <code>api/src/main/resources/db/changelog/sql/202606010001-create-watch-history-table.sql</code>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">watch_history</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">id</span><span class="w">              </span><span class="nb">BIGINT</span><span class="w">      </span><span class="k">GENERATED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">IDENTITY</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">user_id</span><span class="w">         </span><span class="nb">BIGINT</span><span class="w">      </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="n">video_id</span><span class="w">        </span><span class="nb">BIGINT</span><span class="w">               </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">video_sources</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
@@ -7977,12 +7978,15 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="k">CONSTRAINT</span><span class="w"> </span><span class="n">uq_watch_history_user_video</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">source_video_id</span><span class="p">)</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">);</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_watch_history_user_watched</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">watch_history</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">watched_at</span><span class="w"> </span><span class="k">DESC</span><span class="p">);</span>
-</code></pre></div></li>
-<li>[ ] <strong>1.2</strong> Register the changeset in <code>db.changelog-master.yaml</code> (follow existing <code>&lt;include file=...&gt;</code>/yaml pattern used for <code>202605010001</code>).</li>
+</code></pre></div></p>
+</li>
+<li>
+<p>[ ] <strong>1.2</strong> Register the changeset in <code>db.changelog-master.yaml</code> (follow existing <code>&lt;include file=...&gt;</code>/yaml pattern used for <code>202605010001</code>).</p>
+</li>
 </ul>
 <h3 id="phase-2-entity-05-day">Phase 2: Entity (0.5 day)<a class="headerlink" href="#phase-2-entity-05-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>2.1</strong> Create <code>api/.../entity/WatchHistory.java</code> (extends <code>BaseDomain</code>, mirroring <code>VideoSource</code>)</li>
+<li>[ ] <strong>2.1</strong> Create <code>api/.../entity/WatchHistory.java</code> (extends <code>BaseDomain</code>, mirroring <code>VideoSource</code>)<ul>
 <li><code>@Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id</code> — <strong>BIGINT</strong>, matches <code>User</code>/<code>VideoSource</code></li>
 <li><code>@ManyToOne(fetch = LAZY) @JoinColumn(name="user_id") User user</code></li>
 <li><code>@ManyToOne(fetch = LAZY) @JoinColumn(name="video_id") VideoSource video</code> (nullable)</li>
@@ -7991,10 +7995,12 @@
 <li><code>@Table(name="watch_history", uniqueConstraints=@UniqueConstraint(name="uq_watch_history_user_video", columnNames={"user_id","source_video_id"}))</code></li>
 <li>Lombok per project style (<code>@Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor</code>)</li>
 </ul>
+</li>
+</ul>
 <h3 id="phase-3-repository-05-day">Phase 3: Repository (0.5 day)<a class="headerlink" href="#phase-3-repository-05-day" title="Permanent link">&para;</a></h3>
 <ul>
 <li>[ ] <strong>3.1</strong> Create <code>api/.../repo/WatchHistoryRepository.java extends JpaRepository&lt;WatchHistory, Long&gt;</code>
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// Badges — page load</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// Badges — page load</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nd">@Query</span><span class="p">(</span><span class="s">"SELECT w.sourceVideoId FROM WatchHistory w WHERE w.user.id = :userId"</span><span class="p">)</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findSourceVideoIdsByUserId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
@@ -8032,24 +8038,27 @@
 <a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a>
 <a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="nd">@Modifying</span>
 <a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a><span class="kt">void</span><span class="w"> </span><span class="nf">deleteByUserId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
-</code></pre></div><blockquote>
-<p><code>video_id</code> in the upsert is the verified <code>VideoSource.id</code> or <code>null</code> when the id is unknown; <code>source_video_id</code> is always the input id.</p>
-</blockquote>
-</li>
+</code></pre></div>
+    &gt; <code>video_id</code> in the upsert is the verified <code>VideoSource.id</code> or <code>null</code> when the id is unknown; <code>source_video_id</code> is always the input id.</li>
 </ul>
 <h3 id="phase-4-dtos-05-day">Phase 4: DTOs (0.5 day)<a class="headerlink" href="#phase-4-dtos-05-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>4.1</strong> Create in <code>api/.../dto/</code>:</li>
+<li>[ ] <strong>4.1</strong> Create in <code>api/.../dto/</code>:<ul>
 <li><code>WatchHistoryDto</code> — <code>{ Long id, Long sourceVideoId, Long videoId, String title, String poster, Instant watchedAt }</code> (<code>id</code>/<code>videoId</code> may be null per Rule 3)</li>
 <li><code>WatchHistoryIdsDto</code> — <code>{ List&lt;Long&gt; videoIds }</code></li>
 <li><code>RecordWatchRequest</code> — <code>{ @NotNull @Positive Long videoId }</code></li>
 </ul>
+</li>
+</ul>
 <h3 id="phase-5-service-1-day-the-correctness-core">Phase 5: Service (1 day) — the correctness core<a class="headerlink" href="#phase-5-service-1-day-the-correctness-core" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>5.1</strong> Create <code>api/.../service/impl/WatchHistoryServiceImpl.java</code> (interface <code>WatchHistoryService</code> in <code>service/</code>, per project pattern)</li>
+<li>[ ] <strong>5.1</strong> Create <code>api/.../service/impl/WatchHistoryServiceImpl.java</code> (interface <code>WatchHistoryService</code> in <code>service/</code>, per project pattern)<ul>
 <li>Resolve user: <code>SecurityContextHolder.getContext().getAuthentication().getDetails()</code> → <code>UserDetailDto</code> → <code>getId()</code>. <strong>Never</strong> read a userId from the request.</li>
-<li>[ ] <strong>5.2</strong> Methods:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@Transactional</span><span class="p">(</span><span class="n">readOnly</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</ul>
+</li>
+<li>
+<p>[ ] <strong>5.2</strong> Methods:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@Transactional</span><span class="p">(</span><span class="n">readOnly</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">WatchHistoryIdsDto</span><span class="w"> </span><span class="nf">getWatchedIds</span><span class="p">();</span><span class="w">          </span><span class="c1">// findSourceVideoIdsByUserId(currentUserId)</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nd">@Transactional</span><span class="p">(</span><span class="n">readOnly</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
@@ -8066,8 +8075,11 @@
 <a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
 <a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="nd">@Transactional</span>
 <a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="kt">void</span><span class="w"> </span><span class="nf">clearAll</span><span class="p">();</span><span class="w">                             </span><span class="c1">// deleteByUserId</span>
-</code></pre></div></li>
-<li>[ ] <strong>5.3</strong> Unknown <code>videoId</code>: <code>recordWatch</code> must <strong>not</strong> throw — resolve <code>video_id = null</code>, persist silently, return 200 path (EC-2).</li>
+</code></pre></div></p>
+</li>
+<li>
+<p>[ ] <strong>5.3</strong> Unknown <code>videoId</code>: <code>recordWatch</code> must <strong>not</strong> throw — resolve <code>video_id = null</code>, persist silently, return 200 path (EC-2).</p>
+</li>
 <li>[ ] <strong>5.4</strong> Contract validation via <code>Contract.require(videoId != null &amp;&amp; videoId &gt; 0, ...)</code> for the service-layer guard (controller <code>@Valid</code> is the first gate).</li>
 </ul>
 <blockquote>
@@ -8075,8 +8087,9 @@
 </blockquote>
 <h3 id="phase-6-controller-05-day">Phase 6: Controller (0.5 day)<a class="headerlink" href="#phase-6-controller-05-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>6.1</strong> Create <code>api/.../web/WatchHistoryController.java</code>
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@RestController</span>
+<li>
+<p>[ ] <strong>6.1</strong> Create <code>api/.../web/WatchHistoryController.java</code>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@RestController</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nd">@RequestMapping</span><span class="p">(</span><span class="n">AppConstant</span><span class="p">.</span><span class="na">API</span><span class="p">.</span><span class="na">BASE_URL</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/watch-history"</span><span class="p">)</span><span class="w">   </span><span class="c1">// /v1/funny-app/watch-history (verified)</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1">// No @AuditLog — per-play POST volume would flood the audit log (Spec)</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
@@ -8089,29 +8102,36 @@
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nd">@DeleteMapping</span><span class="w">        </span><span class="p">(</span><span class="nd">@RequestParam</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">videoId</span><span class="p">)</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span><span class="w">    </span><span class="p">(</span><span class="mi">204</span><span class="w"> </span><span class="n">idempotent</span><span class="p">)</span>
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="nd">@DeleteMapping</span><span class="p">(</span><span class="s">"/all"</span><span class="p">)</span><span class="w">                              </span><span class="err">→</span><span class="w"> </span><span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span><span class="w">    </span><span class="p">(</span><span class="mi">204</span><span class="p">)</span>
 </code></pre></div>
-  Follow <code>CommentController</code> style (constructor injection, <code>ResultObjectInfo/ResultListInfo</code> builders, <code>ResultStatus.SUCCESS</code>).</li>
-<li>[ ] <strong>6.2</strong> Confirm <code>/v1/funny-app/watch-history/**</code> is <strong>not</strong> in the <code>JWTAuthenticationFilter</code> whitelist (must require auth).</li>
+    Follow <code>CommentController</code> style (constructor injection, <code>ResultObjectInfo/ResultListInfo</code> builders, <code>ResultStatus.SUCCESS</code>).</p>
+</li>
+<li>
+<p>[ ] <strong>6.2</strong> Confirm <code>/v1/funny-app/watch-history/**</code> is <strong>not</strong> in the <code>JWTAuthenticationFilter</code> whitelist (must require auth).</p>
+</li>
 </ul>
 <h3 id="phase-7-backend-tests-1-day">Phase 7: Backend Tests (1 day)<a class="headerlink" href="#phase-7-backend-tests-1-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>7.1</strong> <code>WatchHistoryServiceImplTest</code></li>
+<li>[ ] <strong>7.1</strong> <code>WatchHistoryServiceImplTest</code><ul>
 <li>new → entry created; re-watch → <code>watched_at</code> updated, count unchanged</li>
 <li>at cap 500 + new video → <code>evictOverCap</code> trims to 500</li>
 <li>at cap 500 + re-watch → no eviction</li>
 <li>unknown videoId → saved with <code>video_id = null</code>, no throw</li>
 <li><code>removeEntry</code> non-existent → no-op; <code>clearAll</code> removes only current user's rows</li>
-<li>[ ] <strong>7.2</strong> <code>WatchHistoryControllerTest</code> (MockMvc + security context)</li>
+</ul>
+</li>
+<li>[ ] <strong>7.2</strong> <code>WatchHistoryControllerTest</code> (MockMvc + security context)<ul>
 <li>unauthenticated any endpoint → 401</li>
 <li>POST new → 201; POST same → 200; one DB row</li>
 <li>POST &gt; 30/min → 429</li>
 <li>DELETE non-existent → 204; DELETE /all then GET → empty</li>
+</ul>
+</li>
 <li>[ ] <strong>7.3</strong> Concurrency test (EC-8/EC-9): two parallel <code>recordWatch</code> calls (same user) for (a) the same new video → exactly one row; (b) two different new videos at cap → final count ≤ 500.</li>
 <li>[ ] <strong>7.4</strong> <code>mvn verify</code>; bump <code>api/.coverage-threshold</code> (+1%).</li>
 </ul>
 <h3 id="phase-8-frontend-api-module-05-day">Phase 8: Frontend API module (0.5 day)<a class="headerlink" href="#phase-8-frontend-api-module-05-day" title="Permanent link">&para;</a></h3>
 <ul>
 <li>[ ] <strong>8.1</strong> Create <code>webapp/src/api/watchHistory.js</code> (follow <code>webapp/src/api/comments.js</code> + <code>client.js</code> pattern)
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">api</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./client'</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">api</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./client'</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">watchHistoryApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nx">ids</span><span class="o">:</span><span class="w">      </span><span class="p">()</span><span class="w">        </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/watch-history/ids'</span><span class="p">),</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nx">list</span><span class="o">:</span><span class="w">     </span><span class="p">()</span><span class="w">        </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/watch-history'</span><span class="p">),</span>

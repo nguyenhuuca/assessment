@@ -7803,10 +7803,10 @@ Additionally, I want to log the details of each deleted file into a database tab
 
 - ✅ A new cron job runs periodically (e.g., daily) to scan and delete video files that haven't been accessed/viewed in the last **N** days (configurable).
 - ✅ A new table (e.g., `deleted_files_log`) is created with the following fields:
-  - `id` (UUID or auto-increment)
-  - `file_path` (string)
-  - `deleted_at` (timestamp)
-  - `reason` (string or enum, e.g., `UNUSED_TOO_LONG`)
+    - `id` (UUID or auto-increment)
+    - `file_path` (string)
+    - `deleted_at` (timestamp)
+    - `reason` (string or enum, e.g., `UNUSED_TOO_LONG`)
 - ✅ When a file is deleted by the job, an entry is inserted into `deleted_files_log` table.
 - ✅ The cron job handles I/O exceptions gracefully and logs errors.
 - ✅ Configuration allows tuning the time threshold (e.g., 30 days).
@@ -8059,9 +8059,9 @@ As a user, I want to like/unlike a video and see how many views and likes it has
 - ✅ Show total **views** and **likes** on video detail page
 - ✅ Add **like/unlike toggle button** (heart or thumbs up/down)
 - ✅ Call backend APIs to track likes and views:
-  - `POST /videos/{id}/like`
-  - `POST /videos/{id}/unlike`
-  - `POST /videos/{id}/view` (on page load or video start)
+    - `POST /videos/{id}/like`
+    - `POST /videos/{id}/unlike`
+    - `POST /videos/{id}/view` (on page load or video start)
 - ✅ Prevent duplicate likes per session (store locally)
 - ✅ Optimistic UI update (increment like count immediately)
 
@@ -8103,9 +8103,9 @@ As a DevOps engineer, I want to automate the deployment and reloading of Nginx c
 ### **Desired State:**
 
 - Any updates to Nginx config files (e.g., `nginx.conf`, `site.conf`) committed to Git are automatically:
-  - Deployed to remote server via GitHub Actions
-  - Verified for syntax correctness
-  - Trigger a `nginx -s reload` or `systemctl reload nginx` on server
+    - Deployed to remote server via GitHub Actions
+    - Verified for syntax correctness
+    - Trigger a `nginx -s reload` or `systemctl reload nginx` on server
 - Deployment should be **secure, idempotent**, and possibly support multiple environments (staging/production)
 
 ---
@@ -8150,10 +8150,10 @@ Assess the feasibility of using [http://Temporal.io](http://Temporal.io "smartCa
 
 - Compare Temporal with `@Scheduled`, Quartz, and other scheduling mechanisms
 - Review Temporal's support for:
-  - Retry policies
-  - Timeout and error handling
-  - State persistence and observability
-  - Human-in-the-loop workflows (if needed)
+    - Retry policies
+    - Timeout and error handling
+    - State persistence and observability
+    - Human-in-the-loop workflows (if needed)
 - Assess integration with Spring Boot and Java SDK
 - Consider operational complexity: UI/CLI tools, deployment model (Temporal Cloud vs. self-hosted)
 - Evaluate debugging, testing, and maintainability benefits
@@ -8455,12 +8455,12 @@ As a system owner, I want to persist video hit statistics (both from cache and d
 ### **Acceptance Criteria:**
 
 - ✅ A new table `video_access_stats` is created with:
-  - `video_id` (string or UUID)
-  - `hit_count` (integer)
-  - `last_accessed_at` (timestamp)
+    - `video_id` (string or UUID)
+    - `hit_count` (integer)
+    - `last_accessed_at` (timestamp)
 - ✅ When a video is accessed:
-  - If the `video_id` exists: increment `hit_count`, update `last_accessed_at`.
-  - If it doesn’t exist: insert a new row with initial hit count and timestamp.
+    - If the `video_id` exists: increment `hit_count`, update `last_accessed_at`.
+    - If it doesn’t exist: insert a new row with initial hit count and timestamp.
 - ✅ The implementation is **concurrent-safe** and performs well under load.
 - ✅ The cleanup cronjob can now query `video_access_stats` and make deletion decisions based on low usage.
 - ✅ Unit and/or integration tests cover hit tracking and DB updates.
@@ -8508,9 +8508,9 @@ As a system owner, I want to persist video hit statistics (both from cache and d
 ## **Desired State**
 
 - A previewMode is introduced with:
-  - A flag to enable/disable it.
-  - A percentage-based sampling (e.g., 10% of total).
-  - A hard cap on the number of emails sent per day.
+    - A flag to enable/disable it.
+    - A percentage-based sampling (e.g., 10% of total).
+    - A hard cap on the number of emails sent per day.
 - A whitelist of email addresses is injected via environment variable, using comma-separated format (,) to support dynamic updates without modifying application.yml.).
 
 ‌
@@ -8531,8 +8531,8 @@ As a system owner, I want to persist video hit statistics (both from cache and d
 
 - When `preview-mode.enabled = false`: send all emails.
 - When `preview-mode.enabled = true`:
-  - Emails **to addresses matching the whitelist** (by exact match or domain match, e.g., `endsWith("@abc.com")`) are **always sent**, not counted toward the daily cap.
-  - All others follow `percentage` sampling and `max-daily-emails` enforcement.
+    - Emails **to addresses matching the whitelist** (by exact match or domain match, e.g., `endsWith("@abc.com")`) are **always sent**, not counted toward the daily cap.
+    - All others follow `percentage` sampling and `max-daily-emails` enforcement.
 
 ✅ Whitelist parsing:
 
@@ -8572,13 +8572,13 @@ As a user (guest or logged-in), I want to post and reply to comments on a video 
 
 - ✅ Comments section is visible to all visitors
 - ✅ Users can:
-  - View all comments (sorted)
-  - Post comment as guest (enter guest name)
-  - Reply to existing comments
-  - (Optional) Delete their own comment (if tracking guest session/token)
+    - View all comments (sorted)
+    - Post comment as guest (enter guest name)
+    - Reply to existing comments
+    - (Optional) Delete their own comment (if tracking guest session/token)
 - ✅ Input fields:
-  - Text area for comment
-  - Guest name (if not logged in)
+    - Text area for comment
+    - Guest name (if not logged in)
 
 </details>
 
@@ -8612,12 +8612,12 @@ As a backend developer, I want to build public comment APIs that allow both logg
 ### **Acceptance Criteria:**
 
 - ✅ Public endpoints:
-  - `GET /videos/{id}/comments`
-  - `POST /videos/{id}/comments` — accepts either `user_id` (if logged in) or `guest_name`
-  - `DELETE /comments/{id}` — only for authenticated users or guest with proper token (if applied)
+    - `GET /videos/{id}/comments`
+    - `POST /videos/{id}/comments` — accepts either `user_id` (if logged in) or `guest_name`
+    - `DELETE /comments/{id}` — only for authenticated users or guest with proper token (if applied)
 - ✅ Validations:
-  - At least one of `user_id` or `guest_name` must be present
-  - `content` must not be empty
+    - At least one of `user_id` or `guest_name` must be present
+    - `content` must not be empty
 - ✅ Replies are returned in nested structure (if needed)
 - ✅ API is protected against spam (basic rate limit / captcha if needed)
 
@@ -8653,13 +8653,13 @@ As a developer, I want to design and create a database table to store user comme
 ### **Acceptance Criteria:**
 
 - ✅ A new `video_comments` table is created with the following fields:
-  - `id` (UUID or auto-increment)
-  - `video_id` (foreign key)
-  - `user_id` (foreign key or string)
-  - `content` (text)
-  - `created_at` (timestamp)
-  - `updated_at` (timestamp)
-  - `parent_id` (nullable, for nested replies)
+    - `id` (UUID or auto-increment)
+    - `video_id` (foreign key)
+    - `user_id` (foreign key or string)
+    - `content` (text)
+    - `created_at` (timestamp)
+    - `updated_at` (timestamp)
+    - `parent_id` (nullable, for nested replies)
 - ✅ Supports nesting replies (via `parent_id`).
 - ✅ DB migration scripts are written and tested.
 - ✅ Indexes are added for performance (e.g., `video_id`, `created_at`).
@@ -8702,13 +8702,13 @@ As a developer, I want to integrate SonarCloud static code analysis into the Git
 ### 📋 **Acceptance Criteria**:
 
 - ✅ The `pom.xml` is configured with SonarCloud properties:
-  - `sonar.organization=canh-labs`
-  - `sonar.host.url=https://sonarcloud.io`
+    - `sonar.organization=canh-labs`
+    - `sonar.host.url=https://sonarcloud.io`
 - ✅ `sonar-maven-plugin` is added to `pom.xml` (or implicitly used)
 - ✅ GitHub Actions CI includes:
-  - Java setup (JDK 21)
-  - Cache for Maven and Sonar
-  - Step to run `mvn verify sonar:sonar`
+    - Java setup (JDK 21)
+    - Cache for Maven and Sonar
+    - Step to run `mvn verify sonar:sonar`
 - ✅ `SONAR_TOKEN` is stored in GitHub Secrets
 - ✅ The SonarCloud analysis is successfully triggered and visible on [https://sonarcloud.io](https://sonarcloud.io "smartCard-inline")
 - ✅ CI still builds the JAR and uploads artifact as before
@@ -8824,9 +8824,9 @@ As a system, I want the cron job that downloads videos from Google Drive to also
 ### **Desired State:**
 
 - After each video is downloaded:
-  - A thumbnail is generated using `ffmpeg` (at 1 second mark).
-  - The generated image is saved to a configured directory (e.g., `/thumbnails/{videoId}.jpg`).
-  - The `thumbnail_path` in the `video_source` table is updated accordingly.
+    - A thumbnail is generated using `ffmpeg` (at 1 second mark).
+    - The generated image is saved to a configured directory (e.g., `/thumbnails/{videoId}.jpg`).
+    - The `thumbnail_path` in the `video_source` table is updated accordingly.
 
 ---
 
@@ -8899,13 +8899,13 @@ A result wrapper class `Result<T>` is introduced to encapsulate either a success
 ✅ A new utility class `TaskUtils` is implemented with:
 
 - `<T> List<T> runAll(List<Callable<T>> tasks) throws Exception;`
-  → Uses `StructuredTaskScope.ShutdownOnFailure`
-  → Cancels remaining tasks on the first failure
-  → Returns ordered list of results
+    → Uses `StructuredTaskScope.ShutdownOnFailure`
+    → Cancels remaining tasks on the first failure
+    → Returns ordered list of results
 - `<T> List<Result<T>> runAllIgnoreError(List<Callable<T>> tasks);`
-  → Uses basic `StructuredTaskScope`
-  → Collects success and failure without throwing
-  → Returns list of `Result<T>` objects
+    → Uses basic `StructuredTaskScope`
+    → Collects success and failure without throwing
+    → Returns list of `Result<T>` objects
 
 ✅ `Result<T>` class is implemented with:
 
@@ -8966,10 +8966,10 @@ As a developer, I want to add `is_hide` and `thumbnail_path` columns to the `vid
 ### **Acceptance Criteria:**
 
 - ✅ A new column `is_hide` of type `BOOLEAN` is added to the `video_source` table.
-  - Default value is `FALSE`.
-  - Indicates whether the video should be hidden in the UI.
+    - Default value is `FALSE`.
+    - Indicates whether the video should be hidden in the UI.
 - ✅ A new column `thumbnail_path` of type `VARCHAR` (or equivalent) is added to the `video_source` table.
-  - Stores the path or URL to the video’s thumbnail image.(path value = ./icon/{filedId}.jpg
+    - Stores the path or URL to the video’s thumbnail image.(path value = ./icon/{filedId}.jpg
 - ✅ Database migration is created and tested successfully.
 - ✅ ORM/entity (if used) is updated accordingly.
 - ✅ Code is reviewed and merged into the main branch.
@@ -9013,9 +9013,9 @@ As a developer, I want to add `is_hide` and `thumbnail_path` columns to the `vid
 ### **Acceptance Criteria:**
 
 - **✅ System exposes metrics about virtual threads, such as:**
-  - **Number of active virtual threads**
-  - **Completed thread count**
-  - **Average task duration (if executor supports)**
+    - **Number of active virtual threads**
+    - **Completed thread count**
+    - **Average task duration (if executor supports)**
 - **✅ Metrics are visible via actuator endpoint (e.g., /actuator/metrics)**
 - **✅ Metrics are exportable to Prometheus/Grafana if enabled**
 - **✅ Logging includes virtual thread names (e.g., \@VirtualThread) for easier debugging**
@@ -9071,9 +9071,10 @@ As a DevOps/developer, I want to enhance the current Nginx configuration to serv
 - Proper content types are returned (`image/jpeg`, `image/png`)
 - Directory listing is disabled
 - System can access thumbnails like:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>https://images.canh-labs.com/thumbnails/abc123.jpg
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>https://images.canh-labs.com/thumbnails/abc123.jpg
 </code></pre></div>
-  ‌
+    ‌
+
 - CORS and caching headers are optionally configured to support frontend usage
 
 ---
@@ -9125,15 +9126,15 @@ As a team, we want to create a full set of C4 Model diagrams (L1–L3) to docume
 ### **Acceptance Criteria:**
 
 - ✅ Level 1 (System Context Diagram):
-  - Shows the main system, users, and external systems (e.g., Google Drive, Redis, etc.)
-  - Defines system boundaries
+    - Shows the main system, users, and external systems (e.g., Google Drive, Redis, etc.)
+    - Defines system boundaries
 - ✅ Level 2 (Container Diagram):
-  - Shows main containers: Web frontend, Backend service, Database, Redis, etc.
-  - Explains responsibilities and technologies used
-  - Includes communication lines (e.g., HTTP, JDBC, Redis, etc.)
+    - Shows main containers: Web frontend, Backend service, Database, Redis, etc.
+    - Explains responsibilities and technologies used
+    - Includes communication lines (e.g., HTTP, JDBC, Redis, etc.)
 - ✅ Level 3 (Component Diagram):
-  - Zoom into Backend container
-  - Show key components/modules: API controllers, services, repositories, cache, cron jobs, etc.
+    - Zoom into Backend container
+    - Show key components/modules: API controllers, services, repositories, cache, cron jobs, etc.
 - ✅ Diagrams are version-controlled (e.g., in `docs/architecture/`)
 - ✅ Use tools like Structurizr DSL, [http://draw.io](http://draw.io "smartCard-inline") , or PlantUML for diagrams
 
@@ -9180,15 +9181,15 @@ As a team, we want to document key architecture decisions in ADR (Architecture D
 
 - ✅ An ADR document is created and stored (in `/docs/adr/` or shared Notion/Confluence/Repo)
 - ✅ Each ADR should follow a standard format, e.g., MADR or a simplified template:
-  - Title
-  - Context
-  - Decision
-  - Consequences
+    - Title
+    - Context
+    - Decision
+    - Consequences
 - ✅ ADRs must be created for the following components:
-  - Database schema and structure (e.g., normalization, naming, relationships)
-  - Backend service architecture (e.g., REST design, authentication, modular structure)
-  - Frontend structure (e.g., framework choice, state management, component strategy)
-  - Caching strategy (e.g., Redis usage, TTL, keys pattern)
+    - Database schema and structure (e.g., normalization, naming, relationships)
+    - Backend service architecture (e.g., REST design, authentication, modular structure)
+    - Frontend structure (e.g., framework choice, state management, component strategy)
+    - Caching strategy (e.g., Redis usage, TTL, keys pattern)
 
 </details>
 

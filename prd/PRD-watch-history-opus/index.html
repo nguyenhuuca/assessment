@@ -7589,12 +7589,16 @@
 <p>A logged-in user watches a video, leaves the app, and later wants to return to it — but the app keeps no record of what they watched. Their only recovery path is to re-search by half-remembered title, which frequently fails. The watch intent simply evaporates at session end.</p>
 <p>The product already anticipates this: the frontend ships a <code>/history</code> nav item that today routes to a generic <code>ComingSoon</code> placeholder (<code>webapp/src/components/layout/ComingSoon.jsx</code>, wired in <code>AppShell.jsx</code>). Users who click it get nothing. We are advertising a capability we don't deliver.</p>
 <h3 id="evidence">Evidence<a class="headerlink" href="#evidence" title="Permanent link">&para;</a></h3>
-<p><strong>Quantitative Evidence:</strong>
-- <strong>100% of watch intent is non-recoverable today.</strong> There is no persistence of play events per user — once a session ends, the watched set is gone.
-- <strong>A dead nav entry already exists.</strong> <code>/history</code> is presented in the app shell and resolves to a placeholder, so every click on it is a measurable dead-end (instrumentable as bounce on <code>/history</code>).</p>
-<p><strong>Qualitative Evidence:</strong>
-- Observed loop: <em>play a video → navigate away → come back later → can't find it → give up.</em> No tooling exists to short-circuit this.
-- Baseline expectation: every major video platform (YouTube, Netflix, Vimeo) treats watch history as table stakes. Its absence reads as "unfinished" rather than "minimal."</p>
+<p><strong>Quantitative Evidence:</strong></p>
+<ul>
+<li><strong>100% of watch intent is non-recoverable today.</strong> There is no persistence of play events per user — once a session ends, the watched set is gone.</li>
+<li><strong>A dead nav entry already exists.</strong> <code>/history</code> is presented in the app shell and resolves to a placeholder, so every click on it is a measurable dead-end (instrumentable as bounce on <code>/history</code>).</li>
+</ul>
+<p><strong>Qualitative Evidence:</strong></p>
+<ul>
+<li>Observed loop: <em>play a video → navigate away → come back later → can't find it → give up.</em> No tooling exists to short-circuit this.</li>
+<li>Baseline expectation: every major video platform (YouTube, Netflix, Vimeo) treats watch history as table stakes. Its absence reads as "unfinished" rather than "minimal."</li>
+</ul>
 <hr />
 <h2 id="goals-success-metrics">Goals &amp; Success Metrics<a class="headerlink" href="#goals-success-metrics" title="Permanent link">&para;</a></h2>
 <table>
@@ -7630,32 +7634,36 @@
 <h2 id="user-stories">User Stories<a class="headerlink" href="#user-stories" title="Permanent link">&para;</a></h2>
 <h3 id="authenticated-user">Authenticated User<a class="headerlink" href="#authenticated-user" title="Permanent link">&para;</a></h3>
 <ul>
-<li>As a logged-in user, I want videos I play to be recorded automatically, so that I never have to remember to "save" something to find it later.</li>
 <li>
-<p>Acceptance: Playing a video creates a history entry for the current user with zero manual action. Playing it again updates the existing entry's timestamp rather than creating a duplicate.</p>
+<p>As a logged-in user, I want videos I play to be recorded automatically, so that I never have to remember to "save" something to find it later.</p>
+<ul>
+<li>Acceptance: Playing a video creates a history entry for the current user with zero manual action. Playing it again updates the existing entry's timestamp rather than creating a duplicate.</li>
+</ul>
 </li>
 <li>
 <p>As a logged-in user, I want a <code>/history</code> page that lists everything I've watched, newest first, so that the thing I watched most recently is the easiest to find.</p>
-</li>
-<li>
-<p>Acceptance: The page lists entries with thumbnail, title, and a relative watch timestamp ("2 hours ago"), ordered by <code>watched_at</code> descending. Clicking an entry plays the video. An empty history shows a friendly empty state, not a blank page.</p>
+<ul>
+<li>Acceptance: The page lists entries with thumbnail, title, and a relative watch timestamp ("2 hours ago"), ordered by <code>watched_at</code> descending. Clicking an entry plays the video. An empty history shows a friendly empty state, not a blank page.</li>
+</ul>
 </li>
 <li>
 <p>As a logged-in user, I want video cards to show a "watched" badge for videos I've already seen, so that I can tell new from seen content at a glance while browsing.</p>
-</li>
-<li>
-<p>Acceptance: Cards for videos in my history render a visible "watched" indicator; cards for unwatched videos render none. The indicator requires no per-card API call.</p>
+<ul>
+<li>Acceptance: Cards for videos in my history render a visible "watched" indicator; cards for unwatched videos render none. The indicator requires no per-card API call.</li>
+</ul>
 </li>
 <li>
 <p>As a logged-in user, I want to delete a single history entry, so that I can remove something I'd rather not keep a record of.</p>
-</li>
-<li>
-<p>Acceptance: Each entry has a delete action; confirming it removes only that entry and refreshes the list and badges.</p>
+<ul>
+<li>Acceptance: Each entry has a delete action; confirming it removes only that entry and refreshes the list and badges.</li>
+</ul>
 </li>
 <li>
 <p>As a logged-in user, I want to clear my entire history in one action, so that I can reset my record for privacy.</p>
-</li>
+<ul>
 <li>Acceptance: A "Clear all" action, gated behind an explicit confirmation, removes every entry for my account and resets all watched badges.</li>
+</ul>
+</li>
 </ul>
 <hr />
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
@@ -7995,36 +8003,42 @@
 <h2 id="next-steps-handoffs">Next Steps &amp; Handoffs<a class="headerlink" href="#next-steps-handoffs" title="Permanent link">&para;</a></h2>
 <p>After PRD approval:</p>
 <ol>
-<li>[ ] <strong>Architect Review</strong> — technical feasibility &amp; design</li>
-<li>Trigger: <code>/architect</code></li>
 <li>
-<p>Output: ADR (<code>docs/adr/00NN-watch-history-design.md</code>)</p>
+<p>[ ] <strong>Architect Review</strong> — technical feasibility &amp; design</p>
+<ul>
+<li>Trigger: <code>/architect</code></li>
+<li>Output: ADR (<code>docs/adr/00NN-watch-history-design.md</code>)</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>Spec</strong> — feature specification from PRD + ADR</p>
-</li>
+<ul>
 <li>Trigger: <code>/spec</code></li>
-<li>
-<p>Output: <code>docs/specs/spec-watch-history-opus.md</code></p>
+<li>Output: <code>docs/specs/spec-watch-history-opus.md</code></li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>UI/UX Designer</strong> — <code>/history</code> page + watched badge</p>
-</li>
+<ul>
 <li>Trigger: <code>/ui-ux-designer</code></li>
-<li>
-<p>Output: Design spec</p>
+<li>Output: Design spec</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>Implementation Plan</strong> — decomposition into trackable work</p>
-</li>
+<ul>
 <li>Trigger: <code>/swarm-plan</code></li>
 <li>Output: <code>docs/plans/plan-watch-history-opus.md</code></li>
+</ul>
+</li>
 </ol>
-<p><strong>Related Artifacts:</strong>
-- Sibling PRD (comparison baseline): <code>docs/prd/PRD-watch-history.md</code>
-- ADR: [Link after architect review]
-- Design Spec: [Link after designer review]
-- Implementation Plan: [Link after decomposition]</p>
+<p><strong>Related Artifacts:</strong></p>
+<ul>
+<li>Sibling PRD (comparison baseline): <code>docs/prd/PRD-watch-history.md</code></li>
+<li>ADR: [Link after architect review]</li>
+<li>Design Spec: [Link after designer review]</li>
+<li>Implementation Plan: [Link after decomposition]</li>
+</ul>
 <hr />
 <h2 id="version-history">Version History<a class="headerlink" href="#version-history" title="Permanent link">&para;</a></h2>
 <table>

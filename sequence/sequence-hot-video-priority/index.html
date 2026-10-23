@@ -7117,12 +7117,13 @@
 <h1 id="sequence-diagrams-hot-video-priority-and-trending-feed">Sequence Diagrams: Hot Video Priority and Trending Feed<a class="headerlink" href="#sequence-diagrams-hot-video-priority-and-trending-feed" title="Permanent link">&para;</a></h1>
 <!--
 One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug = PRD slug).
+
 - Mermaid `sequenceDiagram` only (rendered by mkdocs via pymdownx.superfences); no PNG/PlantUML.
 - Draw what the code does (or will do, per ADR/spec). Cite the class/method in each participant or note.
 - One diagram per main flow: the happy path first, then the important alternative or failure paths
-  (auth failure, validation error, async/event, scheduled job). 2-6 diagrams is typical.
+    (auth failure, validation error, async/event, scheduled job). 2-6 diagrams is typical.
 - Participants: Browser (React page/hook) → Controller → Service → Repository/DB, plus external
-  systems (YouTube, GitHub, SMTP, SSE) and async listeners/jobs. Use `autonumber`.
+    systems (YouTube, GitHub, SMTP, SSE) and async listeners/jobs. Use `autonumber`.
 - Keep in sync: when the as-built flow changes, update the diagram in the same commit.
 -->
 
@@ -7133,10 +7134,12 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
 <li><strong>Status:</strong> Draft (the hot score is NOT implemented. Flows 1-3 are as-built, flow 4 is planned only)</li>
 </ul>
 <blockquote>
-<p><strong>Planned vs built.</strong>
-- <strong>Built:</strong> manual <code>priority</code> column (0-9999) on <code>video_sources</code>, set by an admin and used for feed ordering. The <code>VideoAccessStats</code> entity and repo, the <code>VideoAccessService.recordAccess(String)</code> signature, and a <code>cleanUpOldVideos</code> job whose delete step is commented out.
-- <strong>Not built:</strong> <code>recordAccess()</code> body (commented out with a TODO), the Liquibase migration for <code>hot_score</code>, <code>is_hot</code>, <code>hot_rank</code>, <code>HotVideoService</code> / <code>HotVideoServiceImpl</code>, <code>HotVideoProperties</code> (<code>app.hot-video.*</code>), the <code>recomputeHotScores()</code> job, <code>GET /videos/trending</code>, <code>sort=hot</code>, cache pre-warming, and the frontend "Trending Now" section and Hot badge. A grep for <code>hotScore</code> / <code>hot_score</code> in <code>api/src</code> returns nothing.
-- <strong>PRD vs code.</strong> The PRD uses paths <code>/api/videos</code>, <code>/api/videos/trending</code>. The real feed endpoint is <code>GET /v1/funny-app/video-stream/list</code>, and there is no <code>/videos</code> list endpoint. <code>recordAccess</code> is called only inside <code>getFileRangeFromDisk</code>, so even once implemented it would count cache misses, not every stream request as the PRD (FR-1) intends. The web client (<code>useVideos</code>) re-sorts the list by <code>upvotes</code> descending, which can override the server order except for ties.</p>
+<p><strong>Planned vs built.</strong></p>
+<ul>
+<li><strong>Built:</strong> manual <code>priority</code> column (0-9999) on <code>video_sources</code>, set by an admin and used for feed ordering. The <code>VideoAccessStats</code> entity and repo, the <code>VideoAccessService.recordAccess(String)</code> signature, and a <code>cleanUpOldVideos</code> job whose delete step is commented out.</li>
+<li><strong>Not built:</strong> <code>recordAccess()</code> body (commented out with a TODO), the Liquibase migration for <code>hot_score</code>, <code>is_hot</code>, <code>hot_rank</code>, <code>HotVideoService</code> / <code>HotVideoServiceImpl</code>, <code>HotVideoProperties</code> (<code>app.hot-video.*</code>), the <code>recomputeHotScores()</code> job, <code>GET /videos/trending</code>, <code>sort=hot</code>, cache pre-warming, and the frontend "Trending Now" section and Hot badge. A grep for <code>hotScore</code> / <code>hot_score</code> in <code>api/src</code> returns nothing.</li>
+<li><strong>PRD vs code.</strong> The PRD uses paths <code>/api/videos</code>, <code>/api/videos/trending</code>. The real feed endpoint is <code>GET /v1/funny-app/video-stream/list</code>, and there is no <code>/videos</code> list endpoint. <code>recordAccess</code> is called only inside <code>getFileRangeFromDisk</code>, so even once implemented it would count cache misses, not every stream request as the PRD (FR-1) intends. The web client (<code>useVideos</code>) re-sorts the list by <code>upvotes</code> descending, which can override the server order except for ties.</li>
+</ul>
 </blockquote>
 <h2 id="1-stream-a-video-chunk-access-recording-is-a-no-op-today">1. Stream a video chunk (access recording is a no-op today)<a class="headerlink" href="#1-stream-a-video-chunk-access-recording-is-a-no-op-today" title="Permanent link">&para;</a></h2>
 <p>The browser requests byte ranges. A chunk-cache hit never touches disk. On a miss the service reads the file, records a cache miss in <code>StatsCache</code>, and calls <code>recordAccess</code>, which does nothing yet.</p>

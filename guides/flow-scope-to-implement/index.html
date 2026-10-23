@@ -7518,25 +7518,31 @@ flowchart LR
 <li>Any known technical constraints?</li>
 </ol>
 <p>After each answer Claude briefly acknowledges it, then asks the next question. Once all gaps are filled, Claude summarizes its understanding and confirms before writing.</p>
-<p>After the conversation, Claude:
-1. Reads relevant existing code via Grep/Glob
-2. Writes <code>docs/prd/PRD-comment-section.md</code> using <code>templates/artifacts/prd.template.md</code>
-3. Offers to create an ADR and Plan</p>
+<p>After the conversation, Claude:</p>
+<ol>
+<li>Reads relevant existing code via Grep/Glob</li>
+<li>Writes <code>docs/prd/PRD-comment-section.md</code> using <code>templates/artifacts/prd.template.md</code></li>
+<li>Offers to create an ADR and Plan</li>
+</ol>
 <p><strong>Output:</strong> <code>docs/prd/PRD-{slug}.md</code></p>
 <hr />
 <h2 id="step-2-architecture-decision-adr">Step 2 — Architecture decision (ADR)<a class="headerlink" href="#step-2-architecture-decision-adr" title="Permanent link">&para;</a></h2>
 <p>Once the PRD is approved, run <code>/architect</code> to make and record the key technical decisions.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/architect review docs/prd/PRD-comment-section.md and create an ADR
 </code></pre></div>
-<p>Claude:
-1. Reads the PRD
-2. Identifies the key architectural decisions (data model, API design, caching strategy, etc.)
-3. Researches the existing codebase for constraints
-4. Writes <code>docs/adr/NNNN-comment-section.md</code> using <code>templates/artifacts/adr.template.md</code></p>
-<p>The ADR contains:
-- <strong>Considered Options</strong> — at least 2–3 alternatives with Pros/Cons tables
-- <strong>Decision Outcome</strong> — chosen option + rationale + quantified impact
-- <strong>Consequences</strong> — positive, negative, risks</p>
+<p>Claude:</p>
+<ol>
+<li>Reads the PRD</li>
+<li>Identifies the key architectural decisions (data model, API design, caching strategy, etc.)</li>
+<li>Researches the existing codebase for constraints</li>
+<li>Writes <code>docs/adr/NNNN-comment-section.md</code> using <code>templates/artifacts/adr.template.md</code></li>
+</ol>
+<p>The ADR contains:</p>
+<ul>
+<li><strong>Considered Options</strong> — at least 2–3 alternatives with Pros/Cons tables</li>
+<li><strong>Decision Outcome</strong> — chosen option + rationale + quantified impact</li>
+<li><strong>Consequences</strong> — positive, negative, risks</li>
+</ul>
 <blockquote>
 <p><strong>Rule:</strong> One ADR per major decision. If a feature has multiple independent decisions (e.g., data model + caching strategy), create multiple ADRs.</p>
 </blockquote>
@@ -7686,48 +7692,58 @@ flowchart LR
 </tr>
 </tbody>
 </table>
-<p><code>/swarm-plan</code> will:
-1. Launch 3–6 <code>worker-explorer</code> agents in parallel to research existing patterns
-2. Classify decision reversibility (Two-Way Door vs One-Way Door)
-3. Write <code>docs/plans/plan-{slug}.md</code> using <code>templates/artifacts/plan.template.md</code>
-4. Output the implementation tasks (native task list, or listed in the plan) with <code>blockedBy</code> dependencies</p>
-<p>The plan contains:
-- Phased steps with exact file paths and acceptance criteria
-- Testing strategy (unit + integration + manual)
-- Rollback plan
-- Dependency graph showing task order
-- Before/During/After PR checklist</p>
+<p><code>/swarm-plan</code> will:</p>
+<ol>
+<li>Launch 3–6 <code>worker-explorer</code> agents in parallel to research existing patterns</li>
+<li>Classify decision reversibility (Two-Way Door vs One-Way Door)</li>
+<li>Write <code>docs/plans/plan-{slug}.md</code> using <code>templates/artifacts/plan.template.md</code></li>
+<li>Output the implementation tasks (native task list, or listed in the plan) with <code>blockedBy</code> dependencies</li>
+</ol>
+<p>The plan contains:</p>
+<ul>
+<li>Phased steps with exact file paths and acceptance criteria</li>
+<li>Testing strategy (unit + integration + manual)</li>
+<li>Rollback plan</li>
+<li>Dependency graph showing task order</li>
+<li>Before/During/After PR checklist</li>
+</ul>
 <p><strong>Output:</strong> <code>docs/plans/plan-{slug}.md</code> + task list</p>
 <hr />
 <h2 id="step-5-implement">Step 5 — Implement<a class="headerlink" href="#step-5-implement" title="Permanent link">&para;</a></h2>
 <h3 id="option-a-single-builder-smallmedium-tasks">Option A — Single builder (small/medium tasks)<a class="headerlink" href="#option-a-single-builder-smallmedium-tasks" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/builder implement docs/plans/plan-comment-section.md
 </code></pre></div>
-<p>The builder:
-1. Reads the plan, PRD, and ADR
-2. Reads existing code patterns via Grep/Glob before writing
-3. Implements phase by phase
-4. Writes tests alongside code (TDD)
-5. Runs <code>mvn verify</code> or <code>npm run test</code> to confirm passing</p>
+<p>The builder:</p>
+<ol>
+<li>Reads the plan, PRD, and ADR</li>
+<li>Reads existing code patterns via Grep/Glob before writing</li>
+<li>Implements phase by phase</li>
+<li>Writes tests alongside code (TDD)</li>
+<li>Runs <code>mvn verify</code> or <code>npm run test</code> to confirm passing</li>
+</ol>
 <h3 id="option-b-swarm-largeparallel-tasks">Option B — Swarm (large/parallel tasks)<a class="headerlink" href="#option-b-swarm-largeparallel-tasks" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/swarm-execute implement docs/plans/plan-comment-section.md
 </code></pre></div>
-<p>The swarm:
-1. Decomposes the plan into parallel tracks (e.g., backend + frontend + tests)
-2. Spawns multiple <code>worker-builder</code> agents simultaneously
-3. Each worker handles one track
-4. Orchestrator integrates and resolves conflicts</p>
+<p>The swarm:</p>
+<ol>
+<li>Decomposes the plan into parallel tracks (e.g., backend + frontend + tests)</li>
+<li>Spawns multiple <code>worker-builder</code> agents simultaneously</li>
+<li>Each worker handles one track</li>
+<li>Orchestrator integrates and resolves conflicts</li>
+</ol>
 <p>Use swarm when the plan has 3+ independent phases that can run in parallel.</p>
 <p><strong>Output:</strong> Code commits on a feature branch</p>
 <hr />
 <h2 id="step-6-test">Step 6 — Test<a class="headerlink" href="#step-6-test" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/qa-engineer test the comment section feature
 </code></pre></div>
-<p>QA engineer:
-1. Reviews the implementation against PRD acceptance criteria
-2. Writes missing unit tests
-3. Writes integration tests for the happy path and edge cases
-4. Checks test isolation (no shared state, no order-dependent tests)</p>
+<p>QA engineer:</p>
+<ol>
+<li>Reviews the implementation against PRD acceptance criteria</li>
+<li>Writes missing unit tests</li>
+<li>Writes integration tests for the happy path and edge cases</li>
+<li>Checks test isolation (no shared state, no order-dependent tests)</li>
+</ol>
 <p>Run tests manually to confirm:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">cd</span><span class="w"> </span>api<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mvn<span class="w"> </span>verify<span class="w">          </span><span class="c1"># backend</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">cd</span><span class="w"> </span>webapp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span><span class="nb">test</span><span class="w">     </span><span class="c1"># frontend</span>
@@ -7740,11 +7756,13 @@ flowchart LR
 <p>Or for a deeper multi-perspective review:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/swarm-review
 </code></pre></div>
-<p>The reviewer checks:
-- Correctness — logic errors, edge cases missed
-- Security — OWASP Top 10, input validation, auth/authz
-- Performance — N+1 queries, blocking I/O, missing indexes
-- Code quality — SOLID, DRY, naming, test coverage</p>
+<p>The reviewer checks:</p>
+<ul>
+<li>Correctness — logic errors, edge cases missed</li>
+<li>Security — OWASP Top 10, input validation, auth/authz</li>
+<li>Performance — N+1 queries, blocking I/O, missing indexes</li>
+<li>Code quality — SOLID, DRY, naming, test coverage</li>
+</ul>
 <p>Fix findings, then commit and open a PR.</p>
 <hr />
 <h2 id="full-example-end-to-end">Full example — end to end<a class="headerlink" href="#full-example-end-to-end" title="Permanent link">&para;</a></h2>

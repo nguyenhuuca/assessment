@@ -7117,12 +7117,13 @@
 <h1 id="sequence-diagrams-react-frontend-migration-spa-runtime">Sequence Diagrams: React Frontend Migration (SPA runtime)<a class="headerlink" href="#sequence-diagrams-react-frontend-migration-spa-runtime" title="Permanent link">&para;</a></h1>
 <!--
 One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug = PRD slug).
+
 - Mermaid `sequenceDiagram` only (rendered by mkdocs via pymdownx.superfences); no PNG/PlantUML.
 - Draw what the code does (or will do, per ADR/spec). Cite the class/method in each participant or note.
 - One diagram per main flow: the happy path first, then the important alternative or failure paths
-  (auth failure, validation error, async/event, scheduled job). 2-6 diagrams is typical.
+    (auth failure, validation error, async/event, scheduled job). 2-6 diagrams is typical.
 - Participants: Browser (React page/hook) → Controller → Service → Repository/DB, plus external
-  systems (YouTube, GitHub, SMTP, SSE) and async listeners/jobs. Use `autonumber`.
+    systems (YouTube, GitHub, SMTP, SSE) and async listeners/jobs. Use `autonumber`.
 - Keep in sync: when the as-built flow changes, update the diagram in the same commit.
 -->
 
@@ -7133,13 +7134,15 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
 <li><strong>Status:</strong> As-built (2026-10-21)</li>
 </ul>
 <blockquote>
-<p><strong>PRD vs code.</strong>
-- The PRD status is <code>Planning</code> but the SPA is live in <code>webapp/</code> (ADR-0008: Accepted, implemented).
-- PRD says React Router v6 for routing. The code uses <code>react-router-dom</code> v7 but defines no <code>&lt;Route&gt;</code> elements. <code>BrowserRouter</code> only provides <code>useNavigate</code> to <code>MagicLinkHandler</code>, and screens are switched by an <code>activeNav</code> state in <code>AppShell</code>.
-- PRD says react-bootstrap and Font Awesome. The UI uses custom CSS tokens and Material Symbols.
-- PRD lists <code>/private-videos</code>, the private tab and <code>/share-links</code> POST. The private tab was removed and share links are being retired. Only <code>DELETE /share-links/{id}</code> remains in <code>videosApi</code>.
-- <code>webapp/CLAUDE.md</code> mentions Axios, but <code>src/api/client.js</code> uses <code>fetch</code>. The <code>Authorization</code> header carries the raw JWT with no <code>Bearer</code> prefix.
-- There is no global React Query 401 handler. 401 handling lives in <code>client.js</code> (TOKEN_REVOKED only) and <code>AuthContext</code> (the <code>/user/me</code> check at boot).</p>
+<p><strong>PRD vs code.</strong></p>
+<ul>
+<li>The PRD status is <code>Planning</code> but the SPA is live in <code>webapp/</code> (ADR-0008: Accepted, implemented).</li>
+<li>PRD says React Router v6 for routing. The code uses <code>react-router-dom</code> v7 but defines no <code>&lt;Route&gt;</code> elements. <code>BrowserRouter</code> only provides <code>useNavigate</code> to <code>MagicLinkHandler</code>, and screens are switched by an <code>activeNav</code> state in <code>AppShell</code>.</li>
+<li>PRD says react-bootstrap and Font Awesome. The UI uses custom CSS tokens and Material Symbols.</li>
+<li>PRD lists <code>/private-videos</code>, the private tab and <code>/share-links</code> POST. The private tab was removed and share links are being retired. Only <code>DELETE /share-links/{id}</code> remains in <code>videosApi</code>.</li>
+<li><code>webapp/CLAUDE.md</code> mentions Axios, but <code>src/api/client.js</code> uses <code>fetch</code>. The <code>Authorization</code> header carries the raw JWT with no <code>Bearer</code> prefix.</li>
+<li>There is no global React Query 401 handler. 401 handling lives in <code>client.js</code> (TOKEN_REVOKED only) and <code>AuthContext</code> (the <code>/user/me</code> check at boot).</li>
+</ul>
 </blockquote>
 <p>All API calls go to <code>VITE_API_BASE_URL</code>, default <code>https://canh-labs.com/api/v1/funny-app</code>.</p>
 <h2 id="1-app-boot-and-jwt-restore">1. App boot and JWT restore<a class="headerlink" href="#1-app-boot-and-jwt-restore" title="Permanent link">&para;</a></h2>

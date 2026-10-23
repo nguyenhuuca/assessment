@@ -7272,27 +7272,27 @@ orchestrator, do not push. See AGENTS.md; do not apply this skill there.</p>
 <ul>
 <li>Run <code>git status</code>. Read every entry: modified, deleted, untracked.</li>
 <li>Account for each file explicitly — nothing is silently left behind, and
-  nothing is blindly swept in.</li>
+    nothing is blindly swept in.</li>
 <li><code>git add -A</code> and <code>git add .</code> are FORBIDDEN. Stage with explicit pathspecs
-  (<code>git add path/to/file.ts path/to/other.ts</code>) so the diff you review is the
-  diff you commit.</li>
+    (<code>git add path/to/file.ts path/to/other.ts</code>) so the diff you review is the
+    diff you commit.</li>
 <li>If <code>$ARGUMENTS</code> names a scope or branch, confirm the inventory matches it —
-  don't land unrelated dirty files just because they happen to be present.</li>
+    don't land unrelated dirty files just because they happen to be present.</li>
 </ul>
 <h2 id="2-gates-never-commit-red">2. Gates — Never Commit Red<a class="headerlink" href="#2-gates-never-commit-red" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Run the project's full quality gates per <code>.claude/rules/code-quality.md</code>:
-  tests, linter, type checker, build.</li>
+    tests, linter, type checker, build.</li>
 <li>A failing gate STOPS the landing. Fix the failure, or explicitly hand it
-  off (issue + task-list entry) — never commit past a red gate.</li>
+    off (issue + task-list entry) — never commit past a red gate.</li>
 <li>See Failure Branches below for the exact stop condition.</li>
 </ul>
 <h2 id="3-commit-atomic-and-explicit">3. Commit — Atomic and Explicit<a class="headerlink" href="#3-commit-atomic-and-explicit" title="Permanent link">&para;</a></h2>
 <ul>
 <li>One logical change per commit; write an atomic, descriptive message.</li>
 <li>Put the commit on its own command line. Do NOT chain it with <code>&amp;&amp;</code> after
-  staging or other commands — if an earlier segment exits non-zero, a
-  chained commit silently skips and the failure goes unnoticed.</li>
+    staging or other commands — if an earlier segment exits non-zero, a
+    chained commit silently skips and the failure goes unnoticed.</li>
 <li>Confirm the commit landed (<code>git log -1</code>) before moving to Sync.</li>
 </ul>
 <h2 id="4-sync-rebase-push-verify">4. Sync — Rebase, Push, Verify<a class="headerlink" href="#4-sync-rebase-push-verify" title="Permanent link">&para;</a></h2>
@@ -7304,28 +7304,28 @@ approval for one push does not carry over). Then:</p>
 </code></pre></div>
 <ul>
 <li>Resolve any rebase conflicts, then re-run the Gates step if the rebase
-  touched code — a pre-rebase gate pass does not cover post-rebase code.</li>
+    touched code — a pre-rebase gate pass does not cover post-rebase code.</li>
 <li>Work is NOT complete until the push is verified. Report the pushed commit
-  SHA (<code>git rev-parse HEAD</code>) as evidence, not just "pushed."</li>
+    SHA (<code>git rev-parse HEAD</code>) as evidence, not just "pushed."</li>
 <li>After the push, watch the CI runs for that SHA (<code>gh run list</code>) and
-  smoke-test prod (<code>./api/mock-test.sh</code> once the backend deploy is green;
-  add a request to <code>api/Mock-Test.http</code> for any new API); report any red run verbatim.</li>
+    smoke-test prod (<code>./api/mock-test.sh</code> once the backend deploy is green;
+    add a request to <code>api/Mock-Test.http</code> for any new API); report any red run verbatim.</li>
 </ul>
 <h2 id="5-handoff-leave-a-clean-trail">5. Handoff — Leave a Clean Trail<a class="headerlink" href="#5-handoff-leave-a-clean-trail" title="Permanent link">&para;</a></h2>
 <ul>
 <li>This repo commits on <code>main</code>; open a PR only when the user asks for one.
-  Then target <code>main</code>, pass the body via a file (heredoc or temp file), never
-  as an inline string, and state gates run, the pushed SHA and a risk tier.</li>
+    Then target <code>main</code>, pass the body via a file (heredoc or temp file), never
+    as an inline string, and state gates run, the pushed SHA and a risk tier.</li>
 <li>File remaining work as issues or task-list entries, each referencing the
-  relevant artifact under <code>docs/</code>.</li>
+    relevant artifact under <code>docs/</code>.</li>
 <li>Release working state: drop stashes, remove temp files, release any
-  locks, and keep <code>./scratchpad/</code> references out of anything you hand off —
-  scratchpad is ephemeral and disposable, not a citable deliverable.</li>
+    locks, and keep <code>./scratchpad/</code> references out of anything you hand off —
+    scratchpad is ephemeral and disposable, not a citable deliverable.</li>
 <li><strong>Retro</strong>: if <code>scratchpad/corrections.log</code> is non-empty, map each entry
-  to the strongest enforcement rung it can support (rule edit &lt; skill edit
-  &lt; hook &lt; permissions.deny/CI — same discipline as <code>postmortem</code>'s
-  Prevention step), promote it via a small PR or filed issue, then remove
-  the processed lines. Never end a session by silently discarding the log.</li>
+    to the strongest enforcement rung it can support (rule edit &lt; skill edit
+    &lt; hook &lt; permissions.deny/CI — same discipline as <code>postmortem</code>'s
+    Prevention step), promote it via a small PR or filed issue, then remove
+    the processed lines. Never end a session by silently discarding the log.</li>
 </ul>
 <h2 id="failure-branches">Failure Branches<a class="headerlink" href="#failure-branches" title="Permanent link">&para;</a></h2>
 <table>

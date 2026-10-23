@@ -7139,75 +7139,105 @@ Handoff to: Builder, QA Engineer
 <h3 id="backend">Backend<a class="headerlink" href="#backend" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Model:</strong> <code>entity/VideoSuggestion</code>, <code>enums/SuggestionStatus</code> and <code>enums/SuggestionRejectReason</code> (DUPLICATE, INAPPROPRIATE, LOW_QUALITY, COPYRIGHT, OTHER), plus <code>repo/VideoSuggestionRepository</code>.</li>
-<li><strong><code>service/VideoSuggestionService</code> and its impl.</strong></li>
+<li>
+<p><strong><code>service/VideoSuggestionService</code> and its impl.</strong></p>
+<p>User-facing:</p>
+<ul>
+<li><strong><code>submit(url, title, note)</code></strong><ol>
+<li>Parse the URL with <code>ImportUrlValidator.parse</code> (shared allowlist and normalization).</li>
+<li>Enforce the daily limit: <code>countByUserIdAndCreatedAtAfter(now − 24h) ≥ app.video-suggestion.daily-limit</code> (default 5) gives 429 <code>error.suggestion.dailyLimit</code>.</li>
+<li>Reject duplicates with 409 <code>error.suggestion.duplicate</code> when either:<ul>
+<li>a suggestion for the same <code>normalizedUrl</code> is pending, or</li>
+<li>an import job for that URL exists with status in ACTIVE ∪ {DONE}.</li>
 </ul>
-<p>User-facing:
-  - <strong><code>submit(url, title, note)</code></strong>
-    1. Parse the URL with <code>ImportUrlValidator.parse</code> (shared allowlist and normalization).
-    2. Enforce the daily limit: <code>countByUserIdAndCreatedAtAfter(now − 24h) ≥ app.video-suggestion.daily-limit</code> (default 5) gives 429 <code>error.suggestion.dailyLimit</code>.
-    3. Reject duplicates with 409 <code>error.suggestion.duplicate</code> when either:
-       - a suggestion for the same <code>normalizedUrl</code> is pending, or
-       - an import job for that URL exists with status in ACTIVE ∪ {DONE}.
-    4. Save. The partial unique index is authoritative: <code>DataIntegrityViolationException</code> also maps to 409.
-  - <strong><code>mine(status, page, size)</code></strong> returns the user's own suggestions, newest first, with an optional status filter and a size clamped to 50. Each has <code>liveVideoId</code> when its job's <code>drive_file_id</code> exists in <code>video_sources</code>. The modal uses page 0 with size 5, and History uses pages of 20.</p>
-<p>Admin:
-  - <strong><code>list(status, page)</code></strong> lists suggestions, pending first.
-  - <strong><code>approve(id, titleOverride)</code></strong>
-    1. Require import to be enabled, otherwise 503 <code>error.import.disabled</code>.
-    2. Lock the suggestion row and require PENDING, otherwise 409.
-    3. Call <code>VideoImportService.create(single item, scheduledAt = now, adminId)</code>. If that line result is an error (for example a duplicate active job), return 409 with the import's code.
-    4. Set APPROVED, <code>import_job_id</code>, <code>reviewed_*</code>.
-    5. Publish <code>SuggestionReviewedEvent</code>.
-  - <strong><code>reject(id, reason, note)</code></strong> requires a note when the reason is OTHER, sets REJECTED, and publishes <code>SuggestionReviewedEvent</code>.
-- <strong>Controllers:</strong>
-  - <code>VideoSuggestionController</code> <code>/suggestions</code>, authenticated:
-    - <code>POST</code> with <code>@RateLimited(permit=10)</code> and <code>@AuditLog</code>.
-    - <code>GET /mine?status&amp;page&amp;size</code> with <code>@RateLimited(60)</code>.
-  - <code>AdminVideoSuggestionController</code> <code>/admin/video-suggestions</code>, with <code>@HasPermission(ADMIN)</code> like the import controller:
-    - <code>GET ?status&amp;page</code>
-    - <code>POST /{id}/approve</code>
-    - <code>POST /{id}/reject</code>
-    - <code>GET /pending-count</code> for the tab badge.
-- <strong>"Live" hook:</strong>
-  - <code>VideoStorageServiceImpl.saveInfo</code>, after save, publishes <code>VideoIngestedEvent(driveFileId, videoSourceId, videoId)</code>.
-  - <code>SuggestionLiveListener</code> (<code>AFTER_COMMIT</code> + <code>@Async</code>, like the notification listeners) does the following:
-    1. Finds the import job by <code>drive_file_id</code>.
-    2. Finds the suggestion by <code>import_job_id</code>.
-    3. Notifies <code>SUGGESTION_LIVE</code> with <code>videoId</code>.
-  - A new video is PUBLISHED and visible by default, so "live" is accurate.
-- <strong>Notifications:</strong>
-  - <code>NotificationType</code> gains <code>SUGGESTION_APPROVED</code>, <code>SUGGESTION_REJECTED</code> and <code>SUGGESTION_LIVE</code>. The type column is VARCHAR(30) with no CHECK, so no migration is needed.
-  - The group key is <code>suggestion:&lt;id&gt;:&lt;type&gt;</code>, so they never collapse with each other.
-  - The payload holds <code>{ title, reason }</code>.
-  - The digest gets new <code>mail.digest.item.suggestion*</code> keys in both properties files.
-- <strong>i18n:</strong> new <code>error.suggestion.*</code> keys in both properties files; the parity test keeps them in sync.
-- <strong>Config:</strong> <code>app.video-suggestion.daily-limit: ${VIDEO_SUGGESTION_DAILY_LIMIT:5}</code>.</p>
+</li>
+<li>Save. The partial unique index is authoritative: <code>DataIntegrityViolationException</code> also maps to 409.</li>
+</ol>
+</li>
+<li><strong><code>mine(status, page, size)</code></strong> returns the user's own suggestions, newest first, with an optional status filter and a size clamped to 50. Each has <code>liveVideoId</code> when its job's <code>drive_file_id</code> exists in <code>video_sources</code>. The modal uses page 0 with size 5, and History uses pages of 20.</li>
+</ul>
+<p>Admin:</p>
+<ul>
+<li><strong><code>list(status, page)</code></strong> lists suggestions, pending first.</li>
+<li><strong><code>approve(id, titleOverride)</code></strong><ol>
+<li>Require import to be enabled, otherwise 503 <code>error.import.disabled</code>.</li>
+<li>Lock the suggestion row and require PENDING, otherwise 409.</li>
+<li>Call <code>VideoImportService.create(single item, scheduledAt = now, adminId)</code>. If that line result is an error (for example a duplicate active job), return 409 with the import's code.</li>
+<li>Set APPROVED, <code>import_job_id</code>, <code>reviewed_*</code>.</li>
+<li>Publish <code>SuggestionReviewedEvent</code>.</li>
+</ol>
+</li>
+<li><strong><code>reject(id, reason, note)</code></strong> requires a note when the reason is OTHER, sets REJECTED, and publishes <code>SuggestionReviewedEvent</code>.</li>
+<li><strong>Controllers:</strong></li>
+<li><code>VideoSuggestionController</code> <code>/suggestions</code>, authenticated:<ul>
+<li><code>POST</code> with <code>@RateLimited(permit=10)</code> and <code>@AuditLog</code>.</li>
+<li><code>GET /mine?status&amp;page&amp;size</code> with <code>@RateLimited(60)</code>.</li>
+</ul>
+</li>
+<li><code>AdminVideoSuggestionController</code> <code>/admin/video-suggestions</code>, with <code>@HasPermission(ADMIN)</code> like the import controller:<ul>
+<li><code>GET ?status&amp;page</code></li>
+<li><code>POST /{id}/approve</code></li>
+<li><code>POST /{id}/reject</code></li>
+<li><code>GET /pending-count</code> for the tab badge.</li>
+</ul>
+</li>
+<li><strong>"Live" hook:</strong></li>
+<li><code>VideoStorageServiceImpl.saveInfo</code>, after save, publishes <code>VideoIngestedEvent(driveFileId, videoSourceId, videoId)</code>.</li>
+<li><code>SuggestionLiveListener</code> (<code>AFTER_COMMIT</code> + <code>@Async</code>, like the notification listeners) does the following:<ol>
+<li>Finds the import job by <code>drive_file_id</code>.</li>
+<li>Finds the suggestion by <code>import_job_id</code>.</li>
+<li>Notifies <code>SUGGESTION_LIVE</code> with <code>videoId</code>.</li>
+</ol>
+</li>
+<li>A new video is PUBLISHED and visible by default, so "live" is accurate.</li>
+<li><strong>Notifications:</strong></li>
+<li><code>NotificationType</code> gains <code>SUGGESTION_APPROVED</code>, <code>SUGGESTION_REJECTED</code> and <code>SUGGESTION_LIVE</code>. The type column is VARCHAR(30) with no CHECK, so no migration is needed.</li>
+<li>The group key is <code>suggestion:&lt;id&gt;:&lt;type&gt;</code>, so they never collapse with each other.</li>
+<li>The payload holds <code>{ title, reason }</code>.</li>
+<li>The digest gets new <code>mail.digest.item.suggestion*</code> keys in both properties files.</li>
+<li><strong>i18n:</strong> new <code>error.suggestion.*</code> keys in both properties files; the parity test keeps them in sync.</li>
+<li><strong>Config:</strong> <code>app.video-suggestion.daily-limit: ${VIDEO_SUGGESTION_DAILY_LIMIT:5}</code>.</li>
+</ul>
+</li>
+</ul>
 <h3 id="frontend">Frontend<a class="headerlink" href="#frontend" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong><code>api/suggestions.js</code></strong> and <strong><code>hooks/useSuggestions.js</code></strong>:</li>
+<li><strong><code>api/suggestions.js</code></strong> and <strong><code>hooks/useSuggestions.js</code></strong>:<ul>
 <li><code>useSubmitSuggestion</code> and <code>useMySuggestions</code>.</li>
 <li>Admin: <code>useAdminSuggestions(status, page)</code>, <code>useApproveSuggestion</code>, <code>useRejectSuggestion</code> and <code>useSuggestionPendingCount</code>.</li>
-<li><strong><code>components/suggestions/SuggestVideoModal.jsx</code></strong> (namespace <code>suggestions</code>):</li>
+</ul>
+</li>
+<li><strong><code>components/suggestions/SuggestVideoModal.jsx</code></strong> (namespace <code>suggestions</code>):<ul>
 <li>Fields: URL, title, note. Client-side check that the URL is HTTPS YouTube or Facebook.</li>
 <li>Errors map from <code>err.code</code>.</li>
 <li>A "Đề xuất gần đây" list shows the latest 5 with status chips. A live item has a "Xem" button that opens <code>?v=</code>. A "Xem tất cả" link opens History.</li>
 <li>Uses <code>aria-busy</code> on submit.</li>
-<li><strong>AppShell:</strong></li>
+</ul>
+</li>
+<li><strong>AppShell:</strong><ul>
 <li>The FAB and the mobile FAB open <code>SuggestVideoModal</code> for users. For admins they navigate to Admin with <code>initialTab='IMPORT_VIDEO'</code>.</li>
 <li>Remove the header upload icon and <code>ShareModal</code>.</li>
 <li>Rename <code>shareAVideo</code> to <code>suggestVideo</code>.</li>
-<li><strong>Admin:</strong></li>
+</ul>
+</li>
+<li><strong>Admin:</strong><ul>
 <li>New <code>SUGGESTIONS</code> tab in <code>AdminView</code>, with a pending-count badge.</li>
 <li><code>AdminSuggestionTable.jsx</code>: link (opens in a new tab), title, note, suggester, time, status. Approve uses a title override and a ConfirmModal. Reject uses a reason select and a note, reusing the pattern of the comment <code>RemoveModal</code>.</li>
-<li><strong>History page:</strong> <code>components/history/HistoryView.jsx</code> replaces the <code>ComingSoon</code> placeholder for the <code>history</code> nav item. It is built so watch history (plan-watch-history-opus) can become another section later.</li>
+</ul>
+</li>
+<li><strong>History page:</strong> <code>components/history/HistoryView.jsx</code> replaces the <code>ComingSoon</code> placeholder for the <code>history</code> nav item. It is built so watch history (plan-watch-history-opus) can become another section later.<ul>
 <li>Section "Đề xuất của tôi" / "My suggestions" (<code>MySuggestionsSection.jsx</code>, namespace <code>history</code>) shows the full list with status filter tabs (Tất cả / Chờ duyệt / Đã duyệt / Bị từ chối / Đã lên app) and paging with "Xem thêm".</li>
 <li>Each row shows the link, title, note, date, status chip and reject reason. A live row has a "Xem" button.</li>
 <li>Logged out, it shows a sign-in hint.</li>
+</ul>
+</li>
 <li><strong>Notifications:</strong> <code>notificationText.js</code> adds the three types. Clicking <code>SUGGESTION_LIVE</code> plays the video (<code>?v=</code>); the other two open History → My suggestions.</li>
-<li><strong>Clean up:</strong></li>
+<li><strong>Clean up:</strong><ul>
 <li>Delete <code>components/modals/ShareModal.jsx</code> and <code>videosApi.share</code>/<code>delete</code>.</li>
 <li>Remove the share keys from <code>shell.json</code>.</li>
 <li>Update <code>webapp/CLAUDE.md</code>.</li>
+</ul>
+</li>
 </ul>
 <h2 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h2>
 <table>

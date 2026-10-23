@@ -7529,13 +7529,17 @@
 <h1 id="planning-orchestrator">Planning Orchestrator<a class="headerlink" href="#planning-orchestrator" title="Permanent link">&para;</a></h1>
 <p>Decompose features into actionable plans using parallel exploration swarms.</p>
 <h2 id="mcp-tools">MCP Tools<a class="headerlink" href="#mcp-tools" title="Permanent link">&para;</a></h2>
-<p><strong>Sequential Thinking</strong> (structured analysis):
-- Complex requirement decomposition
-- Trade-off evaluation for approach selection
-- Risk assessment for implementation choices</p>
-<p><strong>Context7</strong> (library research):
-- Research existing patterns in libraries
-- Validate technology choices from Tech Strategy</p>
+<p><strong>Sequential Thinking</strong> (structured analysis):</p>
+<ul>
+<li>Complex requirement decomposition</li>
+<li>Trade-off evaluation for approach selection</li>
+<li>Risk assessment for implementation choices</li>
+</ul>
+<p><strong>Context7</strong> (library research):</p>
+<ul>
+<li>Research existing patterns in libraries</li>
+<li>Validate technology choices from Tech Strategy</li>
+</ul>
 <h2 id="planning-workflow">Planning Workflow<a class="headerlink" href="#planning-workflow" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>Explore</strong> — Launch 3-6 worker-explorer agents to research existing patterns, dependencies, constraints, and prior art</li>
@@ -7573,27 +7577,37 @@
 </table>
 <h2 id="artifact-requirements">Artifact Requirements<a class="headerlink" href="#artifact-requirements" title="Permanent link">&para;</a></h2>
 <p>Two independent axes: <strong>PRD/PR-FAQ scale with feature size</strong>; <strong>an ADR is triggered by the decision type, at any size</strong>.</p>
-<p><strong>Small Feature (1-3 days)</strong>
-- <code>docs/plans/plan-&lt;feature&gt;.md</code> — Implementation steps only</p>
-<p><strong>Medium Feature (1-2 weeks)</strong>
-- <code>docs/prd/PRD-&lt;feature&gt;.md</code> — Requirements
-- <code>docs/sequence/sequence-&lt;feature&gt;.md</code> — Mermaid sequence diagrams (see below)
-- <code>docs/plans/plan-&lt;feature&gt;.md</code> — Implementation steps</p>
-<p><strong>Large Feature (2+ weeks)</strong>
-- <code>docs/prd/PR-FAQ-&lt;feature&gt;.md</code> — Vision and customer value
-- <code>docs/prd/PRD-&lt;feature&gt;.md</code> — Detailed requirements
-- <code>docs/sequence/sequence-&lt;feature&gt;.md</code> — Mermaid sequence diagrams (see below)
-- <code>docs/plans/plan-&lt;feature&gt;.md</code> — Implementation steps</p>
-<p><strong>ADR — any size</strong> (<code>docs/adr/NNNN-&lt;topic&gt;.md</code>; format: <code>writing-adrs</code> skill; template bundled with <code>designing-systems</code> at <code>resources/adr.template.md</code>)
-- Required when the work contains a One-Way Door (High) decision (Decision Framework above), or a decision on the <code>writing-adrs</code> "When to Write an ADR" list (framework/library, database or storage, a new API pattern, a coding convention, infrastructure, anything affecting multiple components)
-- One-Way Door (Medium) decisions: record the RFC/design excerpt in the plan's design section instead of a separate ADR
-- Following an existing pattern (another endpoint, another Liquibase column) is not a new decision and needs no ADR</p>
-<p><strong>Sequence diagrams — every feature with a PRD</strong> (<code>docs/sequence/sequence-&lt;feature&gt;.md</code>, slug = PRD slug; template <code>templates/artifacts/sequence.template.md</code>)
-- Mermaid <code>sequenceDiagram</code> blocks only (mkdocs renders them); one diagram per main flow: happy path first, then the failure, async/event and scheduled-job paths that matter
-- Participants are real names from the code or the ADR/spec (page/hook, controller, service, repository, external system)
-- Write it before the plan (<code>/spec</code> writes it when it runs; otherwise this skill does). If it is missing, create it as part of planning. Plan tasks cite it in the plan's architecture section
-- Small features without a PRD need none. When the as-built flow changes, update the diagram in the same commit as the code
-- Link it from <code>docs/tracking.md</code> (Sequence column) and <code>mkdocs.yml</code> (nav "Sequence Diagrams")</p>
+<p><strong>Small Feature (1-3 days)</strong></p>
+<ul>
+<li><code>docs/plans/plan-&lt;feature&gt;.md</code> — Implementation steps only</li>
+</ul>
+<p><strong>Medium Feature (1-2 weeks)</strong></p>
+<ul>
+<li><code>docs/prd/PRD-&lt;feature&gt;.md</code> — Requirements</li>
+<li><code>docs/sequence/sequence-&lt;feature&gt;.md</code> — Mermaid sequence diagrams (see below)</li>
+<li><code>docs/plans/plan-&lt;feature&gt;.md</code> — Implementation steps</li>
+</ul>
+<p><strong>Large Feature (2+ weeks)</strong></p>
+<ul>
+<li><code>docs/prd/PR-FAQ-&lt;feature&gt;.md</code> — Vision and customer value</li>
+<li><code>docs/prd/PRD-&lt;feature&gt;.md</code> — Detailed requirements</li>
+<li><code>docs/sequence/sequence-&lt;feature&gt;.md</code> — Mermaid sequence diagrams (see below)</li>
+<li><code>docs/plans/plan-&lt;feature&gt;.md</code> — Implementation steps</li>
+</ul>
+<p><strong>ADR — any size</strong> (<code>docs/adr/NNNN-&lt;topic&gt;.md</code>; format: <code>writing-adrs</code> skill; template bundled with <code>designing-systems</code> at <code>resources/adr.template.md</code>)</p>
+<ul>
+<li>Required when the work contains a One-Way Door (High) decision (Decision Framework above), or a decision on the <code>writing-adrs</code> "When to Write an ADR" list (framework/library, database or storage, a new API pattern, a coding convention, infrastructure, anything affecting multiple components)</li>
+<li>One-Way Door (Medium) decisions: record the RFC/design excerpt in the plan's design section instead of a separate ADR</li>
+<li>Following an existing pattern (another endpoint, another Liquibase column) is not a new decision and needs no ADR</li>
+</ul>
+<p><strong>Sequence diagrams — every feature with a PRD</strong> (<code>docs/sequence/sequence-&lt;feature&gt;.md</code>, slug = PRD slug; template <code>templates/artifacts/sequence.template.md</code>)</p>
+<ul>
+<li>Mermaid <code>sequenceDiagram</code> blocks only (mkdocs renders them); one diagram per main flow: happy path first, then the failure, async/event and scheduled-job paths that matter</li>
+<li>Participants are real names from the code or the ADR/spec (page/hook, controller, service, repository, external system)</li>
+<li>Write it before the plan (<code>/spec</code> writes it when it runs; otherwise this skill does). If it is missing, create it as part of planning. Plan tasks cite it in the plan's architecture section</li>
+<li>Small features without a PRD need none. When the as-built flow changes, update the diagram in the same commit as the code</li>
+<li>Link it from <code>docs/tracking.md</code> (Sequence column) and <code>mkdocs.yml</code> (nav "Sequence Diagrams")</li>
+</ul>
 <h2 id="worker-types">Worker Types<a class="headerlink" href="#worker-types" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -7680,12 +7694,16 @@
 <li>NO plans that require stacked PR chains or integration branches — every planned unit merges to <code>main</code> on its own; a dependent unit branches from <code>main</code> after its prerequisite lands</li>
 </ul>
 <h2 id="output">Output<a class="headerlink" href="#output" title="Permanent link">&para;</a></h2>
-<p>Every planning session MUST produce:
-1. Artifact(s) in <code>docs/</code> following naming conventions (including <code>docs/sequence/sequence-&lt;feature&gt;.md</code> when the feature has a PRD)
-2. Tasks (via <code>TaskCreate</code>) for all implementation work, each with acceptance criteria
-   - <strong>This repo:</strong> also add a <code>## Feature: &lt;name&gt;</code> section to <code>TASKS.md</code> with one <code>- [ ] **&lt;ID&gt;**</code> line per task (the native list is machine-local; <code>TASKS.md</code> is the durable record). If <code>TaskCreate</code> is unavailable, <code>TASKS.md</code> + the plan's task table are the record.
-3. Dependency graph showing task order (via <code>blockedBy</code>)
-4. Handoff summary for /execute command</p>
+<p>Every planning session MUST produce:</p>
+<ol>
+<li>Artifact(s) in <code>docs/</code> following naming conventions (including <code>docs/sequence/sequence-&lt;feature&gt;.md</code> when the feature has a PRD)</li>
+<li>Tasks (via <code>TaskCreate</code>) for all implementation work, each with acceptance criteria<ul>
+<li><strong>This repo:</strong> also add a <code>## Feature: &lt;name&gt;</code> section to <code>TASKS.md</code> with one <code>- [ ] **&lt;ID&gt;**</code> line per task (the native list is machine-local; <code>TASKS.md</code> is the durable record). If <code>TaskCreate</code> is unavailable, <code>TASKS.md</code> + the plan's task table are the record.</li>
+</ul>
+</li>
+<li>Dependency graph showing task order (via <code>blockedBy</code>)</li>
+<li>Handoff summary for /execute command</li>
+</ol>
 <h2 id="product-planning">Product Planning<a class="headerlink" href="#product-planning" title="Permanent link">&para;</a></h2>
 <h3 id="pr-faq">PR-FAQ<a class="headerlink" href="#pr-faq" title="Permanent link">&para;</a></h3>
 <p>Use <code>planning-artifacts</code> skill for structure and template.</p>

@@ -8471,10 +8471,12 @@
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
 <a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_watch_history_user_watched</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">watch_history</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">watched_at</span><span class="w"> </span><span class="k">DESC</span><span class="p">);</span>
 </code></pre></div>
-<p><strong>Column notes:</strong>
-- <code>video_id</code> — nullable FK; becomes <code>NULL</code> if video is deleted (<code>ON DELETE SET NULL</code>)
-- <code>source_video_id</code> — immutable copy of the original video ID; used for uniqueness and delete-by-videoId operations
-- <code>watched_at</code> — updated on re-watch (upsert); drives sort order</p>
+<p><strong>Column notes:</strong></p>
+<ul>
+<li><code>video_id</code> — nullable FK; becomes <code>NULL</code> if video is deleted (<code>ON DELETE SET NULL</code>)</li>
+<li><code>source_video_id</code> — immutable copy of the original video ID; used for uniqueness and delete-by-videoId operations</li>
+<li><code>watched_at</code> — updated on re-watch (upsert); drives sort order</li>
+</ul>
 <h3 id="no-changes-to-existing-tables">No Changes to Existing Tables<a class="headerlink" href="#no-changes-to-existing-tables" title="Permanent link">&para;</a></h3>
 <hr />
 <h2 id="security-requirements">Security Requirements<a class="headerlink" href="#security-requirements" title="Permanent link">&para;</a></h2>

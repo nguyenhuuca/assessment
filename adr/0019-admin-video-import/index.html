@@ -7271,10 +7271,12 @@
 <li>FFmpeg thumbnail → <code>saveInfo(driveFileId, fileName without extension, …)</code> → <code>video_sources</code> row (<code>source_type = google_drive</code>, title = file name, ChatGPT poem as description)</li>
 </ol>
 <p>The admin wants to paste one or many YouTube / Facebook URLs into an admin page and have the server download them (yt-dlp, already installed on the host), upload them into that same Drive folder, and let the existing cron bring them into the app. Downloads can run immediately or at a scheduled time, and progress is shown by polling.</p>
-<p>Constraints:
-- Single VM, 1 vCPU, prod runs the JAR directly on the host (not in Docker) → <code>yt-dlp</code> and <code>ffmpeg</code> on the host <code>PATH</code> are usable.
-- Drive client: Service Account, scope <code>DriveScopes.DRIVE</code> (full), folder shared with the Service Account (reads work today).
-- No job/queue infrastructure exists (no ShedLock, no job table); scheduling is <code>@Scheduled</code> in <code>AppScheduler</code>.</p>
+<p>Constraints:</p>
+<ul>
+<li>Single VM, 1 vCPU, prod runs the JAR directly on the host (not in Docker) → <code>yt-dlp</code> and <code>ffmpeg</code> on the host <code>PATH</code> are usable.</li>
+<li>Drive client: Service Account, scope <code>DriveScopes.DRIVE</code> (full), folder shared with the Service Account (reads work today).</li>
+<li>No job/queue infrastructure exists (no ShedLock, no job table); scheduling is <code>@Scheduled</code> in <code>AppScheduler</code>.</li>
+</ul>
 <h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
 <h3 id="d1-the-drive-folder-stays-the-single-entry-point-the-cron-does-the-ingest">D1 — The Drive folder stays the single entry point; the cron does the ingest<a class="headerlink" href="#d1-the-drive-folder-stays-the-single-entry-point-the-cron-does-the-ingest" title="Permanent link">&para;</a></h3>
 <p>The import job only <strong>downloads → uploads to the Drive folder → deletes the local temp file</strong>. It never writes <code>video_sources</code> itself. The existing cron ingests the file within ≤ 15 min, exactly like a manually uploaded file (owner decision 2026-10-10).</p>
@@ -7353,12 +7355,14 @@
 </tbody>
 </table>
 <p>Indexes: <code>(status, scheduled_at)</code>; partial unique <code>normalized_url WHERE status IN ('PENDING','DOWNLOADING','UPLOADING')</code> (no duplicate active import).</p>
-<p>Worker (<code>VideoImportWorker</code>):
-- <code>@Scheduled(cron = "0 */5 * * * *")</code> (every 5 minutes on the clock; scheduled times must be on a 5-minute slot, claim allows 1 min of DB clock slack) <strong>and</strong> an immediate wake-up after "run now" / create-with-no-schedule / retry.
-- Claims one due job atomically: <code>UPDATE … SET status='DOWNLOADING', started_at=now(), attempts=attempts+1 WHERE id = (SELECT id … WHERE status='PENDING' AND scheduled_at &lt;= now() ORDER BY scheduled_at, id LIMIT 1 FOR UPDATE SKIP LOCKED) RETURNING id</code>.
-- <strong>Concurrency 1</strong> by default (<code>app.video-import.max-concurrent</code>, guarded by a <code>Semaphore</code>, no <code>synchronized</code>): 1 vCPU, disk and bandwidth shared with streaming.
-- Runs on a virtual thread; the job itself is blocking I/O + one child process.
-- On startup, jobs left in <code>DOWNLOADING</code>/<code>UPLOADING</code> (crash/deploy) go back to <code>PENDING</code> if <code>attempts &lt; 3</code>, else <code>FAILED (INTERRUPTED)</code>.</p>
+<p>Worker (<code>VideoImportWorker</code>):</p>
+<ul>
+<li><code>@Scheduled(cron = "0 */5 * * * *")</code> (every 5 minutes on the clock; scheduled times must be on a 5-minute slot, claim allows 1 min of DB clock slack) <strong>and</strong> an immediate wake-up after "run now" / create-with-no-schedule / retry.</li>
+<li>Claims one due job atomically: <code>UPDATE … SET status='DOWNLOADING', started_at=now(), attempts=attempts+1 WHERE id = (SELECT id … WHERE status='PENDING' AND scheduled_at &lt;= now() ORDER BY scheduled_at, id LIMIT 1 FOR UPDATE SKIP LOCKED) RETURNING id</code>.</li>
+<li><strong>Concurrency 1</strong> by default (<code>app.video-import.max-concurrent</code>, guarded by a <code>Semaphore</code>, no <code>synchronized</code>): 1 vCPU, disk and bandwidth shared with streaming.</li>
+<li>Runs on a virtual thread; the job itself is blocking I/O + one child process.</li>
+<li>On startup, jobs left in <code>DOWNLOADING</code>/<code>UPLOADING</code> (crash/deploy) go back to <code>PENDING</code> if <code>attempts &lt; 3</code>, else <code>FAILED (INTERRUPTED)</code>.</li>
+</ul>
 <h3 id="d4-yt-dlp-invocation-hardened">D4 — yt-dlp invocation (hardened)<a class="headerlink" href="#d4-yt-dlp-invocation-hardened" title="Permanent link">&para;</a></h3>
 <p><code>ProcessBuilder</code> with an argument list (never a shell):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>yt-dlp --ignore-config --no-playlist --use-extractors youtube,facebook
@@ -7384,16 +7388,20 @@
 <h3 id="d6-progress-by-polling">D6 — Progress by polling<a class="headerlink" href="#d6-progress-by-polling" title="Permanent link">&para;</a></h3>
 <p>FE polls <code>GET /admin/video-imports</code> with <code>refetchInterval: 2000</code> <strong>only while at least one job is <code>PENDING</code> (due) / <code>DOWNLOADING</code> / <code>UPLOADING</code></strong>, stops otherwise; React Query already pauses when the tab is hidden. Progress = phase + percent (download 0–100 %, then upload 0–100 %). SSE (ADR-0017) is not reused: admin-only, few users, polling every 2 s is cheap and simpler.</p>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive</strong>
-- No change to the ingest path, thumbnails, poems or streaming; a manually uploaded Drive file and an imported one behave the same.
-- Jobs survive restarts/deploys; scheduled imports work across deploys.
-- Hardened process execution (allowlist, no shell, timeouts, extractor allowlist).</p>
-<p><strong>Negative / risks</strong>
-- Up to 15 min extra latency, double transfer (D1, accepted).
-- Service Account upload may be rejected → OAuth fallback (D2), one more secret to manage.
-- yt-dlp breaks when YouTube/Facebook change → host cron <code>yt-dlp -U</code> daily; failures surface as <code>FAILED (EXTRACTOR_ERROR)</code>, admin can retry after update.
-- Legal: downloading from YouTube/Facebook may break their Terms of Service and copyright; the owner is responsible for importing only content they have rights to.
-- K8s/Helm image does not contain <code>yt-dlp</code>/<code>ffmpeg</code> (same as today for ffmpeg); VM is the supported runtime.</p>
+<p><strong>Positive</strong></p>
+<ul>
+<li>No change to the ingest path, thumbnails, poems or streaming; a manually uploaded Drive file and an imported one behave the same.</li>
+<li>Jobs survive restarts/deploys; scheduled imports work across deploys.</li>
+<li>Hardened process execution (allowlist, no shell, timeouts, extractor allowlist).</li>
+</ul>
+<p><strong>Negative / risks</strong></p>
+<ul>
+<li>Up to 15 min extra latency, double transfer (D1, accepted).</li>
+<li>Service Account upload may be rejected → OAuth fallback (D2), one more secret to manage.</li>
+<li>yt-dlp breaks when YouTube/Facebook change → host cron <code>yt-dlp -U</code> daily; failures surface as <code>FAILED (EXTRACTOR_ERROR)</code>, admin can retry after update.</li>
+<li>Legal: downloading from YouTube/Facebook may break their Terms of Service and copyright; the owner is responsible for importing only content they have rights to.</li>
+<li>K8s/Helm image does not contain <code>yt-dlp</code>/<code>ffmpeg</code> (same as today for ffmpeg); VM is the supported runtime.</li>
+</ul>
 <h2 id="alternatives-considered">Alternatives considered<a class="headerlink" href="#alternatives-considered" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

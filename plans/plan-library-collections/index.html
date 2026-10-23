@@ -7183,20 +7183,26 @@ Handoff to: Builder, QA Engineer
 <h3 id="in-scope">In Scope<a class="headerlink" href="#in-scope" title="Permanent link">&para;</a></h3>
 <ul>
 <li>One migration: <code>video_collections</code> + <code>video_collection_items</code></li>
-<li>BE:</li>
+<li>BE:<ul>
 <li>entities and repos</li>
 <li><code>VideoCollectionService</code> (interface + impl)</li>
 <li><code>VideoCollectionController</code></li>
 <li>optional-auth public reads</li>
-<li>FE:</li>
+</ul>
+</li>
+<li>FE:<ul>
 <li><code>api/collections.js</code></li>
 <li><code>hooks/useCollections.js</code></li>
 <li><code>LibraryView</code>, which replaces <code>ComingSoon page="library"</code></li>
 <li><code>AddToCollectionModal</code>, opened from a new "Lưu" button in <code>VideoSwiper</code></li>
 <li>deep link <code>?l=&lt;collectionId&gt;</code></li>
-<li>Built-in <strong>"Xem sau"</strong> (Watch later) collection:</li>
+</ul>
+</li>
+<li>Built-in <strong>"Xem sau"</strong> (Watch later) collection:<ul>
 <li>created lazily, always private</li>
 <li>replaces the planned bookmark feature</li>
+</ul>
+</li>
 </ul>
 <h3 id="out-of-scope">Out of Scope<a class="headerlink" href="#out-of-scope" title="Permanent link">&para;</a></h3>
 <ul>
@@ -7376,16 +7382,20 @@ Handoff to: Builder, QA Engineer
 </tr>
 </tbody>
 </table>
-<p><code>CollectionDto</code> has these fields:
-- <code>id</code>, <code>name</code>, <code>visibility</code>, <code>isDefault</code>
-- <code>ownerName</code>: display name only, never the email
-- <code>itemCount</code>, <code>unavailableCount</code> (<code>null</code> unless <code>canManage</code>)
-- <code>coverVideoId</code>, <code>canManage</code>, <code>updatedAt</code></p>
-<p>Endpoint rules:
-- Writes carry <code>@RateLimited(permit = 30)</code>. The two public GETs carry <code>@RateLimited(permit = 60)</code>.
-- <code>@AuditLog</code> is applied to create, rename, delete and visibility change, and to any write on a PUBLIC collection.
-- The admin check reads the caller's role from the DB (ADMIN or SUPER_ADMIN), the same way <code>AdminAccountServiceImpl.actorRole</code> does. A token issued before a demotion therefore cannot manage public collections.
-- PATCH, PUT and DELETE are already in <code>WebSecurityConfig.setAllowedMethods</code>. Verify only.</p>
+<p><code>CollectionDto</code> has these fields:</p>
+<ul>
+<li><code>id</code>, <code>name</code>, <code>visibility</code>, <code>isDefault</code></li>
+<li><code>ownerName</code>: display name only, never the email</li>
+<li><code>itemCount</code>, <code>unavailableCount</code> (<code>null</code> unless <code>canManage</code>)</li>
+<li><code>coverVideoId</code>, <code>canManage</code>, <code>updatedAt</code></li>
+</ul>
+<p>Endpoint rules:</p>
+<ul>
+<li>Writes carry <code>@RateLimited(permit = 30)</code>. The two public GETs carry <code>@RateLimited(permit = 60)</code>.</li>
+<li><code>@AuditLog</code> is applied to create, rename, delete and visibility change, and to any write on a PUBLIC collection.</li>
+<li>The admin check reads the caller's role from the DB (ADMIN or SUPER_ADMIN), the same way <code>AdminAccountServiceImpl.actorRole</code> does. A token issued before a demotion therefore cannot manage public collections.</li>
+<li>PATCH, PUT and DELETE are already in <code>WebSecurityConfig.setAllowedMethods</code>. Verify only.</li>
+</ul>
 <h3 id="frontend">Frontend<a class="headerlink" href="#frontend" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>AppShell (activeNav === 'library')
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  └── LibraryView
@@ -7403,11 +7413,13 @@ Handoff to: Builder, QA Engineer
 <ul>
 <li>The "Lưu" button shows a login hint for guests, the same way <code>VoteButtons</code> does.</li>
 <li>All mutation buttons use <code>aria-busy</code>, the busy feedback added in <code>7d8f72a5</code>.</li>
-<li>Query keys:</li>
+<li>Query keys:<ul>
 <li><code>['collections', 'mine']</code></li>
 <li><code>['collections', 'public']</code></li>
 <li><code>['collections', id, 'videos', page]</code></li>
 <li><code>['collections', 'membership', videoId]</code></li>
+</ul>
+</li>
 <li>Toggling an item invalidates the affected keys. Changing visibility invalidates both lists.</li>
 </ul>
 <h2 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h2>
@@ -7527,10 +7539,12 @@ Handoff to: Builder, QA Engineer
 </tbody>
 </table>
 <h2 id="rollback">Rollback<a class="headerlink" href="#rollback" title="Permanent link">&para;</a></h2>
-<p>All changes are additive.
-1. Revert the FE commit. Library returns to <code>ComingSoon</code>.
-2. Run <code>DROP TABLE video_collection_items; DROP TABLE video_collections;</code>.
-3. Remove the Liquibase changeset row.</p>
+<p>All changes are additive.</p>
+<ol>
+<li>Revert the FE commit. Library returns to <code>ComingSoon</code>.</li>
+<li>Run <code>DROP TABLE video_collection_items; DROP TABLE video_collections;</code>.</li>
+<li>Remove the Liquibase changeset row.</li>
+</ol>
 <p>No existing data is touched.</p>
 <h2 id="progress-log">Progress Log<a class="headerlink" href="#progress-log" title="Permanent link">&para;</a></h2>
 <table>

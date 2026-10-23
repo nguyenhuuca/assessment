@@ -7476,11 +7476,13 @@
 <ol>
 <li><strong>Per-user password, opt-in, set only after a magic-link (or existing) authenticated session.</strong> Remove the global either/or switch: replace <code>app.use-password-less</code> with <code>app.auth.password-login-enabled</code> (default <code>true</code>) — a kill switch for the password endpoints only; magic link is always on.</li>
 <li><strong>Retire the legacy auto-register path</strong> (<code>UserController.signIn</code> → <code>joinSystem</code>). <code>POST /user/join</code> only sends magic links.</li>
-<li><strong>New endpoints</strong>
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>POST   /user/login              {email, password}                 → UserInfoDto | MFA_REQUIRED   (public, @RateLimited 10/min/IP)
+<li>
+<p><strong>New endpoints</strong>
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>POST   /user/login              {email, password}                 → UserInfoDto | MFA_REQUIRED   (public, @RateLimited 10/min/IP)
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>PUT    /user/password           {currentPassword?, newPassword, otp?} → {jwt}                    (auth)
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>DELETE /user/password           {currentPassword, otp?}           → {jwt}  (fresh token; removal also bumps credentials_version)  (auth)
-</code></pre></div></li>
+</code></pre></div></p>
+<ul>
 <li><code>PUT</code> first-time set: no <code>currentPassword</code>; requires <code>otp</code> if MFA enabled.</li>
 <li><code>PUT</code> change: requires <code>currentPassword</code> (and <code>otp</code> if MFA).</li>
 <li><code>DELETE</code>: back to magic-link-only.</li>
@@ -7492,6 +7494,8 @@
 <li>Failure: <code>failed_login_count++</code>; at 5 → <code>locked_until = now + 15 min</code>, counter reset.</li>
 <li><strong><code>passwordEnabled</code></strong> in JWT / <code>/user/me</code> / settings becomes <strong>per user</strong>: <code>password-login-enabled &amp;&amp; user.password != null</code>. New capability <code>passwordLoginAvailable</code> = the global flag (FE shows the password tab).</li>
 <li><strong>Forgot password</strong> = request a magic link ("Quên mật khẩu? Gửi link đăng nhập"), then set a new password in Settings. No separate reset token flow.</li>
+</ul>
+</li>
 </ol>
 <h2 id="data-model">Data Model<a class="headerlink" href="#data-model" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span>
@@ -7541,18 +7545,24 @@
 </tbody>
 </table>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive</strong>
-- Users get a fast login option without weakening email-verified identity.
-- Email budget pressure drops (fewer magic links).
-- Fixes the latent pre-hijacking hole by removing the auto-register path.</p>
-<p><strong>Negative</strong>
-- Users must sign in by magic link once before they can use a password.
-- One extra cached lookup per authenticated request (<code>credentials_version</code>).
-- Lockout can be triggered by a third party for 15 min (magic link remains available).</p>
-<p><strong>Follow-ups</strong>
-- CAPTCHA after N failures if abuse appears.
-- Breached-password check (HIBP k-anonymity) — needs outbound call; deferred.
-- Passkeys/WebAuthn as a later option.</p>
+<p><strong>Positive</strong></p>
+<ul>
+<li>Users get a fast login option without weakening email-verified identity.</li>
+<li>Email budget pressure drops (fewer magic links).</li>
+<li>Fixes the latent pre-hijacking hole by removing the auto-register path.</li>
+</ul>
+<p><strong>Negative</strong></p>
+<ul>
+<li>Users must sign in by magic link once before they can use a password.</li>
+<li>One extra cached lookup per authenticated request (<code>credentials_version</code>).</li>
+<li>Lockout can be triggered by a third party for 15 min (magic link remains available).</li>
+</ul>
+<p><strong>Follow-ups</strong></p>
+<ul>
+<li>CAPTCHA after N failures if abuse appears.</li>
+<li>Breached-password check (HIBP k-anonymity) — needs outbound call; deferred.</li>
+<li>Passkeys/WebAuthn as a later option.</li>
+</ul>
 
 
 

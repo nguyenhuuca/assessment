@@ -8173,6 +8173,7 @@ Handoff to: Builder (/builder) for remediation, Architect (/architect) for desig
 Related Skills: security-auditor, threat-modeling
 
 Methodology:
+
 - STRIDE threat modeling (Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation)
 - OWASP Top 10 (2021) - https://owasp.org/Top10/
 - MITRE ATT&CK framework for advanced threat mapping - https://attack.mitre.org/
@@ -8180,6 +8181,7 @@ Methodology:
 - Dependency scanning (Trivy, Snyk, or equivalent)
 
 For cloud-native systems, also consider:
+
 - Shared responsibility model (what's provider-managed vs customer-managed)
 - IAM policies, roles, and service accounts
 - Network segmentation (VPCs, security groups)
@@ -8317,9 +8319,11 @@ For cloud-native systems, also consider:
 <strong>CVSS:</strong> [Score]</p>
 <p><strong>Description:</strong>
 [Detailed description of the vulnerability]</p>
-<p><strong>Location:</strong>
-- File: <code>path/to/file.ts:123</code>
-- Endpoint: <code>POST /api/vulnerable</code></p>
+<p><strong>Location:</strong></p>
+<ul>
+<li>File: <code>path/to/file.ts:123</code></li>
+<li>Endpoint: <code>POST /api/vulnerable</code></li>
+</ul>
 <p><strong>Impact:</strong>
 [What could happen if exploited]</p>
 <p><strong>Proof of Concept:</strong>
@@ -8328,9 +8332,11 @@ For cloud-native systems, also consider:
 <p><strong>Remediation:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[Code fix or mitigation steps]
 </code></pre></div></p>
-<p><strong>References:</strong>
-- <a href="link">OWASP Reference</a>
-- <a href="link">CVE if applicable</a></p>
+<p><strong>References:</strong></p>
+<ul>
+<li><a href="link">OWASP Reference</a></li>
+<li><a href="link">CVE if applicable</a></li>
+</ul>
 <hr />
 <h3 id="high-findings">High Findings<a class="headerlink" href="#high-findings" title="Permanent link">&para;</a></h3>
 <h4 id="finding-002-title">[FINDING-002] [Title]<a class="headerlink" href="#finding-002-title" title="Permanent link">&para;</a></h4>

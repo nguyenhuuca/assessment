@@ -7725,24 +7725,30 @@
 FFmpeg (already present for thumbnails) remuxes each <code>.full</code> file into 6-second segments at ingest time.<br />
 Old Range endpoint stays live throughout — rollout is feature-flagged via <code>hlsReady</code> in <code>VideoDto</code>.<br />
 YouTube videos are <strong>not affected</strong>.</p>
-<p><strong>Phases:</strong>
-1. Database — Liquibase migration
-2. Backend Core — transcode service + HLS controller
-3. Backend Wiring — integrate into download pipeline + scheduler
-4. Frontend — <code>hls.js</code> player + fallback logic
-5. Migration Job — backfill existing videos
-6. Cleanup — delete <code>.full</code> files, retire old cache</p>
+<p><strong>Phases:</strong></p>
+<ol>
+<li>Database — Liquibase migration</li>
+<li>Backend Core — transcode service + HLS controller</li>
+<li>Backend Wiring — integrate into download pipeline + scheduler</li>
+<li>Frontend — <code>hls.js</code> player + fallback logic</li>
+<li>Migration Job — backfill existing videos</li>
+<li>Cleanup — delete <code>.full</code> files, retire old cache</li>
+</ol>
 <hr />
 <h2 id="phase-1-database-migration-05-days">Phase 1: Database Migration (0.5 days)<a class="headerlink" href="#phase-1-database-migration-05-days" title="Permanent link">&para;</a></h2>
 <h3 id="task-1-add-hls_status-and-hls_path-to-video_sources">Task 1: Add <code>hls_status</code> and <code>hls_path</code> to <code>video_sources</code><a class="headerlink" href="#task-1-add-hls_status-and-hls_path-to-video_sources" title="Permanent link">&para;</a></h3>
 <p><strong>File:</strong> <code>api/src/main/resources/db/changelog/</code> — create next-numbered migration file<br />
-<strong>Acceptance criteria:</strong>
-- <code>mvn verify</code> passes with new columns present
-- <code>hls_status</code> defaults to <code>'PENDING'</code> for all existing rows
-- <code>hls_path</code> is nullable</p>
-<p><strong>Steps:</strong>
-1. Find the latest Liquibase file number in <code>db/changelog/</code>
-2. Create <code>V{n}__add_hls_fields_to_video_sources.xml</code> (or <code>.sql</code> matching project convention):</p>
+<strong>Acceptance criteria:</strong></p>
+<ul>
+<li><code>mvn verify</code> passes with new columns present</li>
+<li><code>hls_status</code> defaults to <code>'PENDING'</code> for all existing rows</li>
+<li><code>hls_path</code> is nullable</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Find the latest Liquibase file number in <code>db/changelog/</code></li>
+<li>Create <code>V{n}__add_hls_fields_to_video_sources.xml</code> (or <code>.sql</code> matching project convention):</li>
+</ol>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">video_sources</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">hls_status</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'PENDING'</span><span class="p">,</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">hls_path</span><span class="w">   </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span>
@@ -7769,9 +7775,11 @@ YouTube videos are <strong>not affected</strong>.</p>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nd">@Column</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"hls_path"</span><span class="p">)</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">hlsPath</span><span class="p">;</span>
 </code></pre></div></p>
-<p><strong>Acceptance criteria:</strong>
-- Entity compiles and maps to new columns correctly
-- Existing tests pass (no schema drift)</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Entity compiles and maps to new columns correctly</li>
+<li>Existing tests pass (no schema drift)</li>
+</ul>
 <h3 id="task-4-hlstranscodeservice-interface">Task 4: <code>HlsTranscodeService</code> interface<a class="headerlink" href="#task-4-hlstranscodeservice-interface" title="Permanent link">&para;</a></h3>
 <p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/service/HlsTranscodeService.java</code></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">HlsTranscodeService</span><span class="w"> </span><span class="p">{</span>
@@ -7784,14 +7792,16 @@ YouTube videos are <strong>not affected</strong>.</p>
 </code></pre></div>
 <h3 id="task-5-hlstranscodeserviceimpl">Task 5: <code>HlsTranscodeServiceImpl</code><a class="headerlink" href="#task-5-hlstranscodeserviceimpl" title="Permanent link">&para;</a></h3>
 <p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/HlsTranscodeServiceImpl.java</code></p>
-<p><strong>Acceptance criteria:</strong>
-- <code>transcode(fileId)</code> sets status PROCESSING → READY on success, ERROR on failure
-- FFmpeg command uses <code>-c copy</code> (stream-copy, no re-encode)
-- Output directory <code>video-cache/{fileId}/</code> is created before FFmpeg runs
-- Uses <code>ProcessBuilder</code> with <code>inheritIO()</code> redirected to log
-- Process runs on a Virtual Thread (non-blocking caller)
-- Status is persisted to DB via <code>VideoSourceRepository</code>
-- <code>getPlaylistPath</code> / <code>getSegmentPath</code> resolve from <code>AppConstant.CACHE_DIR</code></p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li><code>transcode(fileId)</code> sets status PROCESSING → READY on success, ERROR on failure</li>
+<li>FFmpeg command uses <code>-c copy</code> (stream-copy, no re-encode)</li>
+<li>Output directory <code>video-cache/{fileId}/</code> is created before FFmpeg runs</li>
+<li>Uses <code>ProcessBuilder</code> with <code>inheritIO()</code> redirected to log</li>
+<li>Process runs on a Virtual Thread (non-blocking caller)</li>
+<li>Status is persisted to DB via <code>VideoSourceRepository</code></li>
+<li><code>getPlaylistPath</code> / <code>getSegmentPath</code> resolve from <code>AppConstant.CACHE_DIR</code></li>
+</ul>
 <p><strong>FFmpeg command constructed:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>ffmpeg -i {CACHE_DIR}/{fileId}.full
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>       -c:v copy -c:a copy
@@ -7802,16 +7812,20 @@ YouTube videos are <strong>not affected</strong>.</p>
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>       -hls_segment_filename {CACHE_DIR}/{fileId}/seg_%03d.ts
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>       {CACHE_DIR}/{fileId}/playlist.m3u8
 </code></pre></div></p>
-<p><strong>Key implementation notes:</strong>
-- Check <code>{fileId}.full</code> exists before starting; set ERROR if missing
-- Create output dir: <code>Files.createDirectories(Path.of(CACHE_DIR, fileId))</code>
-- After FFmpeg exits, verify <code>playlist.m3u8</code> exists before setting READY
-- Use <code>@Async</code> or <code>Thread.ofVirtual().start(...)</code> — do not block caller</p>
-<p><strong>Unit test: <code>HlsTranscodeServiceImplTest</code></strong>
-- Mock <code>VideoSourceRepository</code>, mock <code>ProcessBuilder</code> (or use test double)
-- Assert status transitions: PENDING → PROCESSING → READY
-- Assert status transitions: PENDING → PROCESSING → ERROR (nonzero exit code)
-- Assert correct FFmpeg args are built</p>
+<p><strong>Key implementation notes:</strong></p>
+<ul>
+<li>Check <code>{fileId}.full</code> exists before starting; set ERROR if missing</li>
+<li>Create output dir: <code>Files.createDirectories(Path.of(CACHE_DIR, fileId))</code></li>
+<li>After FFmpeg exits, verify <code>playlist.m3u8</code> exists before setting READY</li>
+<li>Use <code>@Async</code> or <code>Thread.ofVirtual().start(...)</code> — do not block caller</li>
+</ul>
+<p><strong>Unit test: <code>HlsTranscodeServiceImplTest</code></strong></p>
+<ul>
+<li>Mock <code>VideoSourceRepository</code>, mock <code>ProcessBuilder</code> (or use test double)</li>
+<li>Assert status transitions: PENDING → PROCESSING → READY</li>
+<li>Assert status transitions: PENDING → PROCESSING → ERROR (nonzero exit code)</li>
+<li>Assert correct FFmpeg args are built</li>
+</ul>
 <h3 id="task-6-hlsstreamcontroller">Task 6: <code>HlsStreamController</code><a class="headerlink" href="#task-6-hlsstreamcontroller" title="Permanent link">&para;</a></h3>
 <p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/web/HlsStreamController.java</code></p>
 <p><strong>Endpoints:</strong></p>
@@ -7841,20 +7855,24 @@ YouTube videos are <strong>not affected</strong>.</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Acceptance criteria:</strong>
-- Playlist endpoint returns 202 + <code>Retry-After: 5</code> header when status is PROCESSING
-- Playlist endpoint returns 404 when status is PENDING or ERROR
-- Segment endpoint returns <code>Cache-Control: public, max-age=31536000, immutable</code>
-- Segment endpoint returns 404 for unknown segment names (path traversal safe — validate filename matches <code>seg_\d+\.ts</code>)
-- Status endpoint always returns 200 with current status string
-- Served via <code>FileSystemResource</code> (no Guava cache in this path)</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Playlist endpoint returns 202 + <code>Retry-After: 5</code> header when status is PROCESSING</li>
+<li>Playlist endpoint returns 404 when status is PENDING or ERROR</li>
+<li>Segment endpoint returns <code>Cache-Control: public, max-age=31536000, immutable</code></li>
+<li>Segment endpoint returns 404 for unknown segment names (path traversal safe — validate filename matches <code>seg_\d+\.ts</code>)</li>
+<li>Status endpoint always returns 200 with current status string</li>
+<li>Served via <code>FileSystemResource</code> (no Guava cache in this path)</li>
+</ul>
 <p><strong>Security:</strong> Reject segment names containing <code>..</code> or <code>/</code> — validate with regex <code>^seg_\d{3}\.ts$</code>.</p>
-<p><strong>Unit test: <code>HlsStreamControllerTest</code></strong>
-- Mock <code>HlsTranscodeService</code>
-- Assert 200 response when READY + file exists
-- Assert 202 + Retry-After when PROCESSING
-- Assert 404 when PENDING/ERROR
-- Assert path traversal attempt <code>../etc/passwd</code> returns 400</p>
+<p><strong>Unit test: <code>HlsStreamControllerTest</code></strong></p>
+<ul>
+<li>Mock <code>HlsTranscodeService</code></li>
+<li>Assert 200 response when READY + file exists</li>
+<li>Assert 202 + Retry-After when PROCESSING</li>
+<li>Assert 404 when PENDING/ERROR</li>
+<li>Assert path traversal attempt <code>../etc/passwd</code> returns 400</li>
+</ul>
 <h3 id="task-7-update-videodto">Task 7: Update <code>VideoDto</code><a class="headerlink" href="#task-7-update-videodto" title="Permanent link">&para;</a></h3>
 <p><strong>File:</strong> <code>api/src/main/java/com/canhlabs/funnyapp/dto/VideoDto.java</code></p>
 <p>Add two fields:
@@ -7867,9 +7885,11 @@ YouTube videos are <strong>not affected</strong>.</p>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">dto</span><span class="p">.</span><span class="na">setHlsUrl</span><span class="p">(</span><span class="s">"/api/v1/hls/"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">source</span><span class="p">.</span><span class="na">getSourceId</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/playlist.m3u8"</span><span class="p">);</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">}</span>
 </code></pre></div></p>
-<p><strong>Acceptance criteria:</strong>
-- Existing API consumers receive <code>hlsReady: false</code> for all current videos (no breaking change)
-- Once transcoding completes, <code>hlsReady: true</code> and <code>hlsUrl</code> populated on next request</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Existing API consumers receive <code>hlsReady: false</code> for all current videos (no breaking change)</li>
+<li>Once transcoding completes, <code>hlsReady: true</code> and <code>hlsUrl</code> populated on next request</li>
+</ul>
 <hr />
 <h2 id="phase-3-backend-wiring-1-day">Phase 3: Backend Wiring (1 day)<a class="headerlink" href="#phase-3-backend-wiring-1-day" title="Permanent link">&para;</a></h2>
 <h3 id="task-8-wire-transcoding-into-videostorageserviceimpl">Task 8: Wire transcoding into <code>VideoStorageServiceImpl</code><a class="headerlink" href="#task-8-wire-transcoding-into-videostorageserviceimpl" title="Permanent link">&para;</a></h3>
@@ -7881,10 +7901,12 @@ YouTube videos are <strong>not affected</strong>.</p>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
 <a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">});</span>
 </code></pre></div>
-<p><strong>Acceptance criteria:</strong>
-- Download and transcoding both run in the same <code>StructuredTaskScope</code>
-- A transcoding failure does NOT fail the download (catch exception inside the fork, log it)
-- <code>VideoSource</code> is saved to DB with <code>hlsStatus = PENDING</code> before fork starts</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Download and transcoding both run in the same <code>StructuredTaskScope</code></li>
+<li>A transcoding failure does NOT fail the download (catch exception inside the fork, log it)</li>
+<li><code>VideoSource</code> is saved to DB with <code>hlsStatus = PENDING</code> before fork starts</li>
+</ul>
 <h3 id="task-9-add-feature-flag-in-applicationyaml">Task 9: Add feature flag in <code>application.yaml</code><a class="headerlink" href="#task-9-add-feature-flag-in-applicationyaml" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">hls</span><span class="p">:</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
@@ -7901,19 +7923,23 @@ YouTube videos are <strong>not affected</strong>.</p>
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="c1">//   .forEach(v -&gt; hlsTranscodeService.transcode(v.getSourceId()));</span>
 <a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">}</span>
 </code></pre></div>
-<p><strong>Acceptance criteria:</strong>
-- Only fires when <code>hls.enabled = true</code>
-- Does not re-process videos already in PROCESSING or READY state
-- Logs how many videos were submitted for retry</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Only fires when <code>hls.enabled = true</code></li>
+<li>Does not re-process videos already in PROCESSING or READY state</li>
+<li>Logs how many videos were submitted for retry</li>
+</ul>
 <hr />
 <h2 id="phase-4-frontend-2-days">Phase 4: Frontend (2 days)<a class="headerlink" href="#phase-4-frontend-2-days" title="Permanent link">&para;</a></h2>
 <h3 id="task-11-add-hlsjs-dependency">Task 11: Add <code>hls.js</code> dependency<a class="headerlink" href="#task-11-add-hlsjs-dependency" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">cd</span><span class="w"> </span>webapp
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>npm<span class="w"> </span>install<span class="w"> </span>hls.js
 </code></pre></div>
-<p><strong>Acceptance criteria:</strong>
-- <code>npm run build</code> succeeds with <code>hls.js</code> included
-- Import is lazy (<code>React.lazy</code> / dynamic import) to avoid loading on pages without video</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li><code>npm run build</code> succeeds with <code>hls.js</code> included</li>
+<li>Import is lazy (<code>React.lazy</code> / dynamic import) to avoid loading on pages without video</li>
+</ul>
 <h3 id="task-12-hlsvideoplayer-component">Task 12: <code>HlsVideoPlayer</code> component<a class="headerlink" href="#task-12-hlsvideoplayer-component" title="Permanent link">&para;</a></h3>
 <p><strong>File:</strong> <code>webapp/src/components/video/HlsVideoPlayer.jsx</code></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useEffect</span><span class="p">,</span><span class="w"> </span><span class="nx">useRef</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'react'</span><span class="p">;</span>
@@ -7942,11 +7968,13 @@ YouTube videos are <strong>not affected</strong>.</p>
 <a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">video</span><span class="w"> </span><span class="na">ref</span><span class="o">=</span><span class="p">{</span><span class="nx">videoRef</span><span class="p">}</span><span class="w"> </span><span class="na">controls</span><span class="w"> </span><span class="na">className</span><span class="o">=</span><span class="p">{</span><span class="nx">className</span><span class="p">}</span><span class="w"> </span><span class="p">/&gt;;</span>
 <a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a><span class="p">}</span>
 </code></pre></div>
-<p><strong>Acceptance criteria:</strong>
-- Plays in Chrome/Firefox via hls.js
-- Plays in Safari via native HLS
-- Cleans up hls instance on unmount
-- Renders nothing (or spinner) if <code>src</code> is null</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Plays in Chrome/Firefox via hls.js</li>
+<li>Plays in Safari via native HLS</li>
+<li>Cleans up hls instance on unmount</li>
+<li>Renders nothing (or spinner) if <code>src</code> is null</li>
+</ul>
 <h3 id="task-13-update-video-player-integration">Task 13: Update video player integration<a class="headerlink" href="#task-13-update-video-player-integration" title="Permanent link">&para;</a></h3>
 <p><strong>Where:</strong> Wherever <code>&lt;video&gt;</code> or the existing player is rendered for local videos.</p>
 <p><strong>Logic:</strong>
@@ -7977,11 +8005,13 @@ YouTube videos are <strong>not affected</strong>.</p>
 <a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">&lt;</span><span class="nt">video</span><span class="w"> </span><span class="na">src</span><span class="o">=</span><span class="p">{</span><span class="sb">`/api/v1/stream/</span><span class="si">${</span><span class="nx">video</span><span class="p">.</span><span class="nx">fileId</span><span class="si">}</span><span class="sb">`</span><span class="p">}</span><span class="w"> </span><span class="na">controls</span><span class="w"> </span><span class="p">/&gt;;</span>
 <a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a><span class="p">}</span>
 </code></pre></div></p>
-<p><strong>Acceptance criteria:</strong>
-- Uses <code>HlsVideoPlayer</code> when <code>hlsReady = true</code>
-- Shows processing indicator when status = PROCESSING
-- Falls back to existing Range stream when PENDING or ERROR
-- No flicker: initial render uses <code>video.hlsReady</code> from API response</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Uses <code>HlsVideoPlayer</code> when <code>hlsReady = true</code></li>
+<li>Shows processing indicator when status = PROCESSING</li>
+<li>Falls back to existing Range stream when PENDING or ERROR</li>
+<li>No flicker: initial render uses <code>video.hlsReady</code> from API response</li>
+</ul>
 <h3 id="task-14-frontend-tests">Task 14: Frontend tests<a class="headerlink" href="#task-14-frontend-tests" title="Permanent link">&para;</a></h3>
 <p><strong>File:</strong> <code>webapp/src/components/video/HlsVideoPlayer.test.jsx</code></p>
 <ul>
@@ -7999,11 +8029,13 @@ YouTube videos are <strong>not affected</strong>.</p>
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>  → Returns { "submitted": 42 }
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>  → Requires admin role (existing security config)
 </code></pre></div>
-<p><strong>Acceptance criteria:</strong>
-- Endpoint is authenticated (admin only)
-- Does not re-submit PROCESSING/READY/ERROR videos
-- Returns count of submitted videos
-- Each transcoding runs asynchronously — response is immediate</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Endpoint is authenticated (admin only)</li>
+<li>Does not re-submit PROCESSING/READY/ERROR videos</li>
+<li>Returns count of submitted videos</li>
+<li>Each transcoding runs asynchronously — response is immediate</li>
+</ul>
 <h3 id="task-16-backfill-verification-script-optional-for-ops">Task 16: Backfill verification script (optional, for ops)<a class="headerlink" href="#task-16-backfill-verification-script-optional-for-ops" title="Permanent link">&para;</a></h3>
 <p>A simple log-query or actuator check to confirm all videos reach READY status:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>GET /api/v1/admin/hls/stats
@@ -8019,10 +8051,12 @@ YouTube videos are <strong>not affected</strong>.</p>
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="n">Files</span><span class="p">.</span><span class="na">deleteIfExists</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">CACHE_DIR</span><span class="p">,</span><span class="w"> </span><span class="n">fileId</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">".full"</span><span class="p">));</span>
 <a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">}</span>
 </code></pre></div></p>
-<p><strong>Acceptance criteria:</strong>
-- Only deletes <code>.full</code> when <code>hlsStatus = READY</code> (not before)
-- Logs deletion with fileId
-- Does not throw if file already missing</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Only deletes <code>.full</code> when <code>hlsStatus = READY</code> (not before)</li>
+<li>Logs deletion with fileId</li>
+<li>Does not throw if file already missing</li>
+</ul>
 <h3 id="task-18-remove-guava-chunk-cache-from-hls-path-future-cleanup">Task 18: Remove Guava chunk cache from HLS path (future cleanup)<a class="headerlink" href="#task-18-remove-guava-chunk-cache-from-hls-path-future-cleanup" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>VideoCacheImpl</code> and <code>ChunkIndexCacheImpl</code> are only used in <code>StreamVideoServiceImpl</code> (Range path)</li>

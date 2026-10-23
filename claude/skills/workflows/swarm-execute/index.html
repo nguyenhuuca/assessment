@@ -7485,14 +7485,18 @@
 <h1 id="execution-orchestrator">Execution Orchestrator<a class="headerlink" href="#execution-orchestrator" title="Permanent link">&para;</a></h1>
 <p>Execute plans using parallel worker swarms with quality gates and native task-list tracking.</p>
 <h2 id="mcp-tools">MCP Tools<a class="headerlink" href="#mcp-tools" title="Permanent link">&para;</a></h2>
-<p><strong>Context7</strong> (documentation):
-- Research implementation patterns
-- Verify API usage</p>
+<p><strong>Context7</strong> (documentation):</p>
+<ul>
+<li>Research implementation patterns</li>
+<li>Verify API usage</li>
+</ul>
 <h2 id="cli-tools">CLI Tools<a class="headerlink" href="#cli-tools" title="Permanent link">&para;</a></h2>
-<p><strong>gh</strong> (GitHub CLI):
-- Use <code>gh pr create</code> for creating pull requests
-- Use <code>gh pr view</code> to check PR status
-- Use <code>gh issue list</code> for issue tracking</p>
+<p><strong>gh</strong> (GitHub CLI):</p>
+<ul>
+<li>Use <code>gh pr create</code> for creating pull requests</li>
+<li>Use <code>gh pr view</code> to check PR status</li>
+<li>Use <code>gh issue list</code> for issue tracking</li>
+</ul>
 <h2 id="execution-workflow">Execution Workflow<a class="headerlink" href="#execution-workflow" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>Discover</strong> — Find available work via <code>TaskList</code> (unblocked, not-yet-started tasks)</li>
@@ -7544,14 +7548,18 @@
 <p>Model tiers are pinned in each agent's frontmatter (<code>.claude/agents/</code>) — that is the single source of truth.</p>
 <h2 id="worker-focus-modes">Worker Focus Modes<a class="headerlink" href="#worker-focus-modes" title="Permanent link">&para;</a></h2>
 <p>Orchestrators specialize workers by specifying a focus mode in the prompt.</p>
-<p><strong>worker-builder focus modes:</strong>
-- <code>implementation</code> (default): Write code per specification
-- <code>testing</code>: Write tests, cover happy path and edge cases, ensure deterministic
-- <code>refactoring</code>: Extract patterns, simplify conditionals, apply SOLID/DRY. Follow Two Hats Rule (see code-quality.md)</p>
-<p><strong>worker-reviewer focus modes:</strong>
-- <code>quality</code> (default): Code review checklist — naming, style, tests, patterns
-- <code>security</code>: OWASP Top 10 scan, hardcoded secrets, auth/authz flows, input validation. Reference CWE IDs. See security.md
-- <code>performance</code>: N+1 queries, blocking I/O, allocations, pagination, caching. See code-quality.md</p>
+<p><strong>worker-builder focus modes:</strong></p>
+<ul>
+<li><code>implementation</code> (default): Write code per specification</li>
+<li><code>testing</code>: Write tests, cover happy path and edge cases, ensure deterministic</li>
+<li><code>refactoring</code>: Extract patterns, simplify conditionals, apply SOLID/DRY. Follow Two Hats Rule (see code-quality.md)</li>
+</ul>
+<p><strong>worker-reviewer focus modes:</strong></p>
+<ul>
+<li><code>quality</code> (default): Code review checklist — naming, style, tests, patterns</li>
+<li><code>security</code>: OWASP Top 10 scan, hardcoded secrets, auth/authz flows, input validation. Reference CWE IDs. See security.md</li>
+<li><code>performance</code>: N+1 queries, blocking I/O, allocations, pagination, caching. See code-quality.md</li>
+</ul>
 <h2 id="quality-gates">Quality Gates<a class="headerlink" href="#quality-gates" title="Permanent link">&para;</a></h2>
 <p>Run quality gates per <code>code-quality.md</code> — all must pass. No exceptions.</p>
 <h2 id="coordination-protocol">Coordination Protocol<a class="headerlink" href="#coordination-protocol" title="Permanent link">&para;</a></h2>

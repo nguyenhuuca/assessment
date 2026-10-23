@@ -7072,9 +7072,11 @@
 <ul>
 <li>Headless autopilot (ADR-0022) stops twice for the owner: <code>/approve</code> at Gate 1 and a merge at Gate 2.</li>
 <li>The owner wants small issues to go through when they are busy, with no approval.</li>
-<li>Two GitHub limits shape the design:</li>
+<li>Two GitHub limits shape the design:<ul>
 <li><strong>Comments posted with the job token start no workflows</strong>, so a bot <code>/approve</code> cannot start the build job. <code>workflow_dispatch</code> is the exception: the job token can start it.</li>
 <li><strong>A merge made with the job token does not start the push-to-<code>main</code> deploy CI</strong>. The merge needs another token.</li>
+</ul>
+</li>
 <li>The repo is <strong>public</strong>, so the checks that decide a merge must not depend on what the model says.</li>
 </ul>
 <h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
@@ -7112,29 +7114,37 @@
 <h3 id="d2-auto-gate-1-the-workflow-dispatches-the-build">D2. Auto Gate 1: the workflow dispatches the build<a class="headerlink" href="#d2-auto-gate-1-the-workflow-dispatches-the-build" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Marker:</strong> the plan job writes <code>&lt;!-- autopilot:plan-review=approve --&gt;</code> in the PR body, and only when the plan review returned <code>approve</code>.</li>
-<li><strong>Workflow step:</strong> after the plan job, a workflow step checks two things:</li>
+<li><strong>Workflow step:</strong> after the plan job, a workflow step checks two things:<ul>
 <li>the issue has <code>autopilot:auto</code>;</li>
 <li>the open <code>autopilot/issue-&lt;N&gt;</code> PR has the marker.</li>
+</ul>
+</li>
 <li><strong>If both hold:</strong> the step runs <code>gh workflow run autopilot.yml -f pr=&lt;N&gt;</code> and comments on the PR.</li>
 <li><strong>If the marker is missing:</strong> it comments that Gate 1 stays manual.</li>
 <li><strong>Scope:</strong> only a first plan (the <code>issues</code> event) dispatches. A <code>/revise</code> always waits for <code>/approve</code>.</li>
 <li><strong>Who can start the build:</strong> the dispatched build accepts the actor <code>github-actions[bot]</code> or the owner. <code>allowed_bots: "github-actions[bot]"</code> is set only on the build step.</li>
 </ul>
 <h3 id="d3-auto-gate-2-a-deterministic-merge-script">D3. Auto Gate 2: a deterministic merge script<a class="headerlink" href="#d3-auto-gate-2-a-deterministic-merge-script" title="Permanent link">&para;</a></h3>
-<p><code>scripts/claude-autopilot-merge.sh</code> is always run from <code>origin/main</code>, never from the PR branch. It merges only when every check passes; otherwise it comments the reason and leaves the PR for the owner. The checks:
-1. The head branch is <code>autopilot/issue-&lt;N&gt;</code>.
-2. The issue or PR has <code>autopilot:auto-merge</code> or <code>autopilot:auto</code>.
-3. The PR is open and <strong>not a draft</strong>. The model marks it ready only after a code-review <code>approve</code> and green gates.
-4. <strong>No protected paths changed:</strong>
-   - <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>scripts/claude-*</code>;
-   - Liquibase migrations (<code>api/src/main/resources/db/changelog/</code>);
-   - <code>.env*</code> files.
-   - A schema change always gets a human.
-5. At most <strong>400 changed lines</strong> outside tests and docs (<code>AUTOPILOT_MAX_LOC</code>).
-6. <strong>The gates are re-run by the script</strong>, not taken from the model's report:
-   - <code>mvn verify</code> when <code>api/</code> changed;
-   - <code>vitest run</code>, lint and build when <code>webapp/</code> changed.
-7. <strong>The merge:</strong> <code>gh pr merge --squash --match-head-commit &lt;sha&gt;</code> with the secret <code>AUTOPILOT_MERGE_TOKEN</code>. Its push starts the normal deploy CI.</p>
+<p><code>scripts/claude-autopilot-merge.sh</code> is always run from <code>origin/main</code>, never from the PR branch. It merges only when every check passes; otherwise it comments the reason and leaves the PR for the owner. The checks:</p>
+<ol>
+<li>The head branch is <code>autopilot/issue-&lt;N&gt;</code>.</li>
+<li>The issue or PR has <code>autopilot:auto-merge</code> or <code>autopilot:auto</code>.</li>
+<li>The PR is open and <strong>not a draft</strong>. The model marks it ready only after a code-review <code>approve</code> and green gates.</li>
+<li><strong>No protected paths changed:</strong><ul>
+<li><code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>scripts/claude-*</code>;</li>
+<li>Liquibase migrations (<code>api/src/main/resources/db/changelog/</code>);</li>
+<li><code>.env*</code> files.</li>
+<li>A schema change always gets a human.</li>
+</ul>
+</li>
+<li>At most <strong>400 changed lines</strong> outside tests and docs (<code>AUTOPILOT_MAX_LOC</code>).</li>
+<li><strong>The gates are re-run by the script</strong>, not taken from the model's report:<ul>
+<li><code>mvn verify</code> when <code>api/</code> changed;</li>
+<li><code>vitest run</code>, lint and build when <code>webapp/</code> changed.</li>
+</ul>
+</li>
+<li><strong>The merge:</strong> <code>gh pr merge --squash --match-head-commit &lt;sha&gt;</code> with the secret <code>AUTOPILOT_MERGE_TOKEN</code>. Its push starts the normal deploy CI.</li>
+</ol>
 <h3 id="d4-the-merge-token">D4. The merge token<a class="headerlink" href="#d4-the-merge-token" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Token type:</strong> a fine-grained PAT (or GitHub App token) created and stored by the owner. Scope: this repo only, with <code>Contents: read/write</code> and <code>Pull requests: read/write</code>.</li>
@@ -7143,11 +7153,13 @@
 </ul>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Code reaches prod without a human read.</strong> The limits on that are:</li>
+<li><strong>Code reaches prod without a human read.</strong> The limits on that are:<ul>
 <li>the opt-in label;</li>
 <li>two model reviews;</li>
 <li>the re-run gates;</li>
 <li>no migrations and no workflow or agent-config changes.</li>
+</ul>
+</li>
 <li><strong>The smoke check after the deploy stays manual</strong> (<code>./api/mock-test.sh</code>). Smoke tests are read-only, so write paths are not covered.</li>
 <li><strong>ADR-0022 D4's "both gates are human" no longer holds for labelled issues.</strong> A prompt injection in a labelled issue body could now reach prod without anyone seeing it. The owner-only issue check (ADR-0022 D2) is what keeps that out.</li>
 <li><strong>Rolling back</strong> = <code>git revert</code> the squash commit on <code>main</code> and push.</li>

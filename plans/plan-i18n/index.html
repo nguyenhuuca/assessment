@@ -7111,15 +7111,17 @@ Handoff to: Builder, QA Engineer
 <strong>Date:</strong> 2026-10-14
 <strong>Related PRD:</strong> <a href="../../prd/PRD-i18n/">PRD-i18n</a>
 <strong>Related ADR:</strong> <a href="../../adr/0020-i18n-vietnamese-english/">ADR-0020</a></p>
-<p>Owner decisions (2026-10-14):
-- Use <code>react-i18next</code>.
-- Default language comes from the browser.
-- Scope covers user UI, API errors, emails and Admin.</p>
+<p>Owner decisions (2026-10-14):</p>
+<ul>
+<li>Use <code>react-i18next</code>.</li>
+<li>Default language comes from the browser.</li>
+<li>Scope covers user UI, API errors, emails and Admin.</li>
+</ul>
 <h2 id="objective">Objective<a class="headerlink" href="#objective" title="Permanent link">&para;</a></h2>
 <p>Every user-facing string on the frontend and backend comes from per-language resources (vi, en), with one switcher, a persisted preference, and localized errors and emails.</p>
 <h2 id="technical-approach">Technical Approach<a class="headerlink" href="#technical-approach" title="Permanent link">&para;</a></h2>
 <h3 id="frontend">Frontend<a class="headerlink" href="#frontend" title="Permanent link">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>webapp/src/i18n/
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>webapp/src/i18n/
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  index.js                     # i18next init: resources, detector (localStorage 'lang' → navigator), supportedLngs [vi,en], fallback en
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  format.js                    # relativeTime(date), compactNumber(n), formatDate(d): Intl.* with i18n.language
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  locales/vi/*.json            # common, feed, library, auth, comments, notifications, settings, admin, errors
@@ -7127,17 +7129,21 @@ Handoff to: Builder, QA Engineer
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  __tests__/parity.test.js     # identical key sets per namespace, no empty values
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>components/common/LanguageSwitcher.jsx   # "VI | EN", aria-pressed; in header + Settings
 </code></pre></div>
-- <code>main.jsx</code> imports <code>./i18n</code> before rendering.
-- A <code>languageChanged</code> handler does three things:
-  - Sets <code>document.documentElement.lang</code>.
-  - Writes <code>localStorage.lang</code>.
-  - When logged in, PATCHes <code>/user/settings { locale }</code>.
-- <code>api/client.js</code> adds <code>Accept-Language: i18n.language</code> to every request.
-- After login (<code>AuthContext</code>), if <code>settings.locale</code> is set and differs from the current language, the app calls <code>i18n.changeLanguage(settings.locale)</code>.
-- Components call <code>const { t } = useTranslation('&lt;ns&gt;')</code>. Interpolation uses <code>t('library.removeFrom', { title })</code>, and plurals use <code>t('library.videoCount', { count })</code>.
-- The default collection shows <code>t('library.watchLater')</code> when <code>isDefault</code>.
-- <code>notificationText.js</code> and <code>commentUtils.js</code> call the i18n instance, using <code>i18n.t</code> outside components.
-- <code>test-setup.js</code> runs <code>i18n.init</code> synchronously with <code>lng: 'vi'</code>.</p>
+<ul>
+<li><code>main.jsx</code> imports <code>./i18n</code> before rendering.</li>
+<li>A <code>languageChanged</code> handler does three things:<ul>
+<li>Sets <code>document.documentElement.lang</code>.</li>
+<li>Writes <code>localStorage.lang</code>.</li>
+<li>When logged in, PATCHes <code>/user/settings { locale }</code>.</li>
+</ul>
+</li>
+<li><code>api/client.js</code> adds <code>Accept-Language: i18n.language</code> to every request.</li>
+<li>After login (<code>AuthContext</code>), if <code>settings.locale</code> is set and differs from the current language, the app calls <code>i18n.changeLanguage(settings.locale)</code>.</li>
+<li>Components call <code>const { t } = useTranslation('&lt;ns&gt;')</code>. Interpolation uses <code>t('library.removeFrom', { title })</code>, and plurals use <code>t('library.videoCount', { count })</code>.</li>
+<li>The default collection shows <code>t('library.watchLater')</code> when <code>isDefault</code>.</li>
+<li><code>notificationText.js</code> and <code>commentUtils.js</code> call the i18n instance, using <code>i18n.t</code> outside components.</li>
+<li><code>test-setup.js</code> runs <code>i18n.init</code> synchronously with <code>lng: 'vi'</code>.</li>
+</ul>
 <h3 id="backend">Backend<a class="headerlink" href="#backend" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>src/main/resources/i18n/messages.properties      # en (default)
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>src/main/resources/i18n/messages_vi.properties

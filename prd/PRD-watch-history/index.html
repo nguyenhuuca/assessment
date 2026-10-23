@@ -7561,12 +7561,16 @@
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
 <p>Logged-in users who watch a video and later want to find it again have no way to do so. After leaving the app or ending a session, the video is gone from their view — they must manually re-search, often unsuccessfully, and give up. There is no persistent record of what they have watched.</p>
 <h3 id="evidence">Evidence<a class="headerlink" href="#evidence" title="Permanent link">&para;</a></h3>
-<p><strong>Quantitative Evidence:</strong>
-- 100% of watch intent is lost at session end — no history mechanism exists
-- The <code>/history</code> nav item in the frontend already exists and routes to a "Coming Soon" placeholder, confirming the feature is anticipated by users</p>
-<p><strong>Qualitative Evidence:</strong>
-- Common behaviour: play a video → navigate away → return later → cannot find it again
-- Universal expectation: YouTube, Netflix, and every major video platform provide watch history as a baseline feature</p>
+<p><strong>Quantitative Evidence:</strong></p>
+<ul>
+<li>100% of watch intent is lost at session end — no history mechanism exists</li>
+<li>The <code>/history</code> nav item in the frontend already exists and routes to a "Coming Soon" placeholder, confirming the feature is anticipated by users</li>
+</ul>
+<p><strong>Qualitative Evidence:</strong></p>
+<ul>
+<li>Common behaviour: play a video → navigate away → return later → cannot find it again</li>
+<li>Universal expectation: YouTube, Netflix, and every major video platform provide watch history as a baseline feature</li>
+</ul>
 <hr />
 <h2 id="goals-success-metrics">Goals &amp; Success Metrics<a class="headerlink" href="#goals-success-metrics" title="Permanent link">&para;</a></h2>
 <table>
@@ -7599,26 +7603,30 @@
 <h2 id="user-stories">User Stories<a class="headerlink" href="#user-stories" title="Permanent link">&para;</a></h2>
 <h3 id="authenticated-user">Authenticated User<a class="headerlink" href="#authenticated-user" title="Permanent link">&para;</a></h3>
 <ul>
-<li>As a logged-in user, I want my watched videos to be automatically recorded so that I can find them again without searching.</li>
 <li>
-<p>Acceptance: Every video play event creates or updates a history entry for the current user. No manual action required.</p>
+<p>As a logged-in user, I want my watched videos to be automatically recorded so that I can find them again without searching.</p>
+<ul>
+<li>Acceptance: Every video play event creates or updates a history entry for the current user. No manual action required.</li>
+</ul>
 </li>
 <li>
 <p>As a logged-in user, I want a <code>/history</code> page listing all videos I have watched, sorted newest first, so that I can quickly find something I watched recently.</p>
-</li>
-<li>
-<p>Acceptance: The history page shows all entries with thumbnail, title, and watch timestamp. Clicking a video plays it.</p>
+<ul>
+<li>Acceptance: The history page shows all entries with thumbnail, title, and watch timestamp. Clicking a video plays it.</li>
+</ul>
 </li>
 <li>
 <p>As a logged-in user, I want a "watched" indicator on video cards so that I know at a glance which videos I have already seen.</p>
-</li>
-<li>
-<p>Acceptance: Video cards display a visual badge/icon when the video is in my history. Cards without history show no indicator.</p>
+<ul>
+<li>Acceptance: Video cards display a visual badge/icon when the video is in my history. Cards without history show no indicator.</li>
+</ul>
 </li>
 <li>
 <p>As a logged-in user, I want to delete individual history entries or clear my entire history so that I can manage my privacy.</p>
-</li>
+<ul>
 <li>Acceptance: Each entry has a delete button. A "Clear all" action removes all entries. Both actions are confirmed before executing.</li>
+</ul>
+</li>
 </ul>
 <hr />
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>

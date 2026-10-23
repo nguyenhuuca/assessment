@@ -8797,14 +8797,18 @@
 <a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="cost-estimation">Cost Estimation<a class="headerlink" href="#cost-estimation" title="Permanent link">&para;</a></h2>
-<p><strong>Assumptions:</strong>
-- 10 tasks/day
-- Average 2000 tokens input + 4000 tokens output per task
-- Claude Sonnet 4.5 pricing: $3/M input, $15/M output</p>
-<p><strong>Monthly cost:</strong>
-- Input: 10 tasks × 2000 tokens × 30 days = 600k tokens = $1.80
-- Output: 10 tasks × 4000 tokens × 30 days = 1.2M tokens = $18.00
-- <strong>Total: ~$20/month</strong></p>
+<p><strong>Assumptions:</strong></p>
+<ul>
+<li>10 tasks/day</li>
+<li>Average 2000 tokens input + 4000 tokens output per task</li>
+<li>Claude Sonnet 4.5 pricing: $3/M input, $15/M output</li>
+</ul>
+<p><strong>Monthly cost:</strong></p>
+<ul>
+<li>Input: 10 tasks × 2000 tokens × 30 days = 600k tokens = $1.80</li>
+<li>Output: 10 tasks × 4000 tokens × 30 days = 1.2M tokens = $18.00</li>
+<li><strong>Total: ~$20/month</strong></li>
+</ul>
 <h2 id="comparison-with-plan-a-file-based">Comparison with Plan A (File-Based)<a class="headerlink" href="#comparison-with-plan-a-file-based" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -8853,22 +8857,28 @@
 </tbody>
 </table>
 <h2 id="when-to-use-plan-b">When to Use Plan B<a class="headerlink" href="#when-to-use-plan-b" title="Permanent link">&para;</a></h2>
-<p><strong>Best for:</strong>
-- ✅ Simple use cases with low volume (&lt;20 tasks/day)
-- ✅ Fast prototyping and MVP
-- ✅ Teams comfortable with process management
-- ✅ Single server deployments</p>
-<p><strong>Not ideal for:</strong>
-- ❌ High-volume production systems
-- ❌ Distributed/multi-server setups
-- ❌ Need for audit trail and recovery
-- ❌ Serverless or containerized environments</p>
+<p><strong>Best for:</strong></p>
+<ul>
+<li>✅ Simple use cases with low volume (&lt;20 tasks/day)</li>
+<li>✅ Fast prototyping and MVP</li>
+<li>✅ Teams comfortable with process management</li>
+<li>✅ Single server deployments</li>
+</ul>
+<p><strong>Not ideal for:</strong></p>
+<ul>
+<li>❌ High-volume production systems</li>
+<li>❌ Distributed/multi-server setups</li>
+<li>❌ Need for audit trail and recovery</li>
+<li>❌ Serverless or containerized environments</li>
+</ul>
 <h2 id="migration-path">Migration Path<a class="headerlink" href="#migration-path" title="Permanent link">&para;</a></h2>
-<p>Start with <strong>Plan B</strong> for simplicity, then migrate to <strong>Plan A</strong> when:
-1. Task volume exceeds 50/day
-2. Need better reliability and recovery
-3. Adding multiple task sources
-4. Require detailed audit trails</p>
+<p>Start with <strong>Plan B</strong> for simplicity, then migrate to <strong>Plan A</strong> when:</p>
+<ol>
+<li>Task volume exceeds 50/day</li>
+<li>Need better reliability and recovery</li>
+<li>Adding multiple task sources</li>
+<li>Require detailed audit trails</li>
+</ol>
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <p>Plan B offers the simplest implementation path with direct Claude Code CLI spawning. It's perfect for small-to-medium deployments where immediate execution and low infrastructure overhead are priorities. The trade-off is reduced reliability and scalability compared to the queue-based Plan A approach.</p>
 

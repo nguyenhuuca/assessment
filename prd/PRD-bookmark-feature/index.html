@@ -7569,12 +7569,16 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
 <p>Logged-in users who discover interesting videos during browsing have no way to save them for later. When they return to the app, they cannot find the videos again because there is no persistent watch-list — they must re-search, often unsuccessfully, and eventually churn.</p>
 <h3 id="evidence">Evidence<a class="headerlink" href="#evidence" title="Permanent link">&para;</a></h3>
-<p><strong>Quantitative Evidence:</strong>
-- No native save mechanism exists in the current UI — 100% of "watch later" intent is lost at session end
-- Re-search friction increases with catalog size; the app indexes YouTube content with growing volume</p>
-<p><strong>Qualitative Evidence:</strong>
-- User behaviour pattern: browse → find video → navigate away → forget → leave app
-- Common user expectation: every video platform (YouTube, Netflix, Twitch) provides a save/bookmark primitive; its absence is felt as a gap</p>
+<p><strong>Quantitative Evidence:</strong></p>
+<ul>
+<li>No native save mechanism exists in the current UI — 100% of "watch later" intent is lost at session end</li>
+<li>Re-search friction increases with catalog size; the app indexes YouTube content with growing volume</li>
+</ul>
+<p><strong>Qualitative Evidence:</strong></p>
+<ul>
+<li>User behaviour pattern: browse → find video → navigate away → forget → leave app</li>
+<li>Common user expectation: every video platform (YouTube, Netflix, Twitch) provides a save/bookmark primitive; its absence is felt as a gap</li>
+</ul>
 <hr />
 <h2 id="goals-success-metrics">Goals &amp; Success Metrics<a class="headerlink" href="#goals-success-metrics" title="Permanent link">&para;</a></h2>
 <table>
@@ -7607,26 +7611,30 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 <h2 id="user-stories">User Stories<a class="headerlink" href="#user-stories" title="Permanent link">&para;</a></h2>
 <h3 id="authenticated-user">Authenticated User<a class="headerlink" href="#authenticated-user" title="Permanent link">&para;</a></h3>
 <ul>
-<li>As a logged-in user, I want to bookmark a video from the video card or player page so that I can find it again later without searching.</li>
 <li>
-<p>Acceptance: A bookmark toggle button is visible on every video card and on the player page. Clicking it saves the video; clicking again removes it. State persists across sessions.</p>
+<p>As a logged-in user, I want to bookmark a video from the video card or player page so that I can find it again later without searching.</p>
+<ul>
+<li>Acceptance: A bookmark toggle button is visible on every video card and on the player page. Clicking it saves the video; clicking again removes it. State persists across sessions.</li>
+</ul>
 </li>
 <li>
 <p>As a logged-in user, I want to see a visual indicator on video cards I have already bookmarked so that I know at a glance what I saved.</p>
-</li>
-<li>
-<p>Acceptance: Bookmarked videos display a filled/highlighted bookmark icon. Non-bookmarked videos show an outline icon.</p>
+<ul>
+<li>Acceptance: Bookmarked videos display a filled/highlighted bookmark icon. Non-bookmarked videos show an outline icon.</li>
+</ul>
 </li>
 <li>
 <p>As a logged-in user, I want a dedicated <code>/bookmarks</code> page that lists all my saved videos so that I can browse and play them in one place.</p>
-</li>
-<li>
-<p>Acceptance: Page shows all bookmarked videos in a grid, sorted by bookmark date (newest first). Each card supports remove-bookmark and play actions.</p>
+<ul>
+<li>Acceptance: Page shows all bookmarked videos in a grid, sorted by bookmark date (newest first). Each card supports remove-bookmark and play actions.</li>
+</ul>
 </li>
 <li>
 <p>As a logged-in user, I want to organise my bookmarks into named folders/collections so that I can group content by theme (e.g. "Comedy", "Weekend Watch").</p>
-</li>
+<ul>
 <li>Acceptance: I can create, rename, and delete collections. I can add a bookmarked video to one or more collections. A default "All Bookmarks" view always exists.</li>
+</ul>
+</li>
 </ul>
 <hr />
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
@@ -7965,28 +7973,34 @@ Related Skills: writing-prds, decomposing-tasks, requirements-analysis
 <h2 id="next-steps-handoffs">Next Steps &amp; Handoffs<a class="headerlink" href="#next-steps-handoffs" title="Permanent link">&para;</a></h2>
 <p>After PRD approval:</p>
 <ol>
-<li>[ ] <strong>Architect Review</strong>: Technical feasibility — schema, API design, caching strategy</li>
-<li>Trigger: <code>/architect</code></li>
 <li>
-<p>Output: <code>docs/adr/00NN-bookmark-storage.md</code></p>
+<p>[ ] <strong>Architect Review</strong>: Technical feasibility — schema, API design, caching strategy</p>
+<ul>
+<li>Trigger: <code>/architect</code></li>
+<li>Output: <code>docs/adr/00NN-bookmark-storage.md</code></li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>UI/UX Designer</strong>: Bookmark toggle, indicator design, collections UI</p>
-</li>
+<ul>
 <li>Trigger: <code>/ui-ux-designer</code></li>
-<li>
-<p>Output: Design Spec</p>
+<li>Output: Design Spec</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>Engineering Estimate</strong>: Effort estimation and task decomposition</p>
-</li>
+<ul>
 <li>Trigger: <code>/builder</code> or <code>/architect</code></li>
 <li>Output: <code>docs/plans/plan-bookmark-feature.md</code></li>
+</ul>
+</li>
 </ol>
-<p><strong>Related Artifacts:</strong>
-- ADR: TBD after architect review
-- Design Spec: TBD after designer review
-- Implementation Plan: TBD after decomposition</p>
+<p><strong>Related Artifacts:</strong></p>
+<ul>
+<li>ADR: TBD after architect review</li>
+<li>Design Spec: TBD after designer review</li>
+<li>Implementation Plan: TBD after decomposition</li>
+</ul>
 <hr />
 <h2 id="version-history">Version History<a class="headerlink" href="#version-history" title="Permanent link">&para;</a></h2>
 <table>

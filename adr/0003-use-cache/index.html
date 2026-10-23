@@ -7511,16 +7511,22 @@
 </table>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Fast, zero-configuration caching in the early development and single-instance phase
-- No external service to provision, monitor, or secure during initial deployment
-- Abstracted cache interface allows future migration to Redis with minimal code changes</p>
-<p><strong>Negative:</strong>
-- Cache is not shared across instances; horizontal scaling before migration will cause cache misses and inconsistencies
-- Cached data is lost on application restart, causing a cold-start period</p>
-<p><strong>Risks:</strong>
-- Deferring Redis adoption could require urgent migration under time pressure when scaling is needed
-- Cache abstraction must be maintained carefully to avoid leaking Guava-specific behavior into callers</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>Fast, zero-configuration caching in the early development and single-instance phase</li>
+<li>No external service to provision, monitor, or secure during initial deployment</li>
+<li>Abstracted cache interface allows future migration to Redis with minimal code changes</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Cache is not shared across instances; horizontal scaling before migration will cause cache misses and inconsistencies</li>
+<li>Cached data is lost on application restart, causing a cold-start period</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li>Deferring Redis adoption could require urgent migration under time pressure when scaling is needed</li>
+<li>Cache abstraction must be maintained carefully to avoid leaking Guava-specific behavior into callers</li>
+</ul>
 <hr />
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>

@@ -7474,17 +7474,23 @@
 </table>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Backend handles many concurrent I/O-bound requests with far fewer OS resources
-- Synchronous code style reduces cognitive load for developers
-- Background jobs and REST handlers share the same simple threading model
-- Straightforward layered architecture is easy to extend and test</p>
-<p><strong>Negative:</strong>
-- Libraries that pin platform threads (e.g., certain JDBC drivers, synchronized blocks) may reduce virtual thread benefits
-- Requires JDK 21 or later; Java 24 with preview features adds compiler configuration overhead</p>
-<p><strong>Risks:</strong>
-- Undetected thread pinning by third-party libraries could silently degrade throughput
-- Preview features in Java 24 may introduce breaking changes in future JDK releases</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>Backend handles many concurrent I/O-bound requests with far fewer OS resources</li>
+<li>Synchronous code style reduces cognitive load for developers</li>
+<li>Background jobs and REST handlers share the same simple threading model</li>
+<li>Straightforward layered architecture is easy to extend and test</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Libraries that pin platform threads (e.g., certain JDBC drivers, synchronized blocks) may reduce virtual thread benefits</li>
+<li>Requires JDK 21 or later; Java 24 with preview features adds compiler configuration overhead</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li>Undetected thread pinning by third-party libraries could silently degrade throughput</li>
+<li>Preview features in Java 24 may introduce breaking changes in future JDK releases</li>
+</ul>
 <hr />
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>

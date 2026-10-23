@@ -7058,9 +7058,11 @@ Handoff to: Builder, QA Engineer
 <ul>
 <li>Each loop (<code>⇄</code>) has a cap of <strong>3 rounds</strong>. When a loop reaches the cap, the run stops with <code>status: blocked</code> and asks the user. It never loops forever.</li>
 <li>Reviews return a verdict with <strong>blocking / advisory</strong> counts. Only a blocking finding sends the work back.</li>
-<li>QA runs the affected tests <strong>twice</strong>:</li>
+<li>QA runs the affected tests <strong>twice</strong>:<ul>
 <li>Fails once, passes once → <strong>flaky</strong>. Logged, does not block.</li>
 <li>Fails both times → <strong>fail</strong>, goes to Fix.</li>
+</ul>
+</li>
 <li>Every step is recorded in a <strong>run ledger</strong>: turns, duration, tokens. At the end the run prints a summary table like the Autopilot screenshot.</li>
 <li>The <strong>final step is a commit on <code>main</code></strong>, not a draft PR (core-directives: trunk-based, CI deploys from <code>main</code>). The push still needs the user's go-ahead.</li>
 </ul>
@@ -7108,8 +7110,8 @@ Handoff to: Builder, QA Engineer
 </table>
 <h2 id="design-decisions">Design Decisions<a class="headerlink" href="#design-decisions" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>D1 — Call skills directly, fall back to workers.</strong> On 2026-10-19 five skills were set to <code>disable-model-invocation: false</code> so the orchestrator can call them with the Skill tool: <code>swarm-plan</code>, <code>swarm-review</code>, <code>swarm-execute</code>, <code>qa-engineer</code>, <code>land-the-plane</code>.</li>
-</ul>
+<li>
+<p><strong>D1 — Call skills directly, fall back to workers.</strong> On 2026-10-19 five skills were set to <code>disable-model-invocation: false</code> so the orchestrator can call them with the Skill tool: <code>swarm-plan</code>, <code>swarm-review</code>, <code>swarm-execute</code>, <code>qa-engineer</code>, <code>land-the-plane</code>.</p>
 <table>
 <thead>
 <tr>
@@ -7146,33 +7148,45 @@ Handoff to: Builder, QA Engineer
 </tr>
 </tbody>
 </table>
-<p><strong>Fallback rule.</strong> The fallback is used for a stage when its skill is unavailable:
-  - the owner set the flag back to <code>true</code>;
-  - the Skill tool refuses the call;
-  - the skill is missing.</p>
-<p>The fallback worker gets "Read <code>.claude/skills/&lt;name&gt;/SKILL.md</code> and follow its method" plus the stage input, and must end with the same verdict contract (D2). The run ledger records which path each stage used (<code>skill</code> / <code>fallback</code>), so flipping the flag never breaks a run. Either way, the rules stay in one place (DRY).
-- <strong>D2 — Verdict contract.</strong> Every review worker ends its reply with a fenced block, and the orchestrator parses only that block:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>VERDICT: approve | revise
+<p><strong>Fallback rule.</strong> The fallback is used for a stage when its skill is unavailable:</p>
+<ul>
+<li>the owner set the flag back to <code>true</code>;</li>
+<li>the Skill tool refuses the call;</li>
+<li>the skill is missing.</li>
+</ul>
+<p>The fallback worker gets "Read <code>.claude/skills/&lt;name&gt;/SKILL.md</code> and follow its method" plus the stage input, and must end with the same verdict contract (D2). The run ledger records which path each stage used (<code>skill</code> / <code>fallback</code>), so flipping the flag never breaks a run. Either way, the rules stay in one place (DRY).</p>
+</li>
+<li>
+<p><strong>D2 — Verdict contract.</strong> Every review worker ends its reply with a fenced block, and the orchestrator parses only that block:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>VERDICT: approve | revise
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>BLOCKING: &lt;n&gt;
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>ADVISORY: &lt;n&gt;
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>- [B] file:line — finding
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>- [A] file:line — finding
 </code></pre></div>
-  <code>revise</code> with <code>BLOCKING: 0</code> is treated as <code>approve</code>. Advisories go into the ledger and the summary but never trigger a loop.
-- <strong>D3 — Round caps.</strong> Plan⇄review ≤ 3, implement⇄review ≤ 3, QA⇄fix ≤ 3. Going over a cap means <code>blocked</code>, with a summary of what failed.
-- <strong>D4 — Flaky detection script.</strong> <code>scripts/qa-twice.sh</code> takes the backend test classes and webapp test files to run.
-  - It runs each set twice: <code>mvn -q test -Dtest=…</code> and <code>npx vitest run …</code>.
-  - It prints <code>pass</code> / <code>flaky</code> / <code>fail</code> per test.
-  - The full gates (<code>mvn verify</code>, <code>npm run test</code>, <code>npm run lint</code>) still run once before the commit.
-- <strong>D5 — Ledger.</strong> The ledger lives at <code>scratchpad/autopilot/&lt;YYYYMMDD-HHMM&gt;-&lt;slug&gt;.md</code> (ephemeral) and holds one row per worker run: stage, round, verdict, turns, min, tokens, ≈$. The run report (results + ledger + cost) goes to <code>docs/reports/autopilot-&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md</code>, so a durable record stays in <code>docs/</code>. The plan artifact is not edited for it (owner, 2026-10-19).
-- <strong>D6 — Scope guard.</strong> Autopilot refuses tasks that need a PR-FAQ or PRD (Medium/Large features per <code>swarm-plan</code>) and points to <code>/scope</code>. It targets small features and fixes.
-- <strong>D8 — Plan mode (added 2026-10-19).</strong> <code>/autopilot docs/plans/plan-&lt;x&gt;.md</code> runs on an existing plan, e.g. one made by <code>/swarm-plan</code>.
-  - <strong>Skipped:</strong> only the Plan stage.
-  - <strong>Kept:</strong> Plan review (that plan has not been through a reviewer yet) and Gate 1. Without them, autopilot would just be <code>/swarm-execute</code>.
-  - <strong>Scope:</strong> only tasks still <code>[ ]</code> in <code>TASKS.md</code>. Owner-only QA/prod checks are not counted or run.
-  - <strong>Refused (→ <code>/swarm-execute</code>):</strong> more than 6 open tasks, any task <code>[~]</code>, or the plan's Status is Done.
-- <strong>D9 — Exact cost (added 2026-10-19).</strong> <code>scripts/claude-cost.mjs</code> prices every API request found in the session transcripts (<code>~/.claude/projects/&lt;project&gt;/&lt;session&gt;.jsonl</code> + <code>subagents/*.jsonl</code>). It dedupes by <code>message.id</code> and uses the cache write 5m/1h split, the Haiku long-prompt tier, fast mode and US-geo. Prices come from <code>scripts/claude-pricing.json</code> (pricing page, read 2026-10-19). It replaces the ≈$ estimate, which was too low because Agent result token totals miss repeated cache reads.
-- <strong>D7 — Gates are never skipped.</strong> Gate 1 (plan) and Gate 2 (push) always use <code>AskUserQuestion</code>. There is no <code>--yes</code> flag. This follows the standing "ask before every push" rule. <em>Amended by <a href="../../adr/0028-local-autopilot-auto-gates/">ADR-0028</a> (2026-10-22): opt-in <code>--auto</code> / <code>--auto-push</code> typed in the command.</em></p>
+    <code>revise</code> with <code>BLOCKING: 0</code> is treated as <code>approve</code>. Advisories go into the ledger and the summary but never trigger a loop.</p>
+</li>
+<li>
+<p><strong>D3 — Round caps.</strong> Plan⇄review ≤ 3, implement⇄review ≤ 3, QA⇄fix ≤ 3. Going over a cap means <code>blocked</code>, with a summary of what failed.</p>
+</li>
+<li><strong>D4 — Flaky detection script.</strong> <code>scripts/qa-twice.sh</code> takes the backend test classes and webapp test files to run.<ul>
+<li>It runs each set twice: <code>mvn -q test -Dtest=…</code> and <code>npx vitest run …</code>.</li>
+<li>It prints <code>pass</code> / <code>flaky</code> / <code>fail</code> per test.</li>
+<li>The full gates (<code>mvn verify</code>, <code>npm run test</code>, <code>npm run lint</code>) still run once before the commit.</li>
+</ul>
+</li>
+<li><strong>D5 — Ledger.</strong> The ledger lives at <code>scratchpad/autopilot/&lt;YYYYMMDD-HHMM&gt;-&lt;slug&gt;.md</code> (ephemeral) and holds one row per worker run: stage, round, verdict, turns, min, tokens, ≈$. The run report (results + ledger + cost) goes to <code>docs/reports/autopilot-&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md</code>, so a durable record stays in <code>docs/</code>. The plan artifact is not edited for it (owner, 2026-10-19).</li>
+<li><strong>D6 — Scope guard.</strong> Autopilot refuses tasks that need a PR-FAQ or PRD (Medium/Large features per <code>swarm-plan</code>) and points to <code>/scope</code>. It targets small features and fixes.</li>
+<li><strong>D8 — Plan mode (added 2026-10-19).</strong> <code>/autopilot docs/plans/plan-&lt;x&gt;.md</code> runs on an existing plan, e.g. one made by <code>/swarm-plan</code>.<ul>
+<li><strong>Skipped:</strong> only the Plan stage.</li>
+<li><strong>Kept:</strong> Plan review (that plan has not been through a reviewer yet) and Gate 1. Without them, autopilot would just be <code>/swarm-execute</code>.</li>
+<li><strong>Scope:</strong> only tasks still <code>[ ]</code> in <code>TASKS.md</code>. Owner-only QA/prod checks are not counted or run.</li>
+<li><strong>Refused (→ <code>/swarm-execute</code>):</strong> more than 6 open tasks, any task <code>[~]</code>, or the plan's Status is Done.</li>
+</ul>
+</li>
+<li><strong>D9 — Exact cost (added 2026-10-19).</strong> <code>scripts/claude-cost.mjs</code> prices every API request found in the session transcripts (<code>~/.claude/projects/&lt;project&gt;/&lt;session&gt;.jsonl</code> + <code>subagents/*.jsonl</code>). It dedupes by <code>message.id</code> and uses the cache write 5m/1h split, the Haiku long-prompt tier, fast mode and US-geo. Prices come from <code>scripts/claude-pricing.json</code> (pricing page, read 2026-10-19). It replaces the ≈$ estimate, which was too low because Agent result token totals miss repeated cache reads.</li>
+<li><strong>D7 — Gates are never skipped.</strong> Gate 1 (plan) and Gate 2 (push) always use <code>AskUserQuestion</code>. There is no <code>--yes</code> flag. This follows the standing "ask before every push" rule. <em>Amended by <a href="../../adr/0028-local-autopilot-auto-gates/">ADR-0028</a> (2026-10-22): opt-in <code>--auto</code> / <code>--auto-push</code> typed in the command.</em></li>
+</ul>
 <h2 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

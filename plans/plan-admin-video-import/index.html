@@ -7418,9 +7418,11 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer), Security Auditor (/s
 <ul>
 <li>[ ] <code>api/admin.js</code>: <code>createImports</code>, <code>listImports</code>, <code>previewImport</code>, <code>runImportNow</code>, <code>cancelImport</code>, <code>retryImport</code></li>
 <li>[ ] <code>hooks/useAdmin.js</code>: <code>useVideoImports(page, status)</code> with <code>refetchInterval: data =&gt; hasActive(data) ? 2000 : false</code>; mutations invalidate <code>['admin','imports']</code></li>
-<li>[ ] <code>AdminView</code> new tab <strong>Import Video</strong> → <code>AdminImportPanel</code>:</li>
+<li>[ ] <code>AdminView</code> new tab <strong>Import Video</strong> → <code>AdminImportPanel</code>:<ul>
 <li>Form: textarea (one URL per line, optional <code>URL | Tiêu đề</code>), single-URL mode shows a title input + "Lấy tiêu đề" (preview); radio <strong>Tải ngay / Hẹn giờ</strong> + <code>datetime-local</code> (Asia/Ho_Chi_Minh, must be future); submit shows per-line results</li>
 <li>Table: title, platform icon, status badge, phase + progress bar (%, MB), scheduled/started time, "Đã lên app"/"Chờ đồng bộ", error message (Vietnamese map), actions run-now / cancel / retry</li>
+</ul>
+</li>
 <li>[ ] Tests: line parsing, validation, schedule-in-past blocked, polling on/off by status, actions, error mapping</li>
 <li>[ ] <code>npm run lint &amp;&amp; npx vitest run &amp;&amp; npm run build</code></li>
 </ul>

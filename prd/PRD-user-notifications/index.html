@@ -7509,9 +7509,11 @@ Handoff to: Architect (ADR-0017, accepted), Builder (/builder)
 <p>Logged-in users get an in-app notification inbox (bell icon with unread badge, updated in real time) and an optional email digest when someone replies to them or when a moderator removes their comment.</p>
 <hr />
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
-<p>Threaded replies and admin moderation shipped on 2026-10-02, but users are never told when:
-- someone replies to their comment — they must reopen the comment panel of every video they commented on;
-- their comment was removed for a policy violation — it silently disappears, so they don't learn the rule.</p>
+<p>Threaded replies and admin moderation shipped on 2026-10-02, but users are never told when:</p>
+<ul>
+<li>someone replies to their comment — they must reopen the comment panel of every video they commented on;</li>
+<li>their comment was removed for a policy violation — it silently disappears, so they don't learn the rule.</li>
+</ul>
 <p>The Settings page already shows <strong>"Email notifications"</strong> and <strong>"New content"</strong> toggles (<code>user_settings.notify_email</code>, <code>notify_new_content</code>), but no code reads them — a promise not kept.</p>
 <h3 id="evidence">Evidence<a class="headerlink" href="#evidence" title="Permanent link">&para;</a></h3>
 <ul>

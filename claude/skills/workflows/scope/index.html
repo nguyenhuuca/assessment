@@ -7259,12 +7259,14 @@
 <hr />
 <h2 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Permanent link">&para;</a></h2>
 <h3 id="step-1-parse-the-input">Step 1 — Parse the input<a class="headerlink" href="#step-1-parse-the-input" title="Permanent link">&para;</a></h3>
-<p>Read <code>$ARGUMENTS</code>. Extract what is already clear:
-- Feature name
-- Problem being solved (if stated)
-- Target users / persona (if stated)
-- Success signal (if stated)
-- Known constraints (if stated)</p>
+<p>Read <code>$ARGUMENTS</code>. Extract what is already clear:</p>
+<ul>
+<li>Feature name</li>
+<li>Problem being solved (if stated)</li>
+<li>Target users / persona (if stated)</li>
+<li>Success signal (if stated)</li>
+<li>Known constraints (if stated)</li>
+</ul>
 <h3 id="step-2-identify-gaps-and-ask-questions-one-at-a-time">Step 2 — Identify gaps and ask questions one at a time<a class="headerlink" href="#step-2-identify-gaps-and-ask-questions-one-at-a-time" title="Permanent link">&para;</a></h3>
 <p>Before writing anything, check which of the following are <strong>missing or ambiguous</strong>. Ask ONLY for what is genuinely unclear — do not re-ask information already in the input.</p>
 <p><strong>Required information:</strong></p>
@@ -7309,13 +7311,15 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Rules:</strong>
-- Ask questions <strong>one at a time</strong> — use <code>AskUserQuestion</code> for each, wait for the answer, then ask the next
-- Work through Q1 → Q6 in order, skipping any already answered in the input
-- For each question, provide <strong>3–4 contextually relevant options</strong> derived from the feature description. Mark your best guess with <code>(Recommended)</code> at the end of its label. The tool automatically appends an "Other" option so the user can type a free-form answer.
-- After each answer, briefly acknowledge it (one sentence) before asking the next question
-- Once all gaps are filled, summarize what you understood and confirm before writing
-- If the user says "just write it" or "use your best judgment", proceed with clearly labeled assumptions</p>
+<p><strong>Rules:</strong></p>
+<ul>
+<li>Ask questions <strong>one at a time</strong> — use <code>AskUserQuestion</code> for each, wait for the answer, then ask the next</li>
+<li>Work through Q1 → Q6 in order, skipping any already answered in the input</li>
+<li>For each question, provide <strong>3–4 contextually relevant options</strong> derived from the feature description. Mark your best guess with <code>(Recommended)</code> at the end of its label. The tool automatically appends an "Other" option so the user can type a free-form answer.</li>
+<li>After each answer, briefly acknowledge it (one sentence) before asking the next question</li>
+<li>Once all gaps are filled, summarize what you understood and confirm before writing</li>
+<li>If the user says "just write it" or "use your best judgment", proceed with clearly labeled assumptions</li>
+</ul>
 <p><strong>Example — asking Q1 for a "trending videos" feature:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>AskUserQuestion({
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  questions: [{
@@ -7339,19 +7343,25 @@
 <h3 id="step-4-write-the-prd">Step 4 — Write the PRD<a class="headerlink" href="#step-4-write-the-prd" title="Permanent link">&para;</a></h3>
 <p>Once all gaps are resolved, create <code>docs/prd/PRD-{kebab-slug}.md</code> following the <strong>official template</strong> from <code>templates/artifacts/prd.template.md</code>.</p>
 <p>Fill every section — do not leave placeholder text. Where information is assumed rather than stated by the user, mark it with <code>&gt; **Assumption:** ...</code> so it is easy to review.</p>
-<p><strong>Project-specific conventions to follow:</strong>
-- Use <code>VideoSource</code> (not <code>YouTubeVideo</code>) as the active video entity
-- Use <code>ResultObjectInfo&lt;T&gt;</code> / <code>ResultListInfo&lt;T&gt;</code> for API response wrappers
-- Reference <code>docs/adr/</code> (not <code>doc/adr/</code>) for ADR links
-- Place new DB migrations in <code>api/src/main/resources/db/changelog/sql/</code></p>
+<p><strong>Project-specific conventions to follow:</strong></p>
+<ul>
+<li>Use <code>VideoSource</code> (not <code>YouTubeVideo</code>) as the active video entity</li>
+<li>Use <code>ResultObjectInfo&lt;T&gt;</code> / <code>ResultListInfo&lt;T&gt;</code> for API response wrappers</li>
+<li>Reference <code>docs/adr/</code> (not <code>doc/adr/</code>) for ADR links</li>
+<li>Place new DB migrations in <code>api/src/main/resources/db/changelog/sql/</code></li>
+</ul>
 <h3 id="step-5-offer-next-steps">Step 5 — Offer next steps<a class="headerlink" href="#step-5-offer-next-steps" title="Permanent link">&para;</a></h3>
-<p>After writing the PRD, offer:
-1. Create <strong>ADR</strong> (<code>docs/adr/00NN-{slug}.md</code>) using <code>templates/artifacts/adr.template.md</code>
-   - Key sections to fill: Metadata, Context, Decision Drivers, Considered Options (pros/cons per option), Decision Outcome, Consequences, Validation, Links, Changelog
-   - Do NOT include Technical Details or Implementation Steps in the ADR — those go in the Plan
-2. Run <strong><code>/spec</code></strong>, which also writes the required <strong>sequence diagrams</strong> (<code>docs/sequence/sequence-{slug}.md</code>, Mermaid, from <code>templates/artifacts/sequence.template.md</code>). Every feature with a PRD needs them before its plan
-3. Create <strong>Implementation Plan</strong> (<code>docs/plans/plan-{slug}.md</code>) using <code>templates/artifacts/plan.template.md</code>
-4. Add entries to <strong><code>mkdocs.yml</code></strong> nav</p>
+<p>After writing the PRD, offer:</p>
+<ol>
+<li>Create <strong>ADR</strong> (<code>docs/adr/00NN-{slug}.md</code>) using <code>templates/artifacts/adr.template.md</code><ul>
+<li>Key sections to fill: Metadata, Context, Decision Drivers, Considered Options (pros/cons per option), Decision Outcome, Consequences, Validation, Links, Changelog</li>
+<li>Do NOT include Technical Details or Implementation Steps in the ADR — those go in the Plan</li>
+</ul>
+</li>
+<li>Run <strong><code>/spec</code></strong>, which also writes the required <strong>sequence diagrams</strong> (<code>docs/sequence/sequence-{slug}.md</code>, Mermaid, from <code>templates/artifacts/sequence.template.md</code>). Every feature with a PRD needs them before its plan</li>
+<li>Create <strong>Implementation Plan</strong> (<code>docs/plans/plan-{slug}.md</code>) using <code>templates/artifacts/plan.template.md</code></li>
+<li>Add entries to <strong><code>mkdocs.yml</code></strong> nav</li>
+</ol>
 <p>Do not auto-create these — wait for the user to confirm.</p>
 <hr />
 <h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>

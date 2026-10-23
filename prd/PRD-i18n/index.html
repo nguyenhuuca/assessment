@@ -7103,11 +7103,13 @@ Handoff to: Architect (ADR-0020), Builder (/swarm-execute)
 <p>Every screen, API error and email is available in <strong>Tiếng Việt</strong> and <strong>English</strong>. The first visit follows the browser language. Users can switch at any time, and a logged-in user's choice follows them across devices.</p>
 <hr />
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
-<p>The UI mixes the two languages today. Navigation is in English ("Home", "Library", "Settings") while actions are in Vietnamese ("Phát", "Xoá", "Lưu"). Other text is inconsistent too:
-- Relative times are always English ("2m ago").
-- The magic link email is English.
-- The password-change email is Vietnamese.
-- API errors come in either language.</p>
+<p>The UI mixes the two languages today. Navigation is in English ("Home", "Library", "Settings") while actions are in Vietnamese ("Phát", "Xoá", "Lưu"). Other text is inconsistent too:</p>
+<ul>
+<li>Relative times are always English ("2m ago").</li>
+<li>The magic link email is English.</li>
+<li>The password-change email is Vietnamese.</li>
+<li>API errors come in either language.</li>
+</ul>
 <p>Non-Vietnamese visitors cannot use most actions, and Vietnamese users get half-English screens.</p>
 <hr />
 <h2 id="goals-success-metrics">Goals &amp; Success Metrics<a class="headerlink" href="#goals-success-metrics" title="Permanent link">&para;</a></h2>
@@ -7161,12 +7163,16 @@ Handoff to: Architect (ADR-0020), Builder (/swarm-execute)
 <ol>
 <li><strong>Language switcher</strong> (VI / EN) in the header, available to guests and users, and in Settings, logged in only.</li>
 <li><strong>First-visit default:</strong> a browser language starting with <code>vi</code> gives Vietnamese; any other gives English.</li>
-<li><strong>Persistence:</strong></li>
+<li><strong>Persistence:</strong><ul>
 <li><code>localStorage</code> for everyone.</li>
 <li><code>user_settings.locale</code> for logged-in users, applied after login.</li>
-<li><strong>Coverage:</strong></li>
+</ul>
+</li>
+<li><strong>Coverage:</strong><ul>
 <li>All user UI: feed, Explore, Library, auth, comments, notifications, Settings, modals and the mobile nav.</li>
 <li>The Admin pages.</li>
+</ul>
+</li>
 <li><strong>Formatting:</strong> relative time, compact view counts, dates and plurals follow the selected language.</li>
 <li><strong>API errors:</strong> user-visible errors come back in the request language (<code>Accept-Language</code>).</li>
 <li><strong>Emails:</strong> the magic link and the password set/change/remove notices go out in the user's language, using the request language for brand-new users.</li>

@@ -7363,9 +7363,11 @@
 <h1 id="codebase-health-auditor">Codebase Health Auditor<a class="headerlink" href="#codebase-health-auditor" title="Permanent link">&para;</a></h1>
 <p>Regular codebase review for Clean Code, SOLID, DRY principles and consistency.</p>
 <h2 id="mcp-tools">MCP Tools<a class="headerlink" href="#mcp-tools" title="Permanent link">&para;</a></h2>
-<p><strong>Sequential Thinking</strong> (analysis):
-- Complex code smell evaluation
-- Trade-off analysis for refactoring decisions</p>
+<p><strong>Sequential Thinking</strong> (analysis):</p>
+<ul>
+<li>Complex code smell evaluation</li>
+<li>Trade-off analysis for refactoring decisions</li>
+</ul>
 <h2 id="audit-workflow">Audit Workflow<a class="headerlink" href="#audit-workflow" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>Swarm</strong> — Launch parallel worker-reviewer agents for each audit dimension</li>
@@ -7376,45 +7378,55 @@
 <li><strong>Report</strong> — Generate prioritized findings with remediation</li>
 </ol>
 <h2 id="parallel-analysis-pattern">Parallel Analysis Pattern<a class="headerlink" href="#parallel-analysis-pattern" title="Permanent link">&para;</a></h2>
-<p>Launch workers for different audit aspects:
-- SOLID violations audit
-- DRY violations and duplication detection
-- Code smell detection
-- Consistency audit
-- Security anti-pattern detection
-- Dead code and unused export detection</p>
+<p>Launch workers for different audit aspects:</p>
+<ul>
+<li>SOLID violations audit</li>
+<li>DRY violations and duplication detection</li>
+<li>Code smell detection</li>
+<li>Consistency audit</li>
+<li>Security anti-pattern detection</li>
+<li>Dead code and unused export detection</li>
+</ul>
 <h2 id="audit-dimensions">Audit Dimensions<a class="headerlink" href="#audit-dimensions" title="Permanent link">&para;</a></h2>
 <h3 id="solid-and-dry">SOLID and DRY<a class="headerlink" href="#solid-and-dry" title="Permanent link">&para;</a></h3>
 <p>Apply the principles and duplication classes defined in <code>.claude/rules/code-quality.md</code> — do not restate them here; that file is the single source of truth. For DRY, use AST-based tools (jscpd) not just grep patterns.</p>
 <h3 id="code-smells">Code Smells<a class="headerlink" href="#code-smells" title="Permanent link">&para;</a></h3>
-<p>Identify common code smells (context-dependent thresholds):
-- Long methods/functions
-- Large classes
-- Feature envy
-- Data clumps
-- Primitive obsession
-- Message chains
-- Language-specific anti-patterns (type assertions, any propagation, promise anti-patterns)</p>
+<p>Identify common code smells (context-dependent thresholds):</p>
+<ul>
+<li>Long methods/functions</li>
+<li>Large classes</li>
+<li>Feature envy</li>
+<li>Data clumps</li>
+<li>Primitive obsession</li>
+<li>Message chains</li>
+<li>Language-specific anti-patterns (type assertions, any propagation, promise anti-patterns)</li>
+</ul>
 <h3 id="consistency">Consistency<a class="headerlink" href="#consistency" title="Permanent link">&para;</a></h3>
-<p>Check pattern consistency:
-- Error handling patterns
-- Async/await usage
-- Naming conventions
-- Import strategies
-- Type vs interface usage
-- Validation approach</p>
+<p>Check pattern consistency:</p>
+<ul>
+<li>Error handling patterns</li>
+<li>Async/await usage</li>
+<li>Naming conventions</li>
+<li>Import strategies</li>
+<li>Type vs interface usage</li>
+<li>Validation approach</li>
+</ul>
 <h3 id="complexity">Complexity<a class="headerlink" href="#complexity" title="Permanent link">&para;</a></h3>
-<p>Evaluate cyclomatic complexity and function/class sizes. Use language-appropriate tools:
-- TypeScript: ts-complexity-report, eslint-plugin-sonarjs
-- Python: radon cc, radon mi
-- Go: gocyclo, gocognit
-- Rust: cargo-geiger, cargo-bloat</p>
+<p>Evaluate cyclomatic complexity and function/class sizes. Use language-appropriate tools:</p>
+<ul>
+<li>TypeScript: ts-complexity-report, eslint-plugin-sonarjs</li>
+<li>Python: radon cc, radon mi</li>
+<li>Go: gocyclo, gocognit</li>
+<li>Rust: cargo-geiger, cargo-bloat</li>
+</ul>
 <h3 id="dead-code">Dead Code<a class="headerlink" href="#dead-code" title="Permanent link">&para;</a></h3>
-<p>Use language-appropriate detection tools:
-- TypeScript: knip, depcheck
-- Python: vulture, pip-audit
-- Go: go mod tidy, staticcheck
-- Rust: cargo-udeps, cargo-machete</p>
+<p>Use language-appropriate detection tools:</p>
+<ul>
+<li>TypeScript: knip, depcheck</li>
+<li>Python: vulture, pip-audit</li>
+<li>Go: go mod tidy, staticcheck</li>
+<li>Rust: cargo-udeps, cargo-machete</li>
+</ul>
 <p>Verify findings before deletion (false positives with dynamic imports).</p>
 <h3 id="scope-adherence">Scope Adherence<a class="headerlink" href="#scope-adherence" title="Permanent link">&para;</a></h3>
 <p>Applies <code>swarm-review</code>'s Scope adherence review lens (unrequested refactors, drive-by edits, orphaned dead code) across the whole codebase instead of one diff at a time — see that skill for the full perspective and adversarial question; this entry exists so the audit checklist doesn't have a gap, not to restate the lens.</p>

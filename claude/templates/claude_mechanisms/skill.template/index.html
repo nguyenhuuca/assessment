@@ -7220,20 +7220,23 @@
 Skills are model-invoked workflows discovered via description matching.
 
 Required fields:
-  - name: lowercase, hyphens only, max 64 chars, must match directory name
-  - description: max 1024 chars, CRITICAL for auto-discovery
+
+    - name: lowercase, hyphens only, max 64 chars, must match directory name
+    - description: max 1024 chars, CRITICAL for auto-discovery
 
 Optional fields:
-  - allowed-tools: Comma-separated list to restrict tool access
+
+    - allowed-tools: Comma-separated list to restrict tool access
 
 Description best practices:
   GOOD: "API design skill. Use when designing REST APIs, GraphQL schemas, or gRPC services."
   BAD:  "Helps with APIs"
 
 Supporting files (auto-discovered):
-  - FORMS.md: Input templates
-  - REFERENCE.md: Technical reference
-  - resources/: Additional materials
+
+    - FORMS.md: Input templates
+    - REFERENCE.md: Technical reference
+    - resources/: Additional materials
 
 Location: .claude/skills/[domain]/[skill-name]/SKILL.md
 -->

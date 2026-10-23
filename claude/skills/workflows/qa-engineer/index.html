@@ -7243,12 +7243,14 @@
 <h2 id="method">Method<a class="headerlink" href="#method" title="Permanent link">&para;</a></h2>
 <p>Follow the <code>testing</code> skill for methodology (pyramid, unit/integration/E2E design). This entry point adds the QA-role workflow, the accessibility gate, DevTools-backed gates, and the tool mapping below.</p>
 <h2 id="mcp-tools">MCP Tools<a class="headerlink" href="#mcp-tools" title="Permanent link">&para;</a></h2>
-<p><strong>Chrome DevTools</strong> (E2E and browser testing):
-- Automate user flows in real browser
-- Capture screenshots for visual regression
-- Run Lighthouse accessibility audits
-- Profile performance during tests
-- Inspect network requests and console errors</p>
+<p><strong>Chrome DevTools</strong> (E2E and browser testing):</p>
+<ul>
+<li>Automate user flows in real browser</li>
+<li>Capture screenshots for visual regression</li>
+<li>Run Lighthouse accessibility audits</li>
+<li>Profile performance during tests</li>
+<li>Inspect network requests and console errors</li>
+</ul>
 <h2 id="testing-workflow">Testing Workflow<a class="headerlink" href="#testing-workflow" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>Analyze</strong> — Use Glob to find source files without corresponding tests</li>
@@ -7304,11 +7306,13 @@
 <p>Run for any UI-touching change, as part of the standard test pass:</p>
 <ol>
 <li><strong>Automated</strong> — Run a Lighthouse accessibility audit via Chrome DevTools; a regression fails the gate</li>
-<li><strong>Manual</strong> — automated tools miss real usability issues; verify by hand:</li>
+<li><strong>Manual</strong> — automated tools miss real usability issues; verify by hand:<ul>
 <li>Keyboard-only navigation (no mouse) reaches every interactive element</li>
 <li>Focus indicator is visible at each stop</li>
 <li>Screen reader announces labels and state changes (aria-live) correctly</li>
 <li>Color contrast meets WCAG 2.1 AA, and color is never the sole indicator of state</li>
+</ul>
+</li>
 </ol>
 <h2 id="constraints">Constraints<a class="headerlink" href="#constraints" title="Permanent link">&para;</a></h2>
 <ul>

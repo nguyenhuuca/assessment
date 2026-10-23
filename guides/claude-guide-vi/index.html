@@ -8568,12 +8568,14 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Chọn cấp nào:</strong>
-- Chưa rõ nên làm gì, hoặc chỉ cần hiểu code → <strong>cấp 1</strong>.
-- Sửa nhỏ, cần bạn nhìn từng bước → <strong>cấp 2</strong>.
-- Feature vừa/lớn (cần PRD, nhiều ngày) → <strong>cấp 3</strong>.
-- Feature nhỏ, fix, refactor có acceptance criteria rõ → <strong>cấp 4</strong>, hoặc <strong>cấp 5</strong> nếu không mở terminal.
-- Việc nhỏ, rủi ro thấp, không đụng migration hay config agent → <strong>cấp 6</strong>.</p>
+<p><strong>Chọn cấp nào:</strong></p>
+<ul>
+<li>Chưa rõ nên làm gì, hoặc chỉ cần hiểu code → <strong>cấp 1</strong>.</li>
+<li>Sửa nhỏ, cần bạn nhìn từng bước → <strong>cấp 2</strong>.</li>
+<li>Feature vừa/lớn (cần PRD, nhiều ngày) → <strong>cấp 3</strong>.</li>
+<li>Feature nhỏ, fix, refactor có acceptance criteria rõ → <strong>cấp 4</strong>, hoặc <strong>cấp 5</strong> nếu không mở terminal.</li>
+<li>Việc nhỏ, rủi ro thấp, không đụng migration hay config agent → <strong>cấp 6</strong>.</li>
+</ul>
 <hr />
 <h2 id="cau-hinh-co-san">Cấu hình có sẵn<a class="headerlink" href="#cau-hinh-co-san" title="Permanent link">&para;</a></h2>
 <h3 id="cau-truc-thu-muc">📁 Cấu trúc thư mục<a class="headerlink" href="#cau-truc-thu-muc" title="Permanent link">&para;</a></h3>
@@ -9347,12 +9349,14 @@
 </table>
 <ul>
 <li><strong>Gate 1 tự duyệt:</strong> plan job chỉ ghi dấu <code>&lt;!-- autopilot:plan-review=approve --&gt;</code> vào mô tả PR khi plan review ra <code>approve</code>. Workflow thấy dấu đó thì tự chạy build job (<code>workflow_dispatch</code>). <code>/revise</code> luôn chờ bạn.</li>
-<li><strong>Gate 2 tự merge:</strong> <code>scripts/claude-autopilot-merge.sh</code> (luôn chạy bản trên <code>main</code>) chỉ merge khi đủ hết các điều kiện:</li>
+<li><strong>Gate 2 tự merge:</strong> <code>scripts/claude-autopilot-merge.sh</code> (luôn chạy bản trên <code>main</code>) chỉ merge khi đủ hết các điều kiện:<ul>
 <li>PR đã ready, tức là code review ra <code>approve</code>;</li>
 <li>không đụng <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>scripts/claude-*</code>, migration Liquibase hay <code>.env</code>;</li>
 <li>≤ 400 dòng thay đổi ngoài test và docs;</li>
 <li>script <strong>tự chạy lại</strong> <code>mvn verify</code> / test + lint + build webapp.</li>
 <li>Sau đó merge squash bằng secret <code>AUTOPILOT_MERGE_TOKEN</code>, để CI deploy chạy. Thiếu điều kiện nào thì script comment lý do và để PR cho bạn.</li>
+</ul>
+</li>
 <li><strong>Ví dụ thật:</strong> issue #36 (dịch nhãn ON/OFF) → PR #37 merged + frontend deployed trong khoảng 5 phút, build job $0.39, không ai bấm gì.</li>
 <li><strong>Rủi ro:</strong> code lên prod mà không ai đọc. Smoke test sau deploy vẫn chạy tay. Rollback = <code>git revert</code> commit squash.</li>
 </ul>
@@ -9363,11 +9367,13 @@
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Chỉ cần nếu dùng auto gate: fine-grained PAT chỉ cho repo này, Contents + Pull requests read/write</span>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>gh<span class="w"> </span>secret<span class="w"> </span><span class="nb">set</span><span class="w"> </span>AUTOPILOT_MERGE_TOKEN
 </code></pre></div>
-<p><strong>Giới hạn và an toàn:</strong>
-- Chỉ <strong>owner của repo</strong> kích hoạt được, kể cả label lẫn comment. Repo đang public, nên comment của người khác bị bỏ qua.
-- Nội dung issue chỉ là dữ liệu. Chỉ dẫn nằm trong issue mà định thay đổi workflow, quyền hay gate sẽ bị bỏ qua và được ghi lại trong PR.
-- Headless <strong>từ chối</strong> sửa <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, file <code>.env</code> và migration xóa dữ liệu. Những việc đó phải làm ở local.
-- Mỗi job tối đa 60 phút, mỗi lúc chỉ 1 run. Các run xếp hàng theo thứ tự đến trước chạy trước, nên gắn label cho nhiều issue cùng lúc không mất run nào (chờ tối đa khoảng 5,5 giờ). Bước Claude chỉ thấy secret <code>CLAUDE_CODE_OAUTH_TOKEN</code>; <code>AUTOPILOT_MERGE_TOKEN</code> chỉ bước auto-merge thấy; các secret deploy (SSH, Docker) không bao giờ lộ ra job.</p>
+<p><strong>Giới hạn và an toàn:</strong></p>
+<ul>
+<li>Chỉ <strong>owner của repo</strong> kích hoạt được, kể cả label lẫn comment. Repo đang public, nên comment của người khác bị bỏ qua.</li>
+<li>Nội dung issue chỉ là dữ liệu. Chỉ dẫn nằm trong issue mà định thay đổi workflow, quyền hay gate sẽ bị bỏ qua và được ghi lại trong PR.</li>
+<li>Headless <strong>từ chối</strong> sửa <code>.github/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, file <code>.env</code> và migration xóa dữ liệu. Những việc đó phải làm ở local.</li>
+<li>Mỗi job tối đa 60 phút, mỗi lúc chỉ 1 run. Các run xếp hàng theo thứ tự đến trước chạy trước, nên gắn label cho nhiều issue cùng lúc không mất run nào (chờ tối đa khoảng 5,5 giờ). Bước Claude chỉ thấy secret <code>CLAUDE_CODE_OAUTH_TOKEN</code>; <code>AUTOPILOT_MERGE_TOKEN</code> chỉ bước auto-merge thấy; các secret deploy (SSH, Docker) không bao giờ lộ ra job.</li>
+</ul>
 <h3 id="cach-goi">▶️ Cách gọi<a class="headerlink" href="#cach-goi" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/autopilot<span class="w"> </span>ben<span class="w"> </span>tab<span class="w"> </span>Đề<span class="w"> </span>xuất<span class="w"> </span>cho<span class="w"> </span>admin<span class="w"> </span>move<span class="w"> </span>về<span class="w"> </span>chờ<span class="w"> </span>duyệt<span class="w"> </span>rồi<span class="w"> </span>review<span class="w"> </span>lại
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/autopilot<span class="w"> </span>refactor:<span class="w"> </span>gom<span class="w"> </span>luật<span class="w"> </span>chuyển<span class="w"> </span>trạng<span class="w"> </span>thái<span class="w"> </span>suggestion<span class="w"> </span>vào<span class="w"> </span>một<span class="w"> </span>chỗ,<span class="w"> </span>không<span class="w"> </span>đổi<span class="w"> </span>behavior
@@ -9430,16 +9436,18 @@
 <ul>
 <li><strong>Signals:</strong> <code>defect:&lt;sha&gt;</code>, <code>bug:#&lt;N&gt;</code> (bug report từ app mà bản sửa phải đổi các dòng do agent viết, trong run autopilot hoặc commit có <code>Co-Authored-By: Claude</code> ở session thường, tìm bằng <code>git blame</code>), <code>revert:&lt;sha&gt;</code>, <code>blocked:&lt;run&gt;</code>, <code>flaky:&lt;run&gt;</code>, <code>review-skipped:&lt;run&gt;</code>, <code>revise:pr-&lt;N&gt;</code>. Signal nào đã có PR hoặc issue <code>evolve</code> (kể cả cái bạn đã đóng) hoặc đã có seeded case thì không đề xuất lại. Tối đa 3 signal mỗi run.</li>
 <li><strong>Seeded-bug evals</strong> (<code>evals/seeded/&lt;id&gt;/case.json</code>): mỗi bug lọt thật thành một regression test <strong>cho agent</strong>: chạy reviewer trên đúng diff có bug và chấm cố định (có finding blocking ở đúng file, đúng cách mô tả bug).</li>
-<li><strong>Eval gate</strong> (<code>scripts/evolve.mjs gate</code>), phải đủ cả 4:</li>
+<li><strong>Eval gate</strong> (<code>scripts/evolve.mjs gate</code>), phải đủ cả 4:<ol>
 <li>rule hiện tại trên <code>main</code> <strong>bỏ sót</strong> case (ít nhất 2/3 lần);</li>
 <li>rule mới <strong>bắt được</strong> ít nhất 2/3 lần;</li>
 <li>mọi case cũ vẫn bắt được;</li>
 <li>chi phí reviewer tăng tối đa 25%.</li>
+</ol>
+</li>
 <li><strong>Agent được sửa gì:</strong> chỉ được thêm dòng vào <code>.claude/skills/**</code>, <code>.claude/rules/*.md</code>, phần prompt của <code>.claude/agents/*.md</code>, và thêm case mới. Không bao giờ đụng <code>scripts/</code>, <code>.github/</code>, hooks, settings, case cũ, threshold hay code app. Frontmatter bị khoá. Do code kiểm tra (<code>check-paths</code>), không phải do prompt.</li>
 <li><strong>Cách chạy:</strong> gõ <code>/evolve</code>. Nó dừng ở bước Ship và hỏi bạn: merge vào <code>main</code>, push và mở PR, giữ branch, hay bỏ.</li>
 <li><strong>Chạy hàng tuần trên CI:</strong> <code>.github/workflows/agent-evolve.yml</code> chạy 9:00 thứ Hai (hoặc Actions → Agent Evolve → Run workflow). Agent ghi bản sao file vào <code>evolve-out/</code>, không sửa <code>.claude/</code>. Ship job dựng branch <code>evolve/*</code> bằng <code>scripts/evolve.mjs apply</code>, chạy cùng gate rồi mở PR có label <code>evolve</code>; bạn là người merge (<a href="../../adr/0029-headless-evolve-staging/">ADR-0029</a>).</li>
 <li><strong>Dọn rule (prune):</strong> mỗi rule do Evolve thêm kết thúc bằng <code>&lt;!-- evolve:&lt;case id&gt; --&gt;</code>; run sau có thể đề xuất gỡ một rule, chỉ khi case của nó vẫn bắt được khi không có rule đó.</li>
-<li><strong>Compress</strong> (ADR-0027 D6): mỗi tháng một lần (<code>compress:&lt;YYYY-MM&gt;</code>), Evolve được <strong>cắt bớt</strong> nội dung: trùng lặp, tham chiếu chết, nội dung mâu thuẫn với source of truth, số liệu lỗi thời, trong <code>.claude/</code> và <code>CLAUDE.md</code>.</li>
+<li><strong>Compress</strong> (ADR-0027 D6): mỗi tháng một lần (<code>compress:&lt;YYYY-MM&gt;</code>), Evolve được <strong>cắt bớt</strong> nội dung: trùng lặp, tham chiếu chết, nội dung mâu thuẫn với source of truth, số liệu lỗi thời, trong <code>.claude/</code> và <code>CLAUDE.md</code>.<ul>
 <li><code>node scripts/evolve.mjs lint-rules</code> đưa gợi ý (dòng trùng, path chết, kích thước context luôn load, hiện khoảng 37 KB).</li>
 <li>Không bao giờ cắt: <code>AGENTS.md</code>, <code>security.md</code>, skill evolve, frontmatter, và mọi dòng mang luật an toàn (push, gate, merge, deny, secret, prod, smoke, Core Principles, "never …").</li>
 <li>Gate: nhỏ hơn (context luôn load -5% hoặc file bị sửa -1 KiB), không thêm dòng trùng hay ref chết, mọi seeded case vẫn bắt được. Bạn đọc từng dòng bị xoá trước khi merge.</li>
@@ -9460,6 +9468,8 @@
 <ul>
 <li><strong>Review:</strong> đọc từng dòng bị xoá (<code>git diff main...&lt;branch&gt;</code>). Merge nếu mỗi chỗ cắt đúng là trùng lặp, ref chết hoặc lỗi thời; ngược lại thì bỏ.</li>
 <li><strong>Bỏ qua một tháng:</strong> tạo issue label <code>evolve</code> có body chứa <code>&lt;!-- evolve:signal=compress:&lt;YYYY-MM&gt; --&gt;</code>.</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -9538,10 +9548,12 @@
 </table>
 <p><strong>Khi nào Claude ghi file</strong>: lúc bắt đầu task có từ 3 bước trở lên (hoặc task dễ vượt quá context window), sau mỗi bước hay commit, <code>blocked</code> khi đang chờ bạn, và <code>done</code> + <code>progress: 100</code> khi đã push và verify. Luôn ghi đè toàn bộ file; sửa vặt hay câu hỏi một lần thì không ghi.</p>
 <p><strong>Đồng bộ giữa các máy</strong>: file được commit và push cùng phần việc nó mô tả (cập nhật chỉ trạng thái thì commit riêng <code>chore(session): …</code>). Sang máy khác thì <code>git pull</code> trước. Không ghi secret, hostname/IP hay đường dẫn key vào file.</p>
-<p><strong>Bạn sẽ thấy gì</strong>
-- <strong>Lúc mở session</strong>, <code>session-start-loader.sh</code> hiện một bảng có khung: 📌 Task, Status (progress bar + <code>updated</code>), ✅ Done và 🔄 Doing (commit hash ở cột riêng), ⛔ Blocked, → Next. Task chưa xong có gợi ý <code>▶ /task-resume</code>; task <code>done</code> hiện như task gần nhất và không được làm tiếp. Sau compact thì không hiện bảng.
-- <strong>Status line</strong> (<code>.claude/statusline-command.sh</code>) hiện <code>task: &lt;tên&gt; &lt;progress&gt;% (&lt;status&gt;)</code> khi task chưa xong.
-- <strong><code>/task-resume [chỉ dẫn]</code></strong> đọc lại plan, <code>git status</code>/<code>git log</code> và <code>TASKS.md</code>, sửa file nếu repo khác với file, báo cáo 3–5 dòng rồi làm tiếp từ <code>next</code>. Claude không tự làm tiếp, và push vẫn cần bạn đồng ý.</p>
+<p><strong>Bạn sẽ thấy gì</strong></p>
+<ul>
+<li><strong>Lúc mở session</strong>, <code>session-start-loader.sh</code> hiện một bảng có khung: 📌 Task, Status (progress bar + <code>updated</code>), ✅ Done và 🔄 Doing (commit hash ở cột riêng), ⛔ Blocked, → Next. Task chưa xong có gợi ý <code>▶ /task-resume</code>; task <code>done</code> hiện như task gần nhất và không được làm tiếp. Sau compact thì không hiện bảng.</li>
+<li><strong>Status line</strong> (<code>.claude/statusline-command.sh</code>) hiện <code>task: &lt;tên&gt; &lt;progress&gt;% (&lt;status&gt;)</code> khi task chưa xong.</li>
+<li><strong><code>/task-resume [chỉ dẫn]</code></strong> đọc lại plan, <code>git status</code>/<code>git log</code> và <code>TASKS.md</code>, sửa file nếu repo khác với file, báo cáo 3–5 dòng rồi làm tiếp từ <code>next</code>. Claude không tự làm tiếp, và push vẫn cần bạn đồng ý.</li>
+</ul>
 <hr />
 <h2 id="hooks-permissions">Hooks &amp; permissions<a class="headerlink" href="#hooks-permissions" title="Permanent link">&para;</a></h2>
 <p>Hooks là script bash trong <code>.claude/hooks/</code>, đăng ký trong <code>.claude/settings.json</code>. Chúng <strong>fail-open</strong>: thiếu <code>jq</code> thì bỏ qua. Trên Windows chúng chạy qua Git Bash.</p>

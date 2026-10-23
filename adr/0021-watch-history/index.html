@@ -7136,10 +7136,12 @@
 <ul>
 <li><strong>One trigger, one threshold:</strong> a "watch" means the same thing as a counted view (≥ 3 s of real playback), with no second client timer.</li>
 <li><strong>No extra requests on play start:</strong> zero new requests for the common case.</li>
-<li><strong>Privacy:</strong></li>
+<li><strong>Privacy:</strong><ul>
 <li>Owner-only access, derived from the JWT and never from a client <code>userId</code>.</li>
 <li>Incognito really records nothing, including progress.</li>
 <li>The user can delete one entry or everything.</li>
+</ul>
+</li>
 <li><strong>Bounded storage:</strong> at most 500 entries per user, enforced on write.</li>
 <li><strong>Convention fit:</strong> composite primary key and native upsert, like <code>video_reactions</code>. Liquibase SQL. No new infrastructure.</li>
 </ul>
@@ -7195,31 +7197,39 @@
 <h3 id="d7-account-deletion-clears-history">D7. Account deletion clears history<a class="headerlink" href="#d7-account-deletion-clears-history" title="Permanent link">&para;</a></h3>
 <p><code>UserSettingsServiceImpl.deleteAccount</code> soft-deletes the user (ADR-0016). It now also deletes that user's <code>watch_history</code>, because viewing history is personal data with no audit value. The cascade covers hard deletes.</p>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- No new request on play start.
-- History and view counts share one definition of a watch.
-- Incognito finally does what Settings says.
-- Storage is bounded.</p>
-<p><strong>Negative:</strong>
-- History depends on the view call. A blocked or dropped view request means no history entry. This is the same best-effort contract as view counts, and it is acceptable.
-- Progress heartbeats add about 1 small <code>PUT</code> per 30 s per active logged-in viewer. On 1 vCPU this is fine at current traffic; revisit if traffic grows ten times.
-- The title search is accent-sensitive (<code>ILIKE</code>). The <code>unaccent</code> extension is a later option (see open questions in the PRD).</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>No new request on play start.</li>
+<li>History and view counts share one definition of a watch.</li>
+<li>Incognito finally does what Settings says.</li>
+<li>Storage is bounded.</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>History depends on the view call. A blocked or dropped view request means no history entry. This is the same best-effort contract as view counts, and it is acceptable.</li>
+<li>Progress heartbeats add about 1 small <code>PUT</code> per 30 s per active logged-in viewer. On 1 vCPU this is fine at current traffic; revisit if traffic grows ten times.</li>
+<li>The title search is accent-sensitive (<code>ILIKE</code>). The <code>unaccent</code> extension is a later option (see open questions in the PRD).</li>
+</ul>
 <p><strong>Reversibility:</strong> a two-way door. The table and endpoints are additive. Rollback drops the table and removes the upsert call from the view path.</p>
 <h2 id="compliance">Compliance<a class="headerlink" href="#compliance" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>@RateLimited</code>:</li>
+<li><code>@RateLimited</code>:<ul>
 <li><code>GET</code> list: 60/min</li>
 <li>summary: 30/min</li>
 <li>progress: 120/min</li>
 <li>deletes: 20/min</li>
+</ul>
+</li>
 <li>All endpoints are authenticated and use the JWT user id only.</li>
-<li>Tests cover:</li>
+<li>Tests cover:<ul>
 <li>owner isolation</li>
 <li>incognito</li>
 <li>the cap</li>
 <li>a hidden or unknown video</li>
 <li>re-watch inside the dedupe window</li>
 <li>clamping</li>
+</ul>
+</li>
 </ul>
 
 

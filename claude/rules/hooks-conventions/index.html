@@ -7160,14 +7160,14 @@ hook/script-specific only; universal engineering rules live in
 <h2 id="shell-baseline">Shell Baseline<a class="headerlink" href="#shell-baseline" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>#!/usr/bin/env bash</code> (or <code>#!/bin/bash</code> for existing hooks) with <code>set -u</code> —
-  fail loudly on an unset variable instead of silently expanding to empty.</li>
+    fail loudly on an unset variable instead of silently expanding to empty.</li>
 <li>Run <code>shellcheck</code> and <code>bash -n</code> before committing; both are CI-enforced
-  (<code>framework-invariants.yml</code>'s <code>shellcheck</code> job over <code>.claude/hooks/*.sh</code> +
-  <code>scripts/*.sh</code>; <code>check-invariants.sh</code>'s <code>hooks-valid</code> check runs <code>bash -n</code>
-  over every shipped hook).</li>
+    (<code>framework-invariants.yml</code>'s <code>shellcheck</code> job over <code>.claude/hooks/*.sh</code> +
+    <code>scripts/*.sh</code>; <code>check-invariants.sh</code>'s <code>hooks-valid</code> check runs <code>bash -n</code>
+    over every shipped hook).</li>
 <li>Keep each hook/script to roughly ≤120 lines and commented for adaptation —
-  these are illustrative references an adopter edits for their own repo, not
-  a framework to extend indefinitely in place.</li>
+    these are illustrative references an adopter edits for their own repo, not
+    a framework to extend indefinitely in place.</li>
 </ul>
 <h2 id="fail-open-visibly">Fail-Open, Visibly<a class="headerlink" href="#fail-open-visibly" title="Permanent link">&para;</a></h2>
 <p>Hooks are guardrails, not a security boundary — <code>permissions.deny</code> is the hard

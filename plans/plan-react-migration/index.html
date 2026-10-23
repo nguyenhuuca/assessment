@@ -7871,19 +7871,23 @@ Migration follows a bottom-up approach: infrastructure → auth → video core �
 <hr />
 <h2 id="phase-1-foundation-3-days">Phase 1: Foundation (3 days)<a class="headerlink" href="#phase-1-foundation-3-days" title="Permanent link">&para;</a></h2>
 <h3 id="task-1-initialize-vite-react-project">Task 1: Initialize Vite + React project<a class="headerlink" href="#task-1-initialize-vite-react-project" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- <code>webapp/</code> contains a working Vite + React 19 project
-- <code>npm run dev</code> starts local dev server
-- <code>npm run build</code> produces <code>webapp/dist/</code>
-- Old files (<code>js/</code>, <code>index.html</code>, <code>css/</code>) moved to <code>webapp/legacy/</code> (kept for reference, not deployed)</p>
-<p><strong>Steps:</strong>
-1. Run <code>npm create vite@latest . -- --template react</code> inside <code>webapp/</code>
-2. Install dependencies: <code>npm install react-router-dom @tanstack/react-query react-bootstrap bootstrap react-swipeable @fortawesome/react-fontawesome @fortawesome/free-solid-svg-icons @fortawesome/free-brands-svg-icons</code>
-3. Install dev deps: <code>npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom</code>
-4. Create project structure (see below)
-5. Move legacy files: <code>mkdir legacy &amp;&amp; mv index.html js/ css/ manifest.json legacy/</code>
-6. Copy <code>manifest.json</code> to <code>public/manifest.json</code>
-7. Copy icons to <code>public/icons/</code></p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li><code>webapp/</code> contains a working Vite + React 19 project</li>
+<li><code>npm run dev</code> starts local dev server</li>
+<li><code>npm run build</code> produces <code>webapp/dist/</code></li>
+<li>Old files (<code>js/</code>, <code>index.html</code>, <code>css/</code>) moved to <code>webapp/legacy/</code> (kept for reference, not deployed)</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Run <code>npm create vite@latest . -- --template react</code> inside <code>webapp/</code></li>
+<li>Install dependencies: <code>npm install react-router-dom @tanstack/react-query react-bootstrap bootstrap react-swipeable @fortawesome/react-fontawesome @fortawesome/free-solid-svg-icons @fortawesome/free-brands-svg-icons</code></li>
+<li>Install dev deps: <code>npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom</code></li>
+<li>Create project structure (see below)</li>
+<li>Move legacy files: <code>mkdir legacy &amp;&amp; mv index.html js/ css/ manifest.json legacy/</code></li>
+<li>Copy <code>manifest.json</code> to <code>public/manifest.json</code></li>
+<li>Copy icons to <code>public/icons/</code></li>
+</ol>
 <p><strong>Project structure:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>webapp/
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── public/
@@ -7910,213 +7914,273 @@ Migration follows a bottom-up approach: infrastructure → auth → video core �
 </code></pre></div></p>
 <hr />
 <h3 id="task-2-api-client-layer">Task 2: API client layer<a class="headerlink" href="#task-2-api-client-layer" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- All 14 API endpoints implemented as async functions
-- JWT + guestToken headers injected automatically
-- Error shape normalized: <code>{ message, status }</code> on failure
-- <code>REACT_APP_API_BASE_URL</code> (or <code>VITE_API_BASE_URL</code>) used for base URL</p>
-<p><strong>Steps:</strong>
-1. Create <code>src/api/client.js</code> — base Fetch wrapper with auth headers
-2. Create <code>src/api/auth.js</code> — join, me, verifyMagic, mfa/setup/verify/enable/disable
-3. Create <code>src/api/videos.js</code> — list, privateList, share, delete
-4. Create <code>src/api/comments.js</code> — list, post, delete
-5. Create <code>src/api/guestToken.js</code> — guest token management</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>All 14 API endpoints implemented as async functions</li>
+<li>JWT + guestToken headers injected automatically</li>
+<li>Error shape normalized: <code>{ message, status }</code> on failure</li>
+<li><code>REACT_APP_API_BASE_URL</code> (or <code>VITE_API_BASE_URL</code>) used for base URL</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Create <code>src/api/client.js</code> — base Fetch wrapper with auth headers</li>
+<li>Create <code>src/api/auth.js</code> — join, me, verifyMagic, mfa/setup/verify/enable/disable</li>
+<li>Create <code>src/api/videos.js</code> — list, privateList, share, delete</li>
+<li>Create <code>src/api/comments.js</code> — list, post, delete</li>
+<li>Create <code>src/api/guestToken.js</code> — guest token management</li>
+</ol>
 <p><strong>Key implementation note:</strong> Replace <code>$.ajaxSetup()</code> global headers with a <code>createHeaders()</code> util that reads from <code>localStorage</code> each call (mirrors current behavior).</p>
 <hr />
 <h3 id="task-3-environment-config">Task 3: Environment config<a class="headerlink" href="#task-3-environment-config" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- <code>VITE_API_BASE_URL</code> sets API base URL
-- <code>.env.local</code> for local dev (points to <code>http://localhost:8081/v1/funny-app</code>)
-- Production uses <code>https://canh-labs.com/api/v1/funny-app</code></p>
-<p><strong>Steps:</strong>
-1. Create <code>webapp/.env.example</code> with <code>VITE_API_BASE_URL=...</code>
-2. Create <code>webapp/.env.local</code> for local dev (gitignored)
-3. Update <code>vite.config.js</code> — no proxy needed (CORS handled by Spring Boot)</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li><code>VITE_API_BASE_URL</code> sets API base URL</li>
+<li><code>.env.local</code> for local dev (points to <code>http://localhost:8081/v1/funny-app</code>)</li>
+<li>Production uses <code>https://canh-labs.com/api/v1/funny-app</code></li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Create <code>webapp/.env.example</code> with <code>VITE_API_BASE_URL=...</code></li>
+<li>Create <code>webapp/.env.local</code> for local dev (gitignored)</li>
+<li>Update <code>vite.config.js</code> — no proxy needed (CORS handled by Spring Boot)</li>
+</ol>
 <hr />
 <h2 id="phase-2-auth-module-3-days">Phase 2: Auth Module (3 days)<a class="headerlink" href="#phase-2-auth-module-3-days" title="Permanent link">&para;</a></h2>
 <h3 id="task-4-authcontext-useauth-hook">Task 4: AuthContext + useAuth hook<a class="headerlink" href="#task-4-authcontext-useauth-hook" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- JWT, user, guestToken stored in/read from localStorage
-- <code>useAuth()</code> provides: <code>{ user, isLoggedIn, login, logout, setGuestToken }</code>
-- Session validation on app mount (calls <code>GET /user/me</code>)
-- All components read auth via <code>useAuth()</code> — no direct localStorage reads</p>
-<p><strong>Steps:</strong>
-1. Create <code>src/contexts/AuthContext.jsx</code>
-2. <code>AuthProvider</code> wraps app, initializes state from localStorage
-3. <code>useEffect</code> on mount: validate JWT via <code>GET /user/me</code>; clear if invalid
-4. Expose: <code>login(jwt, user)</code>, <code>logout()</code>, <code>setGuestToken(token)</code>, <code>user</code>, <code>isLoggedIn</code>
-5. Create <code>src/hooks/useAuth.js</code> consuming context</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>JWT, user, guestToken stored in/read from localStorage</li>
+<li><code>useAuth()</code> provides: <code>{ user, isLoggedIn, login, logout, setGuestToken }</code></li>
+<li>Session validation on app mount (calls <code>GET /user/me</code>)</li>
+<li>All components read auth via <code>useAuth()</code> — no direct localStorage reads</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Create <code>src/contexts/AuthContext.jsx</code></li>
+<li><code>AuthProvider</code> wraps app, initializes state from localStorage</li>
+<li><code>useEffect</code> on mount: validate JWT via <code>GET /user/me</code>; clear if invalid</li>
+<li>Expose: <code>login(jwt, user)</code>, <code>logout()</code>, <code>setGuestToken(token)</code>, <code>user</code>, <code>isLoggedIn</code></li>
+<li>Create <code>src/hooks/useAuth.js</code> consuming context</li>
+</ol>
 <hr />
 <h3 id="task-5-loginform-component">Task 5: LoginForm component<a class="headerlink" href="#task-5-loginform-component" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- Email input → POST /user/join
-- Handles <code>INVITED_SEND</code> status (shows "check email" message)
-- Handles <code>MFA_REQUIRED</code> status (opens MFA modal)
-- Loading spinner during request
-- Error message display</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Email input → POST /user/join</li>
+<li>Handles <code>INVITED_SEND</code> status (shows "check email" message)</li>
+<li>Handles <code>MFA_REQUIRED</code> status (opens MFA modal)</li>
+<li>Loading spinner during request</li>
+<li>Error message display</li>
+</ul>
 <p><strong>Component:</strong> <code>src/components/auth/LoginForm.jsx</code></p>
 <hr />
 <h3 id="task-6-magiclink-handler">Task 6: MagicLink handler<a class="headerlink" href="#task-6-magiclink-handler" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- On app load, check <code>?token=</code> URL param
-- If present, call <code>GET /user/verify-magic?token=&lt;token&gt;</code>
-- On success: store JWT + user, redirect to <code>/</code>
-- On failure: show error message</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>On app load, check <code>?token=</code> URL param</li>
+<li>If present, call <code>GET /user/verify-magic?token=&lt;token&gt;</code></li>
+<li>On success: store JWT + user, redirect to <code>/</code></li>
+<li>On failure: show error message</li>
+</ul>
 <p><strong>Component:</strong> <code>src/components/auth/MagicLinkHandler.jsx</code> (rendered at route <code>/</code>)</p>
 <hr />
 <h3 id="task-7-mfa-modal-profile-modal">Task 7: MFA modal + Profile modal<a class="headerlink" href="#task-7-mfa-modal-profile-modal" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- <strong>MFA Login Modal</strong>: OTP input → POST /user/mfa/verify → login on success
-- <strong>Profile Modal</strong> tabs:
-  - User Info tab: email, member since, last login (read-only)
-  - MFA Setup tab: show QR code, verify code to enable, or disable with code
-- All existing form validation behavior preserved</p>
-<p><strong>Components:</strong>
-- <code>src/components/auth/MFALoginModal.jsx</code>
-- <code>src/components/auth/ProfileModal.jsx</code></p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li><strong>MFA Login Modal</strong>: OTP input → POST /user/mfa/verify → login on success</li>
+<li><strong>Profile Modal</strong> tabs:<ul>
+<li>User Info tab: email, member since, last login (read-only)</li>
+<li>MFA Setup tab: show QR code, verify code to enable, or disable with code</li>
+</ul>
+</li>
+<li>All existing form validation behavior preserved</li>
+</ul>
+<p><strong>Components:</strong></p>
+<ul>
+<li><code>src/components/auth/MFALoginModal.jsx</code></li>
+<li><code>src/components/auth/ProfileModal.jsx</code></li>
+</ul>
 <hr />
 <h2 id="phase-3-video-core-4-days">Phase 3: Video Core (4 days)<a class="headerlink" href="#phase-3-video-core-4-days" title="Permanent link">&para;</a></h2>
 <h3 id="task-8-video-model-category-classifier">Task 8: Video model + category classifier<a class="headerlink" href="#task-8-video-model-category-classifier" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- <code>Video</code> class with same <code>determineCategory()</code> logic (keyword matching: funny/regular)
-- <code>useVideos(category)</code> hook: React Query query for <code>GET /video-stream/list</code>
-- <code>usePrivateVideos()</code> hook: React Query query for <code>GET /private-videos</code> (auth required)
-- Videos sorted by upvotes (matching current <code>sort</code> logic)</p>
-<p><strong>Files:</strong>
-- <code>src/utils/videoModel.js</code> — Video class + category logic
-- <code>src/hooks/useVideos.js</code> — React Query wrappers</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li><code>Video</code> class with same <code>determineCategory()</code> logic (keyword matching: funny/regular)</li>
+<li><code>useVideos(category)</code> hook: React Query query for <code>GET /video-stream/list</code></li>
+<li><code>usePrivateVideos()</code> hook: React Query query for <code>GET /private-videos</code> (auth required)</li>
+<li>Videos sorted by upvotes (matching current <code>sort</code> logic)</li>
+</ul>
+<p><strong>Files:</strong></p>
+<ul>
+<li><code>src/utils/videoModel.js</code> — Video class + category logic</li>
+<li><code>src/hooks/useVideos.js</code> — React Query wrappers</li>
+</ul>
 <hr />
 <h3 id="task-9-videoplayer-component">Task 9: VideoPlayer component<a class="headerlink" href="#task-9-videoplayer-component" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- HTML5 <code>&lt;video&gt;</code> with <code>autoPlay</code>, <code>playsInline</code>, <code>preload="auto"</code>
-- Controls: play/pause toggle, mute toggle, progress bar (seekable)
-- Loading spinner shown on <code>loadstart</code>/<code>waiting</code> events, hidden on <code>canplay</code>
-- Center play icon shown when paused
-- Expandable description overlay with "See more" toggle
-- Video ends → callback to advance to next</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>HTML5 <code>&lt;video&gt;</code> with <code>autoPlay</code>, <code>playsInline</code>, <code>preload="auto"</code></li>
+<li>Controls: play/pause toggle, mute toggle, progress bar (seekable)</li>
+<li>Loading spinner shown on <code>loadstart</code>/<code>waiting</code> events, hidden on <code>canplay</code></li>
+<li>Center play icon shown when paused</li>
+<li>Expandable description overlay with "See more" toggle</li>
+<li>Video ends → callback to advance to next</li>
+</ul>
 <p><strong>Component:</strong> <code>src/components/video/VideoPlayer.jsx</code>
 <strong>Key:</strong> Use <code>useRef</code> for video element — do NOT use React state for video playback controls (causes rerenders/flicker)</p>
 <hr />
 <h3 id="task-10-videoswiper-component">Task 10: VideoSwiper component<a class="headerlink" href="#task-10-videoswiper-component" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- Displays current video (index-based)
-- Left/right swipe navigation via <code>react-swipeable</code>
-- Keyboard left/right arrow navigation
-- Navigation feedback animation (flash left/right)
-- Touch events don't conflict with video controls
-- Auto-advance on video end</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Displays current video (index-based)</li>
+<li>Left/right swipe navigation via <code>react-swipeable</code></li>
+<li>Keyboard left/right arrow navigation</li>
+<li>Navigation feedback animation (flash left/right)</li>
+<li>Touch events don't conflict with video controls</li>
+<li>Auto-advance on video end</li>
+</ul>
 <p><strong>Component:</strong> <code>src/components/video/VideoSwiper.jsx</code>
 <strong>Key:</strong> Maintain <code>currentIndex</code> in React state; video array from <code>useVideos()</code> hook</p>
 <hr />
 <h3 id="task-11-votebuttons-component">Task 11: VoteButtons component<a class="headerlink" href="#task-11-votebuttons-component" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- Up vote / down vote buttons
-- Visual state: active/inactive icon toggle (matching current <code>fa-thumbs-up</code> logic)
-- Vote state persisted per video in component state (resets on unmount)
-- <code>POST /video/like</code> and <code>POST /video/unlike</code> on click</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Up vote / down vote buttons</li>
+<li>Visual state: active/inactive icon toggle (matching current <code>fa-thumbs-up</code> logic)</li>
+<li>Vote state persisted per video in component state (resets on unmount)</li>
+<li><code>POST /video/like</code> and <code>POST /video/unlike</code> on click</li>
+</ul>
 <p><strong>Component:</strong> <code>src/components/video/VoteButtons.jsx</code></p>
 <hr />
 <h3 id="task-12-videotabs-videofeed">Task 12: VideoTabs + VideoFeed<a class="headerlink" href="#task-12-videotabs-videofeed" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- Three tabs: Popular, Funny, Private
-- Private tab hidden unless <code>isLoggedIn</code>
-- Clicking Private tab loads private videos (lazy load on tab click)
-- Each tab has its own <code>VideoSwiper</code> with independent index state</p>
-<p><strong>Components:</strong>
-- <code>src/components/layout/VideoTabs.jsx</code>
-- <code>src/components/video/VideoFeed.jsx</code></p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Three tabs: Popular, Funny, Private</li>
+<li>Private tab hidden unless <code>isLoggedIn</code></li>
+<li>Clicking Private tab loads private videos (lazy load on tab click)</li>
+<li>Each tab has its own <code>VideoSwiper</code> with independent index state</li>
+</ul>
+<p><strong>Components:</strong></p>
+<ul>
+<li><code>src/components/layout/VideoTabs.jsx</code></li>
+<li><code>src/components/video/VideoFeed.jsx</code></li>
+</ul>
 <hr />
 <h2 id="phase-4-social-features-2-days">Phase 4: Social Features (2 days)<a class="headerlink" href="#phase-4-social-features-2-days" title="Permanent link">&para;</a></h2>
 <h3 id="task-13-commentpanel-component">Task 13: CommentPanel component<a class="headerlink" href="#task-13-commentpanel-component" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- Slides in from right (CSS animation matching current <code>slideInRight</code>)
-- Loads comments via <code>GET /videos/{id}/comments</code>
-- Displays avatar (initials + hashCode color, same logic as current)
-- Comment time formatting (relative, matching current <code>formatCommentTime</code>)
-- Post comment via <code>POST /videos/{id}/comments</code>
-- Delete own comment (DELETE with confirmation)
-- Enter key sends comment
-- Mobile keyboard avoidance (panel repositions when virtual keyboard appears)
-- Comment badge count on video action button</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Slides in from right (CSS animation matching current <code>slideInRight</code>)</li>
+<li>Loads comments via <code>GET /videos/{id}/comments</code></li>
+<li>Displays avatar (initials + hashCode color, same logic as current)</li>
+<li>Comment time formatting (relative, matching current <code>formatCommentTime</code>)</li>
+<li>Post comment via <code>POST /videos/{id}/comments</code></li>
+<li>Delete own comment (DELETE with confirmation)</li>
+<li>Enter key sends comment</li>
+<li>Mobile keyboard avoidance (panel repositions when virtual keyboard appears)</li>
+<li>Comment badge count on video action button</li>
+</ul>
 <p><strong>Component:</strong> <code>src/components/comments/CommentPanel.jsx</code></p>
 <hr />
 <h3 id="task-14-sharemodal-component">Task 14: ShareModal component<a class="headerlink" href="#task-14-sharemodal-component" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- YouTube URL input, title, description, private checkbox
-- POST /share-links on submit
-- Loading spinner during submit
-- Clears form on modal close
-- Success: closes modal, new video appears in feed (React Query invalidation)</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>YouTube URL input, title, description, private checkbox</li>
+<li>POST /share-links on submit</li>
+<li>Loading spinner during submit</li>
+<li>Clears form on modal close</li>
+<li>Success: closes modal, new video appears in feed (React Query invalidation)</li>
+</ul>
 <p><strong>Component:</strong> <code>src/components/modals/ShareModal.jsx</code></p>
 <hr />
 <h3 id="task-15-deleteconfirmmodal-component">Task 15: DeleteConfirmModal component<a class="headerlink" href="#task-15-deleteconfirmmodal-component" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- "Are you sure?" confirmation
-- DELETE /share-links/{id} on confirm
-- On success: remove video from UI (React Query mutation)</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>"Are you sure?" confirmation</li>
+<li>DELETE /share-links/{id} on confirm</li>
+<li>On success: remove video from UI (React Query mutation)</li>
+</ul>
 <p><strong>Component:</strong> <code>src/components/modals/DeleteConfirmModal.jsx</code></p>
 <hr />
 <h2 id="phase-5-layout-theme-15-days">Phase 5: Layout &amp; Theme (1.5 days)<a class="headerlink" href="#phase-5-layout-theme-15-days" title="Permanent link">&para;</a></h2>
 <h3 id="task-16-themecontext-usetheme-hook">Task 16: ThemeContext + useTheme hook<a class="headerlink" href="#task-16-themecontext-usetheme-hook" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- Dark/light theme toggle
-- Persists to localStorage
-- Reads OS preference (<code>prefers-color-scheme</code>) as fallback
-- Sets <code>data-theme</code> attribute on <code>&lt;html&gt;</code> (same as current)
-- Moon/sun icon toggle</p>
-<p><strong>Files:</strong>
-- <code>src/contexts/ThemeContext.jsx</code>
-- <code>src/hooks/useTheme.js</code></p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Dark/light theme toggle</li>
+<li>Persists to localStorage</li>
+<li>Reads OS preference (<code>prefers-color-scheme</code>) as fallback</li>
+<li>Sets <code>data-theme</code> attribute on <code>&lt;html&gt;</code> (same as current)</li>
+<li>Moon/sun icon toggle</li>
+</ul>
+<p><strong>Files:</strong></p>
+<ul>
+<li><code>src/contexts/ThemeContext.jsx</code></li>
+<li><code>src/hooks/useTheme.js</code></li>
+</ul>
 <hr />
 <h3 id="task-17-appshell-header-layout">Task 17: AppShell (Header + Layout)<a class="headerlink" href="#task-17-appshell-header-layout" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- App title + icon
-- Global message banner (<code>showMessage</code> equivalent)
-- Email input + Login button (shown when not logged in)
-- Share button, Profile button, Logout button (shown when logged in)
-- Welcome message with email
-- Theme toggle button (top-right)
-- VideoTabs below header</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>App title + icon</li>
+<li>Global message banner (<code>showMessage</code> equivalent)</li>
+<li>Email input + Login button (shown when not logged in)</li>
+<li>Share button, Profile button, Logout button (shown when logged in)</li>
+<li>Welcome message with email</li>
+<li>Theme toggle button (top-right)</li>
+<li>VideoTabs below header</li>
+</ul>
 <p><strong>Component:</strong> <code>src/components/layout/AppShell.jsx</code></p>
 <hr />
 <h2 id="phase-6-cicd-update-1-day">Phase 6: CI/CD Update (1 day)<a class="headerlink" href="#phase-6-cicd-update-1-day" title="Permanent link">&para;</a></h2>
 <h3 id="task-18-update-deploy-webyml">Task 18: Update deploy-web.yml<a class="headerlink" href="#task-18-update-deploy-webyml" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- Workflow installs Node.js 20
-- Runs <code>npm ci</code> in <code>webapp/</code>
-- Runs <code>npm run build</code> in <code>webapp/</code>
-- SCPs <code>webapp/dist/</code> to server (not <code>webapp/</code>)
-- Server receives deployable static files in Nginx document root</p>
-<p><strong>Changes to <code>.github/workflows/deploy-web.yml</code>:</strong>
-1. Add step: <code>actions/setup-node@v4</code> with Node.js 20
-2. Add step: <code>npm ci</code> in <code>webapp/</code>
-3. Add step: <code>npm run build</code> in <code>webapp/</code>
-4. Update SCP source from <code>webapp/</code> to <code>webapp/dist/</code></p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>Workflow installs Node.js 20</li>
+<li>Runs <code>npm ci</code> in <code>webapp/</code></li>
+<li>Runs <code>npm run build</code> in <code>webapp/</code></li>
+<li>SCPs <code>webapp/dist/</code> to server (not <code>webapp/</code>)</li>
+<li>Server receives deployable static files in Nginx document root</li>
+</ul>
+<p><strong>Changes to <code>.github/workflows/deploy-web.yml</code>:</strong></p>
+<ol>
+<li>Add step: <code>actions/setup-node@v4</code> with Node.js 20</li>
+<li>Add step: <code>npm ci</code> in <code>webapp/</code></li>
+<li>Add step: <code>npm run build</code> in <code>webapp/</code></li>
+<li>Update SCP source from <code>webapp/</code> to <code>webapp/dist/</code></li>
+</ol>
 <hr />
 <h3 id="task-19-nginx-spa-routing">Task 19: Nginx SPA routing<a class="headerlink" href="#task-19-nginx-spa-routing" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- <code>try_files $uri $uri/ /index.html</code> configured for React Router
-- No 404 on page refresh with client-side routes</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li><code>try_files $uri $uri/ /index.html</code> configured for React Router</li>
+<li>No 404 on page refresh with client-side routes</li>
+</ul>
 <p><strong>Note:</strong> Verify with ops team if Nginx config needs updating on server; may be out of scope for this PR.</p>
 <hr />
 <h2 id="phase-7-testing-qa-2-days">Phase 7: Testing &amp; QA (2 days)<a class="headerlink" href="#phase-7-testing-qa-2-days" title="Permanent link">&para;</a></h2>
 <h3 id="task-20-unit-tests-for-auth-flows">Task 20: Unit tests for auth flows<a class="headerlink" href="#task-20-unit-tests-for-auth-flows" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- AuthContext: login, logout, session restoration
-- MagicLink handler: token extraction + API call
-- API client: header injection, error normalization</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>AuthContext: login, logout, session restoration</li>
+<li>MagicLink handler: token extraction + API call</li>
+<li>API client: header injection, error normalization</li>
+</ul>
 <hr />
 <h3 id="task-21-unit-tests-for-video-components">Task 21: Unit tests for video components<a class="headerlink" href="#task-21-unit-tests-for-video-components" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- VideoPlayer: play/pause/mute controls
-- VideoSwiper: left/right navigation, auto-advance
-- VoteButtons: toggle state, API calls</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>VideoPlayer: play/pause/mute controls</li>
+<li>VideoSwiper: left/right navigation, auto-advance</li>
+<li>VoteButtons: toggle state, API calls</li>
+</ul>
 <hr />
 <h3 id="task-22-integration-smoke-tests">Task 22: Integration smoke tests<a class="headerlink" href="#task-22-integration-smoke-tests" title="Permanent link">&para;</a></h3>
-<p><strong>Acceptance criteria:</strong>
-- App renders without errors
-- Tab switching shows correct content
-- Share modal opens/closes/clears</p>
+<p><strong>Acceptance criteria:</strong></p>
+<ul>
+<li>App renders without errors</li>
+<li>Tab switching shows correct content</li>
+<li>Share modal opens/closes/clears</li>
+</ul>
 <hr />
 <h2 id="task-dependency-graph">Task Dependency Graph<a class="headerlink" href="#task-dependency-graph" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>T1 (Vite setup)

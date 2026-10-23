@@ -7424,13 +7424,15 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <li>[ ] Migration <code>api/src/main/resources/db/changelog/sql/202610030001-create-notifications.sql</code> (schema from ADR-0017: table, <code>idx_notifications_user_unread</code>, partial unique <code>uq_notifications_unread_group</code>, <code>idx_notifications_digest</code>)</li>
 <li>[ ] <code>enums/NotificationType</code> (<code>COMMENT_REPLY</code>, <code>COMMENT_REMOVED</code>)</li>
 <li>[ ] <code>entity/Notification</code> (<code>payload</code> as <code>@JdbcTypeCode(SqlTypes.JSON) Map&lt;String,Object&gt;</code>)</li>
-<li>[ ] <code>repo/NotificationRepository</code></li>
+<li>[ ] <code>repo/NotificationRepository</code><ul>
 <li><code>Page&lt;Notification&gt; findByUserIdOrderByUpdatedAtDesc(Long, Pageable)</code></li>
 <li><code>long countByUserIdAndReadAtIsNull(Long)</code></li>
 <li><code>Optional&lt;Notification&gt; findByIdAndUserId(UUID, Long)</code> (owner-scoped)</li>
 <li><code>@Modifying int markAllRead(Long userId, Instant now)</code></li>
 <li>native <code>upsertGrouped(...)</code> — <code>INSERT … ON CONFLICT (user_id, group_key) WHERE read_at IS NULL DO UPDATE SET actor_count = notifications.actor_count + 1, actor_display = EXCLUDED.actor_display, payload = EXCLUDED.payload, comment_id = EXCLUDED.comment_id, updated_at = now(), emailed_at = NULL</code></li>
 <li><code>@Modifying int deleteReadOlderThan(Instant)</code></li>
+</ul>
+</li>
 <li>[ ] <code>UserSettingsRepository.findByUserId(Long)</code></li>
 </ul>
 <p><strong>AC:</strong> migration applies; repo methods covered by unit tests (Mockito) — native SQL reviewed manually.</p>
@@ -7438,12 +7440,14 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <ul>
 <li>[ ] Events (records): <code>CommentRepliedEvent(videoId, rootId, parentId, commentId, actorEmail, snippet)</code>, <code>CommentRemovedEvent(List&lt;RemovedComment(commentId, videoId, authorEmail)&gt;, reason)</code></li>
 <li>[ ] Publish from <code>VideoCommentServiceImpl.createComment</code> (only when <code>parentId</code> present; capture <em>original</em> parent before root normalization) and <code>AdminCommentServiceImpl.moderate/bulkModerate</code> (only comments that actually changed to REMOVED)</li>
-<li>[ ] <code>NotificationEventListener</code> — <code>@TransactionalEventListener(AFTER_COMMIT)</code> + <code>@Async</code></li>
+<li>[ ] <code>NotificationEventListener</code> — <code>@TransactionalEventListener(AFTER_COMMIT)</code> + <code>@Async</code><ul>
 <li>Reply recipients = {root author, original-parent author} − actor − guests (<code>userId</code> blank) − unknown/deactivated users</li>
 <li><code>group_key = "REPLY:" + rootId</code>; <code>REMOVED:</code> + commentId</li>
 <li><code>actor_display</code> = email local part; snippet ≤ 140 chars, whitespace-collapsed</li>
 <li>After write → <code>NotificationPublisher.unreadChanged(userId)</code></li>
 <li>All exceptions caught and logged (never propagate)</li>
+</ul>
+</li>
 <li>[ ] Verify async executor uses virtual threads (log <code>Thread.currentThread().isVirtual()</code> in a test or add <code>@Bean(name = "applicationTaskExecutor")</code> with <code>Executors.newVirtualThreadPerTaskExecutor()</code>)</li>
 <li>[ ] Tests: recipients (actor excluded, guest excluded, same person root+parent → one row), grouping calls upsert with same key, removed event per changed comment only, listener swallows errors, nothing published when reply validation fails</li>
 </ul>
@@ -7457,11 +7461,13 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 </ul>
 <h3 id="phase-4-sse-1-d-nt-4-after-nt-3">Phase 4 — SSE (1 d) — <code>NT-4</code> (after NT-3)<a class="headerlink" href="#phase-4-sse-1-d-nt-4-after-nt-3" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <code>service/notification/NotificationPublisher</code> interface; <code>InMemorySsePublisher</code> (<code>ConcurrentHashMap&lt;Long, CopyOnWriteArrayList&lt;SseEmitter&gt;&gt;</code>, no <code>synchronized</code>)</li>
+<li>[ ] <code>service/notification/NotificationPublisher</code> interface; <code>InMemorySsePublisher</code> (<code>ConcurrentHashMap&lt;Long, CopyOnWriteArrayList&lt;SseEmitter&gt;&gt;</code>, no <code>synchronized</code>)<ul>
 <li><code>register(userId)</code>: new <code>SseEmitter(30 min)</code>; cap 5 per user (complete oldest); remove on completion/timeout/error</li>
 <li><code>unreadChanged(userId)</code>: compute count once, send <code>event: unread</code> <code>data: {"unread": n}</code> to each emitter; drop failed emitters</li>
 <li>Heartbeat <code>@Scheduled(fixedRate = 25 s)</code>: send comment <code>ping</code> to all emitters</li>
 <li>Gauge <code>notifications_sse_active_connections</code></li>
+</ul>
+</li>
 <li>[ ] <code>GET /notifications/stream</code> (<code>produces = text/event-stream</code>), headers <code>Cache-Control: no-cache</code>, <code>X-Accel-Buffering: no</code>; sends current unread on connect</li>
 <li>[ ] Tests: register/send/remove-on-error, cap 5, heartbeat, gauge value, controller returns 401 without header (via real <code>JWTAuthenticationFilter</code>, like <code>VideoReactionControllerTest</code>)</li>
 </ul>
@@ -7477,13 +7483,17 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <ul>
 <li>[ ] <code>src/api/notifications.js</code>: <code>list(page)</code>, <code>unreadCount()</code>, <code>markRead(id)</code>, <code>markAllRead()</code></li>
 <li>[ ] <code>src/api/sseStream.js</code>: <code>openStream({ path, headers, onEvent, signal })</code> — <code>fetch</code> + <code>TextDecoderStream</code>, buffer split on blank line, parse <code>event:</code>/<code>data:</code>, ignore <code>:</code> comments; returns on end; throws <code>{status}</code> on non-2xx</li>
-<li>[ ] <code>src/hooks/useNotifications.js</code></li>
+<li>[ ] <code>src/hooks/useNotifications.js</code><ul>
 <li><code>useUnreadCount()</code> — key <code>['notifications','unread']</code>, <code>refetchOnWindowFocus: true</code>, <code>refetchInterval</code> 30 s when stream down / 120 s when up</li>
 <li><code>useNotificationList(page)</code>, <code>useMarkRead()</code>, <code>useMarkAllRead()</code> (optimistic badge decrement)</li>
 <li><code>useNotificationStream()</code> — mounted once in <code>AppShell</code> when logged in; <code>AbortController</code> on logout/unmount; backoff 1 s → 30 s + 1–5 s jitter; stop on 401; on <code>unread</code> → <code>setQueryData</code> + invalidate list</li>
-<li>[ ] <code>components/notifications/NotificationBell.jsx</code> (badge, 9+ cap, <code>aria-label</code>), <code>NotificationDropdown.jsx</code> (latest 10, empty state, mark all, Esc/outside click closes), item text per type:</li>
+</ul>
+</li>
+<li>[ ] <code>components/notifications/NotificationBell.jsx</code> (badge, 9+ cap, <code>aria-label</code>), <code>NotificationDropdown.jsx</code> (latest 10, empty state, mark all, Esc/outside click closes), item text per type:<ul>
 <li><code>COMMENT_REPLY</code>: "<strong>bob</strong> đã trả lời bình luận của bạn" / "<strong>bob</strong> và N người khác đã trả lời…" + snippet</li>
 <li><code>COMMENT_REMOVED</code>: "Bình luận của bạn đã bị gỡ: {reason label}"</li>
+</ul>
+</li>
 <li>[ ] Deep link: item click → <code>markRead</code> → navigate <code>?v={videoId}&amp;c={commentId}</code>; <code>AppShell</code> reads <code>c</code> → opens <code>CommentPanel</code> → scroll to + highlight comment (<code>data-comment-id</code>), expand its thread</li>
 <li>[ ] Styles in <code>styles/index.css</code> (<code>.notif-bell</code>, <code>.notif-badge</code>, <code>.notif-dropdown</code>, <code>.notif-item.unread</code>, <code>.comment-highlight</code>)</li>
 <li>[ ] Tests: SSE parser (event split across chunks, multiple events in one chunk, comments ignored), stream hook reconnect + stop on 401 (fake timers), bell badge from stream event, dropdown render + mark all, deep link opens panel and highlights</li>

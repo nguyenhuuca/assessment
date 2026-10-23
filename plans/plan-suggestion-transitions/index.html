@@ -7053,12 +7053,14 @@ Handoff to: Builder
 <strong>Size:</strong> Small (a few hours). This plan is the only artifact.
 <strong>Hat:</strong> Refactoring only (<code>.claude/rules/code-quality.md</code> Two Hats Rule). Behavior stays the same, and the existing tests must pass <strong>without edits</strong>.</p>
 <h2 id="objective">Objective<a class="headerlink" href="#objective" title="Permanent link">&para;</a></h2>
-<p>Today the rule "which suggestion may move from which status to which" lives in five places:
-- <code>lockPending</code>;
-- <code>reopen</code>'s inline checks;
-- <code>requireRereviewable</code>;
-- <code>canReopen</code>;
-- the <code>canRequestRereview</code> expression in the DTO mapping.</p>
+<p>Today the rule "which suggestion may move from which status to which" lives in five places:</p>
+<ul>
+<li><code>lockPending</code>;</li>
+<li><code>reopen</code>'s inline checks;</li>
+<li><code>requireRereviewable</code>;</li>
+<li><code>canReopen</code>;</li>
+<li>the <code>canRequestRereview</code> expression in the DTO mapping.</li>
+</ul>
 <p>Move these rules into <strong>one</strong> type, so the service, the DTO flags and the tests all read the same table. The concurrency guards stay where they are: the row locks, the conditional UPDATE and the partial unique index handle races, not business rules.</p>
 <h2 id="verified-facts-read-2026-10-19-serviceimplvideosuggestionserviceimpljava-after-6c16388e">Verified Facts (read 2026-10-19, <code>service/impl/VideoSuggestionServiceImpl.java</code> after <code>6c16388e</code>)<a class="headerlink" href="#verified-facts-read-2026-10-19-serviceimplvideosuggestionserviceimpljava-after-6c16388e" title="Permanent link">&para;</a></h2>
 <table>
@@ -7115,14 +7117,18 @@ Handoff to: Builder
 </tr>
 </tbody>
 </table>
-<p>Duplicate and not-found checks (<code>requireNoDuplicate</code>, 404 4042) are <strong>not</strong> transition rules and stay in the service. These also <strong>stay unchanged</strong>, because they select data rather than allow a transition:
-- the <code>APPROVED &amp;&amp; importJobId != null</code> filters in <code>liveRefs</code> (<code>:324</code>) and <code>jobStatuses</code> (<code>:373</code>);
-- the APPROVED filter in <code>SuggestionNotificationListener.java:78</code>.</p>
+<p>Duplicate and not-found checks (<code>requireNoDuplicate</code>, 404 4042) are <strong>not</strong> transition rules and stay in the service. These also <strong>stay unchanged</strong>, because they select data rather than allow a transition:</p>
+<ul>
+<li>the <code>APPROVED &amp;&amp; importJobId != null</code> filters in <code>liveRefs</code> (<code>:324</code>) and <code>jobStatuses</code> (<code>:373</code>);</li>
+<li>the APPROVED filter in <code>SuggestionNotificationListener.java:78</code>.</li>
+</ul>
 <h2 id="design">Design<a class="headerlink" href="#design" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>D1 — <code>SuggestionTransition</code> enum</strong> in <code>enums/</code>, next to <code>SuggestionStatus</code>. Values: <code>APPROVE</code>, <code>REJECT</code>, <code>REOPEN</code>, <code>REREVIEW</code>. Each value implements:</li>
+<li><strong>D1 — <code>SuggestionTransition</code> enum</strong> in <code>enums/</code>, next to <code>SuggestionStatus</code>. Values: <code>APPROVE</code>, <code>REJECT</code>, <code>REOPEN</code>, <code>REREVIEW</code>. Each value implements:<ul>
 <li><code>Optional&lt;Refusal&gt; check(SuggestionStatus status, ImportStatus jobStatus, int rereviewCount)</code>. It is a pure function with no repository and no entity, so it can be unit-tested as a table.</li>
 <li><code>boolean allowed(...)</code>, which returns <code>check(...).isEmpty()</code>. The DTO flags use it.</li>
+</ul>
+</li>
 <li><strong>D2 — <code>Refusal</code></strong> is a nested record <code>SuggestionTransition.Refusal(HttpStatus status, int subCode, String messageKey)</code> in <code>enums/</code>. It is nested so that it does not need its own file. It carries today's exact codes and keys, The service turns it into an exception with one private helper, <code>refuse(Optional&lt;Refusal&gt;)</code>. The helper throws <code>error(r.status(), r.subCode(), r.messageKey())</code>, the same <code>error(...)</code> factory that builds today's <code>CustomException</code>.</li>
 <li><strong>D3 — Constants move with the rules.</strong> <code>MAX_REREVIEWS</code> and <code>REOPENABLE_JOB_STATUSES</code> become constants of <code>SuggestionTransition</code>. The service passes <code>SuggestionTransition.MAX_REREVIEWS</code> to the repository's conditional UPDATE. The DB guard and the rule then share one number.</li>
 <li><strong>D4 — The service keeps the order of operations.</strong> Lock the suggestion first. The service locks and reads the job row with <code>findLockedById</code> <strong>only when the status is APPROVED and <code>importJobId != null</code></strong>, exactly as at <code>:231-234</code>. PENDING, REJECTED and the non-owner paths never touch the job row. Then it runs <code>check</code>, then the duplicate check, then saves. Inside <code>REOPEN.check</code> the PENDING refusal (4095) comes before the job-status refusal (4096). The <code>canReopen</code> flag arguments at <code>:132/152/197/219/247</code> keep their current values. <code>list</code> uses <code>REOPEN.allowed</code>. Only the <code>if</code> blocks are replaced. Lock order, transactions, events and error codes stay the same.</li>

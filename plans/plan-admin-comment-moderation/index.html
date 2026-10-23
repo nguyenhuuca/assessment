@@ -7668,9 +7668,11 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <h3 id="phase-3-admin-api-1-day-cm-3-depends-on-cm-1">Phase 3 — Admin API (1 day) — <code>CM-3</code> (depends on CM-1)<a class="headerlink" href="#phase-3-admin-api-1-day-cm-3-depends-on-cm-1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>[ ] <code>dto/admin/AdminCommentDto</code>, <code>dto/admin/ModerateCommentRequest</code> (<code>@NotNull action</code>; reason required for REMOVE; note required for OTHER; <code>@Size(max=500)</code> note)</li>
-<li>[ ] <code>service/AdminCommentService</code> + <code>impl/AdminCommentServiceImpl</code></li>
+<li>[ ] <code>service/AdminCommentService</code> + <code>impl/AdminCommentServiceImpl</code><ul>
 <li><code>getComments(Pageable, CommentStatus, String q, String videoId)</code> — Specification + batch video-title lookup</li>
 <li><code>moderate(UUID id, ModerateCommentRequest)</code> — REMOVE sets status/reason/note/moderatedBy(=<code>AppUtils.getCurrentUser().getEmail()</code>)/moderatedAt; RESTORE sets <code>VISIBLE</code>, keeps last moderation fields for history; 404 unknown id; idempotent</li>
+</ul>
+</li>
 <li>[ ] <code>AdminController</code>: <code>GET /admin/comments</code>, <code>PATCH /admin/comments/{id}/moderation</code> with <code>@AuditLog("moderateComment")</code>, <code>@HasPermission(perm = Permission.ADMIN)</code></li>
 <li>[ ] <code>AdminStatsDto</code> + <code>getStats()</code>: add <code>removedComments</code>, <code>totalComments</code></li>
 <li>[ ] Tests: service (Mockito) — filters, remove, restore, validation (OTHER without note → 400), unknown id → 404; controller (<code>@WebMvcTest</code>) — 403 for non-admin, 200 for admin, paging params</li>
@@ -7681,10 +7683,12 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <ul>
 <li>[ ] <code>src/api/admin.js</code>: <code>getComments(params)</code>, <code>moderateComment(id, body)</code></li>
 <li>[ ] <code>src/hooks/useAdmin.js</code>: <code>useAdminComments(page, filters)</code> key <code>['admin','comments',page,status,q,videoId]</code>; <code>useModerateComment()</code> invalidates <code>['admin','comments']</code> + <code>['admin','stats']</code></li>
-<li>[ ] <code>components/admin/AdminCommentTable.jsx</code> (follow <code>AdminVideoTable</code> style, <code>SaveIndicator</code>, pagination)</li>
+<li>[ ] <code>components/admin/AdminCommentTable.jsx</code> (follow <code>AdminVideoTable</code> style, <code>SaveIndicator</code>, pagination)<ul>
 <li>Columns: COMMENT (2-line clamp, click to expand), AUTHOR (email or <code>Guest · AnonymousN</code>), VIDEO (title, id), CREATED, STATUS badge (+ reason, by, at on hover), ACTIONS</li>
 <li>Filters: status (<code>ALL / VISIBLE / REMOVED</code>), keyword search (debounced 300 ms)</li>
 <li>REMOVE opens small modal (<code>.app-modal</code>): reason select (policy table), note textarea (required for OTHER); RESTORE uses confirm</li>
+</ul>
+</li>
 <li>[ ] <code>AdminView.jsx</code>: add tab <code>{ key: 'COMMENTS', label: 'COMMENTS' }</code>; stat card <code>REMOVED_COMMENTS</code></li>
 <li>[ ] <code>components/comments/CommentPanel.jsx</code>: render placeholder for <code>removed: true</code> nodes (italic muted text, no delete button)</li>
 <li>[ ] <code>styles/index.css</code>: status badge <code>.admin-badge.removed</code> if missing</li>

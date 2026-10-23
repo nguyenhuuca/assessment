@@ -7029,14 +7029,16 @@ model: haiku</p>
 Agents are lightweight swarm workers spawned via Task tool.
 
 Required fields:
-  - name: lowercase, hyphens only, max 64 chars
-  - description: max 1024 chars, include "when to use" triggers
+
+    - name: lowercase, hyphens only, max 64 chars
+    - description: max 1024 chars, include "when to use" triggers
 
 Optional fields:
-  - tools: Comma-separated list (inherits all if omitted)
-  - model: haiku (fast), sonnet (balanced), opus (complex)
-  - permissionMode: default|acceptEdits|bypassPermissions|plan
-  - skills: Comma-separated skill names to auto-load
+
+    - tools: Comma-separated list (inherits all if omitted)
+    - model: haiku (fast), sonnet (balanced), opus (complex)
+    - permissionMode: default|acceptEdits|bypassPermissions|plan
+    - skills: Comma-separated skill names to auto-load
 
 NOTE: Agents use "tools:" not "allowed-tools:" (unlike commands)
 -->

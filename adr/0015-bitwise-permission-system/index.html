@@ -7519,18 +7519,24 @@
 </table>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Method-level, declarative, type-safe authorization: <code>@HasPermission(perm = Permission.ADMIN)</code>
-- Strictly additive — role guard untouched, flag-off = no behavior change
-- O(1), allocation-free permission check (single bitwise AND)
-- Permission set travels with the JWT principal; no extra DB read per check</p>
-<p><strong>Negative:</strong>
-- Capped at 32 permissions (acceptable headroom)
-- Two non-obvious Spring Security beans required to make the SpEL resolve — documented in <code>WebSecurityConfig</code> and <code>HasPermission</code> comments
-- New runtime dependency: <code>io.harness:ff-java-server-sdk</code></p>
-<p><strong>Risks:</strong>
-- Misaligned <code>bit_value</code> seed vs. <code>Permission</code> enum grants the wrong capabilities → mitigated: seed <code>code</code>/<code>bit_value</code> match the enum exactly; verified by acceptance criteria
-- Flag on with empty user permission bitmask (default 0) locks users out of newly-guarded endpoints → mitigated: default OFF; permissions must be seeded before enabling</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>Method-level, declarative, type-safe authorization: <code>@HasPermission(perm = Permission.ADMIN)</code></li>
+<li>Strictly additive — role guard untouched, flag-off = no behavior change</li>
+<li>O(1), allocation-free permission check (single bitwise AND)</li>
+<li>Permission set travels with the JWT principal; no extra DB read per check</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Capped at 32 permissions (acceptable headroom)</li>
+<li>Two non-obvious Spring Security beans required to make the SpEL resolve — documented in <code>WebSecurityConfig</code> and <code>HasPermission</code> comments</li>
+<li>New runtime dependency: <code>io.harness:ff-java-server-sdk</code></li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li>Misaligned <code>bit_value</code> seed vs. <code>Permission</code> enum grants the wrong capabilities → mitigated: seed <code>code</code>/<code>bit_value</code> match the enum exactly; verified by acceptance criteria</li>
+<li>Flag on with empty user permission bitmask (default 0) locks users out of newly-guarded endpoints → mitigated: default OFF; permissions must be seeded before enabling</li>
+</ul>
 <hr />
 <h2 id="schema-reference">Schema Reference<a class="headerlink" href="#schema-reference" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">-- Migration: db/changelog/sql/202605010001-init_permissions.sql</span>

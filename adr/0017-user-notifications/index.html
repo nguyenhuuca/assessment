@@ -7736,12 +7736,14 @@
 <ol>
 <li><strong>Storage:</strong> new table <code>notifications</code> (in-app inbox is the source of truth).</li>
 <li><strong>Producing:</strong> <strong>B2</strong> — Spring events, <code>@TransactionalEventListener(AFTER_COMMIT)</code> + <code>@Async</code> on the virtual-thread executor. Upgrade path to B3 (outbox) if delivery guarantees become required.</li>
-<li><strong>Delivery:</strong> <strong>A2 SSE with an in-memory emitter registry</strong> (<code>userId → emitters</code>, one user may have several tabs), emitting only <code>{"unread": n}</code> hints — the browser then fetches via REST. <strong>Polling stays as a fallback</strong> (React Query <code>refetchInterval</code> 120 s while SSE is connected, 30 s while it is down, plus on window focus), so a dropped stream or a restart never loses data, only latency.</li>
+<li><strong>Delivery:</strong> <strong>A2 SSE with an in-memory emitter registry</strong> (<code>userId → emitters</code>, one user may have several tabs), emitting only <code>{"unread": n}</code> hints — the browser then fetches via REST. <strong>Polling stays as a fallback</strong> (React Query <code>refetchInterval</code> 120 s while SSE is connected, 30 s while it is down, plus on window focus), so a dropped stream or a restart never loses data, only latency.<ul>
 <li>Push goes through an interface <code>NotificationPublisher { void unreadChanged(long userId); }</code>:
-     <code>InMemorySsePublisher</code> now; <code>PgNotifyPublisher</code> (LISTEN/NOTIFY) when a second instance appears; <code>RedisPublisher</code> only beyond that (ADR-0003). Swapping the implementation does not touch the API, table or FE.</li>
+      <code>InMemorySsePublisher</code> now; <code>PgNotifyPublisher</code> (LISTEN/NOTIFY) when a second instance appears; <code>RedisPublisher</code> only beyond that (ADR-0003). Swapping the implementation does not touch the API, table or FE.</li>
 <li>Auth (A′2): the browser opens the stream with <strong><code>fetch</code> + <code>Authorization</code> header</strong> and reads <code>response.body</code> as a stream; <strong>no token in the URL</strong>. The endpoint is a normal authenticated route (not in <code>ALLOW_ALL_METHOD</code> / <code>OPTIONAL_AUTH_PATH</code>), so the existing <code>JWTAuthenticationFilter</code> returns 401 without a valid JWT. <code>JwtProvider</code> does not expose <code>exp</code> (TTL 30 days), so instead of closing on expiry the emitter <strong>times out after 30 min</strong>; every reconnect re-runs the JWT filter, so an expired or revoked token is rejected within ≤ 30 min. The client reconnects with the current token (or stops after logout).</li>
 <li>Heartbeat comment every 25 s; emitter timeout 30 min (client auto-reconnects); per-user cap 5 connections (oldest closed).</li>
 <li>Deploy restarts the JVM → all streams drop; the client reconnects with exponential backoff (1 s → 30 s cap) plus 1–5 s jitter; on 401 it stops and waits for login. Hidden tabs keep the stream (cheap); <code>AbortController</code> closes it on logout/unmount.</li>
+</ul>
+</li>
 <li><strong>Email:</strong> <strong>C2 digest</strong> every 15 minutes, only for users with <code>notify_email = true</code>, only for unread notifications not yet emailed; at most one email per user per run.</li>
 <li><strong>Recipient resolution:</strong> comment <code>user_id</code> (email) → <code>users.id</code> via <code>UserRepo</code> at event-handling time; guests and deactivated users are skipped.</li>
 <li><strong>Grouping:</strong> multiple replies in the same thread for the same recipient while unread are <strong>collapsed</strong> into one row (<code>actor_count</code>, latest actor, <code>updated_at</code> bumped) — avoids a flood from busy threads.</li>
@@ -7951,22 +7953,28 @@
 </table>
 <p><strong>Email will hit limits first:</strong> Gmail SMTP allows roughly 500–2,000 messages/day. Once the digest exceeds that, move to a transactional provider (SES / SendGrid / Mailgun) behind the existing <code>MailService</code> interface.</p>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive</strong>
-- Activates the existing <code>notify_email</code> setting; users learn about replies and moderation.
-- Near-instant badge updates; idle users cost one idle connection instead of a request per minute.
-- Zero new infrastructure; transport is behind <code>NotificationPublisher</code>, so moving to more instances is a new implementation, not a redesign.
-- Event-driven producer keeps comment/admin code unaware of notifications.</p>
-<p><strong>Negative / trade-offs</strong>
-- SSE adds moving parts: hand-written stream parsing and reconnect/backoff in the FE (A′2), heartbeat, reconnect after each deploy.
-- In-memory registry is correct only while there is exactly one JVM; adding a second instance <strong>requires</strong> switching to <code>PgNotifyPublisher</code> (polling fallback keeps it correct-but-slow if forgotten).
-- Up to 15 min email latency (digest).
-- AFTER_COMMIT + <code>@Async</code> can drop a notification if the process crashes in between — accepted for v1.</p>
-<p><strong>Follow-ups</strong>
-- <code>PgNotifyPublisher</code> when a second instance is introduced.
-- v1.2: <code>video_sources.owner_user_id</code> to enable "your video got a comment/like".
-- <code>@mention</code> notifications once display names exist.
-- Outbox (B3) if guaranteed delivery becomes a requirement.
-- Transactional email provider when the digest volume approaches Gmail limits.</p>
+<p><strong>Positive</strong></p>
+<ul>
+<li>Activates the existing <code>notify_email</code> setting; users learn about replies and moderation.</li>
+<li>Near-instant badge updates; idle users cost one idle connection instead of a request per minute.</li>
+<li>Zero new infrastructure; transport is behind <code>NotificationPublisher</code>, so moving to more instances is a new implementation, not a redesign.</li>
+<li>Event-driven producer keeps comment/admin code unaware of notifications.</li>
+</ul>
+<p><strong>Negative / trade-offs</strong></p>
+<ul>
+<li>SSE adds moving parts: hand-written stream parsing and reconnect/backoff in the FE (A′2), heartbeat, reconnect after each deploy.</li>
+<li>In-memory registry is correct only while there is exactly one JVM; adding a second instance <strong>requires</strong> switching to <code>PgNotifyPublisher</code> (polling fallback keeps it correct-but-slow if forgotten).</li>
+<li>Up to 15 min email latency (digest).</li>
+<li>AFTER_COMMIT + <code>@Async</code> can drop a notification if the process crashes in between — accepted for v1.</li>
+</ul>
+<p><strong>Follow-ups</strong></p>
+<ul>
+<li><code>PgNotifyPublisher</code> when a second instance is introduced.</li>
+<li>v1.2: <code>video_sources.owner_user_id</code> to enable "your video got a comment/like".</li>
+<li><code>@mention</code> notifications once display names exist.</li>
+<li>Outbox (B3) if guaranteed delivery becomes a requirement.</li>
+<li>Transactional email provider when the digest volume approaches Gmail limits.</li>
+</ul>
 <h2 id="implementation-outline-for-swarm-plan">Implementation Outline (for /swarm-plan)<a class="headerlink" href="#implementation-outline-for-swarm-plan" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

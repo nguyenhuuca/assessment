@@ -7139,27 +7139,37 @@
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
 <p>The UI mixes the two languages. Navigation chrome is in English ("Home", "Library", "Settings"), while content labels are in Vietnamese ("Phát", "Xoá", "Xem sau").</p>
 <p>Survey of the codebase on 2026-10-14:</p>
-<p><strong>Frontend</strong>
-- About 40 non-test <code>.jsx</code> files contain roughly 230–280 hardcoded strings.
-- There is no i18n library. <code>index.html</code> hardcodes <code>lang="en"</code>.
-- Formatting is hardcoded too:
-  - <code>commentUtils.js</code> relative time is always English ("2m ago").
-  - <code>ExploreView</code> uses <code>Intl.NumberFormat('en')</code>.
-  - <code>"{n} video"</code> has no plural handling.
-- Notification titles are rendered on the frontend (<code>utils/notificationText.js</code>, in Vietnamese). The DB stores only a JSON payload, so no data migration is needed.
-- 21 test files assert on literal UI strings (about 60 assertions).</p>
-<p><strong>Backend</strong>
-- No <code>MessageSource</code> and no <code>LocaleResolver</code>; <code>Accept-Language</code> is ignored.
-- <code>CustomException</code> messages are free text, mostly English and some Vietnamese. <code>client.js</code> shows <code>error.message</code> directly.
-- Emails:
-  - The magic link email (<code>templates/email/invite.html</code> and its subject) is English only.
-  - The password-change email is built in code in Vietnamese (<code>PasswordLoginServiceImpl</code> ~L234–248).
-- The default collection name <code>"Xem sau"</code> is stored as data in <code>video_collections.name</code>.
-- <code>user_settings</code> exists (ADR-0016) but has no locale column.</p>
-<p>The owner chose (2026-10-14):
-- <code>react-i18next</code>.
-- Default language taken from the browser.
-- Scope covers user UI, API error messages, emails and the Admin pages.</p>
+<p><strong>Frontend</strong></p>
+<ul>
+<li>About 40 non-test <code>.jsx</code> files contain roughly 230–280 hardcoded strings.</li>
+<li>There is no i18n library. <code>index.html</code> hardcodes <code>lang="en"</code>.</li>
+<li>Formatting is hardcoded too:<ul>
+<li><code>commentUtils.js</code> relative time is always English ("2m ago").</li>
+<li><code>ExploreView</code> uses <code>Intl.NumberFormat('en')</code>.</li>
+<li><code>"{n} video"</code> has no plural handling.</li>
+</ul>
+</li>
+<li>Notification titles are rendered on the frontend (<code>utils/notificationText.js</code>, in Vietnamese). The DB stores only a JSON payload, so no data migration is needed.</li>
+<li>21 test files assert on literal UI strings (about 60 assertions).</li>
+</ul>
+<p><strong>Backend</strong></p>
+<ul>
+<li>No <code>MessageSource</code> and no <code>LocaleResolver</code>; <code>Accept-Language</code> is ignored.</li>
+<li><code>CustomException</code> messages are free text, mostly English and some Vietnamese. <code>client.js</code> shows <code>error.message</code> directly.</li>
+<li>Emails:<ul>
+<li>The magic link email (<code>templates/email/invite.html</code> and its subject) is English only.</li>
+<li>The password-change email is built in code in Vietnamese (<code>PasswordLoginServiceImpl</code> ~L234–248).</li>
+</ul>
+</li>
+<li>The default collection name <code>"Xem sau"</code> is stored as data in <code>video_collections.name</code>.</li>
+<li><code>user_settings</code> exists (ADR-0016) but has no locale column.</li>
+</ul>
+<p>The owner chose (2026-10-14):</p>
+<ul>
+<li><code>react-i18next</code>.</li>
+<li>Default language taken from the browser.</li>
+<li>Scope covers user UI, API error messages, emails and the Admin pages.</li>
+</ul>
 <hr />
 <h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
 <ul>
@@ -7178,9 +7188,11 @@
 <li>There is no HTTP backend and no lazy loading. Both languages together are about 300 keys, a few KB gzipped.</li>
 <li>Plurals use i18next suffixes (<code>_one</code> / <code>_other</code>). Vietnamese uses <code>_other</code> only, per CLDR.</li>
 <li>Interpolation uses <code>{{name}}</code>. React already escapes output, so <code>escapeValue: false</code>.</li>
-<li>Dates, numbers and relative time use <code>Intl.*</code> with the current language:</li>
+<li>Dates, numbers and relative time use <code>Intl.*</code> with the current language:<ul>
 <li><code>Intl.RelativeTimeFormat</code> replaces the hand-written "2m ago".</li>
 <li><code>Intl.NumberFormat(lng, { notation: 'compact' })</code>.</li>
+</ul>
+</li>
 </ul>
 <p><strong>Rejected alternative: an in-house <code>useT()</code> hook.</strong> It has no dependency, but the owner preferred the standard library for plurals, detection and future languages.</p>
 <h3 id="d2-language-resolution-order-frontend">D2. Language resolution order (frontend)<a class="headerlink" href="#d2-language-resolution-order-frontend" title="Permanent link">&para;</a></h3>
@@ -7200,14 +7212,18 @@
 <h3 id="d4-backend-messages-messagesource-message-keys">D4. Backend messages: <code>MessageSource</code> + message keys<a class="headerlink" href="#d4-backend-messages-messagesource-message-keys" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Add <code>messages.properties</code> (English, the default) and <code>messages_vi.properties</code> in <code>src/main/resources/i18n/</code>, both UTF-8.</li>
-<li><code>CustomException</code> gains an optional <code>messageKey</code> and <code>args</code>.</li>
+<li><code>CustomException</code> gains an optional <code>messageKey</code> and <code>args</code>.<ul>
 <li><code>RestExceptionHandler</code> resolves the key with <code>LocaleContextHolder.getLocale()</code>.</li>
 <li>Without a key, the existing <code>message</code> is returned unchanged, so migration can be incremental.</li>
+</ul>
+</li>
 <li>Response shape: <code>ResultErrorInfo.message</code> is now localized. A new stable <code>code</code> field holds the message key, for clients and tests.</li>
-<li>Only messages users can see are migrated:</li>
+<li>Only messages users can see are migrated:<ul>
 <li>Validation, collection and comment errors.</li>
 <li>Auth and password errors (<code>PasswordPolicy</code> and <code>PasswordLoginServiceImpl</code> codes already exist).</li>
 <li>Rate limiting.</li>
+</ul>
+</li>
 <li>Internal and system errors stay in English.</li>
 </ul>
 <h3 id="d5-persisted-preference-user_settingslocale">D5. Persisted preference: <code>user_settings.locale</code><a class="headerlink" href="#d5-persisted-preference-user_settingslocale" title="Permanent link">&para;</a></h3>
@@ -7231,25 +7247,33 @@
 <h3 id="d8-test-strategy">D8. Test strategy<a class="headerlink" href="#d8-test-strategy" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>src/test-setup.js</code> initializes i18n synchronously with <code>lng: 'vi'</code> and the real resources. Most existing Vietnamese assertions keep working. Assertions on English chrome ("Home") are updated to the Vietnamese value or switched to role/key-based queries.</li>
-<li>CI guards:</li>
+<li>CI guards:<ul>
 <li>A <strong>key-parity test</strong>: <code>vi</code> and <code>en</code> have identical key sets per namespace, and no value is empty.</li>
 <li>The same check for <code>messages.properties</code> against <code>messages_vi.properties</code> in JUnit.</li>
+</ul>
+</li>
 <li>Each switched component gets at least one test that renders in <code>en</code>.</li>
 </ul>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive</strong>
-- Every user-facing string lives in one place per language.
-- Adding a language means adding JSON and properties files only.
-- Errors and emails match the user's language.</p>
-<p><strong>Negative / costs</strong>
-- Three new frontend dependencies, about 20 KB gzipped, plus an update to tech-strategy.md.
-- Touches about 40 components and 21 test files, so the diff is large. It is phased by area to keep PRs reviewable.
-- <code>ResultErrorInfo</code> gains a field. This is additive, so existing clients are unaffected.</p>
-<p><strong>Risks</strong>
-- <strong>Cloudflare caching.</strong> If any API error or GET response is edge-cached, the language would leak between users. Mitigation: send <code>Vary: Accept-Language</code> on localized responses, and verify that <code>/api</code> JSON is not cached at the edge (QA-1).
-- <strong>Missing keys at runtime.</strong> Mitigated by the parity tests. Set <code>saveMissing: false</code> and <code>returnNull: false</code>, and fall back to <code>en</code>.
-- <strong>Admin-only strings</strong> are lower value. They are translated last (FE-5) and can be deferred without blocking the rest.</p>
+<p><strong>Positive</strong></p>
+<ul>
+<li>Every user-facing string lives in one place per language.</li>
+<li>Adding a language means adding JSON and properties files only.</li>
+<li>Errors and emails match the user's language.</li>
+</ul>
+<p><strong>Negative / costs</strong></p>
+<ul>
+<li>Three new frontend dependencies, about 20 KB gzipped, plus an update to tech-strategy.md.</li>
+<li>Touches about 40 components and 21 test files, so the diff is large. It is phased by area to keep PRs reviewable.</li>
+<li><code>ResultErrorInfo</code> gains a field. This is additive, so existing clients are unaffected.</li>
+</ul>
+<p><strong>Risks</strong></p>
+<ul>
+<li><strong>Cloudflare caching.</strong> If any API error or GET response is edge-cached, the language would leak between users. Mitigation: send <code>Vary: Accept-Language</code> on localized responses, and verify that <code>/api</code> JSON is not cached at the edge (QA-1).</li>
+<li><strong>Missing keys at runtime.</strong> Mitigated by the parity tests. Set <code>saveMissing: false</code> and <code>returnNull: false</code>, and fall back to <code>en</code>.</li>
+<li><strong>Admin-only strings</strong> are lower value. They are translated last (FE-5) and can be deferred without blocking the rest.</li>
+</ul>
 <hr />
 <h2 id="compliance">Compliance<a class="headerlink" href="#compliance" title="Permanent link">&para;</a></h2>
 <ul>

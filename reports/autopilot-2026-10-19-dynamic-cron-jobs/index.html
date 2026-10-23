@@ -7135,10 +7135,12 @@ back and fills the rest. The workflow appends the rows under "## Cost" itself; d
 <ul>
 <li>New table <code>scheduled_job</code> with 6 seed rows (<code>api/src/main/resources/db/changelog/sql/202610190002-create-scheduled-job.sql</code>). <code>log-stats</code> moves to <code>0 */5 * * * *</code>. <code>cleanup-old-videos</code> is seeded disabled, as before (30 Feb never fired).</li>
 <li><code>AppScheduler</code> no longer has <code>@Scheduled</code>. <code>JobRegistry</code> maps names to its methods, and <code>DynamicJobScheduler</code> schedules them with <code>TaskScheduler</code> + <code>CronTrigger</code>, a per-job <code>AtomicBoolean</code> overlap guard, and <code>try/catch</code> per run. The wrong "10:10" log and "20 minutes" comment are gone.</li>
-<li>Admin API <code>/v1/funny-app/admin/jobs</code> (<code>web/AdminJobController.java</code>):</li>
+<li>Admin API <code>/v1/funny-app/admin/jobs</code> (<code>web/AdminJobController.java</code>):<ul>
 <li>GET is for ADMIN.</li>
 <li>PATCH <code>{name}</code> and POST <code>{name}/runs</code> need SUPER_ADMIN + the ADMIN permission, with <code>@AuditLog</code> and <code>@RateLimited</code>.</li>
 <li>Validation: cron must have 6 fields, the seconds field must be a single number (at most once per minute), max 64 characters; zone must be valid and at most 64 characters; an unknown name returns 404 and a running job returns 409.</li>
+</ul>
+</li>
 <li>Webapp: a new Admin tab "Scheduled jobs" (<code>components/admin/AdminJobsTab.jsx</code>), in en and vi. It is read-only for ADMIN. SUPER_ADMIN can toggle a job, edit its cron and use "Run now". It polls every 5 s while a job is running.</li>
 </ul>
 <h2 id="runs">Runs<a class="headerlink" href="#runs" title="Permanent link">&para;</a></h2>

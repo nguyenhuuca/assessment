@@ -7536,28 +7536,38 @@
 <hr />
 <h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
 <p><strong>Chosen Option:</strong> Option B across all three contested sub-decisions, plus three uncontested sub-decisions.</p>
-<p><strong>Rationale:</strong>
-- <strong>Dual-layer authorization</strong> (D-2): Defense-in-depth ensures no path to admin functionality exists without an explicit role check. URL-level rejects at the filter chain; method-level makes intent self-documenting.
-- <strong><code>role</code> VARCHAR enum</strong> (D-1): A <code>UserRole</code> enum is extensible and consistent with other string-enum fields in the schema. A boolean cannot grow to support future roles without a migration.
-- <strong><code>/user/me</code> for admin detection</strong> (D-5): Avoids stale role data in the browser. The endpoint is already called on mount, so no additional request is needed.</p>
-<p>Uncontested sub-decisions rationale:
-- <strong>Video moderation status</strong> (D-3): A <code>status</code> column (<code>PUBLISHED</code>/<code>PENDING</code>/<code>FLAGGED</code>) is orthogonal to <code>isHide</code>. The <code>isHide</code> field is user-controlled privacy; <code>status</code> is admin-controlled moderation. Multiple boolean columns (<code>isPending</code>, <code>isFlagged</code>) were rejected because they permit invalid combinations and are not extensible.
-- <strong>JWT role claim</strong> (D-4): Including <code>role</code> in the JWT payload allows Spring Security's <code>GrantedAuthority</code> mechanism to work correctly. Without it, <code>@PreAuthorize("hasRole('ADMIN')")</code> always fails because the authority list is empty.
-- <strong>Offset pagination</strong> (D-6): Spring <code>Pageable</code> (offset-based) is sufficient — admin data is not high-velocity and admins need random page access. Cursor-based pagination would prevent jumping to arbitrary pages.</p>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Dual-layer authorization</strong> (D-2): Defense-in-depth ensures no path to admin functionality exists without an explicit role check. URL-level rejects at the filter chain; method-level makes intent self-documenting.</li>
+<li><strong><code>role</code> VARCHAR enum</strong> (D-1): A <code>UserRole</code> enum is extensible and consistent with other string-enum fields in the schema. A boolean cannot grow to support future roles without a migration.</li>
+<li><strong><code>/user/me</code> for admin detection</strong> (D-5): Avoids stale role data in the browser. The endpoint is already called on mount, so no additional request is needed.</li>
+</ul>
+<p>Uncontested sub-decisions rationale:</p>
+<ul>
+<li><strong>Video moderation status</strong> (D-3): A <code>status</code> column (<code>PUBLISHED</code>/<code>PENDING</code>/<code>FLAGGED</code>) is orthogonal to <code>isHide</code>. The <code>isHide</code> field is user-controlled privacy; <code>status</code> is admin-controlled moderation. Multiple boolean columns (<code>isPending</code>, <code>isFlagged</code>) were rejected because they permit invalid combinations and are not extensible.</li>
+<li><strong>JWT role claim</strong> (D-4): Including <code>role</code> in the JWT payload allows Spring Security's <code>GrantedAuthority</code> mechanism to work correctly. Without it, <code>@PreAuthorize("hasRole('ADMIN')")</code> always fails because the authority list is empty.</li>
+<li><strong>Offset pagination</strong> (D-6): Spring <code>Pageable</code> (offset-based) is sufficient — admin data is not high-velocity and admins need random page access. Cursor-based pagination would prevent jumping to arbitrary pages.</li>
+</ul>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Defense-in-depth authorization — two independent enforcement points for admin access
-- Extensible role model supports future roles (e.g., MODERATOR) without schema redesign
-- Clean separation between user privacy state (<code>isHide</code>) and admin moderation state (<code>status</code>)
-- JWT now carries a real <code>GrantedAuthority</code>, enabling method-level security annotations throughout the codebase</p>
-<p><strong>Negative:</strong>
-- JWT role claim is stale until the user re-authenticates after a role change
-- Admin-facing pagination uses offset — performance degrades at very high page numbers (not a current concern)</p>
-<p><strong>Risks:</strong>
-- <strong>Stale JWT after role change:</strong> Mitigate with short JWT TTL or forced re-login after role promotion/demotion
-- <strong>Admin deletes own account:</strong> Service layer must guard against this with a check comparing <code>targetId</code> vs authenticated <code>userId</code>
-- <strong>Mass delete:</strong> Current implementation is hard-delete; consider soft-delete (<code>status = DELETED</code>) in a future iteration</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>Defense-in-depth authorization — two independent enforcement points for admin access</li>
+<li>Extensible role model supports future roles (e.g., MODERATOR) without schema redesign</li>
+<li>Clean separation between user privacy state (<code>isHide</code>) and admin moderation state (<code>status</code>)</li>
+<li>JWT now carries a real <code>GrantedAuthority</code>, enabling method-level security annotations throughout the codebase</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>JWT role claim is stale until the user re-authenticates after a role change</li>
+<li>Admin-facing pagination uses offset — performance degrades at very high page numbers (not a current concern)</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li><strong>Stale JWT after role change:</strong> Mitigate with short JWT TTL or forced re-login after role promotion/demotion</li>
+<li><strong>Admin deletes own account:</strong> Service layer must guard against this with a check comparing <code>targetId</code> vs authenticated <code>userId</code></li>
+<li><strong>Mass delete:</strong> Current implementation is hard-delete; consider soft-delete (<code>status = DELETED</code>) in a future iteration</li>
+</ul>
 <hr />
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>

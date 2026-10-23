@@ -7139,15 +7139,19 @@
 </table>
 <h3 id="what-changed">What changed<a class="headerlink" href="#what-changed" title="Permanent link">&para;</a></h3>
 <ul>
-<li>New <code>enums/SuggestionTransition</code>: <code>APPROVE</code>, <code>REJECT</code>, <code>REOPEN</code>, <code>REREVIEW</code>.</li>
+<li>New <code>enums/SuggestionTransition</code>: <code>APPROVE</code>, <code>REJECT</code>, <code>REOPEN</code>, <code>REREVIEW</code>.<ul>
 <li><code>check(status, jobStatus, rereviewCount)</code> returns a <code>Refusal(HttpStatus, subCode, messageKey)</code>.</li>
 <li><code>allowed(...)</code> returns the same answer as a boolean for the DTO flags.</li>
 <li><code>MAX_REREVIEWS</code> and <code>REOPENABLE_JOB_STATUSES</code> moved into the enum.</li>
+</ul>
+</li>
 <li><code>VideoSuggestionServiceImpl</code> calls the enum through <code>refuse(Optional&lt;Refusal&gt;)</code>.</li>
-<li>Unchanged, as the plan requires:</li>
+<li>Unchanged, as the plan requires:<ul>
 <li>the lock order (the job row is locked only for APPROVED with an import job);</li>
 <li>the order of checks (404 → transition rule → duplicate);</li>
 <li>the conditional UPDATE, events and error codes 4093 / 4095 / 4096 / 4097 / 4098.</li>
+</ul>
+</li>
 <li><strong>No existing test was edited</strong> (<code>git diff --name-status</code>: only 2 added files + 1 production file).</li>
 </ul>
 <h2 id="runs-ledger">Runs (ledger)<a class="headerlink" href="#runs-ledger" title="Permanent link">&para;</a></h2>

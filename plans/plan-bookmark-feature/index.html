@@ -8061,13 +8061,14 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <h2 id="implementation-steps">Implementation Steps<a class="headerlink" href="#implementation-steps" title="Permanent link">&para;</a></h2>
 <h3 id="phase-1-database-migration-05-day">Phase 1: Database Migration (0.5 day)<a class="headerlink" href="#phase-1-database-migration-05-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>1.1</strong> Create migration file <code>api/src/main/resources/db/changelog/sql/202605310001-create-bookmark-tables.sql</code></li>
+<li>
+<p>[ ] <strong>1.1</strong> Create migration file <code>api/src/main/resources/db/changelog/sql/202605310001-create-bookmark-tables.sql</code></p>
+<ul>
 <li>Create <code>bookmarks</code> table with <code>source_video_id</code> column (see schema above)</li>
 <li>Create <code>bookmark_collections</code> table</li>
 <li>Create <code>bookmark_collection_items</code> junction table</li>
 <li>Create all indexes</li>
-<li>
-<p>Details:
+<li>Details:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">bookmark_collections</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">id</span><span class="w">         </span><span class="n">UUID</span><span class="w">         </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="n">user_id</span><span class="w">    </span><span class="nb">BIGINT</span><span class="w">       </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
@@ -8091,71 +8092,86 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="n">bookmark_id</span><span class="w">   </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">bookmarks</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
 <a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">    </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">collection_id</span><span class="p">,</span><span class="w"> </span><span class="n">bookmark_id</span><span class="p">)</span>
 <a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="p">);</span>
-</code></pre></div></p>
+</code></pre></div></li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>1.2</strong> Register migration in <code>api/src/main/resources/db/changelog/db.changelog-master.yaml</code></p>
-</li>
+<ul>
 <li>Add <code>include file: sql/202605310001-create-bookmark-tables.sql</code> in correct order</li>
+</ul>
+</li>
 </ul>
 <hr />
 <h3 id="phase-2-backend-entities-05-day">Phase 2: Backend Entities (0.5 day)<a class="headerlink" href="#phase-2-backend-entities-05-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>2.1</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/entity/Bookmark.java</code></li>
+<li>
+<p>[ ] <strong>2.1</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/entity/Bookmark.java</code></p>
+<ul>
 <li>Fields: <code>UUID id</code>, <code>User user</code> (@ManyToOne LAZY, nullable=false), <code>VideoSource video</code> (@ManyToOne LAZY, optional=true), <code>Long sourceVideoId</code> (NOT NULL, updatable=false), <code>Instant createdAt</code> (@CreationTimestamp)</li>
 <li>Annotations: <code>@Entity @Table(name="bookmarks")</code>, Lombok <code>@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor</code></li>
-<li>
-<p><code>@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "source_video_id"}))</code></p>
+<li><code>@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "source_video_id"}))</code></li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>2.2</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/entity/BookmarkCollection.java</code></p>
-</li>
+<ul>
 <li>Fields: <code>UUID id</code>, <code>Long userId</code> (column: user_id, NOT NULL), <code>String name</code>, <code>Instant createdAt</code> (@CreationTimestamp)</li>
-<li>
-<p>Same Lombok annotations</p>
+<li>Same Lombok annotations</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>2.3</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/entity/BookmarkCollectionItem.java</code></p>
-</li>
+<ul>
 <li>Composite PK via <code>@Embeddable BookmarkCollectionItemId { UUID collectionId; UUID bookmarkId; }</code></li>
 <li><code>@EmbeddedId</code>, <code>@ManyToOne</code> to <code>BookmarkCollection</code> and <code>Bookmark</code></li>
+</ul>
+</li>
 </ul>
 <hr />
 <h3 id="phase-3-backend-repositories-05-day">Phase 3: Backend Repositories (0.5 day)<a class="headerlink" href="#phase-3-backend-repositories-05-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>3.1</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/repo/BookmarkRepository.java</code></li>
+<li>
+<p>[ ] <strong>3.1</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/repo/BookmarkRepository.java</code></p>
+<ul>
 <li><code>extends JpaRepository&lt;Bookmark, UUID&gt;</code></li>
-<li>Methods:
+<li>
+<p>Methods:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findSourceVideoIdsByUserId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Bookmark</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findByUserIdAndSourceVideoId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">sourceVideoId</span><span class="p">);</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Bookmark</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findByUserIdOrderByCreatedAtDesc</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kt">boolean</span><span class="w"> </span><span class="nf">existsByUserIdAndSourceVideoId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">sourceVideoId</span><span class="p">);</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kt">long</span><span class="w"> </span><span class="nf">countByUserId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="kt">void</span><span class="w"> </span><span class="nf">deleteByUserIdAndSourceVideoId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">sourceVideoId</span><span class="p">);</span>
-</code></pre></div></li>
-<li>
-<p>Note: <code>findSourceVideoIdsByUserId</code> needs a <code>@Query("SELECT b.sourceVideoId FROM Bookmark b WHERE b.user.id = :userId")</code></p>
-</li>
-<li>
-<p>[ ] <strong>3.2</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/repo/BookmarkCollectionRepository.java</code></p>
-</li>
-<li><code>extends JpaRepository&lt;BookmarkCollection, UUID&gt;</code></li>
-<li>
-<p>Methods:
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">BookmarkCollection</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findByUserIdOrderByCreatedAtAsc</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kt">long</span><span class="w"> </span><span class="nf">countByUserId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">Optional</span><span class="o">&lt;</span><span class="n">BookmarkCollection</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findByIdAndUserId</span><span class="p">(</span><span class="n">UUID</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
 </code></pre></div></p>
 </li>
 <li>
-<p>[ ] <strong>3.3</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/repo/BookmarkCollectionItemRepository.java</code></p>
+<p>Note: <code>findSourceVideoIdsByUserId</code> needs a <code>@Query("SELECT b.sourceVideoId FROM Bookmark b WHERE b.user.id = :userId")</code></p>
 </li>
+</ul>
+</li>
+<li>
+<p>[ ] <strong>3.2</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/repo/BookmarkCollectionRepository.java</code></p>
+<ul>
+<li><code>extends JpaRepository&lt;BookmarkCollection, UUID&gt;</code></li>
+<li>Methods:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">BookmarkCollection</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findByUserIdOrderByCreatedAtAsc</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kt">long</span><span class="w"> </span><span class="nf">countByUserId</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">Optional</span><span class="o">&lt;</span><span class="n">BookmarkCollection</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findByIdAndUserId</span><span class="p">(</span><span class="n">UUID</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
+</code></pre></div></li>
+</ul>
+</li>
+<li>
+<p>[ ] <strong>3.3</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/repo/BookmarkCollectionItemRepository.java</code></p>
+<ul>
 <li>Methods to add/remove items from collections</li>
+</ul>
+</li>
 </ul>
 <hr />
 <h3 id="phase-4-dtos-05-day">Phase 4: DTOs (0.5 day)<a class="headerlink" href="#phase-4-dtos-05-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>4.1</strong> Create DTOs in <code>api/src/main/java/com/canhlabs/funnyapp/dto/</code>:</li>
+<li>[ ] <strong>4.1</strong> Create DTOs in <code>api/src/main/java/com/canhlabs/funnyapp/dto/</code>:<ul>
 <li><code>BookmarkDto</code> — <code>{ id: UUID, sourceVideoId: Long, videoId: Long|null, title: String|null, createdAt: Instant }</code></li>
 <li><code>BookmarkIdsDto</code> — <code>{ videoIds: List&lt;Long&gt; }</code></li>
 <li><code>AddBookmarkRequest</code> — <code>{ videoId: Long }</code> with <code>@NotNull</code> validation</li>
@@ -8164,24 +8180,28 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <li><code>RenameCollectionRequest</code> — <code>{ name: String }</code> with <code>@NotBlank @Size(max=100)</code></li>
 <li><code>AddToCollectionRequest</code> — <code>{ bookmarkId: UUID }</code></li>
 </ul>
+</li>
+</ul>
 <hr />
 <h3 id="phase-5-backend-service-15-days">Phase 5: Backend Service (1.5 days)<a class="headerlink" href="#phase-5-backend-service-15-days" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>5.1</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/BookmarkService.java</code></li>
+<li>
+<p>[ ] <strong>5.1</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/service/impl/BookmarkService.java</code></p>
+<ul>
 <li><code>@Service @RequiredArgsConstructor @Slf4j</code></li>
 <li>Inject: <code>BookmarkRepository</code>, <code>BookmarkCollectionRepository</code>, <code>BookmarkCollectionItemRepository</code>, <code>VideoSourceRepository</code> (for video title lookup)</li>
-<li>
-<p>Auth helper:
+<li>Auth helper:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">private</span><span class="w"> </span><span class="n">UserDetailDto</span><span class="w"> </span><span class="nf">currentUser</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">Authentication</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SecurityContextHolder</span><span class="p">.</span><span class="na">getContext</span><span class="p">().</span><span class="na">getAuthentication</span><span class="p">();</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">auth</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">auth</span><span class="p">.</span><span class="na">isAuthenticated</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UnauthorizedException</span><span class="p">(</span><span class="s">"..."</span><span class="p">);</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">UserDetailDto</span><span class="p">)</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="na">getDetails</span><span class="p">();</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
-</code></pre></div></p>
+</code></pre></div></li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>5.2</strong> Implement core bookmark methods:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@Transactional</span><span class="p">(</span><span class="n">readOnly</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@Transactional</span><span class="p">(</span><span class="n">readOnly</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">BookmarkIdsDto</span><span class="w"> </span><span class="nf">getBookmarkIds</span><span class="p">()</span><span class="w">          </span><span class="c1">// returns all source_video_ids for current user</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nd">@Transactional</span><span class="p">(</span><span class="n">readOnly</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
@@ -8193,14 +8213,14 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="nd">@Transactional</span>
 <a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">removeBookmark</span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">videoId</span><span class="p">)</span><span class="w">         </span><span class="c1">// delete by (userId, sourceVideoId)</span>
 </code></pre></div></p>
-</li>
+<ul>
 <li>Cap enforcement: <code>if (repo.countByUserId(userId) &gt;= 500) throw new LimitExceededException("...")</code></li>
-<li>
-<p>Idempotent add: check <code>existsByUserIdAndSourceVideoId</code> first; return existing if found</p>
+<li>Idempotent add: check <code>existsByUserIdAndSourceVideoId</code> first; return existing if found</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>5.3</strong> Implement collection methods:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@Transactional</span><span class="p">(</span><span class="n">readOnly</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@Transactional</span><span class="p">(</span><span class="n">readOnly</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">BookmarkCollectionDto</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getCollections</span><span class="p">()</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nd">@Transactional</span>
@@ -8218,17 +8238,20 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="nd">@Transactional</span>
 <a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">removeFromCollection</span><span class="p">(</span><span class="n">UUID</span><span class="w"> </span><span class="n">collectionId</span><span class="p">,</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="n">bookmarkId</span><span class="p">)</span>
 </code></pre></div></p>
-</li>
+<ul>
 <li>All methods: verify ownership via <code>findByIdAndUserId</code> before modifying</li>
+</ul>
+</li>
 </ul>
 <hr />
 <h3 id="phase-6-backend-controller-1-day">Phase 6: Backend Controller (1 day)<a class="headerlink" href="#phase-6-backend-controller-1-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>6.1</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/web/BookmarkController.java</code></li>
+<li>
+<p>[ ] <strong>6.1</strong> Create <code>api/src/main/java/com/canhlabs/funnyapp/web/BookmarkController.java</code></p>
+<ul>
 <li><code>@RestController @RequestMapping(AppConstant.API.BASE_URL + "/bookmarks")</code></li>
 <li><code>@AuditLog</code> at class level (matches <code>UserController</code> pattern)</li>
-<li>
-<p>Endpoints:
+<li>Endpoints:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@GetMapping</span><span class="p">(</span><span class="s">"/ids"</span><span class="p">)</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">ResultObjectInfo</span><span class="o">&lt;</span><span class="n">BookmarkIdsDto</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getIds</span><span class="p">()</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
@@ -8261,34 +8284,39 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a>
 <a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="nd">@DeleteMapping</span><span class="p">(</span><span class="s">"/collections/{id}/items/{bookmarkId}"</span><span class="p">)</span>
 <a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a><span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">removeFromCollection</span><span class="p">(</span><span class="nd">@PathVariable</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="nd">@PathVariable</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="n">bookmarkId</span><span class="p">)</span>
-</code></pre></div></p>
+</code></pre></div></li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>6.2</strong> Verify <code>JWTAuthenticationFilter.shouldNotFilter()</code> does NOT whitelist <code>/bookmarks/**</code></p>
-</li>
+<ul>
 <li>No change needed if not in whitelist — JWT filter auto-blocks unauthenticated requests</li>
 <li>Add <code>400/401/409</code> error codes to <code>@ControllerAdvice</code> if not already handled</li>
+</ul>
+</li>
 </ul>
 <hr />
 <h3 id="phase-7-backend-tests-1-day">Phase 7: Backend Tests (1 day)<a class="headerlink" href="#phase-7-backend-tests-1-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>7.1</strong> Create <code>BookmarkServiceTest.java</code> (unit test)</li>
+<li>
+<p>[ ] <strong>7.1</strong> Create <code>BookmarkServiceTest.java</code> (unit test)</p>
+<ul>
 <li>Test: <code>addBookmark</code> idempotent (same videoId twice → returns existing, no duplicate)</li>
 <li>Test: cap at 500 → 501st throws exception</li>
 <li>Test: <code>removeBookmark</code> on non-existent → no error (idempotent)</li>
 <li>Test: ownership check on collection ops → throws for wrong user</li>
 <li>Test: <code>deleteCollection</code> → bookmarks still exist in <code>getBookmarks()</code></li>
-<li>
-<p>Mock: <code>BookmarkRepository</code>, <code>BookmarkCollectionRepository</code></p>
+<li>Mock: <code>BookmarkRepository</code>, <code>BookmarkCollectionRepository</code></li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>7.2</strong> Create <code>BookmarkControllerTest.java</code> (integration/slice test)</p>
-</li>
+<ul>
 <li>Test: unauthenticated <code>GET /bookmarks</code> → 401</li>
 <li>Test: <code>POST /bookmarks { videoId: X }</code> → 201 first time, 200 second time</li>
 <li>Test: <code>DELETE /bookmarks?videoId=X</code> → 204</li>
-<li>
-<p>Test: collection CRUD flow end-to-end</p>
+<li>Test: collection CRUD flow end-to-end</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>7.3</strong> Run <code>mvn verify</code> and update coverage threshold in <code>api/.coverage-threshold</code> (+1%)</p>
@@ -8298,7 +8326,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <h3 id="phase-8-frontend-api-module-05-day">Phase 8: Frontend API Module (0.5 day)<a class="headerlink" href="#phase-8-frontend-api-module-05-day" title="Permanent link">&para;</a></h3>
 <ul>
 <li>[ ] <strong>8.1</strong> Create <code>webapp/src/api/bookmarks.js</code>
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">api</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./client'</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">api</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./client'</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">bookmarksApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nx">ids</span><span class="o">:</span><span class="w">              </span><span class="p">()</span><span class="w">           </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/bookmarks/ids'</span><span class="p">),</span>
@@ -8321,7 +8349,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <ul>
 <li>
 <p>[ ] <strong>9.1</strong> Create <code>webapp/src/hooks/useBookmarks.js</code>
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useQuery</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@tanstack/react-query'</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useQuery</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@tanstack/react-query'</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">bookmarksApi</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'../api/bookmarks'</span>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1">// Returns a Set&lt;number&gt; of bookmarked video IDs — O(1) per-card lookup</span>
@@ -8354,76 +8382,90 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 </li>
 <li>
 <p>[ ] <strong>9.2</strong> Create <code>webapp/src/hooks/useBookmarkActions.js</code></p>
-</li>
+<ul>
 <li><code>addBookmark(videoId)</code> — calls API, then <code>queryClient.invalidateQueries(['bookmarks', 'ids'])</code></li>
 <li><code>removeBookmark(videoId)</code> — calls API, then invalidates same key</li>
 <li>Use optimistic update for toggle: flip Set state immediately, revert on error</li>
 <li>Export <code>queryClient</code> from <code>webapp/src/main.jsx</code> or use <code>useQueryClient()</code></li>
 </ul>
+</li>
+</ul>
 <hr />
 <h3 id="phase-10-bookmarkbutton-component-05-day">Phase 10: BookmarkButton Component (0.5 day)<a class="headerlink" href="#phase-10-bookmarkbutton-component-05-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>10.1</strong> Create <code>webapp/src/components/video/BookmarkButton.jsx</code>
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// Props: videoId (number)</span>
+<li>
+<p>[ ] <strong>10.1</strong> Create <code>webapp/src/components/video/BookmarkButton.jsx</code>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// Props: videoId (number)</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="c1">// Reads bookmarkedIds Set from useBookmarkedIds()</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="c1">// Calls addBookmark/removeBookmark on click</span>
 <a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1">// Shows filled icon when bookmarked, outline when not</span>
-</code></pre></div></li>
+</code></pre></div></p>
+<ul>
 <li>Style: match <code>.action-btn</code> class (56px circular glass button) from <code>VideoSwiper.jsx</code></li>
 <li>Icon: FontAwesome <code>faBookmark</code> (solid) / <code>faBookmark</code> (regular) from <code>@fortawesome/react-fontawesome</code></li>
-<li>
-<p>Hide when user not logged in</p>
+<li>Hide when user not logged in</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>10.2</strong> Add <code>&lt;BookmarkButton videoId={video.id} /&gt;</code> to <code>.action-col</code> in <code>VideoSwiper.jsx</code></p>
-</li>
+<ul>
 <li>Place between share and delete buttons</li>
 <li>Conditional: only render when <code>user</code> context is authenticated</li>
+</ul>
+</li>
 </ul>
 <hr />
 <h3 id="phase-11-bookmarks-page-1-day">Phase 11: Bookmarks Page (1 day)<a class="headerlink" href="#phase-11-bookmarks-page-1-day" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>11.1</strong> Create <code>webapp/src/pages/BookmarksPage.jsx</code></li>
+<li>
+<p>[ ] <strong>11.1</strong> Create <code>webapp/src/pages/BookmarksPage.jsx</code></p>
+<ul>
 <li>Uses <code>useBookmarksList()</code> for data</li>
 <li>Grid layout matching existing video list style</li>
 <li>Each card: thumbnail (poster), title, play button, remove-bookmark button</li>
 <li>Handle <code>videoId: null</code> case — show "Video no longer available" placeholder card</li>
 <li>Empty state: "No bookmarks yet — save videos to watch later"</li>
-<li>
-<p>Loading skeleton matching existing feed skeleton</p>
+<li>Loading skeleton matching existing feed skeleton</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>11.2</strong> Add <code>bookmarks</code> to side nav in <code>AppShell.jsx</code></p>
-</li>
+<ul>
 <li>Add to <code>SIDE_NAV</code> array: <code>{ key: 'bookmarks', label: 'Bookmarks', icon: faBookmark }</code></li>
 <li>Add conditional render: <code>activeNav === 'bookmarks' &amp;&amp; &lt;BookmarksPage /&gt;</code></li>
 <li>Import <code>BookmarksPage</code>, <code>faBookmark</code></li>
 </ul>
+</li>
+</ul>
 <hr />
 <h3 id="phase-12-collections-ui-15-days">Phase 12: Collections UI (1.5 days)<a class="headerlink" href="#phase-12-collections-ui-15-days" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>12.1</strong> Create <code>webapp/src/components/bookmark/CollectionManager.jsx</code></li>
+<li>
+<p>[ ] <strong>12.1</strong> Create <code>webapp/src/components/bookmark/CollectionManager.jsx</code></p>
+<ul>
 <li>Shown in <code>BookmarksPage</code> as a sidebar or top panel</li>
 <li>Lists existing collections via <code>useCollections()</code></li>
 <li>Create new collection: text input + submit</li>
 <li>Rename collection: inline edit on double-click</li>
 <li>Delete collection: button with confirmation</li>
-<li>
-<p>Active collection filter: clicking a collection filters the bookmark list</p>
+<li>Active collection filter: clicking a collection filters the bookmark list</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>12.2</strong> Create <code>webapp/src/components/bookmark/AddToCollectionModal.jsx</code></p>
-</li>
+<ul>
 <li>Triggered from bookmark card menu (ellipsis button)</li>
 <li>Shows list of existing collections with checkboxes</li>
 <li>Add/remove bookmark from collection via API calls</li>
-<li>
-<p>Invalidates <code>['bookmarks', 'collections']</code> on change</p>
+<li>Invalidates <code>['bookmarks', 'collections']</code> on change</li>
+</ul>
 </li>
 <li>
 <p>[ ] <strong>12.3</strong> Wire up: bookmark card in <code>BookmarksPage</code> shows collection badges + ellipsis menu</p>
-</li>
+<ul>
 <li>Ellipsis menu → "Add to collection" → opens <code>AddToCollectionModal</code></li>
+</ul>
+</li>
 </ul>
 <hr />
 <h2 id="files-to-create-modify">Files to Create / Modify<a class="headerlink" href="#files-to-create-modify" title="Permanent link">&para;</a></h2>

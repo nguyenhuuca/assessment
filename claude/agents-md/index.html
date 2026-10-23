@@ -7277,18 +7277,24 @@
 <li><strong>Run quality gates</strong> (if code changed)</li>
 <li><strong>Update status</strong> — <code>TASKS.md</code>; <code>docs/tracking.md</code> when a feature/plan/ADR status changed</li>
 <li><strong>Commit</strong> with explicit pathspecs (never <code>git add -A</code>); never commit <code>.claude/settings.local.json</code> or <code>*.stackdump</code></li>
-<li><strong>Ask the user before pushing.</strong> Every push to <code>main</code> deploys through CI, and approval for one push does not carry over to the next. Once approved:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>pull<span class="w"> </span>--rebase
+<li>
+<p><strong>Ask the user before pushing.</strong> Every push to <code>main</code> deploys through CI, and approval for one push does not carry over to the next. Once approved:
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>pull<span class="w"> </span>--rebase
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>push
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>status<span class="w">  </span><span class="c1"># MUST show "up to date with origin"</span>
-</code></pre></div></li>
-<li><strong>Verify</strong> — watch the CI runs for the pushed SHA ("Funny App Build and Deploy", "Deploy Frontend (React Build)", "Publish Docs") and smoke-test prod</li>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Verify</strong> — watch the CI runs for the pushed SHA ("Funny App Build and Deploy", "Deploy Frontend (React Build)", "Publish Docs") and smoke-test prod</p>
+</li>
 <li><strong>Hand off</strong> — leave clear context and artifact references for the next session</li>
 </ol>
-<p><strong>Rules:</strong>
-- Never force-push; never push without the user's go-ahead
-- If a push is rejected, <code>git pull --rebase</code> and retry once; still rejected → stop and report
-- Work goes straight to <code>main</code> here; open a PR only when the user asks for one</p>
+<p><strong>Rules:</strong></p>
+<ul>
+<li>Never force-push; never push without the user's go-ahead</li>
+<li>If a push is rejected, <code>git pull --rebase</code> and retry once; still rejected → stop and report</li>
+<li>Work goes straight to <code>main</code> here; open a PR only when the user asks for one</li>
+</ul>
 <h2 id="quality-gates">Quality Gates<a class="headerlink" href="#quality-gates" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>API</strong>: <code>cd api &amp;&amp; mvn verify</code> (tests + LINE coverage ≥ <code>api/.coverage-threshold</code>)</li>

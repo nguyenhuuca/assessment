@@ -7995,20 +7995,26 @@
 </table>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- One capture path covers YouTube and local videos with no streaming-layer coupling.
-- Schema is convention-aligned (all BIGINT keys); FK joins on <code>user_id</code> stay compact.
-- The 500-entry cap is a hard guarantee, not a best-effort average.
-- Ownership is non-spoofable by construction — no client-supplied identity.
-- Watched badges cost a single fetch per page load regardless of card count.</p>
-<p><strong>Negative:</strong>
-- Fire-and-forget recording has no retry: a failed POST loses that one watch (low severity, self-corrects next play).
-- First-watch timestamp is lost on re-watch (history = "recent", not a diary — acceptable).
-- The transactional evict adds a conditional delete to the write path (bounded, single-digit rows).</p>
-<p><strong>Risks:</strong>
-- <strong>Write pressure</strong> on <code>watch_history</code> for popular videos watched by many users concurrently → mitigated by keeping each write to one lightweight upsert (+ rare bounded delete).
-- <strong>Concurrent multi-tab plays of the same video</strong> → the unique <code>(user_id, source_video_id)</code> constraint + upsert resolves to last-write-wins on <code>watched_at</code>; no duplicates.
-- <strong>Min-watch-duration absent</strong> → accidental plays are recorded in v1; revisit in v2 if history noise is reported (PRD open question).</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>One capture path covers YouTube and local videos with no streaming-layer coupling.</li>
+<li>Schema is convention-aligned (all BIGINT keys); FK joins on <code>user_id</code> stay compact.</li>
+<li>The 500-entry cap is a hard guarantee, not a best-effort average.</li>
+<li>Ownership is non-spoofable by construction — no client-supplied identity.</li>
+<li>Watched badges cost a single fetch per page load regardless of card count.</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Fire-and-forget recording has no retry: a failed POST loses that one watch (low severity, self-corrects next play).</li>
+<li>First-watch timestamp is lost on re-watch (history = "recent", not a diary — acceptable).</li>
+<li>The transactional evict adds a conditional delete to the write path (bounded, single-digit rows).</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li><strong>Write pressure</strong> on <code>watch_history</code> for popular videos watched by many users concurrently → mitigated by keeping each write to one lightweight upsert (+ rare bounded delete).</li>
+<li><strong>Concurrent multi-tab plays of the same video</strong> → the unique <code>(user_id, source_video_id)</code> constraint + upsert resolves to last-write-wins on <code>watched_at</code>; no duplicates.</li>
+<li><strong>Min-watch-duration absent</strong> → accidental plays are recorded in v1; revisit in v2 if history noise is reported (PRD open question).</li>
+</ul>
 <hr />
 <h2 id="data-model-reference">Data Model (Reference)<a class="headerlink" href="#data-model-reference" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>watch_history

@@ -7246,9 +7246,11 @@
 <p>The two model outputs agree on the <strong>core design</strong> — fire-and-forget recording, upsert-on-replay, 500-entry cap, client-side badge via an IDs endpoint, <code>ON DELETE SET NULL</code> with an immutable <code>source_video_id</code>. That agreement is itself a signal the design is sound.</p>
 <p>The Opus branch is <strong>stronger on three things that compound across tiers</strong>:</p>
 <ol>
-<li><strong>Codebase grounding.</strong> It caught two facts the baseline got wrong or missed:</li>
+<li><strong>Codebase grounding.</strong> It caught two facts the baseline got wrong or missed:<ul>
 <li><strong>PK type:</strong> baseline chose <code>UUID</code>; the actual entities <code>User.id</code> and <code>VideoSource.id</code> are both <code>BIGINT</code>/<code>IDENTITY</code>. Opus aligned to <code>BIGINT</code>.</li>
 <li><strong>API base path:</strong> baseline ADR assumed <code>/api/v1/...</code>; the verified constant is <code>AppConstant.API.BASE_URL = /v1/funny-app</code>. Opus flagged and corrected this.</li>
+</ul>
+</li>
 <li><strong>Concurrency rigor.</strong> The baseline's "find-then-insert + delete-one-oldest" is non-atomic — its own ADR-0013 admits eviction "is not atomic with INSERT without a transaction." Opus made the ≤500 cap a hard invariant via native <code>ON CONFLICT</code> upsert + a single bulk-evict query in one transaction, and added explicit concurrency tests.</li>
 <li><strong>Decidability.</strong> Opus tiers carry primary-vs-secondary metric ranking, "leaning" recommendations on open questions, and an explicit IDOR (CWE-639) framing for ownership.</li>
 </ol>
@@ -7483,17 +7485,21 @@
 </table>
 <hr />
 <h2 id="cross-cutting-observations">Cross-Cutting Observations<a class="headerlink" href="#cross-cutting-observations" title="Permanent link">&para;</a></h2>
-<p><strong>Where the models agreed (design is robust):</strong>
-- Fire-and-forget POST on play as the only source-agnostic capture point (covers YouTube).
-- Upsert on <code>(user_id, source_video_id)</code>; re-watch bumps to top.
-- 500-entry cap with silent auto-eviction (vs hard reject) — correct for an automatic feature.
-- Client-side <code>Set.has()</code> badge fed by one <code>/ids</code> fetch — zero per-card calls.
-- <code>ON DELETE SET NULL</code> + immutable <code>source_video_id</code>; UI renders "Video unavailable".</p>
-<p><strong>Where Opus added defensible value:</strong>
-- Fixed a real schema inconsistency (UUID → BIGINT) verified against <code>User.java</code>/<code>VideoSource.java</code>.
-- Corrected a real, wrong API path assumption (verified against <code>AppConstant.java</code>).
-- Closed a genuine concurrency hole (non-atomic eviction) end-to-end PRD→Plan, with tests.
-- Reframed privacy as an IDOR class fix, not just "JWT auth".</p>
+<p><strong>Where the models agreed (design is robust):</strong></p>
+<ul>
+<li>Fire-and-forget POST on play as the only source-agnostic capture point (covers YouTube).</li>
+<li>Upsert on <code>(user_id, source_video_id)</code>; re-watch bumps to top.</li>
+<li>500-entry cap with silent auto-eviction (vs hard reject) — correct for an automatic feature.</li>
+<li>Client-side <code>Set.has()</code> badge fed by one <code>/ids</code> fetch — zero per-card calls.</li>
+<li><code>ON DELETE SET NULL</code> + immutable <code>source_video_id</code>; UI renders "Video unavailable".</li>
+</ul>
+<p><strong>Where Opus added defensible value:</strong></p>
+<ul>
+<li>Fixed a real schema inconsistency (UUID → BIGINT) verified against <code>User.java</code>/<code>VideoSource.java</code>.</li>
+<li>Corrected a real, wrong API path assumption (verified against <code>AppConstant.java</code>).</li>
+<li>Closed a genuine concurrency hole (non-atomic eviction) end-to-end PRD→Plan, with tests.</li>
+<li>Reframed privacy as an IDOR class fix, not just "JWT auth".</li>
+</ul>
 <p><strong>Shared residual risk (both, by user decision):</strong> unknown <code>videoId</code> is recorded silently with <code>video_id = null</code> while <code>source_video_id NOT NULL</code> — bogus client ids can create junk rows; the only guard is the 30/min rate limit. Worth monitoring null-<code>video_id</code> growth post-launch.</p>
 <hr />
 <h2 id="scorecard">Scorecard<a class="headerlink" href="#scorecard" title="Permanent link">&para;</a></h2>

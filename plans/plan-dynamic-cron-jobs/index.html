@@ -7054,8 +7054,8 @@ Handoff to: Builder
 <p>Move the six job schedules in <code>AppScheduler</code> from hardcoded <code>@Scheduled</code> annotations (<code>AppScheduler.java:69, 79, 91, 107, 117, 127</code>) to the <code>scheduled_job</code> table. An admin can then list jobs, and a SUPER_ADMIN can change cron, zone and on/off, or run a job now, from a new Admin tab, all without a deploy.</p>
 <h2 id="facts-the-tasks-rely-on">Facts the tasks rely on<a class="headerlink" href="#facts-the-tasks-rely-on" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Jobs and current schedules</strong> (<code>AppScheduler.java</code>):</li>
-</ul>
+<li>
+<p><strong>Jobs and current schedules</strong> (<code>AppScheduler.java</code>):</p>
 <table>
 <thead>
 <tr>
@@ -7104,33 +7104,47 @@ Handoff to: Builder
 </tr>
 </tbody>
 </table>
-<p><code>cleanUpOldVideos</code> never fires, and its body is a no-op (<code>:130-132</code>). The wrong log is at <code>:71</code> and the wrong comment at <code>:91</code>.
-- <strong>Existing test:</strong> <code>AppSchedulerTest.java</code> asserts the <code>@Scheduled</code> cron of the notification jobs (<code>:326-334</code>). These assertions move to the migration/registry tests, because the annotations are removed.
-- <strong>Scheduling setup:</strong> <code>@EnableScheduling</code> is at <code>FunnyApp.java:17</code>. There is no custom <code>TaskScheduler</code> bean, and virtual threads are on (<code>application.yaml:46</code>).
-- <strong>Liquibase:</strong>
-  - <code>db.changelog-master.yaml:1-4</code> uses <code>includeAll sql/</code>, ordered by filename, so no master edit is needed.
-  - Migrations are plain SQL.
-  - Table + seed example: <code>sql/202605010001-init_permissions.sql:4-24</code>.
-  - Latest file: <code>sql/202610190001-suggestion-rereview-count.sql</code>.
-- <strong>Entity style:</strong>
-  - <code>entity/VideoSuggestion.java:23-29</code> uses Lombok <code>@Getter @Setter @NoArgsConstructor</code>.
-  - <code>@UpdateTimestamp Instant</code> is used in <code>entity/BaseDomain.java:20-26</code>.
-- <strong>Admin controller pattern:</strong>
-  - <code>web/AdminDriveSyncController.java:30-56</code>: class-level <code>hasRole('ADMIN')</code>; reads use <code>@HasPermission(perm = Permission.ADMIN)</code>.
-  - Mutations use <code>@PreAuthorize("hasRole('SUPER_ADMIN') and @permissionServiceImpl.hasPermission(authentication.details.permissions, ADMIN)")</code> + <code>@AuditLog</code> + <code>@RateLimited</code> (<code>:53-57</code>).
-  - Errors use <code>CustomException.of(HttpStatus, subCode, key)</code> (<code>:47</code>), with keys in <code>i18n/messages.properties</code> and <code>messages_vi.properties</code>.
-- <strong>Security config:</strong> the <code>/v1/funny-app/admin/**</code> role guard is at <code>WebSecurityConfig.java:54</code>. PATCH is already in CORS (<code>:139</code>), so no change is needed.
-- <strong>Error mapping:</strong> in <code>RestExceptionHandler.java</code>, <code>CustomException</code> maps to its own status (<code>:225-235</code>).
-- <strong>Test style:</strong>
-  - Plain Mockito: <code>web/AdminControllerTest.java:42-46</code>.
-  - Security slice: <code>@WebMvcTest</code> in <code>web/AdminControllerPermissionTest.java:81</code>.
-- <strong>Webapp:</strong>
-  - <code>components/admin/AdminView.jsx</code>: <code>TABS</code> at <code>:13</code>, <code>TAB_QUERY</code> at <code>:16-24</code>, content switch at <code>:113-121</code>.
-  - <code>api/admin.js</code> wraps <code>api/client.js</code> (<code>api.get/post/patch</code>, <code>:42-48</code>).
-  - Hooks pattern: <code>hooks/useAdmin.js:28-34</code> (mutation + <code>invalidateQueries</code>).
-  - <code>utils/roles.js:5</code> provides <code>isSuperAdmin</code>.
-  - i18n: <code>i18n/locales/{en,vi}/admin.json</code> (<code>tabs</code> at <code>en/admin.json:14-22</code>).
-  - Tests: <code>components/admin/__tests__/AdminView.test.jsx:8-25</code> and <code>api/__tests__/admin.test.js:5</code>.</p>
+<p><code>cleanUpOldVideos</code> never fires, and its body is a no-op (<code>:130-132</code>). The wrong log is at <code>:71</code> and the wrong comment at <code>:91</code>.</p>
+</li>
+<li>
+<p><strong>Existing test:</strong> <code>AppSchedulerTest.java</code> asserts the <code>@Scheduled</code> cron of the notification jobs (<code>:326-334</code>). These assertions move to the migration/registry tests, because the annotations are removed.</p>
+</li>
+<li><strong>Scheduling setup:</strong> <code>@EnableScheduling</code> is at <code>FunnyApp.java:17</code>. There is no custom <code>TaskScheduler</code> bean, and virtual threads are on (<code>application.yaml:46</code>).</li>
+<li><strong>Liquibase:</strong><ul>
+<li><code>db.changelog-master.yaml:1-4</code> uses <code>includeAll sql/</code>, ordered by filename, so no master edit is needed.</li>
+<li>Migrations are plain SQL.</li>
+<li>Table + seed example: <code>sql/202605010001-init_permissions.sql:4-24</code>.</li>
+<li>Latest file: <code>sql/202610190001-suggestion-rereview-count.sql</code>.</li>
+</ul>
+</li>
+<li><strong>Entity style:</strong><ul>
+<li><code>entity/VideoSuggestion.java:23-29</code> uses Lombok <code>@Getter @Setter @NoArgsConstructor</code>.</li>
+<li><code>@UpdateTimestamp Instant</code> is used in <code>entity/BaseDomain.java:20-26</code>.</li>
+</ul>
+</li>
+<li><strong>Admin controller pattern:</strong><ul>
+<li><code>web/AdminDriveSyncController.java:30-56</code>: class-level <code>hasRole('ADMIN')</code>; reads use <code>@HasPermission(perm = Permission.ADMIN)</code>.</li>
+<li>Mutations use <code>@PreAuthorize("hasRole('SUPER_ADMIN') and @permissionServiceImpl.hasPermission(authentication.details.permissions, ADMIN)")</code> + <code>@AuditLog</code> + <code>@RateLimited</code> (<code>:53-57</code>).</li>
+<li>Errors use <code>CustomException.of(HttpStatus, subCode, key)</code> (<code>:47</code>), with keys in <code>i18n/messages.properties</code> and <code>messages_vi.properties</code>.</li>
+</ul>
+</li>
+<li><strong>Security config:</strong> the <code>/v1/funny-app/admin/**</code> role guard is at <code>WebSecurityConfig.java:54</code>. PATCH is already in CORS (<code>:139</code>), so no change is needed.</li>
+<li><strong>Error mapping:</strong> in <code>RestExceptionHandler.java</code>, <code>CustomException</code> maps to its own status (<code>:225-235</code>).</li>
+<li><strong>Test style:</strong><ul>
+<li>Plain Mockito: <code>web/AdminControllerTest.java:42-46</code>.</li>
+<li>Security slice: <code>@WebMvcTest</code> in <code>web/AdminControllerPermissionTest.java:81</code>.</li>
+</ul>
+</li>
+<li><strong>Webapp:</strong><ul>
+<li><code>components/admin/AdminView.jsx</code>: <code>TABS</code> at <code>:13</code>, <code>TAB_QUERY</code> at <code>:16-24</code>, content switch at <code>:113-121</code>.</li>
+<li><code>api/admin.js</code> wraps <code>api/client.js</code> (<code>api.get/post/patch</code>, <code>:42-48</code>).</li>
+<li>Hooks pattern: <code>hooks/useAdmin.js:28-34</code> (mutation + <code>invalidateQueries</code>).</li>
+<li><code>utils/roles.js:5</code> provides <code>isSuperAdmin</code>.</li>
+<li>i18n: <code>i18n/locales/{en,vi}/admin.json</code> (<code>tabs</code> at <code>en/admin.json:14-22</code>).</li>
+<li>Tests: <code>components/admin/__tests__/AdminView.test.jsx:8-25</code> and <code>api/__tests__/admin.test.js:5</code>.</li>
+</ul>
+</li>
+</ul>
 <h2 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -7160,34 +7174,16 @@ Handoff to: Builder
 <td>Service tests: an invalid cron gives 400 <code>error.job.invalidCron</code>; a seconds field other than one number (e.g. <code>*/5 * * * * *</code>) gives 400 <code>error.job.tooFrequent</code>; a bad zone gives 400 <code>error.job.invalidZone</code>; an unknown name gives 404 <code>error.job.notFound</code>; a valid PATCH saves first, then calls <code>reschedule</code> (if <code>reschedule</code> throws, the transaction rolls back, so the DB and the live schedule stay the same); PATCH semantics are as follows:</td>
 <td></td>
 </tr>
-<tr>
-<td>- only fields that are sent change;</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>- <code>zone: ""</code> clears it to NULL;</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>- an empty body gives 400 <code>error.job.emptyUpdate</code>;</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>- <code>cron</code> longer than 64 characters gives 400 <code>error.job.invalidCron</code>.</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
 </tbody>
 </table>
-<p>Run-now goes through <code>TaskScheduler.schedule(task, Instant.now())</code> and returns 202 when started. It works on a disabled job (a manual run), and returns 409 <code>error.job.running</code> when the guard is held; <code>nextRunAt</code> is null when disabled. <code>@WebMvcTest</code> permission test: an ADMIN gets 200 on GET and 403 on PATCH/POST, and a SUPER_ADMIN gets 200/202. <code>mvn verify</code> is green with coverage ≥ <code>api/.coverage-threshold</code> | DJ-2 |
-| <strong>DJ-4</strong> | FE <code>api/admin.js</code> (<code>getJobs</code>, <code>updateJob</code>, <code>runJob</code>) + hooks <code>useAdminJobs</code>, <code>useUpdateJob</code>, <code>useRunJob</code> (key <code>['admin','jobs']</code>, mutations invalidate it) | <code>admin.test.js</code>: correct URL/method/body for each call. The hook test shows a mutation success invalidates <code>['admin','jobs']</code> | DJ-3 (API contract) |
+<div class="highlight"><pre><span></span><code>- only fields that are sent change;
+- `zone: ""` clears it to NULL;
+- an empty body gives 400 `error.job.emptyUpdate`;
+- `cron` longer than 64 characters gives 400 `error.job.invalidCron`.
+
+Run-now goes through `TaskScheduler.schedule(task, Instant.now())` and returns 202 when started. It works on a disabled job (a manual run), and returns 409 `error.job.running` when the guard is held; `nextRunAt` is null when disabled. `@WebMvcTest` permission test: an ADMIN gets 200 on GET and 403 on PATCH/POST, and a SUPER_ADMIN gets 200/202. `mvn verify` is green with coverage ≥ `api/.coverage-threshold` | DJ-2 |
+</code></pre></div>
+<p>| <strong>DJ-4</strong> | FE <code>api/admin.js</code> (<code>getJobs</code>, <code>updateJob</code>, <code>runJob</code>) + hooks <code>useAdminJobs</code>, <code>useUpdateJob</code>, <code>useRunJob</code> (key <code>['admin','jobs']</code>, mutations invalidate it) | <code>admin.test.js</code>: correct URL/method/body for each call. The hook test shows a mutation success invalidates <code>['admin','jobs']</code> | DJ-3 (API contract) |
 | <strong>DJ-5</strong> | FE <code>components/admin/AdminJobsTab.jsx</code> + <code>SCHEDULED_JOBS</code> in <code>TABS</code>/<code>TAB_QUERY</code>/switch of <code>AdminView.jsx</code> + <code>tabs.SCHEDULED_JOBS</code> and <code>jobs.*</code> keys in en/vi <code>admin.json</code> | Tests (vi + en): the table shows name, description, cron, zone, enabled, next run, last run/result. ADMIN sees read-only (no input or buttons). SUPER_ADMIN can toggle enabled, edit cron (save → <code>updateJob</code> with the new value) and click "Run now" (button disabled while running/pending). A server error key is shown translated. <code>npm run test</code> and <code>npm run lint</code> are green | DJ-4 |</p>
 <p><strong>Landing:</strong> add the feature to <code>docs/tracking.md</code> (it has an ADR and a plan).</p>
 <p><strong>Commits:</strong> BE (DJ-1..3) and FE (DJ-4..5) are 2 commits, each independently mergeable. The FE tab only calls endpoints that exist after the BE commit. Estimate: about 350 LOC BE prod + 300 test, and about 200 LOC FE prod + 150 test.</p>

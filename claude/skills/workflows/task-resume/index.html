@@ -7131,22 +7131,28 @@
 <h1 id="task-resume">Task Resume<a class="headerlink" href="#task-resume" title="Permanent link">&para;</a></h1>
 <p>Pick up the task in <code>session.txt</code> (format: <code>.claude/rules/session-file.md</code>) as if the previous session never ended.</p>
 <h2 id="how-the-user-gets-here">How the User Gets Here<a class="headerlink" href="#how-the-user-gets-here" title="Permanent link">&para;</a></h2>
-<p>On <code>startup</code>, <code>resume</code> and <code>clear</code>, <code>.claude/hooks/session-start-loader.sh</code> prints a status report from <code>session.txt</code> straight to the user as a <code>systemMessage</code>. The report is a boxed table with the columns label | value | commit. A trailing commit hash on a <code>done</code>/<code>doing</code> item moves into the commit column, and that column is left out when no item has a hash. Its row groups are separated by <code>├──┼──┤</code> lines:
-- 📌 Task and Status (progress bar and <code>updated</code>)
-- ✅ Done, one row per finished subtask
-- 🔄 Doing, one row per half-done subtask (at most 8 rows each group)
-- ⛔ Blocked and → Next</p>
+<p>On <code>startup</code>, <code>resume</code> and <code>clear</code>, <code>.claude/hooks/session-start-loader.sh</code> prints a status report from <code>session.txt</code> straight to the user as a <code>systemMessage</code>. The report is a boxed table with the columns label | value | commit. A trailing commit hash on a <code>done</code>/<code>doing</code> item moves into the commit column, and that column is left out when no item has a hash. Its row groups are separated by <code>├──┼──┤</code> lines:</p>
+<ul>
+<li>📌 Task and Status (progress bar and <code>updated</code>)</li>
+<li>✅ Done, one row per finished subtask</li>
+<li>🔄 Doing, one row per half-done subtask (at most 8 rows each group)</li>
+<li>⛔ Blocked and → Next</li>
+</ul>
 <p>Below the table is the hint "▶ /task-resume để làm tiếp". <code>next</code> and <code>blocker</code> show only their first <code>;</code> item. Every value is cut at 70 characters, and <code>plan</code> is left out. A <code>status: done</code> task is still reported, with ✅ and no resume hint. The report is skipped on <code>compact</code> and when <code>session.txt</code> is missing or empty. The same file also goes into the model's context. If the user's first message is not <code>/task-resume</code>, the reply carries one line reminding them about it, and Claude does not start the task on its own.</p>
 <h2 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Read</strong> <code>session.txt</code> at the repo root.</li>
+<li><strong>Read</strong> <code>session.txt</code> at the repo root.<ul>
 <li>Missing or empty → say there is nothing to resume and stop.</li>
 <li><code>status: done</code> → report the task and its last <code>updated</code>, ask what to work on next, stop.</li>
-<li><strong>Re-orient</strong> — never trust the file alone:</li>
+</ul>
+</li>
+<li><strong>Re-orient</strong> — never trust the file alone:<ul>
 <li>Read the <code>plan</code> artifact if one is set, and find the task matching <code>next</code></li>
 <li><code>git status</code> and <code>git log --oneline -10</code>: are the <code>done</code> items committed? Is anything unpushed or uncommitted?</li>
 <li>Check <code>TASKS.md</code> lines for the same task IDs</li>
 <li>If the repo disagrees with the file (e.g. <code>next</code> is already committed), trust the repo and correct <code>done</code>/<code>next</code>/<code>progress</code></li>
+</ul>
+</li>
 <li><strong>Report</strong> in 3–5 lines, in the user's language: the task, <code>progress</code>%, what is done, what comes next, and any mismatch you fixed. The user already saw the raw report at startup, so lead with what the re-check found, not a copy of the file. If <code>status: blocked</code>, show the <code>blocker</code> and ask whether it is resolved before doing anything.</li>
 <li><strong>Continue</strong> from <code>next</code> following the normal rules (plan tasks, quality gates, ask before every <code>git push</code>). Apply <code>$ARGUMENTS</code> as an extra instruction if given.</li>
 <li><strong>Keep <code>session.txt</code> current</strong> after each step, per the rule's "When to Write It".</li>

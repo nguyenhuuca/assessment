@@ -7705,12 +7705,14 @@
 <li><strong>Account deletion semantics</strong> — the design's Danger Zone "Delete Account" is destructive and cascades to related data (watch-history, comments, share-links). Behavior was left open as PRD OQ-1.</li>
 <li><strong>Auth-surface variability</strong> — sign-in is config-gated: <code>appProperties.isUsePasswordless()</code> switches between password login and magic-link (<code>UserController.signIn</code>). The design's "Change Password" field only applies in one mode. (OQ-3, PRD risk R-1)</li>
 </ol>
-<p>Constraints from the existing codebase to honor:
-- <code>User.id</code> is <code>BIGINT</code> (<code>GenerationType.IDENTITY</code>) — new FKs reference <code>users(id)</code> as BIGINT (unlike the UUID PKs used by <code>video_comments</code> / watch-history).
-- Controllers use <code>@RequestMapping(AppConstant.API.BASE_URL + "/user")</code>, <code>ResultObjectInfo&lt;T&gt;</code> wrappers, <code>@AuditLog</code>, <code>@RateLimited</code>, <code>@WithSpan</code>.
-- MFA endpoints already exist: <code>GET /user/mfa/setup</code>, <code>POST /user/mfa/enable|disable|verify</code>.
-- Migrations live in <code>db/changelog/sql/</code> and are auto-included via <code>includeAll</code> in <code>db.changelog-master.yaml</code> (ordered by filename <code>YYYYMMDDHHMM-*.sql</code>).
-- No subscription/billing backend exists (PRD risk R-2).</p>
+<p>Constraints from the existing codebase to honor:</p>
+<ul>
+<li><code>User.id</code> is <code>BIGINT</code> (<code>GenerationType.IDENTITY</code>) — new FKs reference <code>users(id)</code> as BIGINT (unlike the UUID PKs used by <code>video_comments</code> / watch-history).</li>
+<li>Controllers use <code>@RequestMapping(AppConstant.API.BASE_URL + "/user")</code>, <code>ResultObjectInfo&lt;T&gt;</code> wrappers, <code>@AuditLog</code>, <code>@RateLimited</code>, <code>@WithSpan</code>.</li>
+<li>MFA endpoints already exist: <code>GET /user/mfa/setup</code>, <code>POST /user/mfa/enable|disable|verify</code>.</li>
+<li>Migrations live in <code>db/changelog/sql/</code> and are auto-included via <code>includeAll</code> in <code>db.changelog-master.yaml</code> (ordered by filename <code>YYYYMMDDHHMM-*.sql</code>).</li>
+<li>No subscription/billing backend exists (PRD risk R-2).</li>
+</ul>
 <hr />
 <h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
 <ul>
@@ -8009,20 +8011,26 @@
 </table>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- <code>Users</code> (auth-critical) stays lean; settings evolve independently.
-- Per-toggle autosave is race-safe (PATCH merges only changed fields).
-- Account deletion is reversible within a support window and keeps audit + referential integrity.
-- Security UI adapts to <code>usePasswordless</code> mode — no dead controls.
-- Zero new infrastructure; consistent with existing controller/migration patterns.</p>
-<p><strong>Negative:</strong>
-- Lazy-create adds a small branch on first <code>GET /user/settings</code>.
-- Soft delete retains data until a (deferred) purge job runs — not immediate physical erasure.
-- PATCH "non-null = changed" cannot express "set field to null"; v1 preferences have no nullable user-settable values, so acceptable (revisit if such a field appears).</p>
-<p><strong>Risks:</strong>
-- <strong>Concurrent PATCHes from two tabs</strong> → both partial updates apply; last-write-wins per field. Acceptable for independent toggles (no cross-field invariants in v1).
-- <strong>Deactivated-user login</strong> must be blocked in the auth path — login/magic-link flow must check <code>status != DEACTIVATED</code> (add to validation; flagged for Builder).
-- <strong>Anonymization completeness</strong> — ensure no PII leaks remain in logs/related tables; covered by existing <code>@AuditLog</code> masking, to be verified in security review.</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li><code>Users</code> (auth-critical) stays lean; settings evolve independently.</li>
+<li>Per-toggle autosave is race-safe (PATCH merges only changed fields).</li>
+<li>Account deletion is reversible within a support window and keeps audit + referential integrity.</li>
+<li>Security UI adapts to <code>usePasswordless</code> mode — no dead controls.</li>
+<li>Zero new infrastructure; consistent with existing controller/migration patterns.</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Lazy-create adds a small branch on first <code>GET /user/settings</code>.</li>
+<li>Soft delete retains data until a (deferred) purge job runs — not immediate physical erasure.</li>
+<li>PATCH "non-null = changed" cannot express "set field to null"; v1 preferences have no nullable user-settable values, so acceptable (revisit if such a field appears).</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li><strong>Concurrent PATCHes from two tabs</strong> → both partial updates apply; last-write-wins per field. Acceptable for independent toggles (no cross-field invariants in v1).</li>
+<li><strong>Deactivated-user login</strong> must be blocked in the auth path — login/magic-link flow must check <code>status != DEACTIVATED</code> (add to validation; flagged for Builder).</li>
+<li><strong>Anonymization completeness</strong> — ensure no PII leaks remain in logs/related tables; covered by existing <code>@AuditLog</code> masking, to be verified in security review.</li>
+</ul>
 <hr />
 <h2 id="schema-reference">Schema Reference<a class="headerlink" href="#schema-reference" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">-- Migration: db/changelog/sql/202606200001-create-user-settings.sql</span>

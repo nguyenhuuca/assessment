@@ -7298,20 +7298,24 @@ Handoff to: Builder, QA Engineer
 <h3 id="be-1-migration-repository-ordering">BE-1: Migration + repository ordering<a class="headerlink" href="#be-1-migration-repository-ordering" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>db/changelog/sql/202610180001-video-collection-items-position.sql</code>: add the column with a default (old pods keep inserting during a rolling deploy), backfill, drop the old index, create <code>idx_video_collection_items_position (collection_id, position, video_id)</code></li>
-<li><code>VideoCollectionItemRepository</code>:</li>
+<li><code>VideoCollectionItemRepository</code>:<ul>
 <li><code>addItem</code> → <code>INSERT … SELECT :cid, :vid, COALESCE((SELECT MIN(position) FROM video_collection_items WHERE collection_id = :cid), 0) - 1 ON CONFLICT DO NOTHING</code></li>
 <li><code>findVisibleVideos</code> and its <code>countQuery</code>: <code>ORDER BY i.position, i.video_id</code></li>
 <li><code>findCovers</code> LATERAL: <code>ORDER BY i.position, i.video_id LIMIT 1</code>, and update the Javadoc ("first visible video")</li>
 <li><code>findOrderedVideoIds(cid)</code> → <code>List&lt;Long&gt;</code></li>
 <li><code>@Modifying renumber(cid, Long[] ids)</code> → <code>UPDATE video_collection_items i SET position = o.ord - 1 FROM unnest(CAST(:ids AS bigint[])) WITH ORDINALITY o(video_id, ord) WHERE i.collection_id = :cid AND i.video_id = o.video_id</code></li>
+</ul>
+</li>
 <li>Update the <code>VideoCollectionService#getVideos</code> Javadoc ("in collection order")</li>
 </ul>
-<p><strong>Acceptance criteria</strong>
-- [ ] Liquibase runs cleanly on a copy of the local DB. Existing collections come back in the same order as before (newest added first)
-- [ ] A newly added video comes back first from <code>GET /collections/{id}/videos</code>
-- [ ] The cover is the first visible item in <code>position</code> order
-- [ ] <code>renumber</code> binds <code>Long[]</code> correctly on Hibernate 6 / Postgres. Check by hand with <code>startLocal.sh</code> + psql, because the repo has no DB integration tests (no Testcontainers or <code>@DataJpaTest</code>)
-- [ ] <code>mvn verify</code> passes, with LINE coverage ≥ <code>api/.coverage-threshold</code></p>
+<p><strong>Acceptance criteria</strong></p>
+<ul>
+<li>[ ] Liquibase runs cleanly on a copy of the local DB. Existing collections come back in the same order as before (newest added first)</li>
+<li>[ ] A newly added video comes back first from <code>GET /collections/{id}/videos</code></li>
+<li>[ ] The cover is the first visible item in <code>position</code> order</li>
+<li>[ ] <code>renumber</code> binds <code>Long[]</code> correctly on Hibernate 6 / Postgres. Check by hand with <code>startLocal.sh</code> + psql, because the repo has no DB integration tests (no Testcontainers or <code>@DataJpaTest</code>)</li>
+<li>[ ] <code>mvn verify</code> passes, with LINE coverage ≥ <code>api/.coverage-threshold</code></li>
+</ul>
 <h3 id="be-2-movevideo-service-dto-controller-i18n-errors">BE-2: <code>moveVideo</code> service, DTO, controller, i18n errors<a class="headerlink" href="#be-2-movevideo-service-dto-controller-i18n-errors" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>dto/collection/MoveVideoRequest</code> (record or Lombok, following <code>CollectionRequest</code>): <code>Long afterVideoId</code></li>
@@ -7319,42 +7323,52 @@ Handoff to: Builder, QA Engineer
 <li><code>VideoCollectionController</code>: <code>@PatchMapping("/{id}/videos/{videoId}")</code>, <code>@RateLimited(permit = 60)</code>, <code>@AuditLog("moveVideoInCollection")</code>, returns 204</li>
 <li><code>i18n/messages.properties</code> + <code>messages_vi.properties</code>: <code>error.collection.itemNotFound</code>, <code>error.collection.moveInvalid</code></li>
 </ul>
-<p><strong>Acceptance criteria</strong>
-- [ ] <code>VideoCollectionServiceImplTest</code> covers: move to the top, to the middle, to the bottom; a no-op (no <code>renumber</code> call); <code>videoId</code> not in the collection → 404; <code>afterVideoId</code> not in the collection → 404; <code>afterVideoId == videoId</code> → 400; a non-manager → 404; a public collection evicts the cache; a private one does not; <code>updatedAt</code> is not changed
-- [ ] <code>VideoCollectionControllerTest</code> covers: 204 on success, a null body field means top, 401 for a guest
-- [ ] Both new message keys exist in vi and en (the i18n parity test passes)
-- [ ] <code>mvn verify</code> passes and coverage is ≥ the threshold</p>
+<p><strong>Acceptance criteria</strong></p>
+<ul>
+<li>[ ] <code>VideoCollectionServiceImplTest</code> covers: move to the top, to the middle, to the bottom; a no-op (no <code>renumber</code> call); <code>videoId</code> not in the collection → 404; <code>afterVideoId</code> not in the collection → 404; <code>afterVideoId == videoId</code> → 400; a non-manager → 404; a public collection evicts the cache; a private one does not; <code>updatedAt</code> is not changed</li>
+<li>[ ] <code>VideoCollectionControllerTest</code> covers: 204 on success, a null body field means top, 401 for a guest</li>
+<li>[ ] Both new message keys exist in vi and en (the i18n parity test passes)</li>
+<li>[ ] <code>mvn verify</code> passes and coverage is ≥ the threshold</li>
+</ul>
 <h3 id="fe-1-api-client-hook-util">FE-1: API client + hook + util<a class="headerlink" href="#fe-1-api-client-hook-util" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>api/collections.js</code>: <code>moveVideo: (id, videoId, afterVideoId) =&gt; api.patch(\</code>/collections/${enc(id)}/videos/${enc(videoId)}`, { afterVideoId })`</li>
 <li><code>components/library/collectionUtils.js</code>: <code>moveAfterId(ids, fromIndex, toIndex)</code> returns the <code>afterVideoId</code> for the API (<code>null</code> when the target is index 0), using the list <em>after</em> the move</li>
-<li><code>hooks/useCollections.js</code>: <code>useMoveCollectionItem()</code></li>
+<li><code>hooks/useCollections.js</code>: <code>useMoveCollectionItem()</code><ul>
 <li><code>onMutate</code>: cancel queries, then <code>setQueryData(['collections', id, 'videos', 'all'], arrayMove…)</code>. Return the snapshot</li>
 <li><code>onError</code>: restore the snapshot</li>
 <li><code>onSettled</code>: invalidate the page queries <code>['collections', id, 'videos', &lt;n&gt;]</code> and the lists (the cover may change; <code>includePublic: visibility !== 'PRIVATE'</code>). Leave out the <code>'all'</code> key, so a refetch of up to 500 items does not follow every drop</li>
 </ul>
-<p><strong>Acceptance criteria</strong>
-- [ ] Vitest: <code>moveAfterId</code> for first→last, last→first, a middle move, and a no-op
-- [ ] Vitest <code>useCollections.test.jsx</code>: the optimistic order shows up at once and rolls back on error. The PATCH body has the right <code>afterVideoId</code>
-- [ ] <code>npm run lint</code> and <code>npm run test</code> pass</p>
+</li>
+</ul>
+<p><strong>Acceptance criteria</strong></p>
+<ul>
+<li>[ ] Vitest: <code>moveAfterId</code> for first→last, last→first, a middle move, and a no-op</li>
+<li>[ ] Vitest <code>useCollections.test.jsx</code>: the optimistic order shows up at once and rolls back on error. The PATCH body has the right <code>afterVideoId</code></li>
+<li>[ ] <code>npm run lint</code> and <code>npm run test</code> pass</li>
+</ul>
 <h3 id="fe-2-sap-xep-mode-with-dnd-kit">FE-2: "Sắp xếp" mode with <code>@dnd-kit</code><a class="headerlink" href="#fe-2-sap-xep-mode-with-dnd-kit" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>npm i @dnd-kit/core@^6.3.1 @dnd-kit/sortable@^10.0.0 @dnd-kit/utilities@^3.2.2</code></li>
-<li><code>LibraryView.jsx</code>, <code>CollectionDetail</code>: for <code>canManage</code>, add a "Sắp xếp" / "Xong" toggle button. In sort mode, render <code>&lt;ReorderGrid&gt;</code>:</li>
+<li><code>LibraryView.jsx</code>, <code>CollectionDetail</code>: for <code>canManage</code>, add a "Sắp xếp" / "Xong" toggle button. In sort mode, render <code>&lt;ReorderGrid&gt;</code>:<ul>
 <li>data from <code>useCollectionPlaylist(collectionId)</code>, which is the same cache that "Phát" uses</li>
 <li><code>DndContext</code> with <code>PointerSensor</code> (activation distance 5px), <code>TouchSensor</code> (delay 200ms, tolerance 5, so page scroll still works), <code>KeyboardSensor</code> + <code>sortableKeyboardCoordinates</code></li>
 <li><code>SortableContext</code> + <code>rectSortingStrategy</code> over the existing <code>explore-reels-grid</code> and tile look. A drag handle button (<code>drag_indicator</code> icon, <code>aria-label</code> from i18n). Clicking a tile does nothing in sort mode</li>
 <li><code>onDragEnd</code> → <code>moveAfterId</code> → <code>useMoveCollectionItem().mutate</code>. Show an <code>app-alert error</code> on failure</li>
 <li><code>accessibility.announcements</code> / <code>screenReaderInstructions</code> localized</li>
+</ul>
+</li>
 <li><code>i18n/locales/{vi,en}/library.json</code>: <code>reorder</code>, <code>reorderDone</code>, <code>reorderHint</code>, <code>dragHandleAria</code>, <code>moveError</code>, and the announcement strings</li>
 <li><code>.claude/rules/tech-strategy.md</code>, JavaScript table: add the row <code>| Drag &amp; Drop | @dnd-kit (core + sortable) |</code></li>
 </ul>
-<p><strong>Acceptance criteria</strong>
-- [ ] The "Sắp xếp" button shows only when <code>canManage</code>. Guests and viewers of a public collection do not see it
-- [ ] Dragging with the mouse on desktop, a long press and drag on mobile (Chrome DevTools touch emulation), and keyboard (Space → arrows → Space) all reorder the list and persist after a reload
-- [ ] After a reorder, "Phát" and the paged grid show the new order. The library card cover shows the first video
-- [ ] Vitest <code>LibraryView.test.jsx</code>: the button is hidden for non-managers; sort mode renders the handles; <code>onDragEnd</code> calls the mutation with the right ids (mock the hook or fire the handler)
-- [ ] The i18n parity test passes, <code>npm run lint</code> and <code>npm run build</code> pass, and the bundle grows by less than about 20 KB gzip</p>
+<p><strong>Acceptance criteria</strong></p>
+<ul>
+<li>[ ] The "Sắp xếp" button shows only when <code>canManage</code>. Guests and viewers of a public collection do not see it</li>
+<li>[ ] Dragging with the mouse on desktop, a long press and drag on mobile (Chrome DevTools touch emulation), and keyboard (Space → arrows → Space) all reorder the list and persist after a reload</li>
+<li>[ ] After a reorder, "Phát" and the paged grid show the new order. The library card cover shows the first video</li>
+<li>[ ] Vitest <code>LibraryView.test.jsx</code>: the button is hidden for non-managers; sort mode renders the handles; <code>onDragEnd</code> calls the mutation with the right ids (mock the hook or fire the handler)</li>
+<li>[ ] The i18n parity test passes, <code>npm run lint</code> and <code>npm run build</code> pass, and the bundle grows by less than about 20 KB gzip</li>
+</ul>
 <h3 id="qa-1-e2e-prod-smoke">QA-1: E2E + prod smoke<a class="headerlink" href="#qa-1-e2e-prod-smoke" title="Permanent link">&para;</a></h3>
 <ul>
 <li>[ ] Local: run all three input methods. Two tabs moving items at the same time end in a consistent order with no 500. Add a video after sorting: it lands at the top</li>

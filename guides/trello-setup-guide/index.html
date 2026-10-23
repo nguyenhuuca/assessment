@@ -7117,29 +7117,33 @@
 <h1 id="trello-mcp-server-setup-guide">Trello MCP Server Setup Guide<a class="headerlink" href="#trello-mcp-server-setup-guide" title="Permanent link">&para;</a></h1>
 <h2 id="step-1-get-trello-api-credentials">Step 1: Get Trello API Credentials<a class="headerlink" href="#step-1-get-trello-api-credentials" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Get API Key:</strong></li>
+<li>
+<p><strong>Get API Key:</strong></p>
+<ul>
 <li>Visit: https://trello.com/app-key</li>
 <li>Login to your Trello account</li>
-<li>
-<p>Copy your API Key</p>
+<li>Copy your API Key</li>
+</ul>
 </li>
 <li>
 <p><strong>Get Token:</strong></p>
-</li>
+<ul>
 <li>On the same page, click "Token" link (or manually generate)</li>
 <li>Or visit: <code>https://trello.com/1/authorize?expiration=never&amp;scope=read,write&amp;response_type=token&amp;name=Claude%20Code&amp;key=YOUR_API_KEY</code></li>
 <li>Replace <code>YOUR_API_KEY</code> with your actual API key</li>
 <li>Authorize the application</li>
-<li>
-<p>Copy the token</p>
+<li>Copy the token</li>
+</ul>
 </li>
 <li>
 <p><strong>Get Board ID:</strong></p>
-</li>
+<ul>
 <li>Open your Trello board in browser</li>
 <li>URL format: <code>https://trello.com/b/BOARD_ID/board-name</code></li>
 <li>Or add <code>.json</code> to board URL: <code>https://trello.com/b/BOARD_ID.json</code></li>
 <li>Copy the <code>id</code> field</li>
+</ul>
+</li>
 </ol>
 <h2 id="step-2-add-to-environment-variables">Step 2: Add to Environment Variables<a class="headerlink" href="#step-2-add-to-environment-variables" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Add to api/.env</span>

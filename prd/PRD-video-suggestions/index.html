@@ -7089,11 +7089,13 @@ Handoff to: Builder (/swarm-execute)
 <strong>Date:</strong> 2026-10-15
 <strong>Related Plan:</strong> <a href="../../plans/plan-video-suggestions/">plan-video-suggestions</a>
 <strong>Builds on:</strong> <a href="../../adr/0019-admin-video-import/">ADR-0019 Admin Video Import</a>, <a href="../../adr/0017-user-notifications/">ADR-0017 User Notifications</a></p>
-<p>The "+" button no longer shares a YouTube link (the legacy <code>share_link</code> feature is being retired). It becomes <strong>"Đề xuất video" / "Suggest a video"</strong>:
-1. A logged-in user submits a YouTube or Facebook link.
-2. An admin approves or rejects it.
-3. Approved links go through the existing import pipeline (yt-dlp → Drive → cron).
-4. The user is notified at each step.</p>
+<p>The "+" button no longer shares a YouTube link (the legacy <code>share_link</code> feature is being retired). It becomes <strong>"Đề xuất video" / "Suggest a video"</strong>:</p>
+<ol>
+<li>A logged-in user submits a YouTube or Facebook link.</li>
+<li>An admin approves or rejects it.</li>
+<li>Approved links go through the existing import pipeline (yt-dlp → Drive → cron).</li>
+<li>The user is notified at each step.</li>
+</ol>
 <hr />
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
 <p>Logged-in users see three "+"/upload buttons (the desktop FAB, the mobile nav FAB and a header icon) that open <code>ShareModal</code>. The share feature is dead, so the buttons do nothing useful. The only way to add videos today is the admin-only import, so users cannot contribute content at all.</p>
@@ -7141,37 +7143,51 @@ Handoff to: Builder (/swarm-execute)
 <li><strong>User:</strong> I paste a YouTube or Facebook link, with an optional title and a note on why it is fun, and see the status of my recent suggestions in the same dialog.</li>
 <li><strong>User:</strong> in History → My suggestions I can browse all my past suggestions, filter them by status, and play the ones that went live.</li>
 <li><strong>User:</strong> I get a notification when my suggestion is approved, when it is rejected (with the reason), and when the video is live. Tapping the live notification plays the video.</li>
-<li><strong>Admin:</strong> I see a queue of pending suggestions with the link, a preview title, who suggested it, and when.</li>
+<li><strong>Admin:</strong> I see a queue of pending suggestions with the link, a preview title, who suggested it, and when.<ul>
 <li>I approve with one click (and can edit the title). The link then enters the normal import queue.</li>
 <li>I reject with a reason.</li>
+</ul>
+</li>
 <li><strong>Admin:</strong> pressing "+" opens the import form directly.</li>
 </ul>
 <hr />
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <h3 id="functional">Functional<a class="headerlink" href="#functional" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>The "+" buttons:</strong></li>
+<li><strong>The "+" buttons:</strong><ul>
 <li>Logged-in non-admin users: the desktop FAB and the mobile nav FAB open <code>SuggestVideoModal</code>.</li>
 <li>Admins: they open the Admin → Import tab.</li>
 <li>The header "upload" icon is removed, so two entry points are enough.</li>
-<li><strong>Submit:</strong></li>
+</ul>
+</li>
+<li><strong>Submit:</strong><ul>
 <li>The URL is required. Only HTTPS YouTube or Facebook links are accepted, using the same allowlist and normalization as import.</li>
 <li>The title is optional, at most 200 characters. The note is optional, at most 300 characters.</li>
-<li><strong>Reject on submit when:</strong></li>
+</ul>
+</li>
+<li><strong>Reject on submit when:</strong><ul>
 <li><strong>Duplicate:</strong> a suggestion for the same normalized URL is already pending, or an import of that URL is active or done. The response is 409 with a clear message.</li>
 <li><strong>Daily limit:</strong> the user has already made 5 suggestions in the last 24 hours (configurable). The response is 429 with a clear message.</li>
-<li><strong>The user's own suggestions:</strong></li>
+</ul>
+</li>
+<li><strong>The user's own suggestions:</strong><ul>
 <li>The modal shows the latest 5 with their status (Chờ duyệt / Đã duyệt / Bị từ chối with the reason / Đã lên app with a link) and a "Xem tất cả" link.</li>
 <li>The <strong>History → "Đề xuất của tôi"</strong> page shows the full list, paged, with a status filter. It replaces the ComingSoon placeholder of the History nav item.</li>
 <li>Users only ever see their own suggestions.</li>
-<li><strong>The Admin "Đề xuất" tab:</strong></li>
+</ul>
+</li>
+<li><strong>The Admin "Đề xuất" tab:</strong><ul>
 <li>It lists suggestions, pending first, with a status filter and pagination, and shows the pending count on the tab.</li>
 <li><strong>Approve</strong> has an optional title override. It creates an import job, either now or using the import defaults. The suggestion moves to APPROVED and is linked to the job.</li>
 <li><strong>Reject</strong> uses a reason from a fixed list (duplicate, inappropriate, low quality, copyright, other) plus a note, which is required for "other". The suggestion moves to REJECTED.</li>
-<li><strong>Notifications</strong> to the suggester, in-app and in the email digest, in their language:</li>
+</ul>
+</li>
+<li><strong>Notifications</strong> to the suggester, in-app and in the email digest, in their language:<ul>
 <li><code>SUGGESTION_APPROVED</code></li>
 <li><code>SUGGESTION_REJECTED</code> (with the reason)</li>
 <li><code>SUGGESTION_LIVE</code>, when the cron ingests the Drive file. It deep-links <code>?v=&lt;videoId&gt;</code>.</li>
+</ul>
+</li>
 <li><strong>Retire share:</strong> remove <code>ShareModal</code>, <code>videosApi.share</code>/<code>delete</code> and their translations. The backend <code>share_link</code> tables and endpoints are left for the owner to delete separately.</li>
 </ol>
 <h3 id="non-functional">Non-functional<a class="headerlink" href="#non-functional" title="Permanent link">&para;</a></h3>

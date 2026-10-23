@@ -7234,7 +7234,7 @@
 <li><strong>What the PRD asks for:</strong> a <strong>Report</strong> menu where an admin sends a bug, an enhancement or an issue. The server turns it into a GitHub issue labelled <code>autopilot</code>, so headless autopilot picks it up.</li>
 <li><strong>The workflow's owner-only check:</strong> <code>.github/workflows/autopilot.yml</code> starts only when the label sender is the repo owner (ADR-0022 D2). A server that creates issues with <strong>any</strong> identity other than the owner's does not start autopilot.</li>
 <li><strong>The repo is public,</strong> so issue text is public.</li>
-<li><strong>Existing building blocks:</strong></li>
+<li><strong>Existing building blocks:</strong><ul>
 <li><strong>External HTTP:</strong> <code>java.net.http.HttpClient</code>, for example <code>client/HttpRedirectProbe.java:31-34</code>. There is no Spring <code>RestClient</code> or <code>WebClient</code> in <code>api/</code>.</li>
 <li><strong>Rate limiting:</strong><ul>
 <li><code>@RateLimited</code> keys the limit by user name plus request URI (<code>aop/RateLimitAspect.java:33-36, 52-55</code>).</li>
@@ -7249,6 +7249,8 @@
 </li>
 <li><strong>Permission bits:</strong> generic (<code>READ</code>, <code>WRITE</code>, <code>EXEC</code>, <code>DELETE</code>, <code>ADMIN</code>; <code>enums/Permission.java</code>). Admins get every bit.</li>
 <li><strong>Cache:</strong> Guava with <code>expireAfterWrite</code> (<code>cache/CredentialsVersionCache.java:24-25</code>).</li>
+</ul>
+</li>
 </ul>
 <h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
 <ol>
@@ -7324,83 +7326,105 @@
 <h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
 <h3 id="d1-github-client">D1. GitHub client<a class="headerlink" href="#d1-github-client" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Interface:</strong> <code>GitHubIssueClient</code> in the <code>client</code> package, implemented with <code>java.net.http.HttpClient</code> and Jackson, like <code>HttpRedirectProbe</code>. It has two calls:</li>
+<li><strong>Interface:</strong> <code>GitHubIssueClient</code> in the <code>client</code> package, implemented with <code>java.net.http.HttpClient</code> and Jackson, like <code>HttpRedirectProbe</code>. It has two calls:<ul>
 <li><code>POST /repos/{owner}/{repo}/issues</code> with <code>title</code>, <code>body</code> and <code>labels</code>;</li>
 <li><code>GET /repos/{owner}/{repo}/issues/{number}</code> for the state.</li>
+</ul>
+</li>
 <li><strong>Config:</strong> <code>AppProperties.github</code> with <code>token</code>, <code>owner</code> and <code>repo</code>. The token comes from the env var <code>GITHUB_REPORT_TOKEN</code>.</li>
-<li><strong>Token rules:</strong></li>
+<li><strong>Token rules:</strong><ul>
 <li>Fine-grained PAT, this repo only, Issues read/write.</li>
 <li>Never logged, never returned to the browser, masked by <code>@AuditLog</code>.</li>
+</ul>
+</li>
 <li><strong>Timeouts:</strong> connect 5 s, request 10 s.</li>
 </ul>
 <h3 id="d2-labels-and-trust-amends-adr-0022-d2">D2. Labels and trust (amends ADR-0022 D2)<a class="headerlink" href="#d2-labels-and-trust-amends-adr-0022-d2" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Labels on every issue:</strong> <code>autopilot</code> plus one type label: <code>bug</code>, <code>enhancement</code> or <code>report</code>.</li>
 <li><strong>Auto labels:</strong> <code>autopilot:auto</code> and <code>autopilot:auto-merge</code> are accepted <strong>only from SUPER_ADMIN</strong>. The server checks this and returns 403 to an ADMIN; hiding the option in the UI is not the check.</li>
-<li><strong>Trust change:</strong></li>
+<li><strong>Trust change:</strong><ul>
 <li>Because the PAT is the owner's, an ADMIN report starts autopilot.</li>
 <li>The owner-only check in ADR-0022 D2 now means "the owner, or an admin through the app". Admin accounts are granted only by the SUPER_ADMIN.</li>
+</ul>
+</li>
 <li><strong>Report text is data,</strong> exactly like issue text today (ADR-0022 D3). The headless denylist and the ADR-0025 merge checks still apply.</li>
 </ul>
 <h3 id="d3-abuse-limits">D3. Abuse limits<a class="headerlink" href="#d3-abuse-limits" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Per user:</strong> <code>@RateLimited(permit = 5, windowInSeconds = 3600)</code> on create and on retry (NFR-4). It is in memory, so a restart resets it; that is acceptable.</li>
-<li><strong>Global daily cap</strong> on reports that carry <code>autopilot</code>: <strong>10 per rolling 24 h</strong>, counted from the stored reports, so it survives a restart.</li>
+<li><strong>Global daily cap</strong> on reports that carry <code>autopilot</code>: <strong>10 per rolling 24 h</strong>, counted from the stored reports, so it survives a restart.<ul>
 <li><strong>Over the cap:</strong> the issue is still created, but <strong>without</strong> <code>autopilot</code>.</li>
 <li>The user is told that the owner can add the label.</li>
+</ul>
+</li>
 <li><strong>Audit:</strong> <code>@AuditLog</code> on create and on retry. Each stored report keeps its reporter.</li>
 </ul>
 <h3 id="d4-storage-and-status">D4. Storage and status<a class="headerlink" href="#d4-storage-and-status" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Table:</strong> <code>app_report</code>, added by a Liquibase migration in <code>db/changelog/sql/</code>. Columns:</li>
+<li><strong>Table:</strong> <code>app_report</code>, added by a Liquibase migration in <code>db/changelog/sql/</code>. Columns:<ul>
 <li><code>id</code>, <code>reporter_id</code> (FK to users);</li>
 <li><code>type</code>, <code>title</code>, <code>description</code>;</li>
 <li><code>context</code> (path, app version, user agent, screen width);</li>
 <li><code>labels</code>, <code>status</code> (<code>CREATED</code> / <code>FAILED</code>), <code>issue_number</code>, <code>issue_url</code>, <code>error</code>;</li>
 <li><code>created_at</code>, <code>updated_at</code>.</li>
-<li><strong>Write path:</strong></li>
+</ul>
+</li>
+<li><strong>Write path:</strong><ol>
 <li>Save the report as <code>FAILED</code>.</li>
 <li>Call GitHub.</li>
 <li>On success, set <code>CREATED</code> with the issue number and URL.</li>
 <li>On failure, keep <code>FAILED</code> with a short error (no token, no response body). Retry repeats steps 2 and 3.</li>
+</ol>
+</li>
 <li><strong>Duplicates:</strong> the issue body ends with <code>&lt;!-- app-report:{id} --&gt;</code>. A response lost after GitHub created the issue can lead to a duplicate on retry; the marker lets the owner find and close it. The risk is accepted.</li>
-<li><strong>Status:</strong> read through from GitHub when the list loads:</li>
+<li><strong>Status:</strong> read through from GitHub when the list loads:<ul>
 <li>one <code>GET</code> per issue on the page, in parallel on virtual threads;</li>
 <li>cached in Guava for 5 min;</li>
 <li>a failure shows <code>unknown</code>.</li>
 <li>Superseded for issues with a stored state by D7: the list reads the state from the table and calls GitHub only for rows that have none.</li>
+</ul>
+</li>
 <li><strong>List scope:</strong> every admin sees all reports, newest first, paged, with the reporter's display name. The issues are public anyway.</li>
 </ul>
 <h3 id="d5-issue-body-public-repo">D5. Issue body (public repo)<a class="headerlink" href="#d5-issue-body-public-repo" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Content, in order:</strong></li>
+<li><strong>Content, in order:</strong><ol>
 <li>the description as typed;</li>
 <li>a "Context" section: page path <strong>without the query string</strong>, app version, user agent, screen width;</li>
 <li>the footer "Reported in-app by <code>&lt;display name&gt;</code> · report #<code>&lt;id&gt;</code>".</li>
+</ol>
+</li>
 <li><strong>Never in the body:</strong> the email, IDs other than the report id, or tokens.</li>
 <li><strong>Form warning:</strong> the form says that the text will be public.</li>
 </ul>
 <h3 id="d6-future-contributor">D6. Future CONTRIBUTOR<a class="headerlink" href="#d6-future-contributor" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>v1:</strong> the endpoints use <code>hasRole('ADMIN')</code>.</li>
-<li><strong>When CONTRIBUTOR is added:</strong></li>
+<li><strong>When CONTRIBUTOR is added:</strong><ul>
 <li>insert it into <code>UserRole</code> between <code>USER</code> and <code>ADMIN</code>;</li>
 <li>change the endpoints to <code>hasRole('CONTRIBUTOR')</code>;</li>
 <li>add a migration if the <code>role</code> column has a check constraint;</li>
 <li>leave the auto-label rule (SUPER_ADMIN only) unchanged.</li>
 </ul>
+</li>
+</ul>
 <h3 id="d7-issue-state-by-webhook-amendment-2026-10-21">D7. Issue state by webhook (amendment, 2026-10-21)<a class="headerlink" href="#d7-issue-state-by-webhook-amendment-2026-10-21" title="Permanent link">&para;</a></h3>
 <p>The owner asked for the closed state to be pushed to the app and stored, and to tell "done" from "closed, not planned".</p>
 <ul>
 <li><strong>Endpoint:</strong> <code>POST /v1/funny-app/webhooks/github</code>, added to <code>WHITE_LIST_PATH</code> (<code>utils/AppConstant.java:45</code>), so no JWT. GitHub is the only intended caller.</li>
-<li><strong>Authentication:</strong> the HMAC-SHA256 signature in <code>X-Hub-Signature-256</code> over the <strong>raw body</strong>, with the shared secret from the env var <code>GITHUB_WEBHOOK_SECRET</code>.</li>
+<li><strong>Authentication:</strong> the HMAC-SHA256 signature in <code>X-Hub-Signature-256</code> over the <strong>raw body</strong>, with the shared secret from the env var <code>GITHUB_WEBHOOK_SECRET</code>.<ul>
 <li>Compared in constant time (<code>MessageDigest.isEqual</code>) before the body is parsed.</li>
 <li>Missing or wrong signature → 401. Secret not configured → 503, so the endpoint is off until the owner sets it.</li>
 <li>The secret is never logged; the delivery id (<code>X-GitHub-Delivery</code>) is logged at INFO.</li>
+</ul>
+</li>
 <li><strong>Events:</strong> only <code>X-GitHub-Event: issues</code> with action <code>closed</code> or <code>reopened</code>. <code>ping</code> and every other event or action → 204 and nothing stored.</li>
-<li><strong>Storage:</strong> new columns on <code>app_report</code>: <code>github_state</code> (<code>OPEN</code>/<code>CLOSED</code>), <code>github_state_reason</code> (<code>completed</code>, <code>not_planned</code>, <code>duplicate</code>, <code>reopened</code>, or null), <code>github_state_at</code> (the issue's <code>updated_at</code> from the payload), plus an index on <code>issue_number</code>.</li>
+<li><strong>Storage:</strong> new columns on <code>app_report</code>: <code>github_state</code> (<code>OPEN</code>/<code>CLOSED</code>), <code>github_state_reason</code> (<code>completed</code>, <code>not_planned</code>, <code>duplicate</code>, <code>reopened</code>, or null), <code>github_state_at</code> (the issue's <code>updated_at</code> from the payload), plus an index on <code>issue_number</code>.<ul>
 <li>The row is found by <code>issue_number</code> among <code>CREATED</code> reports. An issue that was not created by the app → 204, nothing stored.</li>
 <li><strong>Out-of-order deliveries:</strong> an event is applied only when its <code>updated_at</code> is newer than the stored <code>github_state_at</code>.</li>
+</ul>
+</li>
 <li><strong>List:</strong> a row with a stored state uses it, with no GitHub call. A row without one (created before D7, or no event yet) keeps the D4 read-through.</li>
 <li><strong>Missed deliveries:</strong> GitHub does not retry a failed delivery on its own. The stored state can then stay stale until the next event or a manual redeliver from the repo's webhook settings. Accepted.</li>
 <li><strong>Owner setup:</strong> repo Settings → Webhooks → payload URL above, content type <code>application/json</code>, secret, "Issues" events only; <code>GITHUB_WEBHOOK_SECRET</code> in the VM's env file, then restart.</li>
@@ -7440,9 +7464,11 @@
 <h3 id="positive">Positive<a class="headerlink" href="#positive" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>One click</strong> from seeing a problem to an autopilot run, and the issue carries its context.</li>
-<li><strong>Small footprint:</strong></li>
+<li><strong>Small footprint:</strong><ul>
 <li>no new library, no new infrastructure, no workflow change;</li>
 <li>one new client, one table, one controller.</li>
+</ul>
+</li>
 <li><strong>Least-privilege credential:</strong> easy to rotate by replacing the env var.</li>
 </ul>
 <h3 id="negative">Negative<a class="headerlink" href="#negative" title="Permanent link">&para;</a></h3>
@@ -7455,14 +7481,18 @@
 </ul>
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>
-<li>An integration test against a stubbed GitHub (local <code>HttpServer</code>, like <code>HttpRedirectProbeTest</code>) checks:</li>
+<li>An integration test against a stubbed GitHub (local <code>HttpServer</code>, like <code>HttpRedirectProbeTest</code>) checks:<ul>
 <li>the labels for ADMIN, for SUPER_ADMIN with auto labels, and over the daily cap;</li>
 <li>FAILED and retry;</li>
 <li>the marker in the body.</li>
-<li>Permission tests:</li>
+</ul>
+</li>
+<li>Permission tests:<ul>
 <li>USER gets 403;</li>
 <li>ADMIN sending an auto label gets 403;</li>
 <li>SUPER_ADMIN gets 201.</li>
+</ul>
+</li>
 <li>A prod check by the owner: a report from the app creates issue N with <code>autopilot</code>, and the plan job starts.</li>
 </ul>
 <h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>

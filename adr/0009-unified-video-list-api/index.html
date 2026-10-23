@@ -7365,11 +7365,13 @@
 <p><strong>Tech Strategy:</strong> ✅ Follows Golden Path</p>
 <hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The application exposes four separate video listing endpoints:
-- <code>/api/top-videos</code> — YouTube videos suggested by ChatGPT
-- <code>/api/stream/list</code> — Locally stored streamable videos
-- <code>/api/share-links</code> — User-shared video links
-- <code>/api/private-videos</code> — Private user uploads</p>
+<p>The application exposes four separate video listing endpoints:</p>
+<ul>
+<li><code>/api/top-videos</code> — YouTube videos suggested by ChatGPT</li>
+<li><code>/api/stream/list</code> — Locally stored streamable videos</li>
+<li><code>/api/share-links</code> — User-shared video links</li>
+<li><code>/api/private-videos</code> — Private user uploads</li>
+</ul>
 <p>These endpoints share no common contract and have accumulated compounding limitations:</p>
 <ul>
 <li>No pagination — any response with more than ~100 videos risks memory exhaustion</li>
@@ -7555,22 +7557,28 @@
 </table>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Single endpoint eliminates frontend result-merging logic
-- Pagination prevents memory exhaustion at any dataset size
-- Caching reduces database load by an estimated 80–90%
-- Full-text search, sorting, and filtering are available without frontend workarounds
-- DRY: one cache, one pagination pattern, one response contract
-- New video sources can be added by extending the service, not adding new endpoints</p>
-<p><strong>Negative:</strong>
-- Service-layer aggregation increases code complexity vs. direct single-table queries
-- Frontend must migrate from four endpoints to one (mitigated by backward-compatible wrappers)
-- Cache invalidation must be coordinated across create, update, and delete operations for all source types
-- In-memory merge can consume memory for large sort operations (bounded by enforced max page size)</p>
-<p><strong>Risks:</strong>
-- Cache invalidation gaps could serve stale lists — mitigate with conservative TTL and explicit invalidation on writes
-- Offset pagination degrades at extreme page numbers — monitor and migrate to cursor-based if needed
-- 6-sprint deprecation window may be tight for consumers unaware of the change — communicate actively</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>Single endpoint eliminates frontend result-merging logic</li>
+<li>Pagination prevents memory exhaustion at any dataset size</li>
+<li>Caching reduces database load by an estimated 80–90%</li>
+<li>Full-text search, sorting, and filtering are available without frontend workarounds</li>
+<li>DRY: one cache, one pagination pattern, one response contract</li>
+<li>New video sources can be added by extending the service, not adding new endpoints</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Service-layer aggregation increases code complexity vs. direct single-table queries</li>
+<li>Frontend must migrate from four endpoints to one (mitigated by backward-compatible wrappers)</li>
+<li>Cache invalidation must be coordinated across create, update, and delete operations for all source types</li>
+<li>In-memory merge can consume memory for large sort operations (bounded by enforced max page size)</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li>Cache invalidation gaps could serve stale lists — mitigate with conservative TTL and explicit invalidation on writes</li>
+<li>Offset pagination degrades at extreme page numbers — monitor and migrate to cursor-based if needed</li>
+<li>6-sprint deprecation window may be tight for consumers unaware of the change — communicate actively</li>
+</ul>
 <hr />
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>

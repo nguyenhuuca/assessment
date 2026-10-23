@@ -7555,18 +7555,24 @@
 </table>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Automated CVE detection runs before every production deploy
-- SARIF upload surfaces findings in GitHub Security Code Scanning tab
-- Catches both OS-level (Alpine) and Java library vulnerabilities in one job
-- Establishes the foundation for secrets scanning (<code>--scanners secret</code> can be added later)</p>
-<p><strong>Negative:</strong>
-- Pipeline gains one additional job (~60s on a warm runner)
-- Trivy DB must be downloaded each run if the cache is cold (~200MB)</p>
-<p><strong>Risks:</strong>
-- The CRITICAL gate may block the pipeline on the first run if existing dependencies carry unresolved critical CVEs; a one-time triage pass is required before the gate is activated
-- HIGH severity findings are non-blocking initially; if the threshold is not tightened after the baseline is established, medium-term risk accumulates
-- Image scanning is deferred; OS-level CVEs in the deployed container will not be caught until Docker is used in production</p>
+<p><strong>Positive:</strong></p>
+<ul>
+<li>Automated CVE detection runs before every production deploy</li>
+<li>SARIF upload surfaces findings in GitHub Security Code Scanning tab</li>
+<li>Catches both OS-level (Alpine) and Java library vulnerabilities in one job</li>
+<li>Establishes the foundation for secrets scanning (<code>--scanners secret</code> can be added later)</li>
+</ul>
+<p><strong>Negative:</strong></p>
+<ul>
+<li>Pipeline gains one additional job (~60s on a warm runner)</li>
+<li>Trivy DB must be downloaded each run if the cache is cold (~200MB)</li>
+</ul>
+<p><strong>Risks:</strong></p>
+<ul>
+<li>The CRITICAL gate may block the pipeline on the first run if existing dependencies carry unresolved critical CVEs; a one-time triage pass is required before the gate is activated</li>
+<li>HIGH severity findings are non-blocking initially; if the threshold is not tightened after the baseline is established, medium-term risk accumulates</li>
+<li>Image scanning is deferred; OS-level CVEs in the deployed container will not be caught until Docker is used in production</li>
+</ul>
 <hr />
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>

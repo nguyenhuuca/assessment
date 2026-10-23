@@ -7105,14 +7105,18 @@
 <ul>
 <li><code>/autopilot</code> runs plan → review → build → QA → land with two human gates. It only runs inside an interactive terminal session, and the gates use <code>AskUserQuestion</code>.</li>
 <li>Goal ("Level 5"): hand work to the agent from GitHub, without opening a terminal, and keep both gates.</li>
-<li><code>anthropics/claude-code-action@v1</code> runs Claude Code in a GitHub Actions job:</li>
+<li><code>anthropics/claude-code-action@v1</code> runs Claude Code in a GitHub Actions job:<ul>
 <li><strong>automation mode</strong> with a <code>prompt</code>, which can be a skill invocation such as <code>/autopilot …</code>;</li>
 <li><strong>auth:</strong> <code>claude_code_oauth_token</code> (subscription) or <code>anthropic_api_key</code>;</li>
 <li><strong>trigger check:</strong> on issue and PR events, the triggering user must have <strong>write access</strong>, and bots are rejected unless listed.</li>
-<li><strong>Repo facts:</strong></li>
+</ul>
+</li>
+<li><strong>Repo facts:</strong><ul>
 <li><code>nguyenhuuca/assessment</code> is <strong>public</strong>, with 1 collaborator (the owner). Anyone can open issues and comment.</li>
 <li>CI deploys on push to <code>main</code> (and <code>VID-*</code>). Other branches run no CI and deploy nothing.</li>
 <li>The repo convention is "commit on <code>main</code>, ask before every push".</li>
+</ul>
+</li>
 </ul>
 <h2 id="decision-drivers">Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permanent link">&para;</a></h2>
 <ol>
@@ -7126,26 +7130,34 @@
 <h3 id="d1-gates-on-github-branch-pr-merge-gate-2">D1. Gates on GitHub: branch + PR, merge = Gate 2<a class="headerlink" href="#d1-gates-on-github-branch-pr-merge-gate-2" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Start:</strong> the owner adds the label <strong><code>autopilot</code></strong> to an issue.</li>
-<li><strong>Plan job:</strong></li>
+<li><strong>Plan job:</strong><ul>
 <li>runs <code>/autopilot --headless plan --issue &lt;N&gt;</code>;</li>
 <li>writes the plan and <code>TASKS.md</code> section on branch <code>autopilot/issue-&lt;N&gt;</code>;</li>
 <li>opens a <strong>draft PR</strong> with the plan summary and the plan-review verdict;</li>
 <li>comments on the issue.</li>
+</ul>
+</li>
 <li><strong>Gate 1:</strong> the owner comments <strong><code>/approve</code></strong> on the PR. <code>/revise &lt;notes&gt;</code> re-runs the plan job with the notes.</li>
-<li><strong>Build job:</strong></li>
+<li><strong>Build job:</strong><ul>
 <li>runs <code>/autopilot --headless build --pr &lt;N&gt;</code>: implement ⇄ review, QA ×2, full gates;</li>
 <li>commits and pushes <strong>to the PR branch only</strong>;</li>
 <li>writes the run report, then marks the PR ready for review with the report in its body.</li>
+</ul>
+</li>
 <li><strong>Gate 2:</strong> the owner <strong>merges</strong> the PR. The merge is the push to <code>main</code> and triggers the normal deploy, followed by the owner's smoke check.</li>
 <li><strong>Exception to "commit on <code>main</code>":</strong> headless runs use a branch + PR, because a merge is the only gate GitHub can offer. Local runs keep committing on <code>main</code>.</li>
 </ul>
 <h3 id="d2-who-can-trigger">D2. Who can trigger<a class="headerlink" href="#d2-who-can-trigger" title="Permanent link">&para;</a></h3>
-<p>Each job runs only when <strong>both</strong> checks pass:
-- the action's built-in write-access check;
-- an explicit workflow <code>if</code>: <code>github.event.sender.login == github.repository_owner</code> (label or comment author).</p>
-<p>The build and revise jobs also require:
-- the PR head branch starts with <code>autopilot/</code>;
-- the comment starts with <code>/approve</code> or <code>/revise</code>.</p>
+<p>Each job runs only when <strong>both</strong> checks pass:</p>
+<ul>
+<li>the action's built-in write-access check;</li>
+<li>an explicit workflow <code>if</code>: <code>github.event.sender.login == github.repository_owner</code> (label or comment author).</li>
+</ul>
+<p>The build and revise jobs also require:</p>
+<ul>
+<li>the PR head branch starts with <code>autopilot/</code>;</li>
+<li>the comment starts with <code>/approve</code> or <code>/revise</code>.</li>
+</ul>
 <h3 id="d3-untrusted-content">D3. Untrusted content<a class="headerlink" href="#d3-untrusted-content" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The issue title and body are <strong>data</strong>: the request to plan. Instructions inside them that try to change the workflow, permissions, secrets or gates are ignored and quoted in the PR as a finding.</li>
@@ -7156,12 +7168,14 @@
 <li><strong>Auth:</strong> <code>CLAUDE_CODE_OAUTH_TOKEN</code> (subscription), created by the owner with <code>claude setup-token</code> and stored as a repo secret by the owner.</li>
 <li><strong>GitHub token:</strong> the workflow passes <code>github_token: ${{ github.token }}</code> with job permissions <code>contents: write</code>, <code>pull-requests: write</code>, <code>issues: write</code>, so the broad Claude GitHub App is not needed. Pushes made with this token start no workflows. That is fine here, because <code>autopilot/*</code> branches have no CI.</li>
 <li>No other secrets are referenced by the job.</li>
-<li><strong>The Bash allowlist is a guardrail, not a boundary.</strong> <code>node</code>, <code>mvn</code>, <code>npm</code>, <code>awk</code> and <code>sed</code> can all run arbitrary code, and the build job needs them. The OAuth token is present in the job, so a determined prompt injection could reach it. The real boundaries are:</li>
+<li><strong>The Bash allowlist is a guardrail, not a boundary.</strong> <code>node</code>, <code>mvn</code>, <code>npm</code>, <code>awk</code> and <code>sed</code> can all run arbitrary code, and the build job needs them. The OAuth token is present in the job, so a determined prompt injection could reach it. The real boundaries are:<ul>
 <li>only the owner can trigger (D2);</li>
 <li>both gates are human;</li>
 <li>the job has no deploy secrets;</li>
 <li>the token can be revoked by running <code>claude setup-token</code> again.</li>
 <li><code>curl</code> and <code>wget</code> are not allowed, which keeps casual exfiltration harder.</li>
+</ul>
+</li>
 </ul>
 <h3 id="d5-limits">D5. Limits<a class="headerlink" href="#d5-limits" title="Permanent link">&para;</a></h3>
 <ul>
@@ -7177,23 +7191,31 @@
 </ul>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Positive:</strong></li>
+<li><strong>Positive:</strong><ul>
 <li>Work can be started and approved from a phone, and every run leaves a PR with its plan, verdicts, report and diff.</li>
 <li>Deploy secrets stay out of reach.</li>
-<li><strong>Negative:</strong></li>
+</ul>
+</li>
+<li><strong>Negative:</strong><ul>
 <li>Plan and build run in separate jobs, so the build job re-reads the plan from the branch. There is no shared conversation context, which may cost a little more per run.</li>
 <li>Merging from GitHub skips the local "ask before push" prompt. The merge button <strong>is</strong> that prompt.</li>
 <li>The subscription token is tied to the owner's account, so its usage counts against the owner's plan limits.</li>
-<li><strong>Risks:</strong></li>
+</ul>
+</li>
+<li><strong>Risks:</strong><ul>
 <li>A prompt injection inside an issue the owner labels. Mitigations: D3 path denylist, both human gates, and the diff is reviewed before merge.</li>
 <li>Action behaviour changes upstream. Mitigation: pin <code>@v1</code> and review on upgrade.</li>
 </ul>
+</li>
+</ul>
 <h2 id="compliance">Compliance<a class="headerlink" href="#compliance" title="Permanent link">&para;</a></h2>
-<p>The decision holds if:
-- <code>autopilot.yml</code> contains the owner check from D2;
-- no job references secrets other than <code>CLAUDE_CODE_OAUTH_TOKEN</code>;
-- no job pushes to <code>main</code>;
-- <code>SKILL.md</code> keeps the D3 denylist in headless mode.</p>
+<p>The decision holds if:</p>
+<ul>
+<li><code>autopilot.yml</code> contains the owner check from D2;</li>
+<li>no job references secrets other than <code>CLAUDE_CODE_OAUTH_TOKEN</code>;</li>
+<li>no job pushes to <code>main</code>;</li>
+<li><code>SKILL.md</code> keeps the D3 denylist in headless mode.</li>
+</ul>
 
 
 

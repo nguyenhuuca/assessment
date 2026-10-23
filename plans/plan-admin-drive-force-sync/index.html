@@ -7581,8 +7581,10 @@ The ChatGPT poem is only requested when the row has no description (<code>makeDe
 </ul>
 <h3 id="fs-3-api-025-d-after-fs-2">FS-3 — API (0.25 d) — after FS-2<a class="headerlink" href="#fs-3-api-025-d-after-fs-2" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[x] <code>AdminDriveSyncController</code> <code>/admin/drive-sync</code>: <code>GET /files</code>, <code>POST /runs</code>, <code>GET /runs/current</code> — class-level <code>hasRole('ADMIN')</code>, <code>POST /runs</code> adds <code>hasRole('SUPER_ADMIN')</code></li>
+<li>[x] <code>AdminDriveSyncController</code> <code>/admin/drive-sync</code>: <code>GET /files</code>, <code>POST /runs</code>, <code>GET /runs/current</code> — class-level <code>hasRole('ADMIN')</code>, <code>POST /runs</code> adds <code>hasRole('SUPER_ADMIN')</code><ul>
 <li><code>@HasPermission</code> is a meta <code>@PreAuthorize</code>; two on one method fail at runtime, so <code>POST /runs</code> uses one combined <code>@PreAuthorize</code> (SA role + ADMIN bit)</li>
+</ul>
+</li>
 <li>[x] Permission tests: GETs — SA 200, ADMIN 200, USER 403; <code>POST /runs</code> — SA 202, ADMIN 403, USER 403</li>
 </ul>
 <h3 id="fs-4-fe-tab-drive_sync-05-d-contract-first-parallel-with-fs-23">FS-4 — FE tab DRIVE_SYNC (0.5 d) — contract-first, parallel with FS-2/3<a class="headerlink" href="#fs-4-fe-tab-drive_sync-05-d-contract-first-parallel-with-fs-23" title="Permanent link">&para;</a></h3>

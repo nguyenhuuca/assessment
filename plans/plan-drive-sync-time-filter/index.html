@@ -7363,18 +7363,22 @@ Handoff to: Builder, QA Engineer
 <ul>
 <li><code>AdminDriveSyncController.files(@RequestParam(required = false) @DateTimeFormat(iso = DATE_TIME) Instant from, … Instant to)</code>; <code>Contract.require(from == null || to == null || !from.isAfter(to), …)</code> → 400 with an i18n message key (vi + en)</li>
 <li><code>DriveSyncService.listFolder(Instant from, Instant to)</code> (replace the no-arg method; update the interface and its one caller)</li>
-<li><code>DriveSyncServiceImpl</code>:</li>
+<li><code>DriveSyncServiceImpl</code>:<ul>
 <li><code>listDriveFolder(Instant from, Instant to)</code> appends <code>and createdTime &gt;= '…'</code> / <code>and createdTime &lt; '…'</code> when set (<code>DateTimeFormatter.ISO_INSTANT</code> on <code>Instant.truncatedTo(SECONDS)</code>); <code>startRun</code> calls it with <code>(null, null)</code> (D9)</li>
 <li>with a range: DB rows from <code>videoSourceRepository.findAllBySourceTypeAndSourceIdIn(SOURCE_TYPE, ids)</code> in chunks of 1 000, empty list → no DB call; orphans = <code>[]</code>, <code>orphansChecked = false</code></li>
 <li>without a range: today's code path, <code>orphansChecked = true</code></li>
+</ul>
+</li>
 <li><code>DriveSyncListingDto</code>: add <code>boolean orphansChecked</code></li>
 <li><code>VideoSourceRepository</code>: derived query <code>findAllBySourceTypeAndSourceIdIn(String, Collection&lt;String&gt;)</code></li>
 </ul>
-<p><strong>Acceptance criteria</strong>
-- [ ] <code>DriveSyncServiceImplTest</code>: no range → same <code>q</code> as today and orphans computed; <code>from</code> only, <code>to</code> only, both → exact <code>q</code> strings; range → <code>findAllBySourceTypeAndSourceIdIn</code> used, <code>findAllBySourceType</code> not called, <code>orphansChecked = false</code>; empty listing → no DB call; states unchanged for a filtered file; <code>startRun</code> still lists without a range
-- [ ] <code>AdminDriveSyncControllerPermissionTest</code> (or a new WebMvc test): params bind as ISO instants; <code>from &gt; to</code> → 400; malformed instant → 400; ADMIN allowed, anonymous rejected (unchanged)
-- [ ] New message key in <code>messages.properties</code> and <code>messages_vi.properties</code> (parity test passes)
-- [ ] <code>mvn verify</code> passes with LINE coverage ≥ <code>api/.coverage-threshold</code></p>
+<p><strong>Acceptance criteria</strong></p>
+<ul>
+<li>[ ] <code>DriveSyncServiceImplTest</code>: no range → same <code>q</code> as today and orphans computed; <code>from</code> only, <code>to</code> only, both → exact <code>q</code> strings; range → <code>findAllBySourceTypeAndSourceIdIn</code> used, <code>findAllBySourceType</code> not called, <code>orphansChecked = false</code>; empty listing → no DB call; states unchanged for a filtered file; <code>startRun</code> still lists without a range</li>
+<li>[ ] <code>AdminDriveSyncControllerPermissionTest</code> (or a new WebMvc test): params bind as ISO instants; <code>from &gt; to</code> → 400; malformed instant → 400; ADMIN allowed, anonymous rejected (unchanged)</li>
+<li>[ ] New message key in <code>messages.properties</code> and <code>messages_vi.properties</code> (parity test passes)</li>
+<li>[ ] <code>mvn verify</code> passes with LINE coverage ≥ <code>api/.coverage-threshold</code></li>
+</ul>
 <h3 id="fe-1-util-api-hook">FE-1: Util + API + hook<a class="headerlink" href="#fe-1-util-api-hook" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>webapp/src/utils/timeRange.js</code>: <code>TIME_PRESETS</code> (<code>1h</code>, <code>12h</code>, <code>24h</code>, <code>7d</code>, <code>30d</code> → ms), <code>DEFAULT_TIME_FILTER = { mode: 'relative', preset: '12h' }</code>, <code>toRangeParams</code> per the contract; reuse <code>localToIso</code></li>
@@ -7382,40 +7386,48 @@ Handoff to: Builder, QA Engineer
 <li><code>hooks/useAdmin.js</code>: <code>useDriveSyncFiles(filter)</code> → key <code>['admin','drive-sync','files', filter]</code>, <code>queryFn</code> calls <code>toRangeParams(filter)</code> at fetch time (D5), <code>enabled</code> only when there is no error, <code>placeholderData: keepPreviousData</code> (D8)</li>
 <li>Tests: <code>utils/__tests__/timeRange.test.js</code>; hook/API call params checked through the panel test or a hook test</li>
 </ul>
-<p><strong>Acceptance criteria</strong>
-- [ ] Each preset gives <code>from = now − preset</code> and no <code>to</code>, with <code>now</code> injected; <code>all</code> gives <code>{}</code>
-- [ ] Custom: from only, to only, both, both empty; <code>to</code> includes its minute; <code>2026-10-18T07:00</code> (VN) → <code>2026-10-18T00:00:00.000Z</code>; from &gt; to → error and <code>params: null</code>
-- [ ] <code>getDriveSyncFiles({ from })</code> calls <code>/admin/drive-sync/files?from=…</code>; empty params call the bare path
-- [ ] <code>npm run test</code> and <code>npm run lint</code> pass</p>
+<p><strong>Acceptance criteria</strong></p>
+<ul>
+<li>[ ] Each preset gives <code>from = now − preset</code> and no <code>to</code>, with <code>now</code> injected; <code>all</code> gives <code>{}</code></li>
+<li>[ ] Custom: from only, to only, both, both empty; <code>to</code> includes its minute; <code>2026-10-18T07:00</code> (VN) → <code>2026-10-18T00:00:00.000Z</code>; from &gt; to → error and <code>params: null</code></li>
+<li>[ ] <code>getDriveSyncFiles({ from })</code> calls <code>/admin/drive-sync/files?from=…</code>; empty params call the bare path</li>
+<li>[ ] <code>npm run test</code> and <code>npm run lint</code> pass</li>
+</ul>
 <h3 id="fe-2-filter-control-panel-wiring">FE-2: Filter control + panel wiring<a class="headerlink" href="#fe-2-filter-control-panel-wiring" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>webapp/src/components/admin/DriveTimeFilter.jsx</code>: labelled <code>&lt;select&gt;</code> (1 h, 12 h, 24 h, 7 d, 30 d, All, Custom); in Custom mode two labelled <code>&lt;input type="datetime-local"&gt;</code> (from, to) and a <code>role="alert"</code> error. Controlled via <code>value</code> / <code>onChange</code></li>
-<li><code>DriveSyncPanel.jsx</code>:</li>
+<li><code>DriveSyncPanel.jsx</code>:<ul>
 <li>state <code>timeFilter = DEFAULT_TIME_FILTER</code>; <code>useDriveSyncFiles(timeFilter)</code></li>
 <li>on filter change: <code>setSelected(new Set())</code> (D7)</li>
 <li><code>onlyUnsynced</code> stays client-side on the returned rows; <code>selectAllUnsynced</code> and <code>showingFiles</code> work on the returned rows</li>
 <li>loading state on the table while <code>isFetching</code> with previous data (D8)</li>
 <li>orphan section: when <code>orphansChecked === false</code>, show the note "Chọn Tất cả để xem orphan" instead of the list</li>
+</ul>
+</li>
 <li><code>admin.json</code> (vi + en): <code>timeFilter</code>, <code>timeLast1h</code>, <code>timeLast12h</code>, <code>timeLast24h</code>, <code>timeLast7d</code>, <code>timeLast30d</code>, <code>timeAll</code>, <code>timeCustom</code>, <code>timeFrom</code>, <code>timeTo</code>, <code>timeRangeInvalid</code>, <code>orphansOnlyInAll</code></li>
 <li>Toolbar CSS only if the controls wrap badly on mobile (reuse admin classes first)</li>
 </ul>
-<p><strong>Acceptance criteria</strong>
-- [ ] First render calls <code>getDriveSyncFiles</code> with <code>from ≈ now − 12 h</code> and no <code>to</code>
-- [ ] Each preset change calls the API again with the new <code>from</code>; "All" calls it with no params and shows orphans
-- [ ] Custom from/to calls the API with both bounds; from &gt; to shows the error and makes no call
-- [ ] Changing the filter clears the selection and the FORCE_SYNC count
-- [ ] With a range, the orphan note shows instead of the orphan table
-- [ ] Existing panel tests pass (updated for the new default params); every new string exists in vi and en; controls are labelled and keyboard-reachable
-- [ ] <code>npm run test</code>, <code>npm run lint</code>, <code>npm run build</code> pass</p>
+<p><strong>Acceptance criteria</strong></p>
+<ul>
+<li>[ ] First render calls <code>getDriveSyncFiles</code> with <code>from ≈ now − 12 h</code> and no <code>to</code></li>
+<li>[ ] Each preset change calls the API again with the new <code>from</code>; "All" calls it with no params and shows orphans</li>
+<li>[ ] Custom from/to calls the API with both bounds; from &gt; to shows the error and makes no call</li>
+<li>[ ] Changing the filter clears the selection and the FORCE_SYNC count</li>
+<li>[ ] With a range, the orphan note shows instead of the orphan table</li>
+<li>[ ] Existing panel tests pass (updated for the new default params); every new string exists in vi and en; controls are labelled and keyboard-reachable</li>
+<li>[ ] <code>npm run test</code>, <code>npm run lint</code>, <code>npm run build</code> pass</li>
+</ul>
 <h3 id="qa-1-verify-and-close">QA-1: Verify and close<a class="headerlink" href="#qa-1-verify-and-close" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Local (<code>startLocal.sh</code> + <code>npm run dev</code>) against the real Drive folder: default 12 h matches the "Created" column; presets, All (with orphans) and a custom range around a file's exact minute; mobile width</li>
 <li>Push BE-1 → wait for deploy → push FE-2; prod smoke as ADMIN and SUPER_ADMIN, including FORCE_SYNC on a filtered list</li>
 <li>Mark the plan Done, update <code>docs/tracking.md</code> and <code>TASKS.md</code></li>
 </ul>
-<p><strong>Acceptance criteria</strong>
-- [ ] Prod tab filters per range for both roles; orphans only under All; FORCE_SYNC still works
-- [ ] Plan, <code>docs/tracking.md</code> and <code>TASKS.md</code> updated with commit hashes</p>
+<p><strong>Acceptance criteria</strong></p>
+<ul>
+<li>[ ] Prod tab filters per range for both roles; orphans only under All; FORCE_SYNC still works</li>
+<li>[ ] Plan, <code>docs/tracking.md</code> and <code>TASKS.md</code> updated with commit hashes</li>
+</ul>
 <h2 id="risks">Risks<a class="headerlink" href="#risks" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

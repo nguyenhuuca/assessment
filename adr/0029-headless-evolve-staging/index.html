@@ -7116,14 +7116,18 @@
 <li>The agent holds a read-only token, as before. Its tools: <code>Read</code>, <code>Glob</code>, <code>Grep</code>, read-only <code>git diff/show/log/rev-parse/ls-files</code>, and <code>Write</code>/<code>Edit</code> scoped to <code>evolve-out/**</code>. It cannot write <code>.git/</code> or <code>.gitattributes</code> (a planted git helper would run under the allowed git commands), cannot read <code>/proc</code> or <code>/sys</code>, has no shell readers (<code>cat</code>, <code>grep</code>, <code>head</code>, <code>tail</code>) and no web tools. Git runs with <code>GIT_CONFIG_NOSYSTEM=1</code> and <code>GIT_CONFIG_GLOBAL=/dev/null</code>.</li>
 </ul>
 <h3 id="d2-a-manifest-row-for-every-signal">D2. A manifest row for every signal<a class="headerlink" href="#d2-a-manifest-row-for-every-signal" title="Permanent link">&para;</a></h3>
-<p><code>evolve-out/manifest.json</code> is an array with one row per signal:
-- a proposal: <code>{signal, slug, case, kind, body, message}</code>, where <code>kind</code> is <code>rule</code>, <code>case-only</code>, <code>not-eval-proven</code> or <code>compress</code>;
-- no proposal: <code>{signal, kind: "none", body}</code>, where <code>body</code> explains why.</p>
+<p><code>evolve-out/manifest.json</code> is an array with one row per signal:</p>
+<ul>
+<li>a proposal: <code>{signal, slug, case, kind, body, message}</code>, where <code>kind</code> is <code>rule</code>, <code>case-only</code>, <code>not-eval-proven</code> or <code>compress</code>;</li>
+<li>no proposal: <code>{signal, kind: "none", body}</code>, where <code>body</code> explains why.</li>
+</ul>
 <p>The ship job files a "no proposal" issue, which closes the signal, <strong>only</strong> for a <code>none</code> row. A signal with no row, or a row without a <code>tree/</code> (agent crash, turn limit, broken artifact), is left for next week's run. A row whose staged files are invalid becomes a "rejected (staging)" issue and closes the signal.</p>
 <h3 id="d3-the-ship-job-builds-the-branch-the-agents-files-are-data">D3. The ship job builds the branch; the agent's files are data<a class="headerlink" href="#d3-the-ship-job-builds-the-branch-the-agents-files-are-data" title="Permanent link">&para;</a></h3>
-<p><code>node scripts/evolve.mjs apply --dir &lt;proposal&gt;/evolve-out/&lt;slug&gt; --base &lt;main sha&gt; --branch evolve/&lt;slug&gt; --message &lt;file&gt;</code>:
-- accepts only regular files ≤ 64 KiB whose decoded path matches the Evolve allowlist or a new case path (ADR-0027 D2), and rejects <code>..</code>, symlinks and an empty tree;
-- writes the commit with git plumbing (temporary index, <code>commit-tree</code>, <code>update-ref</code>), so the ship job's working tree, and the <code>evolve.mjs</code> it runs, stay on <code>main</code>.</p>
+<p><code>node scripts/evolve.mjs apply --dir &lt;proposal&gt;/evolve-out/&lt;slug&gt; --base &lt;main sha&gt; --branch evolve/&lt;slug&gt; --message &lt;file&gt;</code>:</p>
+<ul>
+<li>accepts only regular files ≤ 64 KiB whose decoded path matches the Evolve allowlist or a new case path (ADR-0027 D2), and rejects <code>..</code>, symlinks and an empty tree;</li>
+<li>writes the commit with git plumbing (temporary index, <code>commit-tree</code>, <code>update-ref</code>), so the ship job's working tree, and the <code>evolve.mjs</code> it runs, stay on <code>main</code>.</li>
+</ul>
 <p>Then <code>check-paths</code> and <code>gate</code> run unchanged. A pass becomes a PR labelled <code>evolve</code> (draft for <code>compress</code> and <code>not-eval-proven</code>). A fail becomes an issue. Nothing is merged: the owner merges.</p>
 <h3 id="d4-schedule-and-cost">D4. Schedule and cost<a class="headerlink" href="#d4-schedule-and-cost" title="Permanent link">&para;</a></h3>
 <ul>
