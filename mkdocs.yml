@@ -98,6 +98,7 @@ nav:
       - Password Login: prd/PRD-password-login.md
       - Admin Video Import: prd/PRD-admin-video-import.md
       - In-App Report: prd/PRD-in-app-report.md
+      - Contributor Autopilot Permissions: prd/PRD-contributor-autopilot-permissions.md
 
   - Specs:
       - Overview: specs/index.md
@@ -105,11 +106,13 @@ nav:
       - Bitwise Permissions: specs/spec-bitwise-permissions.md
       - User Settings: specs/spec-user-settings.md
       - In-App Report: specs/spec-in-app-report.md
+      - Contributor Autopilot Permissions: specs/spec-contributor-autopilot-permissions.md
 
   - Sequence Diagrams:
       - Overview: sequence/index.md
       - Admin Video Import: sequence/sequence-admin-video-import.md
       - Bookmark / Collections: sequence/sequence-bookmark-feature.md
+      - Contributor Autopilot Permissions: sequence/sequence-contributor-autopilot-permissions.md
       - Hot Video Priority: sequence/sequence-hot-video-priority.md
       - i18n: sequence/sequence-i18n.md
       - In-App Report: sequence/sequence-in-app-report.md
@@ -141,6 +144,7 @@ nav:
       - Admin Video Import: plans/plan-admin-video-import.md
       - Admin Drive Force Sync: plans/plan-admin-drive-force-sync.md
       - In-App Report: plans/plan-in-app-report.md
+      - Contributor Autopilot Permissions: plans/plan-contributor-autopilot-permissions.md
       - Report Webhook State: plans/plan-report-webhook-state.md
       - Report Closed Notification: plans/plan-report-closed-notify.md
       - Agent Evolve Loop: plans/plan-agent-evolve.md

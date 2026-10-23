@@ -1,7 +1,7 @@
-task: Evolve bug signal: also link to Claude-co-authored session commits (option A)
-status: done
-progress: 100
-done: BG-4 session fallback + tests 36/36; skill/ADR/guides; 4 of 5 bug reports now signals; 63e64e4c pushed
-next: owner: trigger Agent Evolve to get proposals for bug:#56, #53, #51
-plan: docs/adr/0027-agent-self-improvement-loop.md
-updated: 2026-10-22 22:03
+task: Contributor role + SA-granted autopilot permissions for reports (ADR-0030)
+status: in_progress
+progress: 30
+done: PRD v1.1; ADR-0030 accepted; spec + sequence diagrams; plan CA-1..CA-6; docs committed
+next: build CA-1..CA-6 via /autopilot docs/plans/plan-contributor-autopilot-permissions.md or /swarm-execute
+plan: docs/plans/plan-contributor-autopilot-permissions.md
+updated: 2026-10-23 21:24
