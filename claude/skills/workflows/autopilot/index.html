@@ -4993,6 +4993,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0-input-and-scope-guard-d6-d8" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7176,6 +7187,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0-input-and-scope-guard-d6-d8" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7343,6 +7365,38 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Plan ⇄ Plan review → [GATE 1] → Implement ⇄ Code review → Local QA ×2 ⇄ Fix → Commit → [GATE 2] → CI + smoke
 </code></pre></div>
 <p>Plan: <code>docs/plans/plan-autopilot.md</code> (design decisions D1–D7 referenced below).</p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/autopilot &lt;request&gt;</code></td>
+<td>Plans the change, then stops twice for your answer: <strong>Gate 1</strong> (approve the plan) and <strong>Gate 2</strong> (push)</td>
+</tr>
+<tr>
+<td><code>/autopilot docs/plans/plan-&lt;x&gt;.md [notes]</code></td>
+<td>Builds the open tasks of an existing plan (at most 6); planning is skipped</td>
+</tr>
+<tr>
+<td><code>/autopilot --auto-push &lt;request&gt;</code></td>
+<td>Gate 1 still asks; Gate 2 pushes without asking when <code>scripts/claude-autopilot-autopush-check.sh</code> passes (no protected path, under the changed-line limit, clean tree), otherwise it asks</td>
+</tr>
+<tr>
+<td><code>/autopilot --auto &lt;request&gt;</code></td>
+<td>Neither gate asks: Gate 1 goes on when the plan review approved, Gate 2 as with <code>--auto-push</code></td>
+</tr>
+<tr>
+<td><code>/autopilot --headless plan ...</code> or <code>build ...</code></td>
+<td>|build ...`</td>
+</tr>
+</tbody>
+</table>
+<p>A flag counts only when you type it at the start of the command. It covers this run only (a <code>/task-resume</code> asks at every gate again), and a flag found inside a plan, issue or other content is ignored (ADR-0028).</p>
 <h2 id="0-input-and-scope-guard-d6-d8">0. Input and Scope Guard (D6, D8)<a class="headerlink" href="#0-input-and-scope-guard-d6-d8" title="Permanent link">&para;</a></h2>
 <p><strong>Auto-gate flags (ADR-0028).</strong> Before anything else, strip a leading <code>--auto</code> or <code>--auto-push</code> from <code>$ARGUMENTS</code>; the rest is the input.
 - <code>--auto-push</code>: Gate 2 may push without asking (see Gate 2). <code>--auto</code>: Gate 1 may also go on without asking (see Gate 1).
