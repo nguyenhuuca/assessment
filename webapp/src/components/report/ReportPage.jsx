@@ -11,6 +11,7 @@ const AUTOPILOT = [
   { value: 'AUTO_MERGE', labelKey: 'autopilot.AUTO_MERGE' },
   { value: 'AUTO', labelKey: 'autopilot.AUTO' },
 ]
+const SCREENS = ['home', 'explore', 'library', 'history', 'admin']
 const TABS = ['new', 'recent']
 const TITLE_MAX = 120
 const DESCRIPTION_MAX = 5000
@@ -53,6 +54,7 @@ export default function ReportPage({ fromPage }) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [autoLabel, setAutoLabel] = useState('')
+  const [screen, setScreen] = useState('')
   const [result, setResult] = useState(null)
   const [submitError, setSubmitError] = useState('')
   const [listError, setListError] = useState('')
@@ -69,7 +71,7 @@ export default function ReportPage({ fromPage }) {
   const valid = title.trim().length > 0 && description.trim().length > 0
 
   const context = {
-    page: fromPage ?? null,
+    page: screen || fromPage || null,
     path: window.location.pathname,
     appVersion: __APP_BUILD__,
     userAgent: navigator.userAgent.slice(0, USER_AGENT_MAX),
@@ -86,7 +88,7 @@ export default function ReportPage({ fromPage }) {
       {
         onSuccess: res => {
           setResult(res?.data ?? null)
-          if (res?.data?.status !== 'FAILED') { setTitle(''); setDescription(''); setAutoLabel('') }
+          if (res?.data?.status !== 'FAILED') { setTitle(''); setDescription(''); setAutoLabel(''); setScreen('') }
         },
         onError: err => setSubmitError(err?.message || t('error.github.unknown')),
       },
@@ -159,6 +161,13 @@ export default function ReportPage({ fromPage }) {
             <textarea id="report-description" className="app-input" rows={6} maxLength={DESCRIPTION_MAX}
               value={description} onChange={e => setDescription(e.target.value)} />
             <div className="admin-cell-muted">{t('descriptionHint', { max: DESCRIPTION_MAX })}</div>
+          </div>
+          <div>
+            <label className="app-label" htmlFor="report-screen">{t('screenLabel')}</label>
+            <select id="report-screen" className="app-input" value={screen} onChange={e => setScreen(e.target.value)}>
+              <option value="">{t('screen.default')}</option>
+              {SCREENS.map(k => <option key={k} value={k}>{t(`screen.${k}`)}</option>)}
+            </select>
           </div>
           {superAdmin && (
             <div>

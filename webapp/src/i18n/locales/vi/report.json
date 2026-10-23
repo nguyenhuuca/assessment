@@ -10,6 +10,8 @@
   "descriptionHint": "Tối đa {{max}} ký tự",
   "autopilotLabel": "Autopilot",
   "autopilot": { "NONE": "Không", "AUTO_MERGE": "Auto-merge", "AUTO": "Full auto" },
+  "screenLabel": "Màn hình",
+  "screen": { "default": "Tự động (màn hình trước)", "home": "Trang chủ", "explore": "Khám phá", "library": "Thư viện", "history": "Lịch sử", "admin": "Quản trị" },
   "contextTitle": "Ngữ cảnh trang",
   "context": {
     "page": "Trang",

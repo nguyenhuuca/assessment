@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-23-report-screen-dropdown",
+  "date": "2026-10-23",
+  "mode": "headless",
+  "lite": true,
+  "issue": 60,
+  "pr": 61,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 0,
+  "advisory": 6,
+  "locNonTest": 14,
+  "tests": { "passed": 23, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}
