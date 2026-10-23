@@ -498,3 +498,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **RV-1** Image carries `APP_VERSION=prod-<N>` (Dockerfile `ARG`/`ENV`, CI `build-args`); `app.version: ${APP_VERSION:dev}`
 - [x] **RV-2** `app_report.api_version` (Liquibase `202610230001`), stamped by the server in `ReportServiceImpl` (never from the client); issue body adds `- API: <version>`; tests
+
+## Report screen dropdown: missing screens (#62, autopilot lite)
+
+- [x] **RS2-1** `ReportPage`: add `report`, `settings` and `other` to the screen select; `other` sends page `null` (never `'other'`)
+- [x] **RS2-2** en + vi `screen.report` / `screen.settings` / `screen.other` strings
+- [x] **RS2-3** Tests: `report` posts 'report'; `other` posts null despite `fromPage`; reset to blank after success
