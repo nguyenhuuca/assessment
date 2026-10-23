@@ -282,6 +282,16 @@ class AdminAccountServiceImplTest {
     }
 
     @Test
+    void updatePermissions_mask128_justAbove127_isRejected() {
+        actor(1L, UserRole.SUPER_ADMIN);
+        target(10L, UserRole.CONTRIBUTOR);
+
+        assertThrows(IllegalArgumentException.class, () -> service.updatePermissions(10L, 1L, 128));
+        assertThrows(IllegalArgumentException.class, () -> service.updatePermissions(10L, 1L, 127 | 128));
+        verify(userRepo, never()).save(any());
+    }
+
+    @Test
     void updatePermissions_adminCannotChangeAutopilotBits() {
         actor(1L, UserRole.ADMIN);
         User user = target(10L, UserRole.CONTRIBUTOR);

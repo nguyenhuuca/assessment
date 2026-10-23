@@ -558,6 +558,27 @@ class ReportServiceImplTest {
     }
 
     @Test
+    void cap_contributorAt9_stillGetsAutopilot() {
+        contributor(0);
+        capCount(9);
+        ReportDto dto = service.create(request());
+
+        assertThat(dto.getLabels()).containsExactly("autopilot", "bug");
+        assertThat(dto.isCapReached()).isFalse();
+    }
+
+    @Test
+    void cap_contributorAt10_getsTypeLabelOnlyAndCapReached() {
+        contributor(0);
+        capCount(10);
+        ReportDto dto = service.create(request());
+
+        assertThat(dto.getLabels()).containsExactly("bug");
+        assertThat(dto.isAutopilot()).isFalse();
+        assertThat(dto.isCapReached()).isTrue();
+    }
+
+    @Test
     void retry_ec1_autoDowngradesToAutoMergeWhenOnlyThatBitRemains() {
         User c = contributor(32);
         AppReport row = failedRow(c, UserRole.CONTRIBUTOR);

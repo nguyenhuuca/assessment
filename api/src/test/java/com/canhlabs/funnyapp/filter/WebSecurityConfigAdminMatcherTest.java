@@ -32,8 +32,10 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -88,6 +90,29 @@ class WebSecurityConfigAdminMatcherTest {
     void contributor_isRefusedOnEveryOtherAdminPath(String path) throws Exception {
         mockMvc.perform(get(ADMIN_URL + path).with(authentication(principal(UserRole.CONTRIBUTOR))))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void contributor_trailingSlashOnReports_isNotRefusedBySecurityChain() throws Exception {
+        MvcResult result = mockMvc.perform(get(ADMIN_URL + "/reports/")
+                .with(authentication(principal(UserRole.CONTRIBUTOR)))).andReturn();
+        assertThat(result.getResponse().getStatus()).isNotEqualTo(403).isNotEqualTo(401);
+    }
+
+    @Test
+    void contributor_deleteOnReportId_isNeverAServerSuccess() throws Exception {
+        MvcResult result = mockMvc.perform(delete(ADMIN_URL + "/reports/" + ID)
+                .with(authentication(principal(UserRole.CONTRIBUTOR)))).andReturn();
+        assertThat(result.getResponse().getStatus()).isGreaterThanOrEqualTo(400);
+        verifyNoInteractions(reportService);
+    }
+
+    @Test
+    void contributor_dotDotPathToAccounts_isRejectedNeverOk() throws Exception {
+        MvcResult result = mockMvc.perform(get(ADMIN_URL + "/reports/../accounts")
+                .with(authentication(principal(UserRole.CONTRIBUTOR)))).andReturn();
+        assertThat(result.getResponse().getStatus()).isIn(400, 403, 404);
+        verifyNoInteractions(reportService);
     }
 
     @ParameterizedTest
