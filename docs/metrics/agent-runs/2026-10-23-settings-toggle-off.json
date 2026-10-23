@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-23-settings-toggle-off",
+  "date": "2026-10-23",
+  "mode": "headless",
+  "lite": true,
+  "issue": 64,
+  "pr": 65,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 0,
+  "advisory": 2,
+  "locNonTest": 8,
+  "tests": { "passed": 3, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}

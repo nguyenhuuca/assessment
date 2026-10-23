@@ -504,3 +504,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **RS2-1** `ReportPage`: add `report`, `settings` and `other` to the screen select; `other` sends page `null` (never `'other'`)
 - [x] **RS2-2** en + vi `screen.report` / `screen.settings` / `screen.other` strings
 - [x] **RS2-3** Tests: `report` posts 'report'; `other` posts null despite `fromPage`; reset to blank after success
+
+## Settings toggle off state visibility (#64)
+- [x] **FE-1** `.settings-toggle` off: `--bg-high` track, `--text-muted` ring + knob; `.on` unchanged
+- [x] **FE-2** `settingsToggleContrast.test.js` (fails on old CSS, passes now)
