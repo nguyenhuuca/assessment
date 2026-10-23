@@ -487,3 +487,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **DEL-1** (PR #59) `VideoStorageService.deleteDriveFile` (404 = gone, other failure -> error) + sourceId guard `[A-Za-z0-9_-]+` for the local path and the Drive call
 - [x] **DEL-2** (PR #59) `AdminVideoService.deleteVideo(id, deleteLocal, deleteDrive)`, `DELETE /admin/videos/{id}?deleteLocalFile&deleteDriveFile` (default false), `@AuditLog`; Drive first, then local, then row
 - [x] **DEL-3** (PR #59) Webapp: dialog checkboxes in `AdminVideoTable`, `deleteVideo(id, opts)`, en + vi strings, tests
+
+## Report screen dropdown (#60, autopilot lite)
+
+- [x] **RS-1** (PR #61) `ReportPage` optional screen select; page sent is the pick, else `fromPage`; reset only when not FAILED
+- [x] **RS-2** (PR #61) en + vi `screenLabel` / `screen.*` strings
+- [x] **RS-3** (PR #61) Tests: default, override, reset after success, FAILED keeps choice

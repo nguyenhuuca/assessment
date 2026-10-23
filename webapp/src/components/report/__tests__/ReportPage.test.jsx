@@ -78,6 +78,32 @@ describe('ReportPage', () => {
     expect(link).toHaveAttribute('href', 'https://github.com/o/r/issues/9')
   })
 
+  it('screen select: default keeps fromPage, a pick overrides it, reset after success', async () => {
+    reportsApi.createReport.mockResolvedValue({ data: { status: 'CREATED', issueNumber: 9, issueUrl: 'https://github.com/o/r/issues/9' } })
+    renderPage()
+    await fill()
+    fireEvent.click(submitBtn())
+    await waitFor(() => expect(reportsApi.createReport).toHaveBeenCalledTimes(1))
+    expect(reportsApi.createReport.mock.calls[0][0].context.page).toBe('library')
+
+    await fill()
+    fireEvent.change(screen.getByLabelText(i18n.t('report:screenLabel')), { target: { value: 'explore' } })
+    fireEvent.click(submitBtn())
+    await waitFor(() => expect(reportsApi.createReport).toHaveBeenCalledTimes(2))
+    expect(reportsApi.createReport.mock.calls[1][0].context.page).toBe('explore')
+    await waitFor(() => expect(screen.getByLabelText(i18n.t('report:screenLabel'))).toHaveValue(''))
+  })
+
+  it('screen select keeps the choice when the report FAILED', async () => {
+    reportsApi.createReport.mockResolvedValue({ data: { id: 'f1', status: 'FAILED', error: 'github.timeout' } })
+    renderPage()
+    await fill()
+    fireEvent.change(screen.getByLabelText(i18n.t('report:screenLabel')), { target: { value: 'history' } })
+    fireEvent.click(submitBtn())
+    await screen.findByText(i18n.t('report:failed'))
+    expect(screen.getByLabelText(i18n.t('report:screenLabel'))).toHaveValue('history')
+  })
+
   it('shows the cap-reached notice', async () => {
     reportsApi.createReport.mockResolvedValue({ data: { status: 'CREATED', issueNumber: 3, issueUrl: 'https://github.com/o/r/issues/3', capReached: true } })
     renderPage()

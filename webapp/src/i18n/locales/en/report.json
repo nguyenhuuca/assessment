@@ -10,6 +10,8 @@
   "descriptionHint": "At most {{max}} characters",
   "autopilotLabel": "Autopilot",
   "autopilot": { "NONE": "None", "AUTO_MERGE": "Auto-merge", "AUTO": "Full auto" },
+  "screenLabel": "Screen",
+  "screen": { "default": "Auto-detect (previous screen)", "home": "Home", "explore": "Explore", "library": "Library", "history": "History", "admin": "Admin" },
   "contextTitle": "Page context",
   "context": {
     "page": "Page",
