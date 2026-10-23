@@ -1,12 +1,10 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.aop.AuditLog;
-import com.canhlabs.funnyapp.aop.HasPermission;
 import com.canhlabs.funnyapp.aop.RateLimited;
 import com.canhlabs.funnyapp.dto.admin.CreateReportRequest;
 import com.canhlabs.funnyapp.dto.admin.ReportDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
-import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.service.ReportService;
@@ -26,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-/** In-app reports that become GitHub issues (ADR-0026); open to ADMIN and SUPER_ADMIN. */
+/** In-app reports that become GitHub issues (ADR-0026); open to CONTRIBUTOR, ADMIN and SUPER_ADMIN (no permission bit, ADR-0030). */
 @RestController
 @RequestMapping(AppConstant.API.BASE_URL + "/admin/reports")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('CONTRIBUTOR')")
 public class AdminReportController {
 
     private ReportService reportService;
@@ -40,7 +38,6 @@ public class AdminReportController {
     }
 
     @PostMapping
-    @HasPermission(perm = Permission.ADMIN)
     @AuditLog("createReport")
     @RateLimited(permit = 5, windowInSeconds = 3600)
     public ResponseEntity<ResultObjectInfo<ReportDto>> create(@RequestBody CreateReportRequest request) {
@@ -48,7 +45,6 @@ public class AdminReportController {
     }
 
     @GetMapping
-    @HasPermission(perm = Permission.ADMIN)
     @RateLimited(permit = 60)
     public ResponseEntity<ResultObjectInfo<Page<ReportDto>>> list(@RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "20") int size) {
@@ -56,7 +52,6 @@ public class AdminReportController {
     }
 
     @PostMapping("/{id}/retry")
-    @HasPermission(perm = Permission.ADMIN)
     @AuditLog("retryReport")
     @RateLimited(permit = 5, windowInSeconds = 3600)
     public ResponseEntity<ResultObjectInfo<ReportDto>> retry(@PathVariable String id) {

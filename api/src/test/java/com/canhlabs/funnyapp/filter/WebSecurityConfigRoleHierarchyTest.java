@@ -19,12 +19,17 @@ class WebSecurityConfigRoleHierarchyTest {
 
     @Test
     void superAdminImpliesEveryLowerRole() {
-        assertThat(reachable("ROLE_SUPER_ADMIN")).containsExactlyInAnyOrder("ROLE_SUPER_ADMIN", "ROLE_ADMIN", "ROLE_USER");
+        assertThat(reachable("ROLE_SUPER_ADMIN")).containsExactlyInAnyOrder("ROLE_SUPER_ADMIN", "ROLE_ADMIN", "ROLE_CONTRIBUTOR", "ROLE_USER");
     }
 
     @Test
-    void adminImpliesUserOnly() {
-        assertThat(reachable("ROLE_ADMIN")).containsExactlyInAnyOrder("ROLE_ADMIN", "ROLE_USER");
+    void adminImpliesContributorAndUser() {
+        assertThat(reachable("ROLE_ADMIN")).containsExactlyInAnyOrder("ROLE_ADMIN", "ROLE_CONTRIBUTOR", "ROLE_USER");
+    }
+
+    @Test
+    void contributorImpliesUserOnly() {
+        assertThat(reachable("ROLE_CONTRIBUTOR")).containsExactlyInAnyOrder("ROLE_CONTRIBUTOR", "ROLE_USER");
     }
 
     @Test

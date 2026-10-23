@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * ADMIN and SUPER_ADMIN may use the report API, USER may not (real PermissionServiceImpl).
+ * CONTRIBUTOR, ADMIN and SUPER_ADMIN may use the report API, USER may not (real PermissionServiceImpl).
  * The slice does not load the rate-limit or audit aspects, so those limits are not exercised here.
  */
 @WebMvcTest(AdminReportController.class)
@@ -99,7 +99,7 @@ class AdminReportControllerPermissionTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = UserRole.class, names = {"ADMIN", "SUPER_ADMIN"})
+    @EnumSource(value = UserRole.class, names = {"CONTRIBUTOR", "ADMIN", "SUPER_ADMIN"})
     void create_adminRoles_return200WithContract(UserRole role) throws Exception {
         when(reportService.create(any())).thenReturn(dto(ReportStatus.CREATED, 42));
 
@@ -112,7 +112,7 @@ class AdminReportControllerPermissionTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = UserRole.class, names = {"ADMIN", "SUPER_ADMIN"})
+    @EnumSource(value = UserRole.class, names = {"CONTRIBUTOR", "ADMIN", "SUPER_ADMIN"})
     void list_adminRoles_return200WithPage(UserRole role) throws Exception {
         when(reportService.list(0, 20)).thenReturn(
                 new PageImpl<>(List.of(dto(ReportStatus.CREATED, 7)), PageRequest.of(0, 20), 1));
@@ -135,7 +135,7 @@ class AdminReportControllerPermissionTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = UserRole.class, names = {"ADMIN", "SUPER_ADMIN"})
+    @EnumSource(value = UserRole.class, names = {"CONTRIBUTOR", "ADMIN", "SUPER_ADMIN"})
     void retry_adminRoles_return200(UserRole role) throws Exception {
         when(reportService.retry(ID)).thenReturn(dto(ReportStatus.CREATED, 9));
 
@@ -182,14 +182,35 @@ class AdminReportControllerPermissionTest {
         verifyNoInteractions(reportService);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void contributorWithNoPermissionBits_canUseAllThreeEndpoints_flagOnAndOff(boolean flag) throws Exception {
+        when(featureFlagService.isEnabled(eq(AppConstant.Flags.PERMISSION_ENFORCEMENT), anyBoolean()))
+                .thenReturn(flag);
+        when(reportService.create(any())).thenReturn(dto(ReportStatus.CREATED, 1));
+        when(reportService.list(0, 20)).thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
+        when(reportService.retry(ID)).thenReturn(dto(ReportStatus.CREATED, 2));
+        Authentication contributor = principal(UserRole.CONTRIBUTOR, 0);
+
+        mockMvc.perform(post(REPORTS_URL).contentType("application/json").content(BODY)
+                        .with(authentication(contributor))).andExpect(status().isOk());
+        mockMvc.perform(get(REPORTS_URL).with(authentication(contributor))).andExpect(status().isOk());
+        mockMvc.perform(post(REPORTS_URL + "/" + ID + "/retry").with(authentication(contributor)))
+                .andExpect(status().isOk());
+    }
+
     private static ReportDto dto(ReportStatus status, Integer issueNumber) {
         return ReportDto.builder().id(ID).title("Broken").status(status).issueNumber(issueNumber).build();
     }
 
     private Authentication principal(UserRole role) {
+        return principal(role, Permission.ADMIN.getBit());
+    }
+
+    private Authentication principal(UserRole role, int permissions) {
         UserDetailDto user = UserDetailDto.builder()
                 .id(1L).email("tester@test.com")
-                .role(role.name()).permissions(Permission.ADMIN.getBit())
+                .role(role.name()).permissions(permissions)
                 .build();
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
         UsernamePasswordAuthenticationToken authentication =

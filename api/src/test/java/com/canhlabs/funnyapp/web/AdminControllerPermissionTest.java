@@ -90,6 +90,7 @@ class AdminControllerPermissionTest {
             return http
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeHttpRequests(auth -> auth
+                            .requestMatchers("/v1/funny-app/admin/reports/**").hasAnyRole("CONTRIBUTOR", "ADMIN", "SUPER_ADMIN")
                             .requestMatchers("/v1/funny-app/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                             .anyRequest().permitAll())
                     .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

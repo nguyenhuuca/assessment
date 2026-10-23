@@ -7,6 +7,8 @@ package com.canhlabs.funnyapp.enums;
  */
 public enum UserRole {
     USER,
+    /** Report-only account (ADR-0030); no permission bits by default. */
+    CONTRIBUTOR,
     ADMIN,
     /** Highest role; exactly one account (DB-enforced). */
     SUPER_ADMIN;
@@ -15,8 +17,8 @@ public enum UserRole {
         return other != null && ordinal() > other.ordinal();
     }
 
-    /** Permission bits an account gets when it is given this role (admins: every bit, users: none). */
+    /** Permission bits an account gets when it is given this role (admins: every bit, users and contributors: none). */
     public int defaultPermissions() {
-        return this == USER ? 0 : Permission.ALL_BITS;
+        return (this == USER || this == CONTRIBUTOR) ? 0 : Permission.ALL_BITS;
     }
 }

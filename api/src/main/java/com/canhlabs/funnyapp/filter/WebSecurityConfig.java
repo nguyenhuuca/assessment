@@ -51,6 +51,8 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     // Whitelisted endpoints
+                    // Order matters: the report endpoints must precede the broader admin matcher (ADR-0030)
+                    auth.requestMatchers("/v1/funny-app/admin/reports/**").hasAnyRole("CONTRIBUTOR", "ADMIN", "SUPER_ADMIN");
                     auth.requestMatchers("/v1/funny-app/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN");
                     AppConstant.WebIgnoringConfig.WHITE_LIST_PATH.forEach(item -> auth.requestMatchers(HttpMethod.valueOf(item.getMethod()), item.getFullPath()).permitAll());
                     auth.requestMatchers(swaggerWhiteList).permitAll();
