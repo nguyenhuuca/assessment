@@ -244,7 +244,7 @@ class AdminAccountServiceImplTest {
 
     @Test
     void updatePermissions_unknownBits_areRejected() {
-        assertThrows(IllegalArgumentException.class, () -> service.updatePermissions(10L, 1L, 32));
+        assertThrows(IllegalArgumentException.class, () -> service.updatePermissions(10L, 1L, 128));
         assertThrows(IllegalArgumentException.class, () -> service.updatePermissions(10L, 1L, -1));
         verify(userRepo, never()).save(any());
     }
@@ -268,6 +268,138 @@ class AdminAccountServiceImplTest {
 
         assertEquals(1, user.getPermissions());
         verify(userRepo).save(user);
+    }
+
+    @Test
+    void updatePermissions_bits32And64AreKnownNow() {
+        actor(1L, UserRole.SUPER_ADMIN);
+        User user = target(10L, UserRole.CONTRIBUTOR);
+
+        service.updatePermissions(10L, 1L, 96);
+
+        assertEquals(96, user.getPermissions());
+        verify(credentialsVersionCache).evict(10L);
+    }
+
+    @Test
+    void updatePermissions_adminCannotChangeAutopilotBits() {
+        actor(1L, UserRole.ADMIN);
+        User user = target(10L, UserRole.CONTRIBUTOR);
+
+        assertEquals("Only the SUPER_ADMIN can change autopilot permissions",
+                assertThrows(CustomException.class, () -> service.updatePermissions(10L, 1L, 32)).getMessage());
+        assertEquals(0, user.getPermissions());
+        verify(userRepo, never()).save(any());
+    }
+
+    @Test
+    void updatePermissions_adminCannotRevokeAutopilotBits() {
+        actor(1L, UserRole.ADMIN);
+        User user = target(10L, UserRole.CONTRIBUTOR);
+        user.setPermissions(96);
+
+        assertForbidden(() -> service.updatePermissions(10L, 1L, 0));
+        assertEquals(96, user.getPermissions());
+    }
+
+    @Test
+    void updatePermissions_adminEditsOtherBitsKeepingAutopilotBits() {
+        actor(1L, UserRole.ADMIN);
+        User user = target(10L, UserRole.CONTRIBUTOR);
+        user.setPermissions(32);
+
+        service.updatePermissions(10L, 1L, 32 | Permission.READ.getBit());
+
+        assertEquals(33, user.getPermissions());
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void updatePermissions_autopilotBitOnUser_isBadRequest() {
+        actor(1L, UserRole.SUPER_ADMIN);
+        User user = target(10L, UserRole.USER);
+
+        assertThrows(IllegalArgumentException.class, () -> service.updatePermissions(10L, 1L, 32));
+        assertEquals(0, user.getPermissions());
+        verify(userRepo, never()).save(any());
+    }
+
+    @Test
+    void updatePermissions_superAdminGrantsAutopilotToAdmin() {
+        actor(1L, UserRole.SUPER_ADMIN);
+        User user = target(10L, UserRole.ADMIN);
+        user.setPermissions(31);
+
+        service.updatePermissions(10L, 1L, 31 | 64);
+
+        assertEquals(95, user.getPermissions());
+    }
+
+    @Test
+    void updateRole_adminAssignsAndRemovesContributor() {
+        actor(1L, UserRole.ADMIN);
+        User user = target(10L, UserRole.USER);
+
+        service.updateRole(10L, 1L, UserRole.CONTRIBUTOR);
+        assertEquals(UserRole.CONTRIBUTOR, user.getRole());
+        assertEquals(0, user.getPermissions());
+
+        service.updateRole(10L, 1L, UserRole.USER);
+        assertEquals(UserRole.USER, user.getRole());
+    }
+
+    @Test
+    void updateRole_contributorKeepsAutopilotBitsWhenPromotedToAdmin() {
+        actor(1L, UserRole.SUPER_ADMIN);
+        User user = target(10L, UserRole.CONTRIBUTOR);
+        user.setPermissions(32);
+        user.setCredentialsVersion(1);
+
+        service.updateRole(10L, 1L, UserRole.ADMIN);
+
+        assertEquals(63, user.getPermissions());
+        assertEquals(2, user.getCredentialsVersion());
+    }
+
+    @Test
+    void updateRole_adminDemotedToContributorKeepsOnlyAutopilotBits() {
+        actor(1L, UserRole.SUPER_ADMIN);
+        User user = target(10L, UserRole.ADMIN);
+        user.setPermissions(31 | 64);
+
+        service.updateRole(10L, 1L, UserRole.CONTRIBUTOR);
+
+        assertEquals(64, user.getPermissions());
+    }
+
+    @Test
+    void updateRole_contributorDemotedToUserLosesAutopilotBits() {
+        actor(1L, UserRole.SUPER_ADMIN);
+        User user = target(10L, UserRole.CONTRIBUTOR);
+        user.setPermissions(64);
+
+        service.updateRole(10L, 1L, UserRole.USER);
+
+        assertEquals(0, user.getPermissions());
+    }
+
+    @Test
+    void updateRole_userPromotedToContributorGetsNoBits() {
+        actor(1L, UserRole.SUPER_ADMIN);
+        User user = target(10L, UserRole.USER);
+
+        service.updateRole(10L, 1L, UserRole.CONTRIBUTOR);
+
+        assertEquals(0, user.getPermissions());
+    }
+
+    @Test
+    void updateRole_adminCannotAssignAdminToContributor() {
+        actor(1L, UserRole.ADMIN);
+        target(10L, UserRole.CONTRIBUTOR);
+
+        assertForbidden(() -> service.updateRole(10L, 1L, UserRole.ADMIN));
+        verify(userRepo, never()).save(any());
     }
 
     private void actor(Long id, UserRole role) {

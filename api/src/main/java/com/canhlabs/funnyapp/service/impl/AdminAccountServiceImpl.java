@@ -49,8 +49,10 @@ public class AdminAccountServiceImpl implements AdminAccountService {
         User user = userRepo.findById(targetId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetId));
         requireOutranks(actorRole, user);
+        // Autopilot grants survive CONTRIBUTOR <-> ADMIN moves and are dropped for USER (ADR-0030 BR-7)
+        int keptAutopilot = role == UserRole.USER ? 0 : user.getPermissions() & Permission.AUTOPILOT_BITS;
         user.setRole(role);
-        user.setPermissions(role.defaultPermissions());
+        user.setPermissions(role.defaultPermissions() | keptAutopilot);
         revokeSessions(user);
         userRepo.save(user);
         credentialsVersionCache.evict(targetId);
@@ -74,19 +76,31 @@ public class AdminAccountServiceImpl implements AdminAccountService {
         if (targetId.equals(currentUserId)) {
             throw new IllegalArgumentException("Cannot change your own permissions");
         }
-        if ((permissions & ~Permission.ALL_BITS) != 0) {
+        if ((permissions & ~(Permission.ALL_BITS | Permission.AUTOPILOT_BITS)) != 0) {
             throw new IllegalArgumentException("Unknown permission bits: " + permissions);
         }
         UserRole actorRole = actorRole(currentUserId);
         User user = userRepo.findById(targetId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetId));
         requireOutranks(actorRole, user);
+        requireAutopilotRules(actorRole, user, permissions);
         user.setPermissions(permissions);
         revokeSessions(user);
         User saved = userRepo.save(user);
         credentialsVersionCache.evict(targetId);
         log.info("Permissions of user id={} set to {} by user id={}", targetId, permissions, currentUserId);
         return toDto(saved != null ? saved : user);
+    }
+
+    /** Only the SUPER_ADMIN changes the autopilot bits, and only CONTRIBUTOR/ADMIN accounts may hold them (BR-5, BR-6). */
+    private static void requireAutopilotRules(UserRole actorRole, User target, int permissions) {
+        int requested = permissions & Permission.AUTOPILOT_BITS;
+        if (actorRole != UserRole.SUPER_ADMIN && requested != (target.getPermissions() & Permission.AUTOPILOT_BITS)) {
+            throw forbidden("Only the SUPER_ADMIN can change autopilot permissions");
+        }
+        if (requested != 0 && target.getRole() == UserRole.USER) {
+            throw new IllegalArgumentException("Autopilot permissions need the CONTRIBUTOR or ADMIN role");
+        }
     }
 
     /** Role and permissions travel in the JWT: bump credentials_version so older tokens stop working now. */
