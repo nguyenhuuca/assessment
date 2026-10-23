@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,9 +28,9 @@ public interface AppReportRepository extends JpaRepository<AppReport, UUID> {
     @EntityGraph(attributePaths = "reporter")
     Optional<AppReport> findWithReporterById(UUID id);
 
-    /** Counts toward the autopilot cap (BR-3); served by idx_app_report_autopilot_cap. */
-    long countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter(
-            ReportStatus status, UserRole reporterRole, Instant since);
+    /** Counts toward the shared autopilot cap (ADR-0030 BR-11); served by idx_app_report_autopilot_cap. */
+    long countByStatusAndAutopilotTrueAndReporterRoleInAndCreatedAtAfter(
+            ReportStatus status, Collection<UserRole> reporterRoles, Instant since);
 
     /**
      * Stores a webhook state on the CREATED report of that issue, only when the event is newer than the

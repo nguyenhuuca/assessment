@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,6 +81,15 @@ class AppReportMigrationTest {
     }
 
     @Test
+    void capIndexMigration_widensThePredicateToContributor() throws Exception {
+        String sql = resource("db/changelog/sql/202610230002-app-report-cap-contributor.sql");
+
+        assertThat(sql).contains("DROP INDEX IF EXISTS idx_app_report_autopilot_cap");
+        assertThat(sql).containsPattern("CREATE INDEX idx_app_report_autopilot_cap ON app_report \\(created_at\\)\\s+"
+                + "WHERE status = 'CREATED' AND autopilot AND reporter_role IN \\('ADMIN', 'CONTRIBUTOR'\\)");
+    }
+
+    @Test
     void checkConstraints_matchTheEnums() throws Exception {
         String sql = sql();
 
@@ -131,10 +141,10 @@ class AppReportMigrationTest {
     }
 
     @Test
-    void repository_capCountFiltersCreatedAutopilotAdminInWindow() throws Exception {
+    void repository_capCountFiltersCreatedAutopilotAdminAndContributorInWindow() throws Exception {
         Method m = AppReportRepository.class.getMethod(
-                "countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter",
-                ReportStatus.class, UserRole.class, Instant.class);
+                "countByStatusAndAutopilotTrueAndReporterRoleInAndCreatedAtAfter",
+                ReportStatus.class, Collection.class, Instant.class);
 
         assertThat(m.getReturnType()).isEqualTo(long.class);
     }
@@ -142,7 +152,7 @@ class AppReportMigrationTest {
     @Test
     void repository_derivedQueryNamesResolveAgainstTheEntity() {
         new PartTree("findAllByOrderByCreatedAtDesc", AppReport.class);
-        PartTree count = new PartTree("countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter", AppReport.class);
+        PartTree count = new PartTree("countByStatusAndAutopilotTrueAndReporterRoleInAndCreatedAtAfter", AppReport.class);
 
         assertThat(count.isCountProjection()).isTrue();
         assertThat(count.getParts()).hasSize(4);

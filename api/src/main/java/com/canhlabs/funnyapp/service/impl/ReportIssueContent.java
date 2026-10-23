@@ -42,7 +42,11 @@ final class ReportIssueContent {
 
     /** Never includes the reporter's email, user name or id. */
     static String body(AppReport report) {
-        String role = report.getReporterRole() == UserRole.SUPER_ADMIN ? "the SUPER_ADMIN" : "an ADMIN";
+        String role = switch (report.getReporterRole()) {
+            case SUPER_ADMIN -> "the SUPER_ADMIN";
+            case CONTRIBUTOR -> "a CONTRIBUTOR";
+            default -> "an ADMIN";
+        };
         return report.getDescription() + "\n\n"
                 + "### Context\n"
                 + "- Page: " + orUnknown(report.getPage()) + "\n"

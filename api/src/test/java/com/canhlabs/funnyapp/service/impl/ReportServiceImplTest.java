@@ -115,8 +115,8 @@ class ReportServiceImplTest {
     }
 
     void capCount(long n) {
-        when(repository.countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter(
-                eq(ReportStatus.CREATED), eq(UserRole.ADMIN), any())).thenReturn(n);
+        when(repository.countByStatusAndAutopilotTrueAndReporterRoleInAndCreatedAtAfter(
+                eq(ReportStatus.CREATED), eq(ReportServiceImpl.CAPPED_ROLES), any())).thenReturn(n);
     }
 
     @SuppressWarnings("unchecked")
@@ -289,8 +289,8 @@ class ReportServiceImplTest {
     void cap_countsLast24HoursOfCreatedAdminAutopilot() {
         capCount(0);
         service.create(request());
-        verify(repository).countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter(
-                ReportStatus.CREATED, UserRole.ADMIN, NOW.minusSeconds(24 * 3600));
+        verify(repository).countByStatusAndAutopilotTrueAndReporterRoleInAndCreatedAtAfter(
+                ReportStatus.CREATED, List.of(UserRole.ADMIN, UserRole.CONTRIBUTOR), NOW.minusSeconds(24 * 3600));
     }
 
     @Test
@@ -304,7 +304,7 @@ class ReportServiceImplTest {
         assertThat(dto.getLabels()).containsExactly("autopilot", "autopilot:auto", "bug");
         assertThat(dto.isCapReached()).isFalse();
         assertThat(dto.getAutoLabel()).isEqualTo(ReportAutoLabel.AUTO);
-        verify(repository, never()).countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter(any(), any(), any());
+        verify(repository, never()).countByStatusAndAutopilotTrueAndReporterRoleInAndCreatedAtAfter(any(), any(), any());
         assertThat(sentBody()).contains("by the SUPER_ADMIN");
     }
 
@@ -469,6 +469,137 @@ class ReportServiceImplTest {
         CreateReportRequest ok = request();
         ok.setDescription("a\nb");
         assertThat(service.create(ok).getStatus()).isEqualTo(ReportStatus.CREATED);
+    }
+
+    // ---- ADR-0030: contributor, autopilot bits
+
+    User contributor(int permissions) {
+        User c = user(5L, "contrib@example.com", UserRole.CONTRIBUTOR);
+        c.setPermissions(permissions);
+        when(userRepo.findById(5L)).thenReturn(Optional.of(c));
+        loginAs(5L);
+        return c;
+    }
+
+    List<String> createWith(String label) {
+        CreateReportRequest r = request();
+        r.setAutoLabel(label);
+        service.create(r);
+        return sentLabels();
+    }
+
+    @Test
+    void contributor_noBits_cannotUseAnyAutoLabel_andNothingIsSaved() {
+        contributor(0);
+        for (String label : new String[]{"AUTO", "AUTO_MERGE"}) {
+            CreateReportRequest r = request();
+            r.setAutoLabel(label);
+            assertCode(() -> service.create(r), HttpStatus.FORBIDDEN, "error.report.autoLabelForbidden");
+        }
+        verify(repository, never()).save(any(AppReport.class));
+        verify(client, never()).create(anyString(), anyString(), anyList());
+    }
+
+    @Test
+    void contributor_autoMergeBit_mayUseAutoMergeOnly() {
+        contributor(32);
+        capCount(0);
+        CreateReportRequest r = request();
+        r.setAutoLabel("AUTO");
+        assertCode(() -> service.create(r), HttpStatus.FORBIDDEN, "error.report.autoLabelForbidden");
+
+        assertThat(createWith("AUTO_MERGE")).containsExactly("autopilot", "autopilot:auto-merge", "bug");
+    }
+
+    @Test
+    void contributor_autoBit_mayUseBothLabels() {
+        contributor(64);
+        capCount(0);
+        assertThat(createWith("AUTO")).containsExactly("autopilot", "autopilot:auto", "bug");
+    }
+
+    @Test
+    void contributor_noLabel_isAllowedWithoutBits_andBodySaysContributor() {
+        contributor(0);
+        capCount(0);
+        ReportDto dto = service.create(request());
+
+        assertThat(dto.getLabels()).containsExactly("autopilot", "bug");
+        assertThat(sentBody()).contains("Reported in-app by a CONTRIBUTOR · report");
+    }
+
+    @Test
+    void admin_withAutopilotBit_mayUseLabel_andSuperAdminBitsAreIgnored() {
+        admin.setPermissions(31 | 32);
+        capCount(0);
+        assertThat(createWith("AUTO_MERGE")).containsExactly("autopilot", "autopilot:auto-merge", "bug");
+    }
+
+    @Test
+    void labelChecks_doNotDependOnTheJwtPermissions() {
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("u", null, List.of());
+        auth.setDetails(UserDetailDto.builder().id(5L).permissions(96).role("SUPER_ADMIN").build());
+        contributor(0);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        CreateReportRequest r = request();
+        r.setAutoLabel("AUTO");
+
+        assertCode(() -> service.create(r), HttpStatus.FORBIDDEN, "error.report.autoLabelForbidden");
+    }
+
+    @Test
+    void cap_countsContributorsAndAdminsTogether() {
+        contributor(0);
+        capCount(10);
+        ReportDto dto = service.create(request());
+
+        assertThat(dto.getLabels()).containsExactly("bug");
+        assertThat(dto.isCapReached()).isTrue();
+    }
+
+    @Test
+    void retry_ec1_autoDowngradesToAutoMergeWhenOnlyThatBitRemains() {
+        User c = contributor(32);
+        AppReport row = failedRow(c, UserRole.CONTRIBUTOR);
+        row.setAutoLabel(ReportAutoLabel.AUTO);
+        when(repository.findWithReporterById(row.getId())).thenReturn(Optional.of(row));
+        capCount(0);
+
+        ReportDto dto = service.retry(row.getId());
+
+        assertThat(dto.getLabels()).containsExactly("autopilot", "autopilot:auto-merge", "bug");
+        assertThat(dto.getAutoLabel()).isEqualTo(ReportAutoLabel.AUTO);
+    }
+
+    @Test
+    void retry_labelFallsToNoneWhenNoBitRemains() {
+        User c = contributor(0);
+        AppReport row = failedRow(c, UserRole.CONTRIBUTOR);
+        row.setAutoLabel(ReportAutoLabel.AUTO_MERGE);
+        when(repository.findWithReporterById(row.getId())).thenReturn(Optional.of(row));
+        capCount(0);
+
+        assertThat(service.retry(row.getId()).getLabels()).containsExactly("autopilot", "bug");
+    }
+
+    @Test
+    void retry_ec2_superAdminKeepsFullStoredLabelOnContributorRow() {
+        User c = contributor(0);
+        loginAs(2L);
+        AppReport row = failedRow(c, UserRole.CONTRIBUTOR);
+        row.setAutoLabel(ReportAutoLabel.AUTO);
+        when(repository.findWithReporterById(row.getId())).thenReturn(Optional.of(row));
+
+        assertThat(service.retry(row.getId()).getLabels()).containsExactly("autopilot", "autopilot:auto", "bug");
+    }
+
+    @Test
+    void autoLabelChecks_neverTouchTheFeatureFlag() {
+        contributor(32);
+        capCount(0);
+        assertThat(createWith("AUTO_MERGE")).contains("autopilot:auto-merge");
+        assertThat(ReportServiceImpl.class.getDeclaredFields())
+                .noneMatch(f -> f.getType().getSimpleName().equals("FeatureFlagService"));
     }
 
     // ---- retry

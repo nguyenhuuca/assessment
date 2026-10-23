@@ -10,6 +10,7 @@ import com.canhlabs.funnyapp.dto.admin.ReportDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.entity.AppReport;
 import com.canhlabs.funnyapp.entity.User;
+import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.ReportAutoLabel;
 import com.canhlabs.funnyapp.enums.ReportStatus;
 import com.canhlabs.funnyapp.enums.ReportType;
@@ -35,6 +36,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,6 +59,8 @@ public class ReportServiceImpl implements ReportService {
     static final int MAX_SCREEN_WIDTH = 10_000;
     static final int MAX_PAGE_SIZE = 50;
     static final int ADMIN_AUTOPILOT_CAP = 10;
+    /** Reporter roles that share the daily autopilot cap (ADR-0030 D6). */
+    static final Collection<UserRole> CAPPED_ROLES = List.of(UserRole.ADMIN, UserRole.CONTRIBUTOR);
     static final Duration CAP_WINDOW = Duration.ofHours(24);
     static final String PENDING = "pending";
     private static final int MAX_ERROR = 64;
@@ -100,7 +104,7 @@ public class ReportServiceImpl implements ReportService {
         ReportContext context = request.getContext() == null ? new ReportContext() : request.getContext();
         validateContext(context);
         ReportAutoLabel autoLabel = parseAutoLabel(request.getAutoLabel());
-        if (autoLabel != null && reporter.getRole() != UserRole.SUPER_ADMIN) {
+        if (!mayUse(reporter, autoLabel)) {
             throw CustomException.of(HttpStatus.FORBIDDEN, 403, "error.report.autoLabelForbidden");
         }
 
@@ -120,7 +124,7 @@ public class ReportServiceImpl implements ReportService {
                 .status(ReportStatus.FAILED)
                 .error(PENDING)
                 .build());
-        return toDto(callGitHub(row, reporter.getRole()), IssueState.OPEN.name());
+        return toDto(callGitHub(row, reporter), IssueState.OPEN.name());
     }
 
     @Override
@@ -151,16 +155,16 @@ public class ReportServiceImpl implements ReportService {
         if (row.getStatus() == ReportStatus.CREATED) {
             throw CustomException.of(HttpStatus.CONFLICT, 409, "error.report.alreadyCreated");
         }
-        return toDto(callGitHub(row, caller.getRole()), IssueState.OPEN.name());
+        return toDto(callGitHub(row, caller), IssueState.OPEN.name());
     }
 
     /**
      * Applies the cap, calls GitHub and saves the outcome; never throws for a GitHub failure.
-     * The auto label and the cap follow the caller's current role, not the stored reporter role.
+     * The auto label and the cap follow the caller's current role and bits, not the stored reporter role.
      */
-    private AppReport callGitHub(AppReport row, UserRole callerRole) {
-        boolean autopilot = !isCapped(callerRole);
-        ReportAutoLabel autoLabel = callerRole == UserRole.SUPER_ADMIN ? row.getAutoLabel() : null;
+    private AppReport callGitHub(AppReport row, User caller) {
+        boolean autopilot = !isCapped(caller.getRole());
+        ReportAutoLabel autoLabel = capLabel(caller, row.getAutoLabel());
         List<String> labels = ReportIssueContent.labels(row.getType(), autoLabel, autopilot);
         try {
             CreatedIssue issue = client.create(row.getTitle(), ReportIssueContent.body(row), labels);
@@ -189,13 +193,27 @@ public class ReportServiceImpl implements ReportService {
         row.setError(code == null ? "github.io" : code.substring(0, Math.min(code.length(), MAX_ERROR)));
     }
 
-    /** BR-3: only ADMIN reports are capped; the count takes no lock (EC-3). */
+    /** BR-8: the SUPER_ADMIN may use every label, others need an autopilot bit read from the DB user. */
+    private static boolean mayUse(User caller, ReportAutoLabel label) {
+        return caller.getRole() == UserRole.SUPER_ADMIN || Permission.allowsAutoLabel(caller.getPermissions(), label);
+    }
+
+    /** BR-10: a retry never fails on the label, it falls to what the current caller may use. */
+    private static ReportAutoLabel capLabel(User caller, ReportAutoLabel stored) {
+        if (mayUse(caller, stored)) {
+            return stored;
+        }
+        return stored == ReportAutoLabel.AUTO && mayUse(caller, ReportAutoLabel.AUTO_MERGE)
+                ? ReportAutoLabel.AUTO_MERGE : null;
+    }
+
+    /** BR-11: ADMIN and CONTRIBUTOR reports share the cap; the count takes no lock (EC-3). */
     private boolean isCapped(UserRole callerRole) {
         if (callerRole == UserRole.SUPER_ADMIN) {
             return false;
         }
-        long used = repository.countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter(
-                ReportStatus.CREATED, UserRole.ADMIN, clock.instant().minus(CAP_WINDOW));
+        long used = repository.countByStatusAndAutopilotTrueAndReporterRoleInAndCreatedAtAfter(
+                ReportStatus.CREATED, CAPPED_ROLES, clock.instant().minus(CAP_WINDOW));
         return used >= ADMIN_AUTOPILOT_CAP;
     }
 
