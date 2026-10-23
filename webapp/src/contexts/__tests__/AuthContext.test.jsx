@@ -75,6 +75,33 @@ describe('AuthContext', () => {
     expect(JSON.parse(localStorage.getItem('user')).isAdmin).toBe(true)
   })
 
+  it('keeps permissions and canReport from /user/me on reload', async () => {
+    localStorage.setItem('jwt', 'jwt-c')
+    localStorage.setItem('user', JSON.stringify({ email: 'c@test.com', role: 'USER' }))
+    const { authApi } = await import('../../api/auth.js')
+    authApi.me.mockResolvedValue({ data: { role: 'CONTRIBUTOR', permissions: 33 } })
+    function Probe() {
+      const { user, canReport } = useAuth()
+      return <span data-testid="probe">{`${user?.permissions}|${canReport}`}</span>
+    }
+    render(<AuthProvider><Probe /></AuthProvider>)
+    await waitFor(() => expect(screen.getByTestId('probe').textContent).toBe('33|true'))
+    expect(JSON.parse(localStorage.getItem('user')).permissions).toBe(33)
+  })
+
+  it('keeps permissions from login', async () => {
+    function Probe() {
+      const { user, canReport, login } = useAuth()
+      return <>
+        <span data-testid="probe">{`${user?.permissions}|${canReport}`}</span>
+        <button onClick={() => login('j', { email: 'c@test.com', role: 'CONTRIBUTOR', permissions: 32 })}>go</button>
+      </>
+    }
+    render(<AuthProvider><Probe /></AuthProvider>)
+    act(() => screen.getByText('go').click())
+    expect(screen.getByTestId('probe').textContent).toBe('32|true')
+  })
+
   it('logout clears JWT and resets state', async () => {
     localStorage.setItem('jwt', 'existing-jwt')
     localStorage.setItem('user', JSON.stringify({ email: 'user@test.com' }))

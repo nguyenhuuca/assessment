@@ -232,6 +232,15 @@ describe('NotificationDropdown tabs (admins)', () => {
     expect(screen.queryByText('bob đã trả lời bình luận của bạn')).toBeNull()
   })
 
+  it('a contributor also gets the Admin tab', async () => {
+    auth.user = { role: 'CONTRIBUTOR', isAdmin: false }
+    notificationsApi.list.mockImplementation(byCategory([reply({ read: true })], [closed()]))
+    renderBell()
+    fireEvent.click(await screen.findByRole('button', { name: /Thông báo/ }))
+    fireEvent.click(await screen.findByRole('tab', { name: /Admin/ }))
+    expect(await screen.findByText('Report của bạn đã được đóng: Khó đọc (Đã xong)')).toBeTruthy()
+  })
+
   it('a tab with an unread item shows a dot; mark-all follows the total unread count', async () => {
     auth.user = { isAdmin: true }
     notificationsApi.unreadCount.mockResolvedValue({ data: { count: 1 } })

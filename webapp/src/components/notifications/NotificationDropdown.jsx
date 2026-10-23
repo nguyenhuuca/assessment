@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMarkAllRead, useMarkRead, useNotificationList, useUnreadCount } from '../../hooks/useNotifications.js'
 import { useAuth } from '../../hooks/useAuth.js'
+import { userCanReport } from '../../utils/roles.js'
 import { notificationTitle } from '../../utils/notificationText.js'
 import { formatTime } from '../comments/commentUtils.js'
 
@@ -15,7 +16,7 @@ export default function NotificationDropdown({ onClose, onOpenNotification, anch
   const rootRef = useRef(null)
   const { user } = useAuth()
   // Admins get two tabs: admin-feature notifications (e.g. a closed report) apart from the rest
-  const admin = !!user?.isAdmin
+  const admin = userCanReport(user)
   const [tab, setTab] = useState('GENERAL')
   const general = useNotificationList(0, { category: admin ? 'GENERAL' : undefined })
   const adminList = useNotificationList(0, { category: 'ADMIN', enabled: admin })

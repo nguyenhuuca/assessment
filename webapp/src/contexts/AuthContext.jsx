@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { authApi } from '../api/auth.js'
 import i18n from '../i18n/index.js'
 import { AUTH_REVOKED_EVENT } from '../api/client.js'
-import { isAdminRole } from '../utils/roles.js'
+import { isAdminRole, userCanReport } from '../utils/roles.js'
 
 const AuthContext = createContext(null)
 
@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
         if (userData?.role !== undefined) {
           setUser(prev => {
             if (!prev) return prev
-            const next = { ...prev, role: userData.role, isAdmin: isAdminRole(userData.role) }
+            const next = { ...prev, role: userData.role, permissions: userData.permissions ?? prev.permissions, isAdmin: isAdminRole(userData.role) }
             localStorage.setItem('user', JSON.stringify(next))
             return next
           })
@@ -79,11 +79,12 @@ export function AuthProvider({ children }) {
     if (newUser?.role === undefined && newUser?.isAdmin === undefined) {
       authApi.me()
         .then((data) => {
-          const role = (data?.data ?? data)?.role
+          const me = data?.data ?? data
+          const role = me?.role
           if (role === undefined) return
           setUser(prev => {
             if (!prev) return prev
-            const next = { ...prev, role, isAdmin: isAdminRole(role) }
+            const next = { ...prev, role, permissions: me.permissions ?? prev.permissions, isAdmin: isAdminRole(role) }
             localStorage.setItem('user', JSON.stringify(next))
             return next
           })
@@ -121,6 +122,7 @@ export function AuthProvider({ children }) {
       jwt,
       guestToken,
       isLoggedIn: !!jwt,
+      canReport: userCanReport(user),
       loading,
       login,
       logout,

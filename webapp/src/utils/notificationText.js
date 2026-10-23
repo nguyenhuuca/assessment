@@ -27,10 +27,10 @@ export function notificationTitle(n) {
     : i18n.t('notifications:replyOne', { actor })
 }
 
-/** Nav key a notification opens, or null when it opens a video (or nothing). The report page is admin-only. */
-export function notificationNav(n, isAdmin) {
+/** Nav key a notification opens, or null when it opens a video (or nothing). The report page needs CONTRIBUTOR or above. */
+export function notificationNav(n, canReport) {
   if (n?.type === 'SUGGESTION_APPROVED' || n?.type === 'SUGGESTION_REJECTED') return 'history'
-  if (n?.type === 'REPORT_CLOSED') return isAdmin ? 'report' : null
+  if (n?.type === 'REPORT_CLOSED') return canReport ? 'report' : null
   return null
 }
 

@@ -54,6 +54,16 @@ describe('AppShell Report nav', () => {
     expect(screen.queryByRole('menuitem', { name: /Báo lỗi/ })).toBeNull()
   })
 
+  it('shows Report but not Admin to a contributor, on desktop and mobile', () => {
+    auth = { ...auth, user: { email: 'c@x.com', isAdmin: false, role: 'CONTRIBUTOR' } }
+    renderShell()
+    expect(within(sidenav()).getByText('Báo lỗi')).toBeInTheDocument()
+    expect(within(sidenav()).queryByText('Admin')).toBeNull()
+    fireEvent.click(within(document.querySelector('.mobile-nav')).getByRole('button', { name: 'Menu' }))
+    expect(screen.getByRole('menuitem', { name: /Báo lỗi/ })).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /Admin/ })).toBeNull()
+  })
+
   it('opens the page with the previous nav key', () => {
     renderShell()
     fireEvent.click(within(sidenav()).getByText('Báo lỗi'))

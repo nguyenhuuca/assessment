@@ -24,6 +24,7 @@ import NotificationBell from '../notifications/NotificationBell.jsx'
 import { useNotificationStream } from '../../hooks/useNotifications.js'
 import { useLocaleSync } from '../../hooks/useLocaleSync.js'
 import { notificationNav } from '../../utils/notificationText.js'
+import { userCanReport } from '../../utils/roles.js'
 
 // Mobile bottom nav (no side nav on mobile). Secondary actions live in the
 // settings menu (MobileNavMenu), shown once logged in.
@@ -48,6 +49,7 @@ const REPORT_NAV = { key: 'report', icon: 'bug_report', labelKey: 'navReport', r
 export default function AppShell() {
   const { t } = useTranslation(['shell', 'common'])
   const { isLoggedIn, user, logout, sessionNotice, clearSessionNotice } = useAuth()
+  const reporter = userCanReport(user)
   const { theme, toggle: toggleTheme } = useTheme()
   const [message,       setMessage]       = useState(null)
   const [mfaModal,      setMfaModal]      = useState({ show: false, pendingData: null })
@@ -100,7 +102,7 @@ export default function AppShell() {
 
   // Notification click: jump to the video, open its comments and highlight the comment
   function openNotification(n) {
-    const nav = notificationNav(n, user?.isAdmin)
+    const nav = notificationNav(n, reporter)
     if (nav) {
       goNav(nav)
       return
@@ -158,7 +160,7 @@ export default function AppShell() {
   const mobileMenu = [
     { key: 'suggest',  icon: 'add',                  labelKey: 'suggestVideo', onSelect: handleFab },
     ...(user?.isAdmin ? [{ key: 'admin', icon: 'admin_panel_settings', labelKey: 'navAdmin', onSelect: () => goNav('admin') }] : []),
-    ...(user?.isAdmin ? [{ key: 'report', icon: 'bug_report', labelKey: 'navReport', onSelect: () => goNav('report') }] : []),
+    ...(reporter ? [{ key: 'report', icon: 'bug_report', labelKey: 'navReport', onSelect: () => goNav('report') }] : []),
     { key: 'settings', icon: 'settings',             labelKey: 'navSettings',  onSelect: () => goNav('settings') },
   ]
   const mobileTitle = activeNav === 'home' ? t('forYou') : t([...SIDE_NAV, REPORT_NAV].find(n => n.key === activeNav)?.labelKey ?? 'forYou')
@@ -328,7 +330,7 @@ export default function AppShell() {
             <span>{t(item.labelKey)}</span>
           </button>
         ))}
-        {user?.isAdmin && (
+        {reporter && (
           <button
             className={`sidenav-item${activeNav === 'report' ? ' active' : ''}`}
             style={{ marginTop: 'auto' }}
@@ -340,7 +342,7 @@ export default function AppShell() {
         )}
         <button
           className={`sidenav-item${activeNav === 'settings' ? ' active' : ''}`}
-          style={user?.isAdmin ? undefined : { marginTop: 'auto' }}
+          style={reporter ? undefined : { marginTop: 'auto' }}
           onClick={() => goNav('settings')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 22 }}>settings</span>
@@ -379,7 +381,7 @@ export default function AppShell() {
           <ExploreView onNavigateToVideo={handleExploreNavigate} />
         ) : activeNav === 'admin' && user?.isAdmin ? (
           <AdminView key={`admin-${adminNonce}`} initialTab={adminTab ?? undefined} />
-        ) : activeNav === 'report' && user?.isAdmin ? (
+        ) : activeNav === 'report' && reporter ? (
           <ReportPage fromPage={prevNav} />
         ) : activeNav === 'settings' && isLoggedIn ? (
           <SettingsPage />
