@@ -11,7 +11,8 @@ vi.mock('../../../api/admin.js', () => ({
   updateAccountPermissions: vi.fn(),
   deleteAccount: vi.fn(),
 }))
-vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => ({ user: { email: 'boss@x.com', role: 'SUPER_ADMIN' } }) }))
+const viewer = vi.hoisted(() => ({ role: 'SUPER_ADMIN' }))
+vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => ({ user: { email: 'boss@x.com', role: viewer.role } }) }))
 
 const account = (o) => ({ id: 1, email: 'a@x.com', role: 'USER', mfaEnabled: false, permissions: 0, createdAt: null, ...o })
 
@@ -21,10 +22,13 @@ function renderTable(accounts) {
   return render(<QueryClientProvider client={qc}><AdminAccountTable /></QueryClientProvider>)
 }
 
-const chips = async (email) => within(await screen.findByRole('group', { name: new RegExp(email) })).getAllByRole('button')
+const chips = async (email) => within(await screen.findByRole('group', { name: new RegExp(`^(?!AUTOPILOT).*${email}`) })).getAllByRole('button')
+
+const roleSelect = (email) => screen.findByRole('combobox', { name: new RegExp(email) })
 
 beforeEach(() => {
   vi.clearAllMocks()
+  viewer.role = 'SUPER_ADMIN'
   adminApi.updateAccountPermissions.mockResolvedValue({})
 })
 
@@ -55,7 +59,7 @@ describe('AdminAccountTable role change', () => {
 
   const openPromote = async () => {
     renderTable([account({ id: 5, email: 'u@x.com', role: 'USER' })])
-    fireEvent.click(await screen.findByTitle('Nâng lên ADMIN'))
+    fireEvent.change(await roleSelect('u@x.com'), { target: { value: 'ADMIN' } })
     return screen.findByRole('dialog')
   }
 
@@ -85,8 +89,73 @@ describe('AdminAccountTable role change', () => {
 
   it('demote has no dialog', async () => {
     renderTable([account({ id: 6, email: 'a@x.com', role: 'ADMIN' })])
-    fireEvent.click(await screen.findByTitle('Hạ xuống USER'))
+    fireEvent.change(await roleSelect('a@x.com'), { target: { value: 'USER' } })
     await waitFor(() => expect(adminApi.updateAccountRole).toHaveBeenCalledWith(6, 'USER'))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('SUPER_ADMIN select offers USER / CONTRIBUTOR / ADMIN; CONTRIBUTOR needs no dialog', async () => {
+    renderTable([account({ id: 7, email: 'u@x.com', role: 'USER' })])
+    const select = await roleSelect('u@x.com')
+    expect(Array.from(select.options).map(o => o.value)).toEqual(['USER', 'CONTRIBUTOR', 'ADMIN'])
+    fireEvent.change(select, { target: { value: 'CONTRIBUTOR' } })
+    await waitFor(() => expect(adminApi.updateAccountRole).toHaveBeenCalledWith(7, 'CONTRIBUTOR'))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('an ADMIN viewer toggles USER to CONTRIBUTOR and back, with no select', async () => {
+    viewer.role = 'ADMIN'
+    renderTable([account({ id: 8, email: 'u@x.com', role: 'USER' }), account({ id: 9, email: 'c@x.com', role: 'CONTRIBUTOR' })])
+    fireEvent.click(await screen.findByTitle('Nâng lên CONTRIBUTOR'))
+    await waitFor(() => expect(adminApi.updateAccountRole).toHaveBeenCalledWith(8, 'CONTRIBUTOR'))
+    fireEvent.click(screen.getByTitle('Hạ xuống USER'))
+    await waitFor(() => expect(adminApi.updateAccountRole).toHaveBeenCalledWith(9, 'USER'))
+    expect(screen.queryByRole('combobox')).toBeNull()
+    expect(adminApi.updateAccountRole).not.toHaveBeenCalledWith(expect.anything(), 'ADMIN')
+  })
+
+  it('an ADMIN viewer cannot touch another ADMIN row', async () => {
+    viewer.role = 'ADMIN'
+    renderTable([account({ id: 3, email: 'adm@x.com', role: 'ADMIN' })])
+    const locked = (await screen.findAllByTitle('Chỉ quản lý được tài khoản có vai trò thấp hơn')).find(el => el.classList.contains('admin-action-btn') && !el.classList.contains('danger'))
+    expect(locked).toBeDisabled()
+  })
+
+  it('shows the CONTRIBUTOR badge', async () => {
+    renderTable([account({ email: 'c@x.com', role: 'CONTRIBUTOR' })])
+    const badge = await screen.findByText('CONTRIBUTOR', { selector: 'span.admin-badge' })
+    expect(badge).toHaveClass('admin-badge-contributor')
+  })
+})
+
+describe('AdminAccountTable autopilot toggles', () => {
+  const autopilot = async (email) => within(await screen.findByRole('group', { name: new RegExp(`AUTOPILOT ${email}`) })).getAllByRole('button')
+
+  it('SUPER_ADMIN sees two toggles on a CONTRIBUTOR row reflecting bits 32/64', async () => {
+    renderTable([account({ email: 'c@x.com', role: 'CONTRIBUTOR', permissions: 33 })])
+    const buttons = await autopilot('c@x.com')
+    expect(buttons.map(b => [b.textContent, b.getAttribute('aria-pressed')])).toEqual([['Auto-merge', 'true'], ['Full auto', 'false']])
+  })
+
+  it('toggling sends the new mask', async () => {
+    renderTable([account({ id: 4, email: 'c@x.com', role: 'CONTRIBUTOR', permissions: 1 })])
+    const [autoMerge, full] = await autopilot('c@x.com')
+    fireEvent.click(autoMerge)
+    await waitFor(() => expect(adminApi.updateAccountPermissions).toHaveBeenCalledWith(4, 33))
+    fireEvent.click(full)
+    await waitFor(() => expect(adminApi.updateAccountPermissions).toHaveBeenCalledWith(4, 65))
+  })
+
+  it('shows on ADMIN rows but not on USER rows', async () => {
+    renderTable([account({ id: 1, email: 'adm@x.com', role: 'ADMIN' }), account({ id: 2, email: 'u@x.com', role: 'USER' })])
+    await autopilot('adm@x.com')
+    expect(screen.queryByRole('group', { name: /AUTOPILOT u@x.com/ })).toBeNull()
+  })
+
+  it('is hidden from an ADMIN viewer', async () => {
+    viewer.role = 'ADMIN'
+    renderTable([account({ email: 'c@x.com', role: 'CONTRIBUTOR' })])
+    await chips('c@x.com')
+    expect(screen.queryByRole('group', { name: /AUTOPILOT/ })).toBeNull()
   })
 })

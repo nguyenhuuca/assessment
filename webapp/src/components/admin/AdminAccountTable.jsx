@@ -5,10 +5,13 @@ import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useTranslation } from 'react-i18next'
 import { formatDate } from '../../i18n/format.js'
-import { PERMISSIONS, hasPermission, togglePermission } from '../../utils/permissions.js'
+import { PERMISSIONS, AUTOPILOT_PERMISSIONS, hasPermission, togglePermission } from '../../utils/permissions.js'
+import { isSuperAdmin } from '../../utils/roles.js'
 
 // Mirrors the server: you can only manage accounts, and assign roles, strictly below your own
-const ROLE_RANK = { USER: 0, ADMIN: 1, SUPER_ADMIN: 2 }
+const ROLE_RANK = { USER: 0, CONTRIBUTOR: 1, ADMIN: 2, SUPER_ADMIN: 3 }
+const SELECTABLE_ROLES = ['USER', 'CONTRIBUTOR', 'ADMIN']
+const BADGE_CLASS = { SUPER_ADMIN: 'admin-badge-super', ADMIN: 'admin-badge-admin', CONTRIBUTOR: 'admin-badge-contributor' }
 const rank = (role) => ROLE_RANK[role] ?? 0
 
 export default function AdminAccountTable() {
@@ -16,6 +19,7 @@ export default function AdminAccountTable() {
   const [page, setPage] = useState(0)
   const { user } = useAuth()
   const myRank = rank(user?.role)
+  const viewerIsSuper = isSuperAdmin(user?.role)
   const { data, isLoading } = useAdminAccounts(page)
   const updateRole    = useUpdateAccountRole()
   const updatePerms   = useUpdateAccountPermissions()
@@ -65,10 +69,17 @@ export default function AdminAccountTable() {
               const isSelf = a.email === user?.email
               const isSuper = a.role === 'SUPER_ADMIN'
               const outranked = myRank <= rank(a.role)
-              const nextRole = a.role === 'ADMIN' ? 'USER' : 'ADMIN'
+              // An ADMIN viewer toggles USER <-> CONTRIBUTOR; a SUPER_ADMIN picks any of USER / CONTRIBUTOR / ADMIN
+              const nextRole = a.role === 'USER' ? 'CONTRIBUTOR' : 'USER'
+              const showAutopilot = viewerIsSuper && (a.role === 'CONTRIBUTOR' || a.role === 'ADMIN')
               const lockReason = isSelf ? null
                 : outranked ? t('lockLowerRole')
-                : myRank <= rank(nextRole) ? t('lockAssignLower') : null
+                : !viewerIsSuper && myRank <= rank(nextRole) ? t('lockAssignLower') : null
+              const changeRole = async (role) => {
+                if (role === a.role) return
+                if (role === 'ADMIN' && !await confirmGrantAdmin(a.email)) return
+                updateRole.mutate({ id: a.id, role })
+              }
               const roleLocked = isSelf || lockReason !== null
               const deleteLocked = isSelf || outranked
               // Same rule as the server: never yourself, only accounts ranked below you
@@ -78,8 +89,8 @@ export default function AdminAccountTable() {
                 <tr key={a.id} className="admin-table-row">
                   <td>{a.email}</td>
                   <td>
-                    <span className={`admin-badge ${isSuper ? 'admin-badge-super' : a.role === 'ADMIN' ? 'admin-badge-admin' : 'admin-badge-user'}`}>
-                      {isSuper ? t('roleSuper') : a.role}
+                    <span className={`admin-badge ${BADGE_CLASS[a.role] ?? 'admin-badge-user'}`}>
+                      {isSuper ? t('roleSuper') : a.role === 'CONTRIBUTOR' ? t('roleContributor') : a.role}
                     </span>
                   </td>
                   <td>
@@ -101,25 +112,56 @@ export default function AdminAccountTable() {
                         )
                       })}
                     </div>
+                    {showAutopilot && (
+                      <div className="perm-chips" role="group" aria-label={`${t('colAutopilot')} ${a.email}`} style={{ marginTop: 4 }}>
+                        {AUTOPILOT_PERMISSIONS.map(p => {
+                          const on = hasPermission(a.permissions, p.bit)
+                          return (
+                            <button
+                              key={p.key}
+                              type="button"
+                              className={`perm-chip${on ? ' on' : ''}`}
+                              aria-pressed={on}
+                              disabled={permsLocked || updatePerms.isPending}
+                              title={t('autopilotHint')}
+                              onClick={() => updatePerms.mutate({ id: a.id, permissions: togglePermission(a.permissions, p.bit) })}
+                            >
+                              {t(p.key === 'AUTOPILOT_AUTO_MERGE' ? 'permAutopilotAutoMerge' : 'permAutopilotAuto')}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
                   </td>
                   <td className="admin-cell-muted">{a.mfaEnabled ? t('mfaOn') : t('mfaOff')}</td>
                   <td className="admin-cell-muted">{a.createdAt ? formatDate(a.createdAt) : '—'}</td>
                   <td>
                     <div className="admin-actions">
-                      <button
-                        className="admin-action-btn"
-                        disabled={roleLocked}
-                        aria-busy={isBusyFor(updateRole, a.id, x => x?.id)}
-                        title={isSelf ? t('cannotChangeOwnRole') : (lockReason ?? (a.role === 'ADMIN' ? t('demote') : t('promote')))}
-                        onClick={async () => {
-                          if (nextRole === 'ADMIN' && !await confirmGrantAdmin(a.email)) return
-                          updateRole.mutate({ id: a.id, role: nextRole })
-                        }}
-                      >
-                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
-                          {a.role === 'ADMIN' ? 'person_remove' : 'person_add'}
-                        </span>
-                      </button>
+                      {viewerIsSuper ? (
+                        <select
+                          className="app-input"
+                          aria-label={t('roleSelectLabel', { email: a.email })}
+                          value={a.role}
+                          disabled={roleLocked || isSuper}
+                          aria-busy={isBusyFor(updateRole, a.id, x => x?.id)}
+                          title={isSelf ? t('cannotChangeOwnRole') : (lockReason ?? '')}
+                          onChange={e => changeRole(e.target.value)}
+                        >
+                          {(SELECTABLE_ROLES.includes(a.role) ? SELECTABLE_ROLES : [a.role, ...SELECTABLE_ROLES]).map(r => <option key={r} value={r}>{r}</option>)}
+                        </select>
+                      ) : (
+                        <button
+                          className="admin-action-btn"
+                          disabled={roleLocked}
+                          aria-busy={isBusyFor(updateRole, a.id, x => x?.id)}
+                          title={isSelf ? t('cannotChangeOwnRole') : (lockReason ?? (a.role === 'CONTRIBUTOR' ? t('demoteContributor') : t('promoteContributor')))}
+                          onClick={() => changeRole(nextRole)}
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
+                            {a.role === 'CONTRIBUTOR' ? 'person_remove' : 'person_add'}
+                          </span>
+                        </button>
+                      )}
                       <button
                         className="admin-action-btn danger"
                         disabled={deleteLocked}

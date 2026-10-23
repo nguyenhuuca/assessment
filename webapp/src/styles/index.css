@@ -1676,6 +1676,14 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   border: 1px solid #ffc107;
 }
 
+.admin-badge-contributor {
+  background: rgba(179, 136, 255, 0.14);
+  color: #b388ff;
+  border: 1px solid #b388ff;
+}
+
+.admin-actions select.app-input { width: auto; padding: 2px 6px; font-size: 12px; }
+
 /* Account permission bits: one toggle chip per bit */
 .perm-chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .perm-chip {
