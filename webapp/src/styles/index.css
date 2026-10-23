@@ -1955,12 +1955,14 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   border: none;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background var(--transition);
-  background: var(--bg-elevated);
+  transition: background var(--transition), box-shadow var(--transition);
+  background: var(--bg-high);
+  box-shadow: inset 0 0 0 1px var(--text-muted);
 }
 
 .settings-toggle.on {
   background: var(--primary);
+  box-shadow: none;
 }
 
 .settings-toggle-knob {
@@ -1970,12 +1972,13 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--text-muted);
   transition: transform var(--transition);
   pointer-events: none;
 }
 
 .settings-toggle.on .settings-toggle-knob {
+  background: #fff;
   transform: translateX(20px);
 }
 
