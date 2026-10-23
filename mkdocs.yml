@@ -5,6 +5,10 @@ repo_url: https://github.com/nguyenhuuca/assessment
 repo_name: nguyenhuuca/assessment
 edit_uri: edit/main/docs/
 
+# docs are written for GitHub (2-space nested lists, no blank line before a list); see the hook
+hooks:
+  - scripts/mkdocs_hooks.py
+
 theme:
   name: material
   features:

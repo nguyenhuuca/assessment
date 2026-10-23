@@ -63,3 +63,5 @@ scratchpad/
 
 # Evolve headless staging output (ADR-0029)
 evolve-out/
+site-check/
+__pycache__/

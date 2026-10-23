@@ -7,6 +7,8 @@ on:
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
+      - 'scripts/mkdocs_hooks.py'
+      - 'scripts/check-docs-lists.py'
   workflow_dispatch:
 
 permissions:
@@ -35,6 +37,11 @@ jobs:
 
       - name: Install MkDocs Material
         run: pip install mkdocs-material
+
+      - name: No list rendered as paragraph text
+        run: |
+          mkdocs build -d site-check
+          python scripts/check-docs-lists.py site-check
 
       - name: Deploy to GitHub Pages
         run: mkdocs gh-deploy --force
