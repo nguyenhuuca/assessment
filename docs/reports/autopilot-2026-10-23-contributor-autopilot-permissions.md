@@ -3,8 +3,8 @@
 - **Request:** `/autopilot docs/plans/plan-contributor-autopilot-permissions.md` (plan mode, CA-1..CA-6)
 - **Mode:** local
 - **Plan:** [plan-contributor-autopilot-permissions](../plans/plan-contributor-autopilot-permissions.md)
-- **Started:** 2026-10-23 21:14 · **Landed:** pending (Gate 2)
-- **Result:** pending Gate 2 (push)
+- **Started:** 2026-10-23 21:14 · **Landed:** 2026-10-23 21:44
+- **Result:** ✅ pushed `a6a2f086`
 
 ## Pipeline
 
@@ -19,8 +19,8 @@
 | Local QA ×2 | `qa-twice.sh`: 290 tests, pass 290 · flaky 0 · fail 0 | 1 of 3 |
 | Fix | the 5 code-review advisories were applied as tests and a small refactor (`9f82a9c5`, `102fced0`) | — |
 | Land: full gates | `mvn verify`: 1640 tests, 0 failures, 2 skipped, line coverage 96.70% (threshold 90%). `npm run test`: 583/583. `npm run lint`: 0 errors, 3 old warnings | — |
-| Gate 2 (owner) | pending | — |
-| CI + smoke | pending: runs after the push | — |
+| Gate 2 (owner) | push (`a89ee852..a6a2f086`) | — |
+| CI + smoke | CI green (Funny App Build and Deploy, Deploy Frontend, Publish Docs). `mock-test.sh` 22/22 on the 3rd and 4th runs; runs 1–2 right after the restart had 1 transient `ECONNRESET` each (`/admin/comments`), not an assertion failure | — |
 
 ## What changed
 
