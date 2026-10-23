@@ -11,7 +11,7 @@
   "autopilotLabel": "Autopilot",
   "autopilot": { "NONE": "None", "AUTO_MERGE": "Auto-merge", "AUTO": "Full auto" },
   "screenLabel": "Screen",
-  "screen": { "default": "Auto-detect (previous screen)", "home": "Home", "explore": "Explore", "library": "Library", "history": "History", "admin": "Admin" },
+  "screen": { "default": "Auto-detect (previous screen)", "home": "Home", "explore": "Explore", "library": "Library", "history": "History", "report": "Report", "settings": "Settings", "admin": "Admin", "other": "Other (describe the screen in the description)" },
   "contextTitle": "Page context",
   "context": {
     "page": "Page",

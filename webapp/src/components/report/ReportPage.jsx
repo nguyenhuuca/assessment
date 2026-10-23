@@ -11,7 +11,7 @@ const AUTOPILOT = [
   { value: 'AUTO_MERGE', labelKey: 'autopilot.AUTO_MERGE' },
   { value: 'AUTO', labelKey: 'autopilot.AUTO' },
 ]
-const SCREENS = ['home', 'explore', 'library', 'history', 'admin']
+const SCREENS = ['home', 'explore', 'library', 'history', 'report', 'settings', 'admin', 'other']
 const TABS = ['new', 'recent']
 const TITLE_MAX = 120
 const DESCRIPTION_MAX = 5000
@@ -71,7 +71,8 @@ export default function ReportPage({ fromPage }) {
   const valid = title.trim().length > 0 && description.trim().length > 0
 
   const context = {
-    page: screen || fromPage || null,
+    // 'other': the reporter names the screen in the description, so send no page
+    page: screen === 'other' ? null : (screen || fromPage || null),
     path: window.location.pathname,
     appVersion: __APP_BUILD__,
     userAgent: navigator.userAgent.slice(0, USER_AGENT_MAX),

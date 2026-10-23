@@ -501,6 +501,6 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Report screen dropdown: missing screens (#62, autopilot lite)
 
-- [ ] **RS2-1** `ReportPage`: add `report`, `settings` and `other` to the screen select; `other` sends page `null` (never `'other'`)
-- [ ] **RS2-2** en + vi `screen.report` / `screen.settings` / `screen.other` strings
-- [ ] **RS2-3** Tests: `report` posts 'report'; `other` posts null despite `fromPage`; reset to blank after success
+- [x] **RS2-1** `ReportPage`: add `report`, `settings` and `other` to the screen select; `other` sends page `null` (never `'other'`)
+- [x] **RS2-2** en + vi `screen.report` / `screen.settings` / `screen.other` strings
+- [x] **RS2-3** Tests: `report` posts 'report'; `other` posts null despite `fromPage`; reset to blank after success

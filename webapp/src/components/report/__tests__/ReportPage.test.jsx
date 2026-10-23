@@ -94,6 +94,17 @@ describe('ReportPage', () => {
     await waitFor(() => expect(screen.getByLabelText(i18n.t('report:screenLabel'))).toHaveValue(''))
   })
 
+  it.each([['report', 'report'], ['other', null]])('screen select %s posts page %s despite fromPage', async (pick, expected) => {
+    reportsApi.createReport.mockResolvedValue({ data: { status: 'CREATED', issueNumber: 9, issueUrl: 'https://github.com/o/r/issues/9' } })
+    renderPage()
+    await fill()
+    fireEvent.change(screen.getByLabelText(i18n.t('report:screenLabel')), { target: { value: pick } })
+    fireEvent.click(submitBtn())
+    await waitFor(() => expect(reportsApi.createReport).toHaveBeenCalledTimes(1))
+    expect(reportsApi.createReport.mock.calls[0][0].context.page).toBe(expected)
+    await waitFor(() => expect(screen.getByLabelText(i18n.t('report:screenLabel'))).toHaveValue(''))
+  })
+
   it('screen select keeps the choice when the report FAILED', async () => {
     reportsApi.createReport.mockResolvedValue({ data: { id: 'f1', status: 'FAILED', error: 'github.timeout' } })
     renderPage()
