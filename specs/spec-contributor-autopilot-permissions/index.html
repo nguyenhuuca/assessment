@@ -1,0 +1,9417 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Architecture documentation for the Funny Movies video streaming platform">
+      
+      
+        <meta name="author" content="nguyenhuuca">
+      
+      
+      
+        <link rel="prev" href="../spec-in-app-report/">
+      
+      
+        <link rel="next" href="../../sequence/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Contributor Autopilot Permissions - Funny Movies - Architecture Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#feature-specification-contributor-role-and-autopilot-permissions-for-reports" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Funny Movies - Architecture Docs" class="md-header__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Funny Movies - Architecture Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Contributor Autopilot Permissions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/nguyenhuuca/assessment" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nguyenhuuca/assessment
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../tracking/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Feature Tracking
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../adr/0001-use-relational-database/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  ADR
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../prd/PRD-hot-video-priority/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  PRD
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Specs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../sequence/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Sequence Diagrams
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../plans/plan-hls-migration/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Plans
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../presentations/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Presentations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/claude-guide-en/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reports/agent-metrics-2026-10/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../prd/PRD-watch-history/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Archived
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../claude/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Claude Workspace
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Funny Movies - Architecture Docs" class="md-nav__button md-logo" aria-label="Funny Movies - Architecture Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Funny Movies - Architecture Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nguyenhuuca/assessment" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nguyenhuuca/assessment
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tracking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature Tracking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/sequence-diagrams/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sequence Diagrams
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/performance-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/diagrams/ci-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI/CD Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0001-use-relational-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0001 - Use RDBMS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0002-backend-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0002 - Backend Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0003-use-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0003 - Cache Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0004-frontend-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0004 - Frontend Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0005-use_lru_cache_video_streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0005 - LRU Video Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0006-hls-video-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0006 - HLS Video Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0007-admin-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0007 - Admin Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0008-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0008 - React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0009-unified-video-list-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0009 - Unified Video List API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0010-trivy-container-scanning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0010 - Trivy Dependency Scanning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0011-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0011 - Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0012-bookmark-feature-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0012 - Bookmark Feature Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0014-watch-history-design-opus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0014 - Watch History Design (Opus)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0015-bitwise-permission-system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0015 - Bitwise Permission System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0016-user-settings-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0016 - User Settings Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0017-user-notifications/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0017 - User Notifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0018-password-login-option/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0018 - Password Login Option
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0019-admin-video-import/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0019 - Admin Video Import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    PRD
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-bookmark-feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bookmark Feature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-watch-history-opus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watch History
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-user-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-user-notifications/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Notifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-password-login/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Password Login
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-admin-video-import/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Video Import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-in-app-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    In-App Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-contributor-autopilot-permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specs
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Specs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spec-watch-history-opus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watch History
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spec-bitwise-permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bitwise Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spec-user-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spec-in-app-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    In-App Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#business-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Business Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Business Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#br-1-role-rank" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-1: Role rank
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-2-contributor-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-2: Contributor access
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-3-who-may-assign-contributor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-3: Who may assign CONTRIBUTOR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-4-autopilot-bits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-4: Autopilot bits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-5-who-may-change-autopilot-bits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-5: Who may change autopilot bits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-6-which-accounts-may-hold-autopilot-bits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-6: Which accounts may hold autopilot bits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-7-role-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-7: Role change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-8-allowed-auto-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-8: Allowed auto labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-9-create-with-a-label-the-caller-may-not-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-9: Create with a label the caller may not use
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-10-retry-downgrades-never-refuses-on-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-10: Retry downgrades, never refuses, on labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-11-shared-daily-cap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-11: Shared daily cap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-12-issue-body-role-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-12: Issue body role line
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-13-report-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-13: Report list
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-14-report-closed-notification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-14: Report-closed notification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fr-1-role-enum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-1: Role enum
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-2-security-matchers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-2: Security matchers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-3-report-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-3: Report controller
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-4-permission-enum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-4: Permission enum
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-5-account-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-5: Account service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-6-report-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-6: Report service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-7-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-7: Repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-8-issue-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-8: Issue content
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-9-notifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-9: Notifications
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-10-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-10: Messages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Endpoints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Endpoints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modified Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-v1funny-appadminreports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /v1/funny-app/admin/reports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-v1funny-appadminreportsidretry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /v1/funny-app/admin/reports/{id}/retry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-v1funny-appadminreports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /v1/funny-app/admin/reports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patch-v1funny-appadminaccountsidpermissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PATCH /v1/funny-app/admin/accounts/{id}/permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patch-v1funny-appadminaccountsidrole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PATCH /v1/funny-app/admin/accounts/{id}/role
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-v1funny-appuserme-and-login-responses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /v1/funny-app/user/me and login responses
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Database Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sensitive-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensitive Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caching-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caching Impact
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#frontend-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontend Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Frontend Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Routes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#event-job-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event / Job Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Event / Job Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#domain-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domain Events
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scheduled-jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scheduled Jobs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Non-Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Non-Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#availability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Availability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scalability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scalability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edge-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edge Cases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Edge Cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ec-1-revoke-between-create-and-retry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-1: Revoke between create and retry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-2-retry-of-a-contributors-report-by-the-super_admin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-2: Retry of a contributor's report by the SUPER_ADMIN
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-3-concurrent-creates-at-the-cap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-3: Concurrent creates at the cap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-4-admin-edits-a-granted-contributors-other-bits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-4: ADMIN edits a granted contributor's other bits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-5-autopilot-bit-on-a-user" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-5: Autopilot bit on a USER
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-6-promotion-keeps-the-grant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-6: Promotion keeps the grant
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-7-harness-flag-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-7: Harness flag off
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-8-contributor-on-another-admin-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-8: Contributor on another admin endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-9-old-jwt-with-role-admin-after-demotion-to-contributor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-9: Old JWT with role ADMIN after demotion to CONTRIBUTOR
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acceptance-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Acceptance Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version History
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../sequence/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sequence Diagrams
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sequence Diagrams
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-admin-video-import/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Video Import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-bookmark-feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bookmark / Collections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-contributor-autopilot-permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-i18n/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    i18n
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-in-app-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    In-App Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-password-login/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Password Login
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-user-notifications/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Notifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-user-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-video-suggestions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video Suggestions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-watch-history-v2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watch History (v2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plans
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plans
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-hls-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-react-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-admin-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-permissions-bitwise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions (Bitwise)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-vid2-hot-score-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Score Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-trivy-scan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trivy Scan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-hot-video-priority/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-a-file-based-hooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan A (File-based Hooks)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-b-direct-cli-spawn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan B (Direct CLI Spawn)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-bookmark-feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bookmark Feature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-watch-history-opus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watch History
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-user-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-video-reactions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video Reactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-admin-comment-moderation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Comment Moderation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-comment-replies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Comment Replies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-user-notifications/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Notifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-password-login/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Password Login
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-admin-video-import/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Video Import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-admin-drive-force-sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Drive Force Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-in-app-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    In-App Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-contributor-autopilot-permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-report-webhook-state/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Report Webhook State
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-report-closed-notify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Report Closed Notification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-agent-evolve/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Evolve Loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../presentations/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presentations
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Presentations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_2" id="__nav_9_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRDs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    PRDs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-hot-video-priority.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hot Video Priority
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_3" id="__nav_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Specs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spec-watch-history.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watch History
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_4" id="__nav_9_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/flow-scope-to-implement.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scope to Implement Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/claude-levels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Usage Levels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/claude-guide-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Guide (EN)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/claude-guide-vi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Guide (VI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/flow-scope-to-implement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scope to Implement Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/flow-scope-to-implement-vi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scope to Implement Flow (VI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/feature-flags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature Flags (EN)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/feature-flags-vi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature Flags (VI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/bitwise-permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bitwise Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/trello-setup-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trello Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/trello-board-status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trello Board Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/video-import-setup-vi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video Import Setup (VI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reports/agent-metrics-2026-10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Metrics 2026-10
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reports/system-health-2026-05-30/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-05-30
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reports/system-health-2026-02-06/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Health 2026-02-06
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reports/architecture-quality-2025-07-13-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-13 EN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reports/architecture-quality-2025-07-13-vn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-13 VN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reports/architecture-quality-2025-07-05/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Quality 2025-07-05
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reports/comparison-watch-history-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watch History Model Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Archived
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Archived
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-watch-history/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watch History (baseline) - PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0013-watch-history-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watch History (baseline) - ADR 0013
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spec-watch-history/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watch History (baseline) - Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plans/plan-watch-history/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watch History (baseline) - Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../claude/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Workspace
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_13" id="__nav_13_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Claude Workspace
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/agents-md/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AGENTS.md (Landing the Plane)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_3" id="__nav_13_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Workflows (user-invoked)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Workflows (user-invoked)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/scope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /scope
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/architect/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /architect
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /builder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/qa-engineer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /qa-engineer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/security-auditor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /security-auditor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/ui-ux-designer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /ui-ux-designer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/code-check/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /code-check
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/swarm-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /swarm-plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/swarm-execute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /swarm-execute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/swarm-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /swarm-review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/swarm-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /swarm-research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/land-the-plane/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /land-the-plane
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/tailor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /tailor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/task-resume/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /task-resume
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/autopilot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /autopilot
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/workflows/evolve/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    /evolve
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_4" id="__nav_13_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/architecture/designing-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Designing Systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/architecture/writing-adrs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing ADRs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_5" id="__nav_13_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Core Engineering
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Core Engineering
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/core-engineering/dependency-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/core-engineering/review-steering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Review Steering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/core-engineering/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_6" id="__nav_13_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/design/presentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presentation (HTML Deck)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_7" id="__nav_13_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/operations/postmortem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Postmortem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/operations/swarm-coordination/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Swarm Coordination
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_8" id="__nav_13_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Product
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Product
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/product/planning-artifacts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning Artifacts (PR-FAQ, PRD, Roadmap)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_9" id="__nav_13_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills — Security
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills — Security
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/skills/security/threat-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Threat Modeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_10" id="__nav_13_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/agents/worker-architect/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worker Architect
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/agents/worker-builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worker Builder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/agents/worker-explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worker Explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/agents/worker-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worker Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/agents/worker-reviewer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worker Reviewer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_11" id="__nav_13_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rules
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Rules
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/rules/core-directives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Directives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/rules/code-quality/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/rules/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/rules/tech-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tech Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/rules/debugging-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging Protocol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/rules/agent-constraints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Constraints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/rules/session-file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Session File (session.txt)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/rules/hooks-conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hooks Conventions (scoped)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_12" id="__nav_13_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hooks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Hooks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/hooks/dangerous-command-guard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    dangerous-command-guard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/hooks/pre-tool-use-validator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pre-tool-use-validator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/hooks/session-start-loader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    session-start-loader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/hooks/stop-validator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    stop-validator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_13" id="__nav_13_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templates — Artifacts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Templates — Artifacts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/artifacts/prd.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/artifacts/adr.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/artifacts/spec.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/artifacts/plan.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/artifacts/system_design.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/artifacts/design_spec.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/artifacts/pr_faq.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PR-FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/artifacts/roadmap.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/artifacts/security_audit.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/artifacts/postmortem.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Post-Mortem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_14" id="__nav_13_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templates — Claude Mechanisms
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Templates — Claude Mechanisms
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/claude_mechanisms/command.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/claude_mechanisms/skill.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skill
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/claude_mechanisms/agent.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../claude/templates/claude_mechanisms/rule.template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#business-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Business Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Business Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#br-1-role-rank" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-1: Role rank
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-2-contributor-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-2: Contributor access
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-3-who-may-assign-contributor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-3: Who may assign CONTRIBUTOR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-4-autopilot-bits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-4: Autopilot bits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-5-who-may-change-autopilot-bits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-5: Who may change autopilot bits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-6-which-accounts-may-hold-autopilot-bits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-6: Which accounts may hold autopilot bits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-7-role-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-7: Role change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-8-allowed-auto-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-8: Allowed auto labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-9-create-with-a-label-the-caller-may-not-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-9: Create with a label the caller may not use
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-10-retry-downgrades-never-refuses-on-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-10: Retry downgrades, never refuses, on labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-11-shared-daily-cap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-11: Shared daily cap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-12-issue-body-role-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-12: Issue body role line
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-13-report-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-13: Report list
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#br-14-report-closed-notification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BR-14: Report-closed notification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fr-1-role-enum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-1: Role enum
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-2-security-matchers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-2: Security matchers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-3-report-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-3: Report controller
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-4-permission-enum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-4: Permission enum
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-5-account-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-5: Account service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-6-report-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-6: Report service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-7-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-7: Repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-8-issue-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-8: Issue content
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-9-notifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-9: Notifications
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-10-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-10: Messages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Endpoints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Endpoints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modified Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-v1funny-appadminreports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /v1/funny-app/admin/reports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-v1funny-appadminreportsidretry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /v1/funny-app/admin/reports/{id}/retry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-v1funny-appadminreports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /v1/funny-app/admin/reports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patch-v1funny-appadminaccountsidpermissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PATCH /v1/funny-app/admin/accounts/{id}/permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patch-v1funny-appadminaccountsidrole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PATCH /v1/funny-app/admin/accounts/{id}/role
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-v1funny-appuserme-and-login-responses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /v1/funny-app/user/me and login responses
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Database Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sensitive-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensitive Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caching-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caching Impact
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#frontend-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontend Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Frontend Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Routes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#event-job-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event / Job Changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Event / Job Changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#domain-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domain Events
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scheduled-jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scheduled Jobs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Non-Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Non-Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#availability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Availability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scalability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scalability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edge-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edge Cases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Edge Cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ec-1-revoke-between-create-and-retry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-1: Revoke between create and retry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-2-retry-of-a-contributors-report-by-the-super_admin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-2: Retry of a contributor's report by the SUPER_ADMIN
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-3-concurrent-creates-at-the-cap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-3: Concurrent creates at the cap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-4-admin-edits-a-granted-contributors-other-bits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-4: ADMIN edits a granted contributor's other bits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-5-autopilot-bit-on-a-user" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-5: Autopilot bit on a USER
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-6-promotion-keeps-the-grant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-6: Promotion keeps the grant
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-7-harness-flag-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-7: Harness flag off
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-8-contributor-on-another-admin-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-8: Contributor on another admin endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec-9-old-jwt-with-role-admin-after-demotion-to-contributor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC-9: Old JWT with role ADMIN after demotion to CONTRIBUTOR
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acceptance-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Acceptance Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version History
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/nguyenhuuca/assessment/edit/main/docs/specs/spec-contributor-autopilot-permissions.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="feature-specification-contributor-role-and-autopilot-permissions-for-reports">Feature Specification: Contributor Role and Autopilot Permissions for Reports<a class="headerlink" href="#feature-specification-contributor-role-and-autopilot-permissions-for-reports" title="Permanent link">&para;</a></h1>
+<!--
+Feature Specification
+Filename: docs/specs/spec-contributor-autopilot-permissions.md
+Owner: Builder (/builder) or Architect (/architect)
+Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
+-->
+
+<h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> Implemented (2026-10-23)
+<strong>Author:</strong> nguyenhuuca
+<strong>Date:</strong> 2026-10-23
+<strong>Related PRD:</strong> <a href="../../prd/PRD-contributor-autopilot-permissions/">PRD-contributor-autopilot-permissions</a>
+<strong>Related ADR:</strong> <a href="../../adr/0030-contributor-autopilot-permissions/">ADR-0030</a> (amends <a href="../../adr/0026-in-app-report/">ADR-0026</a>)
+<strong>Sequence diagrams:</strong> <a href="../../sequence/sequence-contributor-autopilot-permissions/">sequence-contributor-autopilot-permissions</a></p>
+<hr />
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>The system gets a new role, <code>CONTRIBUTOR</code>, that can use only the in-app Report. It also gets two permission bits that the SUPER_ADMIN grants per account (CONTRIBUTOR or ADMIN). These bits let the holder put <code>autopilot:auto-merge</code> or <code>autopilot:auto</code> on the GitHub issue a report creates. Every rule is enforced in the server against the user row in the DB. The headless autopilot workflow is unchanged.</p>
+<hr />
+<h2 id="business-rules">Business Rules<a class="headerlink" href="#business-rules" title="Permanent link">&para;</a></h2>
+<h3 id="br-1-role-rank">BR-1: Role rank<a class="headerlink" href="#br-1-role-rank" title="Permanent link">&para;</a></h3>
+<p><code>UserRole</code> order becomes <code>USER &lt; CONTRIBUTOR &lt; ADMIN &lt; SUPER_ADMIN</code>. <code>CONTRIBUTOR.defaultPermissions()</code> is <code>0</code>.</p>
+<h3 id="br-2-contributor-access">BR-2: Contributor access<a class="headerlink" href="#br-2-contributor-access" title="Permanent link">&para;</a></h3>
+<p>A CONTRIBUTOR may call only the three report endpoints (create, list, retry) under <code>/v1/funny-app/admin/reports</code>. Every other <code>/v1/funny-app/admin/**</code> endpoint returns 403 to a CONTRIBUTOR.</p>
+<h3 id="br-3-who-may-assign-contributor">BR-3: Who may assign CONTRIBUTOR<a class="headerlink" href="#br-3-who-may-assign-contributor" title="Permanent link">&para;</a></h3>
+<p>The SUPER_ADMIN and ADMINs may set a USER to CONTRIBUTOR and a CONTRIBUTOR to USER. This follows the existing rank rule: the actor must outrank both the target's current role and the new role (<code>AdminAccountServiceImpl.java:46,105</code>).</p>
+<h3 id="br-4-autopilot-bits">BR-4: Autopilot bits<a class="headerlink" href="#br-4-autopilot-bits" title="Permanent link">&para;</a></h3>
+<p><code>AUTOPILOT_AUTO_MERGE = 1 &lt;&lt; 5</code> (32) and <code>AUTOPILOT_AUTO = 1 &lt;&lt; 6</code> (64). They are not part of <code>ALL_BITS</code> (stays <code>0b11111</code> = 31). <code>AUTOPILOT_BITS = 32 | 64 = 96</code>. A valid mask is a subset of <code>ALL_BITS | AUTOPILOT_BITS</code> (127).</p>
+<h3 id="br-5-who-may-change-autopilot-bits">BR-5: Who may change autopilot bits<a class="headerlink" href="#br-5-who-may-change-autopilot-bits" title="Permanent link">&para;</a></h3>
+<p>Only the SUPER_ADMIN. When a non-SUPER_ADMIN calls <code>PATCH /admin/accounts/{id}/permissions</code> with a mask whose <code>AUTOPILOT_BITS</code> differ from the target's current ones, the call gets 403. Changes to the other five bits follow today's rules.</p>
+<h3 id="br-6-which-accounts-may-hold-autopilot-bits">BR-6: Which accounts may hold autopilot bits<a class="headerlink" href="#br-6-which-accounts-may-hold-autopilot-bits" title="Permanent link">&para;</a></h3>
+<p>Only CONTRIBUTOR and ADMIN accounts. Setting any autopilot bit on a USER returns 400. The bits on the SUPER_ADMIN account are never read (BR-8). No migration and no default grants them.</p>
+<h3 id="br-7-role-change">BR-7: Role change<a class="headerlink" href="#br-7-role-change" title="Permanent link">&para;</a></h3>
+<p><code>updateRole</code> sets <code>role.defaultPermissions()</code>, then:</p>
+<ul>
+<li>if the new role is CONTRIBUTOR or ADMIN, ORs back the target's previous <code>AUTOPILOT_BITS</code>;</li>
+<li>if the new role is USER, the autopilot bits are cleared.</li>
+</ul>
+<p>Session revocation (<code>credentials_version + 1</code>) is unchanged.</p>
+<h3 id="br-8-allowed-auto-labels">BR-8: Allowed auto labels<a class="headerlink" href="#br-8-allowed-auto-labels" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Caller</th>
+<th><code>AUTO_MERGE</code></th>
+<th><code>AUTO</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SUPER_ADMIN</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>has <code>AUTOPILOT_AUTO</code></td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>has only <code>AUTOPILOT_AUTO_MERGE</code></td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>no autopilot bit</td>
+<td>no</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>The caller's bits are read from the user row loaded by <code>currentUser()</code>, never from the JWT and never through <code>@HasPermission</code>.</p>
+<h3 id="br-9-create-with-a-label-the-caller-may-not-use">BR-9: Create with a label the caller may not use<a class="headerlink" href="#br-9-create-with-a-label-the-caller-may-not-use" title="Permanent link">&para;</a></h3>
+<p><code>POST /admin/reports</code> with an <code>autoLabel</code> not allowed by BR-8 returns 403 <code>error.report.autoLabelForbidden</code>, and no row is saved.</p>
+<h3 id="br-10-retry-downgrades-never-refuses-on-labels">BR-10: Retry downgrades, never refuses, on labels<a class="headerlink" href="#br-10-retry-downgrades-never-refuses-on-labels" title="Permanent link">&para;</a></h3>
+<p>A retry applies the stored <code>auto_label</code> capped to what the <strong>current</strong> caller may use (BR-8):</p>
+<ul>
+<li><code>AUTO</code> falls to <code>AUTO_MERGE</code> when the caller holds only <code>AUTOPILOT_AUTO_MERGE</code>;</li>
+<li>any label falls to none when the caller holds no autopilot bit.</li>
+</ul>
+<p>A retry is never refused because of the label. The stored <code>auto_label</code> is not changed; only the issue labels reflect the downgrade.</p>
+<h3 id="br-11-shared-daily-cap">BR-11: Shared daily cap<a class="headerlink" href="#br-11-shared-daily-cap" title="Permanent link">&para;</a></h3>
+<p>At most <strong>10</strong> reports with <code>autopilot</code> from non-SUPER_ADMIN reporters (ADMIN and CONTRIBUTOR together) in a rolling 24 h. The count is of rows with <code>status = 'CREATED' AND autopilot AND reporter_role IN ('ADMIN','CONTRIBUTOR')</code> and <code>created_at</code> within the window. Over the cap, the issue is created with the type label only: no <code>autopilot</code>, no auto label. SUPER_ADMIN reports are never capped.</p>
+<h3 id="br-12-issue-body-role-line">BR-12: Issue body role line<a class="headerlink" href="#br-12-issue-body-role-line" title="Permanent link">&para;</a></h3>
+<p>"Reported in-app by" is followed by <code>the SUPER_ADMIN</code>, <code>an ADMIN</code> or <code>a CONTRIBUTOR</code>, from the stored <code>reporter_role</code>. Still no email, user name or id.</p>
+<h3 id="br-13-report-list">BR-13: Report list<a class="headerlink" href="#br-13-report-list" title="Permanent link">&para;</a></h3>
+<p>Every caller allowed on the endpoint (CONTRIBUTOR, ADMIN, SUPER_ADMIN) sees every report, as today.</p>
+<h3 id="br-14-report-closed-notification">BR-14: Report-closed notification<a class="headerlink" href="#br-14-report-closed-notification" title="Permanent link">&para;</a></h3>
+<p>A CONTRIBUTOR gets <code>REPORT_CLOSED</code> for their own reports, as an ADMIN does today, and sees it under the Admin tab of the notification dropdown. A click opens the Report page.</p>
+<hr />
+<h2 id="functional-requirements">Functional Requirements<a class="headerlink" href="#functional-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="fr-1-role-enum">FR-1: Role enum<a class="headerlink" href="#fr-1-role-enum" title="Permanent link">&para;</a></h3>
+<p><code>UserRole</code> must declare <code>USER, CONTRIBUTOR, ADMIN, SUPER_ADMIN</code> in that order. <code>roleHierarchy()</code> must derive <code>ROLE_ADMIN &gt; ROLE_CONTRIBUTOR &gt; ROLE_USER</code> from it with no hand-written change. Nothing may persist or compare <code>ordinal()</code>.</p>
+<h3 id="fr-2-security-matchers">FR-2: Security matchers<a class="headerlink" href="#fr-2-security-matchers" title="Permanent link">&para;</a></h3>
+<p><code>WebSecurityConfig.securityFilterChain</code> must register <code>/v1/funny-app/admin/reports/**</code> with <code>hasAnyRole("CONTRIBUTOR","ADMIN","SUPER_ADMIN")</code> <strong>before</strong> <code>/v1/funny-app/admin/**</code> with <code>hasAnyRole("ADMIN","SUPER_ADMIN")</code>. The bare path <code>/v1/funny-app/admin/reports</code> must be covered too, because <code>/**</code> already matches it in Spring's <code>PathPattern</code>.</p>
+<h3 id="fr-3-report-controller">FR-3: Report controller<a class="headerlink" href="#fr-3-report-controller" title="Permanent link">&para;</a></h3>
+<p><code>AdminReportController</code> must use <code>@PreAuthorize("hasRole('CONTRIBUTOR')")</code> at class level and must <strong>drop</strong> <code>@HasPermission(perm = Permission.ADMIN)</code> from <code>create</code>, <code>list</code> and <code>retry</code> (owner decision, 2026-10-23). <code>@AuditLog</code> and <code>@RateLimited</code> stay as they are: 5/h for create and retry, 60/min for list.</p>
+<h3 id="fr-4-permission-enum">FR-4: Permission enum<a class="headerlink" href="#fr-4-permission-enum" title="Permanent link">&para;</a></h3>
+<p><code>Permission</code> must add <code>AUTOPILOT_AUTO_MERGE(1 &lt;&lt; 5)</code> and <code>AUTOPILOT_AUTO(1 &lt;&lt; 6)</code>, keep <code>ALL_BITS = 0b11111</code>, and add <code>AUTOPILOT_BITS = 0b1100000</code>. A helper <code>Permission.allowsAutoLabel(int mask, ReportAutoLabel label)</code> must implement BR-8 for non-SA callers.</p>
+<h3 id="fr-5-account-service">FR-5: Account service<a class="headerlink" href="#fr-5-account-service" title="Permanent link">&para;</a></h3>
+<p><code>AdminAccountServiceImpl</code> must:</p>
+<ul>
+<li><code>updatePermissions</code>: reject bits outside <code>ALL_BITS | AUTOPILOT_BITS</code> (400, as today), reject an autopilot change by a non-SUPER_ADMIN (403, BR-5), and reject any autopilot bit on a USER target (400, BR-6);</li>
+<li><code>updateRole</code>: apply BR-7.</li>
+</ul>
+<h3 id="fr-6-report-service">FR-6: Report service<a class="headerlink" href="#fr-6-report-service" title="Permanent link">&para;</a></h3>
+<p><code>ReportServiceImpl</code> must:</p>
+<ul>
+<li><code>create</code>: replace the SUPER_ADMIN-only check (<code>ReportServiceImpl.java:103</code>) with BR-8/BR-9;</li>
+<li><code>callGitHub</code>: replace <code>callerRole == SUPER_ADMIN ? row.getAutoLabel() : null</code> (<code>:163</code>) with the BR-10 cap, passing the caller's <code>User</code> (role + permissions) instead of only the role;</li>
+<li><code>isCapped</code>: count with BR-11 (repository method takes a collection of roles).</li>
+</ul>
+<h3 id="fr-7-repository">FR-7: Repository<a class="headerlink" href="#fr-7-repository" title="Permanent link">&para;</a></h3>
+<p><code>AppReportRepository</code> must replace <code>countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter(status, role, since)</code> with <code>countByStatusAndAutopilotTrueAndReporterRoleInAndCreatedAtAfter(status, Collection&lt;UserRole&gt; roles, since)</code>.</p>
+<h3 id="fr-8-issue-content">FR-8: Issue content<a class="headerlink" href="#fr-8-issue-content" title="Permanent link">&para;</a></h3>
+<p><code>ReportIssueContent.body</code> must render BR-12.</p>
+<h3 id="fr-9-notifications">FR-9: Notifications<a class="headerlink" href="#fr-9-notifications" title="Permanent link">&para;</a></h3>
+<p>No backend change: <code>REPORT_CLOSED</code> already goes to the reporter by id. Frontend: the Admin tab and <code>notificationNav(n, …)</code> must use "can report" (CONTRIBUTOR or above) instead of <code>isAdmin</code> for <code>REPORT_CLOSED</code> (BR-14).</p>
+<h3 id="fr-10-messages">FR-10: Messages<a class="headerlink" href="#fr-10-messages" title="Permanent link">&para;</a></h3>
+<p><code>error.report.autoLabelForbidden</code> text changes in <code>messages.properties</code> and <code>messages_vi.properties</code> (see API Changes).</p>
+<hr />
+<h2 id="api-changes">API Changes<a class="headerlink" href="#api-changes" title="Permanent link">&para;</a></h2>
+<h3 id="new-endpoints">New Endpoints<a class="headerlink" href="#new-endpoints" title="Permanent link">&para;</a></h3>
+<p>None.</p>
+<h3 id="modified-endpoints">Modified Endpoints<a class="headerlink" href="#modified-endpoints" title="Permanent link">&para;</a></h3>
+<h4 id="post-v1funny-appadminreports">POST /v1/funny-app/admin/reports<a class="headerlink" href="#post-v1funny-appadminreports" title="Permanent link">&para;</a></h4>
+<p><strong>Change:</strong> CONTRIBUTOR may call it. <code>autoLabel</code> is checked against the caller's bits (BR-8) instead of the SUPER_ADMIN role. The request and response bodies are unchanged.</p>
+<p><strong>Auth:</strong> Required (JWT). Role CONTRIBUTOR or above. No permission bit needed.
+<strong>Rate limit:</strong> 5 per hour per user (unchanged)</p>
+<p><strong>Request</strong> (unchanged)</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BUG"</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Player stalls on seek"</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"…"</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">"autoLabel"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AUTO_MERGE"</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">"context"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"page"</span><span class="p">:</span><span class="w"> </span><span class="s2">"explore"</span><span class="p">,</span><span class="w"> </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/explore"</span><span class="p">,</span><span class="w"> </span><span class="nt">"appVersion"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.4.2"</span><span class="p">,</span><span class="w"> </span><span class="nt">"userAgent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"…"</span><span class="p">,</span><span class="w"> </span><span class="nt">"screenWidth"</span><span class="p">:</span><span class="w"> </span><span class="mi">390</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Response — Success</strong> (unchanged shape)</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SUCCESS"</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6f1c…"</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BUG"</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Player stalls on seek"</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CREATED"</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="nt">"issueNumber"</span><span class="p">:</span><span class="w"> </span><span class="mi">71</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">"issueUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://github.com/…/issues/71"</span><span class="p">,</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="nt">"labels"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"autopilot"</span><span class="p">,</span><span class="w"> </span><span class="s2">"autopilot:auto-merge"</span><span class="p">,</span><span class="w"> </span><span class="s2">"bug"</span><span class="p">],</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="nt">"autoLabel"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AUTO_MERGE"</span><span class="p">,</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="nt">"autopilot"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="nt">"capReached"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="nt">"reporter"</span><span class="p">:</span><span class="w"> </span><span class="s2">"…"</span><span class="p">,</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">    </span><span class="nt">"githubState"</span><span class="p">:</span><span class="w"> </span><span class="s2">"OPEN"</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Response — Error</strong></p>
+<table>
+<thead>
+<tr>
+<th>HTTP Status</th>
+<th>Code</th>
+<th>Message</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>400</td>
+<td><code>error.report.invalidAutoLabel</code></td>
+<td>Unknown autopilot option</td>
+<td><code>autoLabel</code> not <code>AUTO</code> / <code>AUTO_MERGE</code> / null (unchanged)</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>error.report.invalid*</code></td>
+<td>(unchanged)</td>
+<td>Title, description, type or context invalid (unchanged)</td>
+</tr>
+<tr>
+<td>401</td>
+<td>—</td>
+<td>—</td>
+<td>Missing or invalid JWT</td>
+</tr>
+<tr>
+<td>403</td>
+<td>—</td>
+<td>—</td>
+<td>Role USER (Spring Security, FR-2)</td>
+</tr>
+<tr>
+<td>403</td>
+<td><code>error.report.autoLabelForbidden</code></td>
+<td>EN: "Your account may not choose this autopilot option" · VI: "Tài khoản của bạn không được chọn tùy chọn autopilot này"</td>
+<td>BR-9</td>
+</tr>
+<tr>
+<td>429</td>
+<td>—</td>
+<td>—</td>
+<td>Rate limit exceeded (unchanged)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="post-v1funny-appadminreportsidretry">POST /v1/funny-app/admin/reports/{id}/retry<a class="headerlink" href="#post-v1funny-appadminreportsidretry" title="Permanent link">&para;</a></h4>
+<p><strong>Change:</strong> CONTRIBUTOR may call it, for their own reports (the reporter-or-SA rule at <code>ReportServiceImpl.java:148</code> is unchanged). Labels follow BR-10. No new error.</p>
+<h4 id="get-v1funny-appadminreports">GET /v1/funny-app/admin/reports<a class="headerlink" href="#get-v1funny-appadminreports" title="Permanent link">&para;</a></h4>
+<p><strong>Change:</strong> CONTRIBUTOR may call it and sees every report (BR-13). No body change.</p>
+<h4 id="patch-v1funny-appadminaccountsidpermissions">PATCH /v1/funny-app/admin/accounts/{id}/permissions<a class="headerlink" href="#patch-v1funny-appadminaccountsidpermissions" title="Permanent link">&para;</a></h4>
+<p><strong>Change:</strong> accepts bits 32 and 64. Request and response shapes are unchanged (<code>{ "permissions": 96 }</code> → <code>AdminAccountDto</code>).</p>
+<table>
+<thead>
+<tr>
+<th>HTTP Status</th>
+<th>Message</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>400</td>
+<td><code>Unknown permission bits: &lt;n&gt;</code></td>
+<td>Any bit outside 127 (was: outside 31)</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>Autopilot permissions need the CONTRIBUTOR or ADMIN role</code></td>
+<td>Any autopilot bit set on a USER target (BR-6)</td>
+</tr>
+<tr>
+<td>403</td>
+<td><code>Only the SUPER_ADMIN can change autopilot permissions</code></td>
+<td>Caller is not SUPER_ADMIN and the autopilot bits differ from the target's current bits (BR-5)</td>
+</tr>
+<tr>
+<td>403</td>
+<td>(unchanged)</td>
+<td>Caller does not outrank the target</td>
+</tr>
+</tbody>
+</table>
+<h4 id="patch-v1funny-appadminaccountsidrole">PATCH /v1/funny-app/admin/accounts/{id}/role<a class="headerlink" href="#patch-v1funny-appadminaccountsidrole" title="Permanent link">&para;</a></h4>
+<p><strong>Change:</strong> <code>role</code> accepts <code>CONTRIBUTOR</code>. Bits follow BR-7. Errors are unchanged. <code>UserRole.valueOf</code> of an unknown name stays a 400.</p>
+<h4 id="get-v1funny-appuserme-and-login-responses">GET /v1/funny-app/user/me and login responses<a class="headerlink" href="#get-v1funny-appuserme-and-login-responses" title="Permanent link">&para;</a></h4>
+<p>No shape change: <code>user.permissions</code> is already sent (<code>Converter.java:53</code>). The frontend starts keeping it (see Frontend Changes).</p>
+<hr />
+<h2 id="database-changes">Database Changes<a class="headerlink" href="#database-changes" title="Permanent link">&para;</a></h2>
+<h3 id="new-tables">New Tables<a class="headerlink" href="#new-tables" title="Permanent link">&para;</a></h3>
+<p>None.</p>
+<h3 id="modified-tables">Modified Tables<a class="headerlink" href="#modified-tables" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Change</th>
+<th>Column</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app_report</code></td>
+<td>Replace partial index</td>
+<td><code>created_at</code></td>
+<td>—</td>
+<td>Cap predicate now covers CONTRIBUTOR (BR-11)</td>
+</tr>
+<tr>
+<td><code>users</code></td>
+<td>None</td>
+<td><code>role</code></td>
+<td><code>VARCHAR(20)</code></td>
+<td><code>CONTRIBUTOR</code> (11 chars) fits; no check constraint on <code>role</code> exists</td>
+</tr>
+<tr>
+<td><code>users</code></td>
+<td>None</td>
+<td><code>permissions</code></td>
+<td><code>INT</code></td>
+<td>Bits 32 and 64 fit; no backfill</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">-- Cap count covers CONTRIBUTOR reports too (ADR-0030 D6, spec BR-11).</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">DROP</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">idx_app_report_autopilot_cap</span><span class="p">;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_app_report_autopilot_cap</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">app_report</span><span class="w"> </span><span class="p">(</span><span class="n">created_at</span><span class="p">)</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'CREATED'</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">autopilot</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">reporter_role</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">'ADMIN'</span><span class="p">,</span><span class="w"> </span><span class="s1">'CONTRIBUTOR'</span><span class="p">);</span>
+</code></pre></div>
+<blockquote>
+<p>Migration file: <code>api/src/main/resources/db/changelog/sql/202610230002-app-report-cap-contributor.sql</code>, picked up by <code>includeAll: sql/</code> in <code>db.changelog-master.yaml</code> (no master entry). <code>AppReportMigrationTest</code> must assert the new predicate.</p>
+</blockquote>
+<hr />
+<h2 id="security-requirements">Security Requirements<a class="headerlink" href="#security-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h3>
+<p>JWT as today. <code>updateRole</code> and <code>updatePermissions</code> already bump <code>credentials_version</code> (<code>AdminAccountServiceImpl.java:54,85,93</code>), so the target's existing tokens stop working on every grant, revoke or role change.</p>
+<h3 id="authorization">Authorization<a class="headerlink" href="#authorization" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Rule</th>
+<th>Where enforced</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Report endpoints</td>
+<td>CONTRIBUTOR or above</td>
+<td><code>WebSecurityConfig</code> matcher (FR-2) + class <code>@PreAuthorize</code> (FR-3)</td>
+</tr>
+<tr>
+<td>Other admin endpoints</td>
+<td>ADMIN or above</td>
+<td>unchanged <code>/admin/**</code> matcher + controller annotations</td>
+</tr>
+<tr>
+<td>Assign or remove CONTRIBUTOR</td>
+<td>actor outranks old and new role</td>
+<td><code>AdminAccountServiceImpl.updateRole</code></td>
+</tr>
+<tr>
+<td>Change autopilot bits</td>
+<td>SUPER_ADMIN only</td>
+<td><code>AdminAccountServiceImpl.updatePermissions</code> (BR-5)</td>
+</tr>
+<tr>
+<td>Use an auto label</td>
+<td>BR-8, read from DB</td>
+<td><code>ReportServiceImpl.create</code> / <code>callGitHub</code></td>
+</tr>
+</tbody>
+</table>
+<p>None of these depend on the Harness flag <code>permission_enforcement_enabled</code>.</p>
+<h3 id="data-validation">Data Validation<a class="headerlink" href="#data-validation" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Permission mask: integer, subset of 127, autopilot bits only on CONTRIBUTOR or ADMIN.</li>
+<li><code>role</code>: one of the four enum names.</li>
+<li>Report fields: unchanged (ADR-0026, <code>ReportServiceImpl</code> limits).</li>
+</ul>
+<h3 id="sensitive-data">Sensitive Data<a class="headerlink" href="#sensitive-data" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The issue body keeps BR-7 of the in-app report spec: no email, user name or id. Only the role word changes (BR-12).</li>
+<li>Audit: <code>@AuditLog</code> on create and retry is unchanged. Role and permission changes are logged by the existing <code>log.info</code> lines in <code>AdminAccountServiceImpl</code> (<code>:57</code>, <code>:88</code>), which carry the ids and the new mask. No new audit screen.</li>
+</ul>
+<hr />
+<h2 id="caching-impact">Caching Impact<a class="headerlink" href="#caching-impact" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Cache</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>credentialsVersionCache</code></td>
+<td>Already evicted on role and permission change (<code>AdminAccountServiceImpl.java:56,87</code>); no change</td>
+</tr>
+<tr>
+<td><code>GitHubIssueStateCache</code></td>
+<td>None</td>
+</tr>
+<tr>
+<td><code>VideoCacheImpl</code>, <code>ChunkIndexCacheImpl</code>, <code>StatsCacheImpl</code></td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="frontend-changes">Frontend Changes<a class="headerlink" href="#frontend-changes" title="Permanent link">&para;</a></h2>
+<h3 id="new-routes">New Routes<a class="headerlink" href="#new-routes" title="Permanent link">&para;</a></h3>
+<p>None. The Report page stays at the <code>report</code> nav key.</p>
+<h3 id="modified-components">Modified Components<a class="headerlink" href="#modified-components" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>webapp/src/utils/roles.js</code></td>
+<td>Add <code>canReport(role)</code> = CONTRIBUTOR, ADMIN or SUPER_ADMIN; <code>isAdminRole</code> unchanged</td>
+</tr>
+<tr>
+<td><code>webapp/src/utils/permissions.js</code></td>
+<td>Add <code>AUTOPILOT_PERMISSIONS = [{ key: 'AUTOPILOT_AUTO_MERGE', bit: 32 }, { key: 'AUTOPILOT_AUTO', bit: 64 }]</code> and <code>allowedAutoLabels(role, mask)</code> → <code>[]</code>, <code>['AUTO_MERGE']</code> or <code>['AUTO_MERGE','AUTO']</code> (SUPER_ADMIN: both)</td>
+</tr>
+<tr>
+<td><code>webapp/src/contexts/AuthContext.jsx</code></td>
+<td>Keep <code>permissions</code> from login and from <code>authApi.me()</code> next to <code>role</code> (<code>:51,72,86</code>); add <code>canReport</code> next to <code>isAdmin</code></td>
+</tr>
+<tr>
+<td><code>webapp/src/components/layout/AppShell.jsx</code></td>
+<td>Report nav item and page (<code>:161,382</code>) use <code>canReport</code>; Admin item stays <code>isAdmin</code></td>
+</tr>
+<tr>
+<td><code>webapp/src/components/report/ReportPage.jsx</code></td>
+<td>The autopilot select (<code>:52,56,88</code>) shows <code>allowedAutoLabels(user.role, user.permissions)</code>; it is hidden when the list is empty; default "No auto"; only an allowed value is sent</td>
+</tr>
+<tr>
+<td><code>webapp/src/components/admin/AdminAccountTable.jsx</code></td>
+<td><code>ROLE_RANK</code> gets <code>CONTRIBUTOR: 1</code>, ADMIN → 2, SUPER_ADMIN → 3; badge class <code>admin-badge-contributor</code>; role control offers USER ⇄ CONTRIBUTOR (any admin), ADMIN ⇄ … unchanged; two autopilot toggles shown only when the viewer is SUPER_ADMIN and the row is CONTRIBUTOR or ADMIN</td>
+</tr>
+<tr>
+<td><code>webapp/src/components/notifications/NotificationDropdown.jsx</code>, <code>webapp/src/utils/notificationText.js</code></td>
+<td>Admin tab and <code>REPORT_CLOSED</code> navigation use <code>canReport</code> (BR-14)</td>
+</tr>
+<tr>
+<td><code>webapp/src/i18n/locales/{en,vi}/admin.json</code>, <code>report.json</code></td>
+<td><code>roleContributor</code>, <code>promoteContributor</code>, <code>demoteContributor</code>, <code>permAutopilotAutoMerge</code>, <code>permAutopilotAuto</code>, <code>autoLabelNone</code> (both languages, ADR-0020)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Assumption:</strong> the role control for an ADMIN viewer offers USER ⇄ CONTRIBUTOR only. A SUPER_ADMIN gets a small select (USER / CONTRIBUTOR / ADMIN) in place of today's single promote/demote toggle (<code>AdminAccountTable.jsx:68</code>), since a toggle cannot express three targets.</p>
+</blockquote>
+<h3 id="state-management">State Management<a class="headerlink" href="#state-management" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Query key</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>['admin', 'accounts']</code></td>
+<td>Invalidated after role and permission mutations (as today)</td>
+</tr>
+<tr>
+<td><code>['reports', …]</code> (<code>useReports.js</code>)</td>
+<td>Unchanged</td>
+</tr>
+<tr>
+<td>Notification queries</td>
+<td><code>enabled</code> for the ADMIN category uses <code>canReport</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="event-job-changes">Event / Job Changes<a class="headerlink" href="#event-job-changes" title="Permanent link">&para;</a></h2>
+<h3 id="domain-events">Domain Events<a class="headerlink" href="#domain-events" title="Permanent link">&para;</a></h3>
+<p>None new. <code>ReportClosedEvent</code> already notifies the reporter whatever the role.</p>
+<h3 id="scheduled-jobs">Scheduled Jobs<a class="headerlink" href="#scheduled-jobs" title="Permanent link">&para;</a></h3>
+<p>None.</p>
+<hr />
+<h2 id="non-functional-requirements">Non-Functional Requirements<a class="headerlink" href="#non-functional-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST /admin/reports</code></td>
+<td>p95 &lt; 3 s including the GitHub call (unchanged, PRD-in-app-report NFR-1). The bit check is in memory on the already loaded user</td>
+</tr>
+<tr>
+<td>Cap count</td>
+<td>one indexed count, &lt; 10 ms (partial index)</td>
+</tr>
+<tr>
+<td><code>PATCH /admin/accounts/{id}/permissions</code> and <code>/role</code></td>
+<td>p95 &lt; 300 ms</td>
+</tr>
+</tbody>
+</table>
+<h3 id="availability">Availability<a class="headerlink" href="#availability" title="Permanent link">&para;</a></h3>
+<p>Unchanged. A GitHub failure still saves the report as FAILED with Retry (ADR-0026).</p>
+<h3 id="scalability">Scalability<a class="headerlink" href="#scalability" title="Permanent link">&para;</a></h3>
+<p>N/A: one more <code>IN</code> value in an indexed count; no new tables or caches.</p>
+<hr />
+<h2 id="edge-cases">Edge Cases<a class="headerlink" href="#edge-cases" title="Permanent link">&para;</a></h2>
+<h3 id="ec-1-revoke-between-create-and-retry">EC-1: Revoke between create and retry<a class="headerlink" href="#ec-1-revoke-between-create-and-retry" title="Permanent link">&para;</a></h3>
+<p>A contributor creates a report with <code>AUTO</code>, GitHub fails (FAILED). The SUPER_ADMIN removes <code>AUTOPILOT_AUTO</code> and leaves <code>AUTOPILOT_AUTO_MERGE</code>. The contributor logs in again (old JWT revoked) and retries. The issue is created with <code>autopilot</code>, <code>autopilot:auto-merge</code> and the type label. The stored <code>auto_label</code> stays <code>AUTO</code> (BR-10).</p>
+<h3 id="ec-2-retry-of-a-contributors-report-by-the-super_admin">EC-2: Retry of a contributor's report by the SUPER_ADMIN<a class="headerlink" href="#ec-2-retry-of-a-contributors-report-by-the-super_admin" title="Permanent link">&para;</a></h3>
+<p>The stored label is applied in full, because the SUPER_ADMIN may use every label.</p>
+<h3 id="ec-3-concurrent-creates-at-the-cap">EC-3: Concurrent creates at the cap<a class="headerlink" href="#ec-3-concurrent-creates-at-the-cap" title="Permanent link">&para;</a></h3>
+<p>Two creates at 9 used can both pass and make 11. This is accepted, as in ADR-0026 (EC-3 of the in-app report spec: the count takes no lock).</p>
+<h3 id="ec-4-admin-edits-a-granted-contributors-other-bits">EC-4: ADMIN edits a granted contributor's other bits<a class="headerlink" href="#ec-4-admin-edits-a-granted-contributors-other-bits" title="Permanent link">&para;</a></h3>
+<p>An ADMIN sends a mask that keeps the target's current autopilot bits unchanged and flips <code>READ</code>. Accepted (BR-5 compares only the autopilot bits). The same call with an autopilot bit flipped → 403 and nothing changes.</p>
+<h3 id="ec-5-autopilot-bit-on-a-user">EC-5: Autopilot bit on a USER<a class="headerlink" href="#ec-5-autopilot-bit-on-a-user" title="Permanent link">&para;</a></h3>
+<p>The SUPER_ADMIN sends <code>{ "permissions": 32 }</code> for a USER → 400, nothing saved (BR-6). A CONTRIBUTOR with bit 64 demoted to USER → stored mask <code>0</code> (BR-7).</p>
+<h3 id="ec-6-promotion-keeps-the-grant">EC-6: Promotion keeps the grant<a class="headerlink" href="#ec-6-promotion-keeps-the-grant" title="Permanent link">&para;</a></h3>
+<p>A CONTRIBUTOR with mask <code>32</code> is promoted to ADMIN by the SUPER_ADMIN. The stored mask becomes <code>31 | 32 = 63</code>.</p>
+<h3 id="ec-7-harness-flag-off">EC-7: Harness flag off<a class="headerlink" href="#ec-7-harness-flag-off" title="Permanent link">&para;</a></h3>
+<p>With <code>permission_enforcement_enabled</code> off, <code>@HasPermission</code> checks are skipped, but BR-5, BR-8 and BR-9 still apply (plain service checks). A test runs them with the flag stubbed off.</p>
+<h3 id="ec-8-contributor-on-another-admin-endpoint">EC-8: Contributor on another admin endpoint<a class="headerlink" href="#ec-8-contributor-on-another-admin-endpoint" title="Permanent link">&para;</a></h3>
+<p><code>GET /admin/accounts</code>, <code>/admin/videos</code>, <code>/admin/jobs</code>, <code>/admin/drive-sync/files</code>, <code>/admin/comments</code>, <code>/admin/video-imports</code> and <code>/admin/video-suggestions/pending-count</code> with a CONTRIBUTOR JWT → 403 each.</p>
+<h3 id="ec-9-old-jwt-with-role-admin-after-demotion-to-contributor">EC-9: Old JWT with role ADMIN after demotion to CONTRIBUTOR<a class="headerlink" href="#ec-9-old-jwt-with-role-admin-after-demotion-to-contributor" title="Permanent link">&para;</a></h3>
+<p>Rejected by the <code>credentials_version</code> check before any role is read (existing behaviour).</p>
+<hr />
+<h2 id="acceptance-criteria">Acceptance Criteria<a class="headerlink" href="#acceptance-criteria" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] <code>UserRole</code> order is USER, CONTRIBUTOR, ADMIN, SUPER_ADMIN; <code>ADMIN</code> outranks <code>CONTRIBUTOR</code>; <code>CONTRIBUTOR.defaultPermissions() == 0</code></li>
+<li>[ ] A CONTRIBUTOR can create, list and retry reports (200) and gets 403 on every endpoint in EC-8</li>
+<li>[ ] A USER gets 403 on the report endpoints</li>
+<li>[ ] SUPER_ADMIN and ADMIN can set USER ⇄ CONTRIBUTOR; an ADMIN cannot set ADMIN</li>
+<li>[ ] Only the SUPER_ADMIN can change bits 32/64 (403 for an ADMIN, EC-4); bits on a USER → 400 (EC-5)</li>
+<li>[ ] <code>ALL_BITS</code> is still 31; role change to ADMIN gives <code>31 | previous autopilot bits</code> (EC-6); role change to USER gives 0</li>
+<li>[ ] Create: BR-8 table holds for each row (4 caller kinds × 2 labels + none); a refused label → 403 <code>error.report.autoLabelForbidden</code>, no row saved</li>
+<li>[ ] Retry: EC-1 and EC-2 produce the labels stated</li>
+<li>[ ] Cap: 10 CREATED autopilot rows split across ADMIN and CONTRIBUTOR → the 11th non-SA report gets the type label only and <code>capReached: true</code>; a SUPER_ADMIN report still gets <code>autopilot</code></li>
+<li>[ ] Issue body says "a CONTRIBUTOR" for a contributor report</li>
+<li>[ ] BR-8/BR-9 checks hold with the Harness flag off (EC-7)</li>
+<li>[ ] Migration test asserts the new index predicate</li>
+<li>[ ] Frontend: a CONTRIBUTOR sees the Report menu and no Admin menu; the autopilot select lists exactly <code>allowedAutoLabels</code>; the account table shows the two toggles only to the SUPER_ADMIN on CONTRIBUTOR/ADMIN rows; the CONTRIBUTOR badge and i18n strings exist in <code>en</code> and <code>vi</code></li>
+<li>[ ] A CONTRIBUTOR's <code>REPORT_CLOSED</code> notification shows under the Admin tab and opens the Report page</li>
+<li>[ ] Coverage ≥ <code>api/.coverage-threshold</code>; <code>npm --prefix webapp run test</code> and <code>lint</code> green</li>
+<li>[ ] Prod check (owner): grant <code>AUTOPILOT_AUTO_MERGE</code> to a contributor, send a report with "Auto-merge", see the issue get <code>autopilot:auto-merge</code></li>
+</ul>
+<hr />
+<h2 id="open-questions">Open Questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<p>None. Owner decisions of 2026-10-23: ADMIN may assign CONTRIBUTOR; the endpoints stay at <code>/admin/reports</code>; contributors see all reports; bits are kept on CONTRIBUTOR ⇄ ADMIN and cleared on USER; <code>@HasPermission(ADMIN)</code> is dropped from the report endpoints; the four edge cases in BR-6, BR-10 and BR-14 are settled.</p>
+<hr />
+<h2 id="version-history">Version History<a class="headerlink" href="#version-history" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>2026-10-23</td>
+<td>nguyenhuuca</td>
+<td>Initial spec from PRD v1.1 + ADR-0030 via <code>/spec</code></td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "search.highlight", "search.suggest", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../javascripts/copy-markdown.js"></script>
+      
+    
+  </body>
+</html>

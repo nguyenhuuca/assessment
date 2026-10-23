@@ -1554,6 +1554,8 @@
       
         
       
+        
+      
     
     
     
@@ -1853,6 +1855,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/PRD-contributor-autopilot-permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1871,6 +1901,8 @@
       
         
           
+        
+      
         
       
         
@@ -2049,6 +2081,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/spec-contributor-autopilot-permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2067,6 +2127,8 @@
       
         
           
+        
+      
         
       
         
@@ -2190,6 +2252,34 @@
     
   
     Bookmark / Collections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sequence/sequence-contributor-autopilot-permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Autopilot Permissions
   
 
     
@@ -2470,6 +2560,8 @@
   
     
     
+      
+        
       
         
       
@@ -3111,6 +3203,34 @@
     
   
     In-App Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-contributor-autopilot-permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Autopilot Permissions
   
 
     
@@ -7633,6 +7753,17 @@
 <td>Report menu above Settings (ADMIN/SA) → GitHub issue with <code>autopilot</code> via the owner's fine-grained PAT; auto labels SA only; 5/h per user + 10 autopilot reports/24 h. Done IR-1..IR-7 (<code>ca21f28e</code>..<code>1cde69c8</code>); live on prod 2026-10-21. D7 webhook state (<a href="../plans/plan-report-webhook-state/">plan</a>): done WH-1..WH-5 (<code>5582b2fc</code>, <code>90dd0a78</code>), live 2026-10-21. Closed-issue notification to the reporter (<a href="../plans/plan-report-closed-notify/">plan</a>): built RN-1..RN-3 (<code>801dcb9f</code>, <code>b3030e52</code>)</td>
 </tr>
 <tr>
+<td><strong>Contributor Autopilot Permissions</strong></td>
+<td><a href="../prd/PRD-contributor-autopilot-permissions/">PRD 📝</a></td>
+<td><a href="../adr/0030-contributor-autopilot-permissions/">0030 ✅</a></td>
+<td><a href="../specs/spec-contributor-autopilot-permissions/">Spec ✅</a></td>
+<td><a href="../sequence/sequence-contributor-autopilot-permissions/">Seq ✅</a></td>
+<td><a href="../plans/plan-contributor-autopilot-permissions/">Plan ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td>New <code>CONTRIBUTOR</code> role (Report only); SA grants per-account bits <code>AUTOPILOT_AUTO_MERGE</code> / <code>AUTOPILOT_AUTO</code> to CONTRIBUTOR or ADMIN; checked in <code>ReportServiceImpl</code> against the DB; shared cap 10/24 h. Amends ADR-0026. Spec drops <code>@HasPermission(ADMIN)</code> on report endpoints. Done CA-1..CA-6 (<code>e1eeb892</code>..<code>102fced0</code>) by autopilot (<a href="../reports/autopilot-2026-10-23-contributor-autopilot-permissions/">report</a>); owner prod check pending</td>
+</tr>
+<tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
 <td>—</td>
 <td><a href="../adr/0027-agent-self-improvement-loop/">0027 ✅</a></td>
@@ -7846,10 +7977,15 @@
 <td>Headless Evolve With Staged Proposals</td>
 <td>✅ Accepted</td>
 </tr>
+<tr>
+<td>0030</td>
+<td>Granted Autopilot Labels for Contributors and Admins</td>
+<td>✅ Accepted</td>
+</tr>
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 
