@@ -126,7 +126,7 @@ export default function AdminAccountTable() {
                               title={t('autopilotHint')}
                               onClick={() => updatePerms.mutate({ id: a.id, permissions: togglePermission(a.permissions, p.bit) })}
                             >
-                              {t(p.key === 'AUTOPILOT_AUTO_MERGE' ? 'permAutopilotAutoMerge' : 'permAutopilotAuto')}
+                              {t(p.labelKey)}
                             </button>
                           )
                         })}

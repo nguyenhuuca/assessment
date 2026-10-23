@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { authApi } from '../api/auth.js'
 import i18n from '../i18n/index.js'
 import { AUTH_REVOKED_EVENT } from '../api/client.js'
-import { isAdminRole, userCanReport } from '../utils/roles.js'
+import { isAdminRole } from '../utils/roles.js'
 
 const AuthContext = createContext(null)
 
@@ -122,7 +122,6 @@ export function AuthProvider({ children }) {
       jwt,
       guestToken,
       isLoggedIn: !!jwt,
-      canReport: userCanReport(user),
       loading,
       login,
       logout,

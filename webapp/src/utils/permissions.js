@@ -13,8 +13,8 @@ export const togglePermission = (mask, bit) => (mask ?? 0) ^ bit
 
 // Mirrors the autopilot bits of api enums/Permission.java (CONTRIBUTOR/ADMIN accounts only)
 export const AUTOPILOT_PERMISSIONS = [
-  { key: 'AUTOPILOT_AUTO_MERGE', bit: 32 },
-  { key: 'AUTOPILOT_AUTO', bit: 64 },
+  { key: 'AUTOPILOT_AUTO_MERGE', bit: 32, labelKey: 'permAutopilotAutoMerge' },
+  { key: 'AUTOPILOT_AUTO', bit: 64, labelKey: 'permAutopilotAuto' },
 ]
 
 /** Auto labels a reporter may pick (spec BR-8): SUPER_ADMIN both, others by their autopilot bits. */
