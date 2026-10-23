@@ -493,3 +493,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **RS-1** (PR #61) `ReportPage` optional screen select; page sent is the pick, else `fromPage`; reset only when not FAILED
 - [x] **RS-2** (PR #61) en + vi `screenLabel` / `screen.*` strings
 - [x] **RS-3** (PR #61) Tests: default, override, reset after success, FAILED keeps choice
+
+## Backend version on in-app reports (2026-10-23, lite)
+
+- [x] **RV-1** Image carries `APP_VERSION=prod-<N>` (Dockerfile `ARG`/`ENV`, CI `build-args`); `app.version: ${APP_VERSION:dev}`
+- [x] **RV-2** `app_report.api_version` (Liquibase `202610230001`), stamped by the server in `ReportServiceImpl` (never from the client); issue body adds `- API: <version>`; tests

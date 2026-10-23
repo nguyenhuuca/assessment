@@ -67,6 +67,9 @@ public class AppReport {
     @Column(name = "app_version", length = 40)
     private String appVersion;
 
+    @Column(name = "api_version", length = 40)
+    private String apiVersion;
+
     @Column(name = "user_agent", length = 300)
     private String userAgent;
 

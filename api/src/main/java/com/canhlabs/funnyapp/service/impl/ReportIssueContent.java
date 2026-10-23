@@ -48,6 +48,7 @@ final class ReportIssueContent {
                 + "- Page: " + orUnknown(report.getPage()) + "\n"
                 + "- Path: " + orUnknown(report.getPagePath()) + "\n"
                 + "- App: " + orUnknown(report.getAppVersion()) + "\n"
+                + "- API: " + orUnknown(report.getApiVersion()) + "\n"
                 + "- Browser: " + orUnknown(report.getUserAgent()) + "\n"
                 + "- Screen: " + (report.getScreenWidth() == null ? UNKNOWN : report.getScreenWidth() + "px") + "\n\n"
                 + "Reported in-app by " + role + " · report " + report.getId().toString().substring(0, 8) + "\n\n"

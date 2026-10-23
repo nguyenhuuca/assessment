@@ -254,6 +254,8 @@ jobs:
           context: ./api           # Dockerfile in  api/
           file: ./api/Dockerfile   # point to Dockerfile
           push: true
+          build-args: |
+            APP_VERSION=prod-${{ steps.next_version.outputs.next_version }}
           tags: |
             nguyenhuuca/funny-app:prod-${{ steps.next_version.outputs.next_version }}
             nguyenhuuca/funny-app:latest

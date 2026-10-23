@@ -19,4 +19,8 @@ RUN chmod +x entrypoint.sh
 EXPOSE 8081
 
 # Use entrypoint script to inject JVM and env variables
+# Image tag (prod-<N>) set by CI; stamped on in-app reports
+ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION}
+
 ENTRYPOINT ["./entrypoint.sh"]

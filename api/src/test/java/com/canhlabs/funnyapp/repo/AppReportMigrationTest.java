@@ -48,6 +48,11 @@ class AppReportMigrationTest {
         return resource("db/changelog/sql/202610210001-app-report-github-state.sql");
     }
 
+    /** Backend version stamped on each report, added later. */
+    private static String apiVersionSql() throws Exception {
+        return resource("db/changelog/sql/202610230001-app-report-api-version.sql");
+    }
+
     private static String resource(String path) throws Exception {
         return new ClassPathResource(path).getContentAsString(StandardCharsets.UTF_8);
     }
@@ -88,7 +93,7 @@ class AppReportMigrationTest {
 
     @Test
     void entity_mapsEnumsAsStringAndEveryColumnExists() throws Exception {
-        String sql = sql() + stateSql();
+        String sql = sql() + stateSql() + apiVersionSql();
         for (String enumField : List.of("reporterRole", "type", "autoLabel", "status", "githubState")) {
             Enumerated e = field(enumField).getAnnotation(Enumerated.class);
             assertThat(e).as(enumField).isNotNull();

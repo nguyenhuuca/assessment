@@ -72,7 +72,7 @@ class ReportServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new ReportServiceImpl(repository, userRepo, client, cache, Clock.fixed(NOW, ZoneOffset.UTC));
+        service = new ReportServiceImpl(repository, userRepo, client, cache, Clock.fixed(NOW, ZoneOffset.UTC), "prod-104");
         admin = user(1L, "admin@example.com", UserRole.ADMIN);
         superAdmin = user(2L, "root@example.com", UserRole.SUPER_ADMIN);
         when(userRepo.findById(1L)).thenReturn(Optional.of(admin));
@@ -199,7 +199,7 @@ class ReportServiceImplTest {
 
         String body = sentBody();
         assertThat(body).startsWith("Desc\n\n### Context\n");
-        assertThat(body).contains("- Page: admin", "- Path: /", "- App: a1b2c3d", "- Browser: Mozilla", "- Screen: 390px");
+        assertThat(body).contains("- Page: admin", "- Path: /", "- App: a1b2c3d", "- API: prod-104", "- Browser: Mozilla", "- Screen: 390px");
         assertThat(body).contains("Reported in-app by an ADMIN · report 6f1c2b0e");
         assertThat(body).endsWith("<!-- app-report:6f1c2b0e-1111-2222-3333-444455556666 -->");
         assertThat(body).doesNotContain("admin@example.com").doesNotContain("@example.com");
@@ -212,7 +212,7 @@ class ReportServiceImplTest {
         r.setContext(null);
         service.create(r);
 
-        assertThat(sentBody()).contains("- Page: unknown", "- Path: unknown", "- App: unknown",
+        assertThat(sentBody()).contains("- Page: unknown", "- Path: unknown", "- App: unknown", "- API: prod-104",
                 "- Browser: unknown", "- Screen: unknown");
     }
 
@@ -227,6 +227,19 @@ class ReportServiceImplTest {
         verify(repository, org.mockito.Mockito.atLeastOnce()).save(saved.capture());
         assertThat(saved.getAllValues().get(0).getPagePath()).isEqualTo("/");
         assertThat(sentBody()).contains("- Path: /\n").doesNotContain("token");
+    }
+
+    @Test
+    void create_apiVersionComesFromServerNotClient() {
+        capCount(0);
+        CreateReportRequest r = request();
+        r.getContext().setAppVersion("prod-999");
+        service.create(r);
+
+        ArgumentCaptor<AppReport> saved = ArgumentCaptor.forClass(AppReport.class);
+        verify(repository, org.mockito.Mockito.atLeastOnce()).save(saved.capture());
+        assertThat(saved.getAllValues().get(0).getApiVersion()).isEqualTo("prod-104");
+        assertThat(sentBody()).contains("- App: prod-999\n", "- API: prod-104\n");
     }
 
     @Test

@@ -23,6 +23,7 @@ import com.canhlabs.funnyapp.utils.TaskUtils;
 import com.canhlabs.funnyapp.utils.TaskUtils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -65,20 +66,23 @@ public class ReportServiceImpl implements ReportService {
     private final GitHubIssueClient client;
     private final GitHubIssueStateCache stateCache;
     private final Clock clock;
+    private final String apiVersion;
 
     @Autowired
     public ReportServiceImpl(AppReportRepository repository, UserRepo userRepo,
-                             GitHubIssueClient client, GitHubIssueStateCache stateCache) {
-        this(repository, userRepo, client, stateCache, Clock.systemUTC());
+                             GitHubIssueClient client, GitHubIssueStateCache stateCache,
+                             @Value("${app.version:dev}") String apiVersion) {
+        this(repository, userRepo, client, stateCache, Clock.systemUTC(), apiVersion);
     }
 
     ReportServiceImpl(AppReportRepository repository, UserRepo userRepo,
-                      GitHubIssueClient client, GitHubIssueStateCache stateCache, Clock clock) {
+                      GitHubIssueClient client, GitHubIssueStateCache stateCache, Clock clock, String apiVersion) {
         this.repository = repository;
         this.userRepo = userRepo;
         this.client = client;
         this.stateCache = stateCache;
         this.clock = clock;
+        this.apiVersion = apiVersion;
     }
 
     @Override
@@ -109,6 +113,7 @@ public class ReportServiceImpl implements ReportService {
                 .page(context.getPage())
                 .pagePath(ReportIssueContent.stripPath(context.getPath()))
                 .appVersion(context.getAppVersion())
+                .apiVersion(apiVersion)
                 .userAgent(context.getUserAgent())
                 .screenWidth(context.getScreenWidth())
                 .autoLabel(autoLabel)
