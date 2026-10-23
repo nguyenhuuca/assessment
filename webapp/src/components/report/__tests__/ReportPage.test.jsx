@@ -41,6 +41,45 @@ describe('ReportPage', () => {
     expect(screen.queryByLabelText('Autopilot')).toBeNull()
   })
 
+  it('CONTRIBUTOR with no autopilot bits has no autopilot select', async () => {
+    setRole('CONTRIBUTOR', { permissions: 1 })
+    renderPage()
+    await fill()
+    expect(screen.queryByLabelText('Autopilot')).toBeNull()
+  })
+
+  it('CONTRIBUTOR with the auto-merge bit sees only None and Auto-merge', async () => {
+    setRole('CONTRIBUTOR', { permissions: 32 })
+    renderPage()
+    const select = await screen.findByLabelText('Autopilot')
+    expect(Array.from(select.options).map(o => o.value)).toEqual(['', 'AUTO_MERGE'])
+  })
+
+  it('CONTRIBUTOR with the auto bit sees both labels and sends the pick', async () => {
+    setRole('CONTRIBUTOR', { permissions: 64 })
+    reportsApi.createReport.mockResolvedValue({ data: { id: 'n', status: 'CREATED', issueNumber: 9, issueUrl: 'https://github.com/o/r/issues/9' } })
+    renderPage()
+    const select = await screen.findByLabelText('Autopilot')
+    expect(Array.from(select.options).map(o => o.value)).toEqual(['', 'AUTO_MERGE', 'AUTO'])
+    await fill()
+    fireEvent.change(select, { target: { value: 'AUTO' } })
+    fireEvent.click(submitBtn())
+    await waitFor(() => expect(reportsApi.createReport).toHaveBeenCalled())
+    expect(reportsApi.createReport.mock.calls[0][0].autoLabel).toBe('AUTO')
+  })
+
+  it('CONTRIBUTOR can retry their own FAILED row', async () => {
+    setRole('CONTRIBUTOR', { userName: 'alice' })
+    reportsApi.listReports.mockResolvedValue({ data: { totalPages: 1, content: [
+      row({ id: 'f1', status: 'FAILED', githubState: null, reporter: 'alice' }),
+    ] } })
+    reportsApi.retryReport.mockResolvedValue({ data: row() })
+    renderPage()
+    openRecent()
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('report:retry') }))
+    await waitFor(() => expect(reportsApi.retryReport).toHaveBeenCalledWith('f1'))
+  })
+
   it('the public-repo notice is an info alert, not an error alert', async () => {
     renderPage()
     await fill()

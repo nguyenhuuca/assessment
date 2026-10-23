@@ -3,14 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useReports, useCreateReport, useRetryReport } from '../../hooks/useReports.js'
 import { isSuperAdmin } from '../../utils/roles.js'
+import { allowedAutoLabels } from '../../utils/permissions.js'
 import { formatTime } from '../../utils/importUtils.js'
 
 const TYPES = ['BUG', 'ENHANCEMENT', 'ISSUE']
-const AUTOPILOT = [
-  { value: '', labelKey: 'autopilot.NONE' },
-  { value: 'AUTO_MERGE', labelKey: 'autopilot.AUTO_MERGE' },
-  { value: 'AUTO', labelKey: 'autopilot.AUTO' },
-]
 const SCREENS = ['home', 'explore', 'library', 'history', 'report', 'settings', 'admin', 'other']
 const TABS = ['new', 'recent']
 const TITLE_MAX = 120
@@ -50,6 +46,7 @@ export default function ReportPage({ fromPage }) {
   const { t } = useTranslation('report')
   const { user } = useAuth()
   const superAdmin = isSuperAdmin(user?.role)
+  const autoLabels = allowedAutoLabels(user?.role, user?.permissions)
   const [type, setType] = useState('BUG')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -85,7 +82,7 @@ export default function ReportPage({ fromPage }) {
     setResult(null)
     setSubmitError('')
     create.mutate(
-      { type, title: title.trim(), description: description.trim(), autoLabel: superAdmin && autoLabel ? autoLabel : null, context },
+      { type, title: title.trim(), description: description.trim(), autoLabel: autoLabels.includes(autoLabel) ? autoLabel : null, context },
       {
         onSuccess: res => {
           setResult(res?.data ?? null)
@@ -170,11 +167,12 @@ export default function ReportPage({ fromPage }) {
               {SCREENS.map(k => <option key={k} value={k}>{t(`screen.${k}`)}</option>)}
             </select>
           </div>
-          {superAdmin && (
+          {autoLabels.length > 0 && (
             <div>
               <label className="app-label" htmlFor="report-autopilot">{t('autopilotLabel')}</label>
               <select id="report-autopilot" className="app-input" value={autoLabel} onChange={e => setAutoLabel(e.target.value)}>
-                {AUTOPILOT.map(o => <option key={o.value} value={o.value}>{t(o.labelKey)}</option>)}
+                <option value="">{t('autopilot.NONE')}</option>
+                {autoLabels.map(k => <option key={k} value={k}>{t(`autopilot.${k}`)}</option>)}
               </select>
             </div>
           )}
