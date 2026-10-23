@@ -3,7 +3,7 @@
 - **PRD:** [PRD-contributor-autopilot-permissions](../prd/PRD-contributor-autopilot-permissions.md)
 - **ADR:** [0030-contributor-autopilot-permissions](../adr/0030-contributor-autopilot-permissions.md)
 - **Spec:** [spec-contributor-autopilot-permissions](../specs/spec-contributor-autopilot-permissions.md)
-- **Status:** Draft
+- **Status:** As-built (2026-10-23)
 
 ## 1. SUPER_ADMIN grants an autopilot bit
 

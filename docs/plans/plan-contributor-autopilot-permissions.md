@@ -8,13 +8,13 @@ Owner: Builder (/builder)
 
 ## Overview
 
-**Status:** Ready
+**Status:** Done (2026-10-23, autopilot run `2026-10-23-contributor-autopilot-permissions`)
 **Date:** 2026-10-23
 **PRD:** [PRD-contributor-autopilot-permissions](../prd/PRD-contributor-autopilot-permissions.md)
 **ADR:** [ADR-0030](../adr/0030-contributor-autopilot-permissions.md)
 **Spec:** [spec-contributor-autopilot-permissions](../specs/spec-contributor-autopilot-permissions.md) (rules are cited as BR-n / FR-n / EC-n)
 **Sequence:** [sequence-contributor-autopilot-permissions](../sequence/sequence-contributor-autopilot-permissions.md)
-**Size:** Medium. 6 tasks: 3 backend, 3 frontend, about 1,200 LOC including tests.
+**Size:** Medium. 6 tasks: 3 backend, 3 frontend, about 1,300 LOC including tests.
 
 ## Objective
 
@@ -64,7 +64,7 @@ Every task lands on `main` on its own. The order in the dependency graph is the 
 
 | ID | Task | Files | Acceptance criteria | Est. LOC (main + tests) |
 |----|------|-------|---------------------|-------------------------|
-| **CA-1** | BE: role, bits, security matchers, report controller | `enums/UserRole.java`, `enums/Permission.java`, `filter/WebSecurityConfig.java:54`, `web/AdminReportController.java:32,42,49,57`; tests `WebSecurityConfigRoleHierarchyTest`, `AdminReportControllerPermissionTest`, new `WebSecurityConfigAdminMatcherTest` | (1) `UserRole` = USER, CONTRIBUTOR, ADMIN, SUPER_ADMIN; `CONTRIBUTOR.defaultPermissions()==0`; ADMIN/SUPER_ADMIN still 31 (BR-1). (2) `Permission` adds 32/64, `ALL_BITS==31`, `AUTOPILOT_BITS==96`, `allowsAutoLabel(mask,label)` per BR-8 (FR-4). (3) `roleHierarchy()` reaches CONTRIBUTOR from ADMIN; `adminImpliesUserOnly` updated. (4) Matcher `/v1/funny-app/admin/reports/**` → CONTRIBUTOR/ADMIN/SUPER_ADMIN, before `/admin/**` (FR-2). The new test boots the real filter chain and checks that a CONTRIBUTOR gets 200 on `/admin/reports` and 403 on each EC-8 path. (5) Controller `hasRole('CONTRIBUTOR')`, no `@HasPermission` on the 3 methods (FR-3). A CONTRIBUTOR with mask 0 gets 200 with the flag on and off; USER still 403 | ~90 + ~180 |
+| **CA-1** | BE: role, bits, security matchers, report controller | `enums/UserRole.java`, `enums/Permission.java`, `filter/WebSecurityConfig.java:54`, `web/AdminReportController.java:32,43,51,59`; tests `WebSecurityConfigRoleHierarchyTest`, `AdminReportControllerPermissionTest`, new `WebSecurityConfigAdminMatcherTest` | (1) `UserRole` = USER, CONTRIBUTOR, ADMIN, SUPER_ADMIN; `CONTRIBUTOR.defaultPermissions()==0`; ADMIN/SUPER_ADMIN still 31 (BR-1). (2) `Permission` adds 32/64, `ALL_BITS==31`, `AUTOPILOT_BITS==96`, `allowsAutoLabel(mask,label)` per BR-8 (FR-4). (3) `roleHierarchy()` reaches CONTRIBUTOR from ADMIN; `adminImpliesUserOnly` updated. (4) Matcher `/v1/funny-app/admin/reports/**` → CONTRIBUTOR/ADMIN/SUPER_ADMIN, before `/admin/**` (FR-2). The new test boots the real filter chain and checks that a CONTRIBUTOR gets 200 on `/admin/reports` and 403 on each EC-8 path. (5) Controller `hasRole('CONTRIBUTOR')`, no `@HasPermission` on the 3 methods (FR-3). A CONTRIBUTOR with mask 0 gets 200 with the flag on and off; USER still 403 | ~90 + ~180 |
 | **CA-2** | BE: account rules for CONTRIBUTOR and autopilot bits | `service/impl/AdminAccountServiceImpl.java:41-58,73-89`; `AdminAccountServiceImplTest` | (1) Mask outside 127 → 400 (literal 32 test moves to 128). (2) Non-SA changing the autopilot bits → 403 "Only the SUPER_ADMIN can change autopilot permissions"; an ADMIN changing only the other bits of a CONTRIBUTOR is accepted (BR-5, EC-4). (3) Autopilot bit on a USER target → 400 (BR-6, EC-5). (4) `updateRole`: keep the autopilot bits for CONTRIBUTOR/ADMIN, clear them for USER (BR-7, EC-5, EC-6). (5) ADMIN may set USER ⇄ CONTRIBUTOR, cannot set ADMIN (BR-3). Sessions are revoked as before | ~40 + ~160 |
 | **CA-3** | BE: report label, retry and cap rules + migration | `service/impl/ReportServiceImpl.java:103,162-199`, `service/impl/ReportIssueContent.java:45`, `repo/AppReportRepository.java:31`, new `db/changelog/sql/202610230002-app-report-cap-contributor.sql`, `messages*.properties:122`; tests `ReportServiceImplTest`, `AppReportMigrationTest` | (1) Create: BR-8 table, refused label → 403 `error.report.autoLabelForbidden` and nothing saved (BR-9). (2) Retry: label capped to the current caller (BR-10, EC-1, EC-2); SA retry keeps the full label. (3) Cap counts `reporter_role IN (ADMIN, CONTRIBUTOR)` (BR-11): repository method `…ReporterRoleIn…`; 10 split across both roles → 11th gets the type label only. (4) Body says "a CONTRIBUTOR" (BR-12). (5) Checks hold with the Harness flag off (EC-7; the service never calls `FeatureFlagService`). (6) Migration replaces `idx_app_report_autopilot_cap` with the new predicate; the migration test asserts it. (7) Message text EN/VI updated | ~80 + ~220 |
 | **CA-4** | FE: role helpers, auth permissions, nav and notifications | `utils/roles.js`, `utils/permissions.js`, `contexts/AuthContext.jsx:45-93`, `components/layout/AppShell.jsx:46,103,139,160-161,314,331,343,380-383`, `components/notifications/NotificationDropdown.jsx:18-22`, `utils/notificationText.js:31-35`; tests `AuthContext.test.jsx`, `AppShell.report.test.jsx`, `notificationText.test.js`, `NotificationBell.test.jsx`, new `roles.test.js`, `permissions.test.js` | (1) `canReport(role)` true for CONTRIBUTOR/ADMIN/SUPER_ADMIN. (2) `AUTOPILOT_PERMISSIONS` (32, 64) and `allowedAutoLabels(role, mask)` per BR-8. (3) AuthContext keeps `permissions` from login and `/user/me` and exposes `canReport`. (4) CONTRIBUTOR sees Report (desktop + mobile) and no Admin; USER sees neither. (5) CONTRIBUTOR's dropdown has the Admin tab; `REPORT_CLOSED` opens Report (BR-14) | ~60 + ~150 |
@@ -77,13 +77,14 @@ Every task lands on `main` on its own. The order in the dependency graph is the 
 CA-1 ──┬──> CA-2
        └──> CA-3
 CA-4 ──┬──> CA-5
-       └──> CA-6
+       └──> CA-6   (also after CA-2)
 ```
 
 - CA-1 and CA-4 can start in parallel (separate backend and frontend files).
 - CA-2 and CA-3 touch different services. They depend on CA-1's enums, so they run in parallel after CA-1 lands.
-- CA-5 and CA-6 depend on CA-4's helpers, and run in parallel after it.
-- The frontend can land before the backend: a CONTRIBUTOR role does not exist in the DB until CA-1 is deployed and someone is assigned it.
+- CA-5 and CA-6 depend on CA-4's helpers, and run in parallel after it. CA-6 also lands after CA-2: its role select sends `CONTRIBUTOR` and its toggles send masks 32/64, which the backend rejects with 400 before CA-1/CA-2.
+- CA-4 and CA-5 can land before the backend: they only read a role and bits that no account has yet.
+- **Rollout rule:** no account is given CONTRIBUTOR until CA-3 is merged and deployed. Between CA-1 and CA-3, a contributor's reports would not count toward the cap (`ReportServiceImpl.java:197` counts ADMIN only), and the issue body would say "an ADMIN" (`ReportIssueContent.java:45`).
 
 ## Files to Modify
 
@@ -172,3 +173,4 @@ Owner, after deploy:
 | Date | Task | Commit | Note |
 |------|------|--------|------|
 | 2026-10-23 | — | — | Plan written from spec + 3 explorer reports |
+| 2026-10-23 | CA-1..CA-6 | e1eeb892..102fced0 | Built by autopilot (2 worker-builders); plan + code review approve; QA ×2 290/290; mvn verify 1640 tests, line coverage 96.70% |

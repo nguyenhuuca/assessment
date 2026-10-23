@@ -9,7 +9,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 
 ## Metadata
 
-**Status:** Draft
+**Status:** Implemented (2026-10-23)
 **Author:** nguyenhuuca
 **Date:** 2026-10-23
 **Related PRD:** [PRD-contributor-autopilot-permissions](../prd/PRD-contributor-autopilot-permissions.md)
@@ -258,7 +258,7 @@ CREATE INDEX idx_app_report_autopilot_cap ON app_report (created_at)
     WHERE status = 'CREATED' AND autopilot AND reporter_role IN ('ADMIN', 'CONTRIBUTOR');
 ```
 
-> Migration file: `api/src/main/resources/db/changelog/sql/202610230002-app-report-cap-contributor.sql`, plus its changeset entry in the master changelog. `AppReportMigrationTest` must assert the new predicate.
+> Migration file: `api/src/main/resources/db/changelog/sql/202610230002-app-report-cap-contributor.sql`, picked up by `includeAll: sql/` in `db.changelog-master.yaml` (no master entry). `AppReportMigrationTest` must assert the new predicate.
 
 ---
 

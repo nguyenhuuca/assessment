@@ -1,7 +1,7 @@
 task: Contributor role + SA-granted autopilot permissions for reports (ADR-0030)
-status: in_progress
-progress: 30
-done: PRD v1.1; ADR-0030 accepted; spec + sequence diagrams; plan CA-1..CA-6; docs committed
-next: build CA-1..CA-6 via /autopilot docs/plans/plan-contributor-autopilot-permissions.md or /swarm-execute
+status: done
+progress: 100
+done: CA-1 role+bits+matcher e1eeb892; CA-2 account rules 8ff49500; CA-3 report rules+migration 59a64873; CA-4 FE helpers+nav bd0298b5; CA-5 report form 9e96b891; CA-6 account table e340ce6c
+next: -
 plan: docs/plans/plan-contributor-autopilot-permissions.md
-updated: 2026-10-23 21:24
+updated: 2026-10-23 21:40

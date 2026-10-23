@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-23-contributor-autopilot-permissions",
+  "date": "2026-10-23",
+  "mode": "local",
+  "lite": false,
+  "issue": null,
+  "pr": null,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 0,
+  "advisory": 10,
+  "locNonTest": 287,
+  "tests": { "passed": 290, "flaky": 0, "failed": 0 },
+  "costUsd": 5.31
+}

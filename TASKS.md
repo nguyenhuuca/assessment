@@ -511,10 +511,10 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Feature: Contributor role + autopilot permissions (2026-10-23, ADR-0030, [plan](docs/plans/plan-contributor-autopilot-permissions.md))
 
-- [ ] **CA-1** BE: `UserRole.CONTRIBUTOR`, `Permission.AUTOPILOT_*` (32/64, `ALL_BITS` stays 31), `/admin/reports/**` matcher before `/admin/**`, report controller `hasRole('CONTRIBUTOR')` without `@HasPermission`; real-filter-chain test
-- [ ] **CA-2** BE: `AdminAccountServiceImpl` autopilot bits SA-only, not on USER, kept/cleared on role change (BR-3/5/6/7) (after CA-1)
-- [ ] **CA-3** BE: report label by bits (BR-8/9), retry downgrade (BR-10), shared cap ADMIN+CONTRIBUTOR + index changeset, "a CONTRIBUTOR" body (after CA-1)
-- [ ] **CA-4** FE: `canReport`, `allowedAutoLabels`, AuthContext keeps `permissions`, Report nav + REPORT_CLOSED for CONTRIBUTOR
-- [ ] **CA-5** FE: report form autopilot options by bits, en/vi (after CA-4)
-- [ ] **CA-6** FE: account table CONTRIBUTOR rank/badge/role select + SA-only autopilot toggles, en/vi (after CA-4)
+- [x] **CA-1** BE: `UserRole.CONTRIBUTOR`, `Permission.AUTOPILOT_*` (32/64, `ALL_BITS` stays 31), `/admin/reports/**` matcher before `/admin/**`, report controller `hasRole('CONTRIBUTOR')` without `@HasPermission`; real-filter-chain test e1eeb892
+- [x] **CA-2** BE: `AdminAccountServiceImpl` autopilot bits SA-only, not on USER, kept/cleared on role change (BR-3/5/6/7) (after CA-1) 8ff49500
+- [x] **CA-3** BE: report label by bits (BR-8/9), retry downgrade (BR-10), shared cap ADMIN+CONTRIBUTOR + index changeset, "a CONTRIBUTOR" body (after CA-1) 59a64873 9f82a9c5
+- [x] **CA-4** FE: `canReport`, `allowedAutoLabels`, AuthContext keeps `permissions`, Report nav + REPORT_CLOSED for CONTRIBUTOR bd0298b5
+- [x] **CA-5** FE: report form autopilot options by bits, en/vi (after CA-4) 9e96b891
+- [x] **CA-6** FE: account table CONTRIBUTOR rank/badge/role select + SA-only autopilot toggles, en/vi (after CA-4) e340ce6c 102fced0
 
