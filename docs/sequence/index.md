@@ -9,6 +9,7 @@ Older platform flows (login, MFA, streaming, video job, deployment) are PlantUML
 | Admin Video Import | [sequence-admin-video-import](sequence-admin-video-import.md) | [PRD](../prd/PRD-admin-video-import.md) |
 | Bookmark / Library Collections | [sequence-bookmark-feature](sequence-bookmark-feature.md) | [PRD](../prd/PRD-bookmark-feature.md) |
 | Contributor Autopilot Permissions | [sequence-contributor-autopilot-permissions](sequence-contributor-autopilot-permissions.md) | [PRD](../prd/PRD-contributor-autopilot-permissions.md) |
+| HLS Streaming | [sequence-hls-streaming](sequence-hls-streaming.md) | [PRD](../prd/PRD-hls-streaming.md) |
 | Hot Video Priority | [sequence-hot-video-priority](sequence-hot-video-priority.md) | [PRD](../prd/PRD-hot-video-priority.md) |
 | i18n (Vietnamese + English) | [sequence-i18n](sequence-i18n.md) | [PRD](../prd/PRD-i18n.md) |
 | In-App Report | [sequence-in-app-report](sequence-in-app-report.md) | [PRD](../prd/PRD-in-app-report.md) |

@@ -98,6 +98,7 @@ nav:
       - Admin Video Import: prd/PRD-admin-video-import.md
       - In-App Report: prd/PRD-in-app-report.md
       - Contributor Autopilot Permissions: prd/PRD-contributor-autopilot-permissions.md
+      - HLS Streaming: prd/PRD-hls-streaming.md
 
   - Specs:
       - Overview: specs/index.md
@@ -106,12 +107,14 @@ nav:
       - User Settings: specs/spec-user-settings.md
       - In-App Report: specs/spec-in-app-report.md
       - Contributor Autopilot Permissions: specs/spec-contributor-autopilot-permissions.md
+      - HLS Streaming: specs/spec-hls-streaming.md
 
   - Sequence Diagrams:
       - Overview: sequence/index.md
       - Admin Video Import: sequence/sequence-admin-video-import.md
       - Bookmark / Collections: sequence/sequence-bookmark-feature.md
       - Contributor Autopilot Permissions: sequence/sequence-contributor-autopilot-permissions.md
+      - HLS Streaming: sequence/sequence-hls-streaming.md
       - Hot Video Priority: sequence/sequence-hot-video-priority.md
       - i18n: sequence/sequence-i18n.md
       - In-App Report: sequence/sequence-in-app-report.md
