@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.CredentialsVersionCache;
+import com.canhlabs.funnyapp.cache.IncognitoCache;
 import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.Permission;
@@ -21,6 +22,12 @@ public class AdminAccountServiceImpl implements AdminAccountService {
 
     private UserRepo userRepo;
     private CredentialsVersionCache credentialsVersionCache;
+    private IncognitoCache incognitoCache;
+
+    @Autowired
+    public void injectIncognitoCache(IncognitoCache incognitoCache) {
+        this.incognitoCache = incognitoCache;
+    }
 
     @Autowired
     public void injectUserRepo(UserRepo userRepo) {
@@ -69,6 +76,7 @@ public class AdminAccountServiceImpl implements AdminAccountService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetId));
         requireOutranks(actorRole, user);
         userRepo.deleteById(targetId);
+        incognitoCache.evict(targetId);
     }
 
     @Override

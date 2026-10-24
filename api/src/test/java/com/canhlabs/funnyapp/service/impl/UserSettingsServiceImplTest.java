@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.IncognitoCache;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.usersettings.DeleteAccountRequest;
@@ -49,6 +50,9 @@ class UserSettingsServiceImplTest {
     @Mock
     private WatchHistoryRepository watchHistoryRepository;
 
+    @Mock
+    private IncognitoCache incognitoCache;
+
     @InjectMocks
     private UserSettingsServiceImpl userSettingsService;
 
@@ -90,6 +94,7 @@ class UserSettingsServiceImplTest {
             assertThat(dto.isIncognitoEnabled()).isFalse();
             assertThat(dto.isProfilePrivate()).isFalse();
             verify(userSettingsRepository).save(any(UserSettings.class));
+            verify(incognitoCache).evict(1L);
         }
     }
 
@@ -285,6 +290,7 @@ class UserSettingsServiceImplTest {
             assertThat(dto.isNotifyNewContent()).isTrue();
             assertThat(dto.getDefaultQuality()).isEqualTo("AUTO");
             verify(userSettingsRepository).save(existing);
+            verify(incognitoCache).evict(1L);
         }
     }
 
@@ -392,6 +398,7 @@ class UserSettingsServiceImplTest {
             assertThat(user.isMfaEnabled()).isFalse();
             verify(userRepo).save(user);
             verify(watchHistoryRepository).deleteAll(1L);
+            verify(incognitoCache).evict(1L);
         }
     }
 

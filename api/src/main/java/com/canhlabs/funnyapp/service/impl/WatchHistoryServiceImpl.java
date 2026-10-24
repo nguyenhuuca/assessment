@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.IncognitoCache;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.watchhistory.WatchHistoryItemDto;
 import com.canhlabs.funnyapp.dto.watchhistory.WatchSummaryDto;
@@ -27,6 +28,7 @@ public class WatchHistoryServiceImpl implements WatchHistoryService {
     private final WatchHistoryRepository watchHistoryRepository;
     private final UserSettingsRepository userSettingsRepository;
     private final AppProperties appProperties;
+    private final IncognitoCache incognitoCache;
 
     @Override
     @Transactional
@@ -34,7 +36,8 @@ public class WatchHistoryServiceImpl implements WatchHistoryService {
         if (isIncognito(userId)) {
             return;
         }
-        if (watchHistoryRepository.upsertWatched(userId, videoId) > 0) {
+        // trim only when the entry is new: moving an existing one to the top cannot exceed the cap
+        if (watchHistoryRepository.upsertWatched(userId, videoId).orElse(false)) {
             watchHistoryRepository.trimToCap(userId, appProperties.getWatchHistory().getMaxEntries());
         }
     }
@@ -112,7 +115,8 @@ public class WatchHistoryServiceImpl implements WatchHistoryService {
     }
 
     private boolean isIncognito(Long userId) {
-        return userSettingsRepository.findById(userId).map(UserSettings::isIncognitoEnabled).orElse(false);
+        return incognitoCache.get(userId, () ->
+                userSettingsRepository.findById(userId).map(UserSettings::isIncognitoEnabled).orElse(false));
     }
 
     private static WatchHistoryItemDto toItem(WatchHistoryRepository.HistoryRow r) {

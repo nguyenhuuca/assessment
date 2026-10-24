@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.IncognitoCache;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.watchhistory.WatchHistoryItemDto;
 import com.canhlabs.funnyapp.dto.watchhistory.WatchSummaryDto;
@@ -50,12 +51,14 @@ class WatchHistoryServiceImplTest {
 
     private final AppProperties props = new AppProperties();
 
+    private IncognitoCache incognitoCache;
     private WatchHistoryServiceImpl service;
 
     @BeforeEach
     void setUp() {
         props.getWatchHistory().setMaxEntries(500);
-        service = new WatchHistoryServiceImpl(repo, settingsRepo, props);
+        incognitoCache = new IncognitoCache();
+        service = new WatchHistoryServiceImpl(repo, settingsRepo, props, incognitoCache);
     }
 
     private void incognito(boolean on) {
@@ -70,7 +73,7 @@ class WatchHistoryServiceImplTest {
     @Test
     void recordWatch_firstWatch_upsertsAndTrimsToConfiguredCap() {
         props.getWatchHistory().setMaxEntries(123);
-        when(repo.upsertWatched(USER, VIDEO)).thenReturn(1);
+        when(repo.upsertWatched(USER, VIDEO)).thenReturn(Optional.of(true));
 
         service.recordWatch(USER, VIDEO);
 
@@ -79,19 +82,19 @@ class WatchHistoryServiceImplTest {
     }
 
     @Test
-    void recordWatch_reWatch_upsertsAgainOnSameKey() {
-        when(repo.upsertWatched(USER, VIDEO)).thenReturn(1);
+    void recordWatch_reWatch_updateOfExistingRow_noTrim() {
+        when(repo.upsertWatched(USER, VIDEO)).thenReturn(Optional.of(false));
 
         service.recordWatch(USER, VIDEO);
         service.recordWatch(USER, VIDEO);
 
         verify(repo, times(2)).upsertWatched(USER, VIDEO);
-        verify(repo, times(2)).trimToCap(USER, 500);
+        verify(repo, never()).trimToCap(anyLong(), anyInt());
     }
 
     @Test
-    void recordWatch_hiddenOrUnknownVideo_zeroRows_noTrim() {
-        when(repo.upsertWatched(USER, VIDEO)).thenReturn(0);
+    void recordWatch_hiddenOrUnknownVideo_nothingWritten_noTrim() {
+        when(repo.upsertWatched(USER, VIDEO)).thenReturn(Optional.empty());
 
         service.recordWatch(USER, VIDEO);
 
@@ -110,7 +113,7 @@ class WatchHistoryServiceImplTest {
     @Test
     void recordWatch_incognitoOff_records() {
         incognito(false);
-        when(repo.upsertWatched(USER, VIDEO)).thenReturn(1);
+        when(repo.upsertWatched(USER, VIDEO)).thenReturn(Optional.of(true));
 
         service.recordWatch(USER, VIDEO);
 
@@ -315,5 +318,32 @@ class WatchHistoryServiceImplTest {
         service.clear(USER);
 
         verify(repo).deleteAll(USER);
+    }
+
+    // ---- incognito cache ----
+
+    @Test
+    void progressPings_readTheSettingsOnce() {
+        incognito(false);
+
+        for (int i = 0; i < 10; i++) {
+            service.saveProgress(USER, VIDEO, 30.0, 120.0);
+        }
+
+        verify(settingsRepo, times(1)).findById(USER);
+        verify(repo, times(10)).updateProgress(USER, VIDEO, 30, 120);
+    }
+
+    @Test
+    void evict_makesTheNextCallReloadTheSetting() {
+        incognito(false);
+        service.saveProgress(USER, VIDEO, 30.0, 120.0);
+        incognito(true);
+
+        incognitoCache.evict(USER);
+        service.saveProgress(USER, VIDEO, 30.0, 120.0);
+
+        verify(settingsRepo, times(2)).findById(USER);
+        verify(repo, times(1)).updateProgress(USER, VIDEO, 30, 120);
     }
 }

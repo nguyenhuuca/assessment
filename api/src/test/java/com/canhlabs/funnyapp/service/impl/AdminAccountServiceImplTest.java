@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.CredentialsVersionCache;
+import com.canhlabs.funnyapp.cache.IncognitoCache;
 
 import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.entity.User;
@@ -30,6 +31,7 @@ class AdminAccountServiceImplTest {
 
     @Mock UserRepo userRepo;
     @Mock CredentialsVersionCache credentialsVersionCache;
+    @Mock IncognitoCache incognitoCache;
 
     @InjectMocks AdminAccountServiceImpl service;
 
@@ -38,6 +40,7 @@ class AdminAccountServiceImplTest {
         MockitoAnnotations.openMocks(this);
         service.injectUserRepo(userRepo);
         service.injectCredentialsVersionCache(credentialsVersionCache);
+        service.injectIncognitoCache(incognitoCache);
     }
 
     // ── getAccounts ───────────────────────────────────────────────────────────
@@ -179,6 +182,7 @@ class AdminAccountServiceImplTest {
         service.deleteAccount(10L, 1L);
 
         verify(userRepo).deleteById(10L);
+        verify(incognitoCache).evict(10L);
     }
 
     @Test

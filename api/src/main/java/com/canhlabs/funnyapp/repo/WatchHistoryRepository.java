@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface WatchHistoryRepository extends JpaRepository<WatchHistory, WatchHistoryId> {
 
@@ -41,17 +42,18 @@ public interface WatchHistoryRepository extends JpaRepository<WatchHistory, Watc
     }
 
     /**
-     * Inserts the entry or moves it to the top. Returns 0 when the video is unknown or not public,
-     * in which case nothing is written.
+     * Inserts the entry or moves it to the top. Returns {@code true} when the row was inserted and {@code false}
+     * when an existing one was moved (PostgreSQL {@code xmax = 0} only on a fresh insert). Empty when the video is
+     * unknown or not public, in which case nothing is written. Not {@code @Modifying}: it reads the RETURNING row.
      */
-    @Modifying
     @Query(value = """
             INSERT INTO watch_history (user_id, video_id, watched_at)
             SELECT :userId, v.id, now() FROM video_sources v
              WHERE v.id = :videoId AND v.is_hide = false AND v.status = 'PUBLISHED'
             ON CONFLICT (user_id, video_id) DO UPDATE SET watched_at = now()
+            RETURNING (xmax = 0)
             """, nativeQuery = true)
-    int upsertWatched(@Param("userId") Long userId, @Param("videoId") Long videoId);
+    Optional<Boolean> upsertWatched(@Param("userId") Long userId, @Param("videoId") Long videoId);
 
     /** Evicts everything older than the {@code cap} newest entries of the user. */
     @Modifying

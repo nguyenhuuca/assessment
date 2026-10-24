@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.IncognitoCache;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.usersettings.AccountStatusDto;
 import com.canhlabs.funnyapp.dto.usersettings.DeleteAccountRequest;
@@ -37,6 +38,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     private final AppProperties appProperties;
     private final Totp totp;
     private final WatchHistoryRepository watchHistoryRepository;
+    private final IncognitoCache incognitoCache;
 
     @Override
     @Transactional
@@ -108,6 +110,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         }
 
         settings = userSettingsRepository.save(settings);
+        incognitoCache.evict(userId);
 
         User user = userRepo.findAllById(userId);
         return buildDto(email, user, settings);
@@ -145,6 +148,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         user.setMfaEnabled(false);
         userRepo.save(user);
         watchHistoryRepository.deleteAll(userId);
+        incognitoCache.evict(userId);
         log.info("Account deactivated and anonymized for user id={}", userId);
     }
 
@@ -160,7 +164,9 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         defaults.setDefaultQuality("AUTO");
         defaults.setIncognitoEnabled(false);
         defaults.setProfilePrivate(false);
-        return userSettingsRepository.save(defaults);
+        UserSettings saved = userSettingsRepository.save(defaults);
+        incognitoCache.evict(userId);
+        return saved;
     }
 
     private UserSettingsDto buildDto(String email, User user, UserSettings settings) {
