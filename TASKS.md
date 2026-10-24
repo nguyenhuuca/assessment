@@ -564,3 +564,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 ## Lite: Library Create button colour (2026-10-24, autopilot lite --auto)
 
 - [x] **LB-1** FE: Create collection uses a new `app-btn outline` style so it no longer matches the filled Play button c614449f
+
+## Lite: Settings build number (2026-10-24, autopilot lite --auto)
+
+- [x] **SB-1** FE: build number ("Phiên bản <sha7>") at the bottom of Settings d600cb1f

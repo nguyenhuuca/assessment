@@ -1,7 +1,7 @@
-task: Library Create-collection button outline style (autopilot lite, --auto)
+task: Build number at the bottom of Settings (autopilot lite, --auto)
 status: done
 progress: 100
-done: LB-1 Create collection outline button c614449f
+done: SB-1 Settings build number d600cb1f
 next: -
 plan: -
-updated: 2026-10-24 20:47
+updated: 2026-10-24 20:56
