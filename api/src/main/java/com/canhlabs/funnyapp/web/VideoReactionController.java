@@ -37,7 +37,7 @@ public class VideoReactionController {
 
     @Operation(summary = "Like or dislike a video", description = "Sets (or switches) the authenticated user's reaction.")
     @PutMapping
-    @RateLimited(permit = 30)
+    @RateLimited(permit = 60)
     public ResponseEntity<ResultObjectInfo<ReactionSummaryDto>> set(@PathVariable Long videoId,
                                                                     @Valid @RequestBody ReactionRequest request) {
         return ok(reactionService.react(videoId, request.getReaction()));
@@ -45,7 +45,7 @@ public class VideoReactionController {
 
     @Operation(summary = "Remove reaction", description = "Clears the authenticated user's reaction (idempotent).")
     @DeleteMapping
-    @RateLimited(permit = 30)
+    @RateLimited(permit = 60)
     public ResponseEntity<ResultObjectInfo<ReactionSummaryDto>> remove(@PathVariable Long videoId) {
         return ok(reactionService.removeReaction(videoId));
     }

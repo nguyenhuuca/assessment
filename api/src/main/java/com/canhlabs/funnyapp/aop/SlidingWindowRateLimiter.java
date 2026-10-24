@@ -5,22 +5,36 @@ import com.google.common.cache.CacheBuilder;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 public class SlidingWindowRateLimiter {
 
-    private final Cache<String, Deque<Long>> requestCache;
-    private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
+    static final long MAX_KEYS = 50_000;
+
+    /** Request timestamps of one key plus the lock guarding them (no separate lock map to prune). */
+    private static final class Window {
+        final ReentrantLock lock = new ReentrantLock();
+        final Deque<Long> timestamps = new ArrayDeque<>();
+    }
+
+    private final Cache<String, Window> requestCache;
 
     public SlidingWindowRateLimiter() {
+        // The 1 h idle expiry must stay >= the largest windowInSeconds of any @RateLimited
+        // (today 3600 s in AdminReportController), or a window could be forgotten mid-way.
         this.requestCache = CacheBuilder.newBuilder()
-                .expireAfterWrite(24, TimeUnit.HOURS)
+                .maximumSize(MAX_KEYS)
+                .expireAfterAccess(1, TimeUnit.HOURS)
                 .build();
+    }
+
+    long cacheSize() {
+        return requestCache.size();
     }
 
     /**
@@ -47,15 +61,16 @@ public class SlidingWindowRateLimiter {
         String key = buildKey(clientKey, apiKey);
         long now = Instant.now().toEpochMilli();
 
-        Deque<Long> timestamps = requestCache.getIfPresent(key);
-        if (timestamps == null) {
-            timestamps = new LinkedList<>();
-            requestCache.put(key, timestamps);
+        Window window;
+        try {
+            window = requestCache.get(key, Window::new);
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("Rate limiter cache failure", e);
         }
 
-        ReentrantLock lock = locks.computeIfAbsent(key, k -> new ReentrantLock());
-        lock.lock();
+        window.lock.lock();
         try {
+            Deque<Long> timestamps = window.timestamps;
             // remove timestamps outside the window
             while (!timestamps.isEmpty() && now - timestamps.peekFirst() > windowMillis) {
                 timestamps.pollFirst();
@@ -69,7 +84,7 @@ public class SlidingWindowRateLimiter {
                 return false;
             }
         } finally {
-            lock.unlock();
+            window.lock.unlock();
         }
     }
 }

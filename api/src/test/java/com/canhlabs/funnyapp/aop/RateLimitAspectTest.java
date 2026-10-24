@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -63,6 +64,8 @@ class RateLimitAspectTest {
             return "work-done";
         }
     }
+
+    private static final String EXPECTED_API_KEY = RateLimitTestService.class.getName() + "#doWork";
 
     @Autowired
     RateLimitTestService rateLimitTestService;
@@ -147,20 +150,21 @@ class RateLimitAspectTest {
         rateLimitTestService.doWork();
 
         // @RateLimited(permit=5, windowInSeconds=60) → windowMs = 60 * 1000L = 60_000
-        verify(limiter).allowRequest(anyString(), eq("/api/test"), eq(5), eq(60_000L));
+        verify(limiter).allowRequest(anyString(), eq(EXPECTED_API_KEY), eq(5), eq(60_000L));
     }
 
-    // ── 6. apiKey is the request URI ──────────────────────────────────────────
+    // ── 6. apiKey is the handler method, so different URIs share one budget ───
 
     @Test
-    void rateLimit_apiKeyIsRequestUri() {
-        request.setRequestURI("/v1/funny-app/videos");
-
+    void rateLimit_apiKeyIsHandlerMethod_notRequestUri() {
+        request.setRequestURI("/v1/funny-app/videos/1/comments");
+        rateLimitTestService.doWork();
+        request.setRequestURI("/v1/funny-app/videos/2/comments");
         rateLimitTestService.doWork();
 
         ArgumentCaptor<String> apiKeyCaptor = ArgumentCaptor.forClass(String.class);
-        verify(limiter).allowRequest(anyString(), apiKeyCaptor.capture(), anyInt(), anyLong());
-        assertThat(apiKeyCaptor.getValue()).isEqualTo("/v1/funny-app/videos");
+        verify(limiter, times(2)).allowRequest(anyString(), apiKeyCaptor.capture(), anyInt(), anyLong());
+        assertThat(apiKeyCaptor.getAllValues()).containsOnly(EXPECTED_API_KEY);
     }
 
     // ── 7. windowMs conversion: windowInSeconds * 1000L ──────────────────────

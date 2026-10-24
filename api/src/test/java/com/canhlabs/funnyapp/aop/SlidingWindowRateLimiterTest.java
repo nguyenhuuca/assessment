@@ -3,6 +3,16 @@ package com.canhlabs.funnyapp.aop;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -58,5 +68,40 @@ class SlidingWindowRateLimiterTest {
         assertTrue(allowedLogin1);
         assertFalse(blockedLogin2);
         assertTrue(allowedSearch, "Different API key should not share the same limit");
+    }
+
+    @Test
+    void allowRequest_concurrentFirstRequests_admitExactlyLimit() throws Exception {
+        int threads = 20;
+        int limit = 10;
+        CountDownLatch start = new CountDownLatch(1);
+        AtomicInteger admitted = new AtomicInteger();
+        try (ExecutorService pool = Executors.newFixedThreadPool(threads)) {
+            List<Future<?>> futures = new ArrayList<>();
+            for (int i = 0; i < threads; i++) {
+                futures.add(pool.submit(() -> {
+                    start.await();
+                    if (rateLimiter.allowRequest(clientKey, "/burst", limit, 60_000)) {
+                        admitted.incrementAndGet();
+                    }
+                    return null;
+                }));
+            }
+            start.countDown();
+            for (Future<?> f : futures) {
+                f.get(10, TimeUnit.SECONDS);
+            }
+        }
+
+        assertEquals(limit, admitted.get());
+    }
+
+    @Test
+    void cache_staysBounded_afterManyDistinctClients() {
+        for (int i = 0; i < SlidingWindowRateLimiter.MAX_KEYS + 5_000; i++) {
+            rateLimiter.allowRequest("client" + i, "/api", 1, 1000);
+        }
+
+        assertTrue(rateLimiter.cacheSize() <= SlidingWindowRateLimiter.MAX_KEYS);
     }
 }

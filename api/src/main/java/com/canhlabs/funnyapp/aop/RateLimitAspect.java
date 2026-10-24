@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.exception.RateLimitExceededException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,9 @@ public class RateLimitAspect {
     public Object rateLimit(ProceedingJoinPoint joinPoint, RateLimited rateLimited) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String clientKey = getClientKey(request, joinPoint);
-        String apiKey = request.getRequestURI();
+        // Per handler method, not per concrete URI: /videos/1/comments and /videos/2/comments share one budget
+        Signature signature = joinPoint.getSignature();
+        String apiKey = signature.getDeclaringTypeName() + "#" + signature.getName();
 
         boolean allowed = limiter.allowRequest(
                 clientKey,
@@ -44,7 +47,7 @@ public class RateLimitAspect {
         );
 
         if (!allowed) {
-            log.warn("Rate limit exceeded for client={}, uri={}", clientKey, apiKey);
+            log.warn("Rate limit exceeded for client={}, api={}, uri={}", clientKey, apiKey, request.getRequestURI());
             throw new RateLimitExceededException("Rate limit exceeded. Please try again later.");
         }
 
