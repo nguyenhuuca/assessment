@@ -9,7 +9,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 
 ## Metadata
 
-**Status:** Approved
+**Status:** Implemented (2026-10-24)
 **Author:** nguyenhuuca
 **Date:** 2026-10-24
 **Related PRD:** [PRD-hls-streaming](../prd/PRD-hls-streaming.md)

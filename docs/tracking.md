@@ -53,14 +53,15 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Headless Autopilot** | — | [0022 ✅](adr/0022-headless-autopilot.md) + [0025 ✅](adr/0025-autopilot-auto-gates.md) | — | — | [Plan ✅](plans/plan-autopilot-headless.md) | — | ✅ | Label `autopilot` on an issue → draft PR with plan → `/approve` → build on the PR branch → owner merges. Opt-in labels `autopilot:auto-merge` / `autopilot:auto` skip Gate 2 / both gates (ADR-0025, needs secret `AUTOPILOT_MERGE_TOKEN`). First run issue #26 → PR #27 merged 2026-10-19 (3 workflow fixes on the way: allowlist, foreground workers, mandatory code review + cost comment) |
 | **In-App Report** | [PRD ✅](prd/PRD-in-app-report.md) | [0026 ✅](adr/0026-in-app-report.md) | [Spec 📋](specs/spec-in-app-report.md) | [Seq ✅](sequence/sequence-in-app-report.md) | [Plan ✅](plans/plan-in-app-report.md) | — | ✅ | Report menu above Settings (ADMIN/SA) → GitHub issue with `autopilot` via the owner's fine-grained PAT; auto labels SA only; 5/h per user + 10 autopilot reports/24 h. Done IR-1..IR-7 (`ca21f28e`..`1cde69c8`); live on prod 2026-10-21. D7 webhook state ([plan](plans/plan-report-webhook-state.md)): done WH-1..WH-5 (`5582b2fc`, `90dd0a78`), live 2026-10-21. Closed-issue notification to the reporter ([plan](plans/plan-report-closed-notify.md)): built RN-1..RN-3 (`801dcb9f`, `b3030e52`) |
 | **Contributor Autopilot Permissions** | [PRD 📝](prd/PRD-contributor-autopilot-permissions.md) | [0030 ✅](adr/0030-contributor-autopilot-permissions.md) | [Spec ✅](specs/spec-contributor-autopilot-permissions.md) | [Seq ✅](sequence/sequence-contributor-autopilot-permissions.md) | [Plan ✅](plans/plan-contributor-autopilot-permissions.md) | — | ✅ | New `CONTRIBUTOR` role (Report only); SA grants per-account bits `AUTOPILOT_AUTO_MERGE` / `AUTOPILOT_AUTO` to CONTRIBUTOR or ADMIN; checked in `ReportServiceImpl` against the DB; shared cap 10/24 h. Amends ADR-0026. Spec drops `@HasPermission(ADMIN)` on report endpoints. Done CA-1..CA-6 (`e1eeb892`..`102fced0`) by autopilot ([report](reports/autopilot-2026-10-23-contributor-autopilot-permissions.md)); owner prod check pending |
-| **HLS Streaming** | [PRD ✅](prd/PRD-hls-streaming.md) | [0031 ✅](adr/0031-hls-streaming.md) | [Spec 📋](specs/spec-hls-streaming.md) | [Seq 📋](sequence/sequence-hls-streaming.md) | [Plan 📋](plans/plan-hls-streaming.md) | — | 🔍 | Opt-in HLS per video (SUPER_ADMIN toggle), single-job stream-copy worker with ffprobe + disk guard, Harness flag `hls_streaming_enabled` decides if `hlsUrl` is offered; Range stays as fallback. Replaces the deleted ADR-0006 draft. Plan HL-1..HL-7. Next: `/autopilot docs/plans/plan-hls-streaming.md` |
+| **HLS Streaming** | [PRD ✅](prd/PRD-hls-streaming.md) | [0031 ✅](adr/0031-hls-streaming.md) | [Spec ✅](specs/spec-hls-streaming.md) | [Seq ✅](sequence/sequence-hls-streaming.md) | [Plan ✅](plans/plan-hls-streaming.md) | — | ✅ | Opt-in HLS per video (SUPER_ADMIN toggle), single-job stream-copy worker with ffprobe + disk guard, Harness flag `hls_streaming_enabled` decides if `hlsUrl` is offered; Range stays as fallback. Replaces the deleted ADR-0006 draft. Done HL-1..HL-7 (`5c485b5f`..`64d66721`) by autopilot ([report](reports/autopilot-2026-10-24-hls-streaming.md)); create Harness flag OFF, owner prod check pending |
 | **Agent Evolve Loop (self-improvement)** | — | [0027 ✅](adr/0027-agent-self-improvement-loop.md) | — | — | [Plan ✅](plans/plan-agent-evolve.md) | — | ✅ | Local `/evolve`: metrics signals → path allowlist + seeded-bug eval gate (`scripts/evolve.mjs`) → owner approves. Compress (D6) cuts duplicate/dead/stale text. Weekly headless workflow back 2026-10-22 with staged proposals ([ADR-0029](adr/0029-headless-evolve-staging.md)). First evolution: reviewer rule for assumptions about unchanged code, case `2026-10-19-swallowed-job-exceptions` caught 0/3 → 3/3 |
 
 ---
 
 ## Status Summary
 
-### ✅ Done (20)
+### ✅ Done (21)
+- [HLS Streaming](plans/plan-hls-streaming.md)
 - [Use RDBMS](adr/0001-use-relational-database.md)
 - [Backend Architecture](adr/0002-backend-architecture.md)
 - [Cache Strategy](adr/0003-use-cache.md)
@@ -87,8 +88,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
 - [Admin Drive Force Sync](plans/plan-admin-drive-force-sync.md)
 
-### 🔍 In Review (7)
-- [HLS Streaming](plans/plan-hls-streaming.md)
+### 🔍 In Review (6)
 - [Video Suggestions](plans/plan-video-suggestions.md)
 - [Unified Video List API](adr/0009-unified-video-list-api.md)
 - [Hot Video Priority](plans/plan-hot-video-priority.md)
@@ -138,4 +138,4 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 
 ---
 
-*Last updated: 2026-10-24 — HLS streaming PRD approved + ADR-0031 accepted + spec, sequence diagrams and plan HL-1..HL-7 (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in `--auto` / `--auto-push` for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod*
+*Last updated: 2026-10-24 — HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in `--auto` / `--auto-push` for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod*

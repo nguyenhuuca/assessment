@@ -3,7 +3,7 @@
 - **PRD:** [PRD-hls-streaming](../prd/PRD-hls-streaming.md)
 - **ADR:** [0031-hls-streaming](../adr/0031-hls-streaming.md)
 - **Spec:** [spec-hls-streaming](../specs/spec-hls-streaming.md)
-- **Status:** Draft
+- **Status:** As-built (2026-10-24)
 
 ## 1. SUPER_ADMIN turns HLS on, worker transcodes (happy path)
 

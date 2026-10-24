@@ -520,10 +520,10 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Feature: HLS streaming for selected videos (2026-10-24, ADR-0031, [plan](docs/plans/plan-hls-streaming.md))
 
-- [ ] **HL-1** BE: `video_sources.hls_status/hls_error` changeset, `HlsStatus`/`HlsErrorCode`, atomic `claimNextHls`, `app.hls.*` config, flag constant
-- [ ] **HL-2** BE: `HlsStorage` (paths, validation, tmp→publish, delete, sweep) + `FfmpegHlsClient` (ffprobe codec check, ffmpeg stream copy, timeout kill)
-- [ ] **HL-3** BE: `HlsTranscodeWorker` single job, lock → claim → probe → disk guard → segment → publish guard, startup recovery + orphan sweep (after HL-1, HL-2)
-- [ ] **HL-4** BE: SUPER_ADMIN PUT/DELETE `/admin/videos/{id}/hls` + audit, admin DTO, delete cleanup, re-download hook (after HL-3)
-- [ ] **HL-5** BE: public playlist/segment endpoints, `hlsUrl` in DTOs with flag read once per request (after HL-1, HL-2)
-- [ ] **HL-6** FE: `hls.js@1.7.3`, `useHlsSource` with Range fallback in `VideoPlayer`, swiper preload rule
-- [ ] **HL-7** FE: admin HLS column, SA toggle, auto refetch, en/vi (after HL-4)
+- [x] **HL-1** BE: `video_sources.hls_status/hls_error` changeset, `HlsStatus`/`HlsErrorCode`, atomic `claimNextHls`, `app.hls.*` config, flag constant 5c485b5f
+- [x] **HL-2** BE: `HlsStorage` (paths, validation, tmp→publish, delete, sweep) + `FfmpegHlsClient` (ffprobe codec check, ffmpeg stream copy, timeout kill) 36cb446f
+- [x] **HL-3** BE: `HlsTranscodeWorker` single job, lock → claim → probe → disk guard → segment → publish guard, startup recovery + orphan sweep (after HL-1, HL-2) 7ad4750d e61f747e 64d66721
+- [x] **HL-4** BE: SUPER_ADMIN PUT/DELETE `/admin/videos/{id}/hls` + audit, admin DTO, delete cleanup, re-download hook (after HL-3) 61e7b83a
+- [x] **HL-5** BE: public playlist/segment endpoints, `hlsUrl` in DTOs with flag read once per request (after HL-1, HL-2) cbc6b067
+- [x] **HL-6** FE: `hls.js@1.7.3`, `useHlsSource` with Range fallback in `VideoPlayer`, swiper preload rule 23b6066c 1e436475
+- [x] **HL-7** FE: admin HLS column, SA toggle, auto refetch, en/vi (after HL-4) 74a24c48 1e436475

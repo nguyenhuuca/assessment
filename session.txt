@@ -1,7 +1,7 @@
-task: Contributor role + SA-granted autopilot permissions for reports (ADR-0030)
+task: HLS streaming for selected videos (ADR-0031), autopilot plan mode
 status: done
 progress: 100
-done: CA-1 role+bits+matcher e1eeb892; CA-2 account rules 8ff49500; CA-3 report rules+migration 59a64873; CA-4 FE helpers+nav bd0298b5; CA-5 report form 9e96b891; CA-6 account table e340ce6c
+done: HL-1 schema+repo 5c485b5f; HL-2 storage+ffmpeg 36cb446f; HL-3 worker 7ad4750d; HL-4 admin+hooks 61e7b83a; HL-5 endpoints+hlsUrl cbc6b067; HL-6 player 23b6066c; HL-7 admin UI 74a24c48
 next: -
-plan: docs/plans/plan-contributor-autopilot-permissions.md
-updated: 2026-10-23 21:40
+plan: docs/plans/plan-hls-streaming.md
+updated: 2026-10-24 11:08
