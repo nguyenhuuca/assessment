@@ -50,6 +50,7 @@ public class AppProperties {
     private Github github = new Github();
     private VideoSuggestion videoSuggestion = new VideoSuggestion();
     private WatchHistory watchHistory = new WatchHistory();
+    private Hls hls = new Hls();
 
     @PostConstruct
     void warnDeprecatedKeys() {
@@ -93,6 +94,16 @@ public class AppProperties {
     public static class WatchHistory {
         /** Entries kept per user; the oldest are evicted on write. */
         private int maxEntries = 500;
+    }
+
+    /** HLS transcoding (ADR-0031): {@code app.hls.*}. */
+    @Getter
+    @Setter
+    public static class Hls {
+        /** Free space that must remain on the video-cache store after the source size (BR-6). */
+        private long minFreeDiskBytes = 1024L * 1024 * 1024;
+        /** Longest a single ffmpeg run may take before it is killed (BR-7). */
+        private Duration timeout = Duration.ofMinutes(10);
     }
 
     /** OAuth user credential of the Drive folder owner, used only for uploads (ADR-0019 D2). */

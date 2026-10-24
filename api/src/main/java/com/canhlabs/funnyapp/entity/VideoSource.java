@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.entity;
 
+import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -68,5 +69,15 @@ public class VideoSource extends BaseDomain {
     /** Only changed by VideoSourceRepository.incrementViewCount: a save() must never overwrite concurrent increments. */
     @Column(name = "view_count", nullable = false, insertable = false, updatable = false)
     private long viewCount;
+
+    /** HLS rendition state (ADR-0031). Drive videos only; every other row stays NONE. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "hls_status", nullable = false, length = 20)
+    @Builder.Default
+    private HlsStatus hlsStatus = HlsStatus.NONE;
+
+    /** {@code HlsErrorCode} name; null unless {@link #hlsStatus} is ERROR. */
+    @Column(name = "hls_error", length = 40)
+    private String hlsError;
 
 }

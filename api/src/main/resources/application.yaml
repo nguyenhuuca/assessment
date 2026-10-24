@@ -134,6 +134,9 @@ app:
     min-free-disk-bytes: ${VIDEO_IMPORT_MIN_FREE_DISK_BYTES:2147483648}
     cookies-path: ${VIDEO_IMPORT_COOKIES_PATH:}
     bulk-max: ${VIDEO_IMPORT_BULK_MAX:20}
+  hls:
+    min-free-disk-bytes: ${HLS_MIN_FREE_DISK_BYTES:1073741824}
+    timeout: ${HLS_TIMEOUT:10m}
   video-suggestion:
     daily-limit: ${VIDEO_SUGGESTION_DAILY_LIMIT:5}
   watch-history:

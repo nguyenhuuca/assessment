@@ -13,6 +13,14 @@ class AppPropertiesTest {
     }
 
     @Test
+    void hls_defaultsToOneGibReserveAndTenMinuteTimeout() {
+        AppProperties.Hls hls = new AppProperties().getHls();
+
+        assertThat(hls.getMinFreeDiskBytes()).isEqualTo(1073741824L);
+        assertThat(hls.getTimeout()).isEqualTo(java.time.Duration.ofMinutes(10));
+    }
+
+    @Test
     void passwordLoginEnabled_defaultsToTrue() {
         assertThat(new AppProperties().isPasswordLoginEnabled()).isTrue();
     }

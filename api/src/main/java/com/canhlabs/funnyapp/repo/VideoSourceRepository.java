@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.repo;
 
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -68,5 +69,28 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
     int upsertDriveSource(@Param("videoId") Long videoId, @Param("sourceId") String sourceId,
                           @Param("title") String title, @Param("desc") String desc,
                           @Param("thumbnailPath") String thumbnailPath);
+
+    List<VideoSource> findAllByHlsStatus(HlsStatus hlsStatus);
+
+    /** PENDING HLS jobs, oldest first (BR-4). */
+    @Query(value = "SELECT * FROM video_sources WHERE hls_status = 'PENDING' ORDER BY updated_at, id", nativeQuery = true)
+    List<VideoSource> findHlsQueue();
+
+    /**
+     * Atomic claim: PENDING -> PROCESSING. Returns 1 when this caller won the row, 0 otherwise (EC-8).
+     * updated_at is set by hand: native updates do not fire @UpdateTimestamp.
+     */
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE video_sources SET hls_status = 'PROCESSING', updated_at = now() "
+            + "WHERE id = :id AND hls_status = 'PENDING'", nativeQuery = true)
+    int claimHls(@Param("id") Long id);
+
+    /** Startup recovery (BR-11): jobs interrupted by a restart go back to the queue. */
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE video_sources SET hls_status = 'PENDING', updated_at = now() "
+            + "WHERE hls_status = 'PROCESSING'", nativeQuery = true)
+    int resetHlsProcessing();
 
 }

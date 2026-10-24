@@ -35,6 +35,7 @@ public class AppConstant {
         }
 
         public static final String PERMISSION_ENFORCEMENT = "permission_enforcement_enabled";
+        public static final String HLS_STREAMING = "hls_streaming_enabled";
     }
 
     // inner class hold all the path url that ignore the security when access to system
