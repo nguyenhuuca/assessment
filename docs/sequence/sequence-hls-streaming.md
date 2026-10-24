@@ -3,11 +3,11 @@
 - **PRD:** [PRD-hls-streaming](../prd/PRD-hls-streaming.md)
 - **ADR:** [0031-hls-streaming](../adr/0031-hls-streaming.md)
 - **Spec:** [spec-hls-streaming](../specs/spec-hls-streaming.md)
-- **Status:** As-built (2026-10-24; flows 3 and 4 updated for the feed cache, the Range cap and the full fallback triggers)
+- **Status:** As-built (2026-10-24; all six flows re-checked against the code after the review fixes, the perf runs and the feed cache)
 
 ## 1. SUPER_ADMIN turns HLS on, worker transcodes (happy path)
 
-The SUPER_ADMIN toggles HLS on in the admin table. The worker stream-copies the `.full` file and publishes the rendition atomically (spec FR-2, FR-3, BR-3..BR-7).
+The SUPER_ADMIN toggles HLS on in the admin table. The worker takes one job at a time (peek the queue, lock the file, win the row), stream-copies the `.full` file and publishes it with a conditional READY update (spec FR-2, FR-3, BR-3..BR-7).
 
 ```mermaid
 sequenceDiagram
@@ -21,6 +21,7 @@ sequenceDiagram
     participant DB as PostgreSQL (video_sources)
     participant FF as ffprobe / ffmpeg
     participant FS as Disk (video-cache)
+    participant FC as FeedCache
 
     SA->>FE: toggle HLS on
     FE->>API: PUT /v1/funny-app/admin/videos/42/hls
@@ -28,19 +29,39 @@ sequenceDiagram
     S->>DB: status NONE or ERROR to PENDING, clear hls_error
     S->>W: wakeUp() on a virtual thread
     API-->>FE: 200 hlsStatus PENDING
-    W->>L: tryClaim(fileId)
-    L-->>W: true
-    W->>DB: UPDATE set PROCESSING where hls_status is PENDING
+
+    W->>W: Semaphore(1).tryAcquire()
+    W->>DB: findHlsQueue() (PENDING, oldest first)
+    loop each queued row until one is taken
+        W->>L: tryClaim(fileId)
+        alt lock free
+            L-->>W: true
+            W->>DB: claimHls(id) = UPDATE set PROCESSING where hls_status is PENDING
+            alt 1 row updated
+                Note over W: job taken
+            else 0 rows (someone else won)
+                W->>L: release(fileId), try the next row
+            end
+        else lock busy (download or delete)
+            L-->>W: false, row stays PENDING, try the next row
+        end
+    end
+
     W->>FS: check fileId.full exists
-    W->>FF: ffprobe streams (argument list)
+    W->>FF: ffprobe streams (argument list, 30 s timeout)
     FF-->>W: video h264, audio aac
-    W->>FS: usable space vs size of .full plus 1 GB
-    W->>FF: ffmpeg -c copy -f hls -hls_time 6 into hls/fileId.tmp
+    W->>FS: usable space vs size of .full plus app.hls.min-free-disk-bytes
+    W->>FS: delete a leftover hls/fileId.tmp
+    W->>FF: ffmpeg -c copy -f hls -hls_time 6 into hls/fileId.tmp (app.hls.timeout)
     FF-->>W: exit 0, playlist.m3u8 written
     W->>DB: re-read status (still PROCESSING)
-    W->>FS: rename hls/fileId.tmp to hls/fileId
-    W->>DB: status READY
-    W->>L: release(fileId)
+    W->>FS: delete a stale hls/fileId, rename hls/fileId.tmp to hls/fileId
+    W->>DB: markHlsReady(id) = UPDATE set READY where hls_status is PROCESSING
+    DB-->>W: 1 row
+    W->>FC: invalidate()
+    W->>L: release(fileId) in finally
+    W->>W: release the permit, drain() for the next job
+
     loop every 5 s while PENDING or PROCESSING
         FE->>API: GET /v1/funny-app/admin/videos
         API-->>FE: hlsStatus READY
@@ -49,35 +70,42 @@ sequenceDiagram
 
 ## 2. Transcode failures
 
-Each check fails fast and leaves Range untouched (spec BR-9, EC-1, EC-15).
+Each check fails fast and leaves Range untouched. A failure writes ERROR only while the row is still PROCESSING, so a status the SUPER_ADMIN set meanwhile (NONE or PENDING) is never overwritten (spec BR-9, EC-1, EC-15).
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant W as HlsTranscodeWorker
+    participant L as DriveFileLocks
     participant DB as PostgreSQL (video_sources)
     participant FF as ffprobe / ffmpeg
     participant FS as Disk (video-cache)
 
-    W->>DB: claim job, status PROCESSING
-    alt .full missing
-        W->>DB: ERROR SOURCE_MISSING
-    else ffprobe or ffmpeg cannot start
-        W->>DB: ERROR FFMPEG_NOT_FOUND
-    else codec is not h264 plus aac or mp3
-        FF-->>W: video hevc
-        W->>DB: ERROR UNSUPPORTED_CODEC
-    else free disk below size plus reserve
-        W->>DB: ERROR DISK_FULL (ffmpeg never started)
-    else ffmpeg runs longer than app.hls.timeout
-        W->>FF: destroyForcibly()
-        W->>FS: delete hls/fileId.tmp
-        W->>DB: ERROR TIMEOUT
-    else non-zero exit or no playlist
-        W->>FS: delete hls/fileId.tmp
-        W->>DB: ERROR FFMPEG_FAILED
+    alt fileId is not a valid id (seen while taking the job)
+        W->>DB: claimHls(id), then ERROR SOURCE_MISSING, take the next row
+    else job taken (row PROCESSING, file locked)
+        alt .full missing
+            W->>W: HlsException SOURCE_MISSING
+        else ffprobe or ffmpeg cannot start
+            W->>W: HlsException FFMPEG_NOT_FOUND
+        else codec is not h264 plus aac, mp3 or no audio
+            FF-->>W: e.g. video vp9
+            W->>W: WARN log with video and audio codecs, HlsException UNSUPPORTED_CODEC
+        else free disk below size plus reserve
+            W->>W: HlsException DISK_FULL (ffmpeg never started)
+        else ffmpeg runs longer than app.hls.timeout
+            W->>FF: destroyForcibly() child processes, then the process
+            W->>W: HlsException TIMEOUT
+        else non-zero exit or no playlist
+            W->>W: HlsException FFMPEG_FAILED
+        else unexpected exception or the executor rejects the job
+            W->>W: treated as FFMPEG_FAILED
+        end
+        W->>FS: delete hls/fileId.tmp (every failure path)
+        W->>DB: markHlsError(id, code) = UPDATE set ERROR where hls_status is PROCESSING
+        Note over W,DB: 0 rows when the owner turned HLS off or re-queued it meanwhile, which is kept as is
+        W->>L: release(fileId) in finally, then drain() takes the next PENDING job
     end
-    Note over W,DB: the file lock is released in a finally block, and the next PENDING job is taken
 ```
 
 ## 3. Viewer plays an HLS video (flag on)
@@ -187,7 +215,7 @@ sequenceDiagram
 
 ## 5. Turn HLS off or delete the video during a job
 
-DELETE wins over a running job: the worker re-reads the status before publishing (spec FR-4, BR-12, EC-6, EC-16).
+The owner always wins over a running job. The worker checks twice: it re-reads the status before publishing, and the READY update itself only matches a PROCESSING row (spec FR-4, BR-12, EC-6, EC-16).
 
 ```mermaid
 sequenceDiagram
@@ -199,12 +227,19 @@ sequenceDiagram
     participant L as DriveFileLocks
     participant DB as PostgreSQL (video_sources)
     participant FS as Disk (video-cache)
+    participant FC as FeedCache
 
     Note over W: job running for fileId, holds the file lock
-    SA->>API: DELETE /v1/funny-app/admin/videos/42/hls
-    API->>S: disableHls(42)
-    S->>DB: status NONE, hls_error null
-    S->>L: tryClaim(fileId)
+    alt turn HLS off
+        SA->>API: DELETE /v1/funny-app/admin/videos/42/hls
+        API->>S: disableHls(42)
+        S->>DB: status NONE, hls_error null
+    else delete the video
+        SA->>API: DELETE /v1/funny-app/admin/videos/42
+        API->>S: deleteVideo(42, deleteLocalFile, deleteDriveFile)
+        S->>S: optional Drive file and local .full delete
+    end
+    S->>L: tryClaim(fileId) to delete hls/fileId
     alt lock held (running job or download)
         L-->>S: false
         Note over S: the lock holder cleans up, no 409
@@ -213,10 +248,21 @@ sequenceDiagram
         S->>FS: delete hls/fileId
         S->>L: release(fileId)
     end
-    API-->>SA: 200 hlsStatus NONE
+    opt delete the video
+        S->>DB: deleteById(42)
+    end
+    S->>FC: invalidate()
+    API-->>SA: 200
+
     W->>DB: re-read status after ffmpeg exits
-    DB-->>W: NONE (not PROCESSING)
-    W->>FS: delete hls/fileId.tmp, do not publish
+    alt status no longer PROCESSING (NONE, or row deleted)
+        W->>FS: delete hls/fileId.tmp, do not publish
+    else still PROCESSING at the re-read, but changed right after
+        W->>FS: publish hls/fileId
+        W->>DB: markHlsReady(id) where hls_status is PROCESSING
+        DB-->>W: 0 rows
+        W->>FS: delete the published hls/fileId, READY is never written over NONE
+    end
     W->>L: release(fileId)
 ```
 
@@ -231,26 +277,40 @@ sequenceDiagram
     autonumber
     participant App as Spring (ApplicationReadyEvent)
     participant W as HlsTranscodeWorker
+    participant C as Caller (scheduler sync or admin force sync)
+    participant L as DriveFileLocks
     participant D as DriveVideoDownloaderImpl
     participant DB as PostgreSQL (video_sources)
     participant FS as Disk (video-cache)
+    participant FC as FeedCache
 
     App->>W: onApplicationReady()
-    W->>DB: PROCESSING to PENDING
+    Note over W: wakeUp and poll do nothing until ready is set
+    W->>DB: resetHlsProcessing(), PROCESSING to PENDING
     W->>FS: delete every hls/*.tmp
-    W->>FS: check the directory of each READY row
-    W->>DB: missing directory to ERROR OUTPUT_MISSING
+    loop each READY row
+        W->>FS: does hls/fileId exist
+        opt directory missing
+            W->>DB: markHlsOutputMissing(id) where hls_status is READY
+            W->>FC: invalidate()
+        end
+    end
     W->>FS: delete orphan hls directories (row missing or not READY)
-    W->>W: wakeUp(), drain PENDING one by one
+    Note over W: any recovery error is logged, startup goes on
+    W->>W: markReady(), wakeUp(), drain PENDING one by one
 
-    Note over D: scheduler or admin force sync downloads fileId again
-    D->>FS: move the new .full into place
+    C->>L: tryClaim(fileId)
+    C->>D: download(fileId) again
+    D->>FS: write .part, move the new .full into place, invalidate cached chunks
     D->>FS: delete hls/fileId if it exists
-    D->>DB: read hls_status for fileId
+    D->>DB: findBySourceId(fileId)
     alt READY or ERROR
         D->>DB: status PENDING, hls_error null
+        D->>FC: invalidate()
         D->>W: wakeUp()
-    else NONE, PENDING or PROCESSING
-        Note over D: no change
+    else NONE, PENDING, PROCESSING or no row yet
+        Note over D: status unchanged
     end
+    Note over D: a failure in this hook is only logged, the download still succeeds
+    C->>L: release(fileId)
 ```
