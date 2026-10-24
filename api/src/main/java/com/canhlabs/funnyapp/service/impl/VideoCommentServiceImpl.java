@@ -187,7 +187,7 @@ public class VideoCommentServiceImpl {
         }
 
         // Never destroy other people's replies: keep a placeholder when replies exist
-        if (repo.findByParentId(c.getId().toString()).isEmpty()) {
+        if (!repo.existsByParentId(c.getId().toString())) {
             repo.deleteById(c.getId());
         } else {
             c.setStatus(CommentStatus.DELETED);

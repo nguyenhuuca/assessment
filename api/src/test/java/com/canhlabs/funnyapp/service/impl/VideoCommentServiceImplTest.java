@@ -227,13 +227,11 @@ class VideoCommentServiceImplTest {
     @Test
     void deleteComment_authenticatedOwner_withReplies_softDeletesAndKeepsReplies() {
         UUID commentId = UUID.randomUUID();
-        UUID childId = UUID.randomUUID();
 
         VideoComment comment = buildComment(commentId, "vid1", null, "user-42", null, "owner comment");
-        VideoComment child = buildComment(childId, "vid1", commentId.toString(), "other-user", null, "child");
 
         when(repo.findById(commentId)).thenReturn(Optional.of(comment));
-        when(repo.findByParentId(commentId.toString())).thenReturn(List.of(child));
+        when(repo.existsByParentId(commentId.toString())).thenReturn(true);
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken("user-42", null, Collections.emptyList());
@@ -253,7 +251,7 @@ class VideoCommentServiceImplTest {
         UUID commentId = UUID.randomUUID();
         VideoComment comment = buildComment(commentId, "vid1", UUID.randomUUID().toString(), "user-42", null, "mine");
         when(repo.findById(commentId)).thenReturn(Optional.of(comment));
-        when(repo.findByParentId(commentId.toString())).thenReturn(Collections.emptyList());
+        when(repo.existsByParentId(commentId.toString())).thenReturn(false);
         authenticateAs("user-42");
 
         service.deleteComment(commentId);
@@ -304,7 +302,7 @@ class VideoCommentServiceImplTest {
         VideoComment child1 = buildComment(child1Id, "vid1", rootId.toString(), "user-2", null, "child");
 
         when(repo.findById(rootId)).thenReturn(Optional.of(root));
-        when(repo.findByParentId(rootId.toString())).thenReturn(List.of(child1));
+        when(repo.existsByParentId(rootId.toString())).thenReturn(true);
         authenticateAs("user-1");
 
         service.deleteComment(rootId);

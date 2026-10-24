@@ -17,7 +17,7 @@ public interface VideoCommentRepository extends JpaRepository<VideoComment, UUID
 
     List<VideoComment> findByVideoIdAndParentIdIsNullOrderByCreatedAtAsc(String videoId);
 
-    List<VideoComment> findByParentId(String parentId);
+    boolean existsByParentId(String parentId);
 
     List<VideoComment> findByParentIdIn(Collection<String> parentIds);
 
