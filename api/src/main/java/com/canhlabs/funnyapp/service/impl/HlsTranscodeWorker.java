@@ -19,11 +19,13 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -37,6 +39,7 @@ public class HlsTranscodeWorker {
     /** Every 5 minutes on the clock; a fallback for a missed wake-up or a job left PENDING by a busy file. */
     static final String POLL_CRON = "0 */5 * * * *";
     private static final String SOURCE_EXTENSION = ".full";
+    private static final Pattern CONTROL_CHARS = Pattern.compile("\\p{Cntrl}");
 
     private final AppProperties props;
     private final VideoSourceRepository repository;
@@ -167,6 +170,12 @@ public class HlsTranscodeWorker {
 
     // ── one job ───────────────────────────────────────────────────────────────
 
+    /** Codec names come from ffprobe output of an untrusted file: strip control characters and cap the length (CWE-117). */
+    private static String codecs(List<String> names) {
+        String joined = CONTROL_CHARS.matcher(String.join(",", names)).replaceAll(" ");
+        return joined.length() > 120 ? joined.substring(0, 120) : joined;
+    }
+
     void runJob(VideoSource source) {
         long id = source.getId();
         String fileId = source.getSourceId();
@@ -176,7 +185,10 @@ public class HlsTranscodeWorker {
             if (!Files.isRegularFile(src)) {
                 throw new HlsException(HlsErrorCode.SOURCE_MISSING);
             }
-            if (!ffmpeg.probe(src).isSupported()) {
+            FfmpegHlsClient.ProbeResult probe = ffmpeg.probe(src);
+            if (!probe.isSupported()) {
+                log.warn("HLS job {} for {} refused, video=[{}] audio=[{}]", id, fileId,
+                        codecs(probe.videoCodecs()), codecs(probe.audioCodecs()));
                 throw new HlsException(HlsErrorCode.UNSUPPORTED_CODEC);
             }
             long size = Files.size(src);

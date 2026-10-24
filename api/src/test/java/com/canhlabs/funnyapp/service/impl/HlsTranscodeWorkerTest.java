@@ -9,6 +9,9 @@ import com.canhlabs.funnyapp.enums.HlsErrorCode;
 import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.exception.HlsException;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -152,6 +156,26 @@ class HlsTranscodeWorkerTest {
 
         assertError(HlsErrorCode.UNSUPPORTED_CODEC);
         verify(ffmpeg, never()).segment(any(Path.class), any(Path.class), any(Duration.class));
+    }
+
+    @Test
+    void runJob_unsupportedCodec_logsSanitizedCodecs() throws IOException {
+        writeSource(FILE);
+        when(ffmpeg.probe(any(Path.class))).thenReturn(new ProbeResult(List.of("vp9"), List.of("aa\nc")));
+        Logger logger = (Logger) LoggerFactory.getLogger(HlsTranscodeWorker.class);
+        ListAppender<ILoggingEvent> logs = new ListAppender<>();
+        logs.start();
+        logger.addAppender(logs);
+        try {
+            worker.runJob(row);
+        } finally {
+            logger.detachAppender(logs);
+        }
+
+        assertThat(logs.list).anyMatch(e -> e.getFormattedMessage().contains("video=[vp9] audio=[aa c]")
+                && e.getFormattedMessage().contains(FILE));
+        verify(ffmpeg, times(1)).probe(any(Path.class));
+        assertError(HlsErrorCode.UNSUPPORTED_CODEC);
     }
 
     @Test
