@@ -57,6 +57,10 @@ markdown_extensions:
 extra_javascript:
   - https://unpkg.com/mermaid@11/dist/mermaid.min.js
   - javascripts/copy-markdown.js
+  - javascripts/diagram-zoom.js
+
+extra_css:
+  - stylesheets/diagram-zoom.css
 
 nav:
   - Home: README.md
