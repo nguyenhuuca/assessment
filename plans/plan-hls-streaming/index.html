@@ -7858,7 +7858,7 @@ Owner: Builder (/builder)
 -->
 
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p><strong>Status:</strong> Ready
+<p><strong>Status:</strong> Done (2026-10-24, autopilot run <code>2026-10-24-hls-streaming</code>)
 <strong>Date:</strong> 2026-10-24
 <strong>PRD:</strong> <a href="../../prd/PRD-hls-streaming/">PRD-hls-streaming</a>
 <strong>ADR:</strong> <a href="../../adr/0031-hls-streaming/">ADR-0031</a>
@@ -8007,7 +8007,7 @@ Owner: Builder (/builder)
 <td><strong>HL-1</strong></td>
 <td>BE: schema, entity, repository, config, flag constant</td>
 <td>new <code>db/changelog/sql/202610240001-video-source-hls.sql</code>, <code>enums/HlsStatus.java</code>, <code>enums/HlsErrorCode.java</code>; <code>entity/VideoSource.java:60-70</code>, <code>repo/VideoSourceRepository.java</code>, <code>config/AppProperties.java:52,66-80</code> (+ <code>Hls</code> class), <code>application.yaml:126-136</code> (+ <code>app.hls</code>), <code>utils/AppConstant.java:37</code>; tests: new <code>repo/VideoSourceHlsMigrationTest</code> (pattern <code>AppReportMigrationTest</code>), <code>AppPropertiesTest</code></td>
-<td>(1) Changeset = spec SQL: 2 columns, CHECK, partial index. Existing rows read <code>NONE</code>/null (BR-3, AC 1). (2) <code>VideoSource.hlsStatus</code> <code>@Enumerated(STRING)</code> <code>@Builder.Default NONE</code> + <code>hlsError</code> String (FR-1). (3) Repository: <code>claimNextHls()</code> native <code>UPDATE … SET hls_status='PROCESSING', updated_at=now() WHERE id=(SELECT id … WHERE hls_status='PENDING' ORDER BY updated_at, id LIMIT 1 FOR UPDATE SKIP LOCKED) RETURNING id</code> → <code>Optional&lt;Long&gt;</code>; <code>resetHlsProcessing()</code>; <code>findAllByHlsStatus(HlsStatus)</code>; <code>findBySourceId</code> is reused (BR-4, BR-11). (4) <code>app.hls.min-free-disk-bytes</code> 1073741824 and <code>app.hls.timeout</code> 10m with env overrides <code>HLS_MIN_FREE_DISK_BYTES</code> / <code>HLS_TIMEOUT</code> (FR-12). (5) <code>AppConstant.Flags.HLS_STREAMING = "hls_streaming_enabled"</code></td>
+<td>(1) Changeset = spec SQL: 2 columns, CHECK, partial index. Existing rows read <code>NONE</code>/null (BR-3, AC 1). (2) <code>VideoSource.hlsStatus</code> <code>@Enumerated(STRING)</code> <code>@Builder.Default NONE</code> + <code>hlsError</code> String (FR-1). (3) Repository: <code>findHlsQueue()</code> = PENDING rows ordered by <code>updated_at, id</code>; <code>claimHls(id)</code> native <code>UPDATE video_sources SET hls_status='PROCESSING', updated_at=now() WHERE id=:id AND hls_status='PENDING'</code> → rows updated (1 = this caller won); <code>resetHlsProcessing()</code>; <code>findAllByHlsStatus(HlsStatus)</code>; <code>findBySourceId</code> is reused (BR-3, BR-4, BR-11). A test asserts the conditional <code>WHERE … hls_status='PENDING'</code> in the query text: EC-8 (one winner) rests on it, because Mockito cannot prove it and the repo has no Postgres harness. (4) <code>app.hls.min-free-disk-bytes</code> 1073741824 and <code>app.hls.timeout</code> 10m with env overrides <code>HLS_MIN_FREE_DISK_BYTES</code> / <code>HLS_TIMEOUT</code> (FR-12). (5) <code>AppConstant.Flags.HLS_STREAMING = "hls_streaming_enabled"</code></td>
 <td>~70 + ~110</td>
 </tr>
 <tr>
@@ -8021,14 +8021,14 @@ Owner: Builder (/builder)
 <td><strong>HL-3</strong></td>
 <td>BE: transcode worker</td>
 <td>new <code>service/impl/HlsTranscodeWorker.java</code>; test <code>HlsTranscodeWorkerTest</code> (sync executor <code>Runnable::run</code>, mocks for repo / <code>HlsStorage</code> / <code>FfmpegHlsClient</code> / <code>DriveFileLocks</code>)</td>
-<td>(1) <code>@Autowired</code> ctor + test ctor with <code>Executor</code> (BeanConstructorTest). (2) <code>wakeUp()</code> on a virtual thread, <code>@Scheduled(cron="0 */5 * * * *") poll()</code>, <code>Semaphore(1)</code>; with 3 PENDING rows exactly one runs at a time (BR-4, AC). (3) Job order: lock → DB claim → source exists (<code>SOURCE_MISSING</code>) → probe (<code>UNSUPPORTED_CODEC</code>) → disk guard <code>usable &lt; size + reserve</code> → <code>DISK_FULL</code>, ffmpeg never started (BR-6) → segment → re-read status → publish + READY, or delete tmp (FR-3, FR-4). Lock busy → the row stays PENDING and the job is not claimed (EC-7). (4) Status NONE after FFmpeg → tmp deleted, no publish, NONE kept (EC-6). (5) <code>onApplicationReady</code>: <code>resetHlsProcessing</code>, <code>deleteTmpDirs</code>, READY with no directory → ERROR <code>OUTPUT_MISSING</code>, orphan directories (row missing or not READY) deleted, then <code>markReady</code> + <code>wakeUp</code> (BR-11, EC-2, EC-9). (6) Every failure releases the lock (<code>finally</code>) and logs <code>fileId</code>, duration and output size (FR-13)</td>
+<td>(1) <code>@Autowired</code> ctor + test ctor with <code>Executor</code> (BeanConstructorTest). (2) <code>wakeUp()</code> on a virtual thread, <code>@Scheduled(cron="0 */5 * * * *") poll()</code>, <code>Semaphore(1)</code>; with 3 PENDING rows exactly one runs at a time (BR-4, AC). (3) Job order (peek, lock, claim by id): walk <code>findHlsQueue()</code>; for each row <code>tryClaim(fileId)</code>, and on busy skip it (EC-7: the row stays PENDING, untouched); on success <code>claimHls(id)</code>, and if it returns 0 release and go on. Stop the drain when no row can be taken, so the loop never spins on a locked row; the next <code>wakeUp()</code> or poll retries. Then → source exists (<code>SOURCE_MISSING</code>) → probe (<code>UNSUPPORTED_CODEC</code>) → disk guard <code>usable &lt; size + reserve</code> → <code>DISK_FULL</code>, ffmpeg never started (BR-6) → segment → re-read status → publish + READY, or delete tmp (FR-3, FR-4). Lock busy → the row stays PENDING and the job is not claimed (EC-7). (4) Status NONE after FFmpeg → tmp deleted, no publish, NONE kept (EC-6). (5) <code>onApplicationReady</code>: <code>resetHlsProcessing</code>, <code>deleteTmpDirs</code>, READY with no directory → ERROR <code>OUTPUT_MISSING</code>, orphan directories (row missing or not READY) deleted, then <code>markReady</code> + <code>wakeUp</code> (BR-11, EC-2, EC-9). (6) Every failure releases the lock (<code>finally</code>) and logs <code>fileId</code>, duration and output size (FR-13)</td>
 <td>~170 + ~280</td>
 </tr>
 <tr>
 <td><strong>HL-4</strong></td>
 <td>BE: admin toggles, admin DTO, delete cleanup, re-download hook</td>
 <td><code>web/AdminController.java:74-133</code> (+ PUT/DELETE <code>/videos/{id}/hls</code>), <code>service/AdminVideoService.java</code>, <code>service/impl/AdminVideoServiceImpl.java:85-95,113-124</code>, <code>dto/admin/AdminVideoDto.java:18-26</code> (+ new <code>AdminHlsStatusDto</code>), <code>service/impl/DriveVideoDownloaderImpl.java:43-81</code>, <code>i18n/messages.properties</code> + <code>messages_vi.properties</code> (<code>error.hls.notDriveVideo</code>); tests <code>AdminVideoServiceImplTest</code>, <code>AdminControllerTest</code>, <code>AdminControllerPermissionTest</code>, <code>DriveVideoDownloaderImplTest</code></td>
-<td>(1) PUT: NONE/ERROR → PENDING (clears error) + <code>worker.wakeUp()</code>; PENDING/PROCESSING/READY → 200 unchanged (BR-3, EC-5). Non-Drive → 400 <code>error.hls.notDriveVideo</code>; unknown → 404 <code>error.video.notFound</code> (AC 3). (2) DELETE: any → NONE; if <code>tryClaim</code> succeeds, delete the directory and release; never 409 (BR-12, EC-6). (3) Both methods: <code>@PreAuthorize("hasRole('SUPER_ADMIN') and @permissionServiceImpl.hasPermission(authentication.details.permissions, ADMIN)")</code> + <code>@AuditLog("enableVideoHls"/"disableVideoHls")</code>; the permission test gets ADMIN 403, SUPER_ADMIN 200 (FR-2). (4) <code>AdminVideoDto</code> <code>hlsStatus</code> (null for non-Drive) + <code>hlsError</code> (FR-7). (5) <code>deleteVideo</code> always deletes <code>hls/{fileId}</code> (EC-16). (6) Downloader after <code>moveIntoPlace</code>: delete <code>hls/{fileId}</code>; READY/ERROR → PENDING + <code>wakeUp()</code>; NONE/PENDING/PROCESSING unchanged (BR-10, EC-4)</td>
+<td>(1) PUT: NONE/ERROR → PENDING (clears error) + <code>worker.wakeUp()</code>; PENDING/PROCESSING/READY → 200 unchanged (BR-3, EC-5). Non-Drive → 400 <code>error.hls.notDriveVideo</code>; unknown → 404 <code>error.video.notFound</code> (AC 3). (2) DELETE: any → NONE; if <code>tryClaim</code> succeeds, delete the directory and release; never 409 (BR-12, EC-6). (3) Both methods: <code>@PreAuthorize("hasRole('SUPER_ADMIN') and @permissionServiceImpl.hasPermission(authentication.details.permissions, ADMIN)")</code> + <code>@AuditLog("enableVideoHls"/"disableVideoHls")</code>; the permission test gets ADMIN 403, SUPER_ADMIN 200 (FR-2). (4) <code>AdminVideoDto</code> <code>hlsStatus</code> (null for non-Drive) + <code>hlsError</code> (FR-7). (5) <code>deleteVideo</code> always deletes <code>hls/{fileId}</code> (EC-16). (6) Downloader after <code>moveIntoPlace</code> (<code>DriveVideoDownloaderImpl.java:70</code>): delete <code>hls/{fileId}</code>; <code>findBySourceId(fileId)</code> → READY/ERROR → PENDING + <code>wakeUp()</code>; NONE/PENDING/PROCESSING unchanged; no row (first download, the row is saved later by <code>saveInfo</code>) → nothing (BR-10, EC-4). New constructor deps <code>VideoSourceRepository</code>, <code>HlsStorage</code>, <code>HlsTranscodeWorker</code> go into both the <code>@Autowired</code> ctor (<code>:43-47</code>) and the test ctor (<code>:49-57</code>); <code>BeanConstructorTest</code> stays green; no bean cycle (the worker does not depend on the downloader)</td>
 <td>~120 + ~260</td>
 </tr>
 <tr>
@@ -8153,6 +8153,10 @@ Owner: Builder (/builder)
 <td>Regex + normalize-and-prefix check, tests for <code>..</code>, <code>%2F</code>, absolute paths (HL-2, HL-5)</td>
 </tr>
 <tr>
+<td>Segments of a hidden video stay fetchable when the <code>fileId</code> is known</td>
+<td>Accepted by the spec (BR-13: no DB call per segment); the playlist is refused, and the Range endpoint has the same exposure today</td>
+</tr>
+<tr>
 <td>Player regression on Range videos</td>
 <td>HL-6 (2): existing player tests unchanged; HLS code runs only when <code>hlsUrl</code> is set</td>
 </tr>
@@ -8175,14 +8179,14 @@ Owner: Builder (/builder)
 </ul>
 <h3 id="before-pr">Before PR<a class="headerlink" href="#before-pr" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <code>mvn -f api/pom.xml verify</code> (coverage ≥ <code>api/.coverage-threshold</code>)</li>
-<li>[ ] <code>npm --prefix webapp run test</code>, <code>npm --prefix webapp run lint</code>, <code>npm --prefix webapp run build</code> (chunk check)</li>
-<li>[ ] <code>BeanConstructorTest</code> green (<code>HlsTranscodeWorker</code>, <code>FfmpegHlsClient</code>)</li>
+<li>[x] <code>mvn -f api/pom.xml verify</code> (coverage ≥ <code>api/.coverage-threshold</code>)</li>
+<li>[x] <code>npm --prefix webapp run test</code>, <code>npm --prefix webapp run lint</code>, <code>npm --prefix webapp run build</code> (chunk check)</li>
+<li>[x] <code>BeanConstructorTest</code> green (<code>HlsTranscodeWorker</code>, <code>FfmpegHlsClient</code>)</li>
 </ul>
 <h3 id="before-merge">Before Merge<a class="headerlink" href="#before-merge" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] Security review (focus <code>security</code>: public file serving, process arguments, SUPER_ADMIN checks)</li>
-<li>[ ] <code>docs/tracking.md</code> updated</li>
+<li>[x] Security review (focus <code>security</code>: public file serving, process arguments, SUPER_ADMIN checks)</li>
+<li>[x] <code>docs/tracking.md</code> updated</li>
 <li>[ ] Harness flag <code>hls_streaming_enabled</code> created OFF</li>
 </ul>
 <h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
@@ -8213,6 +8217,18 @@ Owner: Builder (/builder)
 <td>—</td>
 <td>—</td>
 <td>Plan written from spec + 4 explorer reports</td>
+</tr>
+<tr>
+<td>2026-10-24</td>
+<td>—</td>
+<td>—</td>
+<td>Autopilot plan review: approve, 3 advisories folded in (peek-lock-claim job order, downloader deps, EC-8 rests on the conditional UPDATE)</td>
+</tr>
+<tr>
+<td>2026-10-24</td>
+<td>HL-1..HL-7</td>
+<td>5c485b5f..64d66721</td>
+<td>Built by autopilot (4 worker-builders in 2 waves); plan review approve; code review FE approve, BE revise → approve (publish-guard race fixed); QA ×2 347/347; mvn verify 1788 tests, line coverage 96.37%; vitest 610/610</td>
 </tr>
 </tbody>
 </table>

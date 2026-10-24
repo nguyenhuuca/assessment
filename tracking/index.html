@@ -674,10 +674,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#done-20" class="md-nav__link">
+  <a href="#done-21" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✅ Done (20)
+        ✅ Done (21)
       
     </span>
   </a>
@@ -696,10 +696,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#in-review-7" class="md-nav__link">
+  <a href="#in-review-6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔍 In Review (7)
+        🔍 In Review (6)
       
     </span>
   </a>
@@ -7307,10 +7307,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#done-20" class="md-nav__link">
+  <a href="#done-21" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✅ Done (20)
+        ✅ Done (21)
       
     </span>
   </a>
@@ -7329,10 +7329,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#in-review-7" class="md-nav__link">
+  <a href="#in-review-6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔍 In Review (7)
+        🔍 In Review (6)
       
     </span>
   </a>
@@ -7816,12 +7816,12 @@
 <td><strong>HLS Streaming</strong></td>
 <td><a href="../prd/PRD-hls-streaming/">PRD ✅</a></td>
 <td><a href="../adr/0031-hls-streaming/">0031 ✅</a></td>
-<td><a href="../specs/spec-hls-streaming/">Spec 📋</a></td>
-<td><a href="../sequence/sequence-hls-streaming/">Seq 📋</a></td>
-<td><a href="../plans/plan-hls-streaming/">Plan 📋</a></td>
+<td><a href="../specs/spec-hls-streaming/">Spec ✅</a></td>
+<td><a href="../sequence/sequence-hls-streaming/">Seq ✅</a></td>
+<td><a href="../plans/plan-hls-streaming/">Plan ✅</a></td>
 <td>—</td>
-<td>🔍</td>
-<td>Opt-in HLS per video (SUPER_ADMIN toggle), single-job stream-copy worker with ffprobe + disk guard, Harness flag <code>hls_streaming_enabled</code> decides if <code>hlsUrl</code> is offered; Range stays as fallback. Replaces the deleted ADR-0006 draft. Plan HL-1..HL-7. Next: <code>/autopilot docs/plans/plan-hls-streaming.md</code></td>
+<td>✅</td>
+<td>Opt-in HLS per video (SUPER_ADMIN toggle), single-job stream-copy worker with ffprobe + disk guard, Harness flag <code>hls_streaming_enabled</code> decides if <code>hlsUrl</code> is offered; Range stays as fallback. Replaces the deleted ADR-0006 draft. Done HL-1..HL-7 (<code>5c485b5f</code>..<code>64d66721</code>) by autopilot (<a href="../reports/autopilot-2026-10-24-hls-streaming/">report</a>); create Harness flag OFF, owner prod check pending</td>
 </tr>
 <tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
@@ -7838,8 +7838,9 @@
 </table>
 <hr />
 <h2 id="status-summary">Status Summary<a class="headerlink" href="#status-summary" title="Permanent link">&para;</a></h2>
-<h3 id="done-20">✅ Done (20)<a class="headerlink" href="#done-20" title="Permanent link">&para;</a></h3>
+<h3 id="done-21">✅ Done (21)<a class="headerlink" href="#done-21" title="Permanent link">&para;</a></h3>
 <ul>
+<li><a href="../plans/plan-hls-streaming/">HLS Streaming</a></li>
 <li><a href="../adr/0001-use-relational-database/">Use RDBMS</a></li>
 <li><a href="../adr/0002-backend-architecture/">Backend Architecture</a></li>
 <li><a href="../adr/0003-use-cache/">Cache Strategy</a></li>
@@ -7867,9 +7868,8 @@
 <li><a href="../plans/plan-admin-dashboard/">Admin Dashboard</a></li>
 <li><a href="../plans/plan-admin-drive-force-sync/">Admin Drive Force Sync</a></li>
 </ul>
-<h3 id="in-review-7">🔍 In Review (7)<a class="headerlink" href="#in-review-7" title="Permanent link">&para;</a></h3>
+<h3 id="in-review-6">🔍 In Review (6)<a class="headerlink" href="#in-review-6" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="../plans/plan-hls-streaming/">HLS Streaming</a></li>
 <li><a href="../plans/plan-video-suggestions/">Video Suggestions</a></li>
 <li><a href="../adr/0009-unified-video-list-api/">Unified Video List API</a></li>
 <li><a href="../plans/plan-hot-video-priority/">Hot Video Priority</a></li>
@@ -8045,7 +8045,7 @@
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-24 — HLS streaming PRD approved + ADR-0031 accepted + spec, sequence diagrams and plan HL-1..HL-7 (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-24 — HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 

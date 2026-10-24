@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-24-hls-streaming",
+  "date": "2026-10-24",
+  "mode": "local",
+  "lite": false,
+  "issue": null,
+  "pr": null,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 2, "qa": 2 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 1,
+  "advisory": 14,
+  "locNonTest": 1333,
+  "tests": { "passed": 347, "flaky": 0, "failed": 0 },
+  "costUsd": 8.59
+}
