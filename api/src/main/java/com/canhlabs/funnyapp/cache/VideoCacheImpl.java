@@ -67,7 +67,7 @@ public class VideoCacheImpl implements VideoCache {
         // in case the chunk is already cached
         Optional<byte[]> cached = chunkCache.get(key);
         if (cached.isPresent()) {
-            log.info("✅ [CACHE HIT] Chunk {} ({} - {})", fileId, start, end);
+            log.debug("✅ [CACHE HIT] Chunk {} ({} - {})", fileId, start, end);
             statsCache.recordHit(fileId);
             return new ByteArrayInputStream(cached.get());
         }
@@ -87,11 +87,11 @@ public class VideoCacheImpl implements VideoCache {
                 }
                 chunkCache.put(key, data);
                 accessCounter.invalidate(key);
-                log.info("[CACHED] Chunk {} ({} - {}) after {} hits", fileId, start, end, hits);
+                log.debug("[CACHED] Chunk {} ({} - {}) after {} hits", fileId, start, end, hits);
                 return new ByteArrayInputStream(data);
             }
 
-            log.warn("[MISS] Chunk {} ({} - {}) hit count = {}", fileId, start, end, hits);
+            log.debug("[MISS] Chunk {} ({} - {}) hit count = {}", fileId, start, end, hits);
             return disk;
 
         } catch (Exception e) {

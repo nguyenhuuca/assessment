@@ -65,7 +65,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @Override
     public StreamChunkResult getPartialFileUsingRAF(String fileId, long start, long end) {
         InputStream stream = videoCache.getChunkStream(fileId, start, end, () -> {
-            log.info("Cache miss: fetching {} ({} - {}) from disk", fileId, start, end);
+            log.debug("Cache miss: fetching {} ({} - {}) from disk", fileId, start, end);
             return videoStorageService.getFileRangeFromDisk(fileId, start, end);
         });
 

@@ -56,8 +56,8 @@ public class VideoStreamController {
     ) throws IOException {
 
         long startTime = System.currentTimeMillis();
-        log.info("Thread: {}, Virtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
-        log.info("Incoming stream request for fileId: {}", fileId);
+        log.debug("Thread: {}, Virtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
+        log.debug("Incoming stream request for fileId: {}", fileId);
 
         long fileSize = videoService.getFileSize(fileId);
 
@@ -70,7 +70,7 @@ public class VideoStreamController {
         }
         long start = range.start();
         long end = range.end();
-        log.info("Streaming bytes {} to {}", start, end);
+        log.debug("Streaming bytes {} to {}", start, end);
         // the stream is opened inside the body so nothing leaks if the body never runs
         StreamingResponseBody responseBody = outputStream -> {
             try (InputStream stream = videoService.getPartialFileUsingRAF(fileId, start, end).getStream()) {
@@ -86,7 +86,7 @@ public class VideoStreamController {
         };
 
         long contentLength = end - start + 1;
-        log.info("Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
+        log.debug("Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
@@ -100,7 +100,7 @@ public class VideoStreamController {
     @WithSpan
     @GetMapping("/list")
     public ResponseEntity<ResultListInfo<VideoDto>> getListVideoStream() {
-        log.info("getTopVideos Thread: {}, isVirtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
+        log.debug("getTopVideos Thread: {}, isVirtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
         List<VideoDto> rs = videoService.getVideosToStream();
         return new ResponseEntity<>(ResultListInfo.<VideoDto>builder()
                 .status(ResultStatus.SUCCESS)
