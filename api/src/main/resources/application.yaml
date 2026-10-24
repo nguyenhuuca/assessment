@@ -11,6 +11,12 @@ spring:
   config:
     activate:
       on-profile: dev
+  # SQL logging only in dev (default is off); do not set it in the default document below, it would override this one
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
 # Springdoc (OpenAPI/Swagger) config
 springdoc:
@@ -47,10 +53,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
     properties:
       hibernate:
-        format_sql: true
         jdbc:
           lob:
             non_contextual_creation: true
