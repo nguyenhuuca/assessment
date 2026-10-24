@@ -147,6 +147,7 @@ nav:
       - In-App Report: plans/plan-in-app-report.md
       - Contributor Autopilot Permissions: plans/plan-contributor-autopilot-permissions.md
       - HLS Streaming: plans/plan-hls-streaming.md
+      - BE Performance (Medium): plans/plan-be-perf-medium.md
       - Report Webhook State: plans/plan-report-webhook-state.md
       - Report Closed Notification: plans/plan-report-closed-notify.md
       - Agent Evolve Loop: plans/plan-agent-evolve.md
@@ -181,6 +182,7 @@ nav:
       - Postmortems:
           - 2026-10-24 Startup Hang (VT Class-Init Deadlock): reports/postmortem-2026-10-24-startup-hang.md
       - Autopilot Runs:
+          - 2026-10-24 BE Performance (Medium): reports/autopilot-2026-10-24-be-perf-medium.md
           - 2026-10-24 HLS Streaming: reports/autopilot-2026-10-24-hls-streaming.md
           - 2026-10-23 Contributor Autopilot Permissions: reports/autopilot-2026-10-23-contributor-autopilot-permissions.md
           - 2026-10-21 Report Webhook State: reports/autopilot-2026-10-21-report-webhook-state.md

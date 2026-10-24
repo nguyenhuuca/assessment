@@ -1,7 +1,7 @@
-task: BE perf High items: show-sql, AuditLog, rate limiter, ffmpeg thumbnails, Drive timeouts (autopilot lite)
+task: BE perf Medium items PM-1..PM-7 (autopilot)
 status: done
 progress: 100
-done: PH-1 SQL log dev only 74478a77; PH-2 audit log fc5acab1; PH-3 rate limiter f9ef2dc7; PH-4 ffmpeg thumbnails eb068c89; PH-5 Drive timeouts 7520d0c8
+done: PM-1 JWT key once 9a02f760; PM-2 perm flag cache 61a149c5; PM-3 feed cache+index 3f695b72; PM-4 Hikari 7d6e2e5d; PM-5 existsByParentId ddda7c45; PM-6 history cache+trim a17bd405; PM-7 logs 33bc2d39
 next: -
-plan: -
-updated: 2026-10-24 15:48
+plan: docs/plans/plan-be-perf-medium.md
+updated: 2026-10-24 17:09

@@ -545,3 +545,13 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **PH-3** BE: rate limiter keyed per endpoint, bounded Guava cache, single-flight window (reactions 30 → 60/min) f9ef2dc7
 - [x] **PH-4** BE: thumbnail ffmpeg output discarded, 60 s timeout + kill, one run at a time eb068c89
 - [x] **PH-5** BE: Drive client connect 10 s / read 60 s timeouts 7520d0c8
+
+## Fix: BE performance Medium items (2026-10-24, [plan](docs/plans/plan-be-perf-medium.md))
+
+- [x] **PM-1** BE: JWT SecretKey + JwtParser built once 9a02f760
+- [x] **PM-2** BE: permission enforcement flag cached 15 s, per-check logs to DEBUG 61a149c5 441daa10
+- [x] **PM-3** BE: feed list cache (30 s, evicted on video mutations) + partial feed index 3f695b72
+- [x] **PM-4** BE: explicit Hikari pool size and 5 s connection timeout 7d6e2e5d
+- [x] **PM-5** BE: `existsByParentId` for comment delete ddda7c45
+- [x] **PM-6** BE: incognito cache per user + trimToCap only on a new history row a17bd405
+- [x] **PM-7** BE: Range hot-path logs to DEBUG 33bc2d39
