@@ -69,14 +69,23 @@ public class HlsStorage {
     }
 
     public Path resolvePlaylist(String fileId) {
-        return inside(dir(fileId), PLAYLIST);
+        return rejectSymlink(fileId, inside(dir(fileId), PLAYLIST));
     }
 
     public Path resolveSegment(String fileId, String segment) {
         if (!isValidSegment(segment)) {
             throw new IllegalArgumentException("Invalid segment name");
         }
-        return inside(dir(fileId), segment);
+        return rejectSymlink(fileId, inside(dir(fileId), segment));
+    }
+
+    /** A link in the rendition directory could point outside it; treat it as not found (the file will not exist). */
+    private Path rejectSymlink(String fileId, Path target) {
+        if (Files.isSymbolicLink(target) || Files.isSymbolicLink(dir(fileId))) {
+            log.warn("Refusing symbolic link in HLS rendition {}", fileId);
+            return root.resolve(".missing");
+        }
+        return target;
     }
 
     public boolean exists(String fileId) {

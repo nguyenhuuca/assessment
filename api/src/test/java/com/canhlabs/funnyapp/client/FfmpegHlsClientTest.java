@@ -5,10 +5,12 @@ import com.canhlabs.funnyapp.exception.HlsException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -191,5 +193,19 @@ class FfmpegHlsClientTest {
         c.probe(temp);
 
         assertThat(started.get(0).get(0)).isEqualTo("ffprobe");
+    }
+
+    @Test
+    void drainLines_capsAnOverlongLineAndKeepsTheNextOnes() {
+        String huge = "x".repeat(2_000_000);
+        byte[] bytes = (huge + "\nh264,video\nlast").getBytes(StandardCharsets.UTF_8);
+        List<String> lines = new ArrayList<>();
+
+        FfmpegHlsClient.drainLines(new ByteArrayInputStream(bytes), lines::add);
+
+        assertThat(lines).hasSize(3);
+        assertThat(lines.get(0)).hasSizeLessThanOrEqualTo(4096).startsWith("xxx");
+        assertThat(lines.get(1)).isEqualTo("h264,video");
+        assertThat(lines.get(2)).isEqualTo("last");
     }
 }

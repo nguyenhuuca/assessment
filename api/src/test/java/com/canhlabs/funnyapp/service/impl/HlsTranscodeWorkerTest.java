@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,6 +55,7 @@ class HlsTranscodeWorkerTest {
     @Mock FfmpegHlsClient ffmpeg;
 
     private final DriveFileLocks locks = new DriveFileLocks();
+    private final Map<Long, VideoSource> rows = new HashMap<>();
     private AppProperties props;
     private HlsStorage storage;
     private Path cacheDir;
@@ -67,7 +70,26 @@ class HlsTranscodeWorkerTest {
         Files.createDirectories(cacheDir);
         storage = new HlsStorage(cacheDir.resolve("hls"));
         row = source(ID, FILE, HlsStatus.PROCESSING);
+        rows.put(ID, row);
         when(repo.findById(ID)).thenReturn(Optional.of(row));
+        when(repo.markHlsReady(anyLong())).thenAnswer(inv -> {
+            VideoSource s = rows.get(inv.<Long>getArgument(0));
+            if (s == null || s.getHlsStatus() != HlsStatus.PROCESSING) {
+                return 0;
+            }
+            s.setHlsStatus(HlsStatus.READY);
+            s.setHlsError(null);
+            return 1;
+        });
+        when(repo.markHlsError(anyLong(), any(String.class))).thenAnswer(inv -> {
+            VideoSource s = rows.get(inv.<Long>getArgument(0));
+            if (s == null || s.getHlsStatus() != HlsStatus.PROCESSING) {
+                return 0;
+            }
+            s.setHlsStatus(HlsStatus.ERROR);
+            s.setHlsError(inv.getArgument(1));
+            return 1;
+        });
         when(repo.save(any(VideoSource.class))).thenAnswer(inv -> inv.getArgument(0));
         when(ffmpeg.probe(any(Path.class))).thenReturn(new ProbeResult(List.of("h264"), List.of("aac")));
         doAnswer(inv -> {
@@ -215,6 +237,35 @@ class HlsTranscodeWorkerTest {
         assertThat(row.getHlsError()).isNull();
     }
 
+    @Test
+    void runJob_statusFlipsToNoneBetweenRereadAndMarkReady_deletesPublishedDirAndKeepsNone() throws IOException {
+        writeSource(FILE);
+        doAnswer(inv -> {
+            row.setHlsStatus(HlsStatus.NONE); // owner turned HLS off while the worker held the lock
+            return 0;
+        }).when(repo).markHlsReady(ID);
+
+        worker.runJob(row);
+
+        assertThat(row.getHlsStatus()).isEqualTo(HlsStatus.NONE);
+        assertThat(storage.dir(FILE)).doesNotExist();
+        assertThat(storage.tmpDir(FILE)).doesNotExist();
+    }
+
+    @Test
+    void runJob_failureAfterDeleteThenPut_doesNotOverwritePending() throws IOException {
+        writeSource(FILE);
+        doAnswer(inv -> {
+            row.setHlsStatus(HlsStatus.PENDING); // DELETE then PUT during the job
+            throw new HlsException(HlsErrorCode.TIMEOUT);
+        }).when(ffmpeg).probe(any(Path.class));
+
+        worker.runJob(row);
+
+        assertThat(row.getHlsStatus()).isEqualTo(HlsStatus.PENDING);
+        assertThat(row.getHlsError()).isNull();
+    }
+
     private void assertError(HlsErrorCode code) {
         assertThat(row.getHlsStatus()).isEqualTo(HlsStatus.ERROR);
         assertThat(row.getHlsError()).isEqualTo(code.name());
@@ -240,6 +291,7 @@ class HlsTranscodeWorkerTest {
         List<VideoSource> queue = new java.util.ArrayList<>(List.of(a, b, c));
         for (VideoSource s : queue) {
             writeSource(s.getSourceId());
+            rows.put(s.getId(), s);
             when(repo.findById(s.getId())).thenReturn(Optional.of(s));
         }
         when(repo.findHlsQueue()).thenAnswer(inv -> queue.stream().filter(s -> s.getHlsStatus() == HlsStatus.PENDING).toList());

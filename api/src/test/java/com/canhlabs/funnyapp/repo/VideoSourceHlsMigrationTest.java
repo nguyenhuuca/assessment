@@ -90,6 +90,24 @@ class VideoSourceHlsMigrationTest {
     }
 
     @Test
+    void markHlsReadyAndError_areConditionalOnProcessing() throws Exception {
+        Method ready = VideoSourceRepository.class.getMethod("markHlsReady", Long.class);
+        Method error = VideoSourceRepository.class.getMethod("markHlsError", Long.class, String.class);
+        String readyQuery = ready.getAnnotation(Query.class).value();
+        String errorQuery = error.getAnnotation(Query.class).value();
+
+        for (Method m : new Method[]{ready, error}) {
+            assertThat(m.getReturnType()).isEqualTo(int.class);
+            assertThat(m.getAnnotation(Modifying.class)).isNotNull();
+            assertThat(m.getAnnotation(Transactional.class)).isNotNull();
+        }
+        assertThat(readyQuery).contains("SET hls_status = 'READY'").contains("hls_error = NULL")
+                .contains("updated_at = now()").contains("id = :id AND hls_status = 'PROCESSING'");
+        assertThat(errorQuery).contains("SET hls_status = 'ERROR'").contains("hls_error = :code")
+                .contains("updated_at = now()").contains("id = :id AND hls_status = 'PROCESSING'");
+    }
+
+    @Test
     void resetAndQueue_queriesMatchTheStateMachine() throws Exception {
         Method reset = VideoSourceRepository.class.getMethod("resetHlsProcessing");
         Method queue = VideoSourceRepository.class.getMethod("findHlsQueue");

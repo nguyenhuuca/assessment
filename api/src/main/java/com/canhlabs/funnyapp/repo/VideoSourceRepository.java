@@ -86,6 +86,20 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
             + "WHERE id = :id AND hls_status = 'PENDING'", nativeQuery = true)
     int claimHls(@Param("id") Long id);
 
+    /** Publish step: PROCESSING -> READY only while the row is still PROCESSING (a concurrent toggle wins). */
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE video_sources SET hls_status = 'READY', hls_error = NULL, updated_at = now() "
+            + "WHERE id = :id AND hls_status = 'PROCESSING'", nativeQuery = true)
+    int markHlsReady(@Param("id") Long id);
+
+    /** Failure step: PROCESSING -> ERROR only while the row is still PROCESSING (never over NONE or PENDING). */
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE video_sources SET hls_status = 'ERROR', hls_error = :code, updated_at = now() "
+            + "WHERE id = :id AND hls_status = 'PROCESSING'", nativeQuery = true)
+    int markHlsError(@Param("id") Long id, @Param("code") String code);
+
     /** Startup recovery (BR-11): jobs interrupted by a restart go back to the queue. */
     @Modifying
     @Transactional

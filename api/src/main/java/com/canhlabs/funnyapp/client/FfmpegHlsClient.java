@@ -37,6 +37,7 @@ public class FfmpegHlsClient {
     static final int TAIL_LINES = 20;
     static final Duration PROBE_TIMEOUT = Duration.ofSeconds(30);
     private static final int MAX_PROBE_LINES = 200;
+    private static final int MAX_LINE_CHARS = 4096;
     private static final Set<String> STREAM_TYPES = Set.of("video", "audio", "subtitle", "data", "attachment");
     private static final Set<String> AUDIO_ALLOWED = Set.of("aac", "mp3");
     private static final Pattern CONTROL_CHARS = Pattern.compile("\\p{Cntrl}");
@@ -196,11 +197,26 @@ public class FfmpegHlsClient {
         }
     }
 
-    private static void drainLines(InputStream in, Consumer<String> sink) {
+    /** Reads lines but keeps at most {@link #MAX_LINE_CHARS} of each, so one huge line cannot exhaust memory. */
+    static void drainLines(InputStream in, Consumer<String> sink) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sink.accept(line);
+            StringBuilder line = new StringBuilder();
+            boolean pending = false;
+            int ch;
+            while ((ch = reader.read()) != -1) {
+                if (ch == '\n') {
+                    sink.accept(line.toString());
+                    line.setLength(0);
+                    pending = false;
+                } else {
+                    pending = true;
+                    if (line.length() < MAX_LINE_CHARS) {
+                        line.append((char) ch);
+                    }
+                }
+            }
+            if (pending) {
+                sink.accept(line.toString());
             }
         } catch (IOException e) {
             // stream closed because the process was destroyed; nothing left to read

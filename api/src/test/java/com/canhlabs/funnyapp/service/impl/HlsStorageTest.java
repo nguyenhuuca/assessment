@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -29,6 +30,43 @@ class HlsStorageTest {
     private void touch(Path file) throws IOException {
         Files.createDirectories(file.getParent());
         Files.writeString(file, "x");
+    }
+
+    private Path symlinkOrSkip(Path link, Path target) {
+        try {
+            Files.createDirectories(link.getParent());
+            return Files.createSymbolicLink(link, target);
+        } catch (IOException | UnsupportedOperationException | SecurityException e) {
+            Assumptions.abort("symbolic links are not permitted here: " + e.getMessage());
+            return null;
+        }
+    }
+
+    @Test
+    void resolveSegmentAndPlaylist_symlinkedFile_isTreatedAsNotFound() throws IOException {
+        Path outside = temp.resolve("secret.ts");
+        Files.writeString(outside, "secret");
+        symlinkOrSkip(storage.dir("abc").resolve("seg_0.ts"), outside);
+        symlinkOrSkip(storage.dir("abc").resolve("playlist.m3u8"), outside);
+
+        assertThat(storage.resolveSegment("abc", "seg_0.ts")).doesNotExist();
+        assertThat(storage.resolvePlaylist("abc")).doesNotExist();
+    }
+
+    @Test
+    void resolveSegment_symlinkedRenditionDir_isTreatedAsNotFound() throws IOException {
+        Path outsideDir = temp.resolve("elsewhere");
+        touch(outsideDir.resolve("seg_0.ts"));
+        symlinkOrSkip(storage.dir("abc"), outsideDir);
+
+        assertThat(storage.resolveSegment("abc", "seg_0.ts")).doesNotExist();
+    }
+
+    @Test
+    void resolveSegment_regularFile_isStillReturned() throws IOException {
+        touch(storage.dir("abc").resolve("seg_0.ts"));
+
+        assertThat(storage.resolveSegment("abc", "seg_0.ts")).exists();
     }
 
     @Test

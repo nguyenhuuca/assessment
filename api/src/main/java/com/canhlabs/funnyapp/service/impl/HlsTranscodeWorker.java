@@ -24,7 +24,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -195,10 +194,11 @@ public class HlsTranscodeWorker {
             }
             storage.delete(fileId); // a stale directory must not block the publish
             storage.publish(fileId);
-            update(id, s -> {
-                s.setHlsStatus(HlsStatus.READY);
-                s.setHlsError(null);
-            });
+            if (repository.markHlsReady(id) == 0) {
+                storage.delete(fileId); // turned off or re-queued between the re-read and now: never READY over it
+                log.info("HLS job {} for {} discarded after publish, status changed meanwhile", id, fileId);
+                return;
+            }
             log.info("HLS job {} for {} ready in {} ms, {} bytes", id, fileId, millisSince(started),
                     dirSize(storage.dir(fileId)));
         } catch (HlsException e) {
@@ -226,7 +226,7 @@ public class HlsTranscodeWorker {
         for (VideoSource row : repository.findAllByHlsStatus(HlsStatus.READY)) {
             if (!HlsStorage.isValidFileId(row.getSourceId()) || !storage.exists(row.getSourceId())) {
                 log.warn("HLS output of video {} is missing", row.getId());
-                fail(row.getId(), HlsErrorCode.OUTPUT_MISSING);
+                markOutputMissing(row);
             }
         }
     }
@@ -245,23 +245,17 @@ public class HlsTranscodeWorker {
 
     // ── persistence helpers ───────────────────────────────────────────────────
 
-    private void update(long id, Consumer<VideoSource> change) {
-        repository.findById(id).ifPresent(s -> {
-            change.accept(s);
-            repository.save(s);
-        });
+    /** Startup only (BR-11): a READY row whose directory is gone becomes ERROR; nothing is processing yet. */
+    private void markOutputMissing(VideoSource row) {
+        row.setHlsStatus(HlsStatus.ERROR);
+        row.setHlsError(HlsErrorCode.OUTPUT_MISSING.name());
+        repository.save(row);
     }
 
-    /** Records ERROR, unless the owner turned HLS off in the meantime (never overwrite NONE). */
+    /** Records ERROR only while the row is still PROCESSING; NONE or PENDING set by the owner stay. */
     private void fail(long id, HlsErrorCode code) {
         try {
-            update(id, s -> {
-                if (s.getHlsStatus() == HlsStatus.NONE) {
-                    return;
-                }
-                s.setHlsStatus(HlsStatus.ERROR);
-                s.setHlsError(code.name());
-            });
+            repository.markHlsError(id, code.name());
         } catch (RuntimeException e) {
             log.error("Could not record failure of HLS job {}", id, e);
         }
