@@ -1,7 +1,7 @@
-task: BE streaming perf: Range cap + stream from disk + bounded caches (autopilot lite)
+task: BE perf High items: show-sql, AuditLog, rate limiter, ffmpeg thumbnails, Drive timeouts (autopilot lite)
 status: done
 progress: 100
-done: ST-1 Range cap + 416 69ccd719; ST-2 stream from disk + bounded caches 04de01d2; RAF close on seek failure ed14e981
+done: PH-1 SQL log dev only 74478a77; PH-2 audit log fc5acab1; PH-3 rate limiter f9ef2dc7; PH-4 ffmpeg thumbnails eb068c89; PH-5 Drive timeouts 7520d0c8
 next: -
 plan: -
-updated: 2026-10-24 15:11
+updated: 2026-10-24 15:48

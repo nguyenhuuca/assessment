@@ -537,3 +537,11 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **ST-1** BE: every Range form capped at 1 MB, missing header = `bytes=0-`, invalid/unsatisfiable = 416 `bytes */size` 69ccd719
 - [x] **ST-2** BE: cache misses streamed from disk (opened inside the response body), bounded `accessCounter`, chunk cache weighed at 32 MB 04de01d2 ed14e981
+
+## Lite: BE perf High items (2026-10-24, autopilot lite, from /swarm-review perf)
+
+- [x] **PH-1** BE: `show-sql`/`format_sql` only in the dev profile 74478a77
+- [x] **PH-2** BE: audit logging reuses the static mapper, List results logged by size only, no `@AuditLog` on the public feed fc5acab1
+- [x] **PH-3** BE: rate limiter keyed per endpoint, bounded Guava cache, single-flight window (reactions 30 → 60/min) f9ef2dc7
+- [x] **PH-4** BE: thumbnail ffmpeg output discarded, 60 s timeout + kill, one run at a time eb068c89
+- [x] **PH-5** BE: Drive client connect 10 s / read 60 s timeouts 7520d0c8
