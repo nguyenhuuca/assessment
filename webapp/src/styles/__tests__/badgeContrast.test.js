@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest'
 const css = readFileSync(resolve(__dirname, '../index.css'), 'utf8')
 
 const SURFACES = ['#ffffff', '#f8f9fa']
-const SELECTORS = ['pending', 'missing_local', 'missing_db', 'size_mismatch']
+const SELECTORS = ['pending', 'hls-pending', 'missing_local', 'missing_db', 'size_mismatch']
 
 function luminance(hex) {
   const [r, g, b] = [1, 3, 5]

@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useUpdateVideoVisibility, useDeleteVideo } from '../../hooks/useAdmin.js'
+import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useUpdateVideoVisibility, useDeleteVideo, useToggleVideoHls } from '../../hooks/useAdmin.js'
+import { useAuth } from '../../hooks/useAuth.js'
+import { isSuperAdmin } from '../../utils/roles.js'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { useTranslation } from 'react-i18next'
@@ -37,6 +39,38 @@ function DeleteFileOptions({ opts }) {
         {t('deleteDriveFile')}
       </label>
       <span className="admin-cell-muted">{t('deleteDriveFileHint')}</span>
+    </div>
+  )
+}
+
+// HLS state for Drive videos (hlsStatus is null for non-Drive rows). The ERROR reason is a tooltip.
+function HlsCell({ video, canToggle, toggle }) {
+  const { t } = useTranslation('admin')
+  const status = video.hlsStatus
+  if (!status) return <span className="admin-cell-muted">—</span>
+  const reason = status === 'ERROR' && video.hlsError
+    ? t(`hlsError.${video.hlsError}`, { defaultValue: video.hlsError })
+    : undefined
+  const on = status !== 'NONE'
+  const busy = isBusyFor(toggle, video.id, x => x?.id)
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <span className={`admin-badge hls-${status.toLowerCase()}`} title={reason}>
+        {t(`hlsStatus.${status}`, { defaultValue: status })}
+      </span>
+      {canToggle && (
+        <label title={on ? t('hlsToggleOff') : t('hlsToggleOn')}>
+          <input
+            type="checkbox"
+            className="admin-hide-toggle"
+            aria-busy={busy}
+            disabled={busy || status === 'PENDING' || status === 'PROCESSING'}
+            aria-label={on ? t('hlsToggleOff') : t('hlsToggleOn')}
+            checked={on}
+            onChange={e => toggle.mutate({ id: video.id, enable: e.target.checked })}
+          />
+        </label>
+      )}
     </div>
   )
 }
@@ -91,6 +125,9 @@ export default function AdminVideoTable({ statusFilter }) {
   const updatePriority = useUpdateVideoPriority()
   const updateVisibility = useUpdateVideoVisibility()
   const deleteVideo    = useDeleteVideo()
+  const toggleHls      = useToggleVideoHls()
+  const { user } = useAuth()
+  const canToggleHls = isSuperAdmin(user?.role)
 
   const pageData      = data?.data ?? data ?? {}
   const videos        = pageData?.content ?? []
@@ -129,6 +166,7 @@ export default function AdminVideoTable({ statusFilter }) {
               <th>{t('colStatus')}</th>
               <th title={t('hiddenHeaderTitle')}>{t('colHidden')}</th>
               <th>{t('colPriority')}</th>
+              <th>{t('colHls')}</th>
               <th>{t('colMetrics')}</th>
               <th>{t('colActions')}</th>
             </tr>
@@ -205,7 +243,8 @@ export default function AdminVideoTable({ statusFilter }) {
                     <SaveIndicator state={saveState[`${v.id}:priority`]} />
                   </div>
                 </td>
-                <td className="admin-cell-muted">{t('views', { count: v.viewCount ?? 0 })}</td>
+                <td><HlsCell video={v} canToggle={canToggleHls} toggle={toggleHls} /></td>
+                <td className="admin-cell-muted">{t('views',{ count: v.viewCount ?? 0 })}</td>
                 <td>
                   <div className="admin-actions">
                     <select

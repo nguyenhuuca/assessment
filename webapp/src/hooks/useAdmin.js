@@ -4,10 +4,27 @@ import * as adminApi from '../api/admin.js'
 import { hasActive } from '../utils/importUtils.js'
 import { DEFAULT_TIME_FILTER, toRangeParams } from '../utils/timeRange.js'
 
+const HLS_POLL_MS = 5000
+
+/** Poll while any HLS conversion is queued or running, so the badge moves to READY / ERROR on its own. */
+function hlsInFlight(data) {
+  const rows = (data?.data ?? data)?.content ?? []
+  return rows.some(v => v.hlsStatus === 'PENDING' || v.hlsStatus === 'PROCESSING')
+}
+
 export function useAdminVideos(page = 0, status = null) {
   return useQuery({
     queryKey: ['admin', 'videos', page, status],
     queryFn: () => adminApi.getVideos({ page, size: 20, ...(status ? { status } : {}) }),
+    refetchInterval: query => (hlsInFlight(query.state.data) ? HLS_POLL_MS : false),
+  })
+}
+
+export function useToggleVideoHls() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, enable }) => (enable ? adminApi.enableVideoHls(id) : adminApi.disableVideoHls(id)),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'videos'] }),
   })
 }
 

@@ -55,6 +55,25 @@
   "colCreator": "NGƯỜI ĐĂNG",
   "colStatus": "TRẠNG THÁI",
   "colHidden": "ẨN",
+  "colHls": "HLS",
+  "hlsStatus": {
+    "NONE": "TẮT",
+    "PENDING": "ĐANG CHỜ",
+    "PROCESSING": "ĐANG CONVERT",
+    "READY": "SẴN SÀNG",
+    "ERROR": "LỖI"
+  },
+  "hlsError": {
+    "SOURCE_MISSING": "Không tìm thấy file nguồn trên server",
+    "FFMPEG_NOT_FOUND": "Server chưa cài FFmpeg",
+    "UNSUPPORTED_CODEC": "Codec video hoặc audio không được hỗ trợ",
+    "DISK_FULL": "Không đủ dung lượng đĩa cho output HLS",
+    "TIMEOUT": "Convert quá thời gian cho phép",
+    "FFMPEG_FAILED": "FFmpeg convert video thất bại",
+    "OUTPUT_MISSING": "Convert xong nhưng không có output"
+  },
+  "hlsToggleOn": "Bật HLS streaming cho video này",
+  "hlsToggleOff": "Tắt HLS và xoá các file đã convert",
   "colPriority": "ƯU TIÊN",
   "colMetrics": "SỐ LIỆU",
   "colComment": "BÌNH LUẬN",

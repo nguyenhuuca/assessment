@@ -16,6 +16,9 @@ export const getVideos         = (params) => api.get(buildUrl('/admin/videos', p
 export const updateVideoStatus = (id, status) => patch(`/admin/videos/${id}/status`, { status })
 export const updateVideoPriority = (id, priority) => patch(`/admin/videos/${id}/priority`, { priority })
 export const updateVideoVisibility = (id, hidden) => patch(`/admin/videos/${id}/visibility`, { hidden })
+// HLS opt-in per video (SUPER_ADMIN): enable queues a conversion, disable removes the HLS output
+export const enableVideoHls    = (id) => api.put(`/admin/videos/${id}/hls`)
+export const disableVideoHls   = (id) => api.delete(`/admin/videos/${id}/hls`)
 // File flags are sent only when checked; the server defaults both to false.
 export const deleteVideo       = (id, { deleteLocalFile = false, deleteDriveFile = false } = {}) =>
   api.delete(buildUrl(`/admin/videos/${id}`, {

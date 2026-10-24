@@ -11,7 +11,12 @@ vi.mock('../../../api/admin.js', () => ({
   updateVideoPriority: vi.fn(),
   updateVideoVisibility: vi.fn(),
   deleteVideo: vi.fn(),
+  enableVideoHls: vi.fn(),
+  disableVideoHls: vi.fn(),
 }))
+
+let mockRole = 'ADMIN'
+vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => ({ user: { role: mockRole } }) }))
 
 const video = (o) => ({ id: 1, title: 'Clip', status: 'PUBLISHED', priority: 0, viewCount: 3, hidden: false, ...o })
 
@@ -22,6 +27,7 @@ function renderTable() {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockRole = 'ADMIN'
   adminApi.updateVideoVisibility.mockResolvedValue({})
 })
 
@@ -99,5 +105,73 @@ describe('AdminVideoTable hidden column', () => {
     fireEvent.click(box)
     await waitFor(() => expect(box).toHaveAttribute('aria-busy', 'true'))
     expect(box).toBeDisabled()
+  })
+})
+
+describe('AdminVideoTable HLS column', () => {
+  const page = (...rows) => ({ data: { content: rows, totalPages: 1, totalElements: rows.length } })
+
+  it('shows a status badge for Drive rows and a dash for rows without hlsStatus', async () => {
+    adminApi.getVideos.mockResolvedValue(page(
+      video({ id: 1, title: 'Drive', hlsStatus: 'READY' }),
+      video({ id: 2, title: 'Local', hlsStatus: null }),
+    ))
+    renderTable()
+    const badge = await screen.findByText('SẴN SÀNG')
+    expect(badge).toHaveClass('admin-badge', 'hls-ready')
+    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('shows the localized error reason as a tooltip on ERROR', async () => {
+    adminApi.getVideos.mockResolvedValue(page(video({ id: 1, hlsStatus: 'ERROR', hlsError: 'DISK_FULL' })))
+    renderTable()
+    const badge = await screen.findByText('LỖI')
+    expect(badge).toHaveAttribute('title', 'Không đủ dung lượng đĩa cho output HLS')
+  })
+
+  it('hides the toggle from ADMIN', async () => {
+    adminApi.getVideos.mockResolvedValue(page(video({ id: 1, hlsStatus: 'NONE' })))
+    renderTable()
+    await screen.findByText('TẮT')
+    expect(screen.queryByLabelText('Bật HLS streaming cho video này')).toBeNull()
+  })
+
+  it('lets SUPER_ADMIN enable HLS', async () => {
+    mockRole = 'SUPER_ADMIN'
+    adminApi.getVideos.mockResolvedValue(page(video({ id: 4, hlsStatus: 'NONE' })))
+    adminApi.enableVideoHls.mockResolvedValue({})
+    renderTable()
+    fireEvent.click(await screen.findByLabelText('Bật HLS streaming cho video này'))
+    await waitFor(() => expect(adminApi.enableVideoHls).toHaveBeenCalledWith(4))
+  })
+
+  it('lets SUPER_ADMIN disable HLS when it is on', async () => {
+    mockRole = 'SUPER_ADMIN'
+    adminApi.getVideos.mockResolvedValue(page(video({ id: 4, hlsStatus: 'READY' })))
+    adminApi.disableVideoHls.mockResolvedValue({})
+    renderTable()
+    fireEvent.click(await screen.findByLabelText('Tắt HLS và xoá các file đã convert'))
+    await waitFor(() => expect(adminApi.disableVideoHls).toHaveBeenCalledWith(4))
+  })
+
+  it('polls every 5 s only while a row is PENDING or PROCESSING', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    try {
+      adminApi.getVideos.mockResolvedValue(page(video({ id: 1, hlsStatus: 'PROCESSING' })))
+      renderTable()
+      await screen.findByText('ĐANG CONVERT')
+      const calls = adminApi.getVideos.mock.calls.length
+      await vi.advanceTimersByTimeAsync(5100)
+      expect(adminApi.getVideos.mock.calls.length).toBeGreaterThan(calls)
+
+      adminApi.getVideos.mockResolvedValue(page(video({ id: 1, hlsStatus: 'READY' })))
+      await vi.advanceTimersByTimeAsync(5100)
+      await screen.findByText('SẴN SÀNG')
+      const settled = adminApi.getVideos.mock.calls.length
+      await vi.advanceTimersByTimeAsync(15000)
+      expect(adminApi.getVideos.mock.calls.length).toBe(settled)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

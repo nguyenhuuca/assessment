@@ -55,6 +55,25 @@
   "colCreator": "CREATOR",
   "colStatus": "STATUS",
   "colHidden": "HIDDEN",
+  "colHls": "HLS",
+  "hlsStatus": {
+    "NONE": "OFF",
+    "PENDING": "QUEUED",
+    "PROCESSING": "CONVERTING",
+    "READY": "READY",
+    "ERROR": "ERROR"
+  },
+  "hlsError": {
+    "SOURCE_MISSING": "Source file is missing on the server",
+    "FFMPEG_NOT_FOUND": "FFmpeg is not installed on the server",
+    "UNSUPPORTED_CODEC": "Unsupported video or audio codec",
+    "DISK_FULL": "Not enough disk space for the HLS output",
+    "TIMEOUT": "Conversion timed out",
+    "FFMPEG_FAILED": "FFmpeg failed to convert the video",
+    "OUTPUT_MISSING": "Conversion finished but produced no output"
+  },
+  "hlsToggleOn": "Enable HLS streaming for this video",
+  "hlsToggleOff": "Disable HLS and delete the converted files",
   "colPriority": "PRIORITY",
   "colMetrics": "METRICS",
   "colComment": "COMMENT",
