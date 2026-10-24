@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.cache;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -8,8 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
@@ -19,7 +20,12 @@ public class VideoCacheImpl implements VideoCache {
 
     private final AppCache<String, byte[]> chunkCache;
     private static final int CACHE_THRESHOLD = 5;
-    private final ConcurrentMap<String, AtomicInteger> accessCounter = new ConcurrentHashMap<>();
+    static final long COUNTER_MAX_SIZE = 10_000;
+    // keys are client-chosen (fileId_start_end), so the counter must be bounded
+    private final Cache<String, AtomicInteger> accessCounter = CacheBuilder.newBuilder()
+            .maximumSize(COUNTER_MAX_SIZE)
+            .expireAfterAccess(1, TimeUnit.HOURS)
+            .build();
     private final StatsCache statsCache;
 
     public VideoCacheImpl(@Qualifier("videoCache") AppCache<String, byte[]> chunkCache, StatsCache statsCache) {
@@ -55,7 +61,7 @@ public class VideoCacheImpl implements VideoCache {
     }
 
     @Override
-    public InputStream getChunkStream(String fileId, long start, long end, Callable<byte[]> loader) {
+    public InputStream getChunkStream(String fileId, long start, long end, Callable<InputStream> loader) {
         String key = makeKey(fileId, start, end);
 
         // in case the chunk is already cached
@@ -67,27 +73,36 @@ public class VideoCacheImpl implements VideoCache {
         }
 
         // Count hits for this chunk
-        int hits = accessCounter
+        int hits = accessCounter.asMap()
                 .computeIfAbsent(key, k -> new AtomicInteger(0))
                 .incrementAndGet();
 
         try {
-            byte[] data = loader.call();
+            InputStream disk = loader.call();
 
             if (start == 0 && hits >= CACHE_THRESHOLD) {
+                byte[] data;
+                try (disk) {
+                    data = disk.readAllBytes();
+                }
                 chunkCache.put(key, data);
-                accessCounter.remove(key);
+                accessCounter.invalidate(key);
                 log.info("[CACHED] Chunk {} ({} - {}) after {} hits", fileId, start, end, hits);
-            } else {
-                log.warn("[MISS] Chunk {} ({} - {}) hit count = {}", fileId, start, end, hits);
+                return new ByteArrayInputStream(data);
             }
 
-            return new ByteArrayInputStream(data);
+            log.warn("[MISS] Chunk {} ({} - {}) hit count = {}", fileId, start, end, hits);
+            return disk;
 
         } catch (Exception e) {
             log.error("❌ Failed to load chunk {} ({} - {})", fileId, start, end, e);
             throw new RuntimeException("Failed to load chunk for: " + key, e);
         }
+    }
+
+    /** Number of chunk keys currently counted (bounded by {@link #COUNTER_MAX_SIZE}). */
+    long accessCounterSize() {
+        return accessCounter.size();
     }
 
     @Override
@@ -97,13 +112,13 @@ public class VideoCacheImpl implements VideoCache {
         Predicate<String> ofFile =
                 k -> k.startsWith(prefix) && k.substring(prefix.length()).matches("\\d+_\\d+");
         chunkCache.asMap().keySet().removeIf(ofFile);
-        accessCounter.keySet().removeIf(ofFile);
+        accessCounter.asMap().keySet().removeIf(ofFile);
     }
 
     @Override
     public void invalidateAllChunks() {
         chunkCache.invalidateAll();
-        accessCounter.clear();
+        accessCounter.invalidateAll();
         log.info("Cache & counter cleared");
     }
 }

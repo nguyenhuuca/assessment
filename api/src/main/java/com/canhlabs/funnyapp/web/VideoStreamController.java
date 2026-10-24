@@ -1,7 +1,6 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.streaming.Range;
-import com.canhlabs.funnyapp.streaming.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
@@ -72,26 +71,28 @@ public class VideoStreamController {
         long start = range.start();
         long end = range.end();
         log.info("Streaming bytes {} to {}", start, end);
-        StreamChunkResult streamRs = videoService.getPartialFileUsingRAF(fileId, start, end);
-        InputStream stream = streamRs.getStream();
+        // the stream is opened inside the body so nothing leaks if the body never runs
         StreamingResponseBody responseBody = outputStream -> {
-            try (stream) {
+            try (InputStream stream = videoService.getPartialFileUsingRAF(fileId, start, end).getStream()) {
                 byte[] buffer = new byte[8192];
                 int bytesRead;
                 while ((bytesRead = stream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
                 }
+            } catch (IOException | RuntimeException e) {
+                log.warn("Streaming body failed for fileId: {} ({} - {})", fileId, start, end, e);
+                throw e;
             }
         };
 
-        long contentLength = streamRs.getActualEnd() - streamRs.getActualStart() + 1;
+        long contentLength = end - start + 1;
         log.info("Finished preparing response. Duration: {} ms", System.currentTimeMillis() - startTime);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
                 .header(HttpHeaders.ACCEPT_RANGES, "bytes")
                 .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength))
-                .header(HttpHeaders.CONTENT_RANGE, String.format("bytes %d-%d/%d", streamRs.getActualStart(), streamRs.getActualEnd(), fileSize))
+                .header(HttpHeaders.CONTENT_RANGE, String.format("bytes %d-%d/%d", start, end, fileSize))
                 .body(responseBody);
     }
 

@@ -9,6 +9,9 @@ import java.util.Set;
 @Configuration
 public class CacheBean {
 
+    /** videoCache is bounded by bytes (prod heap is small), not by entry count. */
+    static final long VIDEO_CACHE_MAX_BYTES = 32L * 1024 * 1024;
+
     @Bean(name = "mfaSessionCache")
     public AppCache<String, String> mfaSessionCache(AppCacheFactory factory, CacheProperties props) {
         return factory.createCache( props.getMfa().getTtlMinutes(), props.getMfa().getMaxSize());
@@ -21,7 +24,7 @@ public class CacheBean {
 
     @Bean(name="videoCache")
     public AppCache<String, byte[]> videoCache(AppCacheFactory factory) {
-        return factory.createCache(1440, 2000);
+        return factory.createCacheByWeight(1440, VIDEO_CACHE_MAX_BYTES);
     }
 
     @Bean(name = "statsCache")

@@ -93,9 +93,8 @@ class StreamVideoServiceImplTest {
         // Simulate cache-miss: actually call the loader callback
         when(videoCache.getChunkStream(eq(fileId), eq(start), eq(end), any(Callable.class)))
                 .thenAnswer(invocation -> {
-                    Callable<byte[]> loader = invocation.getArgument(3);
-                    byte[] loaded = loader.call();
-                    return new ByteArrayInputStream(loaded);
+                    Callable<InputStream> loader = invocation.getArgument(3);
+                    return loader.call();
                 });
         when(videoStorageService.getFileRangeFromDisk(fileId, start, end)).thenReturn(diskStream);
 
@@ -104,7 +103,7 @@ class StreamVideoServiceImplTest {
         assertNotNull(result);
         assertEquals(start, result.getActualStart());
         assertEquals(end, result.getActualEnd());
-        assertNotNull(result.getStream());
+        assertSame(diskStream, result.getStream());
         verify(videoStorageService).getFileRangeFromDisk(fileId, start, end);
     }
 

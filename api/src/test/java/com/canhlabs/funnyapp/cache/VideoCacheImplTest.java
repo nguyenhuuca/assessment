@@ -90,7 +90,7 @@ class VideoCacheImplTest {
         // Prime the access counter by calling getChunkStream on a miss
         when(chunkCache.get("fileF_0_50")).thenReturn(Optional.empty());
         try {
-            videoCache.getChunkStream("fileF", 0L, 50L, () -> new byte[]{1});
+            videoCache.getChunkStream("fileF", 0L, 50L, () -> new ByteArrayInputStream(new byte[]{1}));
         } catch (Exception ignored) {
             // not the focus of this test
         }
@@ -101,7 +101,7 @@ class VideoCacheImplTest {
         // After invalidateAllChunks the counter is cleared; a subsequent miss
         // should start the hit count from 1 again (not continue from before).
         when(chunkCache.get("fileF_0_50")).thenReturn(Optional.empty());
-        videoCache.getChunkStream("fileF", 0L, 50L, () -> new byte[]{1});
+        videoCache.getChunkStream("fileF", 0L, 50L, () -> new ByteArrayInputStream(new byte[]{1}));
         // No put expected — hit count is only 1
         verify(chunkCache, never()).put(eq("fileF_0_50"), any());
     }
@@ -130,9 +130,8 @@ class VideoCacheImplTest {
         byte[] loaded = new byte[]{11, 22, 33};
         when(chunkCache.get("fileH_50_150")).thenReturn(Optional.empty());
 
-        InputStream result = videoCache.getChunkStream("fileH", 50L, 150L, () -> loaded);
+        InputStream result = videoCache.getChunkStream("fileH", 50L, 150L, () -> new ByteArrayInputStream(loaded));
 
-        assertThat(result).isInstanceOf(ByteArrayInputStream.class);
         byte[] actualLoaded = result.readAllBytes();
         assertThat(actualLoaded).isEqualTo(loaded);
         // start != 0 so no put even after many calls
@@ -163,7 +162,7 @@ class VideoCacheImplTest {
         // Always return cache miss so all 5 calls go through the loader
         when(chunkCache.get("fileJ_0_500")).thenReturn(Optional.empty());
 
-        Callable<byte[]> loader = () -> data;
+        Callable<InputStream> loader = () -> new ByteArrayInputStream(data);
 
         // First 4 hits – must NOT trigger put
         for (int i = 0; i < 4; i++) {
@@ -181,7 +180,7 @@ class VideoCacheImplTest {
         byte[] data = new byte[]{1, 2, 3};
         when(chunkCache.get("fileK_100_600")).thenReturn(Optional.empty());
 
-        Callable<byte[]> loader = () -> data;
+        Callable<InputStream> loader = () -> new ByteArrayInputStream(data);
 
         // 5+ hits – must NEVER put because start != 0
         for (int i = 0; i < 6; i++) {
@@ -202,5 +201,60 @@ class VideoCacheImplTest {
         videoCache.invalidateFile("abc");
 
         assertThat(map).containsOnlyKeys("abc_x_0_99", "other_0_99");
+    }
+
+    // ── disk stream ownership and bounded counter ─────────────────────────────
+
+    private static final class TrackedStream extends ByteArrayInputStream {
+        boolean closed;
+
+        TrackedStream(byte[] data) {
+            super(data);
+        }
+
+        @Override
+        public void close() throws java.io.IOException {
+            closed = true;
+            super.close();
+        }
+    }
+
+    @Test
+    void getChunkStream_missNotEligible_returnsDiskStreamItself() throws Exception {
+        TrackedStream disk = new TrackedStream(new byte[]{1, 2, 3});
+        when(chunkCache.get("fileL_100_200")).thenReturn(Optional.empty());
+
+        InputStream result = videoCache.getChunkStream("fileL", 100L, 200L, () -> disk);
+
+        assertThat(result).isSameAs(disk);
+        assertThat(disk.closed).isFalse();
+        result.close();
+        assertThat(disk.closed).isTrue();
+    }
+
+    @Test
+    void getChunkStream_missEligible_cachesBytesAndClosesDiskStream() throws Exception {
+        byte[] data = new byte[]{4, 5, 6};
+        TrackedStream disk = new TrackedStream(data);
+        when(chunkCache.get("fileM_0_9")).thenReturn(Optional.empty());
+        for (int i = 0; i < 4; i++) {
+            videoCache.getChunkStream("fileM", 0L, 9L, () -> new ByteArrayInputStream(data));
+        }
+
+        InputStream result = videoCache.getChunkStream("fileM", 0L, 9L, () -> disk);
+
+        assertThat(disk.closed).isTrue();
+        assertThat(result).isInstanceOf(ByteArrayInputStream.class).isNotSameAs(disk);
+        assertThat(result.readAllBytes()).isEqualTo(data);
+        verify(chunkCache).put("fileM_0_9", data);
+    }
+
+    @Test
+    void getChunkStream_accessCounterStaysBounded() throws Exception {
+        for (int i = 0; i < VideoCacheImpl.COUNTER_MAX_SIZE + 2_000; i++) {
+            videoCache.getChunkStream("fileN", 1000L + i, 2000L + i, () -> new ByteArrayInputStream(new byte[0]));
+        }
+
+        assertThat(videoCache.accessCounterSize()).isLessThanOrEqualTo(VideoCacheImpl.COUNTER_MAX_SIZE);
     }
 }

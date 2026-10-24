@@ -27,9 +27,13 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
@@ -64,6 +68,10 @@ class VideoStreamControllerTest {
                         .actualStart(0L)
                         .actualEnd(8L)
                         .build());
+    }
+
+    private void runBody(String fileId, String range) throws IOException {
+        controller.streamVideo(fileId, range).getBody().writeTo(new ByteArrayOutputStream());
     }
 
     // ── /list and /{id} ───────────────────────────────────────────────────────
@@ -112,6 +120,7 @@ class VideoStreamControllerTest {
     @Test
     void streamVideo_rangeNoEnd_start0_usesFirstChunkSize() throws IOException {
         ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=0-");
+        response.getBody().writeTo(new ByteArrayOutputStream());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
         verify(videoService).getPartialFileUsingRAF("video1", 0L, 262_143L);
@@ -120,6 +129,7 @@ class VideoStreamControllerTest {
     @Test
     void streamVideo_rangeNoEnd_nonZeroStart_usesNextChunkSize() throws IOException {
         ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=262144-");
+        response.getBody().writeTo(new ByteArrayOutputStream());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
         verify(videoService).getPartialFileUsingRAF("video1", 262_144L, 786_431L);
@@ -127,14 +137,14 @@ class VideoStreamControllerTest {
 
     @Test
     void streamVideo_explicitEnd_usesMin() throws IOException {
-        controller.streamVideo("video1", "bytes=0-1023");
+        runBody("video1", "bytes=0-1023");
 
         verify(videoService).getPartialFileUsingRAF("video1", 0L, 1023L);
     }
 
     @Test
     void streamVideo_endExceedsFileSize_cappedAtFileSize() throws IOException {
-        controller.streamVideo("video1", "bytes=10-9999999");
+        runBody("video1", "bytes=10-9999999");
 
         verify(videoService).getPartialFileUsingRAF("video1", 10L, FILE_SIZE - 1);
     }
@@ -143,14 +153,14 @@ class VideoStreamControllerTest {
     void streamVideo_explicitEndBeyondMaxChunk_cappedAtOneMb() throws IOException {
         when(videoService.getFileSize(any())).thenReturn(10_000_000L);
 
-        controller.streamVideo("video1", "bytes=0-9999999");
+        runBody("video1", "bytes=0-9999999");
 
         verify(videoService).getPartialFileUsingRAF("video1", 0L, MAX_CHUNK - 1);
     }
 
     @Test
     void streamVideo_suffixRange_returnsLastBytes() throws IOException {
-        controller.streamVideo("video1", "bytes=-500");
+        runBody("video1", "bytes=-500");
 
         verify(videoService).getPartialFileUsingRAF("video1", FILE_SIZE - 500, FILE_SIZE - 1);
     }
@@ -159,7 +169,7 @@ class VideoStreamControllerTest {
     void streamVideo_suffixLargerThanMax_cappedAtOneMb() throws IOException {
         when(videoService.getFileSize(any())).thenReturn(10_000_000L);
 
-        controller.streamVideo("video1", "bytes=-5000000");
+        runBody("video1", "bytes=-5000000");
 
         verify(videoService).getPartialFileUsingRAF("video1", 10_000_000L - MAX_CHUNK, 9_999_999L);
     }
@@ -168,14 +178,14 @@ class VideoStreamControllerTest {
     void streamVideo_suffixLargerThanFile_startsAtZero() throws IOException {
         when(videoService.getFileSize(any())).thenReturn(1000L);
 
-        controller.streamVideo("video1", "bytes=-5000");
+        runBody("video1", "bytes=-5000");
 
         verify(videoService).getPartialFileUsingRAF("video1", 0L, 999L);
     }
 
     @Test
     void streamVideo_multiRange_servesFirstRangeOnly() throws IOException {
-        controller.streamVideo("video1", "bytes=0-99, 500-599");
+        runBody("video1", "bytes=0-99, 500-599");
 
         verify(videoService).getPartialFileUsingRAF("video1", 0L, 99L);
     }
@@ -183,6 +193,7 @@ class VideoStreamControllerTest {
     @Test
     void streamVideo_rangeNotStartingWithBytes_treatedAsOpenRange() throws IOException {
         ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "invalid-header");
+        response.getBody().writeTo(new ByteArrayOutputStream());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
         verify(videoService).getPartialFileUsingRAF("video1", 0L, 262_143L);
@@ -208,6 +219,81 @@ class VideoStreamControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
         assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_RANGE)).isEqualTo("bytes */0");
+        verify(videoService, never()).getPartialFileUsingRAF(any(), anyLong(), anyLong());
+    }
+
+    // ── stream ownership ──────────────────────────────────────────────────────
+
+    private AtomicBoolean stubTrackedStream() throws IOException {
+        AtomicBoolean closed = new AtomicBoolean();
+        InputStream tracked = new ByteArrayInputStream("videodata".getBytes()) {
+            @Override
+            public void close() throws IOException {
+                closed.set(true);
+                super.close();
+            }
+        };
+        when(videoService.getPartialFileUsingRAF(any(), anyLong(), anyLong())).thenReturn(
+                StreamChunkResult.builder().stream(tracked).actualStart(0L).actualEnd(8L).build());
+        return closed;
+    }
+
+    @Test
+    void streamVideo_buildingResponse_doesNotOpenStream() throws IOException {
+        controller.streamVideo("video1", "bytes=0-99");
+
+        verify(videoService, never()).getPartialFileUsingRAF(any(), anyLong(), anyLong());
+    }
+
+    @Test
+    void streamVideo_contentLengthComesFromParsedRange() throws IOException {
+        ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=10-109");
+
+        assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_LENGTH)).isEqualTo("100");
+        assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_RANGE)).isEqualTo("bytes 10-109/" + FILE_SIZE);
+    }
+
+    @Test
+    void streamVideo_runningBody_readsAndClosesStream() throws IOException {
+        AtomicBoolean closed = stubTrackedStream();
+        ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=0-8");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        response.getBody().writeTo(out);
+
+        assertThat(out.toByteArray()).isEqualTo("videodata".getBytes());
+        assertThat(closed).isTrue();
+    }
+
+    @Test
+    void streamVideo_throwingWrite_stillClosesStream() throws IOException {
+        AtomicBoolean closed = stubTrackedStream();
+        ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=0-8");
+        OutputStream failing = new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+                throw new IOException("client gone");
+            }
+        };
+
+        assertThatThrownBy(() -> response.getBody().writeTo(failing)).isInstanceOf(IOException.class);
+        assertThat(closed).isTrue();
+    }
+
+    @Test
+    void streamVideo_openFailsInsideBody_propagates() throws IOException {
+        when(videoService.getPartialFileUsingRAF(any(), anyLong(), anyLong())).thenThrow(new IOException("gone"));
+        ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=0-8");
+
+        assertThatThrownBy(() -> response.getBody().writeTo(new ByteArrayOutputStream()))
+                .isInstanceOf(IOException.class);
+    }
+
+    @Test
+    void streamVideo_missingFile_failsBeforeResponse() throws IOException {
+        when(videoService.getFileSize(any())).thenThrow(new IOException("missing"));
+
+        assertThatThrownBy(() -> controller.streamVideo("video1", "bytes=0-8")).isInstanceOf(IOException.class);
         verify(videoService, never()).getPartialFileUsingRAF(any(), anyLong(), anyLong());
     }
 

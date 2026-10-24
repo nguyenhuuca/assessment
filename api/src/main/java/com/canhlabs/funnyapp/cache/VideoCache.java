@@ -13,7 +13,7 @@ public interface VideoCache {
 
     void invalidateChunk(String fileId, long start, long end);
 
-    InputStream getChunkStream(String fileId, long start, long end, Callable<byte[]> loader);
+    InputStream getChunkStream(String fileId, long start, long end, Callable<InputStream> loader);
 
     void invalidateAllChunks();
 
