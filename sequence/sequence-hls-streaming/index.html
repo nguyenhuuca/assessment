@@ -8063,7 +8063,7 @@
 <li><strong>PRD:</strong> <a href="../../prd/PRD-hls-streaming/">PRD-hls-streaming</a></li>
 <li><strong>ADR:</strong> <a href="../../adr/0031-hls-streaming/">0031-hls-streaming</a></li>
 <li><strong>Spec:</strong> <a href="../../specs/spec-hls-streaming/">spec-hls-streaming</a></li>
-<li><strong>Status:</strong> As-built (2026-10-24)</li>
+<li><strong>Status:</strong> As-built (2026-10-24; flows 3 and 4 updated for the feed cache, the Range cap and the full fallback triggers)</li>
 </ul>
 <h2 id="1-super_admin-turns-hls-on-worker-transcodes-happy-path">1. SUPER_ADMIN turns HLS on, worker transcodes (happy path)<a class="headerlink" href="#1-super_admin-turns-hls-on-worker-transcodes-happy-path" title="Permanent link">&para;</a></h2>
 <p>The SUPER_ADMIN toggles HLS on in the admin table. The worker stream-copies the <code>.full</code> file and publishes the rendition atomically (spec FR-2, FR-3, BR-3..BR-7).</p>
@@ -8131,61 +8131,99 @@
     end
     Note over W,DB: the file lock is released in a finally block, and the next PENDING job is taken</code></pre>
 <h2 id="3-viewer-plays-an-hls-video-flag-on">3. Viewer plays an HLS video (flag on)<a class="headerlink" href="#3-viewer-plays-an-hls-video-flag-on" title="Permanent link">&para;</a></h2>
-<p>The server offers <code>hlsUrl</code> only when the flag is on and the rendition is READY. The player attaches HLS to its single video element (spec BR-8, BR-13, FR-9).</p>
+<p>The server offers <code>hlsUrl</code> only when the flag is on and the rendition is READY. The flag is read once per request and the feed list comes from a 30 s cache keyed by the flag value. The player attaches HLS to its single video element (spec BR-8, BR-13, FR-9).</p>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
     actor V as Viewer (guest or signed in)
     participant FE as Browser (VideoPlayer.jsx + useHlsSource)
+    participant HJ as hls.js (lazy chunk)
     participant API as VideoStreamController
     participant S as StreamVideoServiceImpl
+    participant P as HlsPlaybackServiceImpl
     participant FF as FeatureFlagService (Harness)
+    participant FC as FeedCache (30 s, key = flag)
     participant DB as PostgreSQL (video_sources)
     participant FS as Disk (video-cache/hls)
 
     V-&gt;&gt;FE: open feed
     FE-&gt;&gt;API: GET /v1/funny-app/video-stream/list
     API-&gt;&gt;S: getVideosToStream()
-    S-&gt;&gt;FF: isEnabled(hls_streaming_enabled, false), once per request
-    FF--&gt;&gt;S: true
-    S-&gt;&gt;DB: published, visible videos
-    S--&gt;&gt;API: VideoDto list, hlsUrl set where hls_status is READY
+    S-&gt;&gt;P: hlsEnabled()
+    P-&gt;&gt;FF: isEnabled(hls_streaming_enabled, false), once per request
+    FF--&gt;&gt;P: true
+    P--&gt;&gt;S: true
+    S-&gt;&gt;FC: get(true, loader)
+    alt cache miss
+        FC-&gt;&gt;DB: published, visible videos (partial feed index)
+        FC--&gt;&gt;S: VideoDto list, hlsUrl set where hls_status is READY
+    else cache hit
+        FC--&gt;&gt;S: cached unmodifiable list
+    end
+    S--&gt;&gt;API: VideoDto list
     API--&gt;&gt;FE: 200 list
     alt Safari or iOS (native HLS)
         FE-&gt;&gt;FE: video.src = hlsUrl
+        FE-&gt;&gt;API: GET /video-stream/hls/fileId/playlist.m3u8
     else other browsers
-        FE-&gt;&gt;FE: import hls.js, attach to the video element
+        FE-&gt;&gt;HJ: import hls.js, Hls.isSupported(), loadSource + attachMedia
+        HJ-&gt;&gt;API: GET /video-stream/hls/fileId/playlist.m3u8
     end
-    FE-&gt;&gt;API: GET /video-stream/hls/fileId/playlist.m3u8
-    API-&gt;&gt;DB: READY and PUBLISHED and not hidden
-    API-&gt;&gt;FS: read playlist.m3u8
+    API-&gt;&gt;P: findPlaylist(fileId)
+    P-&gt;&gt;DB: READY and PUBLISHED and not hidden
+    P-&gt;&gt;FS: playlist.m3u8 exists
     API--&gt;&gt;FE: 200 application/vnd.apple.mpegurl, no-cache
     loop each segment
-        FE-&gt;&gt;API: GET /video-stream/hls/fileId/seg_N.ts
+        HJ-&gt;&gt;API: GET /video-stream/hls/fileId/seg_N.ts (on Safari the video element fetches it)
         API-&gt;&gt;FS: FileSystemResource (no DB)
-        API--&gt;&gt;FE: 200 video/mp2t, immutable
+        API--&gt;&gt;HJ: 200 video/mp2t, immutable
     end
     FE-&gt;&gt;FE: resume at startAt, report views and progress as today</code></pre>
 <h2 id="4-fallback-to-range">4. Fallback to Range<a class="headerlink" href="#4-fallback-to-range" title="Permanent link">&para;</a></h2>
-<p>The player falls back on any HLS problem, and the flag off sends everyone to Range (spec EC-2, EC-10, EC-11, EC-12).</p>
+<p>Two ways a viewer ends up on Range: the server offers no <code>hlsUrl</code> (flag off, Harness unreachable, rendition not READY), or the player gives up on HLS for this video and switches the same <code>&lt;video&gt;</code> element to the Range URL (spec EC-2, EC-10, EC-11, EC-12; <code>webapp/src/hooks/useHlsSource.js</code>).</p>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
     participant FE as Browser (VideoPlayer.jsx + useHlsSource)
+    participant HJ as hls.js (lazy chunk)
     participant API as VideoStreamController
     participant S as StreamVideoServiceImpl
+    participant P as HlsPlaybackServiceImpl
     participant FF as FeatureFlagService (Harness)
+    participant FC as FeedCache (30 s, key = flag)
 
-    alt flag off or Harness unreachable
+    alt server offers no hlsUrl
         FE-&gt;&gt;API: GET /v1/funny-app/video-stream/list
-        S-&gt;&gt;FF: isEnabled(hls_streaming_enabled, false)
-        FF--&gt;&gt;S: false (default when unreachable)
-        API--&gt;&gt;FE: every hlsUrl is null
-        FE-&gt;&gt;API: GET /video-stream/stream/fileId with Range header
-        API--&gt;&gt;FE: 206 video/mp4
-    else fatal HLS error or playlist 404
-        FE-&gt;&gt;FE: save currentTime, destroy the hls instance
-        FE-&gt;&gt;API: GET /video-stream/stream/fileId with Range header
-        API--&gt;&gt;FE: 206 video/mp4
-        FE-&gt;&gt;FE: on loadedmetadata restore currentTime and play state
+        API-&gt;&gt;S: getVideosToStream()
+        S-&gt;&gt;P: hlsEnabled()
+        P-&gt;&gt;FF: isEnabled(hls_streaming_enabled, false)
+        FF--&gt;&gt;P: false (also the default when Harness is unreachable)
+        P--&gt;&gt;S: false
+        S-&gt;&gt;FC: get(false, loader)
+        FC--&gt;&gt;S: list built with hlsUrl = null
+        S--&gt;&gt;API: VideoDto list
+        API--&gt;&gt;FE: 200, every hlsUrl is null (READY or not)
+        Note over FE: useHlsSource returns the Range URL, no hls.js is loaded
+    else player gives up on HLS for this video
+        alt hls.js path
+            FE-&gt;&gt;HJ: import hls.js
+            HJ--&gt;&gt;FE: import fails, or Hls.isSupported() is false, or a fatal Hls.Events.ERROR (e.g. playlist 404, segment missing)
+        else native HLS (Safari, iOS)
+            FE-&gt;&gt;API: GET /video-stream/hls/fileId/playlist.m3u8
+            API--&gt;&gt;FE: 404 or a broken segment
+            Note over FE: video element fires error
+        end
+        FE-&gt;&gt;FE: fallback() once: keep currentTime and play state, destroy hls.js, remove the error listener
+        FE-&gt;&gt;FE: failedUrl = hlsUrl, so HLS is not retried for this video (no loop)
+        Note over FE: src switches to the Range URL. If position &gt; 0 or it was playing, restore on loadedmetadata. A video change drops a pending restore.
+    end
+
+    loop while the video plays or seeks
+        FE-&gt;&gt;API: GET /video-stream/stream/fileId, Range bytes=N- or bytes=N-M
+        API-&gt;&gt;API: getFileSize, then cap the range at 1 MB (first chunk 256 KB)
+        alt valid range
+            API--&gt;&gt;FE: 206 video/mp4, Content-Range, body read from disk inside the response
+        else malformed or unsatisfiable range
+            API--&gt;&gt;FE: 416, Content-Range bytes */size
+        end
     end</code></pre>
 <h2 id="5-turn-hls-off-or-delete-the-video-during-a-job">5. Turn HLS off or delete the video during a job<a class="headerlink" href="#5-turn-hls-off-or-delete-the-video-during-a-job" title="Permanent link">&para;</a></h2>
 <p>DELETE wins over a running job: the worker re-reads the status before publishing (spec FR-4, BR-12, EC-6, EC-16).</p>
