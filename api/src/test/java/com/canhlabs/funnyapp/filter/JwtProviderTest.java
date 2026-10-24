@@ -142,4 +142,18 @@ class JwtProviderTest {
 
         assertThat(jwtProvider.verifyToken(token).getData().getCredentialsVersion()).isZero();
     }
+
+    @Test
+    void warmUp_signsAndParsesOnceWithTheConfiguredKey() {
+        assertThatCode(() -> jwtProvider.warmUp()).doesNotThrowAnyException();
+
+        verify(appProperties, times(2)).getJwtSecretKey();
+    }
+
+    @Test
+    void warmUp_neverFailsStartup_whenTheKeyIsInvalid() {
+        when(appProperties.getJwtSecretKey()).thenReturn("short");
+
+        assertThatCode(() -> jwtProvider.warmUp()).doesNotThrowAnyException();
+    }
 }

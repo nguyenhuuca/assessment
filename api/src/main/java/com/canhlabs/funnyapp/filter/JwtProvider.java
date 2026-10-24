@@ -11,6 +11,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,22 @@ public class JwtProvider {
     @Autowired
     public void injectProps(AppProperties props) {
         this.props = props;
+    }
+
+    /**
+     * Initialises the jjwt classes (Jwts, Jwts$SIG/ENC/KEY, the JSON reader) once on the main thread, before
+     * Tomcat accepts requests. Otherwise the first burst of authenticated requests after a deploy runs that class
+     * init on virtual threads: the waiters pin every carrier while the initialiser waits for a nested-jar lock,
+     * and the app hangs (prod 2026-10-15 and 2026-10-24). A failure here never blocks startup.
+     */
+    @PostConstruct
+    void warmUp() {
+        try {
+            String token = Jwts.builder().subject("warm-up").signWith(getKey()).compact();
+            Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token);
+        } catch (Exception e) {
+            log.warn("JWT warm-up failed: {}", e.getMessage());
+        }
     }
 
 
