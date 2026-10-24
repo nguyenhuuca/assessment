@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.dto.admin;
 
+import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,4 +25,7 @@ public class AdminVideoDto {
     private Long viewCount;
     private Integer priority;
     private Instant createdAt;
+    /** Null for videos that are not on Google Drive (HLS is Drive only). */
+    private HlsStatus hlsStatus;
+    private String hlsError;
 }

@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service;
 
+import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.enums.VideoStatus;
@@ -13,5 +14,9 @@ public interface AdminVideoService {
     void updateHidden(Long id, boolean hidden);
     /** Drive file first (a failure keeps the row), then the local file, then the row. */
     void deleteVideo(Long id, boolean deleteLocalFile, boolean deleteDriveFile);
+    /** NONE or ERROR becomes PENDING and wakes the HLS worker; any other status is returned unchanged. */
+    AdminHlsStatusDto enableHls(Long id);
+    /** Any status becomes NONE and the rendition directory is removed when the file is not busy. */
+    AdminHlsStatusDto disableHls(Long id);
     AdminStatsDto getStats();
 }

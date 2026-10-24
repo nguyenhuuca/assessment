@@ -1,6 +1,8 @@
 package com.canhlabs.funnyapp.web;
 
+import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
+import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.UserRole;
@@ -53,6 +55,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
@@ -173,6 +176,55 @@ class AdminControllerPermissionTest {
         mockMvc.perform(get(STATS_URL)
                         .with(authentication(principal(UserRole.SUPER_ADMIN, Permission.ADMIN.getBit()))))
                 .andExpect(status().isOk());
+    }
+
+    // ── HLS toggles: SUPER_ADMIN only (FR-2) ──────────────────────────────────
+
+    private static final String HLS_URL = AppConstant.API.BASE_URL + "/admin/videos/42/hls";
+
+    @Test
+    void enableHls_admin_returns403() throws Exception {
+        mockMvc.perform(put(HLS_URL)
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(adminVideoService);
+    }
+
+    @Test
+    void disableHls_admin_returns403() throws Exception {
+        mockMvc.perform(delete(HLS_URL)
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(adminVideoService);
+    }
+
+    @Test
+    void enableHls_superAdmin_returns200() throws Exception {
+        when(adminVideoService.enableHls(42L)).thenReturn(
+                AdminHlsStatusDto.builder().id(42L).hlsStatus(HlsStatus.PENDING).build());
+
+        mockMvc.perform(put(HLS_URL)
+                        .with(authentication(principal(UserRole.SUPER_ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+        verify(adminVideoService).enableHls(42L);
+    }
+
+    @Test
+    void disableHls_superAdmin_returns200() throws Exception {
+        when(adminVideoService.disableHls(42L)).thenReturn(
+                AdminHlsStatusDto.builder().id(42L).hlsStatus(HlsStatus.NONE).build());
+
+        mockMvc.perform(delete(HLS_URL)
+                        .with(authentication(principal(UserRole.SUPER_ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+        verify(adminVideoService).disableHls(42L);
+    }
+
+    @Test
+    void enableHls_superAdminWithoutAdminBit_returns403() throws Exception {
+        mockMvc.perform(put(HLS_URL)
+                        .with(authentication(principal(UserRole.SUPER_ADMIN, Permission.READ.getBit()))))
+                .andExpect(status().isForbidden());
     }
 
     // ── account management: open to ADMIN and SUPER_ADMIN; ranking is checked in the service ─

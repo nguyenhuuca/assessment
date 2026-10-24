@@ -3,7 +3,10 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.exception.InsufficientDiskSpaceException;
+import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.DriveVideoDownloader;
 import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.utils.AppConstant;
@@ -38,21 +41,32 @@ public class DriveVideoDownloaderImpl implements DriveVideoDownloader {
     private final AppProperties appProps;
     private final VideoCache videoCache;
     private final DriveFileLocks locks;
+    private final VideoSourceRepository videoSourceRepository;
+    private final HlsStorage hlsStorage;
+    private final HlsTranscodeWorker hlsWorker;
     private final Path cacheDir;
 
     @Autowired
     public DriveVideoDownloaderImpl(Drive drive, FfmpegService ffmpegService, AppProperties appProps,
-                                    VideoCache videoCache, DriveFileLocks locks) {
-        this(drive, ffmpegService, appProps, videoCache, locks, Paths.get(AppConstant.CACHE_DIR));
+                                    VideoCache videoCache, DriveFileLocks locks,
+                                    VideoSourceRepository videoSourceRepository, HlsStorage hlsStorage,
+                                    HlsTranscodeWorker hlsWorker) {
+        this(drive, ffmpegService, appProps, videoCache, locks, videoSourceRepository, hlsStorage, hlsWorker,
+                Paths.get(AppConstant.CACHE_DIR));
     }
 
     DriveVideoDownloaderImpl(Drive drive, FfmpegService ffmpegService, AppProperties appProps,
-                             VideoCache videoCache, DriveFileLocks locks, Path cacheDir) {
+                             VideoCache videoCache, DriveFileLocks locks,
+                             VideoSourceRepository videoSourceRepository, HlsStorage hlsStorage,
+                             HlsTranscodeWorker hlsWorker, Path cacheDir) {
         this.drive = drive;
         this.ffmpegService = ffmpegService;
         this.appProps = appProps;
         this.videoCache = videoCache;
         this.locks = locks;
+        this.videoSourceRepository = videoSourceRepository;
+        this.hlsStorage = hlsStorage;
+        this.hlsWorker = hlsWorker;
         this.cacheDir = cacheDir;
     }
 
@@ -73,11 +87,37 @@ public class DriveVideoDownloaderImpl implements DriveVideoDownloader {
         }
         // the old bytes may still be cached under the same file id
         videoCache.invalidateFile(fileId);
+        resetHls(fileId);
 
         String imageName = fileId + ".jpg";
         String thumbnailPath = Paths.get(appProps.getImageStoragePath().concat("/thumbnails"), imageName).toString();
         ffmpegService.generateThumbnail(target.toAbsolutePath().toString(), thumbnailPath);
         return appProps.getImageUrl() + "/" + imageName;
+    }
+
+    /**
+     * BR-10: the HLS rendition was made from the old bytes. The caller still holds the file lock, so the
+     * directory can go; READY and ERROR rows are queued again, other statuses keep their place.
+     */
+    private void resetHls(String fileId) {
+        if (!HlsStorage.isValidFileId(fileId)) {
+            return;
+        }
+        try {
+            hlsStorage.delete(fileId);
+            videoSourceRepository.findBySourceId(fileId)
+                    .filter(s -> s.getHlsStatus() == HlsStatus.READY || s.getHlsStatus() == HlsStatus.ERROR)
+                    .ifPresent(this::requeueHls);
+        } catch (RuntimeException e) {
+            log.warn("Could not reset the HLS rendition of {}: {}", fileId, e.getMessage());
+        }
+    }
+
+    private void requeueHls(VideoSource source) {
+        source.setHlsStatus(HlsStatus.PENDING);
+        source.setHlsError(null);
+        videoSourceRepository.save(source);
+        hlsWorker.wakeUp();
     }
 
     /** A crash or restart mid-download leaves .part files behind; downloads never resume, so delete them. */

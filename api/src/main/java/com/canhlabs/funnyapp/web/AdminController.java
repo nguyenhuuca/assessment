@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.HasPermission;
 import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
+import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.BulkModerateCommentRequest;
 import com.canhlabs.funnyapp.dto.admin.HardDeleteCommentsRequest;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -129,6 +131,27 @@ public class AdminController {
         return ResponseEntity.ok(ResultObjectInfo.<String>builder()
                 .status(ResultStatus.SUCCESS)
                 .message("Deleted")
+                .build());
+    }
+
+    @PutMapping("/videos/{id}/hls")
+    // one @PreAuthorize only: @HasPermission is itself a @PreAuthorize, so its check is inlined here
+    @PreAuthorize("hasRole('SUPER_ADMIN') and @permissionServiceImpl.hasPermission(authentication.details.permissions, ADMIN)")
+    @AuditLog("enableVideoHls")
+    public ResponseEntity<ResultObjectInfo<AdminHlsStatusDto>> enableVideoHls(@PathVariable Long id) {
+        return ResponseEntity.ok(ResultObjectInfo.<AdminHlsStatusDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(adminVideoService.enableHls(id))
+                .build());
+    }
+
+    @DeleteMapping("/videos/{id}/hls")
+    @PreAuthorize("hasRole('SUPER_ADMIN') and @permissionServiceImpl.hasPermission(authentication.details.permissions, ADMIN)")
+    @AuditLog("disableVideoHls")
+    public ResponseEntity<ResultObjectInfo<AdminHlsStatusDto>> disableVideoHls(@PathVariable Long id) {
+        return ResponseEntity.ok(ResultObjectInfo.<AdminHlsStatusDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(adminVideoService.disableHls(id))
                 .build());
     }
 

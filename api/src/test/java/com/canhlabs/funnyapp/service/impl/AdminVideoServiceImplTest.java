@@ -1,10 +1,14 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.DriveFileLocks;
+import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.enums.CommentStatus;
+import com.canhlabs.funnyapp.enums.HlsStatus;
+import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
@@ -33,6 +37,9 @@ class AdminVideoServiceImplTest {
     @Mock UserRepo userRepo;
     @Mock VideoCommentRepository commentRepository;
     @Mock VideoStorageService videoStorageService;
+    @Mock HlsStorage hlsStorage;
+    @Mock HlsTranscodeWorker hlsWorker;
+    DriveFileLocks locks = new DriveFileLocks();
 
     @InjectMocks AdminVideoServiceImpl service;
 
@@ -43,6 +50,9 @@ class AdminVideoServiceImplTest {
         service.injectVideoSourceRepository(videoSourceRepository);
         service.injectUserRepo(userRepo);
         service.injectVideoCommentRepository(commentRepository);
+        service.injectHlsStorage(hlsStorage);
+        service.injectHlsWorker(hlsWorker);
+        service.injectDriveFileLocks(locks);
     }
 
     // ── getVideos ──────────────────────────────────────────────────────────────
@@ -234,6 +244,153 @@ class AdminVideoServiceImplTest {
 
         assertEquals("Video not found: 7", ex.getMessage());
         verify(videoSourceRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void deleteVideo_alwaysDeletesHlsDirectory_evenWithoutLocalFileFlag() {
+        when(videoSourceRepository.findById(7L)).thenReturn(Optional.of(source("google_drive", "abc")));
+
+        service.deleteVideo(7L, false, false);
+
+        verify(hlsStorage).delete("abc");
+        verify(videoStorageService, never()).deleteIfEligible(any());
+        assertFalse(locks.isHeld("abc"));
+    }
+
+    @Test
+    void deleteVideo_fileLocked_skipsHlsDeleteButRemovesRow() {
+        when(videoSourceRepository.findById(7L)).thenReturn(Optional.of(source("google_drive", "abc")));
+        locks.tryClaim("abc");
+
+        service.deleteVideo(7L, false, false);
+
+        verify(hlsStorage, never()).delete(any());
+        verify(videoSourceRepository).deleteById(7L);
+        assertTrue(locks.isHeld("abc")); // the other holder's claim is untouched
+    }
+
+    // ── HLS toggles ───────────────────────────────────────────────────────────
+
+    private VideoSource hlsSource(String type, HlsStatus status) {
+        VideoSource s = source(type, "abc");
+        s.setId(42L);
+        s.setHlsStatus(status);
+        return s;
+    }
+
+    @Test
+    void enableHls_noneOrError_becomesPendingClearsErrorAndWakesWorker() {
+        for (HlsStatus from : List.of(HlsStatus.NONE, HlsStatus.ERROR)) {
+            VideoSource s = hlsSource("google_drive", from);
+            s.setHlsError("TIMEOUT");
+            when(videoSourceRepository.findById(42L)).thenReturn(Optional.of(s));
+
+            AdminHlsStatusDto dto = service.enableHls(42L);
+
+            assertEquals(HlsStatus.PENDING, dto.getHlsStatus());
+            assertNull(dto.getHlsError());
+            assertEquals(42L, dto.getId());
+            verify(videoSourceRepository).save(s);
+            verify(hlsWorker).wakeUp();
+            clearInvocations(videoSourceRepository, hlsWorker);
+        }
+    }
+
+    @Test
+    void enableHls_pendingProcessingReady_unchanged() {
+        for (HlsStatus from : List.of(HlsStatus.PENDING, HlsStatus.PROCESSING, HlsStatus.READY)) {
+            when(videoSourceRepository.findById(42L)).thenReturn(Optional.of(hlsSource("google_drive", from)));
+
+            AdminHlsStatusDto dto = service.enableHls(42L);
+
+            assertEquals(from, dto.getHlsStatus());
+        }
+        verify(videoSourceRepository, never()).save(any());
+        verify(hlsWorker, never()).wakeUp();
+    }
+
+    @Test
+    void enableHls_nonDrive_throws400() {
+        when(videoSourceRepository.findById(42L)).thenReturn(Optional.of(hlsSource("youtube", HlsStatus.NONE)));
+
+        CustomException ex = assertThrows(CustomException.class, () -> service.enableHls(42L));
+
+        assertEquals(400, ex.getStatus().value());
+        assertEquals("error.hls.notDriveVideo", ex.getMessageKey());
+        verify(videoSourceRepository, never()).save(any());
+    }
+
+    @Test
+    void enableHls_unknownId_throws404() {
+        when(videoSourceRepository.findById(42L)).thenReturn(Optional.empty());
+
+        CustomException ex = assertThrows(CustomException.class, () -> service.enableHls(42L));
+
+        assertEquals(404, ex.getStatus().value());
+        assertEquals("error.video.notFound", ex.getMessageKey());
+    }
+
+    @Test
+    void disableHls_anyStatus_becomesNoneAndDeletesDirectory() {
+        VideoSource s = hlsSource("google_drive", HlsStatus.READY);
+        s.setHlsError("x");
+        when(videoSourceRepository.findById(42L)).thenReturn(Optional.of(s));
+
+        AdminHlsStatusDto dto = service.disableHls(42L);
+
+        assertEquals(HlsStatus.NONE, dto.getHlsStatus());
+        assertNull(dto.getHlsError());
+        verify(videoSourceRepository).save(s);
+        verify(hlsStorage).delete("abc");
+        assertFalse(locks.isHeld("abc"));
+    }
+
+    @Test
+    void disableHls_whileProcessing_neverConflicts_leavesCleanupToHolder() {
+        VideoSource s = hlsSource("google_drive", HlsStatus.PROCESSING);
+        when(videoSourceRepository.findById(42L)).thenReturn(Optional.of(s));
+        locks.tryClaim("abc");
+
+        AdminHlsStatusDto dto = service.disableHls(42L);
+
+        assertEquals(HlsStatus.NONE, dto.getHlsStatus());
+        verify(hlsStorage, never()).delete(any());
+        assertTrue(locks.isHeld("abc"));
+    }
+
+    @Test
+    void disableHls_deleteFails_releasesLock() {
+        when(videoSourceRepository.findById(42L)).thenReturn(Optional.of(hlsSource("google_drive", HlsStatus.READY)));
+        doThrow(new IllegalStateException("io")).when(hlsStorage).delete("abc");
+
+        assertThrows(IllegalStateException.class, () -> service.disableHls(42L));
+
+        assertFalse(locks.isHeld("abc"));
+    }
+
+    @Test
+    void disableHls_nonDrive_throws400AndUnknown404() {
+        when(videoSourceRepository.findById(42L)).thenReturn(Optional.of(hlsSource("youtube", HlsStatus.NONE)));
+        assertEquals(400, assertThrows(CustomException.class, () -> service.disableHls(42L)).getStatus().value());
+
+        when(videoSourceRepository.findById(42L)).thenReturn(Optional.empty());
+        assertEquals(404, assertThrows(CustomException.class, () -> service.disableHls(42L)).getStatus().value());
+    }
+
+    @Test
+    void getVideos_hlsStatusNullForNonDrive_andShownForDrive() {
+        VideoSource drive = hlsSource("google_drive", HlsStatus.ERROR);
+        drive.setHlsError("TIMEOUT");
+        VideoSource yt = hlsSource("youtube", HlsStatus.NONE);
+        Pageable pageable = PageRequest.of(0, 20);
+        when(videoSourceRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(drive, yt)));
+
+        List<AdminVideoDto> out = service.getVideos(pageable, null).getContent();
+
+        assertEquals(HlsStatus.ERROR, out.get(0).getHlsStatus());
+        assertEquals("TIMEOUT", out.get(0).getHlsError());
+        assertNull(out.get(1).getHlsStatus());
+        assertNull(out.get(1).getHlsError());
     }
 
     // ── getStats ──────────────────────────────────────────────────────────────

@@ -1,6 +1,8 @@
 package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
+import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
+import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
@@ -95,6 +97,31 @@ class AdminControllerTest {
     void updateVideoStatus_invalidStatus_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
                 () -> controller.updateVideoStatus(1L, Map.of("status", "INVALID_STATUS")));
+    }
+
+    // ── PUT / DELETE /videos/{id}/hls ─────────────────────────────────────────
+
+    @Test
+    void enableVideoHls_returnsStatusFromService() {
+        AdminHlsStatusDto dto = AdminHlsStatusDto.builder().id(42L).hlsStatus(HlsStatus.PENDING).build();
+        when(adminVideoService.enableHls(42L)).thenReturn(dto);
+
+        ResponseEntity<ResultObjectInfo<AdminHlsStatusDto>> response = controller.enableVideoHls(42L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
+        assertSame(dto, response.getBody().getData());
+    }
+
+    @Test
+    void disableVideoHls_returnsStatusFromService() {
+        AdminHlsStatusDto dto = AdminHlsStatusDto.builder().id(42L).hlsStatus(HlsStatus.NONE).build();
+        when(adminVideoService.disableHls(42L)).thenReturn(dto);
+
+        ResponseEntity<ResultObjectInfo<AdminHlsStatusDto>> response = controller.disableVideoHls(42L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertSame(dto, response.getBody().getData());
     }
 
     // ── PATCH /videos/{id}/priority ───────────────────────────────────────────
