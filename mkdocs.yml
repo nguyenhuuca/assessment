@@ -178,12 +178,28 @@ nav:
       - Video Import Setup (VI): guides/video-import-setup-vi.md
 
   - Reports:
+      - Postmortems:
+          - 2026-10-24 Startup Hang (VT Class-Init Deadlock): reports/postmortem-2026-10-24-startup-hang.md
+      - Autopilot Runs:
+          - 2026-10-24 HLS Streaming: reports/autopilot-2026-10-24-hls-streaming.md
+          - 2026-10-23 Contributor Autopilot Permissions: reports/autopilot-2026-10-23-contributor-autopilot-permissions.md
+          - 2026-10-21 Report Webhook State: reports/autopilot-2026-10-21-report-webhook-state.md
+          - 2026-10-21 Report Closed Notify: reports/autopilot-2026-10-21-report-closed-notify.md
+          - 2026-10-19 Dynamic Cron Jobs: reports/autopilot-2026-10-19-dynamic-cron-jobs.md
+          - 2026-10-19 Suggestion Re-review: reports/autopilot-2026-10-19-suggestion-rereview.md
+          - 2026-10-19 Suggestion Transitions: reports/autopilot-2026-10-19-suggestion-transitions.md
+          - 2026-10-19 Admin Re-review Badge: reports/autopilot-2026-10-19-admin-rereview-badge.md
+          - 2026-10-19 Re-review Max From API: reports/autopilot-2026-10-19-rereview-max-from-api.md
+          - 2026-10-19 Re-review Modal Escape/Focus: reports/autopilot-2026-10-19-rereview-modal-escape-focus.md
+          - 2026-10-19 Reopen Button Disable: reports/autopilot-2026-10-19-reopen-button-disable.md
       - Agent Metrics 2026-10: reports/agent-metrics-2026-10.md
-      - System Health 2026-05-30: reports/system-health-2026-05-30.md
-      - System Health 2026-02-06: reports/system-health-2026-02-06.md
-      - Architecture Quality 2025-07-13 EN: reports/architecture-quality-2025-07-13-en.md
-      - Architecture Quality 2025-07-13 VN: reports/architecture-quality-2025-07-13-vn.md
-      - Architecture Quality 2025-07-05: reports/architecture-quality-2025-07-05.md
+      - Health & Quality:
+          - Code Health 2026-10-18: reports/code-health-2026-10-18.md
+          - System Health 2026-05-30: reports/system-health-2026-05-30.md
+          - System Health 2026-02-06: reports/system-health-2026-02-06.md
+          - Architecture Quality 2025-07-13 EN: reports/architecture-quality-2025-07-13-en.md
+          - Architecture Quality 2025-07-13 VN: reports/architecture-quality-2025-07-13-vn.md
+          - Architecture Quality 2025-07-05: reports/architecture-quality-2025-07-05.md
       - Watch History Model Comparison: reports/comparison-watch-history-models.md
 
   - Archived:
