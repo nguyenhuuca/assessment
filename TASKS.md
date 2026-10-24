@@ -568,3 +568,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 ## Lite: Settings build number (2026-10-24, autopilot lite --auto)
 
 - [x] **SB-1** FE: build number ("Phiên bản <sha7>") at the bottom of Settings d600cb1f
+
+## Lite: Hide prev/next arrows on touch screens (2026-10-24, autopilot lite, issue #66)
+
+- [x] **NA-1** FE: hide `.nav-arrows` under `@media (pointer: coarse)` + CSS source test

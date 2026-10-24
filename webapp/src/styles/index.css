@@ -423,6 +423,11 @@ body {
   .action-btn .label { display: none; }
 }
 
+/* Touch screens swipe between videos, so the prev/next arrows are redundant */
+@media (pointer: coarse) {
+  .nav-arrows { display: none; }
+}
+
 /* ── Mobile bottom nav ── */
 .mobile-nav {
   display: none;
