@@ -226,7 +226,7 @@ public class HlsTranscodeWorker {
         for (VideoSource row : repository.findAllByHlsStatus(HlsStatus.READY)) {
             if (!HlsStorage.isValidFileId(row.getSourceId()) || !storage.exists(row.getSourceId())) {
                 log.warn("HLS output of video {} is missing", row.getId());
-                markOutputMissing(row);
+                repository.markHlsOutputMissing(row.getId());
             }
         }
     }
@@ -244,13 +244,6 @@ public class HlsTranscodeWorker {
     }
 
     // ── persistence helpers ───────────────────────────────────────────────────
-
-    /** Startup only (BR-11): a READY row whose directory is gone becomes ERROR; nothing is processing yet. */
-    private void markOutputMissing(VideoSource row) {
-        row.setHlsStatus(HlsStatus.ERROR);
-        row.setHlsError(HlsErrorCode.OUTPUT_MISSING.name());
-        repository.save(row);
-    }
 
     /** Records ERROR only while the row is still PROCESSING; NONE or PENDING set by the owner stay. */
     private void fail(long id, HlsErrorCode code) {

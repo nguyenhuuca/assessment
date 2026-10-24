@@ -100,6 +100,13 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
             + "WHERE id = :id AND hls_status = 'PROCESSING'", nativeQuery = true)
     int markHlsError(@Param("id") Long id, @Param("code") String code);
 
+    /** Startup check (BR-11): READY -> ERROR OUTPUT_MISSING only while the row is still READY. */
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE video_sources SET hls_status = 'ERROR', hls_error = 'OUTPUT_MISSING', updated_at = now() "
+            + "WHERE id = :id AND hls_status = 'READY'", nativeQuery = true)
+    int markHlsOutputMissing(@Param("id") Long id);
+
     /** Startup recovery (BR-11): jobs interrupted by a restart go back to the queue. */
     @Modifying
     @Transactional

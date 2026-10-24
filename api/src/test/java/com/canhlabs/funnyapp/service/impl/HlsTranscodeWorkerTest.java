@@ -441,9 +441,8 @@ class HlsTranscodeWorkerTest {
         assertThat(storage.dir("ok")).exists();
         assertThat(storage.dir("orphan")).doesNotExist();
         assertThat(storage.dir("notReady")).doesNotExist();
-        assertThat(row.getHlsStatus()).isEqualTo(HlsStatus.ERROR);
-        assertThat(row.getHlsError()).isEqualTo(HlsErrorCode.OUTPUT_MISSING.name());
-        assertThat(okRow.getHlsStatus()).isEqualTo(HlsStatus.READY);
+        verify(repo).markHlsOutputMissing(ID);
+        verify(repo, never()).markHlsOutputMissing(1L);
     }
 
     @Test

@@ -108,6 +108,16 @@ class VideoSourceHlsMigrationTest {
     }
 
     @Test
+    void markHlsOutputMissing_isConditionalOnReady() throws Exception {
+        Method m = VideoSourceRepository.class.getMethod("markHlsOutputMissing", Long.class);
+        assertThat(m.getReturnType()).isEqualTo(int.class);
+        assertThat(m.getAnnotation(Modifying.class)).isNotNull();
+        assertThat(m.getAnnotation(Transactional.class)).isNotNull();
+        assertThat(m.getAnnotation(Query.class).value()).contains("SET hls_status = 'ERROR'")
+                .contains("hls_error = 'OUTPUT_MISSING'").contains("id = :id AND hls_status = 'READY'");
+    }
+
+    @Test
     void resetAndQueue_queriesMatchTheStateMachine() throws Exception {
         Method reset = VideoSourceRepository.class.getMethod("resetHlsProcessing");
         Method queue = VideoSourceRepository.class.getMethod("findHlsQueue");
