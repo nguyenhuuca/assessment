@@ -71,6 +71,9 @@ spring:
     url: jdbc:postgresql://${DB_HOST:localhost}:5432/funnyapp
     username: postgres
     password: ${DB_PASS:123456}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT_MS:5000}
 
   liquibase:
     enabled: true
