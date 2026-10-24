@@ -7233,7 +7233,7 @@
 <li><strong>Mode:</strong> local</li>
 <li><strong>Plan:</strong> <a href="../../plans/plan-hls-streaming/">plan-hls-streaming</a></li>
 <li><strong>Started:</strong> 2026-10-24 10:28 · <strong>Landed:</strong> 2026-10-24 11:08</li>
-<li><strong>Result:</strong> ✅ committed <code>5c485b5f</code>..<code>64d66721</code> (Gate 2 pending at report time)</li>
+<li><strong>Result:</strong> ✅ pushed <code>b89acfba..4bb3836c</code></li>
 </ul>
 <h2 id="pipeline">Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h2>
 <table>
@@ -7292,12 +7292,12 @@
 </tr>
 <tr>
 <td>Gate 2 (owner)</td>
-<td>pending</td>
+<td>push (<code>b89acfba..4bb3836c</code>)</td>
 <td>—</td>
 </tr>
 <tr>
 <td>CI + smoke</td>
-<td>pending (after push)</td>
+<td>CI green (Funny App Build and Deploy, Deploy Frontend, Publish Docs). <code>mock-test.sh</code> 22/22. Read-only prod check: 53 feed videos all carry <code>hlsUrl: null</code> (flag absent/OFF); playlist for an unknown id → 404, for <code>..%2Fx</code> → 404 (rejected before the controller)</td>
 <td>—</td>
 </tr>
 </tbody>
