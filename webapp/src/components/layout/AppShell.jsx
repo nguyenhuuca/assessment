@@ -19,6 +19,7 @@ import AdminView from '../admin/AdminView.jsx'
 import ReportPage from '../report/ReportPage.jsx'
 import SettingsPage from '../settings/SettingsPage.jsx'
 import ActivityBar from '../common/ActivityBar.jsx'
+import UpdateBanner from './UpdateBanner.jsx'
 import LanguageSwitcher from '../common/LanguageSwitcher.jsx'
 import NotificationBell from '../notifications/NotificationBell.jsx'
 import { useNotificationStream } from '../../hooks/useNotifications.js'
@@ -190,6 +191,7 @@ export default function AppShell() {
   return (
     <>
       <ActivityBar />
+      <UpdateBanner />
       <MagicLinkHandler
         onMfaRequired={data => setMfaModal({ show: true, pendingData: data })}
         onError={txt => showMsg(txt)}

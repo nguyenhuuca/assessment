@@ -2920,3 +2920,24 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
   .cron-editor-input { font-size: 18px; }
   .cron-editor-fields { font-size: 10px; }
 }
+
+/* New-version banner (PWA) */
+.update-banner {
+  position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 2000;
+  display: flex; align-items: center; gap: 12px;
+  max-width: calc(100vw - 24px); padding: 10px 14px;
+  background: var(--bg-elevated); color: var(--text);
+  border: 1px solid var(--primary-dim); border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4); font-size: 13px;
+}
+.update-banner-reload {
+  background: var(--primary-dim); color: #fff; border: 0; border-radius: 6px;
+  padding: 4px 12px; font-weight: 600; cursor: pointer;
+}
+.update-banner-close {
+  background: transparent; color: var(--text-muted); border: 0;
+  font-size: 18px; line-height: 1; cursor: pointer;
+}
+@media (max-width: 768px) {
+  .update-banner { bottom: 76px; }
+}

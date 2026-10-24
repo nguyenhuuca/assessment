@@ -26,5 +26,8 @@
   "untitled": "Untitled",
   "videoThumbnail": "Video thumbnail",
   "anonymous": "anonymous",
-  "videoFallback": "video"
+  "videoFallback": "video",
+  "updateAvailable": "A new version is available",
+  "updateReload": "Reload",
+  "updateDismiss": "Dismiss"
 }

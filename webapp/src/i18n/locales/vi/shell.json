@@ -26,5 +26,8 @@
   "untitled": "Chưa có tiêu đề",
   "videoThumbnail": "Ảnh thu nhỏ video",
   "anonymous": "ẩn danh",
-  "videoFallback": "video"
+  "videoFallback": "video",
+  "updateAvailable": "Có phiên bản mới",
+  "updateReload": "Tải lại",
+  "updateDismiss": "Đóng"
 }
