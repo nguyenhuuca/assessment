@@ -146,6 +146,7 @@ nav:
       - Admin Drive Force Sync: plans/plan-admin-drive-force-sync.md
       - In-App Report: plans/plan-in-app-report.md
       - Contributor Autopilot Permissions: plans/plan-contributor-autopilot-permissions.md
+      - HLS Streaming: plans/plan-hls-streaming.md
       - Report Webhook State: plans/plan-report-webhook-state.md
       - Report Closed Notification: plans/plan-report-closed-notify.md
       - Agent Evolve Loop: plans/plan-agent-evolve.md

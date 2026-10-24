@@ -518,3 +518,12 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **CA-5** FE: report form autopilot options by bits, en/vi (after CA-4) 9e96b891
 - [x] **CA-6** FE: account table CONTRIBUTOR rank/badge/role select + SA-only autopilot toggles, en/vi (after CA-4) e340ce6c 102fced0
 
+## Feature: HLS streaming for selected videos (2026-10-24, ADR-0031, [plan](docs/plans/plan-hls-streaming.md))
+
+- [ ] **HL-1** BE: `video_sources.hls_status/hls_error` changeset, `HlsStatus`/`HlsErrorCode`, atomic `claimNextHls`, `app.hls.*` config, flag constant
+- [ ] **HL-2** BE: `HlsStorage` (paths, validation, tmp→publish, delete, sweep) + `FfmpegHlsClient` (ffprobe codec check, ffmpeg stream copy, timeout kill)
+- [ ] **HL-3** BE: `HlsTranscodeWorker` single job, lock → claim → probe → disk guard → segment → publish guard, startup recovery + orphan sweep (after HL-1, HL-2)
+- [ ] **HL-4** BE: SUPER_ADMIN PUT/DELETE `/admin/videos/{id}/hls` + audit, admin DTO, delete cleanup, re-download hook (after HL-3)
+- [ ] **HL-5** BE: public playlist/segment endpoints, `hlsUrl` in DTOs with flag read once per request (after HL-1, HL-2)
+- [ ] **HL-6** FE: `hls.js@1.7.3`, `useHlsSource` with Range fallback in `VideoPlayer`, swiper preload rule
+- [ ] **HL-7** FE: admin HLS column, SA toggle, auto refetch, en/vi (after HL-4)
