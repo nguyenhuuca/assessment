@@ -7,6 +7,7 @@ import com.canhlabs.funnyapp.streaming.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
+import com.canhlabs.funnyapp.service.HlsPlaybackService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,9 @@ class StreamVideoServiceImplTest {
     @Mock
     private VideoCache videoCache;
 
+    @Mock
+    private HlsPlaybackService hlsPlaybackService;
+
     private StreamVideoServiceImpl streamVideoService;
 
     @BeforeEach
@@ -51,6 +55,7 @@ class StreamVideoServiceImplTest {
         streamVideoService.injectCacheService(videoStorageService);
         streamVideoService.injectChatGptService(chatGptService);
         streamVideoService.injectVideoCacheStore(videoCache);
+        streamVideoService.injectHlsPlaybackService(hlsPlaybackService);
     }
 
     // -----------------------------------------------------------------------
@@ -301,7 +306,7 @@ class StreamVideoServiceImplTest {
         VideoSource source = VideoSource.builder()
                 .id(42L).sourceId("abc123").title("Test Video").desc("Some description").build();
 
-        VideoDto dto = streamVideoService.toDto(source);
+        VideoDto dto = streamVideoService.toDto(source, false);
 
         String expectedUrl = "https://canh-labs.com/api/v1/funny-app/video-stream/stream/abc123";
         assertEquals(expectedUrl, dto.getUrlLink());
@@ -314,11 +319,50 @@ class StreamVideoServiceImplTest {
         VideoSource source = VideoSource.builder()
                 .id(7L).sourceId("xyz").title("My Movie").desc("Great film").build();
 
-        VideoDto dto = streamVideoService.toDto(source);
+        VideoDto dto = streamVideoService.toDto(source, false);
 
         assertEquals(7L, dto.getId());
         assertEquals("xyz", dto.getFileId());
         assertEquals("My Movie", dto.getTitle());
         assertEquals("Great film", dto.getDesc());
+    }
+
+    // -----------------------------------------------------------------------
+    // hlsUrl and the once-per-request flag read
+    // -----------------------------------------------------------------------
+
+    private static VideoSource readyVideo(long id) {
+        return VideoSource.builder().id(id).sourceId("f" + id).hlsStatus(com.canhlabs.funnyapp.enums.HlsStatus.READY).build();
+    }
+
+    @Test
+    void getVideosToStream_flagOn_readsFlagOnceForTheWholeList() {
+        when(hlsPlaybackService.hlsEnabled()).thenReturn(true);
+        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+                .thenReturn(List.of(readyVideo(1), readyVideo(2), readyVideo(3)));
+
+        List<VideoDto> videos = streamVideoService.getVideosToStream();
+
+        verify(hlsPlaybackService, times(1)).hlsEnabled();
+        assertEquals(3, videos.size());
+        videos.forEach(v -> assertNotNull(v.getHlsUrl()));
+    }
+
+    @Test
+    void getVideosToStream_flagOff_everyHlsUrlIsNull() {
+        when(hlsPlaybackService.hlsEnabled()).thenReturn(false);
+        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+                .thenReturn(List.of(readyVideo(1), readyVideo(2)));
+
+        streamVideoService.getVideosToStream().forEach(v -> assertNull(v.getHlsUrl()));
+    }
+
+    @Test
+    void getVideoBySourceId_flagOn_setsHlsUrl() {
+        when(hlsPlaybackService.hlsEnabled()).thenReturn(true);
+        when(videoSourceRepository.findBySourceId("f1")).thenReturn(Optional.of(readyVideo(1)));
+
+        assertEquals("https://canh-labs.com/api/v1/funny-app/video-stream/hls/f1/playlist.m3u8",
+                streamVideoService.getVideoBySourceId("f1").getHlsUrl());
     }
 }

@@ -9,7 +9,9 @@ import com.canhlabs.funnyapp.entity.VideoCollection;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.CollectionVisibility;
 import com.canhlabs.funnyapp.enums.UserRole;
+import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.service.HlsPlaybackService;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoCollectionItemRepository;
@@ -61,6 +63,7 @@ class VideoCollectionServiceImplTest {
     @Mock VideoCollectionItemRepository itemRepository;
     @Mock VideoSourceRepository videoSourceRepository;
     @Mock UserRepo userRepo;
+    @Mock HlsPlaybackService hlsPlaybackService;
     @InjectMocks VideoCollectionServiceImpl service;
 
     @BeforeEach
@@ -208,6 +211,22 @@ class VideoCollectionServiceImplTest {
 
         assertThat(page.getContent()).singleElement().extracting(VideoDto::getFileId).isEqualTo("f5");
         verify(itemRepository).findVisibleVideos(pub.getId(), PageRequest.of(0, VideoCollectionServiceImpl.MAX_PAGE_SIZE));
+    }
+
+    @Test
+    void getVideos_readsHlsFlagOnce_andOffMeansNoHlsUrl() {
+        VideoCollection pub = stored(OTHER, CollectionVisibility.PUBLIC, false);
+        VideoSource a = VideoSource.builder().id(1L).sourceId("a").hlsStatus(HlsStatus.READY).build();
+        VideoSource b = VideoSource.builder().id(2L).sourceId("b").hlsStatus(HlsStatus.READY).build();
+        when(itemRepository.findVisibleVideos(eq(pub.getId()), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(a, b), PageRequest.of(0, 50), 2));
+
+        when(hlsPlaybackService.hlsEnabled()).thenReturn(true);
+        assertThat(service.getVideos(pub.getId(), 0, 10).getContent()).allSatisfy(v -> assertThat(v.getHlsUrl()).isNotNull());
+        verify(hlsPlaybackService, times(1)).hlsEnabled();
+
+        when(hlsPlaybackService.hlsEnabled()).thenReturn(false);
+        assertThat(service.getVideos(pub.getId(), 0, 10).getContent()).allSatisfy(v -> assertThat(v.getHlsUrl()).isNull());
     }
 
     @Test

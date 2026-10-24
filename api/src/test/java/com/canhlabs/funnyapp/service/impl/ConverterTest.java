@@ -4,6 +4,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.entity.ShareLink;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.user.UserInfoDto;
@@ -117,6 +118,17 @@ class ConverterTest {
         VideoSource source = new VideoSource();
         source.setSourceId("abc");
 
-        assertThat(Converter.toVideoDto(source).getUserShared()).isEqualTo("funnyapp");
+        assertThat(Converter.toVideoDto(source, false).getUserShared()).isEqualTo("funnyapp");
+    }
+
+    @Test
+    void toVideoDto_hlsUrlOnlyWhenEnabledAndReady() {
+        VideoSource ready = VideoSource.builder().sourceId("abc").hlsStatus(HlsStatus.READY).build();
+        VideoSource pending = VideoSource.builder().sourceId("abc").hlsStatus(HlsStatus.PENDING).build();
+
+        assertThat(Converter.toVideoDto(ready, true).getHlsUrl())
+                .isEqualTo("https://canh-labs.com/api/v1/funny-app/video-stream/hls/abc/playlist.m3u8");
+        assertThat(Converter.toVideoDto(ready, false).getHlsUrl()).isNull();
+        assertThat(Converter.toVideoDto(pending, true).getHlsUrl()).isNull();
     }
 }

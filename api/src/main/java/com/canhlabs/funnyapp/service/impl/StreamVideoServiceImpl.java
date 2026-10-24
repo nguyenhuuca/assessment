@@ -8,6 +8,7 @@ import com.canhlabs.funnyapp.streaming.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
+import com.canhlabs.funnyapp.service.HlsPlaybackService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
@@ -27,6 +28,12 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     private VideoStorageService videoStorageService;
     private ChatGptService chatGptService;
     private VideoCache videoCache;
+    private HlsPlaybackService hlsPlaybackService;
+
+    @Autowired
+    public void injectHlsPlaybackService(HlsPlaybackService hlsPlaybackService) {
+        this.hlsPlaybackService = hlsPlaybackService;
+    }
 
     @Autowired
     public void injectVideoCacheStore(VideoCache videoCache) {
@@ -73,9 +80,10 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @WithSpan
     @Override
     public List<VideoDto> getVideosToStream() {
+        boolean hlsEnabled = hlsPlaybackService.hlsEnabled();
         return videoSourceRepository
                 .findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED).stream()
-                .map(this::toDto)
+                .map(v -> toDto(v, hlsEnabled))
                 .toList();
     }
 
@@ -86,7 +94,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         VideoSource source = videoSourceRepository.findById(id)
                 .filter(v -> !v.isHide() && v.getStatus() == VideoStatus.PUBLISHED)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found with id: " + id));
-        return toDto(source);
+        return toDto(source, hlsPlaybackService.hlsEnabled());
     }
 
     @WithSpan
@@ -94,7 +102,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     public VideoDto getVideoBySourceId(String sourceId) {
         VideoSource source = videoSourceRepository.findBySourceId(sourceId)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found with sourceId: " + sourceId));
-        return toDto(source);
+        return toDto(source, hlsPlaybackService.hlsEnabled());
     }
 
     @WithSpan
@@ -109,7 +117,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         }
     }
 
-    VideoDto toDto(VideoSource source) {
-        return Converter.toVideoDto(source);
+    VideoDto toDto(VideoSource source, boolean hlsEnabled) {
+        return Converter.toVideoDto(source, hlsEnabled);
     }
 }

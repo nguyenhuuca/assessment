@@ -16,6 +16,7 @@ import com.canhlabs.funnyapp.repo.VideoCollectionItemRepository.Cover;
 import com.canhlabs.funnyapp.repo.VideoCollectionItemRepository.ItemCounts;
 import com.canhlabs.funnyapp.repo.VideoCollectionRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
+import com.canhlabs.funnyapp.service.HlsPlaybackService;
 import com.canhlabs.funnyapp.service.VideoCollectionService;
 import com.canhlabs.funnyapp.utils.AppUtils;
 import com.canhlabs.funnyapp.utils.NotificationText;
@@ -68,6 +69,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
     private final VideoCollectionItemRepository itemRepository;
     private final VideoSourceRepository videoSourceRepository;
     private final UserRepo userRepo;
+    private final HlsPlaybackService hlsPlaybackService;
 
     @Override
     @Transactional
@@ -187,7 +189,8 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
                 .orElseThrow(this::notFound);
         // A collection never holds more than MAX_ITEMS_PER_COLLECTION rows, so deeper pages are always empty
         PageRequest pageable = PageRequest.of(Math.clamp(page, 0, MAX_ITEMS_PER_COLLECTION), Math.clamp(size, 1, MAX_PAGE_SIZE));
-        return itemRepository.findVisibleVideos(collection.getId(), pageable).map(Converter::toVideoDto);
+        boolean hlsEnabled = hlsPlaybackService.hlsEnabled();
+        return itemRepository.findVisibleVideos(collection.getId(), pageable).map(v -> Converter.toVideoDto(v, hlsEnabled));
     }
 
     @Override

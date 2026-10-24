@@ -2,7 +2,15 @@ package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.streaming.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
+import com.canhlabs.funnyapp.service.HlsPlaybackService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.core.io.Resource;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +32,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -38,6 +47,7 @@ import static org.mockito.Mockito.when;
 class VideoStreamControllerTest {
 
     @Mock StreamVideoService videoService;
+    @Mock HlsPlaybackService hlsPlaybackService;
     @InjectMocks VideoStreamController controller;
 
     private static final long FILE_SIZE = 1_000_000L;
@@ -140,5 +150,71 @@ class VideoStreamControllerTest {
         ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "invalid-header");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
+    }
+
+    // ── /hls/{fileId}/... ─────────────────────────────────────────────────────
+
+    @TempDir Path temp;
+
+    @Test
+    void getHlsPlaylist_found_returns200WithHeaders() throws IOException {
+        Path playlist = Files.writeString(temp.resolve("playlist.m3u8"), "#EXTM3U");
+        when(hlsPlaybackService.findPlaylist("abc_-1")).thenReturn(Optional.of(playlist));
+
+        ResponseEntity<Resource> response = controller.getHlsPlaylist("abc_-1");
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE)).isEqualTo("application/vnd.apple.mpegurl");
+        assertThat(response.getHeaders().getFirst(HttpHeaders.CACHE_CONTROL)).isEqualTo("no-cache");
+        assertThat(response.getBody().contentLength()).isEqualTo(7);
+    }
+
+    @Test
+    void getHlsPlaylist_notServable_returns404() {
+        when(hlsPlaybackService.findPlaylist("abc")).thenReturn(Optional.empty());
+
+        assertThat(controller.getHlsPlaylist("abc").getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"..", "a/b", "a%2Fb", "%2e%2e", "a.b", "", "/etc/passwd", "a\\b"})
+    void hlsEndpoints_badFileId_return400WithoutLookup(String fileId) {
+        assertThat(controller.getHlsPlaylist(fileId).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(controller.getHlsSegment(fileId, "seg_0.ts").getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        verifyNoInteractions(hlsPlaybackService);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"../x.ts", "..%2Fx.ts", "seg_1.m3u8", "seg_.ts", "seg_123456.ts", "playlist.m3u8", "seg_1.ts/../x"})
+    void getHlsSegment_badName_returns400WithoutLookup(String segment) {
+        assertThat(controller.getHlsSegment("abc", segment).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        verifyNoInteractions(hlsPlaybackService);
+    }
+
+    @Test
+    void getHlsSegment_found_returns200WithImmutableCacheAndLength() throws IOException {
+        Path seg = Files.writeString(temp.resolve("seg_0.ts"), "12345");
+        when(hlsPlaybackService.findSegment("abc", "seg_0.ts")).thenReturn(Optional.of(seg));
+
+        ResponseEntity<Resource> response = controller.getHlsSegment("abc", "seg_0.ts");
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE)).isEqualTo("video/mp2t");
+        assertThat(response.getHeaders().getFirst(HttpHeaders.CACHE_CONTROL)).isEqualTo("public, max-age=31536000, immutable");
+        assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_LENGTH)).isEqualTo("5");
+    }
+
+    @Test
+    void getHlsSegment_missing_returns404() {
+        when(hlsPlaybackService.findSegment("abc", "seg_0.ts")).thenReturn(Optional.empty());
+
+        assertThat(controller.getHlsSegment("abc", "seg_0.ts").getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void getHlsSegment_fileVanishesBeforeLength_returns404() {
+        when(hlsPlaybackService.findSegment("abc", "seg_0.ts")).thenReturn(Optional.of(temp.resolve("gone.ts")));
+
+        assertThat(controller.getHlsSegment("abc", "seg_0.ts").getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }

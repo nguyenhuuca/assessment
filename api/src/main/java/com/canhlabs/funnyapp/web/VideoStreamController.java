@@ -6,11 +6,15 @@ import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ResultStatus;
+import com.canhlabs.funnyapp.service.HlsPlaybackService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
+import com.canhlabs.funnyapp.service.impl.HlsStorage;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +27,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
@@ -31,10 +36,15 @@ import java.util.List;
 public class VideoStreamController {
     private static final long FIRST_CHUNK_SIZE = 256 * 1024L; // 256KB
     private static final long NEXT_CHUNK_SIZE = 512 * 1024L;  // 512KB
+    private static final String HLS_PLAYLIST_TYPE = "application/vnd.apple.mpegurl";
+    private static final String HLS_SEGMENT_TYPE = "video/mp2t";
+    private static final String HLS_SEGMENT_CACHE = "public, max-age=31536000, immutable";
     private final StreamVideoService videoService;
+    private final HlsPlaybackService hlsPlaybackService;
 
-    public VideoStreamController(StreamVideoService videoService) {
+    public VideoStreamController(StreamVideoService videoService, HlsPlaybackService hlsPlaybackService) {
         this.videoService = videoService;
+        this.hlsPlaybackService = hlsPlaybackService;
     }
 
     @Operation(summary = "Stream video by fileId", description = "Streams a video file in chunks based on the Range header provided by the client.")
@@ -103,6 +113,45 @@ public class VideoStreamController {
                 .status(ResultStatus.SUCCESS)
                 .data(rs)
                 .build(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "HLS playlist", description = "Serves the HLS playlist of a READY, published, visible video.")
+    @GetMapping("/hls/{fileId}/playlist.m3u8")
+    public ResponseEntity<Resource> getHlsPlaylist(@PathVariable String fileId) {
+        if (!HlsStorage.isValidFileId(fileId)) {
+            return ResponseEntity.badRequest().build();
+        }
+        return hlsPlaybackService.findPlaylist(fileId)
+                .map(path -> ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_TYPE, HLS_PLAYLIST_TYPE)
+                        .header(HttpHeaders.CACHE_CONTROL, "no-cache")
+                        .<Resource>body(new FileSystemResource(path)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "HLS segment", description = "Serves one HLS segment; no database lookup.")
+    @GetMapping("/hls/{fileId}/{segment}")
+    public ResponseEntity<Resource> getHlsSegment(@PathVariable String fileId, @PathVariable String segment) {
+        if (!HlsStorage.isValidFileId(fileId) || !HlsStorage.isValidSegment(segment)) {
+            return ResponseEntity.badRequest().build();
+        }
+        return hlsPlaybackService.findSegment(fileId, segment)
+                .map(VideoStreamController::segmentResponse)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    private static ResponseEntity<Resource> segmentResponse(Path path) {
+        FileSystemResource resource = new FileSystemResource(path);
+        try {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, HLS_SEGMENT_TYPE)
+                    .header(HttpHeaders.CACHE_CONTROL, HLS_SEGMENT_CACHE)
+                    .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(resource.contentLength()))
+                    .body(resource);
+        } catch (IOException e) {
+            log.warn("HLS segment vanished: {}", path.getFileName());
+            return ResponseEntity.notFound().build();
+        }
     }
 
     private Range parseRangeHeader(String rangeHeader, long fileSize) {

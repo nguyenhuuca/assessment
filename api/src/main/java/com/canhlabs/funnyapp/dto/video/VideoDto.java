@@ -21,4 +21,6 @@ public class VideoDto extends BaseDto {
     private String urlLink;
     private String fileId;
     private Long viewCount;
+    /** HLS playlist URL; null unless the HLS flag is on and the rendition is READY (BR-8). */
+    private String hlsUrl;
 }

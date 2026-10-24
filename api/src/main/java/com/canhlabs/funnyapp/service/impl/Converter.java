@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.entity.ShareLink;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.user.UserInfoDto;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
@@ -62,7 +63,7 @@ public class Converter {
     }
 
     /** Feed-shaped DTO for a stored video; shared by the feed and collections. */
-    public static VideoDto toVideoDto(VideoSource source) {
+    public static VideoDto toVideoDto(VideoSource source, boolean hlsEnabled) {
         VideoDto dto = new VideoDto();
         dto.setId(source.getId());
         dto.setFileId(source.getSourceId());
@@ -72,6 +73,9 @@ public class Converter {
         dto.setViewCount(source.getViewCount());
         dto.setUrlLink("https://canh-labs.com/api/v1/funny-app/video-stream/stream/" + source.getSourceId());
         dto.setEmbedLink("https://canh-labs.com/api/v1/funny-app/video-stream/stream/" + source.getSourceId());
+        if (hlsEnabled && source.getHlsStatus() == HlsStatus.READY) {
+            dto.setHlsUrl("https://canh-labs.com/api/v1/funny-app/video-stream/hls/" + source.getSourceId() + "/playlist.m3u8");
+        }
         return dto;
     }
 }
