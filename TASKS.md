@@ -560,3 +560,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **PW-1** FE: service worker (navigation shell + hashed assets only), build-id `version.json`, registration in production a6dfd4b3 ae83a137
 - [x] **PW-2** FE: new-version banner (polls `version.json`), installable manifest + iOS meta, en/vi 32839c3c
+
+## Lite: Library Create button colour (2026-10-24, autopilot lite --auto)
+
+- [x] **LB-1** FE: Create collection uses a new `app-btn outline` style so it no longer matches the filled Play button c614449f

@@ -1,7 +1,7 @@
-task: Basic PWA: service worker, installable, new-version notice (autopilot)
+task: Library Create-collection button outline style (autopilot lite, --auto)
 status: done
 progress: 100
-done: PW-1 service worker + version.json a6dfd4b3; PW-2 update banner + install metadata 32839c3c; shell text/html guard ae83a137
+done: LB-1 Create collection outline button c614449f
 next: -
-plan: docs/plans/plan-pwa-basic.md
-updated: 2026-10-24 20:31
+plan: -
+updated: 2026-10-24 20:47
