@@ -25,7 +25,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -64,6 +68,10 @@ class AuditLogAspectTest {
             return "Hello, " + name;
         }
 
+        List<String> listMethod() {
+            return List.of("a", "b", "c");
+        }
+
         String throwingMethod() {
             throw new IllegalStateException("deliberate failure");
         }
@@ -72,8 +80,12 @@ class AuditLogAspectTest {
     @Autowired
     AuditTestService auditTestService;
 
+    @Autowired
+    MaskingUtils maskingUtils;
+
     @BeforeEach
     void setUp() {
+        clearInvocations(maskingUtils);
         SecurityContextHolder.clearContext();
         RequestContextHolder.resetRequestAttributes();
     }
@@ -178,5 +190,16 @@ class AuditLogAspectTest {
         String result = auditTestService.greet("RemoteAddr");
 
         assertThat(result).isEqualTo("Hello, RemoteAddr");
+    }
+
+    // ── 9. List results are only counted, never cloned/masked ─────────────────
+
+    @Test
+    void auditLog_listResult_isNotMasked() {
+        List<String> result = auditTestService.listMethod();
+
+        assertThat(result).hasSize(3);
+        verify(maskingUtils, never()).maskSensitiveFields(argThat(arg -> arg instanceof List));
+        verify(maskingUtils, never()).toJsonSafe(argThat(arg -> arg instanceof List));
     }
 }

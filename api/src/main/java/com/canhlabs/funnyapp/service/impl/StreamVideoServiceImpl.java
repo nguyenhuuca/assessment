@@ -1,6 +1,5 @@
 package com.canhlabs.funnyapp.service.impl;
 
-import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.VideoStatus;
@@ -76,7 +75,6 @@ public class StreamVideoServiceImpl implements StreamVideoService {
         return videoStorageService.getFileSizeFromDisk(fileId);
     }
 
-    @AuditLog("getALLShare")
     @WithSpan
     @Override
     public List<VideoDto> getVideosToStream() {

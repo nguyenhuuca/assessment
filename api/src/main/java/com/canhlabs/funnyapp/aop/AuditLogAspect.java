@@ -56,12 +56,12 @@ public class AuditLogAspect {
         Object result;
         try {
             result = joinPoint.proceed();
-            Object maskedResult = maskingUtil.maskSensitiveFields(result);
             String outputStr;
-            if (maskedResult instanceof List<?> listResult) {
+            // Lists are only counted, so skip the clone/mask work on them
+            if (result instanceof List<?> listResult) {
                 outputStr = String.format("List(size=%d)", listResult.size());
             } else {
-                outputStr = maskingUtil.toJsonSafe(maskedResult);
+                outputStr = maskingUtil.toJsonSafe(maskingUtil.maskSensitiveFields(result));
             }
 
             long duration = System.currentTimeMillis() - start;

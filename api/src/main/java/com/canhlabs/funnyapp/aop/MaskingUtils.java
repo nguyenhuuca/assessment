@@ -60,8 +60,7 @@ public class MaskingUtils {
 
     private Object cloneObject(Object obj) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(mapper.writeValueAsString(obj), obj.getClass());
+            return MAPPER.readValue(MAPPER.writeValueAsString(obj), obj.getClass());
         } catch (Exception e) {
             return obj;
         }

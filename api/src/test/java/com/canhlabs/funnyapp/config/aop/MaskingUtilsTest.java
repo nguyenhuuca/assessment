@@ -22,6 +22,11 @@ class MaskingUtilsTest {
         public String password = "myPassword";
     }
 
+    static class TimedObj {
+        public String password = "myPassword";
+        public java.time.Instant createdAt = java.time.Instant.parse("2026-10-24T10:15:30Z");
+    }
+
     @BeforeEach
     void setUp() {
         maskingProperties = mock(MaskingProperties.class);
@@ -37,6 +42,17 @@ class MaskingUtilsTest {
         assertThat(masked.secret).isEqualTo("***MASKED***");
         assertThat(masked.password).isEqualTo("***MASKED***");
         assertThat(masked.normal).isEqualTo("normalValue");
+    }
+
+    @Test
+    void maskSensitiveFields_masksObjectWithJavaTimeField() {
+        TimedObj obj = new TimedObj();
+        TimedObj masked = (TimedObj) maskingUtils.maskSensitiveFields(obj);
+
+        assertThat(masked).isNotSameAs(obj);
+        assertThat(masked.password).isEqualTo("***MASKED***");
+        assertThat(masked.createdAt).isEqualTo(obj.createdAt);
+        assertThat(obj.password).isEqualTo("myPassword");
     }
 
     @Test
