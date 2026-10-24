@@ -532,3 +532,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **YT-1** BE: yt-dlp FORMAT `hd/sd/bv*[vcodec^=avc1]+ba[ext=m4a]/...` + `-S res:720` (Facebook progressive H.264, YouTube avc1, ~720p by the smaller side) 7648747e
 - [x] **HC-1** BE: WARN log `video=[..] audio=[..]` when HLS refuses a source with UNSUPPORTED_CODEC 53e9268b
+
+## Lite: BE streaming perf (2026-10-24, autopilot lite, from /swarm-review perf)
+
+- [x] **ST-1** BE: every Range form capped at 1 MB, missing header = `bytes=0-`, invalid/unsatisfiable = 416 `bytes */size` 69ccd719
+- [x] **ST-2** BE: cache misses streamed from disk (opened inside the response body), bounded `accessCounter`, chunk cache weighed at 32 MB 04de01d2 ed14e981

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-24-stream-range-cap",
+  "date": "2026-10-24",
+  "mode": "local",
+  "lite": true,
+  "issue": null,
+  "pr": null,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 2, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 1,
+  "advisory": 9,
+  "locNonTest": 96,
+  "tests": { "passed": 116, "flaky": 0, "failed": 0 },
+  "costUsd": 4.13
+}

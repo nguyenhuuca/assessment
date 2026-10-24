@@ -1,7 +1,7 @@
-task: yt-dlp H.264 import format + codec log on UNSUPPORTED_CODEC (autopilot lite)
+task: BE streaming perf: Range cap + stream from disk + bounded caches (autopilot lite)
 status: done
 progress: 100
-done: YT-1 yt-dlp format H.264 ~720p 7648747e; HC-1 codec log on UNSUPPORTED_CODEC 53e9268b
+done: ST-1 Range cap + 416 69ccd719; ST-2 stream from disk + bounded caches 04de01d2; RAF close on seek failure ed14e981
 next: -
 plan: -
-updated: 2026-10-24 11:40
+updated: 2026-10-24 15:11
