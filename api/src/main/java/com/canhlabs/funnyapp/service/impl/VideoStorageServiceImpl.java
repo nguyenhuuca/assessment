@@ -107,9 +107,13 @@ public class VideoStorageServiceImpl implements VideoStorageService {
         videoAccessService.recordAccess(fileId);
         long length = end - start + 1;
         RandomAccessFile raf = new RandomAccessFile(file, "r");
-        raf.seek(start);
-
-        return new LimitedInputStream(new FileInputStream(raf.getFD()), length, raf);
+        try {
+            raf.seek(start);
+            return new LimitedInputStream(new FileInputStream(raf.getFD()), length, raf);
+        } catch (IOException | RuntimeException e) {
+            raf.close(); // nothing owns the file yet, so close it here
+            throw e;
+        }
     }
 
     @WithSpan

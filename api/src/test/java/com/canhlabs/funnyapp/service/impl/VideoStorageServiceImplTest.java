@@ -90,6 +90,17 @@ class VideoStorageServiceImplTest {
                 .hasMessageContaining("Full file not found");
     }
 
+    @Test
+    void getFileRangeFromDisk_seekFails_closesTheFile() throws IOException {
+        Path path = writeCacheFile("rangefile", "0123456789");
+
+        assertThatThrownBy(() -> service.getFileRangeFromDisk("rangefile", -1, 5))
+                .isInstanceOf(IOException.class);
+
+        // on Windows an open RandomAccessFile blocks the delete, so this proves it was closed
+        assertThat(Files.deleteIfExists(path)).isTrue();
+    }
+
     // ── deleteIfEligible ────────────────────────────────────────────────────────
 
     @Test
