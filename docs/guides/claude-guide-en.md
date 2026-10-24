@@ -289,7 +289,7 @@ Plan ⇄ Plan review → [GATE 1: you approve the plan] → Implement ⇄ Code r
 | **Bug fix with a known cause**: you know what to change and want a regression test | — |
 | Changes to backend and/or webapp that **automated tests can verify** (JUnit, Vitest) | both runs above |
 | A small technical decision that needs an ADR | Still fine: the Plan stage writes the ADR too |
-| **A plan already exists** (from `/swarm-plan` or written by hand) with **≤ 6 open tasks** | `/autopilot docs/plans/plan-x.md` skips the Plan stage but still runs Plan review and Gate 1. It works only on the tasks still `[ ]` in `TASKS.md` |
+| **A plan already exists** (from `/swarm-plan` or written by hand) with **≤ 8 open tasks** | `/autopilot docs/plans/plan-x.md` skips the Plan stage but still runs Plan review and Gate 1. It works only on the tasks still `[ ]` in `TASKS.md` |
 
 ### ⚠️ When Not to Use It (use another flow)
 
@@ -310,7 +310,7 @@ Plan ⇄ Plan review → [GATE 1: you approve the plan] → Implement ⇄ Code r
 | Situation | What autopilot does | What you do |
 |-----------|---------------------|-------------|
 | **Scope guard**: the request needs a PRD/PR-FAQ | **Refuses** at once, before planning, with one line pointing to `/scope` | Run `/scope`, or shrink the request and run again |
-| **Plan mode**: the plan has > 6 open tasks, a task is `[~]`, or the plan is Done | **Refuses** and points to `/swarm-execute` | Use `/swarm-execute`, or split the plan |
+| **Plan mode**: the plan has > 8 open tasks, a task is `[~]`, or the plan is Done | **Refuses** and points to `/swarm-execute` | Use `/swarm-execute`, or split the plan |
 | **Plan mode**: the plan has no open tasks left | Says so and stops | — |
 | Plan review still `revise` after 3 rounds | Stops, `session.txt` gets `status: blocked`, the open blocking findings are listed | Clarify the request or decide the stuck points yourself |
 | Code review still `revise` after 3 rounds | Stops `blocked`; the code stays on the worktree branch, not on `main` | Read the findings, fix by hand or drop |

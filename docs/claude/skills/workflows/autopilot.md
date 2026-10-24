@@ -20,7 +20,7 @@ Plan: `docs/plans/plan-autopilot.md` (design decisions D1–D7 referenced below)
 | Command | What happens |
 |---------|--------------|
 | `/autopilot <request>` | Plans the change, then stops twice for your answer: **Gate 1** (approve the plan) and **Gate 2** (push) |
-| `/autopilot docs/plans/plan-<x>.md [notes]` | Builds the open tasks of an existing plan (at most 6); planning is skipped |
+| `/autopilot docs/plans/plan-<x>.md [notes]` | Builds the open tasks of an existing plan (at most 8); planning is skipped |
 | `/autopilot --auto-push <request>` | Gate 1 still asks; Gate 2 pushes without asking when `scripts/claude-autopilot-autopush-check.sh` passes (no protected path, under the changed-line limit, clean tree), otherwise it asks |
 | `/autopilot --auto <request>` | Neither gate asks: Gate 1 goes on when the plan review approved, Gate 2 as with `--auto-push` |
 | `/autopilot --headless plan ...` or `build ...` |\|build ...` | Sent only by the GitHub workflow; on GitHub the gates are PR comments and issue labels (ADR-0022, ADR-0025) |
@@ -40,7 +40,7 @@ A flag counts only when you type it at the start of the command. It covers this 
 - Read the plan and its `TASKS.md` section, matched by the plan path or by the task IDs in the plan.
 - **Open tasks** = the plan's tasks not yet `[x]` in `TASKS.md`. Count only implementation tasks: owner-only QA or prod checks do not count and are not run.
 - **Refuse**, in one line pointing to `/swarm-execute`, when:
-  - there are **more than 6 open tasks** (one autopilot round must stay reviewable, ≤ ~400 LOC);
+  - there are **more than 8 open tasks** (one autopilot round must stay reviewable; raised from 6 on 2026-10-24);
   - any task is `[~]` (someone else is working on it);
   - the plan's Status is Done.
 - **No open tasks:** say so and stop.

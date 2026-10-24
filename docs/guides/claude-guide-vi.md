@@ -286,7 +286,7 @@ Plan ⇄ Plan review → [GATE 1: bạn duyệt plan] → Implement ⇄ Code rev
 | **Fix bug đã biết nguyên nhân**: biết sửa gì, cần thêm regression test | — |
 | Thay đổi chạm backend và/hoặc webapp, **kiểm tra được bằng test tự động** (JUnit, Vitest) | cả hai run ở trên |
 | Có quyết định kỹ thuật nhỏ cần ADR | Vẫn chạy được: bước Plan viết luôn ADR |
-| **Đã có plan** (từ `/swarm-plan` hoặc viết tay) với **≤ 6 task chưa làm** | `/autopilot docs/plans/plan-x.md`: bỏ qua bước Plan, vẫn chạy Plan review và Gate 1, chỉ làm các task còn `[ ]` trong `TASKS.md` |
+| **Đã có plan** (từ `/swarm-plan` hoặc viết tay) với **≤ 8 task chưa làm** | `/autopilot docs/plans/plan-x.md`: bỏ qua bước Plan, vẫn chạy Plan review và Gate 1, chỉ làm các task còn `[ ]` trong `TASKS.md` |
 
 ### ⚠️ Trường hợp không nên dùng (dùng flow khác)
 
@@ -307,7 +307,7 @@ Plan ⇄ Plan review → [GATE 1: bạn duyệt plan] → Implement ⇄ Code rev
 | Tình huống | Autopilot làm gì | Bạn làm gì |
 |-----------|------------------|-----------|
 | **Scope guard**: yêu cầu cần PRD/PR-FAQ | **Từ chối** ngay, trước khi plan, báo một dòng và chỉ sang `/scope` | Chạy `/scope`, hoặc thu nhỏ yêu cầu rồi chạy lại |
-| **Plan mode**: plan có > 6 task chưa làm, có task đang `[~]`, hoặc plan đã Done | **Từ chối**, chỉ sang `/swarm-execute` | Dùng `/swarm-execute`, hoặc tách plan nhỏ hơn |
+| **Plan mode**: plan có > 8 task chưa làm, có task đang `[~]`, hoặc plan đã Done | **Từ chối**, chỉ sang `/swarm-execute` | Dùng `/swarm-execute`, hoặc tách plan nhỏ hơn |
 | **Plan mode**: plan không còn task nào chưa làm | Báo và dừng | — |
 | Plan review vẫn `revise` sau 3 round | Dừng, `session.txt` chuyển `status: blocked`, liệt kê các lỗi blocking còn mở | Sửa yêu cầu hoặc tự quyết các điểm đang vướng |
 | Code review vẫn `revise` sau 3 round | Dừng `blocked`; code nằm trên worktree branch, chưa vào `main` | Xem các finding, quyết định sửa tay hay bỏ |
