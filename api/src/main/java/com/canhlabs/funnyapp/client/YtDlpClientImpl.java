@@ -40,7 +40,12 @@ public class YtDlpClientImpl implements YtDlpClient {
 
     static final String PROGRESS_TEMPLATE =
             "download:%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s";
-    static final String FORMAT = "bv*[height<=720][ext=mp4]+ba[ext=m4a]/b[height<=720]/b";
+    /**
+     * Facebook's progressive hd/sd are H.264+AAC while its DASH video is VP9 (HLS rejects it); on YouTube avc1 is
+     * preferred. The plain fallbacks keep the previous behaviour when no H.264 exists. Size is bounded by "-S res:720".
+     */
+    static final String FORMAT = "hd/sd/bv*[vcodec^=avc1]+ba[ext=m4a]/bv*[ext=mp4]+ba[ext=m4a]/b";
+    static final String FORMAT_SORT = "res:720";
     static final int TAIL_LINES = 20;
     static final String EXTRACTORS = "youtube,youtube:.*,facebook,facebook:.*";
     /** "242K views · 5.4K reactions | " prefix Facebook puts in front of reel titles. */
@@ -132,6 +137,8 @@ public class YtDlpClientImpl implements YtDlpClient {
         cmd.add(PROGRESS_TEMPLATE);
         cmd.add("-f");
         cmd.add(FORMAT);
+        cmd.add("-S");
+        cmd.add(FORMAT_SORT);
         cmd.add("--merge-output-format");
         cmd.add("mp4");
         cmd.add("--max-filesize");

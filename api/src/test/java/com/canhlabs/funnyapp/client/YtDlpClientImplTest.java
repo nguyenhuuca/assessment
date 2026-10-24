@@ -63,11 +63,24 @@ class YtDlpClientImplTest {
                 "--no-cache-dir", "--socket-timeout", "30",
                 "--newline", "--progress-template",
                 "download:%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s",
-                "-f", "bv*[height<=720][ext=mp4]+ba[ext=m4a]/b[height<=720]/b",
+                "-f", "hd/sd/bv*[vcodec^=avc1]+ba[ext=m4a]/bv*[ext=mp4]+ba[ext=m4a]/b",
+                "-S", "res:720",
                 "--merge-output-format", "mp4",
                 "--max-filesize", "1G", "--match-filter", "!is_live",
                 "-o", jobDir.resolve("video.%(ext)s").toString(),
                 "--", URL);
+    }
+
+    @Test
+    void download_formatPrefersH264_andSortsBySmallerSide() {
+        assertThat(YtDlpClientImpl.FORMAT).startsWith("hd/sd/").contains("vcodec^=avc1");
+        List<String> cmd = new ArrayList<>();
+        cmd.add("-f");
+        cmd.add(YtDlpClientImpl.FORMAT);
+        cmd.add("-S");
+        cmd.add(YtDlpClientImpl.FORMAT_SORT);
+        assertThat(cmd.indexOf("-S")).isEqualTo(cmd.indexOf("-f") + 2);
+        assertThat(YtDlpClientImpl.FORMAT_SORT).isEqualTo("res:720");
     }
 
     @Test
