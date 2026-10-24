@@ -11,6 +11,8 @@ import org.mockito.MockitoAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class PermissionServiceImplTest {
@@ -139,5 +141,40 @@ class PermissionServiceImplTest {
     private void flagOff() {
         when(featureFlagService.isEnabled(eq(AppConstant.Flags.PERMISSION_ENFORCEMENT), anyBoolean()))
                 .thenReturn(false);
+    }
+
+    // ── enforcement flag cache ─────────────────────────────────────────────────
+
+    @Test
+    void manyChecks_readTheFlagOnce() {
+        for (int i = 0; i < 20; i++) {
+            service.hasPermission(Permission.READ.getBit(), Permission.READ);
+            service.hasAllPermissions(Permission.READ.getBit(), new Permission[]{Permission.READ});
+            service.hasAnyPermission(Permission.READ.getBit(), new Permission[]{Permission.READ});
+        }
+
+        verify(featureFlagService, times(1)).isEnabled(AppConstant.Flags.PERMISSION_ENFORCEMENT, false);
+    }
+
+    @Test
+    void flagOff_cachedAndEverythingAllowed() {
+        when(featureFlagService.isEnabled(eq(AppConstant.Flags.PERMISSION_ENFORCEMENT), anyBoolean()))
+                .thenReturn(false);
+        PermissionServiceImpl off = new PermissionServiceImpl();
+        off.injectFeatureFlagService(featureFlagService);
+
+        assertThat(off.hasPermission(0, Permission.ADMIN)).isTrue();
+        assertThat(off.hasAllPermissions(0, new Permission[]{Permission.ADMIN})).isTrue();
+        assertThat(off.hasAnyPermission(0, new Permission[]{Permission.ADMIN})).isTrue();
+        verify(featureFlagService, times(1)).isEnabled(AppConstant.Flags.PERMISSION_ENFORCEMENT, false);
+    }
+
+    @Test
+    void flagLookupFails_fallsBackToDirectLookup() {
+        when(featureFlagService.isEnabled(eq(AppConstant.Flags.PERMISSION_ENFORCEMENT), anyBoolean()))
+                .thenThrow(new IllegalStateException("db down"))
+                .thenReturn(true);
+
+        assertThat(service.hasPermission(Permission.READ.getBit(), Permission.READ)).isTrue();
     }
 }
