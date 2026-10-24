@@ -377,7 +377,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../plans/plan-hls-migration/" class="md-tabs__link">
+        <a href="../../plans/plan-react-migration/" class="md-tabs__link">
           
   
   
@@ -1075,8 +1075,6 @@
       
         
       
-        
-      
     
     
     
@@ -1251,34 +1249,6 @@
     
   
     0005 - LRU Video Cache
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../adr/0006-hls-video-streaming/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0006 - HLS Video Streaming
   
 
     
@@ -2715,8 +2685,6 @@
       
         
       
-        
-      
     
     
     
@@ -2763,34 +2731,6 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../plans/plan-hls-migration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    HLS Migration
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
             
               
                 
@@ -7660,11 +7600,6 @@ Superseded-by: -</p>
 <td>Accepted</td>
 </tr>
 <tr>
-<td><a href="../../adr/0006-hls-video-streaming/">ADR-0006</a></td>
-<td>Switch to HLS for Local Video Streaming</td>
-<td>Proposed</td>
-</tr>
-<tr>
 <td><a href="../../adr/0007-admin-dashboard/">ADR-0007</a></td>
 <td>Admin Dashboard — Content &amp; Account Management</td>
 <td>Accepted</td>
@@ -7752,7 +7687,6 @@ Superseded-by: -</p>
 
     subgraph "Backend Platform"
         ADR2[ADR-0002&lt;br/&gt;Spring Boot + Virtual Threads]
-        ADR6[ADR-0006&lt;br/&gt;HLS Streaming]
         ADR9[ADR-0009&lt;br/&gt;Unified Video List API]
         ADR11[ADR-0011&lt;br/&gt;Hot Video Priority]
         ADR10[ADR-0010&lt;br/&gt;Trivy CI Scanning]
@@ -7786,7 +7720,6 @@ Superseded-by: -</p>
     ADR2 --&gt; ADR1
     ADR3 --&gt; ADR2
     ADR5 --&gt; ADR3
-    ADR6 --&gt; ADR5
     ADR9 --&gt; ADR2
     ADR9 --&gt; ADR5
     ADR11 --&gt; ADR5
@@ -7810,7 +7743,7 @@ Superseded-by: -</p>
 
     classDef proposed stroke-dasharray: 5 5
     classDef superseded fill:#eee,color:#888,stroke:#bbb
-    class ADR6,ADR9 proposed
+    class ADR9 proposed
     class ADR4,ADR13,ADR14 superseded</code></pre>
 
 
