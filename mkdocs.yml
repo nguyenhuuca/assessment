@@ -74,7 +74,6 @@ nav:
       - 0003 - Cache Strategy: adr/0003-use-cache.md
       - 0004 - Frontend Structure: adr/0004-frontend-structure.md
       - 0005 - LRU Video Cache: adr/0005-use_lru_cache_video_streaming.md
-      - 0006 - HLS Video Streaming: adr/0006-hls-video-streaming.md
       - 0007 - Admin Dashboard: adr/0007-admin-dashboard.md
       - 0008 - React Migration: adr/0008-react-migration.md
       - 0009 - Unified Video List API: adr/0009-unified-video-list-api.md
@@ -124,7 +123,6 @@ nav:
       - Watch History (v2): sequence/sequence-watch-history-v2.md
 
   - Plans:
-      - HLS Migration: plans/plan-hls-migration.md
       - React Migration: plans/plan-react-migration.md
       - Admin Dashboard: plans/plan-admin-dashboard.md
       - Permissions (Bitwise): plans/plan-permissions-bitwise.md

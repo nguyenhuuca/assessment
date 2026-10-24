@@ -122,7 +122,6 @@ The following ADRs record the key decisions made for this system. Each links to 
 | [ADR-0003](../adr/0003-use-cache.md) | Use Guava Cache Initially, with Planned Migration to Redis | Accepted |
 | [ADR-0004](../adr/0004-frontend-structure.md) | Use Vanilla JS + Bootstrap with Planned Migration to React | Accepted (superseded by 0008) |
 | [ADR-0005](../adr/0005-use_lru_cache_video_streaming.md) | Use LRU Cache for Video Streaming | Accepted |
-| [ADR-0006](../adr/0006-hls-video-streaming.md) | Switch to HLS for Local Video Streaming | Proposed |
 | [ADR-0007](../adr/0007-admin-dashboard.md) | Admin Dashboard — Content & Account Management | Accepted |
 | [ADR-0008](../adr/0008-react-migration.md) | Migrate Frontend to React with Vite | Accepted |
 | [ADR-0009](../adr/0009-unified-video-list-api.md) | Unified Video List API for UI Display | Proposed |
@@ -153,7 +152,6 @@ graph TD
 
     subgraph "Backend Platform"
         ADR2[ADR-0002<br/>Spring Boot + Virtual Threads]
-        ADR6[ADR-0006<br/>HLS Streaming]
         ADR9[ADR-0009<br/>Unified Video List API]
         ADR11[ADR-0011<br/>Hot Video Priority]
         ADR10[ADR-0010<br/>Trivy CI Scanning]
@@ -187,7 +185,6 @@ graph TD
     ADR2 --> ADR1
     ADR3 --> ADR2
     ADR5 --> ADR3
-    ADR6 --> ADR5
     ADR9 --> ADR2
     ADR9 --> ADR5
     ADR11 --> ADR5
@@ -211,6 +208,6 @@ graph TD
 
     classDef proposed stroke-dasharray: 5 5
     classDef superseded fill:#eee,color:#888,stroke:#bbb
-    class ADR6,ADR9 proposed
+    class ADR9 proposed
     class ADR4,ADR13,ADR14 superseded
 ```

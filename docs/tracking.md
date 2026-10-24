@@ -25,7 +25,6 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Cache Strategy** | — | [0003 ✅](adr/0003-use-cache.md) | — | — | — | — | ✅ | Guava LRU |
 | **Frontend Structure** | — | [0004 ✅](adr/0004-frontend-structure.md) | — | — | — | — | ✅ | Vanilla JS → React |
 | **LRU Video Cache** | — | [0005 ✅](adr/0005-use_lru_cache_video_streaming.md) | — | — | — | — | ✅ | Video chunk caching |
-| **HLS Video Streaming** | — | [0006 💡](adr/0006-hls-video-streaming.md) | — | — | [Plan 📋](plans/plan-hls-migration.md) | — | 🔍 | |
 | **Admin Dashboard** | — | [0007 ✅](adr/0007-admin-dashboard.md) | — | — | [Plan 🔄](plans/plan-admin-dashboard.md) | — | 🔄 | |
 | **React Migration** | [PRD ✅](prd/PRD-react-migration.md) | [0008 ✅](adr/0008-react-migration.md) | — | [Seq ✅](sequence/sequence-react-migration.md) | [Plan](plans/plan-react-migration.md) | — | ✅ | |
 | **Unified Video List API** | — | [0009 💡](adr/0009-unified-video-list-api.md) | — | — | — | — | 🔍 | |
@@ -87,9 +86,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
 - [Admin Drive Force Sync](plans/plan-admin-drive-force-sync.md)
 
-### 🔍 In Review (7)
+### 🔍 In Review (6)
 - [Video Suggestions](plans/plan-video-suggestions.md)
-- [HLS Video Streaming](plans/plan-hls-migration.md)
 - [Unified Video List API](adr/0009-unified-video-list-api.md)
 - [Hot Video Priority](plans/plan-hot-video-priority.md)
 - [Hot Score Migration](plans/plan-vid2-hot-score-migration.md)
@@ -110,7 +108,6 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0003 | Cache Strategy | ✅ Accepted |
 | 0004 | Frontend Structure | ✅ Accepted |
 | 0005 | LRU Video Cache | ✅ Accepted |
-| 0006 | HLS Video Streaming | 💡 Proposed |
 | 0007 | Admin Dashboard | ✅ Accepted |
 | 0008 | React Migration | ✅ Accepted |
 | 0009 | Unified Video List API | 💡 Proposed |
