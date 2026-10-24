@@ -147,7 +147,7 @@ class JwtProviderTest {
     void warmUp_signsAndParsesOnceWithTheConfiguredKey() {
         assertThatCode(() -> jwtProvider.warmUp()).doesNotThrowAnyException();
 
-        verify(appProperties, times(2)).getJwtSecretKey();
+        verify(appProperties, times(1)).getJwtSecretKey();
     }
 
     @Test
@@ -155,5 +155,20 @@ class JwtProviderTest {
         when(appProperties.getJwtSecretKey()).thenReturn("short");
 
         assertThatCode(() -> jwtProvider.warmUp()).doesNotThrowAnyException();
+    }
+
+    @Test
+    void secretIsReadOnceAcrossManyVerifications() {
+        JwtGenerationDto request = JwtGenerationDto.builder()
+                .payload(UserDetailDto.builder().id(3L).email("c@d.com").build())
+                .duration(3600000L)
+                .build();
+        String token = jwtProvider.generateToken(request).getToken();
+
+        for (int i = 0; i < 10; i++) {
+            assertThat(jwtProvider.verifyToken(token).getSuccessful()).isTrue();
+        }
+
+        verify(appProperties, times(1)).getJwtSecretKey();
     }
 }

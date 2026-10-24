@@ -9,6 +9,7 @@ import com.canhlabs.funnyapp.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -30,6 +31,9 @@ import static com.canhlabs.funnyapp.utils.AppUtils.getNonNull;
 @Slf4j
 public class JwtProvider {
     private AppProperties props;
+    // Built once from the configured secret; volatile so a racing double build in ensureInit() is harmless.
+    private volatile SecretKey signingKey;
+    private volatile JwtParser parser;
 
     @Autowired
     public void injectProps(AppProperties props) {
@@ -45,8 +49,9 @@ public class JwtProvider {
     @PostConstruct
     void warmUp() {
         try {
-            String token = Jwts.builder().subject("warm-up").signWith(getKey()).compact();
-            Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token);
+            ensureInit();
+            String token = Jwts.builder().subject("warm-up").signWith(signingKey).compact();
+            parser.parseSignedClaims(token);
         } catch (Exception e) {
             log.warn("JWT warm-up failed: {}", e.getMessage());
         }
@@ -59,11 +64,12 @@ public class JwtProvider {
      * @return token string
      */
     public TokenDto generateToken(JwtGenerationDto request) {
+        ensureInit();
         JwtBuilder jwtBuilder = Jwts.builder().claims(generatePayload(request.getPayload()));
         Date expireDate = getExpiredDate(request);
         jwtBuilder.expiration(expireDate);
         jwtBuilder.issuedAt(new Date());
-        String token = jwtBuilder.signWith(getKey()).compact();
+        String token = jwtBuilder.signWith(signingKey).compact();
         return TokenDto.builder()
                 .token(token)
                 .build();
@@ -79,9 +85,8 @@ public class JwtProvider {
     public JwtVerificationResultDto verifyToken(String token) throws UnauthorizedException {
         JwtVerificationResultDto rs = JwtVerificationResultDto.builder().build();
         try {
-            var claims = Jwts.parser()
-                    .verifyWith(getKey())
-                    .build()
+            ensureInit();
+            var claims = parser
                     .parseSignedClaims(token.replace("Bearer", ""));
             rs.setData(convertValue(claims.getPayload()));
             rs.setSuccessful(true);
@@ -112,12 +117,15 @@ public class JwtProvider {
 
 
     /**
-     * Using get jwt secret key from configure file, keys have to length = 32(256bit)
-     *
-     * @return Key  that use to sign when generate token
+     * Builds the signing key (secret from the configure file, length = 32 / 256 bit) and the parser once.
+     * Idempotent and called on every use, so a swallowed warm-up failure cannot leave them null.
      */
-    private SecretKey getKey() {
-        return Keys.hmacShaKeyFor(props.getJwtSecretKey().getBytes());
+    private void ensureInit() {
+        if (signingKey == null || parser == null) {
+            SecretKey key = Keys.hmacShaKeyFor(props.getJwtSecretKey().getBytes());
+            parser = Jwts.parser().verifyWith(key).build();
+            signingKey = key;
+        }
     }
 
     /**
