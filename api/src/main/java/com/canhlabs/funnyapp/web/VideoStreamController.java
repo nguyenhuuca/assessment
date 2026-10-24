@@ -36,6 +36,7 @@ import java.util.List;
 public class VideoStreamController {
     private static final long FIRST_CHUNK_SIZE = 256 * 1024L; // 256KB
     private static final long NEXT_CHUNK_SIZE = 512 * 1024L;  // 512KB
+    private static final long MAX_CHUNK_SIZE = 1024 * 1024L;  // 1MB, hard cap for any Range form
     private static final String HLS_PLAYLIST_TYPE = "application/vnd.apple.mpegurl";
     private static final String HLS_SEGMENT_TYPE = "video/mp2t";
     private static final String HLS_SEGMENT_CACHE = "public, max-age=31536000, immutable";
@@ -60,15 +61,17 @@ public class VideoStreamController {
         log.info("Incoming stream request for fileId: {}", fileId);
 
         long fileSize = videoService.getFileSize(fileId);
-        long start = 0;
-        long end = fileSize - 1;
 
         Range range = parseRangeHeader(rangeHeader, fileSize);
-        if (range != null) {
-            start = range.start();
-            end = range.end();
-            log.info("Streaming bytes {} to {}", start, end);
+        if (range == null) {
+            log.warn("Unsatisfiable range {} for fileId: {}", rangeHeader, fileId);
+            return ResponseEntity.status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
+                    .header(HttpHeaders.CONTENT_RANGE, "bytes */" + fileSize)
+                    .build();
         }
+        long start = range.start();
+        long end = range.end();
+        log.info("Streaming bytes {} to {}", start, end);
         StreamChunkResult streamRs = videoService.getPartialFileUsingRAF(fileId, start, end);
         InputStream stream = streamRs.getStream();
         StreamingResponseBody responseBody = outputStream -> {
@@ -154,25 +157,48 @@ public class VideoStreamController {
         }
     }
 
+    /**
+     * Parses the Range header into a range of at most {@link #MAX_CHUNK_SIZE} bytes.
+     * A missing header or one not starting with "bytes=" is treated as "bytes=0-";
+     * a multi-range header serves its first range only. Returns null when the range
+     * is malformed or cannot be satisfied (the caller answers 416).
+     */
     private Range parseRangeHeader(String rangeHeader, long fileSize) {
-        if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
-            log.info("Range header: {}", rangeHeader);
-            String[] ranges = rangeHeader.substring(6).split("-");
-            try {
-                long start = Long.parseLong(ranges[0]);
-                long end;
-                if (ranges.length > 1 && !ranges[1].isEmpty()) {
-                    end = Math.min(Long.parseLong(ranges[1]), fileSize - 1);
-                } else {
-                    long chunkSize = (start == 0) ? FIRST_CHUNK_SIZE : NEXT_CHUNK_SIZE;
-                    end = Math.min(start + chunkSize - 1, fileSize - 1);
-                }
-                return new Range(start, end);
-            } catch (NumberFormatException numE) {
-                log.error("NumberFormatException", numE);
-                log.warn("Invalid range format: {}, fallback to full stream", rangeHeader);
-            }
+        String spec = (rangeHeader != null && rangeHeader.startsWith("bytes="))
+                ? rangeHeader.substring(6).split(",")[0].trim()
+                : "0-";
+        int dash = spec.indexOf('-');
+        if (fileSize <= 0 || dash < 0) {
+            return null;
         }
-        return null;
+        String startPart = spec.substring(0, dash).trim();
+        String endPart = spec.substring(dash + 1).trim();
+        try {
+            if (startPart.isEmpty()) {
+                // suffix form bytes=-K: the last K bytes
+                long suffix = Long.parseLong(endPart);
+                if (suffix <= 0) {
+                    return null;
+                }
+                long length = Math.min(Math.min(suffix, MAX_CHUNK_SIZE), fileSize);
+                return new Range(fileSize - length, fileSize - 1);
+            }
+            long start = Long.parseLong(startPart);
+            if (start < 0 || start >= fileSize) {
+                return null;
+            }
+            if (endPart.isEmpty()) {
+                long chunkSize = (start == 0) ? FIRST_CHUNK_SIZE : NEXT_CHUNK_SIZE;
+                return new Range(start, Math.min(start + chunkSize - 1, fileSize - 1));
+            }
+            long end = Long.parseLong(endPart);
+            if (end < start) {
+                return null;
+            }
+            return new Range(start, Math.min(Math.min(end, start + MAX_CHUNK_SIZE - 1), fileSize - 1));
+        } catch (NumberFormatException numE) {
+            log.warn("Invalid range format: {}", rangeHeader);
+            return null;
+        }
     }
 }

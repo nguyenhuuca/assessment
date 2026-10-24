@@ -32,6 +32,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -51,6 +53,7 @@ class VideoStreamControllerTest {
     @InjectMocks VideoStreamController controller;
 
     private static final long FILE_SIZE = 1_000_000L;
+    private static final long MAX_CHUNK = 1024 * 1024L;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -103,53 +106,109 @@ class VideoStreamControllerTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         response.getBody().writeTo(out);
         assertThat(out.toByteArray()).isEqualTo("videodata".getBytes());
+        verify(videoService).getPartialFileUsingRAF("video1", 0L, 262_143L);
     }
 
     @Test
     void streamVideo_rangeNoEnd_start0_usesFirstChunkSize() throws IOException {
-        // bytes=0- → end = min(0 + 256KB - 1, fileSize-1)
         ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=0-");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
-        assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_RANGE)).contains("bytes 0-8/");
+        verify(videoService).getPartialFileUsingRAF("video1", 0L, 262_143L);
     }
 
     @Test
     void streamVideo_rangeNoEnd_nonZeroStart_usesNextChunkSize() throws IOException {
-        // bytes=262144- → end = min(262144 + 512KB - 1, fileSize-1)
         ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=262144-");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
+        verify(videoService).getPartialFileUsingRAF("video1", 262_144L, 786_431L);
     }
 
     @Test
     void streamVideo_explicitEnd_usesMin() throws IOException {
-        // bytes=0-1023 → end = min(1023, fileSize-1)
-        ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=0-1023");
+        controller.streamVideo("video1", "bytes=0-1023");
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
+        verify(videoService).getPartialFileUsingRAF("video1", 0L, 1023L);
     }
 
     @Test
     void streamVideo_endExceedsFileSize_cappedAtFileSize() throws IOException {
-        ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=0-9999999");
+        controller.streamVideo("video1", "bytes=10-9999999");
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
+        verify(videoService).getPartialFileUsingRAF("video1", 10L, FILE_SIZE - 1);
     }
 
     @Test
-    void streamVideo_invalidRangeFormat_fallsBackToFullRange() throws IOException {
-        // NumberFormatException caught → falls back to null range → full range
-        ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=abc-def");
+    void streamVideo_explicitEndBeyondMaxChunk_cappedAtOneMb() throws IOException {
+        when(videoService.getFileSize(any())).thenReturn(10_000_000L);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
+        controller.streamVideo("video1", "bytes=0-9999999");
+
+        verify(videoService).getPartialFileUsingRAF("video1", 0L, MAX_CHUNK - 1);
     }
 
     @Test
-    void streamVideo_rangeNotStartingWithBytes_treatedAsNoRange() throws IOException {
+    void streamVideo_suffixRange_returnsLastBytes() throws IOException {
+        controller.streamVideo("video1", "bytes=-500");
+
+        verify(videoService).getPartialFileUsingRAF("video1", FILE_SIZE - 500, FILE_SIZE - 1);
+    }
+
+    @Test
+    void streamVideo_suffixLargerThanMax_cappedAtOneMb() throws IOException {
+        when(videoService.getFileSize(any())).thenReturn(10_000_000L);
+
+        controller.streamVideo("video1", "bytes=-5000000");
+
+        verify(videoService).getPartialFileUsingRAF("video1", 10_000_000L - MAX_CHUNK, 9_999_999L);
+    }
+
+    @Test
+    void streamVideo_suffixLargerThanFile_startsAtZero() throws IOException {
+        when(videoService.getFileSize(any())).thenReturn(1000L);
+
+        controller.streamVideo("video1", "bytes=-5000");
+
+        verify(videoService).getPartialFileUsingRAF("video1", 0L, 999L);
+    }
+
+    @Test
+    void streamVideo_multiRange_servesFirstRangeOnly() throws IOException {
+        controller.streamVideo("video1", "bytes=0-99, 500-599");
+
+        verify(videoService).getPartialFileUsingRAF("video1", 0L, 99L);
+    }
+
+    @Test
+    void streamVideo_rangeNotStartingWithBytes_treatedAsOpenRange() throws IOException {
         ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "invalid-header");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
+        verify(videoService).getPartialFileUsingRAF("video1", 0L, 262_143L);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"bytes=abc-def", "bytes=5000-10", "bytes=1000000-", "bytes=2000000-2000010",
+            "bytes=-0", "bytes=-", "bytes=-abc", "bytes=100"})
+    void streamVideo_invalidOrUnsatisfiableRange_returns416WithoutReadingFile(String header) throws IOException {
+        ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", header);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+        assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_RANGE)).isEqualTo("bytes */" + FILE_SIZE);
+        assertThat(response.getBody()).isNull();
+        verify(videoService, never()).getPartialFileUsingRAF(any(), anyLong(), anyLong());
+    }
+
+    @Test
+    void streamVideo_emptyFile_returns416() throws IOException {
+        when(videoService.getFileSize(any())).thenReturn(0L);
+
+        ResponseEntity<StreamingResponseBody> response = controller.streamVideo("video1", "bytes=0-");
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+        assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_RANGE)).isEqualTo("bytes */0");
+        verify(videoService, never()).getPartialFileUsingRAF(any(), anyLong(), anyLong());
     }
 
     // ── /hls/{fileId}/... ─────────────────────────────────────────────────────
