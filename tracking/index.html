@@ -684,10 +684,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#done-21" class="md-nav__link">
+  <a href="#done-22" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✅ Done (21)
+        ✅ Done (22)
       
     </span>
   </a>
@@ -2681,6 +2681,8 @@
       
         
       
+        
+      
     
     
     
@@ -3331,6 +3333,34 @@
     
   
     BE Performance (Medium)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-pwa-basic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic PWA
   
 
     
@@ -4385,6 +4415,8 @@
       
         
       
+        
+      
     
     
     
@@ -4431,6 +4463,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reports/autopilot-2026-10-24-pwa-basic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2026-10-24 Basic PWA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -7965,10 +8025,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#done-21" class="md-nav__link">
+  <a href="#done-22" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✅ Done (21)
+        ✅ Done (22)
       
     </span>
   </a>
@@ -8482,6 +8542,17 @@
 <td>Opt-in HLS per video (SUPER_ADMIN toggle), single-job stream-copy worker with ffprobe + disk guard, Harness flag <code>hls_streaming_enabled</code> decides if <code>hlsUrl</code> is offered; Range stays as fallback. Replaces the deleted ADR-0006 draft. Done HL-1..HL-7 (<code>5c485b5f</code>..<code>64d66721</code>) by autopilot (<a href="../reports/autopilot-2026-10-24-hls-streaming/">report</a>); prod verified 2026-10-24 (49/60 videos H.264, 11 VP9 need re-import; HLS + Range fallback checked in browser)</td>
 </tr>
 <tr>
+<td><strong>Basic PWA</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-pwa-basic/">Plan ✅</a></td>
+<td>—</td>
+<td>✅</td>
+<td>Hand-written service worker (navigation shell + hashed assets only; API/video never intercepted), installable manifest + iOS meta, "new version" banner from polled <code>version.json</code>. No new dependency. Built by autopilot (<a href="../reports/autopilot-2026-10-24-pwa-basic/">report</a>); owner install check pending</td>
+</tr>
+<tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
 <td>—</td>
 <td><a href="../adr/0027-agent-self-improvement-loop/">0027 ✅</a></td>
@@ -8496,8 +8567,9 @@
 </table>
 <hr />
 <h2 id="status-summary">Status Summary<a class="headerlink" href="#status-summary" title="Permanent link">&para;</a></h2>
-<h3 id="done-21">✅ Done (21)<a class="headerlink" href="#done-21" title="Permanent link">&para;</a></h3>
+<h3 id="done-22">✅ Done (22)<a class="headerlink" href="#done-22" title="Permanent link">&para;</a></h3>
 <ul>
+<li><a href="../plans/plan-pwa-basic/">Basic PWA</a></li>
 <li><a href="../plans/plan-hls-streaming/">HLS Streaming</a></li>
 <li><a href="../adr/0001-use-relational-database/">Use RDBMS</a></li>
 <li><a href="../adr/0002-backend-architecture/">Backend Architecture</a></li>
@@ -8703,7 +8775,7 @@
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-24 — HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 
