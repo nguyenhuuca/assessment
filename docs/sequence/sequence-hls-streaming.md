@@ -3,7 +3,7 @@
 - **PRD:** [PRD-hls-streaming](../prd/PRD-hls-streaming.md)
 - **ADR:** [0031-hls-streaming](../adr/0031-hls-streaming.md)
 - **Spec:** [spec-hls-streaming](../specs/spec-hls-streaming.md)
-- **Status:** As-built (2026-10-24)
+- **Status:** As-built (2026-10-24; flows 3 and 4 updated for the feed cache, the Range cap and the full fallback triggers)
 
 ## 1. SUPER_ADMIN turns HLS on, worker transcodes (happy path)
 
@@ -82,68 +82,106 @@ sequenceDiagram
 
 ## 3. Viewer plays an HLS video (flag on)
 
-The server offers `hlsUrl` only when the flag is on and the rendition is READY. The player attaches HLS to its single video element (spec BR-8, BR-13, FR-9).
+The server offers `hlsUrl` only when the flag is on and the rendition is READY. The flag is read once per request and the feed list comes from a 30 s cache keyed by the flag value. The player attaches HLS to its single video element (spec BR-8, BR-13, FR-9).
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor V as Viewer (guest or signed in)
     participant FE as Browser (VideoPlayer.jsx + useHlsSource)
+    participant HJ as hls.js (lazy chunk)
     participant API as VideoStreamController
     participant S as StreamVideoServiceImpl
+    participant P as HlsPlaybackServiceImpl
     participant FF as FeatureFlagService (Harness)
+    participant FC as FeedCache (30 s, key = flag)
     participant DB as PostgreSQL (video_sources)
     participant FS as Disk (video-cache/hls)
 
     V->>FE: open feed
     FE->>API: GET /v1/funny-app/video-stream/list
     API->>S: getVideosToStream()
-    S->>FF: isEnabled(hls_streaming_enabled, false), once per request
-    FF-->>S: true
-    S->>DB: published, visible videos
-    S-->>API: VideoDto list, hlsUrl set where hls_status is READY
+    S->>P: hlsEnabled()
+    P->>FF: isEnabled(hls_streaming_enabled, false), once per request
+    FF-->>P: true
+    P-->>S: true
+    S->>FC: get(true, loader)
+    alt cache miss
+        FC->>DB: published, visible videos (partial feed index)
+        FC-->>S: VideoDto list, hlsUrl set where hls_status is READY
+    else cache hit
+        FC-->>S: cached unmodifiable list
+    end
+    S-->>API: VideoDto list
     API-->>FE: 200 list
     alt Safari or iOS (native HLS)
         FE->>FE: video.src = hlsUrl
+        FE->>API: GET /video-stream/hls/fileId/playlist.m3u8
     else other browsers
-        FE->>FE: import hls.js, attach to the video element
+        FE->>HJ: import hls.js, Hls.isSupported(), loadSource + attachMedia
+        HJ->>API: GET /video-stream/hls/fileId/playlist.m3u8
     end
-    FE->>API: GET /video-stream/hls/fileId/playlist.m3u8
-    API->>DB: READY and PUBLISHED and not hidden
-    API->>FS: read playlist.m3u8
+    API->>P: findPlaylist(fileId)
+    P->>DB: READY and PUBLISHED and not hidden
+    P->>FS: playlist.m3u8 exists
     API-->>FE: 200 application/vnd.apple.mpegurl, no-cache
     loop each segment
-        FE->>API: GET /video-stream/hls/fileId/seg_N.ts
+        HJ->>API: GET /video-stream/hls/fileId/seg_N.ts (on Safari the video element fetches it)
         API->>FS: FileSystemResource (no DB)
-        API-->>FE: 200 video/mp2t, immutable
+        API-->>HJ: 200 video/mp2t, immutable
     end
     FE->>FE: resume at startAt, report views and progress as today
 ```
 
 ## 4. Fallback to Range
 
-The player falls back on any HLS problem, and the flag off sends everyone to Range (spec EC-2, EC-10, EC-11, EC-12).
+Two ways a viewer ends up on Range: the server offers no `hlsUrl` (flag off, Harness unreachable, rendition not READY), or the player gives up on HLS for this video and switches the same `<video>` element to the Range URL (spec EC-2, EC-10, EC-11, EC-12; `webapp/src/hooks/useHlsSource.js`).
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant FE as Browser (VideoPlayer.jsx + useHlsSource)
+    participant HJ as hls.js (lazy chunk)
     participant API as VideoStreamController
     participant S as StreamVideoServiceImpl
+    participant P as HlsPlaybackServiceImpl
     participant FF as FeatureFlagService (Harness)
+    participant FC as FeedCache (30 s, key = flag)
 
-    alt flag off or Harness unreachable
+    alt server offers no hlsUrl
         FE->>API: GET /v1/funny-app/video-stream/list
-        S->>FF: isEnabled(hls_streaming_enabled, false)
-        FF-->>S: false (default when unreachable)
-        API-->>FE: every hlsUrl is null
-        FE->>API: GET /video-stream/stream/fileId with Range header
-        API-->>FE: 206 video/mp4
-    else fatal HLS error or playlist 404
-        FE->>FE: save currentTime, destroy the hls instance
-        FE->>API: GET /video-stream/stream/fileId with Range header
-        API-->>FE: 206 video/mp4
-        FE->>FE: on loadedmetadata restore currentTime and play state
+        API->>S: getVideosToStream()
+        S->>P: hlsEnabled()
+        P->>FF: isEnabled(hls_streaming_enabled, false)
+        FF-->>P: false (also the default when Harness is unreachable)
+        P-->>S: false
+        S->>FC: get(false, loader)
+        FC-->>S: list built with hlsUrl = null
+        S-->>API: VideoDto list
+        API-->>FE: 200, every hlsUrl is null (READY or not)
+        Note over FE: useHlsSource returns the Range URL, no hls.js is loaded
+    else player gives up on HLS for this video
+        alt hls.js path
+            FE->>HJ: import hls.js
+            HJ-->>FE: import fails, or Hls.isSupported() is false, or a fatal Hls.Events.ERROR (e.g. playlist 404, segment missing)
+        else native HLS (Safari, iOS)
+            FE->>API: GET /video-stream/hls/fileId/playlist.m3u8
+            API-->>FE: 404 or a broken segment
+            Note over FE: video element fires error
+        end
+        FE->>FE: fallback() once: keep currentTime and play state, destroy hls.js, remove the error listener
+        FE->>FE: failedUrl = hlsUrl, so HLS is not retried for this video (no loop)
+        Note over FE: src switches to the Range URL. If position > 0 or it was playing, restore on loadedmetadata. A video change drops a pending restore.
+    end
+
+    loop while the video plays or seeks
+        FE->>API: GET /video-stream/stream/fileId, Range bytes=N- or bytes=N-M
+        API->>API: getFileSize, then cap the range at 1 MB (first chunk 256 KB)
+        alt valid range
+            API-->>FE: 206 video/mp4, Content-Range, body read from disk inside the response
+        else malformed or unsatisfiable range
+            API-->>FE: 416, Content-Range bytes */size
+        end
     end
 ```
 
