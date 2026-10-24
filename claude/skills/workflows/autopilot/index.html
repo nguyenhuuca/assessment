@@ -1385,6 +1385,8 @@
       
         
       
+        
+      
     
     
     
@@ -1712,6 +1714,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../prd/PRD-hls-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1730,6 +1760,8 @@
       
         
           
+        
+      
         
       
         
@@ -1938,6 +1970,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../specs/spec-hls-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1956,6 +2016,8 @@
       
         
           
+        
+      
         
       
         
@@ -2109,6 +2171,34 @@
     
   
     Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../sequence/sequence-hls-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Streaming
   
 
     
@@ -2389,6 +2479,8 @@
   
     
     
+      
+        
       
         
       
@@ -3030,6 +3122,34 @@
     
   
     Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../plans/plan-hls-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Streaming
   
 
     
@@ -7440,7 +7560,7 @@
 </tr>
 <tr>
 <td><code>/autopilot docs/plans/plan-&lt;x&gt;.md [notes]</code></td>
-<td>Builds the open tasks of an existing plan (at most 6); planning is skipped</td>
+<td>Builds the open tasks of an existing plan (at most 8); planning is skipped</td>
 </tr>
 <tr>
 <td><code>/autopilot --auto-push &lt;request&gt;</code></td>
@@ -7470,7 +7590,7 @@
 <li>Read the plan and its <code>TASKS.md</code> section, matched by the plan path or by the task IDs in the plan.</li>
 <li><strong>Open tasks</strong> = the plan's tasks not yet <code>[x]</code> in <code>TASKS.md</code>. Count only implementation tasks: owner-only QA or prod checks do not count and are not run.</li>
 <li><strong>Refuse</strong>, in one line pointing to <code>/swarm-execute</code>, when:<ul>
-<li>there are <strong>more than 6 open tasks</strong> (one autopilot round must stay reviewable, ≤ ~400 LOC);</li>
+<li>there are <strong>more than 8 open tasks</strong> (one autopilot round must stay reviewable; raised from 6 on 2026-10-24);</li>
 <li>any task is <code>[~]</code> (someone else is working on it);</li>
 <li>the plan's Status is Done.</li>
 </ul>

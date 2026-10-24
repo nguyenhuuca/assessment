@@ -1379,6 +1379,8 @@
       
         
       
+        
+      
     
     
     
@@ -1706,6 +1708,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prd/PRD-hls-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1724,6 +1754,8 @@
       
         
           
+        
+      
         
       
         
@@ -1932,6 +1964,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../specs/spec-hls-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1950,6 +2010,8 @@
       
         
           
+        
+      
         
       
         
@@ -2103,6 +2165,34 @@
     
   
     Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sequence/sequence-hls-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Streaming
   
 
     
@@ -2383,6 +2473,8 @@
   
     
     
+      
+        
       
         
       
@@ -3024,6 +3116,34 @@
     
   
     Contributor Autopilot Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan-hls-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HLS Streaming
   
 
     
@@ -7241,7 +7361,7 @@ Handoff to: Builder, QA Engineer
 <li><strong>Skipped:</strong> only the Plan stage.</li>
 <li><strong>Kept:</strong> Plan review (that plan has not been through a reviewer yet) and Gate 1. Without them, autopilot would just be <code>/swarm-execute</code>.</li>
 <li><strong>Scope:</strong> only tasks still <code>[ ]</code> in <code>TASKS.md</code>. Owner-only QA/prod checks are not counted or run.</li>
-<li><strong>Refused (→ <code>/swarm-execute</code>):</strong> more than 6 open tasks, any task <code>[~]</code>, or the plan's Status is Done.</li>
+<li><strong>Refused (→ <code>/swarm-execute</code>):</strong> more than 8 open tasks (6 until 2026-10-24), any task <code>[~]</code>, or the plan's Status is Done.</li>
 </ul>
 </li>
 <li><strong>D9 — Exact cost (added 2026-10-19).</strong> <code>scripts/claude-cost.mjs</code> prices every API request found in the session transcripts (<code>~/.claude/projects/&lt;project&gt;/&lt;session&gt;.jsonl</code> + <code>subagents/*.jsonl</code>). It dedupes by <code>message.id</code> and uses the cache write 5m/1h split, the Haiku long-prompt tier, fast mode and US-geo. Prices come from <code>scripts/claude-pricing.json</code> (pricing page, read 2026-10-19). It replaces the ≈$ estimate, which was too low because Agent result token totals miss repeated cache reads.</li>
