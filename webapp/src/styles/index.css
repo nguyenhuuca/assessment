@@ -960,6 +960,10 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 .app-btn.danger   { background: #b92902; color: #fff; }
 .app-btn.success  { background: #006940; color: #fff; }
 .app-btn.back     { background: var(--text); color: var(--bg); }
+/* Outlined secondary action (e.g. Create collection) so it never reads as the filled Play button.
+   Inset shadow instead of a border keeps the height of the other buttons. */
+.app-btn.outline  { background: transparent; color: var(--accent-cyan); box-shadow: inset 0 0 0 1.5px var(--accent-cyan); }
+.app-btn.outline:not(:disabled):hover { background: var(--accent-cyan-dim); opacity: 1; }
 
 /* ── App tabs ── */
 .app-tabs {

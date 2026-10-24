@@ -432,7 +432,7 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
         <div className="explore-section-header" style={{ gap: 8 }}>
           <h2 className="explore-section-title">{t('mine')}</h2>
           {isLoggedIn && (
-            <button className="app-btn primary" onClick={() => setFormState({})}>
+            <button className="app-btn outline" onClick={() => setFormState({})}>
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span> {t('create')}
             </button>
           )}

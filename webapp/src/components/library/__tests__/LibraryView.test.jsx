@@ -56,6 +56,16 @@ describe('LibraryView', () => {
     expect(screen.queryByText('Công khai', { selector: 'label' })).toBeNull()
   })
 
+  it('Create collection is an outline button, unlike the filled Play button', async () => {
+    auth = { isLoggedIn: true, user: { id: 1 } }
+    renderView()
+    const create = await screen.findByRole('button', { name: /Tạo collection/ })
+    expect(create.className).toContain('outline')
+    expect(create.className).not.toContain('primary')
+    const play = await screen.findByRole('button', { name: 'Phát Hài tuyển chọn' })
+    expect(play.className).toContain('primary')
+  })
+
   it('guest can open a collection from a deep link', async () => {
     renderView({ initialCollectionId: 'p1' })
     expect(await screen.findByLabelText('Clip')).toBeTruthy()
