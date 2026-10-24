@@ -1,0 +1,60 @@
+/* Zoom / pan / fullscreen wrapper for Mermaid diagrams (see javascripts/diagram-zoom.js) */
+.diagram-zoom {
+  margin: 1em 0;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 4px;
+  background: var(--md-default-bg-color);
+}
+
+.diagram-zoom__bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  padding: 0.25rem 0.4rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.diagram-zoom__btn {
+  min-width: 1.8rem;
+  padding: 0.1rem 0.45rem;
+  font: inherit;
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color);
+  background: var(--md-default-fg-color--lightest);
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.diagram-zoom__btn:hover { background: var(--md-accent-fg-color--transparent); }
+
+.diagram-zoom__label {
+  min-width: 3rem;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.diagram-zoom__view {
+  overflow: auto;
+  max-height: 80vh;
+  cursor: grab;
+}
+
+.diagram-zoom__view.is-dragging { cursor: grabbing; user-select: none; }
+
+.diagram-zoom__stage { transform-origin: 0 0; }
+.diagram-zoom__stage .mermaid { margin: 0; }
+
+.diagram-zoom:fullscreen {
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  border-radius: 0;
+}
+
+.diagram-zoom:fullscreen .diagram-zoom__view {
+  flex: 1;
+  max-height: none;
+}
