@@ -1,7 +1,7 @@
-task: HLS streaming for selected videos (ADR-0031), autopilot plan mode
+task: yt-dlp H.264 import format + codec log on UNSUPPORTED_CODEC (autopilot lite)
 status: done
 progress: 100
-done: HL-1 schema+repo 5c485b5f; HL-2 storage+ffmpeg 36cb446f; HL-3 worker 7ad4750d; HL-4 admin+hooks 61e7b83a; HL-5 endpoints+hlsUrl cbc6b067; HL-6 player 23b6066c; HL-7 admin UI 74a24c48
+done: YT-1 yt-dlp format H.264 ~720p 7648747e; HC-1 codec log on UNSUPPORTED_CODEC 53e9268b
 next: -
-plan: docs/plans/plan-hls-streaming.md
-updated: 2026-10-24 11:08
+plan: -
+updated: 2026-10-24 11:40

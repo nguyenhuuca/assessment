@@ -527,3 +527,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **HL-5** BE: public playlist/segment endpoints, `hlsUrl` in DTOs with flag read once per request (after HL-1, HL-2) cbc6b067
 - [x] **HL-6** FE: `hls.js@1.7.3`, `useHlsSource` with Range fallback in `VideoPlayer`, swiper preload rule 23b6066c 1e436475
 - [x] **HL-7** FE: admin HLS column, SA toggle, auto refetch, en/vi (after HL-4) 74a24c48 1e436475
+
+## Lite: yt-dlp H.264 import format (2026-10-24, autopilot lite, no plan file)
+
+- [x] **YT-1** BE: yt-dlp FORMAT `hd/sd/bv*[vcodec^=avc1]+ba[ext=m4a]/...` + `-S res:720` (Facebook progressive H.264, YouTube avc1, ~720p by the smaller side) 7648747e
+- [x] **HC-1** BE: WARN log `video=[..] audio=[..]` when HLS refuses a source with UNSUPPORTED_CODEC 53e9268b
