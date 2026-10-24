@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.VideoStatus;
@@ -28,6 +29,12 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     private ChatGptService chatGptService;
     private VideoCache videoCache;
     private HlsPlaybackService hlsPlaybackService;
+    private FeedCache feedCache;
+
+    @Autowired
+    public void injectFeedCache(FeedCache feedCache) {
+        this.feedCache = feedCache;
+    }
 
     @Autowired
     public void injectHlsPlaybackService(HlsPlaybackService hlsPlaybackService) {
@@ -79,10 +86,10 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     @Override
     public List<VideoDto> getVideosToStream() {
         boolean hlsEnabled = hlsPlaybackService.hlsEnabled();
-        return videoSourceRepository
+        return feedCache.get(hlsEnabled, () -> videoSourceRepository
                 .findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED).stream()
                 .map(v -> toDto(v, hlsEnabled))
-                .toList();
+                .toList());
     }
 
     @WithSpan
@@ -111,6 +118,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
             String desc = chatGptService.makePoem(source.getTitle());
             source.setDesc(desc);
             videoSourceRepository.save(source);
+            feedCache.invalidate();
             log.info("Updated description for video ID: {}", source.getId());
         }
     }

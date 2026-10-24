@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
+import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.client.FfmpegHlsClient;
 import com.canhlabs.funnyapp.client.FfmpegHlsClient.ProbeResult;
 import com.canhlabs.funnyapp.config.AppProperties;
@@ -57,6 +58,7 @@ class HlsTranscodeWorkerTest {
 
     @Mock VideoSourceRepository repo;
     @Mock FfmpegHlsClient ffmpeg;
+    @Mock FeedCache feedCache;
 
     private final DriveFileLocks locks = new DriveFileLocks();
     private final Map<Long, VideoSource> rows = new HashMap<>();
@@ -107,7 +109,7 @@ class HlsTranscodeWorkerTest {
     }
 
     private HlsTranscodeWorker newWorker() {
-        HlsTranscodeWorker w = new HlsTranscodeWorker(props, repo, storage, ffmpeg, locks, Runnable::run, cacheDir);
+        HlsTranscodeWorker w = new HlsTranscodeWorker(props, repo, storage, ffmpeg, locks, feedCache, Runnable::run, cacheDir);
         w.markReady();
         return w;
     }
@@ -137,6 +139,7 @@ class HlsTranscodeWorkerTest {
         assertThat(storage.resolvePlaylist(FILE)).exists();
         assertThat(storage.tmpDir(FILE)).doesNotExist();
         verify(ffmpeg).segment(eq(cacheDir.resolve(FILE + ".full")), eq(storage.tmpDir(FILE)), eq(Duration.ofMinutes(10)));
+        verify(feedCache).invalidate();
     }
 
     @Test
@@ -274,6 +277,7 @@ class HlsTranscodeWorkerTest {
         assertThat(row.getHlsStatus()).isEqualTo(HlsStatus.NONE);
         assertThat(storage.dir(FILE)).doesNotExist();
         assertThat(storage.tmpDir(FILE)).doesNotExist();
+        verify(feedCache, never()).invalidate();
     }
 
     @Test
@@ -299,7 +303,7 @@ class HlsTranscodeWorkerTest {
 
     @Test
     void drain_notReady_doesNothing() {
-        HlsTranscodeWorker cold = new HlsTranscodeWorker(props, repo, storage, ffmpeg, locks, Runnable::run, cacheDir);
+        HlsTranscodeWorker cold = new HlsTranscodeWorker(props, repo, storage, ffmpeg, locks, feedCache, Runnable::run, cacheDir);
 
         cold.drain();
         cold.wakeUp();
@@ -416,7 +420,7 @@ class HlsTranscodeWorkerTest {
         VideoSource pending = source(ID, FILE, HlsStatus.PENDING);
         when(repo.findHlsQueue()).thenReturn(List.of(pending));
         when(repo.claimHls(ID)).thenReturn(1);
-        HlsTranscodeWorker w = new HlsTranscodeWorker(props, repo, storage, ffmpeg, locks, r -> {
+        HlsTranscodeWorker w = new HlsTranscodeWorker(props, repo, storage, ffmpeg, locks, feedCache, r -> {
             throw new RejectedExecutionException("full");
         }, cacheDir);
         w.markReady();
@@ -456,7 +460,7 @@ class HlsTranscodeWorkerTest {
         when(repo.findBySourceId("orphan")).thenReturn(Optional.empty());
         when(repo.findBySourceId("notReady")).thenReturn(Optional.of(notReady));
         when(repo.findHlsQueue()).thenReturn(List.of());
-        HlsTranscodeWorker fresh = new HlsTranscodeWorker(props, repo, storage, ffmpeg, locks, Runnable::run, cacheDir);
+        HlsTranscodeWorker fresh = new HlsTranscodeWorker(props, repo, storage, ffmpeg, locks, feedCache, Runnable::run, cacheDir);
 
         fresh.onApplicationReady();
 
@@ -466,13 +470,14 @@ class HlsTranscodeWorkerTest {
         assertThat(storage.dir("orphan")).doesNotExist();
         assertThat(storage.dir("notReady")).doesNotExist();
         verify(repo).markHlsOutputMissing(ID);
+        verify(feedCache, times(1)).invalidate();
         verify(repo, never()).markHlsOutputMissing(1L);
     }
 
     @Test
     void onApplicationReady_recoveryFailure_stillBecomesReady() {
         when(repo.resetHlsProcessing()).thenThrow(new IllegalStateException("db down"));
-        HlsTranscodeWorker fresh = new HlsTranscodeWorker(props, repo, storage, ffmpeg, locks, Runnable::run, cacheDir);
+        HlsTranscodeWorker fresh = new HlsTranscodeWorker(props, repo, storage, ffmpeg, locks, feedCache, Runnable::run, cacheDir);
 
         fresh.onApplicationReady();
         fresh.drain();

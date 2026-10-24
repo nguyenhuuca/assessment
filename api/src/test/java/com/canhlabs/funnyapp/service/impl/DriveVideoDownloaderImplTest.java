@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
+import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.entity.VideoSource;
@@ -51,6 +52,7 @@ class DriveVideoDownloaderImplTest {
     VideoSourceRepository videoSourceRepository = mock(VideoSourceRepository.class);
     HlsStorage hlsStorage = mock(HlsStorage.class);
     HlsTranscodeWorker hlsWorker = mock(HlsTranscodeWorker.class);
+    FeedCache feedCache = mock(FeedCache.class);
     AppProperties.VideoImport videoImport = new AppProperties.VideoImport();
 
     DriveVideoDownloaderImpl downloader;
@@ -64,7 +66,7 @@ class DriveVideoDownloaderImplTest {
         when(drive.files()).thenReturn(driveFiles);
         when(driveFiles.get("f1")).thenReturn(getReq);
         downloader = new DriveVideoDownloaderImpl(drive, ffmpegService, appProps, videoCache, locks,
-                videoSourceRepository, hlsStorage, hlsWorker, cacheDir);
+                videoSourceRepository, hlsStorage, hlsWorker, feedCache, cacheDir);
     }
 
     private void driveServes(String content) throws IOException {
@@ -115,6 +117,7 @@ class DriveVideoDownloaderImplTest {
         }
         verify(hlsStorage, times(2)).delete("f1");
         verify(hlsWorker, times(2)).wakeUp();
+        verify(feedCache, times(2)).invalidate();
     }
 
     @Test

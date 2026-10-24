@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
+import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.event.VideoIngestedEvent;
@@ -57,6 +58,7 @@ class VideoStorageServiceImplTest {
     @Mock ChatGptService chatGptService;
     @Mock Drive drive;
     @Mock ApplicationEventPublisher eventPublisher;
+    @Mock FeedCache feedCache;
 
     @InjectMocks VideoStorageServiceImpl service;
 
@@ -70,6 +72,7 @@ class VideoStorageServiceImplTest {
         service.injectDriveFileLocks(driveFileLocks);
         service.injectVideoAccessService(videoAccessService);
         service.injectCacheStatsService(statsCache);
+        service.injectFeedCache(feedCache);
     }
 
     // ── getFileSizeFromDisk ─────────────────────────────────────────────────────
@@ -511,5 +514,33 @@ class VideoStorageServiceImplTest {
         service.upsertInfo("f2", "Title", "thumb");
 
         verify(videoSourceRepository).upsertDriveSource(any(), eq("f2"), eq("Title"), eq("A poem"), eq("thumb"));
+    }
+
+    @Test
+    void saveInfo_newRow_invalidatesFeedCache() {
+        when(videoSourceRepository.existsBySourceId("file9")).thenReturn(false);
+        when(videoSourceRepository.save(any(VideoSource.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        service.saveInfo("file9", "T", "thumb");
+
+        verify(feedCache).invalidate();
+    }
+
+    @Test
+    void saveInfo_existingRow_leavesFeedCache() {
+        when(videoSourceRepository.existsBySourceId("file9")).thenReturn(true);
+
+        service.saveInfo("file9", "T", "thumb");
+
+        verify(feedCache, never()).invalidate();
+    }
+
+    @Test
+    void upsertInfo_invalidatesFeedCache() {
+        when(videoSourceRepository.findBySourceId("f3")).thenReturn(java.util.Optional.empty());
+
+        service.upsertInfo("f3", "Title", "thumb");
+
+        verify(feedCache).invalidate();
     }
 }

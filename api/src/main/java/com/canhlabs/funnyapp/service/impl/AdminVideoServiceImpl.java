@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
+import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
@@ -35,6 +36,12 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     private HlsStorage hlsStorage;
     private HlsTranscodeWorker hlsWorker;
     private DriveFileLocks driveFileLocks;
+    private FeedCache feedCache;
+
+    @Autowired
+    public void injectFeedCache(FeedCache feedCache) {
+        this.feedCache = feedCache;
+    }
 
     @Autowired
     public void injectHlsStorage(HlsStorage hlsStorage) {
@@ -85,6 +92,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
         source.setStatus(status);
         videoSourceRepository.save(source);
+        feedCache.invalidate();
     }
 
     @Override
@@ -94,6 +102,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
         source.setPriority(priority);
         videoSourceRepository.save(source);
+        feedCache.invalidate();
     }
 
     @Override
@@ -102,6 +111,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
         source.setHide(hidden);
         videoSourceRepository.save(source);
+        feedCache.invalidate();
     }
 
     @Override
@@ -116,6 +126,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
         }
         deleteHlsDirectory(source.getSourceId());
         videoSourceRepository.deleteById(id);
+        feedCache.invalidate();
     }
 
     @Override
@@ -128,6 +139,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
             videoSourceRepository.save(source);
             hlsWorker.wakeUp();
         }
+        feedCache.invalidate();
         return toHlsDto(source);
     }
 
@@ -138,6 +150,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
         source.setHlsError(null);
         videoSourceRepository.save(source);
         deleteHlsDirectory(source.getSourceId());
+        feedCache.invalidate();
         return toHlsDto(source);
     }
 

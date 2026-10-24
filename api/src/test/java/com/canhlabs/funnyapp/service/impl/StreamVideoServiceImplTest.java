@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.streaming.StreamChunkResult;
@@ -56,6 +57,7 @@ class StreamVideoServiceImplTest {
         streamVideoService.injectChatGptService(chatGptService);
         streamVideoService.injectVideoCacheStore(videoCache);
         streamVideoService.injectHlsPlaybackService(hlsPlaybackService);
+        streamVideoService.injectFeedCache(new FeedCache());
     }
 
     // -----------------------------------------------------------------------
@@ -363,5 +365,33 @@ class StreamVideoServiceImplTest {
 
         assertEquals("https://canh-labs.com/api/v1/funny-app/video-stream/hls/f1/playlist.m3u8",
                 streamVideoService.getVideoBySourceId("f1").getHlsUrl());
+    }
+
+    @Test
+    void getVideosToStream_twoCallsWithinTtl_queryOnce() {
+        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+                .thenReturn(List.of(VideoSource.builder().id(1L).sourceId("a").title("A").build()));
+
+        streamVideoService.getVideosToStream();
+        streamVideoService.getVideosToStream();
+
+        verify(videoSourceRepository, times(1))
+                .findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED);
+    }
+
+    @Test
+    void updateDesc_evictsTheFeedCache() {
+        VideoSource source = VideoSource.builder().id(1L).title("T").desc("").build();
+        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+                .thenReturn(List.of(source));
+        when(videoSourceRepository.findAllByDescIsNullOrDesc("")).thenReturn(List.of(source));
+        when(chatGptService.makePoem("T")).thenReturn("poem");
+        streamVideoService.getVideosToStream();
+
+        streamVideoService.updateDesc();
+        streamVideoService.getVideosToStream();
+
+        verify(videoSourceRepository, times(2))
+                .findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED);
     }
 }

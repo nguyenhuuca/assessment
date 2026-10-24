@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
+import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.event.VideoIngestedEvent;
@@ -53,6 +54,12 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     private VideoSourceRepository videoSourceRepository;
     private ChatGptService chatGptService;
     private ApplicationEventPublisher eventPublisher;
+    private FeedCache feedCache;
+
+    @Autowired
+    public void injectFeedCache(FeedCache feedCache) {
+        this.feedCache = feedCache;
+    }
 
     @Autowired
     public void injectEventPublisher(ApplicationEventPublisher eventPublisher) {
@@ -258,6 +265,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 entity.getVideoId(), entity.getSourceType(), entity.getSourceId(), entity.getTitle(), entity.getDesc(),
                 entity.getThumbnailPath(), entity.getStatus(), entity.getPriority(), entity.isHide());
         videoSourceRepository.save(entity);
+        feedCache.invalidate();
         log.info("Saved video source id={} videoId={} for Drive file {}", entity.getId(), entity.getVideoId(), fileId);
         publishIngested(fileId, entity.getId());
     }
@@ -281,6 +289,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 .isPresent();
         String desc = hasDesc ? null : makeDesc(title);
         videoSourceRepository.upsertDriveSource(System.nanoTime(), fileId, title, desc, thumbnailPath);
+        feedCache.invalidate();
         log.info("Upserted video source for Drive file {} (title: {})", fileId, title);
     }
 

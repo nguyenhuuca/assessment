@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
+import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.entity.VideoSource;
@@ -44,21 +45,22 @@ public class DriveVideoDownloaderImpl implements DriveVideoDownloader {
     private final VideoSourceRepository videoSourceRepository;
     private final HlsStorage hlsStorage;
     private final HlsTranscodeWorker hlsWorker;
+    private final FeedCache feedCache;
     private final Path cacheDir;
 
     @Autowired
     public DriveVideoDownloaderImpl(Drive drive, FfmpegService ffmpegService, AppProperties appProps,
                                     VideoCache videoCache, DriveFileLocks locks,
                                     VideoSourceRepository videoSourceRepository, HlsStorage hlsStorage,
-                                    HlsTranscodeWorker hlsWorker) {
+                                    HlsTranscodeWorker hlsWorker, FeedCache feedCache) {
         this(drive, ffmpegService, appProps, videoCache, locks, videoSourceRepository, hlsStorage, hlsWorker,
-                Paths.get(AppConstant.CACHE_DIR));
+                feedCache, Paths.get(AppConstant.CACHE_DIR));
     }
 
     DriveVideoDownloaderImpl(Drive drive, FfmpegService ffmpegService, AppProperties appProps,
                              VideoCache videoCache, DriveFileLocks locks,
                              VideoSourceRepository videoSourceRepository, HlsStorage hlsStorage,
-                             HlsTranscodeWorker hlsWorker, Path cacheDir) {
+                             HlsTranscodeWorker hlsWorker, FeedCache feedCache, Path cacheDir) {
         this.drive = drive;
         this.ffmpegService = ffmpegService;
         this.appProps = appProps;
@@ -67,6 +69,7 @@ public class DriveVideoDownloaderImpl implements DriveVideoDownloader {
         this.videoSourceRepository = videoSourceRepository;
         this.hlsStorage = hlsStorage;
         this.hlsWorker = hlsWorker;
+        this.feedCache = feedCache;
         this.cacheDir = cacheDir;
     }
 
@@ -117,6 +120,7 @@ public class DriveVideoDownloaderImpl implements DriveVideoDownloader {
         source.setHlsStatus(HlsStatus.PENDING);
         source.setHlsError(null);
         videoSourceRepository.save(source);
+        feedCache.invalidate();
         hlsWorker.wakeUp();
     }
 

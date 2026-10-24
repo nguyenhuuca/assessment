@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
+import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
@@ -39,6 +40,7 @@ class AdminVideoServiceImplTest {
     @Mock VideoStorageService videoStorageService;
     @Mock HlsStorage hlsStorage;
     @Mock HlsTranscodeWorker hlsWorker;
+    @Mock FeedCache feedCache;
     DriveFileLocks locks = new DriveFileLocks();
 
     @InjectMocks AdminVideoServiceImpl service;
@@ -53,6 +55,7 @@ class AdminVideoServiceImplTest {
         service.injectHlsStorage(hlsStorage);
         service.injectHlsWorker(hlsWorker);
         service.injectDriveFileLocks(locks);
+        service.injectFeedCache(feedCache);
     }
 
     // ── getVideos ──────────────────────────────────────────────────────────────
@@ -423,5 +426,31 @@ class AdminVideoServiceImplTest {
         v.setThumbnailPath(thumbnail);
         v.setStatus(status);
         return v;
+    }
+
+    // ── feed cache eviction ───────────────────────────────────────────────────
+
+    @Test
+    void feedMutations_invalidateTheFeedCache() {
+        VideoSource s = hlsSource("google_drive", HlsStatus.NONE);
+        when(videoSourceRepository.findById(42L)).thenReturn(Optional.of(s));
+
+        service.updateStatus(42L, VideoStatus.FLAGGED);
+        service.updatePriority(42L, 5);
+        service.updateHidden(42L, true);
+        service.deleteVideo(42L, false, false);
+        service.enableHls(42L);
+        service.disableHls(42L);
+
+        verify(feedCache, times(6)).invalidate();
+    }
+
+    @Test
+    void failedMutation_doesNotInvalidateTheFeedCache() {
+        when(videoSourceRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> service.updateHidden(99L, true));
+
+        verify(feedCache, never()).invalidate();
     }
 }

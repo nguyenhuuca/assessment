@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
+import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.client.FfmpegHlsClient;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.entity.VideoSource;
@@ -46,6 +47,7 @@ public class HlsTranscodeWorker {
     private final HlsStorage storage;
     private final FfmpegHlsClient ffmpeg;
     private final DriveFileLocks locks;
+    private final FeedCache feedCache;
     private final Executor executor;
     private final Path cacheDir;
     private final Semaphore permits = new Semaphore(1);
@@ -54,18 +56,20 @@ public class HlsTranscodeWorker {
 
     @Autowired
     public HlsTranscodeWorker(AppProperties props, VideoSourceRepository repository, HlsStorage storage,
-                              FfmpegHlsClient ffmpeg, DriveFileLocks locks) {
-        this(props, repository, storage, ffmpeg, locks, Executors.newVirtualThreadPerTaskExecutor(),
+                              FfmpegHlsClient ffmpeg, DriveFileLocks locks, FeedCache feedCache) {
+        this(props, repository, storage, ffmpeg, locks, feedCache, Executors.newVirtualThreadPerTaskExecutor(),
                 Path.of(AppConstant.CACHE_DIR));
     }
 
     HlsTranscodeWorker(AppProperties props, VideoSourceRepository repository, HlsStorage storage,
-                       FfmpegHlsClient ffmpeg, DriveFileLocks locks, Executor executor, Path cacheDir) {
+                       FfmpegHlsClient ffmpeg, DriveFileLocks locks, FeedCache feedCache, Executor executor,
+                       Path cacheDir) {
         this.props = props;
         this.repository = repository;
         this.storage = storage;
         this.ffmpeg = ffmpeg;
         this.locks = locks;
+        this.feedCache = feedCache;
         this.executor = executor;
         this.cacheDir = cacheDir;
     }
@@ -211,6 +215,7 @@ public class HlsTranscodeWorker {
                 log.info("HLS job {} for {} discarded after publish, status changed meanwhile", id, fileId);
                 return;
             }
+            feedCache.invalidate();
             log.info("HLS job {} for {} ready in {} ms, {} bytes", id, fileId, millisSince(started),
                     dirSize(storage.dir(fileId)));
         } catch (HlsException e) {
@@ -239,6 +244,7 @@ public class HlsTranscodeWorker {
             if (!HlsStorage.isValidFileId(row.getSourceId()) || !storage.exists(row.getSourceId())) {
                 log.warn("HLS output of video {} is missing", row.getId());
                 repository.markHlsOutputMissing(row.getId());
+                feedCache.invalidate();
             }
         }
     }
