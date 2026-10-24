@@ -131,9 +131,12 @@ class AdminControllerPermissionTest {
     @MockitoBean AdminCommentService adminCommentService;
 
     @Autowired MockMvc mockMvc;
+    @Autowired PermissionService permissionService;
 
     @BeforeEach
     void setUp() throws Exception {
+        // the real PermissionServiceImpl caches the flag for 15 s; each test sets its own value
+        ((PermissionServiceImpl) permissionService).invalidateEnforcementCache();
         // JWT filter: transparent pass-through so Spring Security filters run normally
         doAnswer(inv -> {
             inv.<FilterChain>getArgument(2)

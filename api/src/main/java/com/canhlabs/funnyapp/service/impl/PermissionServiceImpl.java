@@ -96,6 +96,11 @@ public class PermissionServiceImpl implements PermissionService {
         return featureFlagService.isEnabled(AppConstant.Flags.PERMISSION_ENFORCEMENT, false);
     }
 
+    /** Drops the cached flag so the next check reads it afresh (tests that flip the flag between requests). */
+    public void invalidateEnforcementCache() {
+        enforcedCache.invalidateAll();
+    }
+
     private static String permNames(Permission[] perms) {
         return Arrays.stream(perms).map(Permission::name).collect(Collectors.joining(", "));
     }

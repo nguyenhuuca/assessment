@@ -97,9 +97,12 @@ class AdminDriveSyncControllerPermissionTest {
     @MockitoBean DriveSyncService driveSyncService;
 
     @Autowired MockMvc mockMvc;
+    @Autowired PermissionService permissionService;
 
     @BeforeEach
     void setUp() throws Exception {
+        // the real PermissionServiceImpl caches the flag for 15 s; each test sets its own value
+        ((PermissionServiceImpl) permissionService).invalidateEnforcementCache();
         doAnswer(inv -> {
             inv.<FilterChain>getArgument(2)
                .doFilter(inv.<ServletRequest>getArgument(0), inv.<ServletResponse>getArgument(1));
