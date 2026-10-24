@@ -1,7 +1,7 @@
-task: BE perf Medium items PM-1..PM-7 (autopilot)
+task: Basic PWA: service worker, installable, new-version notice (autopilot)
 status: done
 progress: 100
-done: PM-1 JWT key once 9a02f760; PM-2 perm flag cache 61a149c5; PM-3 feed cache+index 3f695b72; PM-4 Hikari 7d6e2e5d; PM-5 existsByParentId ddda7c45; PM-6 history cache+trim a17bd405; PM-7 logs 33bc2d39
+done: PW-1 service worker + version.json a6dfd4b3; PW-2 update banner + install metadata 32839c3c; shell text/html guard ae83a137
 next: -
-plan: docs/plans/plan-be-perf-medium.md
-updated: 2026-10-24 17:09
+plan: docs/plans/plan-pwa-basic.md
+updated: 2026-10-24 20:31

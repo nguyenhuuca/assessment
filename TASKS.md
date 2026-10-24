@@ -555,3 +555,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **PM-5** BE: `existsByParentId` for comment delete ddda7c45
 - [x] **PM-6** BE: incognito cache per user + trimToCap only on a new history row a17bd405
 - [x] **PM-7** BE: Range hot-path logs to DEBUG 33bc2d39
+
+## Feature: Basic PWA (2026-10-24, [plan](docs/plans/plan-pwa-basic.md))
+
+- [x] **PW-1** FE: service worker (navigation shell + hashed assets only), build-id `version.json`, registration in production a6dfd4b3 ae83a137
+- [x] **PW-2** FE: new-version banner (polls `version.json`), installable manifest + iOS meta, en/vi 32839c3c

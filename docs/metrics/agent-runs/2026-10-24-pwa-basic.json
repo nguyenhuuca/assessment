@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-24-pwa-basic",
+  "date": "2026-10-24",
+  "mode": "local",
+  "lite": false,
+  "issue": null,
+  "pr": null,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 2, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 2,
+  "advisory": 10,
+  "locNonTest": 130,
+  "tests": { "passed": 28, "flaky": 0, "failed": 0 },
+  "costUsd": 4.12
+}
