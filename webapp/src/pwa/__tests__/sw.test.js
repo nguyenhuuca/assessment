@@ -164,10 +164,10 @@ describe('service worker', () => {
       await expect(dispatch(listeners, req('/', { mode: 'navigate' }))).rejects.toThrow('offline')
     })
 
-    it('does not store redirected or non-ok responses', async () => {
-      for (const odd of [{ redirected: true }, { ok: false }]) {
+    it('does not store redirected, non-ok or non-HTML responses', async () => {
+      for (const odd of [{ redirected: true, type: 'text/html' }, { ok: false, type: 'text/html' }, { type: 'application/json' }]) {
         const caches = makeCaches()
-        const { listeners } = load(caches, vi.fn().mockResolvedValue(resp({ ...odd, type: 'text/html' })))
+        const { listeners } = load(caches, vi.fn().mockResolvedValue(resp(odd)))
         await dispatch(listeners, req('/', { mode: 'navigate' }))
         expect(caches.stores.size).toBe(0)
       }

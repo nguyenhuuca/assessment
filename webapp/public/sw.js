@@ -28,7 +28,9 @@ async function trimAssets(cache) {
 async function handleNavigation(request) {
   try {
     const response = await fetch(request, { cache: 'no-cache' })
-    if (response.ok && !response.redirected) {
+    const type = response.headers.get('content-type') || ''
+    // only the HTML app shell may replace '/', never e.g. a JSON page opened in a tab
+    if (response.ok && !response.redirected && type.includes('text/html')) {
       const cache = await caches.open(CACHE)
       await cache.put(SHELL_KEY, response.clone())
     }
