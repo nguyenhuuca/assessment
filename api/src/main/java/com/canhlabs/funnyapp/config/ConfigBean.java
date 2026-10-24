@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.config;
 import com.canhlabs.funnyapp.utils.totp.Totp;
 import com.canhlabs.funnyapp.utils.totp.TotpImpl;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
@@ -79,8 +80,20 @@ public class ConfigBean {
         return new Drive.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
                 GsonFactory.getDefaultInstance(),
-                new HttpCredentialsAdapter(credentials)
+                withTimeouts(new HttpCredentialsAdapter(credentials))
         ).setApplicationName("VideoStreamApp").build();
+    }
+
+    /**
+     * Wraps the credentials initializer and sets connect 10 s / read 60 s on every Drive request.
+     * The read timeout applies per read, so large media downloads are not cut by a whole-file deadline.
+     */
+    static HttpRequestInitializer withTimeouts(HttpRequestInitializer credentials) {
+        return request -> {
+            credentials.initialize(request);
+            request.setConnectTimeout(10_000);
+            request.setReadTimeout(60_000);
+        };
     }
 
     @Bean
