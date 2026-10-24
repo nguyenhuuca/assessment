@@ -222,7 +222,8 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, resume = nu
       {/* ── Preload next 2 videos ── */}
       {[1, 2].map(offset => {
         const v = videos[index + offset]
-        const src = v ? buildStreamUrl(v.src) : null
+        // HLS videos stream segment by segment: a hidden full-file preload would defeat it (FR-10)
+        const src = v && !v.hlsUrl ? buildStreamUrl(v.src) : null
         return src ? (
           <video
             key={v.id}

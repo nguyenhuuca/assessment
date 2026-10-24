@@ -38,6 +38,7 @@ export function mapApiVideo(raw) {
     downvotes: raw.downvotes || 0,
     viewCount: raw.viewCount || 0,
     isPrivate: raw.isPrivate || raw.is_private || false,
+    hlsUrl: raw.hlsUrl || null,
     fileId: raw.fileId || raw.file_id || null,
     category: determineCategory(raw.title, raw.desc || raw.description),
     poster: thumbnailUrl(raw.fileId),

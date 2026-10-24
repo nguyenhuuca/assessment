@@ -1,5 +1,16 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { buildStreamUrl } from '../videoModel.js'
+import { buildStreamUrl, mapApiVideo } from '../videoModel.js'
+
+describe('mapApiVideo hlsUrl', () => {
+  it('keeps hlsUrl when the API sends one', () => {
+    expect(mapApiVideo({ id: 1, hlsUrl: 'https://x/hls/1/index.m3u8' }).hlsUrl).toBe('https://x/hls/1/index.m3u8')
+  })
+
+  it('defaults hlsUrl to null when absent or null', () => {
+    expect(mapApiVideo({ id: 1 }).hlsUrl).toBeNull()
+    expect(mapApiVideo({ id: 1, hlsUrl: null }).hlsUrl).toBeNull()
+  })
+})
 
 const SRC = 'https://canh-labs.com/api/v1/funny-app/video-stream/stream/abc123'
 

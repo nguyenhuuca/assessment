@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { viewsApi } from '../../api/views.js'
 import { watchHistoryApi } from '../../api/watchHistory.js'
 import { useAuth } from '../../hooks/useAuth.js'
+import { useHlsSource } from '../../hooks/useHlsSource.js'
 import WatchedBadge from './WatchedBadge.jsx'
 
 /** Seconds actually played (not seeked) while visible before a view counts; server dedupes per viewer per video for 30 min. */
@@ -169,6 +170,8 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
     setProgress(ratio * 100)
   }
 
+  const src = useHlsSource(videoRef, { hlsUrl: video?.hlsUrl, rangeUrl: buildStreamUrl(video?.src) })
+
   const poster = thumbnailUrl(video?.fileId) || undefined
 
   const handle = video?.userShared?.split('@')[0] || t('anonymous')
@@ -188,7 +191,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
       {/* ── Video element ── */}
       <video
         ref={videoRef}
-        src={buildStreamUrl(video?.src)}
+        src={src}
         poster={poster}
         autoPlay={active}
         playsInline
