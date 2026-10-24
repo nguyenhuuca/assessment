@@ -35,6 +35,7 @@
   "privateProfile": "Hồ sơ riêng tư",
   "privateProfileDesc": "Kiểm soát ai có thể xem hoạt động và video bạn đã thích",
   "dangerZone": "Vùng nguy hiểm",
+  "appVersion": "Phiên bản {{build}}",
   "dangerDesc": "Xóa tài khoản là vĩnh viễn. Dữ liệu của bạn sẽ được ẩn danh hóa và bạn sẽ bị đăng xuất.",
   "deleteAccount": "Xóa tài khoản",
   "deleteIrreversible": "Hành động này không thể hoàn tác.",

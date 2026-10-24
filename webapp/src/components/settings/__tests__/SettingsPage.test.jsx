@@ -122,6 +122,12 @@ describe('SettingsPage', () => {
       expect(screen.getByText('Vùng nguy hiểm')).toBeInTheDocument()
     })
 
+    it('shows the build number at the bottom', () => {
+      i18n.changeLanguage('vi')
+      renderSettings()
+      expect(screen.getByText('Phiên bản dev')).toBeInTheDocument()
+    })
+
     it('shows a loading spinner while settings are loading', async () => {
       const { useSettings } = await import('../../../hooks/useSettings.js')
       // useSettings is mocked above; the full loading-state assertions live in the next test

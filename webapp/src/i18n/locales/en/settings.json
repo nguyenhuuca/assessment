@@ -35,6 +35,7 @@
   "privateProfile": "Private Profile",
   "privateProfileDesc": "Control who can see your activity and liked videos",
   "dangerZone": "Danger Zone",
+  "appVersion": "Version {{build}}",
   "dangerDesc": "Deleting your account is permanent. Your data will be anonymized and you will be logged out.",
   "deleteAccount": "Delete Account",
   "deleteIrreversible": "This action is irreversible.",

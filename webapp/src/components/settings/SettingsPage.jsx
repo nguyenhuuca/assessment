@@ -373,6 +373,11 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* ── Build number (same value as /version.json) ── */}
+        <div className="settings-col-12">
+          <p className="settings-build">{t('appVersion', { build: __APP_BUILD__ })}</p>
+        </div>
+
       </div>
 
       {/* ── Modals ── */}
