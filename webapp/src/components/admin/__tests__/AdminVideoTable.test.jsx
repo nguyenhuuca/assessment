@@ -154,6 +154,17 @@ describe('AdminVideoTable HLS column', () => {
     await waitFor(() => expect(adminApi.disableVideoHls).toHaveBeenCalledWith(4))
   })
 
+  it('lets SUPER_ADMIN disable HLS while the row is PROCESSING (cancel a stuck job)', async () => {
+    mockRole = 'SUPER_ADMIN'
+    adminApi.getVideos.mockResolvedValue(page(video({ id: 4, hlsStatus: 'PROCESSING' })))
+    adminApi.disableVideoHls.mockResolvedValue({})
+    renderTable()
+    const box = await screen.findByLabelText('Tắt HLS và xoá các file đã convert')
+    expect(box).not.toBeDisabled()
+    fireEvent.click(box)
+    await waitFor(() => expect(adminApi.disableVideoHls).toHaveBeenCalledWith(4))
+  })
+
   it('polls every 5 s only while a row is PENDING or PROCESSING', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true })
     try {

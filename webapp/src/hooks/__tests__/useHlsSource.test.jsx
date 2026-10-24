@@ -78,6 +78,21 @@ describe('useHlsSource', () => {
     expect(play).toHaveBeenCalled()
   })
 
+  it('does not apply the old position when the video switches before metadata loads', async () => {
+    const { container, rerender } = render(<Probe hlsUrl={HLS} />)
+    await waitFor(() => expect(instances).toHaveLength(1))
+    const v = container.querySelector('video')
+    Object.defineProperty(v, 'currentTime', { value: 42, configurable: true, writable: true })
+    Object.defineProperty(v, 'paused', { value: true, configurable: true })
+    act(() => instances[0].handlers.hlsError('hlsError', { fatal: true }))
+    await waitFor(() => expect(v.getAttribute('src')).toBe(RANGE))
+
+    rerender(<Probe hlsUrl="https://x/hls/2/index.m3u8" rangeUrl="https://x/stream/2" />)
+    v.currentTime = 0
+    act(() => { v.dispatchEvent(new Event('loadedmetadata')) })
+    expect(v.currentTime).toBe(0)
+  })
+
   it('ignores non-fatal hls.js errors', async () => {
     const { container } = render(<Probe hlsUrl={HLS} />)
     await waitFor(() => expect(instances).toHaveLength(1))

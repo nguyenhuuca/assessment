@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const HLS_MIME = 'application/vnd.apple.mpegurl'
 
@@ -20,6 +20,7 @@ function supportsNativeHls() {
 export function useHlsSource(videoRef, { hlsUrl, rangeUrl }) {
   const [failedUrl, setFailedUrl] = useState(null)
   const [native] = useState(supportsNativeHls)
+  const restoreRef = useRef(null)
   const useHls = !!hlsUrl && failedUrl !== hlsUrl
 
   useEffect(() => {
@@ -38,10 +39,13 @@ export function useHlsSource(videoRef, { hlsUrl, rangeUrl }) {
       hls = null
       v.removeEventListener('error', fallback)
       if (resumeAt > 0 || wasPlaying) {
-        v.addEventListener('loadedmetadata', () => {
+        const fn = () => {
+          restoreRef.current = null
           if (resumeAt > 0) v.currentTime = resumeAt
           if (wasPlaying) v.play()?.catch?.(() => {})
-        }, { once: true })
+        }
+        restoreRef.current = { el: v, fn }
+        v.addEventListener('loadedmetadata', fn, { once: true })
       }
       setFailedUrl(hlsUrl)
     }
@@ -66,6 +70,14 @@ export function useHlsSource(videoRef, { hlsUrl, rangeUrl }) {
       hls = null
     }
   }, [useHls, native, hlsUrl, videoRef])
+
+  // A pending restore belongs to the old video: drop it on video change / unmount so its position is
+  // never applied to the next one. Keyed on hlsUrl only, because the fallback itself flips `useHls`.
+  useEffect(() => () => {
+    const pending = restoreRef.current
+    if (pending) pending.el.removeEventListener('loadedmetadata', pending.fn)
+    restoreRef.current = null
+  }, [hlsUrl])
 
   if (!useHls) return rangeUrl
   return native ? hlsUrl : undefined

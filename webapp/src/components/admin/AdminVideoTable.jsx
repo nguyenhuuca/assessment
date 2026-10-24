@@ -64,7 +64,7 @@ function HlsCell({ video, canToggle, toggle }) {
             type="checkbox"
             className="admin-hide-toggle"
             aria-busy={busy}
-            disabled={busy || status === 'PENDING' || status === 'PROCESSING'}
+            disabled={busy}
             aria-label={on ? t('hlsToggleOff') : t('hlsToggleOn')}
             checked={on}
             onChange={e => toggle.mutate({ id: video.id, enable: e.target.checked })}
@@ -244,7 +244,7 @@ export default function AdminVideoTable({ statusFilter }) {
                   </div>
                 </td>
                 <td><HlsCell video={v} canToggle={canToggleHls} toggle={toggleHls} /></td>
-                <td className="admin-cell-muted">{t('views',{ count: v.viewCount ?? 0 })}</td>
+                <td className="admin-cell-muted">{t('views', { count: v.viewCount ?? 0 })}</td>
                 <td>
                   <div className="admin-actions">
                     <select
