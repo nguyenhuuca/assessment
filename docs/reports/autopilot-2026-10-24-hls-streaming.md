@@ -4,7 +4,7 @@
 - **Mode:** local
 - **Plan:** [plan-hls-streaming](../plans/plan-hls-streaming.md)
 - **Started:** 2026-10-24 10:28 · **Landed:** 2026-10-24 11:08
-- **Result:** ✅ committed `5c485b5f`..`64d66721` (Gate 2 pending at report time)
+- **Result:** ✅ pushed `b89acfba..4bb3836c`
 
 ## Pipeline
 
@@ -19,8 +19,8 @@
 | Local QA ×2 | `qa-twice.sh`: round 1 fail 2 (test files failed to load: `hls.js` was installed only in the worker's worktree, not in the main checkout; `npm ci` fixed it). Round 2: 347 tests, pass 347 · flaky 0 · fail 0 | 2 of 3 |
 | Fix | blocker fixed with conditional `markHlsReady` / `markHlsError` (`e61f747e`); OUTPUT_MISSING made conditional (`64d66721`); FE advisories (`1e436475`) | — |
 | Land: full gates | `mvn verify`: 1788 tests, 0 failures, 2 skipped, line coverage 96.37% (threshold 90%). `npm run test`: 610/610. `npm run lint`: 0 errors, 3 old warnings. `npm run build`: hls.js in its own chunk | — |
-| Gate 2 (owner) | pending | — |
-| CI + smoke | pending (after push) | — |
+| Gate 2 (owner) | push (`b89acfba..4bb3836c`) | — |
+| CI + smoke | CI green (Funny App Build and Deploy, Deploy Frontend, Publish Docs). `mock-test.sh` 22/22. Read-only prod check: 53 feed videos all carry `hlsUrl: null` (flag absent/OFF); playlist for an unknown id → 404, for `..%2Fx` → 404 (rejected before the controller) | — |
 
 ## What changed
 
