@@ -103,6 +103,7 @@ nav:
       - In-App Report: prd/PRD-in-app-report.md
       - Contributor Autopilot Permissions: prd/PRD-contributor-autopilot-permissions.md
       - HLS Streaming: prd/PRD-hls-streaming.md
+      - Web Push: prd/PRD-web-push.md
 
   - Specs:
       - Overview: specs/index.md

@@ -55,6 +55,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Contributor Autopilot Permissions** | [PRD 📝](prd/PRD-contributor-autopilot-permissions.md) | [0030 ✅](adr/0030-contributor-autopilot-permissions.md) | [Spec ✅](specs/spec-contributor-autopilot-permissions.md) | [Seq ✅](sequence/sequence-contributor-autopilot-permissions.md) | [Plan ✅](plans/plan-contributor-autopilot-permissions.md) | — | ✅ | New `CONTRIBUTOR` role (Report only); SA grants per-account bits `AUTOPILOT_AUTO_MERGE` / `AUTOPILOT_AUTO` to CONTRIBUTOR or ADMIN; checked in `ReportServiceImpl` against the DB; shared cap 10/24 h. Amends ADR-0026. Spec drops `@HasPermission(ADMIN)` on report endpoints. Done CA-1..CA-6 (`e1eeb892`..`102fced0`) by autopilot ([report](reports/autopilot-2026-10-23-contributor-autopilot-permissions.md)); owner prod check pending |
 | **HLS Streaming** | [PRD ✅](prd/PRD-hls-streaming.md) | [0031 ✅](adr/0031-hls-streaming.md) | [Spec ✅](specs/spec-hls-streaming.md) | [Seq ✅](sequence/sequence-hls-streaming.md) | [Plan ✅](plans/plan-hls-streaming.md) | — | ✅ | Opt-in HLS per video (SUPER_ADMIN toggle), single-job stream-copy worker with ffprobe + disk guard, Harness flag `hls_streaming_enabled` decides if `hlsUrl` is offered; Range stays as fallback. Replaces the deleted ADR-0006 draft. Done HL-1..HL-7 (`5c485b5f`..`64d66721`) by autopilot ([report](reports/autopilot-2026-10-24-hls-streaming.md)); prod verified 2026-10-24 (49/60 videos H.264, 11 VP9 need re-import; HLS + Range fallback checked in browser) |
 | **Basic PWA** | — | — | — | — | [Plan ✅](plans/plan-pwa-basic.md) | — | ✅ | Hand-written service worker (navigation shell + hashed assets only; API/video never intercepted), installable manifest + iOS meta, "new version" banner from polled `version.json`. No new dependency. Built by autopilot ([report](reports/autopilot-2026-10-24-pwa-basic.md)); owner install check pending |
+| **Web Push** | [PRD 📝](prd/PRD-web-push.md) | [0032 💡](adr/0032-web-push.md) | — | — | — | — | 💡 | Daily new-video digest (19:00 VN, text only) + admin alerts (import DONE/FAILED, HLS ERROR) for signed-in users; standard Web Push + VAPID implemented in-house on JCA (no new dependency); CTR tracking. Next: approve ADR, `/spec` |
 | **Agent Evolve Loop (self-improvement)** | — | [0027 ✅](adr/0027-agent-self-improvement-loop.md) | — | — | [Plan ✅](plans/plan-agent-evolve.md) | — | ✅ | Local `/evolve`: metrics signals → path allowlist + seeded-bug eval gate (`scripts/evolve.mjs`) → owner approves. Compress (D6) cuts duplicate/dead/stale text. Weekly headless workflow back 2026-10-22 with staged proposals ([ADR-0029](adr/0029-headless-evolve-staging.md)). First evolution: reviewer rule for assumptions about unchanged code, case `2026-10-19-swallowed-job-exceptions` caught 0/3 → 3/3 |
 
 ---
@@ -98,8 +99,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [File-based Hooks](plans/plan-a-file-based-hooks.md)
 - [Bookmark Feature](plans/plan-bookmark-feature.md)
 
-### 💡 Proposed / No Plan Yet (0)
-- —
+### 💡 Proposed / No Plan Yet (1)
+- [Web Push](prd/PRD-web-push.md)
 
 ---
 
@@ -137,7 +138,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | 0029 | Headless Evolve With Staged Proposals | ✅ Accepted |
 | 0030 | Granted Autopilot Labels for Contributors and Admins | ✅ Accepted |
 | 0031 | Opt-in HLS Streaming per Video, Behind a Feature Flag | ✅ Accepted |
+| 0032 | Web Push Notifications with VAPID, Sent from the Backend | 💡 Proposed |
 
 ---
 
-*Last updated: 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in `--auto` / `--auto-push` for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod*
+*Last updated: 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in `--auto` / `--auto-push` for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod*
