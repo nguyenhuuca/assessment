@@ -719,10 +719,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#proposed-no-plan-yet-0" class="md-nav__link">
+  <a href="#proposed-no-plan-yet-1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        💡 Proposed / No Plan Yet (0)
+        💡 Proposed / No Plan Yet (1)
       
     </span>
   </a>
@@ -1540,6 +1540,8 @@
       
         
       
+        
+      
     
     
     
@@ -1882,6 +1884,34 @@
     
   
     HLS Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/PRD-web-push/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web Push
   
 
     
@@ -8060,10 +8090,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#proposed-no-plan-yet-0" class="md-nav__link">
+  <a href="#proposed-no-plan-yet-1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        💡 Proposed / No Plan Yet (0)
+        💡 Proposed / No Plan Yet (1)
       
     </span>
   </a>
@@ -8555,6 +8585,17 @@
 <td>Hand-written service worker (navigation shell + hashed assets only; API/video never intercepted), installable manifest + iOS meta, "new version" banner from polled <code>version.json</code>. No new dependency. Built by autopilot (<a href="../reports/autopilot-2026-10-24-pwa-basic/">report</a>); owner install check pending</td>
 </tr>
 <tr>
+<td><strong>Web Push</strong></td>
+<td><a href="../prd/PRD-web-push/">PRD 📝</a></td>
+<td><a href="../adr/0032-web-push/">0032 💡</a></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>💡</td>
+<td>Daily new-video digest (19:00 VN, text only) + admin alerts (import DONE/FAILED, HLS ERROR) for signed-in users; standard Web Push + VAPID implemented in-house on JCA (no new dependency); CTR tracking. Next: approve ADR, <code>/spec</code></td>
+</tr>
+<tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
 <td>—</td>
 <td><a href="../adr/0027-agent-self-improvement-loop/">0027 ✅</a></td>
@@ -8609,9 +8650,9 @@
 <li><a href="../plans/plan-a-file-based-hooks/">File-based Hooks</a></li>
 <li><a href="../plans/plan-bookmark-feature/">Bookmark Feature</a></li>
 </ul>
-<h3 id="proposed-no-plan-yet-0">💡 Proposed / No Plan Yet (0)<a class="headerlink" href="#proposed-no-plan-yet-0" title="Permanent link">&para;</a></h3>
+<h3 id="proposed-no-plan-yet-1">💡 Proposed / No Plan Yet (1)<a class="headerlink" href="#proposed-no-plan-yet-1" title="Permanent link">&para;</a></h3>
 <ul>
-<li>—</li>
+<li><a href="../prd/PRD-web-push/">Web Push</a></li>
 </ul>
 <hr />
 <h2 id="adr-status-summary">ADR Status Summary<a class="headerlink" href="#adr-status-summary" title="Permanent link">&para;</a></h2>
@@ -8774,10 +8815,15 @@
 <td>Opt-in HLS Streaming per Video, Behind a Feature Flag</td>
 <td>✅ Accepted</td>
 </tr>
+<tr>
+<td>0032</td>
+<td>Web Push Notifications with VAPID, Sent from the Backend</td>
+<td>💡 Proposed</td>
+</tr>
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 
