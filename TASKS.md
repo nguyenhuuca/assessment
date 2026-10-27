@@ -572,3 +572,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 ## Lite: Hide prev/next arrows on touch screens (2026-10-24, autopilot lite, issue #66)
 
 - [x] **NA-1** FE: hide `.nav-arrows` under `@media (pointer: coarse)` + CSS source test
+
+## Lite: Square video player corners on mobile (2026-10-27, autopilot lite, issue #68)
+
+- [x] **FE-1** FE: `.video-player` class + mobile `border-radius: 0 !important` (the inline radius 16 beat the card rule)
+- [x] **FE-2** FE: Vitest check that the player root has `video-player`

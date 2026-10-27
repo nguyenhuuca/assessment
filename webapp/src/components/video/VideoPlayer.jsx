@@ -178,6 +178,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
 
   return (
     <div
+      className="video-player"
       onClick={handlePlayerClick}
       style={{
         position: 'relative',
