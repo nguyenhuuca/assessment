@@ -411,6 +411,18 @@ body {
 }
 .video-mute-btn:hover { background: rgba(0,0,0,0.72); }
 
+/* Desktop Home: the reel runs up behind a transparent header (mobile hides the header) */
+@media (min-width: 769px) {
+  /* Header search/theme icons can sit over the video, so give them a readable backdrop */
+  .topnav-overlay .icon-btn {
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  /* Top-right of the card is under the header controls; mute moves to top-left */
+  .main-home .video-mute-btn { right: auto; left: 12px; }
+}
+
 /* ── Nav arrows group (prev/next) ── */
 .nav-arrows {
   display: flex;

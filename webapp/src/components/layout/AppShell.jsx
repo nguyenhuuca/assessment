@@ -164,7 +164,8 @@ export default function AppShell() {
     ...(reporter ? [{ key: 'report', icon: 'bug_report', labelKey: 'navReport', onSelect: () => goNav('report') }] : []),
     { key: 'settings', icon: 'settings',             labelKey: 'navSettings',  onSelect: () => goNav('settings') },
   ]
-  const mobileTitle = activeNav === 'home' ? t('forYou') : t([...SIDE_NAV, REPORT_NAV].find(n => n.key === activeNav)?.labelKey ?? 'forYou')
+  const isHome = activeNav === 'home'
+  const mobileTitle = isHome ? t('forYou') : t([...SIDE_NAV, REPORT_NAV].find(n => n.key === activeNav)?.labelKey ?? 'forYou')
 
   function renderMobileNavItem(item) {
     const active = activeNav === item.key
@@ -197,12 +198,12 @@ export default function AppShell() {
         onError={txt => showMsg(txt)}
       />
 
-      {/* ── Top Header ── */}
-      <header style={{
+      {/* ── Top Header ── (transparent on Home so the reel can run up behind it) */}
+      <header className={isHome ? 'topnav-overlay' : undefined} style={{
         position: 'fixed', top: 0, left: 0, right: 0,
         height: 'var(--topnav-h)', zIndex: 50,
-        background: 'var(--bg)',
-        borderBottom: '1px solid var(--border)',
+        background: isHome ? 'transparent' : 'var(--bg)',
+        borderBottom: isHome ? '1px solid transparent' : '1px solid var(--border)',
         display: 'flex', alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 24px', gap: 16,
@@ -223,7 +224,7 @@ export default function AppShell() {
 
         {/* Right — auth controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 180, justifyContent: 'flex-end' }}>
-          {activeNav === 'home' && (
+          {isHome && (
             <button
               className={`icon-btn${mobileSearchOpen ? ' active' : ''}`}
               onClick={() => setMobileSearchOpen(v => !v)}
@@ -369,10 +370,10 @@ export default function AppShell() {
       )}
 
       {/* ── Main Content ── */}
-      <main className="main-content" style={{
+      <main className={`main-content${isHome ? ' main-home' : ''}`} style={{
         marginLeft: 'var(--sidenav-w)',
-        marginTop: 'var(--topnav-h)',
-        height: 'calc(100vh - var(--topnav-h))',
+        marginTop: isHome ? 0 : 'var(--topnav-h)',
+        height: isHome ? '100vh' : 'calc(100vh - var(--topnav-h))',
         overflow: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'report' || activeNav === 'library' || activeNav === 'history') ? 'auto' : 'hidden',
         display: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'report' || activeNav === 'library' || activeNav === 'history') ? 'block' : 'flex',
         alignItems: 'center',

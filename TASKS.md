@@ -577,3 +577,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **FE-1** FE: `.video-player` class + mobile `border-radius: 0 !important` (the inline radius 16 beat the card rule)
 - [x] **FE-2** FE: Vitest check that the player root has `video-player`
+
+## Lite: Desktop Home reel runs up behind the header (2026-10-27)
+
+- [x] **RH-1** FE: Home header transparent + main full 100vh, card `maxHeight` 100vh-40; header icons get a backdrop, mute moves top-left on desktop Home
+- [x] **RH-2** FE: Vitest `AppShell.overlay.test.jsx` (Home overlay vs solid header on other tabs)
