@@ -628,6 +628,11 @@ body {
     box-shadow: none !important;
   }
 
+  /* Player root has an inline borderRadius: 16, so it needs !important to square off */
+  .video-card .video-player {
+    border-radius: 0 !important;
+  }
+
   /* Action column: float over video, right edge */
   .action-col {
     position: absolute !important;
