@@ -434,8 +434,12 @@ body {
 .nav-arrows {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 8px;
 }
+
+/* Reel action column: compact buttons stacked at the bottom of the card (mobile shrinks them further) */
+.action-col .action-btn { width: 44px; height: 44px; }
+.action-col .action-btn .icon { font-size: 22px; }
 
 @media (max-width: 768px) {
   .nav-arrows { gap: 4px; }

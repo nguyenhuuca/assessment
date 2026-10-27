@@ -153,7 +153,7 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, resume = nu
       {/* ── Right-side action column ── */}
       <div className="action-col" style={{
         display: 'flex', flexDirection: 'column',
-        gap: 14, paddingBottom: 44, flexShrink: 0,
+        gap: 8, paddingBottom: 4, flexShrink: 0,
       }}>
 
         {/* Like / Dislike */}
