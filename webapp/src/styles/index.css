@@ -419,6 +419,13 @@ body {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
+  .topnav-overlay .icon-btn:hover { background: var(--bg-high); }
+  /* Light theme: a dark disc over a white page reads as grey blobs, so use a frosted white one */
+  [data-theme="light"] .topnav-overlay .icon-btn {
+    background: rgba(255,255,255,0.72);
+    box-shadow: 0 0 0 1px rgba(25, 28, 29, 0.08);
+  }
+  [data-theme="light"] .topnav-overlay .icon-btn:hover { background: var(--bg-high); }
   /* Top-right of the card is under the header controls; mute moves to top-left */
   .main-home .video-mute-btn { right: auto; left: 12px; }
 }
