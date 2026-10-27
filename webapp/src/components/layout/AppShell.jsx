@@ -77,6 +77,7 @@ export default function AppShell() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [jumpIndex,       setJumpIndex]       = useState(0)
   const [muted,           setMuted]           = useState(true)
+  const [libraryPlaying,  setLibraryPlaying]  = useState(false)
   const [deepLinkId,      setDeepLinkId]      = useState(initialLink.v)
   const [deepLinkStartAt, setDeepLinkStartAt] = useState(null)
 
@@ -165,6 +166,8 @@ export default function AppShell() {
     { key: 'settings', icon: 'settings',             labelKey: 'navSettings',  onSelect: () => goNav('settings') },
   ]
   const isHome = activeNav === 'home'
+  // A reel is on screen (Home feed or a Library player): the video runs up behind a transparent header
+  const reelMode = isHome || (activeNav === 'library' && libraryPlaying)
   const mobileTitle = isHome ? t('forYou') : t([...SIDE_NAV, REPORT_NAV].find(n => n.key === activeNav)?.labelKey ?? 'forYou')
 
   function renderMobileNavItem(item) {
@@ -199,11 +202,11 @@ export default function AppShell() {
       />
 
       {/* ── Top Header ── (transparent on Home so the reel can run up behind it) */}
-      <header className={isHome ? 'topnav-overlay' : undefined} style={{
+      <header className={reelMode ? 'topnav-overlay' : undefined} style={{
         position: 'fixed', top: 0, left: 0, right: 0,
         height: 'var(--topnav-h)', zIndex: 50,
-        background: isHome ? 'transparent' : 'var(--bg)',
-        borderBottom: isHome ? '1px solid transparent' : '1px solid var(--border)',
+        background: reelMode ? 'transparent' : 'var(--bg)',
+        borderBottom: reelMode ? '1px solid transparent' : '1px solid var(--border)',
         display: 'flex', alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 24px', gap: 16,
@@ -370,10 +373,10 @@ export default function AppShell() {
       )}
 
       {/* ── Main Content ── */}
-      <main className={`main-content${isHome ? ' main-home' : ''}`} style={{
+      <main className={`main-content${reelMode ? ' main-reel' : ''}`} style={{
         marginLeft: 'var(--sidenav-w)',
-        marginTop: isHome ? 0 : 'var(--topnav-h)',
-        height: isHome ? '100vh' : 'calc(100vh - var(--topnav-h))',
+        marginTop: reelMode ? 0 : 'var(--topnav-h)',
+        height: reelMode ? '100vh' : 'calc(100vh - var(--topnav-h))',
         overflow: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'report' || activeNav === 'library' || activeNav === 'history') ? 'auto' : 'hidden',
         display: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'report' || activeNav === 'library' || activeNav === 'history') ? 'block' : 'flex',
         alignItems: 'center',
@@ -396,6 +399,7 @@ export default function AppShell() {
             muted={muted}
             onMutedChange={setMuted}
             onShowComments={showComments}
+            onPlayerChange={setLibraryPlaying}
           />
         ) : activeNav === 'history' ? (
           <HistoryView onPlayVideo={playVideo} />

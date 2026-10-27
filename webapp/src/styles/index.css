@@ -411,7 +411,7 @@ body {
 }
 .video-mute-btn:hover { background: rgba(0,0,0,0.72); }
 
-/* Desktop Home: the reel runs up behind a transparent header (mobile hides the header) */
+/* Desktop reel (Home feed, Library player): the video runs up behind a transparent header (mobile hides the header) */
 @media (min-width: 769px) {
   /* Header search/theme icons can sit over the video, so give them a readable backdrop */
   .topnav-overlay .icon-btn {
@@ -427,7 +427,13 @@ body {
   }
   [data-theme="light"] .topnav-overlay .icon-btn:hover { background: var(--bg-high); }
   /* Top-right of the card is under the header controls; mute moves to top-left */
-  .main-home .video-mute-btn { right: auto; left: 12px; }
+  .main-reel .video-mute-btn { right: auto; left: 12px; }
+}
+
+/* Library player's back button: below the header on desktop, top of the screen on mobile (no header) */
+.library-player-back { top: calc(var(--topnav-h) + 12px); }
+@media (max-width: 768px) {
+  .library-player-back { top: 12px; }
 }
 
 /* ── Nav arrows group (prev/next) ── */

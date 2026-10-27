@@ -187,14 +187,20 @@ function ReorderGrid({ collectionId, visibility }) {
   )
 }
 
-const PLAYER_BOX = { position: 'relative', height: 'calc(100vh - var(--topnav-h))', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+// Fills the main area, which runs full height behind the transparent header while a player is open
+const PLAYER_BOX = { position: 'relative', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }
 
 /** Plays a list of videos in the swiper, with a back button to the grid it came from. */
-function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComments, currentUser }) {
+function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComments, currentUser, onPlayerChange }) {
   const { t } = useTranslation('common')
+  // Tells the shell a reel is on screen, so it switches to the same overlay layout as Home
+  useEffect(() => {
+    onPlayerChange?.(true)
+    return () => onPlayerChange?.(false)
+  }, [onPlayerChange])
   return (
     <div style={PLAYER_BOX}>
-      <button className="app-btn back" style={{ position: 'absolute', top: 12, left: 12, zIndex: 5 }} onClick={onBack}>
+      <button className="app-btn back library-player-back" style={{ position: 'absolute', left: 12, zIndex: 5 }} onClick={onBack}>
         <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span> {t('back')}
       </button>
       <VideoSwiper
@@ -210,7 +216,7 @@ function PlayerView({ videos, index, onBack, muted, onMutedChange, onShowComment
 }
 
 /** "Phát" on a card: loads the whole collection and plays it from the first video. */
-function CollectionPlayer({ collectionId, onBack, muted, onMutedChange, onShowComments, currentUser }) {
+function CollectionPlayer({ collectionId, onBack, muted, onMutedChange, onShowComments, currentUser, onPlayerChange }) {
   const { t } = useTranslation('library')
   const { data: videos = [], isLoading, error } = useCollectionPlaylist(collectionId)
   // Same box as the player, so the spinner sits where the video will appear
@@ -236,11 +242,12 @@ function CollectionPlayer({ collectionId, onBack, muted, onMutedChange, onShowCo
       onMutedChange={onMutedChange}
       onShowComments={onShowComments}
       currentUser={currentUser}
+      onPlayerChange={onPlayerChange}
     />
   )
 }
 
-function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, deleting, muted, onMutedChange, onShowComments, currentUser }) {
+function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, deleting, muted, onMutedChange, onShowComments, currentUser, onPlayerChange }) {
   const { t } = useTranslation(['library', 'common'])
   const [page, setPage] = useState(0)
   const [playIndex, setPlayIndex] = useState(null)
@@ -268,6 +275,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
         onMutedChange={onMutedChange}
         onShowComments={onShowComments}
         currentUser={currentUser}
+        onPlayerChange={onPlayerChange}
       />
     )
   }
@@ -350,7 +358,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
   )
 }
 
-export default function LibraryView({ initialCollectionId = null, muted, onMutedChange, onShowComments }) {
+export default function LibraryView({ initialCollectionId = null, muted, onMutedChange, onShowComments, onPlayerChange }) {
   const { t } = useTranslation(['library', 'common'])
   const { isLoggedIn, user } = useAuth()
   const [confirm, confirmDialog] = useConfirm()
@@ -385,6 +393,7 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
         onMutedChange={onMutedChange}
         onShowComments={onShowComments}
         currentUser={user}
+        onPlayerChange={onPlayerChange}
       />
     )
   }
@@ -403,6 +412,7 @@ export default function LibraryView({ initialCollectionId = null, muted, onMuted
           onMutedChange={onMutedChange}
           onShowComments={onShowComments}
           currentUser={user}
+          onPlayerChange={onPlayerChange}
         />
         {formState && <CollectionFormModal collection={formState.collection} onClose={() => setFormState(null)} />}
         {confirmDialog}
