@@ -38,7 +38,7 @@ class YoutubeControllerTest {
 
         ResponseEntity<ResultListInfo<VideoDto>> response = controller.getTopVideos();
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
         assertEquals(videos, response.getBody().getData());
         verify(youTubeVideoService).getVideoIds();

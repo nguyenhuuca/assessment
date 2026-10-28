@@ -12,8 +12,9 @@ import com.google.auth.oauth2.GoogleCredentials;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
+import org.springframework.boot.micrometer.metrics.autoconfigure.MeterRegistryCustomizer;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -94,6 +95,12 @@ public class ConfigBean {
             request.setConnectTimeout(10_000);
             request.setReadTimeout(60_000);
         };
+    }
+
+    /** Restores the Boot 3.5 request/response behavior on the MVC mapper (shared with {@link JsonMappers}). */
+    @Bean
+    JsonMapperBuilderCustomizer jsonMapperSettings() {
+        return JsonMappers::configure;
     }
 
     @Bean

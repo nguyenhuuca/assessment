@@ -16,7 +16,8 @@ import com.canhlabs.funnyapp.utils.AppUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.cache.test.autoconfigure.AutoConfigureCache;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -48,6 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Uses the REAL JWTAuthenticationFilter (only JwtProvider is mocked) so the tests prove how
  * authentication is resolved for the public GET and the protected PUT/DELETE on the same URL.
  */
+@AutoConfigureCache
 @WebMvcTest(VideoReactionController.class)
 @Import(VideoReactionControllerTest.TestSecurity.class)
 class VideoReactionControllerTest {

@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.service.notification;
 
+import com.canhlabs.funnyapp.config.JsonMappers;
+
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.entity.VideoImportJob;
 import com.canhlabs.funnyapp.entity.VideoSuggestion;
@@ -13,7 +15,7 @@ import com.canhlabs.funnyapp.repo.NotificationRepository;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoImportJobRepository;
 import com.canhlabs.funnyapp.repo.VideoSuggestionRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +53,7 @@ class SuggestionNotificationListenerTest {
     @BeforeEach
     void setUp() {
         listener = new SuggestionNotificationListener(notificationRepository, suggestionRepository, jobRepository,
-                userRepo, publisher, new ObjectMapper());
+                userRepo, publisher, JsonMappers.create());
         when(userRepo.findById(7L)).thenReturn(Optional.of(user(7L, UserStatus.ACTIVE)));
     }
 

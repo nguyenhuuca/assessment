@@ -17,7 +17,8 @@ import com.canhlabs.funnyapp.utils.AppConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.cache.test.autoconfigure.AutoConfigureCache;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -51,6 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /** Real JWTAuthenticationFilter (JwtProvider mocked) so public vs protected routes are proven end to end. */
+@AutoConfigureCache
 @WebMvcTest(VideoCollectionController.class)
 @Import(VideoCollectionControllerTest.TestSecurity.class)
 class VideoCollectionControllerTest {

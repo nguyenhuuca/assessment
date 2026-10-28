@@ -1,8 +1,8 @@
 package com.canhlabs.funnyapp.client;
 
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,10 +29,10 @@ public class JdkGitHubIssueClient implements GitHubIssueClient {
     private final URI base;
     private final Duration requestTimeout;
     private final AppProperties props;
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
 
     @Autowired
-    public JdkGitHubIssueClient(AppProperties props, ObjectMapper mapper) {
+    public JdkGitHubIssueClient(AppProperties props, JsonMapper mapper) {
         this(HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.NEVER)
                 .connectTimeout(Duration.ofSeconds(5))
@@ -40,7 +40,7 @@ public class JdkGitHubIssueClient implements GitHubIssueClient {
     }
 
     JdkGitHubIssueClient(HttpClient client, URI base, Duration requestTimeout,
-                         AppProperties props, ObjectMapper mapper) {
+                         AppProperties props, JsonMapper mapper) {
         this.client = client;
         this.base = base;
         this.requestTimeout = requestTimeout;

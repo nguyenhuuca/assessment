@@ -3,8 +3,10 @@ package com.canhlabs.funnyapp.client;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.exception.ImportErrorCode;
 import com.canhlabs.funnyapp.exception.ImportException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.canhlabs.funnyapp.config.JsonMappers;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -57,7 +59,7 @@ public class YtDlpClientImpl implements YtDlpClient {
     private static final Duration VERSION_TIMEOUT = Duration.ofSeconds(10);
     private static final Pattern PROGRESS =
             Pattern.compile("^(?:download:)?(\\d+|NA|None)\\|(\\d+|NA|None)\\|(\\d+(?:\\.\\d+)?|NA|None)$");
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final JsonMapper MAPPER = JsonMappers.create();
     private static final Duration SIZE_POLL = Duration.ofSeconds(2);
     private static final Pattern CONTROL_CHARS = Pattern.compile("\\p{Cntrl}");
     private static final Pattern SIZE = Pattern.compile("^(\\d+(?:\\.\\d+)?)\\s*([KMGT]?)i?B?$", Pattern.CASE_INSENSITIVE);
@@ -105,7 +107,7 @@ public class YtDlpClientImpl implements YtDlpClient {
         JsonNode node;
         try {
             node = MAPPER.readTree(json.toString());
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             log.warn("yt-dlp metadata output was not valid JSON");
             throw new ImportException(ImportErrorCode.EXTRACTOR_ERROR, e);
         }

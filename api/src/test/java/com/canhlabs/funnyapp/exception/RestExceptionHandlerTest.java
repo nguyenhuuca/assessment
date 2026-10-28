@@ -1,7 +1,8 @@
 package com.canhlabs.funnyapp.exception;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.canhlabs.funnyapp.config.JsonMappers;
+
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RestExceptionHandlerTest {
 
     private final RestExceptionHandler handler = new RestExceptionHandler(new com.canhlabs.funnyapp.config.I18nConfig().messageSource());
-    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final JsonMapper mapper = JsonMappers.create();
 
     @Test
     void dataIntegrityViolation_doesNotLeakSqlOrRowValues() throws Exception {

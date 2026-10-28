@@ -194,3 +194,4 @@ Go to 4.0 first, then to 4.1.
 |------|--------|--------|
 | 2026-10-28 | nguyenhuuca | Initial draft |
 | 2026-10-28 | nguyenhuuca | Accepted |
+| 2026-10-28 | nguyenhuuca | SB4-2: jjwt 0.13.0 with `jjwt-orgjson` (no Jackson 3 `jjwt-jackson` exists). SB4-3 folded into SB4-4: Jackson 3.1.7 needs `jackson-annotations` 2.21, Boot 3.5.0 pins 2.19.0. Liquibase: accept Boot 4.1.2's 5.0.4 (Community now FSL-1.1-ALv2, source-available; this app is not a competing use), owner decision |

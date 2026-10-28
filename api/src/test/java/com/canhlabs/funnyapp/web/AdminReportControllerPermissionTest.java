@@ -19,7 +19,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.cache.test.autoconfigure.AutoConfigureCache;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -51,6 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * CONTRIBUTOR, ADMIN and SUPER_ADMIN may use the report API, USER may not (real PermissionServiceImpl).
  * The slice does not load the rate-limit or audit aspects, so those limits are not exercised here.
  */
+@AutoConfigureCache
 @WebMvcTest(AdminReportController.class)
 @Import(AdminControllerPermissionTest.TestSecurity.class)
 class AdminReportControllerPermissionTest {

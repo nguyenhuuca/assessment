@@ -49,7 +49,7 @@ Ephemeral notes go to `./scratchpad/` (gitignored). `./artifacts/` holds design 
 
 ## Project Overview
 
-**Funny Movies** - Java 24 video streaming app with Spring Boot 3.x, PostgreSQL, Virtual Threads (Loom), YouTube API integration, and passwordless auth. Stack and prohibited patterns: `.claude/rules/tech-strategy.md`; frontend notes: `webapp/CLAUDE.md`; Docker and database setup: `api/CLAUDE.md`.
+**Funny Movies** - Java 24 video streaming app with Spring Boot 4.x, PostgreSQL, Virtual Threads (Loom), YouTube API integration, and passwordless auth. Stack and prohibited patterns: `.claude/rules/tech-strategy.md`; frontend notes: `webapp/CLAUDE.md`; Docker and database setup: `api/CLAUDE.md`.
 
 ## Essential Commands
 

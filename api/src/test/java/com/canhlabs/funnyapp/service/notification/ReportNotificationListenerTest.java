@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.service.notification;
 
+import com.canhlabs.funnyapp.config.JsonMappers;
+
 import com.canhlabs.funnyapp.entity.AppReport;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.ReportStatus;
@@ -7,7 +9,7 @@ import com.canhlabs.funnyapp.enums.UserStatus;
 import com.canhlabs.funnyapp.event.ReportClosedEvent;
 import com.canhlabs.funnyapp.repo.AppReportRepository;
 import com.canhlabs.funnyapp.repo.NotificationRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +48,7 @@ class ReportNotificationListenerTest {
 
     @BeforeEach
     void setUp() {
-        listener = new ReportNotificationListener(reportRepository, notificationRepository, publisher, new ObjectMapper());
+        listener = new ReportNotificationListener(reportRepository, notificationRepository, publisher, JsonMappers.create());
     }
 
     private static User user(UserStatus status) {

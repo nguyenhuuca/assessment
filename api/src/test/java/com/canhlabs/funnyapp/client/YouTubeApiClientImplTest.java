@@ -1,8 +1,10 @@
 package com.canhlabs.funnyapp.client;
 
+import com.canhlabs.funnyapp.config.JsonMappers;
+
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -57,7 +59,7 @@ class YouTubeApiClientImplTest {
           ]
         }
         """;
-        ObjectMapper mapper = new ObjectMapper();
+        JsonMapper mapper = JsonMappers.create();
         JsonNode responseNode = mapper.readTree(json);
 
         when(restTemplate.getForEntity(anyString(), eq(JsonNode.class)))

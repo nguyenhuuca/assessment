@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.service.notification;
 
+import com.canhlabs.funnyapp.config.JsonMappers;
+
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.entity.VideoComment;
 import com.canhlabs.funnyapp.enums.CommentModerationReason;
@@ -9,7 +11,7 @@ import com.canhlabs.funnyapp.event.CommentRepliedEvent;
 import com.canhlabs.funnyapp.repo.NotificationRepository;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +48,7 @@ class NotificationEventListenerTest {
     @BeforeEach
     void setUp() {
         listener = new NotificationEventListener(notificationRepository, commentRepository, userRepo,
-                publisher, new ObjectMapper());
+                publisher, JsonMappers.create());
     }
 
     private static VideoComment comment(UUID id, String author) {

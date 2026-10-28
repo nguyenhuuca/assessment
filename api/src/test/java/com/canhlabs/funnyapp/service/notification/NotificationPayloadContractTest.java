@@ -17,7 +17,7 @@ import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.repo.VideoImportJobRepository;
 import com.canhlabs.funnyapp.repo.VideoSuggestionRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class NotificationPayloadContractTest {
 
-    private static final ObjectMapper MAPPER = JsonContractSupport.bootMapper();
+    private static final JsonMapper MAPPER = JsonContractSupport.bootMapper();
     private static final UUID ROOT_ID = UUID.fromString("11111111-1111-4111-8111-111111111111");
     private static final UUID PARENT_ID = UUID.fromString("22222222-2222-4222-8222-222222222222");
     private static final UUID NEW_ID = UUID.fromString("33333333-3333-4333-8333-333333333333");

@@ -1,11 +1,11 @@
 package com.canhlabs.funnyapp.aop;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.canhlabs.funnyapp.config.JsonMappers;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class MaskingUtils {
 
     private static final String MASK = "***MASKED***";
-    private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
+    private static final JsonMapper MAPPER = JsonMappers.create();
 
     private final MaskingProperties maskingProperties;
 
@@ -75,7 +75,7 @@ public class MaskingUtils {
             JsonNode node = MAPPER.valueToTree(obj);
             maskTree(node);
             return MAPPER.writeValueAsString(node);
-        } catch (IllegalArgumentException | JsonProcessingException e) {
+        } catch (IllegalArgumentException | JacksonException e) {
             // Never fall back to toString(): it could print the very values we mask
             return "<unserializable " + (obj == null ? "null" : obj.getClass().getSimpleName()) + ">";
         }
@@ -84,8 +84,7 @@ public class MaskingUtils {
     private void maskTree(JsonNode node) {
         if (node instanceof ObjectNode object) {
             Set<String> sensitive = sensitiveKeys();
-            List<String> names = new ArrayList<>();
-            object.fieldNames().forEachRemaining(names::add);
+            List<String> names = new ArrayList<>(object.propertyNames());
             for (String name : names) {
                 JsonNode child = object.get(name);
                 if (sensitive.contains(name.toLowerCase(Locale.ROOT)) && !child.isNull()) {

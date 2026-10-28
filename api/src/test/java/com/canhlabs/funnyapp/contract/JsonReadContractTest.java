@@ -1,7 +1,6 @@
 package com.canhlabs.funnyapp.contract;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Disabled;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class JsonReadContractTest {
 
-    private static final ObjectMapper MAPPER = JsonContractSupport.bootMapper();
+    private static final JsonMapper MAPPER = JsonContractSupport.bootMapper();
 
     /** Test-local DTO with real primitives: no current request DTO has a non-ignored primitive field. */
     public static class Body {
@@ -38,7 +37,6 @@ class JsonReadContractTest {
         assertThat(body.count).isEqualTo(3);
     }
 
-    @Disabled("SB4-4: Jackson 3 rejects trailing tokens, spec Rule 4")
     @Test
     void trailingTokens_throw() {
         assertThatThrownBy(() -> MAPPER.readValue("{\"count\":3} {\"count\":4}", Body.class))

@@ -11,9 +11,9 @@ import com.canhlabs.funnyapp.dto.video.ShareRequestDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.exception.CustomException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.canhlabs.funnyapp.config.JsonMappers;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -131,7 +131,7 @@ public class ShareServiceImpl implements ShareService {
      * @param videoId detect from link
      * @return video info
      */
-    VideoDto requestYouTube(String link, String videoId) throws JsonProcessingException {
+    VideoDto requestYouTube(String link, String videoId) {
         String url = API_GOOGLE +
                 "id=" + videoId + "&" +
                 "key=" + props.getGoogleApiKey() + "&" +
@@ -139,7 +139,7 @@ public class ShareServiceImpl implements ShareService {
 
         // make an HTTP GET request
         String json = restTemplate.getForObject(url, String.class);
-        ObjectMapper mapper = new ObjectMapper();
+        JsonMapper mapper = JsonMappers.create();
         JsonNode jsonNode = mapper.readTree(json);
         JsonNode snippet = jsonNode.get("items").get(0).get("snippet");
         String title = snippet.get("title").asText();

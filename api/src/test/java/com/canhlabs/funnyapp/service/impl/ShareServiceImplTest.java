@@ -11,7 +11,6 @@ import com.canhlabs.funnyapp.dto.video.ShareRequestDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.exception.CustomException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -140,7 +139,7 @@ class ShareServiceImplTest {
     }
 
     @Test
-    void getInfoFromYoutube_returnsVideoDtoForValidUrl() throws JsonProcessingException {
+    void getInfoFromYoutube_returnsVideoDtoForValidUrl() {
         ShareServiceImpl spyService = Mockito.spy(shareService);
         VideoDto mockDto = VideoDto.builder().title("t").desc("d").urlLink("u").embedLink("e").build();
         doReturn(mockDto).when(spyService).requestYouTube(anyString(), anyString());

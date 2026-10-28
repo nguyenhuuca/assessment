@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.client;
 
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

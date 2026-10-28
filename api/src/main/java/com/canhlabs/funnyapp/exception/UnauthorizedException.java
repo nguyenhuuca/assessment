@@ -1,7 +1,7 @@
 package com.canhlabs.funnyapp.exception;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.canhlabs.funnyapp.config.JsonMappers;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -12,6 +12,8 @@ public class UnauthorizedException extends RuntimeException {
      *
      */
     private static final long serialVersionUID = 1L;
+
+    private static final JsonMapper MAPPER = JsonMappers.create();
 
     @Getter
     private final int subCode;
@@ -24,15 +26,14 @@ public class UnauthorizedException extends RuntimeException {
     }
 
 
-    public String toJson() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+    public String toJson() {
         Error apiError = new Error(HttpStatus.valueOf(HttpStatus.UNAUTHORIZED.value()));
         apiError.setMessage(this.getMessage());
         apiError.setSubCode(subCode);
         HashMap<String, Object> errorWrapper = new HashMap<>();
         errorWrapper.put("status", "FAILED");
         errorWrapper.put("error", apiError);
-        return mapper.writeValueAsString(errorWrapper);
+        return MAPPER.writeValueAsString(errorWrapper);
 
     }
 }

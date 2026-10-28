@@ -1,13 +1,16 @@
 package com.canhlabs.funnyapp.contract;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import com.canhlabs.funnyapp.config.JsonMappers;
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import java.io.IOException;
@@ -28,12 +31,13 @@ public final class JsonContractSupport {
     private JsonContractSupport() {
     }
 
-    /** The Boot auto-configured {@link ObjectMapper} (no {@code spring.jackson} overrides in application.yaml). */
-    public static ObjectMapper bootMapper() {
-        AtomicReference<ObjectMapper> holder = new AtomicReference<>();
+    /** The Boot auto-configured {@link JsonMapper} plus the app customizer (no {@code spring.jackson} overrides in application.yaml). */
+    public static JsonMapper bootMapper() {
+        AtomicReference<JsonMapper> holder = new AtomicReference<>();
         new ApplicationContextRunner()
                 .withConfiguration(AutoConfigurations.of(JacksonAutoConfiguration.class))
-                .run(ctx -> holder.set(ctx.getBean(ObjectMapper.class)));
+                .withBean(JsonMapperBuilderCustomizer.class, () -> JsonMappers::configure)
+                .run(ctx -> holder.set(ctx.getBean(JsonMapper.class)));
         return holder.get();
     }
 
@@ -60,7 +64,7 @@ public final class JsonContractSupport {
             assertThat(parent.get(field).asText()).matches(format);
             parent.remove(field);
             return root.toString();
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException("Invalid JSON", e);
         }
     }

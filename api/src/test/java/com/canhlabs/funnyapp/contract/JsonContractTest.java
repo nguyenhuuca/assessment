@@ -40,7 +40,7 @@ import com.canhlabs.funnyapp.dto.webapi.ResultErrorInfo;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.exception.Error;
 import com.canhlabs.funnyapp.exception.UnauthorizedException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -64,7 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class JsonContractTest {
 
-    private static final ObjectMapper MAPPER = JsonContractSupport.bootMapper();
+    private static final JsonMapper MAPPER = JsonContractSupport.bootMapper();
     private static final Instant T1 = Instant.parse("2026-01-02T03:04:05Z");
     private static final Instant T2 = Instant.parse("2026-02-03T04:05:06Z");
     private static final UUID ID1 = UUID.fromString("11111111-1111-4111-8111-111111111111");

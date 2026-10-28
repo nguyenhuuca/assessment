@@ -12,8 +12,7 @@ import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoImportJobRepository;
 import com.canhlabs.funnyapp.repo.VideoSuggestionRepository;
 import com.canhlabs.funnyapp.service.impl.VideoSuggestionServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -41,14 +40,14 @@ public class SuggestionNotificationListener {
     private final VideoImportJobRepository jobRepository;
     private final UserRepo userRepo;
     private final NotificationPublisher publisher;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
 
     public SuggestionNotificationListener(NotificationRepository notificationRepository,
                                           VideoSuggestionRepository suggestionRepository,
                                           VideoImportJobRepository jobRepository,
                                           UserRepo userRepo,
                                           NotificationPublisher publisher,
-                                          ObjectMapper objectMapper) {
+                                          JsonMapper objectMapper) {
         this.notificationRepository = notificationRepository;
         this.suggestionRepository = suggestionRepository;
         this.jobRepository = jobRepository;
@@ -92,7 +91,7 @@ public class SuggestionNotificationListener {
     }
 
     private void deliver(Long userId, NotificationType type, Long suggestionId, String videoId,
-                         String snippet, String reason) throws JsonProcessingException {
+                         String snippet, String reason) {
         User user = userId == null ? null : userRepo.findById(userId).orElse(null);
         if (user == null || user.getStatus() == UserStatus.DEACTIVATED) {
             return;

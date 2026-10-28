@@ -6,8 +6,9 @@ import com.canhlabs.funnyapp.enums.ReportStatus;
 import com.canhlabs.funnyapp.event.ReportClosedEvent;
 import com.canhlabs.funnyapp.repo.AppReportRepository;
 import com.canhlabs.funnyapp.service.GitHubWebhookService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -35,10 +36,10 @@ public class GitHubWebhookServiceImpl implements GitHubWebhookService {
 
     private final AppProperties props;
     private final AppReportRepository repository;
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
     private final ApplicationEventPublisher eventPublisher;
 
-    public GitHubWebhookServiceImpl(AppProperties props, AppReportRepository repository, ObjectMapper mapper,
+    public GitHubWebhookServiceImpl(AppProperties props, AppReportRepository repository, JsonMapper mapper,
                                     ApplicationEventPublisher eventPublisher) {
         this.props = props;
         this.repository = repository;
@@ -108,7 +109,7 @@ public class GitHubWebhookServiceImpl implements GitHubWebhookService {
                 throw new IllegalArgumentException("body is not a JSON object");
             }
             return root;
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new IllegalArgumentException("body is not JSON");
         }
     }

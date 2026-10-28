@@ -2,7 +2,7 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.client.ChatGptResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 class ChatGptServiceImplTest {
 
     @Mock RestTemplate restTemplate;
-    @Mock ObjectMapper objectMapper;
+    @Mock JsonMapper objectMapper;
     @Mock AppProperties props;
 
     @InjectMocks ChatGptServiceImpl service;

@@ -1,13 +1,15 @@
 package com.canhlabs.funnyapp.client;
 
+import com.canhlabs.funnyapp.config.JsonMappers;
+
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.canhlabs.funnyapp.client.GitHubIssueClient.GitHubException;
 import com.canhlabs.funnyapp.client.GitHubIssueClient.IssueState;
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +34,7 @@ class JdkGitHubIssueClientTest {
     private static final String TOKEN = "ghp_FAKE_TOKEN_123";
     private static final String SECRET_BODY = "secret-response-body";
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final JsonMapper mapper = JsonMappers.create();
     private final AtomicInteger requests = new AtomicInteger();
     private final AtomicReference<String> method = new AtomicReference<>();
     private final AtomicReference<String> path = new AtomicReference<>();

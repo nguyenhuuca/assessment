@@ -25,7 +25,8 @@ import jakarta.servlet.ServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.cache.test.autoconfigure.AutoConfigureCache;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -81,6 +82,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Flag behaviour: setUp configures the flag ON so real bitwise checks run.
  * The flagOff test overrides the mock to return false, triggering the bypass path.
  */
+@AutoConfigureCache
 @WebMvcTest(AdminController.class)
 @Import(AdminControllerPermissionTest.TestSecurity.class)
 class AdminControllerPermissionTest {

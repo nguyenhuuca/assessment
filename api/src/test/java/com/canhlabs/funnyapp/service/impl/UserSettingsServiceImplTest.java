@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.config.JsonMappers;
+
 import com.canhlabs.funnyapp.cache.IncognitoCache;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
@@ -251,7 +253,7 @@ class UserSettingsServiceImplTest {
 
     @Test
     void request_jsonNullVersusAbsentLocale() throws Exception {
-        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        tools.jackson.databind.json.JsonMapper mapper = JsonMappers.create();
 
         assertThat(mapper.readValue("{\"locale\":null}", UpdateUserSettingsRequest.class).isLocaleProvided()).isTrue();
         assertThat(mapper.readValue("{\"locale\":\"vi\"}", UpdateUserSettingsRequest.class).isLocaleProvided()).isTrue();

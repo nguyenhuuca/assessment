@@ -93,7 +93,7 @@ public class WebSecurityConfig {
         DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler() {
             @Override
             public EvaluationContext createEvaluationContext(
-                    Supplier<Authentication> authentication, MethodInvocation mi) {
+                    Supplier<? extends Authentication> authentication, MethodInvocation mi) {
                 StandardEvaluationContext ctx =
                         (StandardEvaluationContext) super.createEvaluationContext(authentication, mi);
                 ctx.addPropertyAccessor(new PermissionEnumPropertyAccessor());

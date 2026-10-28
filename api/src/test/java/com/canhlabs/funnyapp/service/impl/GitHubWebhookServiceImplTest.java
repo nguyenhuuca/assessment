@@ -1,5 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.config.JsonMappers;
+
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
@@ -9,7 +11,7 @@ import com.canhlabs.funnyapp.enums.ReportStatus;
 import com.canhlabs.funnyapp.event.ReportClosedEvent;
 import com.canhlabs.funnyapp.repo.AppReportRepository;
 import com.canhlabs.funnyapp.service.GitHubWebhookService.Outcome;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +57,7 @@ class GitHubWebhookServiceImplTest {
         props.getGithub().setWebhookSecret(SECRET);
         repository = mock(AppReportRepository.class);
         events = mock(ApplicationEventPublisher.class);
-        service = new GitHubWebhookServiceImpl(props, repository, new ObjectMapper(), events);
+        service = new GitHubWebhookServiceImpl(props, repository, JsonMappers.create(), events);
         logger = (Logger) LoggerFactory.getLogger(GitHubWebhookServiceImpl.class);
         logs = new ListAppender<>();
         logs.start();

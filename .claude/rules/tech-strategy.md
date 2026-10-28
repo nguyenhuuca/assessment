@@ -15,7 +15,7 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 | Component | Choice |
 |-----------|--------|
 | Runtime | JDK 24 with Preview Features |
-| Framework | Spring Boot 3.x |
+| Framework | Spring Boot 4.x (Jackson 3, `tools.jackson`) |
 | Concurrency | Virtual Threads (Project Loom) |
 | Build Tool | Maven 3.6+ |
 | ORM | JPA / Hibernate |

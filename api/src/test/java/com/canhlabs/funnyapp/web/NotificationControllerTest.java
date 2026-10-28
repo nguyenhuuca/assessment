@@ -16,7 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.cache.test.autoconfigure.AutoConfigureCache;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -58,6 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Uses the REAL JWTAuthenticationFilter (only JwtProvider mocked): the notification routes are ordinary
  * authenticated routes, so the filter must answer 401 when the Authorization header is missing.
  */
+@AutoConfigureCache
 @WebMvcTest(NotificationController.class)
 @Import(NotificationControllerTest.TestSecurity.class)
 class NotificationControllerTest {

@@ -10,7 +10,7 @@ import com.canhlabs.funnyapp.repo.NotificationRepository;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
 import com.canhlabs.funnyapp.utils.NotificationText;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -38,13 +38,13 @@ public class NotificationEventListener {
     private final VideoCommentRepository commentRepository;
     private final UserRepo userRepo;
     private final NotificationPublisher publisher;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
 
     public NotificationEventListener(NotificationRepository notificationRepository,
                                      VideoCommentRepository commentRepository,
                                      UserRepo userRepo,
                                      NotificationPublisher publisher,
-                                     ObjectMapper objectMapper) {
+                                     JsonMapper objectMapper) {
         this.notificationRepository = notificationRepository;
         this.commentRepository = commentRepository;
         this.userRepo = userRepo;
@@ -138,7 +138,7 @@ public class NotificationEventListener {
         publisher.unreadChanged(user.getId());
     }
 
-    private String toJson(Map<String, String> payload) throws com.fasterxml.jackson.core.JsonProcessingException {
+    private String toJson(Map<String, String> payload) {
         return objectMapper.writeValueAsString(payload);
     }
 }

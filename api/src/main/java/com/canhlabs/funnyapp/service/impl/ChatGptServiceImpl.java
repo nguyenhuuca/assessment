@@ -4,7 +4,7 @@ import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.client.ChatGptRequest;
 import com.canhlabs.funnyapp.client.ChatGptResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -17,10 +17,10 @@ import java.util.List;
 public class ChatGptServiceImpl implements ChatGptService {
 
     private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
     private final AppProperties props;
 
-    public ChatGptServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper, AppProperties props) {
+    public ChatGptServiceImpl(RestTemplate restTemplate, JsonMapper objectMapper, AppProperties props) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.props = props;

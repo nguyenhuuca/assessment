@@ -8,7 +8,7 @@ import com.canhlabs.funnyapp.enums.UserStatus;
 import com.canhlabs.funnyapp.event.ReportClosedEvent;
 import com.canhlabs.funnyapp.repo.AppReportRepository;
 import com.canhlabs.funnyapp.repo.NotificationRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -31,12 +31,12 @@ public class ReportNotificationListener {
     private final AppReportRepository reportRepository;
     private final NotificationRepository notificationRepository;
     private final NotificationPublisher publisher;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
 
     public ReportNotificationListener(AppReportRepository reportRepository,
                                       NotificationRepository notificationRepository,
                                       NotificationPublisher publisher,
-                                      ObjectMapper objectMapper) {
+                                      JsonMapper objectMapper) {
         this.reportRepository = reportRepository;
         this.notificationRepository = notificationRepository;
         this.publisher = publisher;
