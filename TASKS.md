@@ -587,3 +587,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **VT-1** FE: `m:ss / m:ss` label under the category in the scrim in `VideoPlayer` (reuses `formatClock`)
 - [x] **VT-2** FE: Vitest for the time label (shown, updated, hidden for NaN/Infinity, reset on video change)
+
+## Lite: Player progress bar visible in light theme (2026-10-28, autopilot lite, issue #72)
+
+- [ ] **PB-1** FE: `player-progress-track/fill` classes (fixed bright fill; light-theme override) replace the inline styles in `VideoPlayer`
+- [ ] **PB-2** FE: Vitest for the fill class + width (extend `VideoPlayer.progress.test.jsx`)
