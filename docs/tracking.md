@@ -56,7 +56,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **HLS Streaming** | [PRD ✅](prd/PRD-hls-streaming.md) | [0031 ✅](adr/0031-hls-streaming.md) | [Spec ✅](specs/spec-hls-streaming.md) | [Seq ✅](sequence/sequence-hls-streaming.md) | [Plan ✅](plans/plan-hls-streaming.md) | — | ✅ | Opt-in HLS per video (SUPER_ADMIN toggle), single-job stream-copy worker with ffprobe + disk guard, Harness flag `hls_streaming_enabled` decides if `hlsUrl` is offered; Range stays as fallback. Replaces the deleted ADR-0006 draft. Done HL-1..HL-7 (`5c485b5f`..`64d66721`) by autopilot ([report](reports/autopilot-2026-10-24-hls-streaming.md)); prod verified 2026-10-24 (49/60 videos H.264, 11 VP9 need re-import; HLS + Range fallback checked in browser) |
 | **Basic PWA** | — | — | — | — | [Plan ✅](plans/plan-pwa-basic.md) | — | ✅ | Hand-written service worker (navigation shell + hashed assets only; API/video never intercepted), installable manifest + iOS meta, "new version" banner from polled `version.json`. No new dependency. Built by autopilot ([report](reports/autopilot-2026-10-24-pwa-basic.md)); owner install check pending |
 | **Web Push** | [PRD 📝](prd/PRD-web-push.md) | [0032 💡](adr/0032-web-push.md) | — | — | — | — | 💡 | Daily new-video digest (19:00 VN, text only) + admin alerts (import DONE/FAILED, HLS ERROR) for signed-in users; standard Web Push + VAPID implemented in-house on JCA (no new dependency); CTR tracking. Next: approve ADR, `/spec` |
-| **Spring Boot 4.1 Upgrade** | [PRD ✅](prd/PRD-spring-boot-4-upgrade.md) | [0033 ✅](adr/0033-spring-boot-4-upgrade.md) | [Spec 📋](specs/spec-spring-boot-4-upgrade.md) | [Seq 📝](sequence/sequence-spring-boot-4-upgrade.md) | [Plan 📋](plans/plan-spring-boot-4-upgrade.md) | — | 📋 | 3.5.0 (OSS EOL 2026-06-30) → 4.1.x on Java 24; direct Jackson 3 migration, jjwt → `jjwt-orgjson`, BOM owns versions; JSON wire format semantically unchanged (order may change), old JWTs stay valid, no schema change. Plan: SB4-1..SB4-5 (baseline tests, jjwt-orgjson, internal Jackson 3 on 3.5, then the 4.1.2 bump). Next: SB4-1 |
+| **Spring Boot 4.1 Upgrade** | [PRD ✅](prd/PRD-spring-boot-4-upgrade.md) | [0033 ✅](adr/0033-spring-boot-4-upgrade.md) | [Spec 📋](specs/spec-spring-boot-4-upgrade.md) | [Seq 📝](sequence/sequence-spring-boot-4-upgrade.md) | [Plan 🔄](plans/plan-spring-boot-4-upgrade.md) | — | 🔄 | 3.5.0 (OSS EOL 2026-06-30) → 4.1.x on Java 24; direct Jackson 3 migration, jjwt → `jjwt-orgjson`, BOM owns versions; JSON wire format semantically unchanged (order may change), old JWTs stay valid, no schema change. Plan: SB4-1..SB4-5 (baseline tests, jjwt-orgjson, internal Jackson 3 on 3.5, then the 4.1.2 bump). Done SB4-1 (JSON contract baseline). Next: SB4-2 jjwt-orgjson |
 | **Agent Evolve Loop (self-improvement)** | — | [0027 ✅](adr/0027-agent-self-improvement-loop.md) | — | — | [Plan ✅](plans/plan-agent-evolve.md) | — | ✅ | Local `/evolve`: metrics signals → path allowlist + seeded-bug eval gate (`scripts/evolve.mjs`) → owner approves. Compress (D6) cuts duplicate/dead/stale text. Weekly headless workflow back 2026-10-22 with staged proposals ([ADR-0029](adr/0029-headless-evolve-staging.md)). First evolution: reviewer rule for assumptions about unchanged code, case `2026-10-19-swallowed-job-exceptions` caught 0/3 → 3/3 |
 
 ---
@@ -87,19 +87,19 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Suggestion Re-review](plans/plan-suggestion-rereview.md)
 - [Headless Autopilot](plans/plan-autopilot-headless.md)
 
-### 🔄 In Progress (3)
+### 🔄 In Progress (4)
+- [Spring Boot 4.1 Upgrade](plans/plan-spring-boot-4-upgrade.md)
 - [/autopilot skill](plans/plan-autopilot.md)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
 - [Admin Drive Force Sync](plans/plan-admin-drive-force-sync.md)
 
-### 🔍 In Review (7)
+### 🔍 In Review (6)
 - [Video Suggestions](plans/plan-video-suggestions.md)
 - [Unified Video List API](adr/0009-unified-video-list-api.md)
 - [Hot Video Priority](plans/plan-hot-video-priority.md)
 - [Hot Score Migration](plans/plan-vid2-hot-score-migration.md)
 - [File-based Hooks](plans/plan-a-file-based-hooks.md)
 - [Bookmark Feature](plans/plan-bookmark-feature.md)
-- [Spring Boot 4.1 Upgrade](plans/plan-spring-boot-4-upgrade.md)
 
 ### 💡 Proposed / No Plan Yet (1)
 - [Web Push](prd/PRD-web-push.md)
@@ -145,4 +145,4 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 
 ---
 
-*Last updated: 2026-10-28 — Spring Boot 4.1 upgrade PRD approved + ADR-0033 accepted + spec + sequence + plan; 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in `--auto` / `--auto-push` for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod*
+*Last updated: 2026-10-28 — SB4-1 JSON contract baseline landed by autopilot; Spring Boot 4.1 upgrade PRD approved + ADR-0033 accepted + spec + sequence + plan; 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in `--auto` / `--auto-push` for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod*

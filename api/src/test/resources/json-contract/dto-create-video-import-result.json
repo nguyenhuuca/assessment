@@ -1,0 +1,13 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "results" : [ {
+      "line" : 1,
+      "jobId" : 9
+    }, {
+      "line" : 2,
+      "errorCode" : "INVALID_URL"
+    } ]
+  }
+}

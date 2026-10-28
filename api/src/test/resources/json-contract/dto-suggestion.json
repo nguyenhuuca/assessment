@@ -1,0 +1,25 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "id" : 5,
+    "sourceUrl" : "https://youtu.be/abc",
+    "platform" : "FACEBOOK",
+    "title" : "Suggested",
+    "note" : "please",
+    "status" : "REJECTED",
+    "live" : false,
+    "liveVideoId" : null,
+    "liveFileId" : null,
+    "rejectReason" : "LOW_QUALITY",
+    "rejectNote" : "blurry",
+    "createdAt" : "2026-01-02T03:04:05Z",
+    "reviewedAt" : "2026-02-03T04:05:06Z",
+    "suggesterName" : "user",
+    "importJobId" : 9,
+    "rereviewCount" : 1,
+    "maxRereviews" : 2,
+    "canRequestRereview" : true,
+    "canReopen" : false
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "jwt" : "fake.jwt.token",
+    "action" : "LOGIN",
+    "sessionToken" : "fake-session",
+    "user" : {
+      "id" : 42,
+      "email" : "user@example.test",
+      "mfaEnabled" : true,
+      "role" : "ADMIN",
+      "permissions" : 5,
+      "passwordEnabled" : true,
+      "mfaAvailable" : true,
+      "passwordLoginAvailable" : true
+    }
+  }
+}

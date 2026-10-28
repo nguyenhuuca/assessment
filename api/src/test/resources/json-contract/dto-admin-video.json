@@ -1,0 +1,17 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "id" : 1,
+    "title" : "Funny cat",
+    "thumbnailPath" : "/thumbs/1.jpg",
+    "creatorEmail" : "user@example.test",
+    "status" : "PUBLISHED",
+    "hidden" : true,
+    "viewCount" : 12,
+    "priority" : 3,
+    "createdAt" : "2026-01-02T03:04:05Z",
+    "hlsStatus" : "READY",
+    "hlsError" : null
+  }
+}

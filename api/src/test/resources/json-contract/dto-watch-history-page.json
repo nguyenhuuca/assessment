@@ -1,0 +1,41 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "content" : [ {
+      "videoId" : 1,
+      "title" : "Funny cat",
+      "fileId" : "file-1",
+      "viewCount" : 12,
+      "watchedAt" : "2026-01-02T03:04:05Z",
+      "positionSec" : 30,
+      "durationSec" : 120,
+      "completed" : true
+    } ],
+    "pageable" : {
+      "pageNumber" : 0,
+      "pageSize" : 20,
+      "sort" : {
+        "empty" : true,
+        "sorted" : false,
+        "unsorted" : true
+      },
+      "offset" : 0,
+      "unpaged" : false,
+      "paged" : true
+    },
+    "totalPages" : 1,
+    "totalElements" : 1,
+    "last" : true,
+    "size" : 20,
+    "number" : 0,
+    "sort" : {
+      "empty" : true,
+      "sorted" : false,
+      "unsorted" : true
+    },
+    "numberOfElements" : 1,
+    "first" : true,
+    "empty" : false
+  }
+}

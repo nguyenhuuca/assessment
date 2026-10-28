@@ -1,0 +1,15 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : [ {
+    "name" : "drive-sync",
+    "description" : "Sync",
+    "cron" : "0 0 * * * *",
+    "zone" : "UTC",
+    "enabled" : true,
+    "nextRunAt" : "2026-02-03T04:05:06Z",
+    "lastRunAt" : "2026-01-02T03:04:05Z",
+    "lastResult" : "OK",
+    "running" : false
+  } ]
+}

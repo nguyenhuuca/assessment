@@ -1,0 +1,15 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "id" : 2,
+    "userShared" : null,
+    "title" : "No extras",
+    "desc" : null,
+    "embedLink" : null,
+    "urlLink" : null,
+    "fileId" : null,
+    "viewCount" : null,
+    "hlsUrl" : null
+  }
+}

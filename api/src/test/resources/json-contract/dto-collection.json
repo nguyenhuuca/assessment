@@ -1,0 +1,17 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "id" : "11111111-1111-4111-8111-111111111111",
+    "name" : "Favourites",
+    "visibility" : "PUBLIC",
+    "ownerName" : "user",
+    "itemCount" : 3,
+    "unavailableCount" : null,
+    "coverVideoId" : 1,
+    "coverFileId" : "file-1",
+    "canManage" : true,
+    "updatedAt" : "2026-01-02T03:04:05Z",
+    "isDefault" : true
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "videoId" : 1,
+    "likeCount" : 5,
+    "dislikeCount" : 1,
+    "myReaction" : "LIKE"
+  }
+}

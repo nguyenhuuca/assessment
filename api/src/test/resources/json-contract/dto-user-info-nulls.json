@@ -1,0 +1,8 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "jwt" : null,
+    "action" : null
+  }
+}

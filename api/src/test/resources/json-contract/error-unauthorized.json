@@ -1,0 +1,8 @@
+{
+  "error" : {
+    "status" : "UNAUTHORIZED",
+    "message" : "TOKEN_INVALID",
+    "subCode" : 601
+  },
+  "status" : "FAILED"
+}

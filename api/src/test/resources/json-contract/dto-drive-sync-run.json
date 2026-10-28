@@ -1,0 +1,18 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "runId" : "run-1",
+    "startedAt" : "2026-01-02T03:04:05Z",
+    "finishedAt" : null,
+    "active" : true,
+    "items" : [ {
+      "fileId" : "f1",
+      "name" : "a.mp4",
+      "status" : "FAILED",
+      "downloadedBytes" : 10,
+      "totalBytes" : 20,
+      "errorCode" : "DISK_FULL"
+    } ]
+  }
+}

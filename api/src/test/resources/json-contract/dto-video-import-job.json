@@ -1,0 +1,24 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "id" : 9,
+    "sourceUrl" : "https://youtu.be/abc",
+    "platform" : "YOUTUBE",
+    "title" : "Imported",
+    "status" : "DOWNLOADING",
+    "phase" : "download",
+    "progressPct" : 40,
+    "downloadedBytes" : 400,
+    "totalBytes" : 1000,
+    "scheduledAt" : "2026-01-02T03:04:05Z",
+    "startedAt" : "2026-02-03T04:05:06Z",
+    "finishedAt" : null,
+    "driveFileId" : "drive-1",
+    "ingested" : false,
+    "errorCode" : null,
+    "errorMessage" : null,
+    "attempts" : 2,
+    "createdAt" : "2026-01-02T03:04:05Z"
+  }
+}

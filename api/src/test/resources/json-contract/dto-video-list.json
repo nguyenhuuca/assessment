@@ -1,0 +1,25 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : [ {
+    "id" : 1,
+    "userShared" : "user@example.test",
+    "title" : "Funny cat",
+    "desc" : "A cat",
+    "embedLink" : "https://example.test/embed/1",
+    "urlLink" : "https://example.test/v/1",
+    "fileId" : "file-1",
+    "viewCount" : 12,
+    "hlsUrl" : "https://example.test/hls/1/index.m3u8"
+  }, {
+    "id" : 2,
+    "userShared" : null,
+    "title" : "No extras",
+    "desc" : null,
+    "embedLink" : null,
+    "urlLink" : null,
+    "fileId" : null,
+    "viewCount" : null,
+    "hlsUrl" : null
+  } ]
+}

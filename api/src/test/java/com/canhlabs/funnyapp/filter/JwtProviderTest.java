@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.filter;
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.contract.JsonContractSupport;
 import com.canhlabs.funnyapp.dto.auth.JwtGenerationDto;
 import com.canhlabs.funnyapp.dto.auth.JwtVerificationResultDto;
 import com.canhlabs.funnyapp.dto.auth.TokenDto;
@@ -141,6 +142,30 @@ class JwtProviderTest {
                 .compact();
 
         assertThat(jwtProvider.verifyToken(token).getData().getCredentialsVersion()).isZero();
+    }
+
+    /** Reads a token recorded once with the test secret (exp 2099-01-01) from json-contract/legacy-jwt.txt. */
+    private static String recordedToken(String key) {
+        return JsonContractSupport.fixture("legacy-jwt.txt").lines()
+                .filter(line -> line.startsWith(key + "="))
+                .map(line -> line.substring(key.length() + 1).trim())
+                .findFirst().orElseThrow();
+    }
+
+    @Test
+    void verifyToken_recordedTokenWithCvClaim_mapsToExpectedUserDetail() {
+        UserDetailDto data = jwtProvider.verifyToken(recordedToken("with-cv")).getData();
+
+        assertThat(data).usingRecursiveComparison().isEqualTo(UserDetailDto.builder().id(42L)
+                .email("user@example.test").role("ADMIN").permissions(5).credentialsVersion(3).build());
+    }
+
+    @Test
+    void verifyToken_recordedTokenWithoutCvClaim_mapsToCredentialsVersionZero() {
+        UserDetailDto data = jwtProvider.verifyToken(recordedToken("without-cv")).getData();
+
+        assertThat(data).usingRecursiveComparison().isEqualTo(UserDetailDto.builder().id(42L)
+                .email("user@example.test").role("ADMIN").permissions(5).credentialsVersion(0).build());
     }
 
     @Test

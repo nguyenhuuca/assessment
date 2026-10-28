@@ -1,0 +1,22 @@
+{
+  "status" : "SUCCESS",
+  "message" : "Executed success",
+  "data" : {
+    "email" : "user@example.test",
+    "passwordEnabled" : true,
+    "passwordLoginAvailable" : true,
+    "mfaEnabled" : false,
+    "mfaAvailable" : true,
+    "notifyNewContent" : true,
+    "notifyEmail" : false,
+    "defaultQuality" : "720p",
+    "incognitoEnabled" : false,
+    "profilePrivate" : true,
+    "locale" : "vi",
+    "accountStatus" : {
+      "plan" : "FREE",
+      "renewsAt" : null
+    },
+    "updatedAt" : "2026-01-02T03:04:05Z"
+  }
+}
