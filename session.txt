@@ -1,7 +1,7 @@
-task: Build number at the bottom of Settings (autopilot lite, --auto)
-status: done
-progress: 100
-done: SB-1 Settings build number d600cb1f
-next: -
-plan: -
-updated: 2026-10-24 20:56
+task: Spring Boot 4.1 upgrade (3.5.0 -> 4.1.2, Jackson 3)
+status: in_progress
+progress: 20
+done: PRD + ADR-0033 + spec + sequence + plan approved
+next: SB4-1 JSON contract baseline tests on 3.5
+plan: docs/plans/plan-spring-boot-4-upgrade.md
+updated: 2026-10-28 21:35
