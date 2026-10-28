@@ -708,10 +708,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#in-review-6" class="md-nav__link">
+  <a href="#in-review-7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔍 In Review (6)
+        🔍 In Review (7)
       
     </span>
   </a>
@@ -944,6 +944,8 @@
   
     
     
+      
+        
       
         
       
@@ -1502,6 +1504,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0033-spring-boot-4-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0033 - Spring Boot 4.1 Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1517,6 +1547,8 @@
   
     
     
+      
+        
       
         
       
@@ -1925,6 +1957,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/PRD-spring-boot-4-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spring Boot 4.1 Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1943,6 +2003,8 @@
       
         
           
+        
+      
         
       
         
@@ -2181,6 +2243,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/spec-spring-boot-4-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spring Boot 4.1 Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2199,6 +2289,8 @@
       
         
           
+        
+      
         
       
         
@@ -2542,6 +2634,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sequence/sequence-spring-boot-4-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spring Boot 4.1 Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../sequence/sequence-user-notifications/" class="md-nav__link">
         
   
@@ -2662,6 +2782,8 @@
   
     
     
+      
+        
       
         
       
@@ -3337,6 +3459,34 @@
     
   
     HLS Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-spring-boot-4-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spring Boot 4.1 Upgrade
   
 
     
@@ -8079,10 +8229,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#in-review-6" class="md-nav__link">
+  <a href="#in-review-7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔍 In Review (6)
+        🔍 In Review (7)
       
     </span>
   </a>
@@ -8596,6 +8746,17 @@
 <td>Daily new-video digest (19:00 VN, text only) + admin alerts (import DONE/FAILED, HLS ERROR) for signed-in users; standard Web Push + VAPID implemented in-house on JCA (no new dependency); CTR tracking. Next: approve ADR, <code>/spec</code></td>
 </tr>
 <tr>
+<td><strong>Spring Boot 4.1 Upgrade</strong></td>
+<td><a href="../prd/PRD-spring-boot-4-upgrade/">PRD ✅</a></td>
+<td><a href="../adr/0033-spring-boot-4-upgrade/">0033 ✅</a></td>
+<td><a href="../specs/spec-spring-boot-4-upgrade/">Spec 📋</a></td>
+<td><a href="../sequence/sequence-spring-boot-4-upgrade/">Seq 📝</a></td>
+<td><a href="../plans/plan-spring-boot-4-upgrade/">Plan 📋</a></td>
+<td>—</td>
+<td>📋</td>
+<td>3.5.0 (OSS EOL 2026-06-30) → 4.1.x on Java 24; direct Jackson 3 migration, jjwt → <code>jjwt-orgjson</code>, BOM owns versions; JSON wire format semantically unchanged (order may change), old JWTs stay valid, no schema change. Plan: SB4-1..SB4-5 (baseline tests, jjwt-orgjson, internal Jackson 3 on 3.5, then the 4.1.2 bump). Next: SB4-1</td>
+</tr>
+<tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
 <td>—</td>
 <td><a href="../adr/0027-agent-self-improvement-loop/">0027 ✅</a></td>
@@ -8641,7 +8802,7 @@
 <li><a href="../plans/plan-admin-dashboard/">Admin Dashboard</a></li>
 <li><a href="../plans/plan-admin-drive-force-sync/">Admin Drive Force Sync</a></li>
 </ul>
-<h3 id="in-review-6">🔍 In Review (6)<a class="headerlink" href="#in-review-6" title="Permanent link">&para;</a></h3>
+<h3 id="in-review-7">🔍 In Review (7)<a class="headerlink" href="#in-review-7" title="Permanent link">&para;</a></h3>
 <ul>
 <li><a href="../plans/plan-video-suggestions/">Video Suggestions</a></li>
 <li><a href="../adr/0009-unified-video-list-api/">Unified Video List API</a></li>
@@ -8649,6 +8810,7 @@
 <li><a href="../plans/plan-vid2-hot-score-migration/">Hot Score Migration</a></li>
 <li><a href="../plans/plan-a-file-based-hooks/">File-based Hooks</a></li>
 <li><a href="../plans/plan-bookmark-feature/">Bookmark Feature</a></li>
+<li><a href="../plans/plan-spring-boot-4-upgrade/">Spring Boot 4.1 Upgrade</a></li>
 </ul>
 <h3 id="proposed-no-plan-yet-1">💡 Proposed / No Plan Yet (1)<a class="headerlink" href="#proposed-no-plan-yet-1" title="Permanent link">&para;</a></h3>
 <ul>
@@ -8820,10 +8982,15 @@
 <td>Web Push Notifications with VAPID, Sent from the Backend</td>
 <td>💡 Proposed</td>
 </tr>
+<tr>
+<td>0033</td>
+<td>Upgrade to Spring Boot 4.1 with a Direct Jackson 3 Migration</td>
+<td>✅ Accepted</td>
+</tr>
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-28 — Spring Boot 4.1 upgrade PRD approved + ADR-0033 accepted + spec + sequence + plan; 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 
