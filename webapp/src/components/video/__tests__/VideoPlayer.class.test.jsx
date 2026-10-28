@@ -27,4 +27,11 @@ describe('VideoPlayer root element', () => {
     )
     expect(container.firstChild).toHaveClass('video-player')
   })
+
+  it('letterboxes the video (contain) instead of zooming it to fill the frame', () => {
+    const { container } = render(
+      <VideoPlayer video={{ id: 1, src: 'https://x/stream/a', title: 't' }} active />,
+    )
+    expect(container.querySelector('video').style.objectFit).toBe('contain')
+  })
 })

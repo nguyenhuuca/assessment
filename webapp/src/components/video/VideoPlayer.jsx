@@ -198,7 +198,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
         playsInline
         preload="auto"
         muted={muted}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
         onLoadStart={handleLoadStart}
         onCanPlay={handleCanPlay}
         onWaiting={handleWaiting}
