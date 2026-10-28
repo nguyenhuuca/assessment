@@ -3,15 +3,15 @@
 - **Request:** `docs/plans/plan-spring-boot-4-upgrade.md` SB4-2..SB4-4, one commit per task; `json-contract/` fixtures unchanged; SB4-3 falls back into SB4-4 on a jackson-annotations conflict
 - **Mode:** local (plan mode)
 - **Plan:** [plan-spring-boot-4-upgrade](../plans/plan-spring-boot-4-upgrade.md)
-- **Started:** 2026-10-28 22:06 · **Landed:** pending Gate 2
-- **Result:** committed locally: SB4-2 `78de3dad`, SB4-4 `59becaba`; push pending Gate 2
+- **Started:** 2026-10-28 22:06 · **Landed:** 2026-10-28 22:50 (pushed `1552b8de`)
+- **Result:** committed locally: SB4-2 `02fe8707`, SB4-4 `6f42137d`; pushed after Gate 2
 
 ## Pipeline
 
 | Stage | Result | Rounds |
 |-------|--------|--------|
 | Start | Owner request in chat | — |
-| Plan | Reused (plan mode); edited in place after review (`9d24aac4`) | 1 of 3 |
+| Plan | Reused (plan mode); edited in place after review (`53435777`) | 1 of 3 |
 | Plan review | Round 1 revise (4 blocking, 9 advisory), round 2 approve (0 blocking, 2 advisory, applied) | 2 of 3 |
 | Gate 1 (owner) | Approved | — |
 | Implement | worker-builder ×3 (SB4-2, SB4-3, SB4-4); SB4-3 fallback fired and was folded into SB4-4; SB4-4: 53 files, main +80/−67, test ≈ +105/−59 | 1 of 3 |
@@ -19,8 +19,8 @@
 | Local QA ×2 | SB4-2: 69 tests, pass 69 · flaky 0 · fail 0. SB4-4: 361 tests (29 changed classes), pass 361 · flaky 0 · fail 0 | 1 of 3 |
 | Fix | SB4-2: orphan pom comments removed. SB4-4: static mapper in `UnauthorizedException`, comment on the enum setting | — |
 | Land: full gates | `mvn verify` green after each task; LINE coverage 96.38% (SB4-2), 96.24% (SB4-4, `clean verify`) | — |
-| Gate 2 (owner) | pending | — |
-| CI + smoke | pending | — |
+| Gate 2 (owner) | Push (owner accepted that the first Boot 4 start is on prod: no local Postgres) | — |
+| CI + smoke | CI green (build, tests, Docker, deploy); `mock-test.sh` 22/22; health 200; `/actuator/prometheus` 403 from nginx/Cloudflare in front of the app (external block, not the app) | — |
 
 ## What changed
 
@@ -45,7 +45,7 @@
   - `Error` reads the constraint leaf name through the public `jakarta.validation.Path` API instead of Hibernate Validator's internal `PathImpl`.
   - `WebSecurityConfig` takes the Security 7 `Supplier<? extends Authentication>` override signature; no matcher or rule changed.
 - **Contract:**
-  - The 31 SB4-1 fixtures are byte-identical (`git diff --exit-code 78de3dad -- api/src/test/resources/json-contract`).
+  - The 31 SB4-1 fixtures are byte-identical (`git diff --exit-code 02fe8707 -- api/src/test/resources/json-contract`).
   - `trailingTokens_throw` is enabled with its assertion unchanged.
 - **Docs:** `tech-strategy.md` and `CLAUDE.md` now say Spring Boot 4.x. The ADR-0033 changelog records the jjwt backend, the SB4-3 fold and the Liquibase decision.
 
@@ -62,7 +62,7 @@
 | 7 | 1 | implement SB4-2 | 1 | fallback (worker-builder) | pom only | — | — | 6 | 1.7 | 31499 | sonnet |
 | 8 | 1 | code review SB4-2 | 1 | fallback (worker-reviewer) | approve | 0 | 3 | 6 | 1.1 | 44171 | sonnet |
 | 9 | 1 | qa x2 SB4-2 | 1 | qa-twice.sh | pass 69/69 | — | — | — | 3 | — | — |
-| 10 | 1 | land SB4-2 | — | orchestrator | `78de3dad`; verify green | — | — | — | 4 | — | opus |
+| 10 | 1 | land SB4-2 | — | orchestrator | `02fe8707`; verify green | — | — | — | 4 | — | opus |
 | 11 | 1 | implement SB4-3 | 1 | fallback (worker-builder) | fallback fired → folded into SB4-4 | — | — | 23 | 3.5 | 40534 | sonnet |
 | 12 | 1 | step 3.1 Liquibase | — | orchestrator + owner | FSL-1.1-ALv2; owner accepts 5.0.4 | — | — | — | 2 | — | opus |
 | 13 | 1 | implement SB4-4 | 1 | fallback (worker-builder) | verify green | — | — | 68 | 18.2 | 136084 | sonnet |

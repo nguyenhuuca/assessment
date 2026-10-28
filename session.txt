@@ -1,7 +1,7 @@
 task: Spring Boot 4.1 upgrade (3.5.0 -> 4.1.2, Jackson 3)
 status: in_progress
-progress: 85
-done: SB4-1 contract baseline 08e8127f; SB4-2 jjwt-orgjson 78de3dad; SB4-4 Boot 4.1.2 + Jackson 3 59becaba (SB4-3 folded)
-next: SB4-5 prod smoke (login, old session, stream, import, admin, SSE, CORS); remove properties-migrator after first boot
+progress: 90
+done: SB4-1 contract baseline 08e8127f; SB4-2 jjwt-orgjson 02fe8707; SB4-4 Boot 4.1.2 + Jackson 3 6f42137d (SB4-3 folded); prod deploy + mock-test 22/22
+next: SB4-5 owner smoke (old session, MFA, stream, SSE, CORS PATCH); check prod log for properties-migrator, then remove it; 7-day watch
 plan: docs/plans/plan-spring-boot-4-upgrade.md
-updated: 2026-10-28 22:48
+updated: 2026-10-28 23:11

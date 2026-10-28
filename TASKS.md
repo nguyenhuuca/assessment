@@ -596,7 +596,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 ## Feature: Spring Boot 4.1 upgrade (2026-10-28, ADR-0033, [plan](docs/plans/plan-spring-boot-4-upgrade.md))
 
 - [x] **SB4-1** BE test: JSON contract baseline on 3.5 (`JsonContractTest` + 31 fixtures in `json-contract/`, `ErrorJsonContractTest`, `NotificationPayloadContractTest`, `JsonReadContractTest`, legacy JWT fixtures; autopilot lite) 08e8127f
-- [x] **SB4-2** BE: jjwt 0.13.0 + `jjwt-orgjson`; drop unused hypersistence + jackson-dataformat-yaml (on 3.5) 78de3dad
+- [x] **SB4-2** BE: jjwt 0.13.0 + `jjwt-orgjson`; drop unused hypersistence + jackson-dataformat-yaml (on 3.5) 02fe8707
 - [x] **SB4-3** folded into SB4-4 (fallback triggers 2+3: Jackson 3.1.7 needs jackson-annotations 2.21, Boot 3.5.0 pins 2.19.0 → `NoClassDefFoundError: JsonSerializeAs`; nothing committed)
-- [x] **SB4-4** BE: Boot 4.1.2 bump + MVC-side Jackson 3 + Security 7 / Hibernate 7 / test-slice fixes + tech-strategy, CLAUDE.md (incl. folded SB4-3) 59becaba
+- [x] **SB4-4** BE: Boot 4.1.2 bump + MVC-side Jackson 3 + Security 7 / Hibernate 7 / test-slice fixes + tech-strategy, CLAUDE.md (incl. folded SB4-3) 6f42137d
 - [ ] **SB4-5** Ops: deploy, prod smoke test, 7-day watch
