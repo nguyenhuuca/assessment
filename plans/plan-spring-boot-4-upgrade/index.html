@@ -9012,8 +9012,9 @@ Owner: Builder (/builder)
 <li><code>FAIL_ON_UNKNOWN_PROPERTIES=false</code></li>
 <li><code>WRITE_DATES_AS_TIMESTAMPS=false</code></li>
 </ul>
-<p>The holder is exposed as a bean and as a static accessor for the static sites.</p>
+<p>The holder is exposed as a bean for injected sites. Static sites (<code>MaskingUtils</code>, <code>YtDlpClientImpl</code>, <code>ShareServiceImpl</code>) call a package-visible factory method <code>JsonMappers.create()</code>, so their tests can build the same mapper without Spring.</p>
 <ul>
+<li>On Boot 3.5 a Jackson 3 <code>JsonMapper</code> bean is a different type from Jackson 2's <code>ObjectMapper</code>. Boot's <code>JacksonAutoConfiguration</code> (which only backs off for an <code>ObjectMapper</code> bean) and Spring MVC ignore it, so SB4-3 cannot change the HTTP wire format.</li>
 <li>Files: <code>config/JsonMappers.java</code> (new), <code>config/ConfigBean.java</code></li>
 <li>[ ] <strong>Step 2.4 (SB4-3):</strong> Move internal Jackson usage to <code>tools.jackson</code>. Catch blocks keep the same fallback (the inventory is in the explorer notes below).</li>
 <li><strong>Static or per-call mappers:</strong><ul>
@@ -9035,13 +9036,19 @@ Owner: Builder (/builder)
 </ul>
 </li>
 <li><strong>Tests:</strong> the matching tests (<code>JdkGitHubIssueClientTest</code>, <code>ChatGptServiceImplTest</code>, <code>GitHubWebhookServiceImplTest</code>, the three listener tests, <code>UserSettingsServiceImplTest</code>).</li>
-<li><strong>Fallback:</strong> if <code>mvn verify</code> fails on a <code>jackson-annotations</code> conflict, stop, and move steps 2.3–2.4 into SB4-4.</li>
+<li><strong>Fallback trigger</strong> (any one of these, checked before committing SB4-3):<ol>
+<li><code>mvn -f api/pom.xml dependency:tree -Dincludes=com.fasterxml.jackson.core:jackson-annotations</code> shows more than one version, or a version different from Boot 3.5.0's managed one;</li>
+<li>any test fails with a Jackson linkage error (<code>NoSuchMethodError</code>, <code>NoClassDefFoundError</code>, <code>ClassNotFoundException</code> naming a <code>com.fasterxml.jackson</code> or <code>tools.jackson</code> class);</li>
+<li>making it work needs a <code>jackson-bom</code> / <code>jackson-annotations</code> version override that changes Boot 3.5's managed Jackson 2 versions.</li>
+</ol>
+</li>
+<li><strong>On trigger:</strong> discard all SB4-3 changes (<code>git restore</code>/<code>git clean</code> on the SB4-3 files; nothing is committed), mark the SB4-3 row "folded into SB4-4" in this table and in <code>TASKS.md</code> (with the trigger that fired), and carry steps 2.3–2.4 into SB4-4. No half state lands on <code>main</code>.</li>
 </ul>
 </li>
 </ul>
 <h3 id="phase-3-the-bump-sb4-4">Phase 3: The bump (SB4-4)<a class="headerlink" href="#phase-3-the-bump-sb4-4" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>Step 3.1:</strong> Check Liquibase 5.0.4: license and changelog compatibility with <code>db/changelog/db.changelog-master.yaml</code>. If either is a problem, decide on a 4.x pin (see Key Decisions).</li>
+<li>[ ] <strong>Step 3.1:</strong> Check Liquibase 5.0.4: license and changelog compatibility with <code>db/changelog/db.changelog-master.yaml</code>. If either is a problem, decide on a 4.x pin (see Key Decisions). Record the decision in the ADR-0033 changelog <strong>before</strong> editing the pom, because a pin changes step 3.2.</li>
 <li>[ ] <strong>Step 3.2:</strong> Update <code>api/pom.xml</code>:<ul>
 <li><strong>Version changes:</strong><ul>
 <li>parent → <code>4.1.2</code></li>
@@ -9057,7 +9064,7 @@ Owner: Builder (/builder)
 <li><strong>Pins to remove:</strong><ul>
 <li><code>spring-security.version</code></li>
 <li><code>&lt;version&gt;</code> on <code>spring-boot-maven-plugin</code>, <code>micrometer-java21</code>, <code>mockito-core</code>, <code>byte-buddy</code></li>
-<li><code>lombok.version</code> property (BOM 1.18.48)</li>
+<li><code>lombok.version</code> property (BOM 1.18.48). <code>pom.xml:379</code> uses <code>${lombok.version}</code> in the compiler plugin's <code>annotationProcessorPaths</code>; Boot's parent still defines <code>lombok.version</code>, so the reference keeps working once the local override is gone. Confirm with <code>mvn help:evaluate -Dexpression=lombok.version</code></li>
 <li><code>maven-compiler-plugin</code> 3.11.0 and the surefire pin (BOM 3.15.0 / 3.5.6)</li>
 </ul>
 </li>
@@ -9072,20 +9079,29 @@ Owner: Builder (/builder)
 <li><code>client/YouTubeApiClientImpl</code>: <code>tools.jackson.databind.JsonNode</code>.</li>
 <li><code>JsonMapperBuilderCustomizer</code> bean applying the same FR-4 settings to the MVC mapper. <code>JsonMappers</code> and MVC share one source of settings.</li>
 <li>Tests: <code>RestExceptionHandlerTest</code>, <code>YouTubeApiClientImplTest</code>, <code>CommentControllerTest</code> and <code>UserSettingsControllerTest</code> (<code>@Autowired JsonMapper</code>).</li>
+<li><strong>Contract test code (not fixtures):</strong> <code>contract/JsonContractSupport.java:3-5,10,35</code>, <code>contract/JsonReadContractTest.java:3</code>, <code>contract/JsonContractTest.java:43</code> and <code>exception/ErrorJsonContractTest</code>, <code>service/notification/NotificationPayloadContractTest</code> move to <code>tools.jackson</code> / <code>JsonMapper</code> and Boot 4's <code>JacksonAutoConfiguration</code> package. They may change only so that the same assertions run against the Boot 4 MVC mapper.</li>
+<li><strong><code>src/test/resources/json-contract/**</code> is read-only.</strong> If a fixture comparison fails, fix the mapper configuration or the annotations, never the fixture. Check: <code>git diff --exit-code &lt;SB4-3 commit&gt; -- api/src/test/resources/json-contract</code>.</li>
+<li><strong>3.5 quirks the fixtures pin; SB4-4 must keep them.</strong> The customizer preserves Boot 3.5's visibility and null-inclusion behavior (null fields are written; field visibility as in Jackson 2 defaults):<ul>
+<li><code>Error.timestamp</code> written with the 12-hour pattern <code>dd-MM-yyyy hh:mm:ss</code> (<code>Error.java:29</code>), e.g. 15:04 → <code>03:04</code> (<code>error-code.json</code>);</li>
+<li><code>ApiSubError</code> sub-errors serialize only <code>field</code> and <code>rejectedValue</code> (it has no getters for <code>object</code> / <code>message</code>) (<code>error-field-sub-errors.json</code>, <code>error-constraint-violation.json</code>);</li>
+<li><code>ResultErrorInfo</code> serializes <code>"error": null</code> (<code>error-result-error-info.json</code>).</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>[ ] <strong>Step 3.4:</strong> Compile fixes, limited to what the build needs (FR-6):<ul>
 <li><strong>Test slices (15 <code>@WebMvcTest</code> files):</strong> the <code>WebMvcTest</code> import moves to the Boot 4 test module package (add the <code>spring-boot-webmvc-test</code> dependency if needed); the <code>TaskExecutionAutoConfiguration</code> import moves in <code>config/AsyncExecutorVirtualThreadTest</code>.</li>
 <li><strong><code>config/ConfigBean</code>:</strong> <code>RestTemplateBuilder</code> and <code>MeterRegistryCustomizer</code> package moves.</li>
-<li><strong><code>filter/WebSecurityConfig</code>:</strong> the <code>DefaultMethodSecurityExpressionHandler.createEvaluationContext</code> override (<code>:92-105</code>) on Security 7; string <code>requestMatchers</code> (<code>:55-58</code>) keep the same effect, so check <code>AppConstant.WebIgnoringConfig</code> paths for pattern-syntax changes; CORS unchanged.</li>
+<li><strong><code>filter/WebSecurityConfig</code>:</strong> the <code>DefaultMethodSecurityExpressionHandler.createEvaluationContext</code> override (<code>:92-105</code>) on Security 7; string <code>requestMatchers</code> (<code>:55-58</code>) keep the same effect under Security 7's path-pattern matching, so check <code>AppConstant.WebIgnoringConfig</code> paths for pattern-syntax changes; CORS unchanged. <code>WebSecurityConfigAdminMatcherTest</code> and the 4 <code>*PermissionTest</code> classes must pass with unchanged assertions.</li>
 <li><strong><code>exception/Error:110</code>:</strong> Hibernate Validator internal <code>PathImpl</code>. Replace it with the public <code>jakarta.validation.Path</code> API, with the same field name in the output.</li>
 <li><strong>Entities:</strong> for the 5 entities with <code>@GeneratedValue</code> and no strategy (<code>UserEmailRequest</code>, <code>AppReport</code>, <code>VideoCollection</code>, <code>VideoComment</code>, <code>VideoAccessStats</code>), confirm that Hibernate 7 resolves the same sequence / identity as Liquibase created. Set it explicitly only if it does not.</li>
 <li><strong><code>exception/RestExceptionHandler</code>:</strong> <code>ResponseEntityExceptionHandler</code> override signatures.</li>
 </ul>
 </li>
-<li>[ ] <strong>Step 3.5:</strong> Enable the trailing-token test from step 1.3 (Rule 4, EC-6). Contract fixtures from SB4-1 must pass <strong>unchanged</strong>.</li>
+<li>[ ] <strong>Step 3.5:</strong> Remove <code>@Disabled</code> from <code>JsonReadContractTest.trailingTokens_throw</code> (<code>:41</code>) <strong>without changing its assertion</strong>: reading a body with trailing tokens through the Boot 4 MVC mapper must throw (Jackson 3 default <code>FAIL_ON_TRAILING_TOKENS=true</code>; the customizer must not turn it off) (spec Rule 4, EC-6). Contract fixtures from SB4-1 must pass <strong>unchanged</strong>.</li>
 <li>[ ] <strong>Step 3.6:</strong> Boot locally against Postgres (<code>./startLocal.sh</code>):<ul>
 <li>Liquibase: 0 pending changesets.</li>
+<li>Local DB only: create one row each for <code>UserEmailRequest</code>, <code>AppReport</code>, <code>VideoCollection</code>, <code>VideoComment</code>, <code>VideoAccessStats</code> through the app (implicit <code>@GeneratedValue</code>); ids must come from the Liquibase-created sequences/identity with no Hibernate error.</li>
 <li><code>/actuator/health</code> UP, <code>/actuator/prometheus</code> serves metrics, Swagger UI loads (dev profile).</li>
 <li>The properties-migrator log shows no renamed keys; fix any it reports.</li>
 <li>Then remove <code>spring-boot-properties-migrator</code>.</li>
@@ -9137,21 +9153,21 @@ Owner: Builder (/builder)
 <td>jjwt 0.13.0 + <code>jjwt-orgjson</code>; drop unused deps (on 3.5)</td>
 <td>SB4-1</td>
 <td>120</td>
-<td>Legacy JWT fixtures verify; warm-up test passes; <code>mvn dependency:tree</code> shows no <code>jjwt-jackson</code> / hypersistence / dataformat-yaml; prod: users stay logged in after deploy</td>
+<td>Both legacy JWT fixtures verify (<code>with-cv</code> → <code>credentialsVersion=3</code>, <code>without-cv</code> → <code>0</code>); warm-up test passes; expired/tampered still 602/601; <code>mvn dependency:tree</code> shows no <code>jjwt-jackson</code> / hypersistence / dataformat-yaml; prod: users stay logged in after deploy</td>
 </tr>
 <tr>
 <td>SB4-3</td>
-<td>Internal Jackson → Jackson 3 + <code>JsonMappers</code> (on 3.5, with fallback)</td>
+<td><strong>Folded into SB4-4</strong> (2026-10-28: fallback triggers 2+3, Jackson 3.1.7 needs <code>jackson-annotations</code> 2.21 vs Boot 3.5.0's 2.19.0). Was: internal Jackson → Jackson 3 + <code>JsonMappers</code> (on 3.5, with fallback)</td>
 <td>SB4-2</td>
 <td>400</td>
-<td>Only the files listed as Jackson 2 in step 2.4 still import <code>com.fasterxml.jackson.databind</code>; same catch fallbacks (tests); contract + payload fixtures pass</td>
+<td><code>grep -rlE "com\.fasterxml\.jackson\.(databind\|core)" api/src/main</code> lists only <code>exception/Error.java</code>, <code>exception/LowerCaseClassNameResolver.java</code>, <code>exception/UnauthorizedException.java</code>, <code>client/YouTubeApiClientImpl.java</code>; same catch fallbacks (tests); contract + payload fixtures pass; none of the step 2.4 fallback triggers fired (else: folded into SB4-4)</td>
 </tr>
 <tr>
 <td>SB4-4</td>
 <td>Boot 4.1.2 bump + remaining Jackson 3 + compile fixes + docs</td>
 <td>SB4-3</td>
 <td>600</td>
-<td><code>grep -rE "com\.fasterxml\.jackson\.(databind\|core\|dataformat)" api/src</code> is empty; SB4-1 fixtures unchanged and green; trailing-token test enabled; coverage ≥ 90%; <code>BeanConstructorTest</code> green; local boot checklist (step 3.6) done; tech-strategy and CLAUDE.md updated</td>
+<td><code>grep -rE "com\.fasterxml\.jackson\.(databind\|core\|dataformat)" api/src</code> is empty (main and test); <code>git diff --exit-code &lt;SB4-3 commit&gt; -- api/src/test/resources/json-contract</code> is clean and every contract test is green, including the three pinned quirks (step 3.3); <code>trailingTokens_throw</code> enabled with its assertion unchanged and passing; security matcher/permission tests unchanged and green; coverage ≥ 90%; <code>BeanConstructorTest</code> green; local boot checklist (step 3.6) done; tech-strategy and CLAUDE.md updated</td>
 </tr>
 <tr>
 <td>SB4-5</td>
@@ -9228,6 +9244,12 @@ Owner: Builder (/builder)
 <td>Modify</td>
 <td>SB4-4</td>
 <td>Test-module imports</td>
+</tr>
+<tr>
+<td><code>contract/*.java</code>, <code>exception/ErrorJsonContractTest</code>, <code>service/notification/NotificationPayloadContractTest</code></td>
+<td>Modify</td>
+<td>SB4-4</td>
+<td>Jackson 3 imports only; fixtures under <code>json-contract/</code> stay untouched</td>
 </tr>
 <tr>
 <td><code>.claude/rules/tech-strategy.md</code>, <code>CLAUDE.md</code>, <code>docs/adr/0033-…</code></td>

@@ -8754,7 +8754,7 @@
 <td><a href="../plans/plan-spring-boot-4-upgrade/">Plan 🔄</a></td>
 <td>—</td>
 <td>🔄</td>
-<td>3.5.0 (OSS EOL 2026-06-30) → 4.1.x on Java 24; direct Jackson 3 migration, jjwt → <code>jjwt-orgjson</code>, BOM owns versions; JSON wire format semantically unchanged (order may change), old JWTs stay valid, no schema change. Plan: SB4-1..SB4-5 (baseline tests, jjwt-orgjson, internal Jackson 3 on 3.5, then the 4.1.2 bump). Done SB4-1 (JSON contract baseline). Next: SB4-2 jjwt-orgjson</td>
+<td>3.5.0 (OSS EOL 2026-06-30) → 4.1.x on Java 24; direct Jackson 3 migration, jjwt → <code>jjwt-orgjson</code>, BOM owns versions; JSON wire format semantically unchanged (order may change), old JWTs stay valid, no schema change. Plan: SB4-1..SB4-5 (baseline tests, jjwt-orgjson, internal Jackson 3 on 3.5, then the 4.1.2 bump). Done SB4-1 <code>08e8127f</code>, SB4-2 jjwt-orgjson <code>78de3dad</code>, SB4-4 Boot 4.1.2 + Jackson 3 <code>59becaba</code> (SB4-3 folded in) by autopilot (<a href="../reports/autopilot-2026-10-28-sb4-boot4/">report</a>). Next: SB4-5 local boot + prod smoke, 7-day watch</td>
 </tr>
 <tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
@@ -8990,7 +8990,7 @@
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-28 — SB4-1 JSON contract baseline landed by autopilot; Spring Boot 4.1 upgrade PRD approved + ADR-0033 accepted + spec + sequence + plan; 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-28 — SB4-2 + SB4-4 (Spring Boot 4.1.2, Jackson 3) built by autopilot; SB4-1 JSON contract baseline landed by autopilot; Spring Boot 4.1 upgrade PRD approved + ADR-0033 accepted + spec + sequence + plan; 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 
