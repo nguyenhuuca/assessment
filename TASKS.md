@@ -590,5 +590,5 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Lite: Player progress bar visible in light theme (2026-10-28, autopilot lite, issue #72)
 
-- [x] **PB-1** FE: `player-progress-track/fill` classes (fixed bright fill; light-theme override) replace the inline styles in `VideoPlayer`
-- [x] **PB-2** FE: Vitest for the fill class + width (extend `VideoPlayer.progress.test.jsx`)
+- [x] **PB-1** FE: `player-progress-track/fill` classes (fixed bright fill; light-theme override) replace the inline styles in `VideoPlayer` c64e5f31
+- [x] **PB-2** FE: Vitest for the fill class + width (extend `VideoPlayer.progress.test.jsx`) c64e5f31
