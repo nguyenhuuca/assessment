@@ -595,7 +595,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Feature: Spring Boot 4.1 upgrade (2026-10-28, ADR-0033, [plan](docs/plans/plan-spring-boot-4-upgrade.md))
 
-- [x] **SB4-1** BE test: JSON contract baseline on 3.5 (`JsonContractTest` + 31 fixtures in `json-contract/`, `ErrorJsonContractTest`, `NotificationPayloadContractTest`, `JsonReadContractTest`, legacy JWT fixtures; autopilot lite)
+- [x] **SB4-1** BE test: JSON contract baseline on 3.5 (`JsonContractTest` + 31 fixtures in `json-contract/`, `ErrorJsonContractTest`, `NotificationPayloadContractTest`, `JsonReadContractTest`, legacy JWT fixtures; autopilot lite) 08e8127f
 - [ ] **SB4-2** BE: jjwt 0.13.0 + `jjwt-orgjson`; drop unused hypersistence + jackson-dataformat-yaml (on 3.5)
 - [ ] **SB4-3** BE: internal Jackson → Jackson 3 + `JsonMappers` (on 3.5; fallback: fold into SB4-4)
 - [ ] **SB4-4** BE: Boot 4.1.2 bump + MVC-side Jackson 3 + Security 7 / Hibernate 7 / test-slice fixes + tech-strategy, CLAUDE.md
