@@ -582,3 +582,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **RH-1** FE: Home header transparent + main full 100vh, card `maxHeight` 100vh-40; header icons get a backdrop, mute moves top-left on desktop Home
 - [x] **RH-2** FE: Vitest `AppShell.overlay.test.jsx` (Home overlay vs solid header on other tabs)
+
+## Lite: Reel-style time on the video player (2026-10-28, autopilot lite, issue #70)
+
+- [x] **VT-1** FE: `m:ss / m:ss` label under the category in the scrim in `VideoPlayer` (reuses `formatClock`)
+- [x] **VT-2** FE: Vitest for the time label (shown, updated, hidden for NaN/Infinity, reset on video change)

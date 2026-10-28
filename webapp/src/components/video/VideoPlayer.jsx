@@ -7,6 +7,7 @@ import { watchHistoryApi } from '../../api/watchHistory.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useHlsSource } from '../../hooks/useHlsSource.js'
 import WatchedBadge from './WatchedBadge.jsx'
+import { formatClock } from '../history/watchHistoryUtils.js'
 
 /** Seconds actually played (not seeked) while visible before a view counts; server dedupes per viewer per video for 30 min. */
 const VIEW_THRESHOLD_SEC = 3
@@ -27,6 +28,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
   const [paused,       setPaused]       = useState(false)
   const [progress,     setProgress]     = useState(0)
   const [descExpanded, setDescExpanded] = useState(false)
+  const [time,         setTime]         = useState({ cur: 0, dur: 0 })
   const viewSentRef = useRef(false)
   const watchedRef  = useRef(0)
   const lastTimeRef = useRef(0)
@@ -73,6 +75,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
     const id = video?.id
     setDescExpanded(false)
     setProgress(0)
+    setTime({ cur: 0, dur: 0 })
     setPaused(false)
     setLoading(true)
     viewSentRef.current = false
@@ -110,9 +113,17 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
   function handlePlaying()   { setLoading(false); setPaused(false); playingRef.current = true }
   function handlePause()     { setPaused(true); playingRef.current = false; reportProgress(video?.id, true) }
   function handleEnded()     { playingRef.current = false; reportProgress(video?.id, true); onEnded?.() }
+  /** Whole-second clock for the time label; keeps the old state when nothing changed (timeupdate fires ~4x/s). */
+  function syncTime(cur, dur) {
+    // `|| 0` turns a NaN currentTime (metadata not ready) into 0
+    const next = { cur: Math.floor(cur) || 0, dur: Number.isFinite(dur) && dur > 0 ? Math.floor(dur) : 0 }
+    setTime(prev => (prev.cur === next.cur && prev.dur === next.dur ? prev : next))
+  }
   function handleLoadedMetadata() {
     const v = videoRef.current
-    if (!v || startAppliedRef.current) return
+    if (!v) return
+    syncTime(v.currentTime, v.duration)
+    if (startAppliedRef.current) return
     startAppliedRef.current = true
     const dur = v.duration
     if (startAt > MIN_RESUME_SEC && Number.isFinite(dur) && startAt < dur - END_MARGIN_SEC) {
@@ -124,6 +135,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
     const v = videoRef.current
     if (v && Number.isFinite(v.duration)) durationRef.current = v.duration
     if (v?.duration) setProgress((v.currentTime / v.duration) * 100)
+    if (v) syncTime(v.currentTime, v.duration)
     trackView(v)
   }
 
@@ -168,6 +180,7 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
     const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
     v.currentTime = ratio * v.duration
     setProgress(ratio * 100)
+    syncTime(v.currentTime, v.duration)
   }
 
   const src = useHlsSource(videoRef, { hlsUrl: video?.hlsUrl, rangeUrl: buildStreamUrl(video?.src) })
@@ -285,6 +298,20 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
             }}>
               {video?.category || t('videoFallback')}
             </div>
+            {/* Elapsed / total time: in the scrim flow, so it never overlaps the description or the action column */}
+            {time.dur > 0 && (
+              <div
+                className="video-time"
+                style={{
+                  fontSize: 11, fontWeight: 600, marginTop: 2,
+                  color: 'rgba(255,255,255,0.85)',
+                  fontVariantNumeric: 'tabular-nums',
+                  pointerEvents: 'none',
+                }}
+              >
+                {formatClock(time.cur)} / {formatClock(time.dur)}
+              </div>
+            )}
           </div>
         </div>
 
