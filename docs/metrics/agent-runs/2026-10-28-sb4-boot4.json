@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-28-sb4-boot4",
+  "date": "2026-10-28",
+  "mode": "local",
+  "lite": false,
+  "issue": null,
+  "pr": null,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 2, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 4,
+  "advisory": 18,
+  "locNonTest": 147,
+  "tests": { "passed": 361, "flaky": 0, "failed": 0 },
+  "costUsd": 5.96
+}

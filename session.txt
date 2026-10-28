@@ -1,7 +1,7 @@
 task: Spring Boot 4.1 upgrade (3.5.0 -> 4.1.2, Jackson 3)
 status: in_progress
-progress: 30
-done: Docs PRD/ADR-0033/spec/plan 2fc4a48e; SB4-1 JSON contract baseline 08e8127f
-next: SB4-2 jjwt 0.13.0 + jjwt-orgjson, drop unused deps (on 3.5)
+progress: 85
+done: SB4-1 contract baseline 08e8127f; SB4-2 jjwt-orgjson 78de3dad; SB4-4 Boot 4.1.2 + Jackson 3 59becaba (SB4-3 folded)
+next: SB4-5 prod smoke (login, old session, stream, import, admin, SSE, CORS); remove properties-migrator after first boot
 plan: docs/plans/plan-spring-boot-4-upgrade.md
-updated: 2026-10-28 21:58
+updated: 2026-10-28 22:48
