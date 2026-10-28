@@ -364,16 +364,9 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
         }}
       >
         {/* track nền */}
-        <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 2, overflow: 'hidden' }}>
+        <div className="player-progress-track">
           {/* fill */}
-          <div style={{
-            height: '100%',
-            width: `${progress}%`,
-            background: 'var(--accent-cyan)',
-            boxShadow: '0 0 8px rgba(0,238,252,0.6)',
-            borderRadius: 2,
-            transition: 'width 0.25s linear',
-          }} />
+          <div className="player-progress-fill" style={{ width: `${progress}%` }} />
         </div>
       </div>
     </div>

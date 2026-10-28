@@ -166,6 +166,18 @@ describe('VideoPlayer progress reporting', () => {
   })
 })
 
+describe('VideoPlayer progress bar', () => {
+  it('renders the fill with the themed class and a width that follows playback', () => {
+    const { container } = render(<VideoPlayer video={video} active />)
+    const fill = container.querySelector('.player-progress-fill')
+    expect(fill).not.toBeNull()
+    expect(fill.parentElement.classList.contains('player-progress-track')).toBe(true)
+    expect(fill.style.width).toBe('0%')
+    tick(container, 30)
+    expect(fill.style.width).toBe('50%')
+  })
+})
+
 describe('VideoPlayer startAt', () => {
   function loaded(container, duration) {
     const v = container.querySelector('video')

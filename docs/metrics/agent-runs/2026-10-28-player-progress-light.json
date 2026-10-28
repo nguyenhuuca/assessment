@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-28-player-progress-light",
+  "date": "2026-10-28",
+  "mode": "headless",
+  "lite": true,
+  "issue": 72,
+  "pr": 73,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 0,
+  "advisory": 5,
+  "locNonTest": 27,
+  "tests": { "passed": 19, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}
