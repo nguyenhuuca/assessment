@@ -330,6 +330,31 @@ body {
   transition: width 0.1s linear;
 }
 
+/* ── Player progress bar: sits on the video in both themes, so it uses fixed colours ── */
+.player-progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.player-progress-fill {
+  height: 100%;
+  background: #00eefc;
+  box-shadow: 0 0 8px rgba(0, 238, 252, 0.6);
+  border-radius: 2px;
+  transition: width 0.25s linear;
+}
+[data-theme="light"] .player-progress-track {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 1px rgba(25, 28, 29, 0.45);
+}
+[data-theme="light"] .player-progress-fill {
+  background: #ffffff;
+  box-shadow: 0 0 4px rgba(25, 28, 29, 0.6);
+}
+
 /* ── FAB ── */
 .fab {
   position: fixed;
