@@ -28,7 +28,7 @@
         <guava.version>33.3.1-jre</guava.version>
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
-        <jsonwebtoken.version>0.12.6</jsonwebtoken.version>
+        <jsonwebtoken.version>0.13.0</jsonwebtoken.version>
         <springdoc-openapi.version>2.7.0</springdoc-openapi.version>
         <spring-security.version>6.5.9</spring-security.version>
         <skipTests>false</skipTests>
@@ -84,10 +84,6 @@
             <artifactId>json</artifactId>
             <version>${json-lib.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-        </dependency>
 
         <!-- Apache Commons -->
         <dependency>
@@ -122,17 +118,9 @@
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
+            <artifactId>jjwt-orgjson</artifactId>
             <version>${jsonwebtoken.version}</version>
             <scope>runtime</scope>
-        </dependency>
-
-        <!-- Hibernate Types -->
-        <!-- https://mvnrepository.com/artifact/com.vladmihalcea/hibernate-types-60 -->
-        <dependency>
-            <groupId>io.hypersistence</groupId>
-            <artifactId>hypersistence-utils-hibernate-63</artifactId>
-            <version>3.9.10</version>
         </dependency>
 
         <!-- SpringDoc OpenAPI -->
