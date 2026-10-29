@@ -1011,6 +1011,8 @@
       
         
       
+        
+      
     
     
     
@@ -1562,6 +1564,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0034-frontend-deps-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0034 - Frontend Dependency Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1577,6 +1607,8 @@
   
     
     
+      
+        
       
         
       
@@ -2015,6 +2047,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/PRD-frontend-deps-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend Dependency Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2033,6 +2093,8 @@
       
         
           
+        
+      
         
       
         
@@ -2301,6 +2363,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/spec-frontend-deps-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend Dependency Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2319,6 +2409,8 @@
       
         
           
+        
+      
         
       
         
@@ -2692,6 +2784,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sequence/sequence-frontend-deps-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend Dependency Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../sequence/sequence-user-notifications/" class="md-nav__link">
         
   
@@ -2812,6 +2932,8 @@
   
     
     
+      
+        
       
         
       
@@ -3517,6 +3639,34 @@
     
   
     Spring Boot 4.1 Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-frontend-deps-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend Dependency Upgrade
   
 
     
@@ -8787,6 +8937,17 @@
 <td>3.5.0 (OSS EOL 2026-06-30) → 4.1.x on Java 24; direct Jackson 3 migration, jjwt → <code>jjwt-orgjson</code>, BOM owns versions; JSON wire format semantically unchanged (order may change), old JWTs stay valid, no schema change. Plan: SB4-1..SB4-5 (baseline tests, jjwt-orgjson, internal Jackson 3 on 3.5, then the 4.1.2 bump). Done SB4-1 <code>08e8127f</code>, SB4-2 jjwt-orgjson <code>02fe8707</code>, SB4-4 Boot 4.1.2 + Jackson 3 <code>6f42137d</code> (SB4-3 folded in) by autopilot (<a href="../reports/autopilot-2026-10-28-sb4-boot4/">report</a>). SB4-5: prod start clean (Liquibase 0 pending, no migrator renames → migrator removed <code>9e0d298d</code>), mock-test 22/22, owner smoke pass; 7-day watch closed early by owner 2026-10-29</td>
 </tr>
 <tr>
+<td><strong>Frontend Dependency Upgrade</strong></td>
+<td><a href="../prd/PRD-frontend-deps-upgrade/">PRD ✅</a></td>
+<td><a href="../adr/0034-frontend-deps-upgrade/">0034 ✅</a></td>
+<td><a href="../specs/spec-frontend-deps-upgrade/">Spec 📋</a></td>
+<td><a href="../sequence/sequence-frontend-deps-upgrade/">Seq ✅</a></td>
+<td><a href="../plans/plan-frontend-deps-upgrade/">Plan ✅</a></td>
+<td>—</td>
+<td>🔄</td>
+<td>All 27 outdated webapp packages to latest in one commit: Vite 8 + plugin-react 6, Vitest 5, jsdom 29, ESLint 10, react-hooks 7, React 19.3; CI (deploy-web, autopilot) on Node 22; unused FontAwesome removed; hls.js exact pin 1.7.4. Plan: FD-1..FD-6 (in-range bumps, FontAwesome removal, build/test toolchain, lint toolchain, Node 22 + docs, land), squashed into one commit. Built by autopilot as <code>82be7105</code> (<a href="../reports/autopilot-2026-10-29-frontend-deps-upgrade/">report</a>): npm outdated empty, 655/655 tests, main chunk 248.37 kB gzip, audit 16 → 1 moderate; react-hooks 7 rules set-state-in-effect/refs/immutability at warn (follow-ups FD-F1..F3); jsdom stays 29 (30 needs Node ≥ 22.22.2/24.15). Pending: push, Deploy Frontend on Node 22, owner prod smoke</td>
+</tr>
+<tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
 <td>—</td>
 <td><a href="../adr/0027-agent-self-improvement-loop/">0027 ✅</a></td>
@@ -9020,7 +9181,7 @@
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-29 — Spring Boot 4.1 upgrade done (SB4-5 prod smoke pass, migrator removed); 2026-10-28 — SB4-2 + SB4-4 (Spring Boot 4.1.2, Jackson 3) built by autopilot; SB4-1 JSON contract baseline landed by autopilot; Spring Boot 4.1 upgrade PRD approved + ADR-0033 accepted + spec + sequence + plan; 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-29 — frontend dependency upgrade built by autopilot (82be7105); Frontend dependency upgrade PRD approved + ADR-0034 accepted + spec + sequence + plan; Spring Boot 4.1 upgrade done (SB4-5 prod smoke pass, migrator removed); 2026-10-28 — SB4-2 + SB4-4 (Spring Boot 4.1.2, Jackson 3) built by autopilot; SB4-1 JSON contract baseline landed by autopilot; Spring Boot 4.1 upgrade PRD approved + ADR-0033 accepted + spec + sequence + plan; 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 
