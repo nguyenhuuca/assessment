@@ -8846,7 +8846,7 @@ Owner: Builder (/builder)
 -->
 
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p><strong>Status:</strong> Approved
+<p><strong>Status:</strong> Done
 <strong>Author:</strong> nguyenhuuca
 <strong>Date:</strong> 2026-10-28
 <strong>Tracking:</strong> <code>docs/tracking.md</code> row "Spring Boot 4.1 Upgrade"; <code>TASKS.md</code> section "Spring Boot 4.1 upgrade"
@@ -9116,8 +9116,8 @@ Owner: Builder (/builder)
 </ul>
 <h3 id="phase-4-ship-and-watch-sb4-5">Phase 4: Ship and watch (SB4-5)<a class="headerlink" href="#phase-4-ship-and-watch-sb4-5" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <strong>Step 4.1:</strong> After push approval, watch CI ("Funny App Build and Deploy"). Confirm the prod VM starts with the existing <code>startServer.sh</code> flags (sequence flow 1).</li>
-<li>[ ] <strong>Step 4.2:</strong> Prod smoke test:<ul>
+<li>[x] <strong>Step 4.1:</strong> After push approval, watch CI ("Funny App Build and Deploy"). Confirm the prod VM starts with the existing <code>startServer.sh</code> flags (sequence flow 1).</li>
+<li>[x] <strong>Step 4.2:</strong> Prod smoke test:<ul>
 <li>magic-link login, password login + MFA</li>
 <li>a session from before the deploy is still logged in</li>
 <li>video list and Range streaming</li>
@@ -9126,7 +9126,7 @@ Owner: Builder (/builder)
 <li>CORS PATCH/PUT from the webapp</li>
 </ul>
 </li>
-<li>[ ] <strong>Step 4.3:</strong> 7-day watch. Then set the tracking row to ✅ and the PRD/ADR/plan statuses to Done.</li>
+<li>[x] <strong>Step 4.3:</strong> 7-day watch (owner closed it early on 2026-10-29, after a clean prod start and smoke pass). Then set the tracking row to ✅ and the PRD/ADR/plan statuses to Done.</li>
 </ul>
 <h2 id="task-breakdown">Task Breakdown<a class="headerlink" href="#task-breakdown" title="Permanent link">&para;</a></h2>
 <p>Every unit merges to <code>main</code> alone, in this order; each needs its own push approval.</p>
