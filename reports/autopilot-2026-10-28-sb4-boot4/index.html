@@ -8132,8 +8132,8 @@
 <li><strong>Request:</strong> <code>docs/plans/plan-spring-boot-4-upgrade.md</code> SB4-2..SB4-4, one commit per task; <code>json-contract/</code> fixtures unchanged; SB4-3 falls back into SB4-4 on a jackson-annotations conflict</li>
 <li><strong>Mode:</strong> local (plan mode)</li>
 <li><strong>Plan:</strong> <a href="../../plans/plan-spring-boot-4-upgrade/">plan-spring-boot-4-upgrade</a></li>
-<li><strong>Started:</strong> 2026-10-28 22:06 · <strong>Landed:</strong> pending Gate 2</li>
-<li><strong>Result:</strong> committed locally: SB4-2 <code>78de3dad</code>, SB4-4 <code>59becaba</code>; push pending Gate 2</li>
+<li><strong>Started:</strong> 2026-10-28 22:06 · <strong>Landed:</strong> 2026-10-28 22:50 (pushed <code>1552b8de</code>)</li>
+<li><strong>Result:</strong> committed locally: SB4-2 <code>02fe8707</code>, SB4-4 <code>6f42137d</code>; pushed after Gate 2</li>
 </ul>
 <h2 id="pipeline">Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h2>
 <table>
@@ -8152,7 +8152,7 @@
 </tr>
 <tr>
 <td>Plan</td>
-<td>Reused (plan mode); edited in place after review (<code>9d24aac4</code>)</td>
+<td>Reused (plan mode); edited in place after review (<code>53435777</code>)</td>
 <td>1 of 3</td>
 </tr>
 <tr>
@@ -8192,12 +8192,12 @@
 </tr>
 <tr>
 <td>Gate 2 (owner)</td>
-<td>pending</td>
+<td>Push (owner accepted that the first Boot 4 start is on prod: no local Postgres)</td>
 <td>—</td>
 </tr>
 <tr>
 <td>CI + smoke</td>
-<td>pending</td>
+<td>CI green (build, tests, Docker, deploy); <code>mock-test.sh</code> 22/22; health 200; <code>/actuator/prometheus</code> 403 from nginx/Cloudflare in front of the app (external block, not the app)</td>
 <td>—</td>
 </tr>
 </tbody>
@@ -8235,7 +8235,7 @@
 </ul>
 </li>
 <li><strong>Contract:</strong><ul>
-<li>The 31 SB4-1 fixtures are byte-identical (<code>git diff --exit-code 78de3dad -- api/src/test/resources/json-contract</code>).</li>
+<li>The 31 SB4-1 fixtures are byte-identical (<code>git diff --exit-code 02fe8707 -- api/src/test/resources/json-contract</code>).</li>
 <li><code>trailingTokens_throw</code> is enabled with its assertion unchanged.</li>
 </ul>
 </li>
@@ -8392,7 +8392,7 @@
 <td>land SB4-2</td>
 <td>—</td>
 <td>orchestrator</td>
-<td><code>78de3dad</code>; verify green</td>
+<td><code>02fe8707</code>; verify green</td>
 <td>—</td>
 <td>—</td>
 <td>—</td>
