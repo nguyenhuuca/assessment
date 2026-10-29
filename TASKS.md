@@ -608,7 +608,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **FD-3** FE: Vite 8 + plugin-react 6 + Vitest 5 + jsdom 29 + jest-dom 7 (check `version.json`, lazy `hls` chunk, main chunk ≤ 258.8 kB gzip) 82be7105
 - [x] **FD-4** FE: ESLint 10 + react-hooks 7 + react-refresh 0.5 + globals 17 (spec Rule 6 threshold) 82be7105
 - [x] **FD-5** CI/docs: Node 22 in deploy-web + autopilot; tech-strategy (×2) Vite 8 / hls.js 1.7.4; README 82be7105
-- [~] **FD-6** Land: squashed to one commit 82be7105 (autopilot [report](docs/reports/autopilot-2026-10-29-frontend-deps-upgrade.md)); push, Deploy Frontend on Node 22, owner prod smoke pending
-- [ ] **FD-F1** Follow-up (spec Rule 6): fix `react-hooks/set-state-in-effect` (10 warnings) and set the rule back to error in `webapp/eslint.config.js`
-- [ ] **FD-F2** Follow-up (spec Rule 6): fix `react-hooks/refs` (8 warnings) and set the rule back to error
-- [ ] **FD-F3** Follow-up (spec Rule 6): fix `react-hooks/immutability` (2 warnings) and set the rule back to error
+- [x] **FD-6** Land: one commit 82be7105 (autopilot [report](docs/reports/autopilot-2026-10-29-frontend-deps-upgrade.md)); Deploy Frontend green on Node 22.23.4, owner prod smoke pass 2026-10-29
+- [x] **FD-F1** Follow-up (spec Rule 6): fix `react-hooks/set-state-in-effect` (10 warnings) and set the rule back to error in `webapp/eslint.config.js` 6ed44dde
+- [x] **FD-F2** Follow-up (spec Rule 6): fix `react-hooks/refs` (8 warnings) and set the rule back to error 6ed44dde
+- [x] **FD-F3** Follow-up (spec Rule 6): fix `react-hooks/immutability` (2 warnings) and set the rule back to error 6ed44dde
+- [x] **FD-F4** Fix: admin comment selection cleared 300 ms after mount by the search debounce (flaky `bulk remove` test), regression test d212e176
