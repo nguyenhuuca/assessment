@@ -180,7 +180,7 @@ jobs:
           cache: 'maven'
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: webapp/package-lock.json
       - name: Install webapp dependencies

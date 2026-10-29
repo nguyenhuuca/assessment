@@ -61,13 +61,13 @@ Full architecture docs, ADRs, plans, and reports:
 | Component | Choice |
 |-----------|--------|
 | Framework | React 19 |
-| Build Tool | Vite 6.2 |
+| Build Tool | Vite 8 |
 | Routing | React Router DOM 7 |
 | Server State | TanStack React Query 5 |
 | UI | Bootstrap 5.3 + React-Bootstrap 2 |
-| Icons | FontAwesome |
+| Icons | Material Symbols Outlined |
 | HTTP Client | Axios |
-| Testing | Vitest 3 + Testing Library |
+| Testing | Vitest 5 + Testing Library |
 
 ### Infrastructure
 
@@ -122,7 +122,7 @@ api/src/main/java/com/canhlabs/funnyapp/
 - JDK 24 (with preview features)
 - Maven 3.6+
 - PostgreSQL
-- Node.js 18+
+- Node.js 22+
 
 ### Database
 

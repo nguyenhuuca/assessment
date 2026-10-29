@@ -21,7 +21,11 @@ export default [
       'react-refresh': reactRefresh,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
+      ...reactHooks.configs.flat.recommended.rules,
+      // New in eslint-plugin-react-hooks 7: too many findings to fix in the upgrade (spec Rule 6); tracked as follow-ups
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/refs': 'warn',
+      'react-hooks/immutability': 'warn',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

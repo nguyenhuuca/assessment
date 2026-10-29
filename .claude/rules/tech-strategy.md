@@ -38,7 +38,7 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 | Component | Choice |
 |-----------|--------|
 | Framework | React 19 |
-| Build Tool | Vite 6 |
+| Build Tool | Vite 8 |
 | Routing | React Router DOM 7 |
 | Server State | TanStack React Query 5 |
 | Icons | Material Symbols Outlined (Google Fonts CDN) |
@@ -46,7 +46,7 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 | HTTP Client | Fetch API (via React Query) |
 | i18n | i18next + react-i18next (ADR-0020) |
 | Cron Text | cronstrue (ADR-0024; validation + next runs stay on the server) |
-| HLS Playback | hls.js 1.7.3 (ADR-0031; lazy-loaded, only when a video has `hlsUrl`) |
+| HLS Playback | hls.js 1.7.4 (ADR-0031; lazy-loaded, only when a video has `hlsUrl`) |
 | Testing | Vitest + Testing Library |
 | Location | `webapp/` directory |
 | Architecture | SPA with component-based rendering |
