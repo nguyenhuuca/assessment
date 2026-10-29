@@ -89,14 +89,16 @@ export default function AdminCommentTable() {
   const headerBox = useRef(null)
 
   // Debounce keyword search (300ms) and reset to the first page when it changes.
+  // Nothing to apply when the term already matches (e.g. on mount), so a fresh selection is kept.
   useEffect(() => {
+    if (search === q) return undefined
     const t = setTimeout(() => {
       setQ(search)
       setPage(0)
       setSelected(new Set())
     }, 300)
     return () => clearTimeout(t)
-  }, [search])
+  }, [search, q])
 
   const { data, isLoading } = useAdminComments({
     page,

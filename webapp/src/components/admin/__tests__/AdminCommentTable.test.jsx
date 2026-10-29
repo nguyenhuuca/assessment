@@ -149,6 +149,14 @@ describe('AdminCommentTable', () => {
     expect(screen.queryByRole('toolbar', { name: 'Thao tác hàng loạt' })).toBeNull()
   })
 
+  it('keeps a selection made right after mount once the search debounce has passed', async () => {
+    renderTable()
+    await screen.findByText('hello world')
+    fireEvent.click(screen.getByLabelText('Chọn tất cả trên trang'))
+    await new Promise(resolve => setTimeout(resolve, 400))
+    expect(screen.getByRole('toolbar', { name: 'Thao tác hàng loạt' })).toBeTruthy()
+  })
+
   it('bulk restore confirms then calls the API', async () => {
     renderTable()
     await screen.findByText('buy now')
