@@ -1,6 +1,6 @@
 # Agent Instructions
 
-Funny Movies: a Java 24 / Spring Boot 3 API (`api/`) and a React 19 + Vite webapp (`webapp/`). These instructions apply to any coding agent working in this repo, not just Claude Code. Project detail lives in `CLAUDE.md` and `webapp/CLAUDE.md`.
+Funny Movies: a Java 24 / Spring Boot 4 API (`api/`) and a React 19 + Vite webapp (`webapp/`). These instructions apply to any coding agent working in this repo, not just Claude Code. Project detail lives in `CLAUDE.md` and `webapp/CLAUDE.md`.
 
 ## Where Things Live
 
