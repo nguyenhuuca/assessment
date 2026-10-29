@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-10-29-frontend-deps-upgrade",
+  "date": "2026-10-29",
+  "mode": "local",
+  "lite": false,
+  "issue": null,
+  "pr": null,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 2, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 1,
+  "advisory": 6,
+  "locNonTest": 81,
+  "tests": { "passed": 655, "flaky": 0, "failed": 0 },
+  "costUsd": 2.35
+}

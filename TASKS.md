@@ -603,9 +603,12 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Feature: Frontend dependency upgrade (2026-10-29, ADR-0034, [plan](docs/plans/plan-frontend-deps-upgrade.md))
 
-- [ ] **FD-1** FE: in-range bumps (React 19.3, Router 7.18, TanStack 5.105, i18next, Testing Library, cronstrue) + hls.js exact 1.7.4
-- [ ] **FD-2** FE: remove the 4 unused `@fortawesome/*` packages
-- [ ] **FD-3** FE: Vite 8 + plugin-react 6 + Vitest 5 + jsdom 29 + jest-dom 7 (check `version.json`, lazy `hls` chunk, main chunk ≤ 258.8 kB gzip)
-- [ ] **FD-4** FE: ESLint 10 + react-hooks 7 + react-refresh 0.5 + globals 17 (spec Rule 6 threshold)
-- [ ] **FD-5** CI/docs: Node 22 in deploy-web + autopilot; tech-strategy (×2) Vite 8 / hls.js 1.7.4; README
-- [ ] **FD-6** Land: squash to one commit with measurements, push (owner approval), Deploy Frontend green, prod smoke
+- [x] **FD-1** FE: in-range bumps (React 19.3, Router 7.18, TanStack 5.105, i18next, Testing Library, cronstrue) + hls.js exact 1.7.4 82be7105
+- [x] **FD-2** FE: remove the 4 unused `@fortawesome/*` packages 82be7105
+- [x] **FD-3** FE: Vite 8 + plugin-react 6 + Vitest 5 + jsdom 29 + jest-dom 7 (check `version.json`, lazy `hls` chunk, main chunk ≤ 258.8 kB gzip) 82be7105
+- [x] **FD-4** FE: ESLint 10 + react-hooks 7 + react-refresh 0.5 + globals 17 (spec Rule 6 threshold) 82be7105
+- [x] **FD-5** CI/docs: Node 22 in deploy-web + autopilot; tech-strategy (×2) Vite 8 / hls.js 1.7.4; README 82be7105
+- [~] **FD-6** Land: squashed to one commit 82be7105 (autopilot [report](docs/reports/autopilot-2026-10-29-frontend-deps-upgrade.md)); push, Deploy Frontend on Node 22, owner prod smoke pending
+- [ ] **FD-F1** Follow-up (spec Rule 6): fix `react-hooks/set-state-in-effect` (10 warnings) and set the rule back to error in `webapp/eslint.config.js`
+- [ ] **FD-F2** Follow-up (spec Rule 6): fix `react-hooks/refs` (8 warnings) and set the rule back to error
+- [ ] **FD-F3** Follow-up (spec Rule 6): fix `react-hooks/immutability` (2 warnings) and set the rule back to error

@@ -8,7 +8,7 @@ Owner: Builder (/builder)
 
 ## Overview
 
-**Status:** Ready
+**Status:** In Progress
 **Author:** nguyenhuuca
 **Date:** 2026-10-29
 **Tracking:** `docs/tracking.md` row "Frontend Dependency Upgrade"; `TASKS.md` section "Frontend dependency upgrade"
@@ -183,3 +183,4 @@ Commit lands directly on `main` (repo convention); "Before PR" means "before ask
 | Date | Task | Note |
 |------|------|------|
 | 2026-10-29 | — | Plan written |
+| 2026-10-29 | FD-1..FD-5 | Built by autopilot, squashed to 82be7105 |

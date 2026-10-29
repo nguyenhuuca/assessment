@@ -1,8 +1,7 @@
-task: Frontend dependency upgrade (webapp, Vite 8, Node 22)
-status: in_progress
-progress: 30
-done: PRD + ADR-0034 c15d4e97; spec + sequence + plan
-doing: -
-next: FD-1 in-range bumps + hls.js 1.7.4 (plan Phase 1)
+task: Frontend dependency upgrade (Vite 8, Node 22)
+status: done
+progress: 100
+done: PRD + ADR-0034 c15d4e97; spec + plan 4f535955; FD-1..FD-5 upgrade 82be7105
+next: -
 plan: docs/plans/plan-frontend-deps-upgrade.md
-updated: 2026-10-29 21:48
+updated: 2026-10-29 22:10
