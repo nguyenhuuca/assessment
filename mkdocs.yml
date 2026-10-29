@@ -119,6 +119,7 @@ nav:
       - Contributor Autopilot Permissions: specs/spec-contributor-autopilot-permissions.md
       - HLS Streaming: specs/spec-hls-streaming.md
       - Spring Boot 4.1 Upgrade: specs/spec-spring-boot-4-upgrade.md
+      - Frontend Dependency Upgrade: specs/spec-frontend-deps-upgrade.md
 
   - Sequence Diagrams:
       - Overview: sequence/index.md
@@ -132,6 +133,7 @@ nav:
       - Password Login: sequence/sequence-password-login.md
       - React Migration: sequence/sequence-react-migration.md
       - Spring Boot 4.1 Upgrade: sequence/sequence-spring-boot-4-upgrade.md
+      - Frontend Dependency Upgrade: sequence/sequence-frontend-deps-upgrade.md
       - User Notifications: sequence/sequence-user-notifications.md
       - User Settings: sequence/sequence-user-settings.md
       - Video Suggestions: sequence/sequence-video-suggestions.md
@@ -160,6 +162,7 @@ nav:
       - Contributor Autopilot Permissions: plans/plan-contributor-autopilot-permissions.md
       - HLS Streaming: plans/plan-hls-streaming.md
       - Spring Boot 4.1 Upgrade: plans/plan-spring-boot-4-upgrade.md
+      - Frontend Dependency Upgrade: plans/plan-frontend-deps-upgrade.md
       - BE Performance (Medium): plans/plan-be-perf-medium.md
       - Basic PWA: plans/plan-pwa-basic.md
       - Report Webhook State: plans/plan-report-webhook-state.md

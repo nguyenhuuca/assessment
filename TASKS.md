@@ -600,3 +600,12 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **SB4-3** folded into SB4-4 (fallback triggers 2+3: Jackson 3.1.7 needs jackson-annotations 2.21, Boot 3.5.0 pins 2.19.0 → `NoClassDefFoundError: JsonSerializeAs`; nothing committed)
 - [x] **SB4-4** BE: Boot 4.1.2 bump + MVC-side Jackson 3 + Security 7 / Hibernate 7 / test-slice fixes + tech-strategy, CLAUDE.md (incl. folded SB4-3) 6f42137d
 - [x] **SB4-5** Ops: deploy, prod smoke test, 7-day watch (deployed 2026-10-28; mock-test 22/22; prod log: Liquibase 0 pending, no migrator renames → migrator removed; owner smoke pass 2026-10-29 (old session, password + MFA, Range stream, SSE, CORS PATCH/PUT); 7-day watch closed early by owner 2026-10-29)
+
+## Feature: Frontend dependency upgrade (2026-10-29, ADR-0034, [plan](docs/plans/plan-frontend-deps-upgrade.md))
+
+- [ ] **FD-1** FE: in-range bumps (React 19.3, Router 7.18, TanStack 5.105, i18next, Testing Library, cronstrue) + hls.js exact 1.7.4
+- [ ] **FD-2** FE: remove the 4 unused `@fortawesome/*` packages
+- [ ] **FD-3** FE: Vite 8 + plugin-react 6 + Vitest 5 + jsdom 29 + jest-dom 7 (check `version.json`, lazy `hls` chunk, main chunk ≤ 258.8 kB gzip)
+- [ ] **FD-4** FE: ESLint 10 + react-hooks 7 + react-refresh 0.5 + globals 17 (spec Rule 6 threshold)
+- [ ] **FD-5** CI/docs: Node 22 in deploy-web + autopilot; tech-strategy (×2) Vite 8 / hls.js 1.7.4; README
+- [ ] **FD-6** Land: squash to one commit with measurements, push (owner approval), Deploy Frontend green, prod smoke
