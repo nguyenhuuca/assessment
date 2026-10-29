@@ -76,7 +76,7 @@
 - **SB4-2:** `org.json` 20231013 is now on the JWT parse path, which reads untrusted input before the signature is verified. Bump `json-lib.version` in a separate change after checking the latest release and its CVEs.
 - **SB4-4:** `MaskingUtils.cloneObject` falls back to the original object, which the caller then masks in place. This hazard existed before the upgrade; fix it in its own task.
 - **SB4-4:** `Error` leaf name for container-element paths (e.g. `list[0]`) through `Path.Node.getName()` is not covered by a fixture.
-- **Plan step 3.6:** `spring-boot-properties-migrator` is still in the pom, because no local boot was possible. Remove it after the first Boot 4 start, once its log shows no renamed keys.
+- **Plan step 3.6:** resolved 2026-10-29. The first prod start (2026-10-28 16:09) logged no renamed keys and Liquibase reported "no changesets to execute", so `spring-boot-properties-migrator` was removed. The one new-looking warning, `Serializing PageImpl instances as-is`, was already logged once per start on 3.5.
 
 ## Manual checks for the owner
 
