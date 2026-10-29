@@ -5,7 +5,7 @@
 ### Build Status
 
 ![Java 24](https://img.shields.io/badge/Java-24-blue)
-![Spring Boot](https://img.shields.io/badge/Spring--Boot-3.5.0-brightgreen)
+![Spring Boot](https://img.shields.io/badge/Spring--Boot-4.1.2-brightgreen)
 ![React](https://img.shields.io/badge/React-19-61DAFB)
 ![Virtual Threads](https://img.shields.io/badge/Threads-Virtual--Threads-orange)
 ![StructuredTaskScope](https://img.shields.io/badge/Concurrency-StructuredTaskScope-informational)
@@ -25,7 +25,7 @@ Full architecture docs, ADRs, plans, and reports:
 
 ## Overview
 
-**Funny Movies** is a video streaming web application built with **Java 24** and **Spring Boot 3.5.0**, backed by a **React 19** SPA frontend. It lets users upload, share, watch, and comment on funny videos.
+**Funny Movies** is a video streaming web application built with **Java 24** and **Spring Boot 4.1.2**, backed by a **React 19** SPA frontend. It lets users upload, share, watch, and comment on funny videos.
 
 ### Key Features
 
@@ -46,7 +46,7 @@ Full architecture docs, ADRs, plans, and reports:
 | Component | Choice |
 |-----------|--------|
 | Language | Java 24 (preview features enabled) |
-| Framework | Spring Boot 3.5.0 |
+| Framework | Spring Boot 4.1.2 |
 | Concurrency | Virtual Threads + `StructuredTaskScope` |
 | ORM | JPA / Hibernate |
 | Migrations | Liquibase |

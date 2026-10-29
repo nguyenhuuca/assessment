@@ -11,7 +11,7 @@ A personal side project for streaming funny videos — built to explore modern b
 | Goal | What I'm exploring |
 |------|--------------------|
 | Build something real | End-to-end video streaming system — not just a tutorial |
-| Learn modern tech | Java 24 Virtual Threads, Spring Boot 3.x, React 19, HLS streaming, Kubernetes |
+| Learn modern tech | Java 24 Virtual Threads, Spring Boot 4.x, React 19, HLS streaming, Kubernetes |
 | Learn AI-assisted dev | Using Claude Code to scope features, write ADRs, generate plans, and implement code |
 | Practice good engineering | ADRs, PRDs, architecture diagrams, coverage gates, CI/CD pipelines |
 | Take security seriously | Bitwise permissions, feature flags, Trivy scanning, magic link auth |
@@ -20,7 +20,7 @@ A personal side project for streaming funny videos — built to explore modern b
 
 ## Tech Stack
 
-**Backend:** Java 24 · Spring Boot 3.x · Virtual Threads (Project Loom) · PostgreSQL · Liquibase · Guava Cache · JWT · OpenTelemetry
+**Backend:** Java 24 · Spring Boot 4.x · Virtual Threads (Project Loom) · PostgreSQL · Liquibase · Guava Cache · JWT · OpenTelemetry
 
 **Frontend:** React 19 · Vite · TanStack Query · React Router · Bootstrap 5
 

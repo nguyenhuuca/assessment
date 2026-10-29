@@ -672,7 +672,7 @@ https://github.com/anthropics/claude-code/issues
 ### Funny Movies Architecture
 
 - **Language**: Java 24 with Virtual Threads
-- **Framework**: Spring Boot 3.5.0
+- **Framework**: Spring Boot 4.1.2
 - **Database**: PostgreSQL + Liquibase
 - **Cache**: Guava (migrate to Redis planned)
 - **CI/CD**: GitHub Actions

@@ -162,7 +162,7 @@ Disciplines that used to live in skills are now **rules**, loaded in every sessi
 | `debugging-protocol.md` | At least three hypotheses before choosing one; root cause required; re-read files before editing |
 | `code-quality.md` | SOLID, DRY, Two Hats, quality gates |
 | `security.md` | Checklist (tagged with how each line is really enforced), prompt injection, OWASP |
-| `tech-strategy.md` | This project's golden paths (Java 24, Spring Boot 3, React 19…) |
+| `tech-strategy.md` | This project's golden paths (Java 24, Spring Boot 4, React 19…) |
 | `agent-constraints.md` | Rules for swarm workers |
 
 ---
@@ -802,7 +802,7 @@ Editing `CLAUDE.md`, `.claude/settings.json` or `.claude/rules/*` triggers a con
 ### Funny Movies Architecture
 
 - **Language**: Java 24 with Virtual Threads
-- **Framework**: Spring Boot 3.x
+- **Framework**: Spring Boot 4.x
 - **Database**: PostgreSQL + Liquibase
 - **Cache**: Guava LRU (Redis once horizontal scaling is needed)
 - **Frontend**: React 19 + Vite (`webapp/`)

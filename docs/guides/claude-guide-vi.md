@@ -162,7 +162,7 @@ Những kỷ luật trước đây nằm trong skill nay nằm trong **rules** (
 | `debugging-protocol.md` | Đưa ra ít nhất 3 giả thuyết trước khi chọn một; bắt buộc tìm root cause; đọc lại file trước khi sửa |
 | `code-quality.md` | SOLID, DRY, Two Hats, quality gates |
 | `security.md` | Checklist (ghi rõ mức enforce thật), prompt injection, OWASP |
-| `tech-strategy.md` | Golden path của project (Java 24, Spring Boot 3, React 19…) |
+| `tech-strategy.md` | Golden path của project (Java 24, Spring Boot 4, React 19…) |
 | `agent-constraints.md` | Luật cho swarm workers |
 
 ---
@@ -795,7 +795,7 @@ Sửa `CLAUDE.md`, `.claude/settings.json` hoặc `.claude/rules/*` sẽ có hoo
 ### Funny Movies Architecture
 
 - **Language**: Java 24 with Virtual Threads
-- **Framework**: Spring Boot 3.x
+- **Framework**: Spring Boot 4.x
 - **Database**: PostgreSQL + Liquibase
 - **Cache**: Guava LRU (Redis khi cần scale ngang)
 - **Frontend**: React 19 + Vite (`webapp/`)
