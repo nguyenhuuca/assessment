@@ -65,3 +65,6 @@ scratchpad/
 evolve-out/
 site-check/
 __pycache__/
+
+# archify skill diagram output
+.archify/
