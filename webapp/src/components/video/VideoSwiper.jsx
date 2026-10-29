@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSwipeable } from 'react-swipeable'
 import { useTranslation } from 'react-i18next'
 import VideoPlayer from './VideoPlayer.jsx'
@@ -14,11 +14,9 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, resume = nu
   const [saveVideo, setSaveVideo] = useState(null)
   const total = videos.length
   // Resume point applies to the deep-linked video only, and is dropped once the user moves to another slide
-  const resumeRef = useRef(resume)
-  const startIndexRef = useRef(index)
-  useEffect(() => {
-    if (index !== startIndexRef.current) resumeRef.current = null
-  }, [index])
+  const [resumePoint, setResumePoint] = useState(resume)
+  const [startIndex] = useState(index)
+  if (resumePoint && index !== startIndex) setResumePoint(null)
 
   const next = useCallback(() => {
     setDirection('next')
@@ -134,7 +132,7 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, resume = nu
             muted={muted}
             onMutedChange={onMutedChange}
             showMuteButton={false}
-            startAt={resumeRef.current && String(video?.id) === resumeRef.current.videoId ? resumeRef.current.startAt : undefined}
+            startAt={resumePoint && String(video?.id) === resumePoint.videoId ? resumePoint.startAt : undefined}
           />
         </div>
         <button

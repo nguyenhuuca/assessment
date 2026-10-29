@@ -260,9 +260,7 @@ function CollectionDetail({ collection, collectionId, onBack, onEdit, onDelete, 
   const canManage = !!collection?.canManage
 
   // Removing the last video of the last page would leave an empty page behind: step back
-  useEffect(() => {
-    if (totalPages > 0 && page > totalPages - 1) setPage(totalPages - 1)
-  }, [page, totalPages])
+  if (totalPages > 0 && page > totalPages - 1) setPage(totalPages - 1)
 
   // Play inside the collection itself: the swiper runs over this page's videos
   if (playIndex !== null && videos.length > 0) {

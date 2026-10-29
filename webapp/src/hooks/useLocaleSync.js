@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import i18n, { SUPPORTED_LANGUAGES } from '../i18n/index.js'
 import { useAuth } from './useAuth.js'
 import { useSettings, useUpdateSettings } from './useSettings.js'
@@ -18,18 +18,15 @@ export function useLocaleSync() {
   const { mutate } = useUpdateSettings()
   const knownServerLocale = useRef(null)
   const applied = useRef(false)
-  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     if (!isLoggedIn) {
       applied.current = false
       knownServerLocale.current = null
-      setReady(false)
       return
     }
     if (applied.current || !settings) return
     applied.current = true
-    setReady(true)
     const locale = settings.locale
     if (!SUPPORTED_LANGUAGES.includes(locale)) {
       const current = short(i18n.language)
@@ -53,5 +50,6 @@ export function useLocaleSync() {
     return () => i18n.off('languageChanged', onChanged)
   }, [isLoggedIn, mutate])
 
-  return ready
+  // Ready once the server settings of this login are loaded (the effect above applies them)
+  return isLoggedIn && !!settings
 }

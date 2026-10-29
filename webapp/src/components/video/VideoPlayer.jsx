@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { buildStreamUrl, thumbnailUrl } from '../../utils/videoModel.js'
 import { useQueryClient } from '@tanstack/react-query'
@@ -39,7 +39,6 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
   const queryClient = useQueryClient()
   const { isLoggedIn } = useAuth()
   const loggedInRef = useRef(isLoggedIn)
-  loggedInRef.current = isLoggedIn
 
   /** Best-effort resume point. Only after the view counted (so history has the row), logged-in users only. */
   function reportProgress(videoId, force, fromRefs = false) {
@@ -55,7 +54,11 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
     watchHistoryApi.progress(videoId, Math.round(pos), Math.round(dur))?.catch?.(() => {})
   }
   const reportRef = useRef(reportProgress)
-  reportRef.current = reportProgress
+  // Latest values for timers and unmount cleanup, refreshed after every commit
+  useLayoutEffect(() => {
+    loggedInRef.current = isLoggedIn
+    reportRef.current = reportProgress
+  })
 
   // Play / pause driven by `active` prop
   useEffect(() => {
@@ -71,13 +74,19 @@ export default function VideoPlayer({ video, onEnded, active, muted = true, onMu
   }, [muted])
 
   // Reset overlay state when video changes
-  useEffect(() => {
-    const id = video?.id
+  const [overlayFor, setOverlayFor] = useState(video?.id)
+  if (video?.id !== overlayFor) {
+    setOverlayFor(video?.id)
     setDescExpanded(false)
     setProgress(0)
     setTime({ cur: 0, dur: 0 })
     setPaused(false)
     setLoading(true)
+  }
+
+  // Reset per-video tracking when video changes
+  useEffect(() => {
+    const id = video?.id
     viewSentRef.current = false
     watchedRef.current = 0
     lastTimeRef.current = 0

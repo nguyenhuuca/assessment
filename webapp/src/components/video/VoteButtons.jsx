@@ -12,11 +12,14 @@ export default function VoteButtons({ video }) {
   const [hint, setHint] = useState('')
   const timer = useRef(null)
 
+  const [hintVideoId, setHintVideoId] = useState(video?.id)
+
   // Reset hint when video changes (reaction state is keyed by video id in the query cache)
-  useEffect(() => {
+  if (video?.id !== hintVideoId) {
+    setHintVideoId(video?.id)
     setHint('')
-    return () => clearTimeout(timer.current)
-  }, [video?.id])
+  }
+  useEffect(() => () => clearTimeout(timer.current), [video?.id])
 
   function showHint(message) {
     setHint(message)

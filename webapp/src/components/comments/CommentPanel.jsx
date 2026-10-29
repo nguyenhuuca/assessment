@@ -23,10 +23,15 @@ export default function CommentPanel({ video, onClose, highlightCommentId = null
     return commentsApi.list(videoId).then(res => setComments(res.data || res || []))
   }
 
-  useEffect(() => {
-    if (!video?.id) return
+  const [loadingFor, setLoadingFor] = useState(video?.id)
+  if (video?.id && video.id !== loadingFor) {
+    setLoadingFor(video.id)
     setLoading(true)
     setError('')
+  }
+
+  useEffect(() => {
+    if (!video?.id) return
     loadComments(video.id)
       .catch(() => setComments([]))
       .finally(() => setLoading(false))

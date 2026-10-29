@@ -16,13 +16,16 @@ export default function PasswordLoginModal({ show, initialEmail = '', onHide, on
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState(null)
 
-  useEffect(() => {
+  const [openedWith, setOpenedWith] = useState({ show, initialEmail })
+
+  if (openedWith.show !== show || openedWith.initialEmail !== initialEmail) {
+    setOpenedWith({ show, initialEmail })
     if (show) {
       setEmail(initialEmail)
       setPassword('')
       setError(null)
     }
-  }, [show, initialEmail])
+  }
 
   useEffect(() => {
     if (!show) return undefined

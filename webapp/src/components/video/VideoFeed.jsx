@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useVideos } from '../../hooks/useVideos.js'
 import VideoSwiper from './VideoSwiper.jsx'
@@ -6,19 +6,25 @@ import VideoSwiper from './VideoSwiper.jsx'
 export function PublicFeed({ category, initialIndex, deepLinkId, deepLinkStartAt, onDeepLinkResolved, muted, onMutedChange, mobileSearchOpen, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const { data: videos = [], isLoading, error } = useVideos(category)
 
-  // Resume point of the deep-linked video, captured when it resolves (the shell clears deepLinkId right after)
-  const resumeRef = useRef(null)
-
-  const resolvedIndex = useMemo(() => {
-    if (!deepLinkId || !videos.length) return initialIndex ?? 0
+  // Deep-linked video and its resume point, captured when it resolves (the shell clears deepLinkId right after)
+  const [deepLink, setDeepLink] = useState(null)
+  if (deepLinkId && videos.length && deepLink?.id !== String(deepLinkId)) {
     const idx = videos.findIndex(v => String(v.id) === String(deepLinkId))
     if (idx >= 0) {
-      resumeRef.current = deepLinkStartAt > 0 ? { videoId: String(deepLinkId), startAt: deepLinkStartAt } : null
-      onDeepLinkResolved?.()
-      return idx
+      setDeepLink({
+        id: String(deepLinkId),
+        index: idx,
+        resume: deepLinkStartAt > 0 ? { videoId: String(deepLinkId), startAt: deepLinkStartAt } : null,
+      })
     }
-    return initialIndex ?? 0
-  }, [deepLinkId, videos]) // eslint-disable-line react-hooks/exhaustive-deps
+  }
+
+  // Tell the shell once per resolved link, after the render that captured it
+  useEffect(() => {
+    if (deepLink) onDeepLinkResolved?.()
+  }, [deepLink]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const resolvedIndex = deepLink ? deepLink.index : (initialIndex ?? 0)
 
   if (isLoading) return <LoadingState />
   if (error) return <ErrorState message={error.message} />
@@ -26,7 +32,7 @@ export function PublicFeed({ category, initialIndex, deepLinkId, deepLinkStartAt
     <VideoSwiper
       videos={videos}
       initialIndex={resolvedIndex}
-      resume={resumeRef.current}
+      resume={deepLink?.resume ?? null}
       muted={muted}
       onMutedChange={onMutedChange}
       mobileSearchOpen={mobileSearchOpen}

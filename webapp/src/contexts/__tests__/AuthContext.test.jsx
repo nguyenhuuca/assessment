@@ -1,7 +1,8 @@
 import React from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, act, waitFor } from '@testing-library/react'
-import { AuthProvider, useAuth } from '../AuthContext.jsx'
+import { AuthProvider } from '../AuthContext.jsx'
+import { useAuth } from '../../hooks/useAuth.js'
 import { userCanReport } from '../../utils/roles.js'
 
 // Mock authApi

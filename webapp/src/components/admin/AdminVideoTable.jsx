@@ -15,8 +15,8 @@ const STATUS_COLORS = {
 const STATUSES = ['PUBLISHED', 'PENDING', 'FLAGGED']
 
 // Checkboxes inside the delete dialog. The confirm promise only resolves to a boolean,
-// so the checked state is written into the caller's `opts` object.
-function DeleteFileOptions({ opts }) {
+// so each change is reported to the caller, which keeps it in its own `opts` object.
+function DeleteFileOptions({ onChange }) {
   const { t } = useTranslation('admin')
   const [local, setLocal] = useState(false)
   const [drive, setDrive] = useState(false)
@@ -26,7 +26,7 @@ function DeleteFileOptions({ opts }) {
         <input
           type="checkbox"
           checked={local}
-          onChange={e => { opts.deleteLocalFile = e.target.checked; setLocal(e.target.checked) }}
+          onChange={e => { onChange('deleteLocalFile', e.target.checked); setLocal(e.target.checked) }}
         />
         {t('deleteLocalFile')}
       </label>
@@ -34,7 +34,7 @@ function DeleteFileOptions({ opts }) {
         <input
           type="checkbox"
           checked={drive}
-          onChange={e => { opts.deleteDriveFile = e.target.checked; setDrive(e.target.checked) }}
+          onChange={e => { onChange('deleteDriveFile', e.target.checked); setDrive(e.target.checked) }}
         />
         {t('deleteDriveFile')}
       </label>
@@ -272,7 +272,7 @@ export default function AdminVideoTable({ statusFilter }) {
                           message: t('deleteVideoMessage', { title: v.title }),
                           confirmLabel: t('delete'),
                           danger: true,
-                          children: <DeleteFileOptions opts={opts} />,
+                          children: <DeleteFileOptions onChange={(key, value) => { opts[key] = value }} />,
                         })
                         if (ok) deleteVideo.mutate({ id: v.id, ...opts })
                       }}

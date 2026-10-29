@@ -1,51 +1,50 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { thumbnailUrl } from '../../utils/videoModel.js'
+
+function normalizeForSearch(value) {
+  return (value || '')
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLocaleLowerCase()
+}
+
+// Lightweight fuzzy score: prioritize exact phrase matches, then word hits,
+// then in-order character subsequence matches for typo-tolerant search.
+function scoreFuzzy(text, term) {
+  if (!text || !term) return 0
+  const haystack = normalizeForSearch(text)
+  const needle = normalizeForSearch(term)
+  if (haystack.includes(needle)) return needle.length * 4
+
+  const words = needle.split(/\s+/).filter(Boolean)
+  let score = 0
+  for (const w of words) {
+    if (haystack.includes(w)) score += w.length * 2
+  }
+
+  // simple subsequence bonus
+  let hi = 0
+  let matched = 0
+  for (let i = 0; i < needle.length && hi < haystack.length; i++) {
+    const ch = needle[i]
+    const foundIdx = haystack.indexOf(ch, hi)
+    if (foundIdx === -1) break
+    matched++
+    hi = foundIdx + 1
+  }
+  score += matched
+  return score
+}
 
 export default function SearchModal({ show, videos = [], currentIndex = 0, onSelect, onClose }) {
   const { t } = useTranslation(['shell', 'common'])
   const [searchTerm, setSearchTerm] = useState('')
 
-  useEffect(() => {
-    if (!show) setSearchTerm('')
-  }, [show])
-
-  function normalizeForSearch(value) {
-    return (value || '')
-      .normalize('NFKD')
-      .replace(/\p{M}/gu, '')
-      .replace(/đ/g, 'd')
-      .replace(/Đ/g, 'D')
-      .toLocaleLowerCase()
-  }
-
-  // Lightweight fuzzy score: prioritize exact phrase matches, then word hits,
-  // then in-order character subsequence matches for typo-tolerant search.
-  function scoreFuzzy(text, term) {
-    if (!text || !term) return 0
-    const haystack = normalizeForSearch(text)
-    const needle = normalizeForSearch(term)
-    if (haystack.includes(needle)) return needle.length * 4
-
-    const words = needle.split(/\s+/).filter(Boolean)
-    let score = 0
-    for (const w of words) {
-      if (haystack.includes(w)) score += w.length * 2
-    }
-
-    // simple subsequence bonus
-    let hi = 0
-    let matched = 0
-    for (let i = 0; i < needle.length && hi < haystack.length; i++) {
-      const ch = needle[i]
-      const foundIdx = haystack.indexOf(ch, hi)
-      if (foundIdx === -1) break
-      matched++
-      hi = foundIdx + 1
-    }
-    score += matched
-    return score
-  }
+  // Closing clears the term, so the modal reopens empty
+  if (!show && searchTerm !== '') setSearchTerm('')
 
   const filteredVideos = useMemo(() => {
     const term = searchTerm.trim()

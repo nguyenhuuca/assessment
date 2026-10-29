@@ -84,9 +84,15 @@ export default function AppShell() {
   useNotificationStream()
   useLocaleSync()
 
+  // A session notice from the auth context becomes the banner; the effect clears it at the source
+  const [shownNotice, setShownNotice] = useState(null)
+  if (sessionNotice !== shownNotice) {
+    setShownNotice(sessionNotice)
+    if (sessionNotice) setMessage({ text: sessionNotice, type: 'error' })
+  }
+
   useEffect(() => {
     if (!sessionNotice) return
-    setMessage({ text: sessionNotice, type: 'error' })
     clearSessionNotice()
     const timer = setTimeout(() => setMessage(null), 5000)
     return () => clearTimeout(timer)

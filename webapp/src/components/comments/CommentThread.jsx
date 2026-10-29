@@ -78,11 +78,13 @@ export default function CommentThread({
   const replies = flattenReplies(root)
   const highlightIdx = highlightId ? replies.findIndex(r => String(r.id) === String(highlightId)) : -1
   const [expanded, setExpanded] = useState(highlightIdx >= COLLAPSED_COUNT)
+  const [seenHighlightIdx, setSeenHighlightIdx] = useState(highlightIdx)
 
   // A later deep link to a collapsed reply expands the thread
-  useEffect(() => {
+  if (highlightIdx !== seenHighlightIdx) {
+    setSeenHighlightIdx(highlightIdx)
     if (highlightIdx >= COLLAPSED_COUNT) setExpanded(true)
-  }, [highlightIdx])
+  }
   const visibleReplies = expanded ? replies : replies.slice(0, COLLAPSED_COUNT)
   const hidden = replies.length - visibleReplies.length
   const boxOpen = replyTo?.rootId === root.id

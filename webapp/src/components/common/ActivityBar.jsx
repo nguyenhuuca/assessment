@@ -10,12 +10,12 @@ export default function ActivityBar({ delayMs = 150 }) {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    if (!active) {
-      setVisible(false)
-      return undefined
-    }
+    if (!active) return undefined
     const t = setTimeout(() => setVisible(true), delayMs)
-    return () => clearTimeout(t)
+    return () => {
+      clearTimeout(t)
+      setVisible(false)
+    }
   }, [active, delayMs])
 
   return visible ? <div className="activity-bar" role="progressbar" aria-label={t('processing')} /> : null

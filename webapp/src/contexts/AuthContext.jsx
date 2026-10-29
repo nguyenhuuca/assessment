@@ -1,10 +1,9 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { authApi } from '../api/auth.js'
 import i18n from '../i18n/index.js'
 import { AUTH_REVOKED_EVENT } from '../api/client.js'
 import { isAdminRole } from '../utils/roles.js'
-
-const AuthContext = createContext(null)
+import { AuthContext } from './authContext.js'
 
 function readStorage() {
   try {
@@ -133,10 +132,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   )
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
-  return ctx
 }
