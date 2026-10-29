@@ -8516,7 +8516,7 @@
 <li>One row can be inserted for each of <code>UserEmailRequest</code>, <code>AppReport</code>, <code>VideoCollection</code>, <code>VideoComment</code>, <code>VideoAccessStats</code> (Hibernate 7 <code>@GeneratedValue</code>).</li>
 </ul>
 </li>
-<li><strong>SB4-5 prod smoke</strong> (plan step 4.2):<ul>
+<li><strong>SB4-5 prod smoke</strong> (plan step 4.2). Owner confirmed pass on 2026-10-29: old session, password login + MFA, Range streaming, SSE, CORS PATCH/PUT. Not separately confirmed: magic-link login, YouTube import, admin pages.<ul>
 <li>magic-link login, password login + MFA</li>
 <li>a session from before the deploy is still logged in</li>
 <li>video list and Range streaming</li>
