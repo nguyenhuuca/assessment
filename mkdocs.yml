@@ -92,6 +92,7 @@ nav:
       - 0018 - Password Login Option: adr/0018-password-login-option.md
       - 0019 - Admin Video Import: adr/0019-admin-video-import.md
       - 0033 - Spring Boot 4.1 Upgrade: adr/0033-spring-boot-4-upgrade.md
+      - 0034 - Frontend Dependency Upgrade: adr/0034-frontend-deps-upgrade.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -107,6 +108,7 @@ nav:
       - HLS Streaming: prd/PRD-hls-streaming.md
       - Web Push: prd/PRD-web-push.md
       - Spring Boot 4.1 Upgrade: prd/PRD-spring-boot-4-upgrade.md
+      - Frontend Dependency Upgrade: prd/PRD-frontend-deps-upgrade.md
 
   - Specs:
       - Overview: specs/index.md

@@ -1,7 +1,8 @@
-task: Spring Boot 4.1 upgrade (3.5.0 -> 4.1.2, Jackson 3)
-status: done
-progress: 100
-done: SB4-1 contract baseline 08e8127f; SB4-2 jjwt-orgjson 02fe8707; SB4-4 Boot 4.1.2 + Jackson 3 6f42137d (SB4-3 folded); migrator removed 9e0d298d; SB4-5 prod smoke pass, watch closed by owner
-next: -
-plan: docs/plans/plan-spring-boot-4-upgrade.md
-updated: 2026-10-29 07:23
+task: Frontend dependency upgrade (webapp, Vite 8, Node 22)
+status: in_progress
+progress: 15
+done: PRD approved + ADR-0034 accepted 4ca029a4
+doing: -
+next: /spec frontend-deps-upgrade (spec + sequence); then plan; then build
+plan: docs/prd/PRD-frontend-deps-upgrade.md
+updated: 2026-10-29 21:38
