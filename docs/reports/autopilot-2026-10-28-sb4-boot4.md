@@ -85,7 +85,7 @@
   - `/actuator/health` is UP, `/actuator/prometheus` serves metrics, and Swagger UI loads (dev profile).
   - The properties-migrator log shows no renamed keys.
   - One row can be inserted for each of `UserEmailRequest`, `AppReport`, `VideoCollection`, `VideoComment`, `VideoAccessStats` (Hibernate 7 `@GeneratedValue`).
-- **SB4-5 prod smoke** (plan step 4.2):
+- **SB4-5 prod smoke** (plan step 4.2). Owner confirmed pass on 2026-10-29: old session, password login + MFA, Range streaming, SSE, CORS PATCH/PUT. Not separately confirmed: magic-link login, YouTube import, admin pages.
   - magic-link login, password login + MFA
   - a session from before the deploy is still logged in
   - video list and Range streaming
