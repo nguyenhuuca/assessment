@@ -8,7 +8,7 @@ Owner: Builder (/builder)
 
 ## Overview
 
-**Status:** Approved
+**Status:** Done
 **Author:** nguyenhuuca
 **Date:** 2026-10-28
 **Tracking:** `docs/tracking.md` row "Spring Boot 4.1 Upgrade"; `TASKS.md` section "Spring Boot 4.1 upgrade"
@@ -195,15 +195,15 @@ The flows themselves do not change; see the sequence diagrams.
 
 ### Phase 4: Ship and watch (SB4-5)
 
-- [ ] **Step 4.1:** After push approval, watch CI ("Funny App Build and Deploy"). Confirm the prod VM starts with the existing `startServer.sh` flags (sequence flow 1).
-- [ ] **Step 4.2:** Prod smoke test:
+- [x] **Step 4.1:** After push approval, watch CI ("Funny App Build and Deploy"). Confirm the prod VM starts with the existing `startServer.sh` flags (sequence flow 1).
+- [x] **Step 4.2:** Prod smoke test:
   - magic-link login, password login + MFA
   - a session from before the deploy is still logged in
   - video list and Range streaming
   - YouTube import, admin pages
   - notifications SSE
   - CORS PATCH/PUT from the webapp
-- [ ] **Step 4.3:** 7-day watch. Then set the tracking row to ✅ and the PRD/ADR/plan statuses to Done.
+- [x] **Step 4.3:** 7-day watch (owner closed it early on 2026-10-29, after a clean prod start and smoke pass). Then set the tracking row to ✅ and the PRD/ADR/plan statuses to Done.
 
 ## Task Breakdown
 

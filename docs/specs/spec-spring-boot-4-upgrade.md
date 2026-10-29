@@ -9,7 +9,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 
 ## Metadata
 
-**Status:** Draft
+**Status:** Done
 **Author:** nguyenhuuca
 **Date:** 2026-10-28
 **Related PRD:** [PRD-spring-boot-4-upgrade](../prd/PRD-spring-boot-4-upgrade.md)
