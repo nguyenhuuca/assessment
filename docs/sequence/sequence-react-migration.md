@@ -19,7 +19,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
 > **PRD vs code.**
 > - The PRD status is `Planning` but the SPA is live in `webapp/` (ADR-0008: Accepted, implemented).
 > - PRD says React Router v6 for routing. The code uses `react-router-dom` v7 but defines no `<Route>` elements. `BrowserRouter` only provides `useNavigate` to `MagicLinkHandler`, and screens are switched by an `activeNav` state in `AppShell`.
-> - PRD says react-bootstrap and Font Awesome. The UI uses custom CSS tokens and Material Symbols.
+> - PRD says react-bootstrap and Font Awesome. Font Awesome is not used (icons are Material Symbols). `bootstrap` and `react-bootstrap` are still dependencies: `main.jsx` imports `bootstrap.min.css` and `MFALoginModal.jsx` uses react-bootstrap `Modal` and `Form`, but the rest of the UI is styled with custom CSS tokens.
 > - PRD lists `/private-videos`, the private tab and `/share-links` POST. The private tab was removed and share links are being retired. Only `DELETE /share-links/{id}` remains in `videosApi`.
 > - `webapp/CLAUDE.md` mentions Axios, but `src/api/client.js` uses `fetch`. The `Authorization` header carries the raw JWT with no `Bearer ` prefix.
 > - There is no global React Query 401 handler. 401 handling lives in `client.js` (TOKEN_REVOKED only) and `AuthContext` (the `/user/me` check at boot).
@@ -51,7 +51,9 @@ sequenceDiagram
         C->>API: GET /user/me (Authorization jwt, X-Guest-Token)
         alt 200
             API-->>C: ResultObjectInfo of UserDetailDto
-            AP->>LS: store user with role and isAdmin
+            opt userData.role defined and a stored user exists
+                AP->>LS: merge role, permissions and isAdmin (ADMIN or SUPER_ADMIN) into stored user
+            end
             AP->>AP: loading = false
         else 401 or 403 (expired or invalid token)
             API-->>C: error
@@ -86,12 +88,16 @@ sequenceDiagram
     alt valid token and no MFA
         API-->>C: 200 ResultObjectInfo (jwt, user)
         H->>AP: login(jwt, user)
-        AP->>AP: localStorage jwt and user, isLoggedIn = true
+        AP->>AP: localStorage jwt and user (isAdmin from payload or role), isLoggedIn = true
+        opt payload has neither role nor isAdmin
+            AP->>C: authApi.me() then merge role, permissions, isAdmin into user
+        end
         H->>H: navigate to root (replace)
     else MFA enabled
         API-->>C: 200 action MFA_REQUIRED
+        H->>H: localStorage user = data.user
         H->>SH: onMfaRequired(data) opens MFALoginModal
-        SH->>API: POST /user/mfa/verify (otp, username, sessionToken)
+        SH->>API: POST /user/mfa/verify (otp, username, sessionToken, whitelisted, no JWT)
         API-->>SH: jwt and user then login()
     else invalid or expired
         API-->>C: error
@@ -101,7 +107,7 @@ sequenceDiagram
 
 ## 3. Screen guard (no router routes)
 
-There are no protected routes. `AppShell` picks the screen from `activeNav` and renders admin screens only when `user.isAdmin` is true. The server is the real gate: `AdminController` is `@PreAuthorize("hasRole('ADMIN')")` and `JWTAuthenticationFilter` rejects bad tokens with 401.
+There are no protected routes. `AppShell` picks the screen from `activeNav` and renders admin screens only when `user.isAdmin` is true (`isAdminRole` accepts ADMIN and SUPER_ADMIN). The Report screen and nav item are gated the same way on `reporter` (`userCanReport`: CONTRIBUTOR or an admin). The server is the real gate: `AdminController` is `@PreAuthorize("hasRole('ADMIN')")` and `JWTAuthenticationFilter` rejects bad tokens with 401.
 
 ```mermaid
 sequenceDiagram

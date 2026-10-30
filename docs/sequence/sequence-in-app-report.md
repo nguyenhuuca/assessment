@@ -9,17 +9,18 @@ Notes where the code differs from the PRD:
 
 - PRD "Out of scope" says there is no in-app notification when an issue is closed. That is superseded: `ReportNotificationListener` now creates a `REPORT_CLOSED` notification (ADR-0026 D7).
 - The 429 for rate limits comes from `@RateLimited` (5 per 3600 s on create and retry, 60 per minute on list). The AOP layer is not drawn in detail.
-- The "global cap of 10 autopilot reports per 24 h" is not a rejection. Over the cap the issue is still created, without the `autopilot` label, and the DTO reports `capReached = true`.
-- Retry is allowed for the reporter or a SUPER_ADMIN only (403 otherwise), although the controller is open to ADMIN.
+- The "global cap of 10 autopilot reports per 24 h" is not a rejection. Over the cap the issue is still created, without the `autopilot` label, and the DTO reports `capReached = true`. The cap counts autopilot reports of `CAPPED_ROLES` (ADMIN and CONTRIBUTOR) and a SUPER_ADMIN is never capped.
+- The controller is class-level `@PreAuthorize("hasRole('CONTRIBUTOR')")`, so it is open to CONTRIBUTOR, ADMIN and SUPER_ADMIN (ADR-0030).
+- Retry is allowed for the reporter or a SUPER_ADMIN only (403 otherwise), although the controller is open to every reporting role.
 
 ## 1. Submit a report and create the GitHub issue
 
-An ADMIN or SUPER_ADMIN fills the form on the Report page. The service stores the row first as FAILED with error `pending`, then calls GitHub outside any transaction, then saves the outcome. A GitHub failure does not fail the HTTP call.
+A CONTRIBUTOR, ADMIN or SUPER_ADMIN fills the form on the Report page. The service stores the row first as FAILED with error `pending`, then calls GitHub outside any transaction, then saves the outcome. A GitHub failure does not fail the HTTP call.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Admin
+    actor U as Reporter (CONTRIBUTOR/ADMIN/SUPER_ADMIN)
     participant FE as Browser (ReportPage.jsx, useCreateReport)
     participant API as AdminReportController
     participant S as ReportServiceImpl
@@ -29,20 +30,21 @@ sequenceDiagram
 
     U->>FE: submit form (type, title, description, optional autoLabel)
     FE->>API: POST /v1/funny-app/admin/reports (JWT, context page path appVersion userAgent screenWidth)
-    API->>API: PreAuthorize hasRole ADMIN, RateLimited 5 per hour, AuditLog createReport
+    API->>API: PreAuthorize hasRole CONTRIBUTOR (also ADMIN and SUPER_ADMIN), RateLimited 5 per hour, AuditLog createReport
     API->>S: create(request)
-    S->>S: currentUser, parseType, trimmed title max 120 and description max 5000,<br/>validateContext, parseAutoLabel
+    S->>S: currentUser, parseType, trimmed title max 120 without control chars and description max 5000,<br/>validateContext, parseAutoLabel
     alt validation fails
-        S-->>API: CustomException 400 (error.report.invalidType, invalidTitle, invalidDescription, invalidContext, invalidAutoLabel)
+        S-->>API: CustomException 400 (error.report.invalidType, invalidTitle incl. control chars, invalidDescription, invalidContext, invalidAutoLabel)
+    Note over S: invalidContext when page, path, appVersion or userAgent has a control char,<br/>page over 32, appVersion over 40, userAgent over 300 chars,<br/>path not starting with / or over 300, screenWidth outside 1..10000
         API-->>FE: 400 ResultErrorInfo
-    else autoLabel sent by a non SUPER_ADMIN
+    else caller is not SUPER_ADMIN and lacks the permission bit for the autoLabel
         S-->>API: CustomException 403 error.report.autoLabelForbidden
         API-->>FE: 403
     else valid
         S->>R: save(AppReport status FAILED, error pending)
         R->>DB: INSERT app_report
-        S->>S: callGitHub(row, role): isCapped counts ADMIN autopilot reports in 24 h
-        S->>R: countByStatusAndAutopilotTrueAndReporterRoleAndCreatedAtAfter
+        S->>S: callGitHub(row, role): isCapped counts ADMIN and CONTRIBUTOR autopilot reports in 24 h (SUPER_ADMIN never capped)
+        S->>R: countByStatusAndAutopilotTrueAndReporterRoleInAndCreatedAtAfter
         S->>GH: create(title, body, labels)
         GH->>GH: POST /repos/{owner}/{repo}/issues, 10 s timeout, no redirects
         GH-->>S: CreatedIssue(number, htmlUrl) on HTTP 201
@@ -90,19 +92,26 @@ sequenceDiagram
     U->>FE: click Retry
     FE->>API: POST /v1/funny-app/admin/reports/{id}/retry (JWT)
     API->>API: RateLimited 5 per hour, AuditLog retryReport, parseId
-    alt id is not a UUID or unknown
+    alt id is not a UUID
         API-->>FE: 404 error.report.notFound
-    else caller is neither reporter nor SUPER_ADMIN
-        API-->>FE: 403 error.report.retryForbidden
-    else row already CREATED
-        API-->>FE: 409 error.report.alreadyCreated
-    else retryable
+    else UUID parsed
         API->>S: retry(id)
         S->>R: findWithReporterById(id)
-        S->>GH: create(...) via callGitHub (label and cap follow the caller's current role)
-        S-->>API: ReportDto CREATED or FAILED again
-        API-->>FE: 200 ResultObjectInfo<ReportDto>
-        FE->>FE: invalidate ['admin','reports']
+        alt row unknown
+            S-->>API: CustomException 404 error.report.notFound
+            API-->>FE: 404
+        else caller is neither reporter nor SUPER_ADMIN
+            S-->>API: CustomException 403 error.report.retryForbidden
+            API-->>FE: 403
+        else row already CREATED
+            S-->>API: CustomException 409 error.report.alreadyCreated
+            API-->>FE: 409
+        else retryable
+            S->>GH: create(...) via callGitHub (cap follows the caller's current role,<br/>a label the caller cannot use is downgraded to AUTO_MERGE or none, not rejected)
+            S-->>API: ReportDto CREATED or FAILED again
+            API-->>FE: 200 ResultObjectInfo<ReportDto>
+            FE->>FE: invalidate ['admin','reports']
+        end
     end
 ```
 
@@ -113,7 +122,7 @@ The list is fetched only while the Recent tab is open. For each CREATED row the 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Admin
+    actor U as Reporter (CONTRIBUTOR/ADMIN/SUPER_ADMIN)
     participant FE as Browser (ReportPage.jsx, useReports)
     participant API as AdminReportController
     participant S as ReportServiceImpl
@@ -123,7 +132,7 @@ sequenceDiagram
 
     U->>FE: open the Recent tab
     FE->>API: GET /v1/funny-app/admin/reports?page=0&size=20 (JWT)
-    API->>API: PreAuthorize hasRole ADMIN, RateLimited 60 per minute
+    API->>API: PreAuthorize hasRole CONTRIBUTOR (also ADMIN and SUPER_ADMIN), RateLimited 60 per minute
     API->>S: list(page, size)
     alt page below 0 or size outside 1..50
         S-->>API: CustomException 400 error.report.invalidPage
@@ -225,7 +234,7 @@ sequenceDiagram
 
 ## 5. ReportClosedEvent to REPORT_CLOSED notification
 
-The webhook stores state without an outer transaction, so the listener uses `fallbackExecution = true` and runs on the async executor. It never lets an exception escape. The admin reporter then sees the item under the ADMIN tab of the bell dropdown.
+The webhook stores state without an outer transaction, so the listener uses `fallbackExecution = true` and runs on the async executor. It never lets an exception escape. The reporter (any role that can report) then sees the item under the ADMIN tab of the bell dropdown.
 
 ```mermaid
 sequenceDiagram
@@ -235,7 +244,7 @@ sequenceDiagram
     participant NR as NotificationRepository
     participant P as InMemorySsePublisher
     participant FE as Reporter browser (useNotificationStream)
-    actor U as Reporter (admin)
+    actor U as Reporter (CONTRIBUTOR/ADMIN/SUPER_ADMIN)
 
     Note over L: @Async @TransactionalEventListener AFTER_COMMIT, fallbackExecution true
     L->>R: findFirstWithReporterByStatusAndIssueNumber(CREATED, issueNumber)
@@ -259,6 +268,6 @@ sequenceDiagram
     U->>FE: open bell, ADMIN tab
     FE->>FE: GET /v1/funny-app/notifications?category=ADMIN (ADMIN_TYPES contains REPORT_CLOSED)
     U->>FE: click the item
-    FE->>FE: PATCH /notifications/{id}/read, then open the Report page (nav key report, admin only)
+    FE->>FE: PATCH /notifications/{id}/read, then open the Report page (nav key report, only when the user can report: CONTRIBUTOR, ADMIN or SUPER_ADMIN)
     Note over L: Failures are only logged. The same notification also appears in the<br/>email digest via NotificationDigestService.describeReportClosed (reason label from mail.digest.reportReason.*).
 ```

@@ -197,7 +197,7 @@ sequenceDiagram
         S-->>AAPI: CustomException 400 error.suggestion.noteRequired
     else valid
         S->>REPO: findByIdForUpdate(id)
-        S->>T: REJECT.check(status)
+        S->>T: REJECT.check(status, null, rereviewCount)
         alt not PENDING
             S-->>AAPI: CustomException 409 error.suggestion.notPending
         else pending
@@ -216,7 +216,7 @@ sequenceDiagram
     alt not found or not the owner
         S-->>UAPI: CustomException 404 error.suggestion.notFound
     else owner
-        S->>T: REREVIEW.check(status, rereviewCount)
+        S->>T: REREVIEW.check(status, null, rereviewCount)
         alt status is not REJECTED
             S-->>UAPI: CustomException 409 error.suggestion.notRejected
         else rereviewCount is 2 or more

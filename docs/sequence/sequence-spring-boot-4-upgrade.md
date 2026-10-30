@@ -3,13 +3,13 @@
 - **PRD:** [PRD-spring-boot-4-upgrade](../prd/PRD-spring-boot-4-upgrade.md)
 - **ADR:** [0033-spring-boot-4-upgrade](../adr/0033-spring-boot-4-upgrade.md)
 - **Spec:** [spec-spring-boot-4-upgrade](../specs/spec-spring-boot-4-upgrade.md)
-- **Status:** Draft
+- **Status:** Done
 
 The upgrade adds no new flow. These diagrams show the existing flows whose internals change: which component now does the work (Jackson 3, `jjwt-orgjson`, Boot 4 modules), and where the spec's rules and edge cases apply.
 
 ## 1. Startup on the prod VM (Boot 4.1)
 
-The JVM starts with the existing `startServer.sh` flags. Liquibase must find nothing to apply, and the JWT/JSON classes are warmed up before Tomcat accepts traffic (spec FR-2, FR-5, Rule 6, EC-9).
+The JVM starts with the runtime flags from the server-side `startServer.sh` (the prod copy may differ from the repo's `api/startServer.sh`, which runs `java $JAVA_OPT -jar funny-app-1.0.0.jar`; `--enable-preview` is set in `pom.xml` for the compiler and surefire). Liquibase must find nothing to apply, and the JWT/JSON classes are warmed up before Tomcat accepts traffic (spec FR-2, FR-5, Rule 6, EC-9).
 
 ```mermaid
 sequenceDiagram
@@ -22,7 +22,7 @@ sequenceDiagram
     participant TC as Tomcat
     participant ACT as /actuator/health
 
-    SH->>BOOT: java --enable-preview -jar funny-app.jar
+    SH->>BOOT: java $JAVA_OPT -jar funny-app-1.0.0.jar
     BOOT->>LQ: auto-configure (spring.liquibase.*)
     LQ->>DB: read DATABASECHANGELOG
     DB-->>LQ: all changesets applied by 3.5 build
@@ -30,7 +30,7 @@ sequenceDiagram
     BOOT->>JWT: @PostConstruct warmUp()
     JWT->>JWT: Jwts.builder()...compact() (org.json writer init)
     JWT->>JWT: parser.parseSignedClaims() (org.json reader init)
-    Note over JWT: class init on main thread, not on virtual threads (EC-9)
+    Note over JWT: class init on main thread, not on virtual threads (EC-9)<br/>any Exception is caught and logged as a warning, startup is never blocked
     BOOT->>TC: start connector :8081
     TC-->>BOOT: accepting requests
     ACT-->>SH: UP
@@ -127,38 +127,50 @@ sequenceDiagram
     participant M as JsonMapper (shared FR-4 settings)
 
     W->>Y: fetchMetadata(url)
-    Y->>P: yt-dlp --dump-json url
+    Y->>P: yt-dlp -J --skip-download [--cookies file] -- url
     P-->>Y: JSON (may contain new fields)
-    Y->>M: readTree / readValue
-    M-->>Y: JsonNode (unknown fields ignored)
+    Y->>M: readTree
     alt malformed output
         M-->>Y: JacksonException (unchecked, was JsonProcessingException)
-        Y-->>W: same fallback as 3.5 (job marked FAILED with message)
+        Y-->>W: ImportException(EXTRACTOR_ERROR)
+    else null, not an object, or no id
+        M-->>Y: JsonNode without id
+        Y-->>W: ImportException(code mapped from stderr)
+    else valid
+        M-->>Y: JsonNode (unknown fields ignored)
+        Y-->>W: VideoMetadata
     end
-    Y-->>W: metadata
 ```
 
 ## 6. Deploy and rollback
 
-The upgrade ships as one artifact. Rollback means redeploying the previous 3.5 artifact; no database step is needed (spec NFR Availability, Rule 6).
+The upgrade ships as one artifact. Rollback means redeploying the previous 3.5 artifact; no database step is needed (spec NFR Availability, Rule 6). In `funnyapp-ci.yml` the `test` job gates both `docker` and `deploy`; the `deploy` job copies the JAR to the VM and runs the deploy script over SSH.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor O as Owner
     participant GH as GitHub Actions (funnyapp-ci.yml)
-    participant VM as Prod VM / Helm
+    participant REG as Docker Hub / Helm values.yaml
+    participant VM as Prod VM
     participant APP as funny-app 4.1
     participant DB as PostgreSQL
 
     O->>GH: push main (after approval)
-    GH->>GH: mvn verify (JsonContractTest, coverage ≥ 90%)
-    GH->>VM: deploy JAR / image tag 4.1
+    GH->>GH: build job: mvn package -DskipTests → funny-app-1.0.0.jar
+    GH->>GH: test job: mvn verify (JsonContractTest) + Sonar
+    GH->>GH: separate step: LINE coverage ≥ api/.coverage-threshold (90%)
+    par docker job (needs test)
+        GH->>REG: push image prod-N, bump api/.funny-app.version and Helm values.yaml tag
+    and deploy job (needs test)
+        GH->>VM: SCP funny-app-1.0.0.jar
+        GH->>VM: SSH: run deploy script
+    end
     VM->>APP: start (diagram 1)
     APP->>DB: Liquibase: 0 pending
     O->>APP: prod smoke test (login, MFA, stream, import, admin, SSE)
     alt smoke test fails or app hangs
-        O->>VM: redeploy previous 3.5 JAR / image tag
+        O->>VM: redeploy previous 3.5 JAR
         VM->>DB: no migration to revert
         VM-->>O: 3.5 back within 10 min
     else all pass

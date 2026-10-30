@@ -9,6 +9,8 @@ Notes where the code differs from the PRD:
 
 - The SSE event is named `unread` with data `{"unread":N}` (the server-side publisher method is `NotificationPublisher.unreadChanged(userId)`).
 - The PRD predates `REPORT_CLOSED` and the `category` filter. `NotificationType.ADMIN_TYPES` is `{REPORT_CLOSED}`. `GET /notifications?category=GENERAL|ADMIN` is accepted from any logged-in user, because the controller and service do no admin check. Only the React dropdown limits the two tabs to admins (`user.isAdmin`).
+- `NotificationType` has six values, not only comment replies: `COMMENT_REPLY` and `COMMENT_REMOVED` (`NotificationEventListener`), `SUGGESTION_APPROVED`, `SUGGESTION_REJECTED` and `SUGGESTION_LIVE` (`SuggestionNotificationListener`), and `REPORT_CLOSED` (`ReportNotificationListener`, driven by `ReportClosedEvent`). They all use the same upsert, SSE push, list and digest path shown below. Diagram 1 draws only the comment-reply producer.
+- The email digest formats each type per item: `describeSuggestion` for the three `SUGGESTION_*` types, `describeReportClosed` for `REPORT_CLOSED` (reason label from `mail.digest.reportReason.*`), a "removed" line (with optional reason) for `COMMENT_REMOVED`, and the reply line (actor, "and N others", snippet) for `COMMENT_REPLY`.
 - Emitters are held in memory per JVM (`InMemorySsePublisher`), at most 5 per user, 30 minute timeout.
 
 ## 1. Event to notification row to SSE unread push
@@ -213,7 +215,7 @@ sequenceDiagram
                 DS->>DS: skip user
             else active
                 DS->>NR: findByUserIdAndReadAtIsNullAndEmailedAtIsNull...OrderByUpdatedAtDesc
-                DS->>DS: build subject and body (max 5 items, then "and N more"), locale via EmailLocaleResolver
+                DS->>DS: build subject and body (max 5 items, then "and N more"), locale via EmailLocaleResolver,<br/>each item via describe(): reply, removed, describeSuggestion or describeReportClosed
                 DS->>M: sendSimpleMail(userName, subject, body)
                 DS->>EL: incrementDailyCount(today)
                 DS->>NR: markEmailed(ids, now)

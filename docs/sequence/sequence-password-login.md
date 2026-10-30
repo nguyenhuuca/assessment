@@ -71,13 +71,24 @@ sequenceDiagram
         FE->>API: POST /v1/funny-app/user/mfa/verify (otp, username, sessionToken)
         API->>US: verifyMfa(MfaRequest)
         US->>MS: getUserId(sessionToken)
-        MS-->>US: userName
-        US->>DB: userRepo.findAllByUserName(userName)
-        US->>US: totp.verify(otp, mfaSecret)
-        US-->>API: UserInfoDto (jwt)
-        API-->>FE: 200 ResultObjectInfo of UserInfoDto
-        FE->>FE: AuthContext.login(jwt, user)
-        FE-->>U: signed in
+        MS-->>US: userName or empty
+        alt unknown or expired sessionToken
+            US-->>API: CustomException error.auth.sessionExpired
+            API-->>FE: error ResultErrorInfo (no JWT)
+        else session found
+            US->>DB: userRepo.findAllByUserName(userName)
+            US->>US: requireActive(user)
+            alt user is DEACTIVATED
+                US-->>API: CustomException 403 error.account.deactivated
+                API-->>FE: 403 ResultErrorInfo (no JWT)
+            else active
+                US->>US: totp.verify(otp, mfaSecret) (wrong OTP raises error.otp.incorrect)
+                US-->>API: UserInfoDto (jwt)
+                API-->>FE: 200 ResultObjectInfo of UserInfoDto
+                FE->>FE: AuthContext.login(jwt, user)
+                FE-->>U: signed in
+            end
+        end
     end
 ```
 
@@ -123,7 +134,7 @@ sequenceDiagram
 
 ## 3. Set or change password (authenticated, MFA aware)
 
-A signed-in user sets a first password (no current password needed) or changes an existing one (current password required) in Settings, `SignInPanel.jsx`. MFA users must also send a 6-digit OTP. Success bumps `credentials_version`, which revokes every other session, and returns a fresh JWT for the current one. Remove password (`DELETE /user/password`) follows the same path with `removePassword`, always requires the current password and sends `PASSWORD_REMOVED`.
+A signed-in user sets a first password (no current password needed) or changes an existing one (current password required) in Settings, `SignInPanel.jsx`. MFA users must also send a 6-digit OTP. Success bumps `credentials_version`, which revokes every other session, and returns a fresh JWT for the current one. Remove password (`DELETE /user/password`) follows the same path with `removePassword`, always requires the current password and sends `PASSWORD_REMOVED`. If the user has no password, `removePassword` throws `400 PASSWORD_NOT_SET` before any credential check.
 
 ```mermaid
 sequenceDiagram
@@ -143,6 +154,11 @@ sequenceDiagram
     FE->>API: PUT /v1/funny-app/user/password (JWT, RateLimited 5)
     API->>PL: setPassword(SetPasswordRequest)
     PL->>PL: requireEnabled() and currentUser() (AppUtils.getCurrentUser, userRepo.findAllById)
+    opt guard fails
+        PL-->>API: CustomException 404 error.user.notFound (password-login flag off, same guard on POST /user/login)
+        PL-->>API: CustomException 401 error.auth.tokenInvalid (no current user)
+        PL-->>API: CustomException 403 error.account.deactivated
+    end
     PL->>PL: PasswordPolicy.validate(newPassword, email)
     opt user already has a password
         PL->>PL: verifyCurrentPassword(user, currentPassword)
@@ -155,7 +171,8 @@ sequenceDiagram
     PL->>DB: userRepo.save(user) with credentialsVersion plus 1
     PL->>CV: evict(userId)
     PL->>US: issueToken(user) (new cv claim)
-    PL->>MAIL: sendSimpleMail(security notice) (failure only logged)
+    PL->>MAIL: sendSimpleMail(security notice) (sendSecurityEmail, failure only logged)
+    Note over PL,MAIL: locale from EmailLocaleResolver.forUser. EmailCacheLimiter daily count is incremented after sending; if the budget is exhausted it only logs a warning and still sends
     PL-->>API: UserInfoDto (jwt, action PASSWORD_SET or PASSWORD_CHANGED)
     API-->>FE: 200 ResultObjectInfo of UserInfoDto
     FE->>FE: AuthContext.login(newJwt, user) and patch ['settings'] query

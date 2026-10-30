@@ -3,7 +3,7 @@
 - **PRD:** [PRD-frontend-deps-upgrade](../prd/PRD-frontend-deps-upgrade.md)
 - **ADR:** [0034-frontend-deps-upgrade](../adr/0034-frontend-deps-upgrade.md)
 - **Spec:** [spec-frontend-deps-upgrade](../specs/spec-frontend-deps-upgrade.md)
-- **Status:** Draft
+- **Status:** Done
 
 This change has no runtime API flow of its own. The diagrams show the upgrade workflow, the CI delivery path it changes, and the two runtime behaviours the upgrade must preserve (lazy `hls.js` playback and the PWA new-version check).
 
@@ -36,6 +36,7 @@ sequenceDiagram
             else > 10 or needs refactor
                 B->>B: rule -> warn in eslint.config.js + TASKS.md follow-up
             end
+            Note over B: fallback not used: all react-hooks rules ended at error (6ed44dde);<br/>only react-refresh/only-export-components stays warn
         end
     end
     B->>NPM: npm outdated
@@ -46,6 +47,8 @@ sequenceDiagram
 
 ## 2. Delivery: push to main builds on Node 22
 
+`deploy-web.yml` runs on a push to `main` or `VID-*` that touches `webapp/**` (or the workflow file). It has no lint or test step; those gates run locally (diagram 1).
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -53,19 +56,20 @@ sequenceDiagram
     participant GH as GitHub Actions (deploy-web.yml)
     participant N as setup-node@v4 (node 22)
     participant V as Vite 8 build
-    participant Host as Static hosting
+    participant VM as VM (nginx)
 
-    O->>GH: approve push to main
+    O->>GH: approve push to main (paths: webapp/**)
     GH->>N: node-version '22', npm cache
     N->>GH: npm ci (webapp/)
-    GH->>V: npm run build
+    GH->>V: npm run build (VITE_API_BASE_URL set)
     V-->>GH: dist/ (index.html, assets/index-*.js, assets/hls-*.js, sw.js, manifest.json, version.json)
     alt build fails only on Node 22 (EC-6)
         GH-->>O: red run
         O->>O: reproduce under Node 22 locally
     else green
-        GH->>Host: deploy dist/
-        O->>Host: prod smoke (login, feed, HLS + Range, admin, i18n, PWA banner)
+        GH->>VM: SCP webapp/dist/ contents to the web root
+        GH->>VM: SSH: reload nginx
+        O->>VM: prod smoke (login, feed, HLS + Range, admin, i18n, PWA banner)
     end
 ```
 
@@ -92,9 +96,11 @@ sequenceDiagram
         H->>Br: import('hls.js') -> fetch assets/hls-*.js
         Br-->>H: Hls
         H->>API: hls.loadSource(playlist.m3u8)
-        opt fatal error
-            H-->>P: fallback to rangeUrl
-        end
+    end
+    opt fallback: fatal hls.js error, <video> error event, Hls.isSupported() false, or import fails
+        H->>H: destroy hls.js, remember currentTime and play state
+        H-->>P: src = rangeUrl
+        H->>P: on loadedmetadata restore position and resume if it was playing
     end
 ```
 

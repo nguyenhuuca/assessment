@@ -31,6 +31,7 @@ sequenceDiagram
     alt no row yet
         S->>SR: save(defaults: notify true, quality AUTO, incognito false, private false)
         SR->>DB: INSERT user_settings
+        S->>S: incognitoCache.evict(userId) (createDefaultSettings)
     else row exists
         SR-->>S: UserSettings
     end
@@ -55,6 +56,8 @@ sequenceDiagram
     participant API as UserSettingsController
     participant S as UserSettingsServiceImpl
     participant SR as UserSettingsRepository
+    participant IC as IncognitoCache
+    participant UR as UserRepo
     participant DB as PostgreSQL
 
     U->>FE: toggles a switch or picks quality
@@ -75,6 +78,9 @@ sequenceDiagram
         S->>S: apply only the provided fields
         S->>SR: save(settings)
         SR->>DB: UPDATE user_settings (updated_at bumped)
+        S->>IC: evict(userId)
+        S->>UR: findAllById(userId) (reload user to build the DTO)
+        S->>S: buildDto: email, passwordEnabled, passwordLoginAvailable, mfaEnabled, mfaAvailable,<br/>settings fields, locale, accountStatus, updatedAt
         S-->>API: UserSettingsDto
         API-->>HK: 200 ResultObjectInfo with UserSettingsDto
         HK->>HK: setQueryData settings
@@ -99,6 +105,7 @@ sequenceDiagram
     participant T as Totp
     participant UR as UserRepo
     participant WR as WatchHistoryRepository
+    participant IC as IncognitoCache
     participant DB as PostgreSQL
 
     U->>FE: clicks Delete my account
@@ -124,6 +131,7 @@ sequenceDiagram
     UR->>DB: UPDATE users
     S->>WR: deleteAll(userId)
     WR->>DB: DELETE FROM watch_history
+    S->>IC: evict(userId)
     S-->>API: void
     API-->>FE: 204 No Content
     FE->>FE: logout() then redirect to /
@@ -163,4 +171,4 @@ sequenceDiagram
 - The spec says toggles may revert on error. As built there is no optimistic update: the UI waits for the 200 and shows `patchError` on failure.
 - `defaultQuality` is stored and returned, but no player code in `webapp/src` reads it yet (only `SettingsPage.jsx`). Incognito is consumed by watch history (see sequence-watch-history-v2).
 - `profilePrivate` is stored only, no other feature reads it in the code searched.
-- The spec says the session or token is invalidated server-side on delete. In the code read, `deleteAccount` does not touch tokens: the client calls `logout()` and redirects. Not verified whether the JWT filter rejects deactivated users on later requests.
+- The spec says the session or token is invalidated server-side on delete. As built, `deleteAccount` does not touch tokens and does not bump `credentialsVersion`. `JWTAuthenticationFilter` (lines 71-73) only compares the token's `cv` claim with `CredentialsVersionCache.currentVersion` and does no user status check, so an old JWT keeps working until it expires. The client calls `logout()` and redirects, which only discards the token locally.

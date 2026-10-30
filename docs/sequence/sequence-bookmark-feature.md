@@ -18,7 +18,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
 
 > **PRD vs code.** The PRD (still `Draft`) and `plan-bookmark-feature` describe a `bookmarks` table and `/bookmarks` endpoints. None of that exists in the code. A "bookmark" is an item in the built-in private collection "Xem sau" (Watch later), served by `VideoCollectionController` under `/v1/funny-app/collections`. The code also has two things the plan lists as out of scope or later: manual ordering (`PATCH /collections/{id}/videos/{videoId}`, column `position`) and `GET /collections/{id}/video-ids`. Items are inserted at the top (`MIN(position) - 1`) instead of ordered by `added_at`.
 
-All endpoints below are relative to `/v1/funny-app`. Writes are JWT-only and carry `@RateLimited(permit = 30)` and `@AuditLog`. `GET /collections/public` and `GET /collections/{id}/videos` are in `OPTIONAL_AUTH_PATH` (guests allowed, a bad token is treated as a guest).
+All endpoints below are relative to `/v1/funny-app`. Writes are JWT-only and carry `@RateLimited(permit = 30)` (the reorder PATCH `/{id}/videos/{videoId}` uses `permit = 60`) and `@AuditLog`. `GET /collections/public` and `GET /collections/{id}/videos` are in `OPTIONAL_AUTH_PATH` (guests allowed, a bad token is treated as a guest).
 
 ## 1. Open the Library tab (public and my collections)
 

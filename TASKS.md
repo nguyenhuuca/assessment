@@ -613,3 +613,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **FD-F2** Follow-up (spec Rule 6): fix `react-hooks/refs` (8 warnings) and set the rule back to error 6ed44dde
 - [x] **FD-F3** Follow-up (spec Rule 6): fix `react-hooks/immutability` (2 warnings) and set the rule back to error 6ed44dde
 - [x] **FD-F4** Fix: admin comment selection cleared 300 ms after mount by the search debounce (flaky `bulk remove` test), regression test d212e176
+
+## Lite: Sequence diagrams synced with code (2026-10-30, swarm-review)
+
+- [x] **SQ-1** Review all 15 `docs/sequence/` files against code (5 parallel reviewers): 3 High in in-app-report (CONTRIBUTOR role, cap roles, autoLabel permission bit), index missing 2 rows
+- [x] **SQ-2** Fix drift in 14 sequence docs + index.md (caches FeedCache/IncognitoCache, missing error branches, CI deploy flows, Status Done on the two upgrade docs)

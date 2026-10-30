@@ -82,10 +82,15 @@ sequenceDiagram
     S->>S: allowsAutoLabel(32, AUTO_MERGE) ✔ (BR-8)
     S->>DB: INSERT app_report (FAILED, 'pending', auto_label AUTO_MERGE)
     S->>DB: COUNT CREATED autopilot reports, role IN (ADMIN, CONTRIBUTOR), last 24 h
-    DB-->>S: 4 (< 10, not capped)
+    DB-->>S: 4 (< 10, not capped, a SUPER_ADMIN skips the count)
     S->>GH: POST /issues labels [autopilot, autopilot:auto-merge, bug]<br/>body "…Reported in-app by a CONTRIBUTOR…"
-    GH-->>S: issue 71
-    S->>DB: UPDATE app_report SET status CREATED, issue 71, labels
+    alt GitHub call fails
+        GH-->>S: error
+        S->>DB: keep row FAILED with error code (no exception thrown, user can retry)
+    else created
+        GH-->>S: issue 71
+        S->>DB: UPDATE app_report SET status CREATED, issue 71, labels
+    end
     S-->>API: ReportDto
     API-->>FE: 200 ResultObjectInfo<ReportDto>
     FE-->>U: Issue 71 created
@@ -141,6 +146,8 @@ sequenceDiagram
     S-->>API: ReportDto
     API-->>U: 200
 ```
+
+Other retry outcomes: a SUPER_ADMIN who is not the reporter may retry any report and may use every label (BR-8); a row already CREATED returns 409 `error.report.alreadyCreated`; any other non-reporter gets 403 `error.report.retryForbidden`.
 
 ## 6. Contributor on another admin endpoint
 

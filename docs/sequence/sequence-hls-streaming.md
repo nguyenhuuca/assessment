@@ -26,9 +26,18 @@ sequenceDiagram
     SA->>FE: toggle HLS on
     FE->>API: PUT /v1/funny-app/admin/videos/42/hls
     API->>S: enableHls(42)
-    S->>DB: status NONE or ERROR to PENDING, clear hls_error
-    S->>W: wakeUp() on a virtual thread
-    API-->>FE: 200 hlsStatus PENDING
+    alt unknown id
+        S-->>API: CustomException 404 error.video.notFound
+    else source is not a Drive video
+        S-->>API: CustomException 400 error.hls.notDriveVideo
+    else status NONE or ERROR
+        S->>DB: status to PENDING, clear hls_error
+        S->>W: wakeUp() on a virtual thread
+    else already PENDING, PROCESSING or READY
+        Note over S: status kept as is
+    end
+    S->>FC: invalidate()
+    API-->>FE: 200 hlsStatus (PENDING after a new request)
 
     W->>W: Semaphore(1).tryAcquire()
     W->>DB: findHlsQueue() (PENDING, oldest first)
@@ -149,12 +158,18 @@ sequenceDiagram
         FE->>HJ: import hls.js, Hls.isSupported(), loadSource + attachMedia
         HJ->>API: GET /video-stream/hls/fileId/playlist.m3u8
     end
+    alt fileId is not a valid id
+        API-->>FE: 400
+    end
     API->>P: findPlaylist(fileId)
     P->>DB: READY and PUBLISHED and not hidden
     P->>FS: playlist.m3u8 exists
     API-->>FE: 200 application/vnd.apple.mpegurl, no-cache
     loop each segment
         HJ->>API: GET /video-stream/hls/fileId/seg_N.ts (on Safari the video element fetches it)
+        opt invalid fileId or segment name
+            API-->>HJ: 400
+        end
         API->>FS: FileSystemResource (no DB)
         API-->>HJ: 200 video/mp2t, immutable
     end
@@ -233,6 +248,7 @@ sequenceDiagram
     alt turn HLS off
         SA->>API: DELETE /v1/funny-app/admin/videos/42/hls
         API->>S: disableHls(42)
+        Note over S: unknown id gives 404 error.video.notFound, a non-Drive source gives 400 error.hls.notDriveVideo
         S->>DB: status NONE, hls_error null
     else delete the video
         SA->>API: DELETE /v1/funny-app/admin/videos/42
@@ -298,6 +314,9 @@ sequenceDiagram
     W->>FS: delete orphan hls directories (row missing or not READY)
     Note over W: any recovery error is logged, startup goes on
     W->>W: markReady(), wakeUp(), drain PENDING one by one
+    loop every 5 min (@Scheduled cron 0 */5 * * * *)
+        W->>W: poll() then drain(), a fallback for a missed wake-up or a row left PENDING by a busy file
+    end
 
     C->>L: tryClaim(fileId)
     C->>D: download(fileId) again

@@ -9,7 +9,7 @@ All endpoints are under `/v1/funny-app`. The user id always comes from the JWT (
 
 ## 1. Record a watch (view reported) and save resume position
 
-A logged-in user plays a video. After 3 s of real, visible playback `VideoPlayer.jsx` calls the public view endpoint, which also upserts the history row. Later the player sends the resume point (update-only) on a 30 s tick (at most every 10 s), on pause, on end, on tab hidden, and on slide switch or unmount. The history write is best effort: a failure is logged and the view still returns 204.
+A logged-in user plays a video. After 3 s of real, visible playback `VideoPlayer.jsx` calls the public view endpoint, which also upserts the history row. Later the player sends the resume point (update-only) on a 30 s tick, on pause, on end, on tab hidden, and on slide switch or unmount. All reports are throttled to at most one every 10 s, except pause, end, slide switch and unmount, which force the send (tab hidden is throttled). Guests never call the server (`watchHistoryApi.progress` returns early without a `jwt` in localStorage). The history write is best effort: a failure is logged and the view still returns 204.
 
 ```mermaid
 sequenceDiagram
@@ -20,6 +20,7 @@ sequenceDiagram
     participant VV as VideoViewService
     participant WC as WatchHistoryController
     participant WS as WatchHistoryServiceImpl
+    participant IC as IncognitoCache (Guava, 60 s, max 10k)
     participant US as UserSettingsRepository
     participant WR as WatchHistoryRepository
     participant DB as PostgreSQL
@@ -30,15 +31,21 @@ sequenceDiagram
     VV-->>VC: counted once per viewer per video per 30 min
     VC->>VC: recordHistory(videoId) - skipped for guests (no user id)
     VC->>WS: recordWatch(userId, videoId)
-    WS->>US: findById(userId) - isIncognito
-    US-->>WS: UserSettings or empty
+    WS->>IC: get(userId, loader) - isIncognito
+    alt cache hit (entry younger than 60 s)
+        IC-->>WS: cached flag
+    else cache miss
+        IC->>US: loader: findById(userId).map(isIncognitoEnabled).orElse(false)
+        US-->>IC: flag (false when no settings row)
+        IC-->>WS: flag
+    end
     alt incognitoEnabled is true
         WS-->>VC: return, nothing written
     else not incognito
         WS->>WR: upsertWatched(userId, videoId)
-        WR->>DB: INSERT SELECT FROM video_sources (PUBLISHED, not hidden) ON CONFLICT DO UPDATE watched_at
-        DB-->>WR: rows affected (0 if video unknown or not public)
-        opt rows affected greater than 0
+        WR->>DB: INSERT SELECT FROM video_sources (PUBLISHED, not hidden) ON CONFLICT DO UPDATE watched_at RETURNING (xmax = 0)
+        DB-->>WR: Optional Boolean (true = fresh insert, false = existing row moved, empty = unknown or non-public video)
+        opt result is true (fresh insert)
             WS->>WR: trimToCap(userId, app.watch-history.max-entries = 500)
             WR->>DB: DELETE rows beyond the newest 500
         end
@@ -46,13 +53,15 @@ sequenceDiagram
     VC-->>FE: 204 No Content
     FE->>FE: invalidateQueries watchHistory (logged in only)
 
-    loop while playing (30 s tick, at most every 10 s) and on pause, end, tab hidden, slide change, unmount
-        FE->>FE: reportProgress(videoId) - only if view already sent and logged in
+    loop while playing (30 s tick) and on pause, end, tab hidden, slide change, unmount
+        FE->>FE: reportProgress(videoId, force) - only if view already sent, throttled to 10 s unless force (pause, end, slide switch, unmount), tab hidden is not forced
+        FE->>FE: watchHistoryApi.progress returns early when no jwt in localStorage (guest)
         FE->>WC: PUT /v1/funny-app/watch-history/:videoId/progress with positionSec and durationSec (keepalive, rate limit 120)
         WC->>WS: saveProgress(userId, videoId, positionSec, durationSec)
-        alt value null, negative or not finite, or incognito
+        alt value null, negative or not finite, or incognito (same IncognitoCache lookup)
             WS-->>WC: return silently
         else valid
+            WS->>WS: clamp dur to 1..21600 and pos to at most dur
             WS->>WR: updateProgress(userId, videoId, pos, dur)
             WR->>DB: UPDATE watch_history SET position_sec, duration_sec (update-only, never inserts)
         end
@@ -128,6 +137,7 @@ sequenceDiagram
     participant SC as UserSettingsController
     participant SS as UserSettingsServiceImpl
     participant SR as UserSettingsRepository
+    participant IC as IncognitoCache
     participant DB as PostgreSQL
     participant WS as WatchHistoryServiceImpl
 
@@ -138,15 +148,20 @@ sequenceDiagram
     SS->>SR: findById(userId) or create defaults
     SS->>SR: save(settings with incognitoEnabled)
     SR->>DB: UPDATE user_settings
+    SS->>IC: evict(userId) - after commit when a transaction is active
     SC-->>HK: 200 ResultObjectInfo with UserSettingsDto
-    HK->>FE: setQueryData settings, then invalidateQueries settings
+    HK->>FE: onSuccess: setQueryData settings (no invalidateQueries)
     FE-->>U: paused banner shown
 
     Note over U,WS: later, while paused
     U->>FE: watches a video
     FE->>WS: POST /view then PUT /watch-history/:videoId/progress
-    WS->>SR: findById(userId) - isIncognito
-    SR-->>WS: incognitoEnabled true
+    WS->>IC: get(userId, loader) - isIncognito
+    alt cache miss (evicted by the save, or older than 60 s)
+        IC->>SR: loader: findById(userId).map(isIncognitoEnabled).orElse(false)
+        SR-->>IC: incognitoEnabled true
+    end
+    IC-->>WS: true
     WS-->>FE: 204, no insert and no update
 ```
 
@@ -191,14 +206,24 @@ sequenceDiagram
     participant SC as UserSettingsController
     participant SS as UserSettingsServiceImpl
     participant WR as WatchHistoryRepository
+    participant IC as IncognitoCache
     participant DB as PostgreSQL
 
-    FE->>SC: DELETE /v1/funny-app/user/account (after step-up check)
+    FE->>SC: DELETE /v1/funny-app/user/account (rate limit 3)
     SC->>SS: deleteAccount(request)
-    SS->>DB: save user as DEACTIVATED and anonymized
-    SS->>WR: deleteAll(userId)
-    WR->>DB: DELETE FROM watch_history WHERE user_id
-    SC-->>FE: 204 No Content
+    alt user already DEACTIVATED
+        SS-->>FE: 409 error.account.alreadyDeactivated
+    else MFA enabled and OTP invalid
+        SS-->>FE: 403 error.otp.incorrect
+    else no MFA and confirmation differs from user name
+        SS-->>FE: 400 error.account.confirmationMismatch
+    else step-up verified
+        SS->>DB: save user as DEACTIVATED and anonymized
+        SS->>WR: deleteAll(userId)
+        WR->>DB: DELETE FROM watch_history WHERE user_id
+        SS->>IC: evict(userId)
+        SC-->>FE: 204 No Content
+    end
 ```
 
 ## Notes: PRD vs code

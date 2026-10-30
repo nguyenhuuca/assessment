@@ -22,7 +22,7 @@ sequenceDiagram
     participant DOM as document.documentElement
 
     U->>M: opens the site
-    M->>I: import i18n (init with bundled resources, initImmediate false)
+    M->>I: import './i18n' as a side effect (main.jsx line 3, before App) - init with bundled resources, initImmediate false
     I->>LS: read key lang
     alt lang stored and supported
         LS-->>I: vi or en
@@ -93,7 +93,7 @@ sequenceDiagram
     I-->>FE: languageChanged event
     alt new language differs from knownServerLocale
         FE->>API: PATCH /v1/funny-app/user/settings with locale
-        alt locale not vi or en
+        alt locale not vi or en (API-only: unreachable from the UI, useLocaleSync only sends vi or en)
             S-->>API: CustomException 400 error.settings.invalidLocale
             API-->>FE: 400 ResultErrorInfo
         else valid
@@ -143,5 +143,5 @@ sequenceDiagram
 - PRD requirement 1 says the Settings switcher is logged in only. As built, `SettingsPage.jsx` embeds the same `LanguageSwitcher` as the header, and the Settings route itself needs login, so this matches.
 - PRD says the first visit with a `vi-*` browser shows Vietnamese and anything else English. As built this comes from i18next `supportedLngs` + `nonExplicitSupportedLngs` + `fallbackLng: en`, not from custom code.
 - `Accept-Language` is sent as the raw `i18n.language` (it can be `vi-VN`), and the server resolver matches on language only.
-- Not every backend error is localized: `handleHttpMediaTypeNotSupported` and `handleEntityNotFound` in `RestExceptionHandler` use plain English text, only keyed `CustomException` and the validation, missing-parameter and rate-limit handlers go through `MessageSource`.
+- Not every backend error is localized: `handleHttpMediaTypeNotSupported`, `handleEntityNotFound` and `handleIllegalArgumentException` (uses `ex.getMessage()`) in `RestExceptionHandler` use plain text, and the `HttpClientErrorException` overload of `handleAuthenticationException` passes the upstream body through. The `AuthenticationException` overload is localized (`KEY_BAD_CREDENTIALS`). The JWT filter writes its 401 straight from `UnauthorizedException.toJson()` (codes such as `TOKEN_REVOKED`), so those bodies are not localized either. Only keyed `CustomException` and the validation, missing-parameter and rate-limit handlers go through `MessageSource`.
 - The password set, change and remove notices are plain-text mails localized by `messages*.properties` keys (not HTML templates). The invite mail is the only HTML template (`templateFor`).

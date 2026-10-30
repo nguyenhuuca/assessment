@@ -1,7 +1,7 @@
-task: Frontend dependency upgrade (Vite 8, Node 22)
+task: Sync docs/sequence diagrams with current code
 status: done
 progress: 100
-done: PRD + ADR-0034 c15d4e97; spec + plan 4f535955; FD-1..FD-5 upgrade 82be7105; FD-6 prod smoke pass; FD-F1..F3 lint warnings 6ed44dde; FD-F4 admin selection fix d212e176
+done: SQ-1 review 15 docs vs code; SQ-2 fix drift in 14 docs + index
 next: -
-plan: docs/plans/plan-frontend-deps-upgrade.md
-updated: 2026-10-29 22:50
+plan: -
+updated: 2026-10-30 21:09

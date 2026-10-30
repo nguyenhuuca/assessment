@@ -18,7 +18,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
 
 > **Planned vs built.**
 > - **Built:** manual `priority` column (0-9999) on `video_sources`, set by an admin and used for feed ordering. The `VideoAccessStats` entity and repo, the `VideoAccessService.recordAccess(String)` signature, and a `cleanUpOldVideos` job whose delete step is commented out.
-> - **Not built:** `recordAccess()` body (commented out with a TODO), the Liquibase migration for `hot_score`, `is_hot`, `hot_rank`, `HotVideoService` / `HotVideoServiceImpl`, `HotVideoProperties` (`app.hot-video.*`), the `recomputeHotScores()` job, `GET /videos/trending`, `sort=hot`, cache pre-warming, and the frontend "Trending Now" section and Hot badge. A grep for `hotScore` / `hot_score` in `api/src` returns nothing.
+> - **Not built:** `recordAccess()` body (commented out with a TODO), the Liquibase migration for `hot_score`, `is_hot`, `hot_rank`, `HotVideoService` / `HotVideoServiceImpl`, `HotVideoProperties` (`app.hot-video.*`), the `recomputeHotScores()` job, `GET /videos/trending`, `sort=hot`, cache pre-warming, and the frontend Hot badge. There is no server trending endpoint or section. `ExploreView.jsx` shows a "Trending Now" hero badge, but it is client side only: the hero is the first video of the list from `useVideos`, sorted by upvotes, views or newest (default upvotes). A grep for `hotScore` / `hot_score` in `api/src` returns nothing.
 > - **PRD vs code.** The PRD uses paths `/api/videos`, `/api/videos/trending`. The real feed endpoint is `GET /v1/funny-app/video-stream/list`, and there is no `/videos` list endpoint. `recordAccess` is called only inside `getFileRangeFromDisk`, so even once implemented it would count cache misses, not every stream request as the PRD (FR-1) intends. The web client (`useVideos`) re-sorts the list by `upvotes` descending, which can override the server order except for ties.
 
 ## 1. Stream a video chunk (access recording is a no-op today)
@@ -38,6 +38,9 @@ sequenceDiagram
 
     FE->>API: GET /v1/funny-app/video-stream/stream/{fileId} (Range header)
     API->>S: getFileSize(fileId)
+    alt malformed or unsatisfiable Range
+        API-->>FE: 416 Range Not Satisfiable (Content-Range bytes */size)
+    end
     API->>S: getPartialFileUsingRAF(fileId, start, end)
     S->>C: getChunkStream(fileId, start, end, loader)
     alt chunk cached
@@ -63,18 +66,27 @@ sequenceDiagram
     participant FE as Browser (useVideos.js, VideoFeed.jsx)
     participant API as VideoStreamController
     participant S as StreamVideoServiceImpl
+    participant P as HlsPlaybackServiceImpl
+    participant FC as FeedCache (Guava, 30 s)
     participant R as VideoSourceRepository
     participant DB as PostgreSQL
 
     U->>FE: open Home
     FE->>API: GET /v1/funny-app/video-stream/list
     API->>S: getVideosToStream()
-    S->>R: findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, PUBLISHED)
-    R->>DB: SELECT ... ORDER BY priority DESC, created_at DESC
-    DB-->>R: rows
-    S-->>API: List of VideoDto (Converter.toVideoDto, no hotScore field)
+    S->>P: hlsEnabled()
+    P-->>S: flag
+    S->>FC: get(flag, loader)
+    alt cache hit (within 30 s)
+        FC-->>S: cached unmodifiable list
+    else cache miss
+        FC->>R: findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, PUBLISHED)
+        R->>DB: SELECT ... ORDER BY priority DESC, created_at DESC
+        DB-->>R: rows
+        FC-->>S: List of VideoDto (no hotScore field)
+    end
     API-->>FE: 200 ResultListInfo of VideoDto
-    FE->>FE: mapApiVideo then sort by upvotes desc (client side)
+    FE->>FE: mapApiVideo then sort by upvotes desc (client side, queryKey videos + category, staleTime 5 min)
     FE-->>U: swipe feed
 ```
 
@@ -90,6 +102,7 @@ sequenceDiagram
     participant API as AdminController (hasRole ADMIN)
     participant S as AdminVideoServiceImpl
     participant R as VideoSourceRepository
+    participant FC as FeedCache
 
     A->>FE: type priority and blur the input
     FE->>API: PATCH /v1/funny-app/admin/videos/{id}/priority (JWT, body priority)
@@ -102,6 +115,7 @@ sequenceDiagram
         API-->>FE: error ResultErrorInfo
     else ok
         S->>R: save(source with new priority)
+        S->>FC: invalidate()
         API-->>FE: 200 ResultObjectInfo "Priority updated" (@AuditLog updateVideoPriority)
     end
     FE-->>A: SaveIndicator, admin videos query refreshed
