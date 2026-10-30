@@ -8,6 +8,7 @@ Older platform flows (login, MFA, streaming, video job, deployment) are PlantUML
 |---------|----------|-----|
 | Admin Video Import | [sequence-admin-video-import](sequence-admin-video-import.md) | [PRD](../prd/PRD-admin-video-import.md) |
 | Bookmark / Library Collections | [sequence-bookmark-feature](sequence-bookmark-feature.md) | [PRD](../prd/PRD-bookmark-feature.md) |
+| Collection-Only Videos | [sequence-collection-only-videos](sequence-collection-only-videos.md) | [PRD](../prd/PRD-collection-only-videos.md) |
 | Contributor Autopilot Permissions | [sequence-contributor-autopilot-permissions](sequence-contributor-autopilot-permissions.md) | [PRD](../prd/PRD-contributor-autopilot-permissions.md) |
 | Frontend Dependency Upgrade | [sequence-frontend-deps-upgrade](sequence-frontend-deps-upgrade.md) | [PRD](../prd/PRD-frontend-deps-upgrade.md) |
 | HLS Streaming | [sequence-hls-streaming](sequence-hls-streaming.md) | [PRD](../prd/PRD-hls-streaming.md) |

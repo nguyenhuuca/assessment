@@ -1,7 +1,7 @@
-task: Sync docs/sequence diagrams with current code
-status: done
-progress: 100
-done: SQ-1 review 15 docs vs code; SQ-2 fix drift in 14 docs + index
-next: -
+task: Collection-only videos (visibility enum, ADR-0035)
+status: in_progress
+progress: 30
+done: CO-0 PRD + ADR-0035 accepted + spec + sequence
+next: /swarm-plan docs/specs/spec-collection-only-videos.md
 plan: -
-updated: 2026-10-30 21:09
+updated: 2026-10-30 21:38

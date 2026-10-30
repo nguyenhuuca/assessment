@@ -93,6 +93,7 @@ nav:
       - 0019 - Admin Video Import: adr/0019-admin-video-import.md
       - 0033 - Spring Boot 4.1 Upgrade: adr/0033-spring-boot-4-upgrade.md
       - 0034 - Frontend Dependency Upgrade: adr/0034-frontend-deps-upgrade.md
+      - 0035 - Collection-Only Videos: adr/0035-collection-only-videos.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -107,6 +108,7 @@ nav:
       - Contributor Autopilot Permissions: prd/PRD-contributor-autopilot-permissions.md
       - HLS Streaming: prd/PRD-hls-streaming.md
       - Web Push: prd/PRD-web-push.md
+      - Collection-Only Videos: prd/PRD-collection-only-videos.md
       - Spring Boot 4.1 Upgrade: prd/PRD-spring-boot-4-upgrade.md
       - Frontend Dependency Upgrade: prd/PRD-frontend-deps-upgrade.md
 
@@ -120,11 +122,13 @@ nav:
       - HLS Streaming: specs/spec-hls-streaming.md
       - Spring Boot 4.1 Upgrade: specs/spec-spring-boot-4-upgrade.md
       - Frontend Dependency Upgrade: specs/spec-frontend-deps-upgrade.md
+      - Collection-Only Videos: specs/spec-collection-only-videos.md
 
   - Sequence Diagrams:
       - Overview: sequence/index.md
       - Admin Video Import: sequence/sequence-admin-video-import.md
       - Bookmark / Collections: sequence/sequence-bookmark-feature.md
+      - Collection-Only Videos: sequence/sequence-collection-only-videos.md
       - Contributor Autopilot Permissions: sequence/sequence-contributor-autopilot-permissions.md
       - HLS Streaming: sequence/sequence-hls-streaming.md
       - Hot Video Priority: sequence/sequence-hot-video-priority.md
