@@ -106,12 +106,12 @@ The replacement for `existsByIdAndIsHideAndStatus` is `existsByIdAndVisibilityNo
 ### FR-5: Admin visibility endpoint
 
 - `PATCH /admin/videos/{id}/visibility` must accept `{"visibility": "FEED" | "COLLECTION_ONLY" | "HIDDEN"}`.
-- For one release it must also accept the legacy `{"hidden": true|false}`, mapped to `HIDDEN|FEED`.
+- ~~For one release it must also accept the legacy `{"hidden": true|false}`, mapped to `HIDDEN|FEED`.~~ Removed by FR-13 (CO-F1): a body without `visibility` is 400 `visibility is required`.
 - It must call `feedCache.invalidate()`.
 
 ### FR-6: Admin list
 
-`GET /admin/videos` items must include `visibility`, and for one release the derived `hidden` (`visibility == HIDDEN`).
+`GET /admin/videos` items must include `visibility`. The derived `hidden` field was kept for one release and removed by FR-13 (CO-F1).
 
 ### FR-7: Import
 
@@ -153,6 +153,8 @@ The inserted video is a slide only: feed search (`SearchModal`, opened from `Vid
 ### FR-13: Compatibility cleanup (follow-up)
 
 After the new frontend is live, a follow-up removes the legacy `{hidden}` body and the `hidden` DTO field.
+
+**Done (CO-F1, v1.3):** `{"hidden": …}` is now 400 `visibility is required`; `AdminVideoDto` and its contract JSON no longer carry `hidden`; the admin page treats a missing `visibility` as `FEED`.
 
 ---
 
@@ -328,8 +330,7 @@ Unchanged. Admin endpoints need a JWT. `/video-stream/**` stays public.
 
 | Field | Rule | Error |
 |-------|------|-------|
-| `visibility` (PATCH) | One of `FEED`, `COLLECTION_ONLY`, `HIDDEN`; mutually exclusive with `hidden` | 400 |
-| `hidden` (PATCH, legacy) | Boolean; mutually exclusive with `visibility` | 400 |
+| `visibility` (PATCH) | Required; one of `FEED`, `COLLECTION_ONLY`, `HIDDEN` (the legacy `hidden` body was removed in CO-F1) | 400 |
 | `visibility` (import) | Null, `FEED` or `COLLECTION_ONLY` | 400 subCode 4104 `INVALID_VISIBILITY` |
 
 ### Sensitive Data
@@ -419,12 +420,12 @@ No concern: `video_sources` has hundreds of rows. The feed index keeps the hot q
 
 ## Edge Cases
 
-### EC-1: Legacy frontend after backend deploy
+### EC-1: Legacy frontend after backend deploy (superseded by CO-F1: now 400)
 
 **Condition:** the old Admin page sends `{"hidden": true}`.
 **Expected:** 200, visibility becomes `HIDDEN`. `{"hidden": false}` becomes `FEED`, even if the video was `COLLECTION_ONLY`.
 
-### EC-2: Both fields sent
+### EC-2: Both fields sent (superseded by CO-F1: `hidden` is ignored, `visibility` applies)
 
 **Condition:** body `{"visibility": "FEED", "hidden": true}`.
 **Expected:** 400 `send either visibility or hidden, not both`; nothing changes.
@@ -511,3 +512,4 @@ None blocking. Decided during `/spec` (2026-10-30):
 | 1.0 | 2026-10-30 | nguyenhuuca | Initial draft |
 | 1.1 | 2026-10-30 | nguyenhuuca | FR-11 / EC-6: no not-found message exists today; resolve the deep link on failure too (found while planning) |
 | 1.2 | 2026-10-30 | nguyenhuuca | Plan review: enum in `enums/`, latest job wins per Drive file, rollback without Liquibase CLI, inserted deep-link video kept out of feed search |
+| 1.3 | 2026-10-31 | nguyenhuuca | FR-13 done (CO-F1): legacy `{hidden}` body and `hidden` DTO field removed; EC-1 / EC-2 superseded |

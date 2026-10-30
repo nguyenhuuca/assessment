@@ -122,16 +122,10 @@ public class AdminController {
                 .build());
     }
 
-    /** New body {visibility}, or the legacy {hidden} (HIDDEN / FEED) kept for one release; exactly one of the two. */
+    /** Body {visibility}; the legacy {hidden} body was removed in CO-F1 and is rejected. */
     private static VideoVisibility parseVisibility(Map<String, Object> body) {
         Object visibility = body == null ? null : body.get("visibility");
-        Object hidden = body == null ? null : body.get("hidden");
-        Contract.require(visibility != null || hidden != null, "visibility or hidden is required");
-        Contract.require(visibility == null || hidden == null, "send either visibility or hidden, not both");
-        if (hidden != null) {
-            Contract.require(hidden instanceof Boolean, "hidden must be a boolean");
-            return (Boolean) hidden ? VideoVisibility.HIDDEN : VideoVisibility.FEED;
-        }
+        Contract.require(visibility != null, "visibility is required");
         VideoVisibility parsed = Arrays.stream(VideoVisibility.values())
                 .filter(v -> v.name().equals(visibility))
                 .findFirst()

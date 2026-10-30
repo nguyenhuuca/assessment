@@ -88,7 +88,7 @@ class JsonContractTest {
         WatchHistoryItemDto history = WatchHistoryItemDto.builder().videoId(1L).title("Funny cat").fileId("file-1")
                 .viewCount(12L).watchedAt(T1).positionSec(30).durationSec(120).completed(true).build();
         AdminVideoDto adminVideo = AdminVideoDto.builder().id(1L).title("Funny cat").thumbnailPath("/thumbs/1.jpg")
-                .creatorEmail("user@example.test").status(VideoStatus.PUBLISHED).visibility(VideoVisibility.HIDDEN).hidden(true).viewCount(12L)
+                .creatorEmail("user@example.test").status(VideoStatus.PUBLISHED).visibility(VideoVisibility.HIDDEN).viewCount(12L)
                 .priority(3).createdAt(T1).hlsStatus(HlsStatus.READY).hlsError(null).build();
         VideoImportJobDto job = VideoImportJobDto.builder().id(9L).sourceUrl("https://youtu.be/abc")
                 .platform(ImportPlatform.YOUTUBE).title("Imported").status(ImportStatus.DOWNLOADING)

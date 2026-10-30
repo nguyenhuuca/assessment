@@ -23,8 +23,6 @@ public class AdminVideoDto {
     private String creatorEmail;
     private VideoStatus status;
     private VideoVisibility visibility;
-    /** Derived (visibility == HIDDEN); kept for one release for the legacy admin page. */
-    private boolean hidden;
     private Long viewCount;
     private Integer priority;
     private Instant createdAt;

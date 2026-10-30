@@ -18,7 +18,7 @@ vi.mock('../../../api/admin.js', () => ({
 let mockRole = 'ADMIN'
 vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => ({ user: { role: mockRole } }) }))
 
-const video = (o) => ({ id: 1, title: 'Clip', status: 'PUBLISHED', priority: 0, viewCount: 3, hidden: false, ...o })
+const video = (o) => ({ id: 1, title: 'Clip', status: 'PUBLISHED', priority: 0, viewCount: 3, ...o })
 
 function renderTable() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
@@ -90,19 +90,17 @@ vi.mock('../../library/AddToCollectionModal.jsx', () => ({
 describe('AdminVideoTable visibility column', () => {
   const page = (...rows) => ({ data: { content: rows, totalPages: 1, totalElements: rows.length } })
 
-  it('reflects visibility per row and falls back to hidden when visibility is absent', async () => {
+  it('reflects visibility per row and treats a missing visibility as FEED', async () => {
     adminApi.getVideos.mockResolvedValue(page(
       video({ id: 1, title: 'Shown', visibility: 'FEED' }),
       video({ id: 2, title: 'Gone', visibility: 'HIDDEN' }),
       video({ id: 3, title: 'Coll', visibility: 'COLLECTION_ONLY' }),
-      video({ id: 4, title: 'OldHidden', hidden: true }),
       video({ id: 5, title: 'OldShown' }),
     ))
     renderTable()
     expect(await screen.findByLabelText('Chế độ hiển thị của Shown')).toHaveValue('FEED')
     expect(screen.getByLabelText('Chế độ hiển thị của Gone')).toHaveValue('HIDDEN')
     expect(screen.getByLabelText('Chế độ hiển thị của Coll')).toHaveValue('COLLECTION_ONLY')
-    expect(screen.getByLabelText('Chế độ hiển thị của OldHidden')).toHaveValue('HIDDEN')
     expect(screen.getByLabelText('Chế độ hiển thị của OldShown')).toHaveValue('FEED')
   })
 

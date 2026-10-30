@@ -210,7 +210,6 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .thumbnailPath(v.getThumbnailPath())
                 .status(v.getStatus())
                 .visibility(v.getVisibility())
-                .hidden(v.getVisibility() == VideoVisibility.HIDDEN)
                 .viewCount(v.getViewCount())
                 .priority(v.getPriority())
                 .createdAt(v.getCreatedAt())

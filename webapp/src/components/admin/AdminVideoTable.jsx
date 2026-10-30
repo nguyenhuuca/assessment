@@ -17,8 +17,7 @@ const STATUS_COLORS = {
 const STATUSES = ['PUBLISHED', 'PENDING', 'FLAGGED']
 const VISIBILITIES = ['FEED', 'COLLECTION_ONLY', 'HIDDEN']
 
-// Old backends only send `hidden`; fall back so the page keeps working during a rolling deploy.
-const visibilityOf = v => v.visibility ?? (v.hidden ? 'HIDDEN' : 'FEED')
+const visibilityOf = v => v.visibility ?? 'FEED'
 
 // Checkboxes inside the delete dialog. The confirm promise only resolves to a boolean,
 // so each change is reported to the caller, which keeps it in its own `opts` object.

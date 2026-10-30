@@ -152,43 +152,35 @@ class AdminControllerTest {
         }
     }
 
+    // CO-F1: the legacy {hidden} body is no longer accepted
     @Test
-    void updateVideoVisibility_legacyHidden_mapsToHiddenOrFeed() {
-        controller.updateVideoVisibility(1L, Map.of("hidden", true));
-        controller.updateVideoVisibility(2L, Map.of("hidden", false));
+    void updateVideoVisibility_legacyHiddenBody_isRejected() {
+        RuntimeException e = assertThrows(RuntimeException.class,
+                () -> controller.updateVideoVisibility(1L, Map.of("hidden", true)));
 
-        verify(adminVideoService).updateVisibility(1L, VideoVisibility.HIDDEN);
-        verify(adminVideoService).updateVisibility(2L, VideoVisibility.FEED);
+        assertEquals("visibility is required", e.getMessage());
+        verifyNoInteractions(adminVideoService);
     }
 
     @Test
-    void updateVideoVisibility_nullBodyOrNeitherField_isRejected() {
+    void updateVideoVisibility_nullOrEmptyBody_isRejected() {
         RuntimeException nullBody = assertThrows(RuntimeException.class, () -> controller.updateVideoVisibility(1L, null));
         RuntimeException empty = assertThrows(RuntimeException.class, () -> controller.updateVideoVisibility(1L, Map.of()));
 
-        assertEquals("visibility or hidden is required", nullBody.getMessage());
-        assertEquals("visibility or hidden is required", empty.getMessage());
+        assertEquals("visibility is required", nullBody.getMessage());
+        assertEquals("visibility is required", empty.getMessage());
         verifyNoInteractions(adminVideoService);
     }
 
     @Test
-    void updateVideoVisibility_bothFields_isRejected() {
-        RuntimeException e = assertThrows(RuntimeException.class,
-                () -> controller.updateVideoVisibility(1L, Map.of("visibility", "FEED", "hidden", true)));
-
-        assertEquals("send either visibility or hidden, not both", e.getMessage());
-        verifyNoInteractions(adminVideoService);
-    }
-
-    @Test
-    void updateVideoVisibility_unknownValueOrBadHidden_isRejected() {
+    void updateVideoVisibility_unknownValue_isRejected() {
         RuntimeException unknown = assertThrows(RuntimeException.class,
                 () -> controller.updateVideoVisibility(1L, Map.of("visibility", "feed")));
-        RuntimeException notBoolean = assertThrows(RuntimeException.class,
-                () -> controller.updateVideoVisibility(1L, Map.of("hidden", "yes")));
+        RuntimeException notString = assertThrows(RuntimeException.class,
+                () -> controller.updateVideoVisibility(1L, Map.of("visibility", true)));
 
         assertEquals("invalid visibility", unknown.getMessage());
-        assertEquals("hidden must be a boolean", notBoolean.getMessage());
+        assertEquals("invalid visibility", notString.getMessage());
         verifyNoInteractions(adminVideoService);
     }
 
