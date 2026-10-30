@@ -48,7 +48,7 @@ An import request carries one `visibility` for all its items: `FEED` (default wh
 
 ### Rule 6: Visibility at row creation
 
-When a Drive file becomes a `video_sources` row (scheduler `saveInfo`, or Drive force sync `upsertInfo` INSERT branch), the row gets the visibility of the import job whose `drive_file_id` matches. With no matching job, it gets `FEED`.
+When a Drive file becomes a `video_sources` row (scheduler `saveInfo`, or Drive force sync `upsertInfo` INSERT branch), the row gets the visibility of the latest import job (highest id) whose `drive_file_id` matches. With no matching job, it gets `FEED`.
 
 ### Rule 7: Existing rows keep their visibility
 
@@ -79,7 +79,7 @@ Changing a video to `HIDDEN` does not delete its collection items; they are filt
 
 ### FR-2: Domain model
 
-- A new enum `VideoVisibility { FEED, COLLECTION_ONLY, HIDDEN }` in `entity/`.
+- A new enum `VideoVisibility { FEED, COLLECTION_ONLY, HIDDEN }` in `enums/`, next to `VideoStatus` and `HlsStatus`.
 - `VideoSource.isHide` becomes `VideoSource.visibility` (`@Enumerated(EnumType.STRING)`, default `FEED`).
 - `VideoImportJob` gets the same field, default `FEED`.
 
@@ -121,7 +121,7 @@ The replacement for `existsByIdAndIsHideAndStatus` is `existsByIdAndVisibilityNo
 
 ### FR-8: Row creation
 
-- `VideoStorageServiceImpl.saveInfo` must set the builder's `visibility` from `videoImportJobRepository.findFirstByDriveFileId(fileId)` (Rule 6).
+- `VideoStorageServiceImpl.saveInfo` must set the builder's `visibility` from the latest job for the file, `videoImportJobRepository.findFirstByDriveFileIdOrderByIdDesc(fileId)` (Rule 6; several jobs can share a Drive file after a re-import).
 - `VideoStorageServiceImpl.upsertInfo` must pass that same visibility to `upsertDriveSource`. Its INSERT branch writes the value, and its `ON CONFLICT` branch must not touch `visibility` (Rule 7).
 
 ### FR-9: Admin UI
@@ -144,7 +144,7 @@ When `PublicFeed` receives a `deepLinkId` that is not in the feed list, it must:
 - start there, applying `deepLinkStartAt` if set;
 - leave the rest of the feed unchanged.
 
-If the fetch fails (400, hidden or unknown video), it must show the feed from `initialIndex ?? 0`, as today when an id is not found (there is no not-found message today, and none is added). In both outcomes it must call `onDeepLinkResolved()`, so `AppShell` clears `deepLinkId` and the lookup does not re-run on every render (today a missing id is never resolved). This applies to `?v=` links, watch-history play and notification open, which all set `deepLinkId` (`AppShell.jsx` ~:125-137).
+The inserted video is a slide only: feed search (`SearchModal`, opened from `VideoSwiper`) keeps searching the feed list without it, so a `COLLECTION_ONLY` video never shows in feed search. If the fetch fails (400, hidden or unknown video), it must show the feed from `initialIndex ?? 0`, as today when an id is not found (there is no not-found message today, and none is added). In both outcomes it must call `onDeepLinkResolved()`, so `AppShell` clears `deepLinkId` and the lookup does not re-run on every render (today a missing id is never resolved). This applies to `?v=` links, watch-history play and notification open, which all set `deepLinkId` (`AppShell.jsx` ~:125-137).
 
 ### FR-12: Notifications
 
@@ -409,7 +409,7 @@ No new job. The existing Drive scheduler (`downloadFileFromFolder` → `saveInfo
 
 - Deploy needs a short backend downtime (owner-approved, ADR-0035).
 - Take a DB backup before deploy.
-- Rollback: `liquibase rollback` of the changeset, then redeploy the previous JAR. Redeploying the old JAR alone fails, because `is_hide` is gone.
+- Rollback (no Liquibase CLI on the VM): roll back the frontend first, run the changeset's `--rollback` statements with `psql` and delete its `databasechangelog` row, then redeploy the previous JAR (plan Rollback Plan). Redeploying the old JAR alone fails, because `is_hide` is gone.
 
 ### Scalability
 
@@ -475,7 +475,7 @@ No concern: `video_sources` has hundreds of rows. The feed index keeps the hot q
 
 ## Acceptance Criteria
 
-- [ ] Migration maps `is_hide` true/false to `HIDDEN`/`FEED`, drops `is_hide`, adds both CHECKs, recreates `idx_video_sources_feed`, and `liquibase rollback` restores `is_hide` (Rule 4, FR-1)
+- [ ] Migration maps `is_hide` true/false to `HIDDEN`/`FEED`, drops `is_hide`, adds both CHECKs, recreates `idx_video_sources_feed`, and its `--rollback` statements (run with `psql`) restore `is_hide` (Rule 4, FR-1)
 - [ ] Feed returns `FEED` videos only; `COLLECTION_ONLY` and `HIDDEN` are excluded (Rule 2, FR-3)
 - [ ] Collections (owner, public, `?l=`), watch history (record, list, summary), `GET /video-stream/{id}`, views, reactions and HLS accept `COLLECTION_ONLY` and reject `HIDDEN` (Rule 3, FR-4)
 - [ ] No `is_hide` / `isHide` reference remains in `api/src/main` or `webapp/src`, except the migration and the legacy `hidden` compatibility code
@@ -487,7 +487,7 @@ No concern: `video_sources` has hundreds of rows. The feed index keeps the hot q
 - [ ] Admin table: three-state control, `COLLECTION_ONLY` badge, "Add to collection" adds the video to the chosen collection (FR-9)
 - [ ] Import form checkbox sends `COLLECTION_ONLY`; the import table shows the badge (FR-10)
 - [ ] A deep link, history play or notification for a `COLLECTION_ONLY` video plays it as slide 0; a `HIDDEN` or unknown id falls back to the feed (FR-11, EC-5, EC-6)
-- [ ] Feed search, the Explore hero and the Library "Add videos" picker do not show `COLLECTION_ONLY` videos (frontend test)
+- [ ] Feed search, the Explore hero and the Library "Add videos" picker do not show `COLLECTION_ONLY` videos (backend feed-query test + frontend test that these surfaces read only the feed list)
 - [ ] Existing flows are unaffected (regression)
 - [ ] API responses match the contracts above
 - [ ] `mvn verify` passes with the 90% coverage gate
@@ -510,3 +510,4 @@ None blocking. Decided during `/spec` (2026-10-30):
 |---------|------|--------|--------|
 | 1.0 | 2026-10-30 | nguyenhuuca | Initial draft |
 | 1.1 | 2026-10-30 | nguyenhuuca | FR-11 / EC-6: no not-found message exists today; resolve the deep link on failure too (found while planning) |
+| 1.2 | 2026-10-30 | nguyenhuuca | Plan review: enum in `enums/`, latest job wins per Drive file, rollback without Liquibase CLI, inserted deep-link video kept out of feed search |
