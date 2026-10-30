@@ -708,10 +708,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#in-review-6" class="md-nav__link">
+  <a href="#in-review-7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔍 In Review (6)
+        🔍 In Review (7)
       
     </span>
   </a>
@@ -974,6 +974,8 @@
   
     
     
+      
+        
       
         
       
@@ -1592,6 +1594,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0035-collection-only-videos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0035 - Collection-Only Videos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1607,6 +1637,8 @@
   
     
     
+      
+        
       
         
       
@@ -2026,6 +2058,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../prd/PRD-collection-only-videos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collection-Only Videos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../prd/PRD-spring-boot-4-upgrade/" class="md-nav__link">
         
   
@@ -2093,6 +2153,8 @@
       
         
           
+        
+      
         
       
         
@@ -2391,6 +2453,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/spec-collection-only-videos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collection-Only Videos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2409,6 +2499,8 @@
       
         
           
+        
+      
         
       
         
@@ -2540,6 +2632,34 @@
     
   
     Bookmark / Collections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sequence/sequence-collection-only-videos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collection-Only Videos
   
 
     
@@ -2932,6 +3052,8 @@
   
     
     
+      
+        
       
         
       
@@ -3667,6 +3789,34 @@
     
   
     Frontend Dependency Upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-collection-only-videos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collection-Only Videos
   
 
     
@@ -8409,10 +8559,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#in-review-6" class="md-nav__link">
+  <a href="#in-review-7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔍 In Review (6)
+        🔍 In Review (7)
       
     </span>
   </a>
@@ -8948,6 +9098,17 @@
 <td>All 27 outdated webapp packages to latest in one commit: Vite 8 + plugin-react 6, Vitest 5, jsdom 29, ESLint 10, react-hooks 7, React 19.3; CI (deploy-web, autopilot) on Node 22; unused FontAwesome removed; hls.js exact pin 1.7.4. Plan: FD-1..FD-6 (in-range bumps, FontAwesome removal, build/test toolchain, lint toolchain, Node 22 + docs, land), squashed into one commit. Built by autopilot as <code>82be7105</code> (<a href="../reports/autopilot-2026-10-29-frontend-deps-upgrade/">report</a>): npm outdated empty, 655/655 tests, main chunk 248.37 kB gzip, audit 16 → 1 moderate; react-hooks 7 rules set-state-in-effect/refs/immutability briefly at warn, then all 23 lint warnings fixed and rules back to error (<code>6ed44dde</code>); flaky admin comment selection bug fixed (<code>d212e176</code>); jsdom stays 29 (30 needs Node ≥ 22.22.2/24.15). Deploy Frontend green on Node 22, owner prod smoke pass 2026-10-29</td>
 </tr>
 <tr>
+<td><strong>Collection-Only Videos</strong></td>
+<td><a href="../prd/PRD-collection-only-videos/">PRD ✅</a></td>
+<td><a href="../adr/0035-collection-only-videos/">0035 ✅</a></td>
+<td><a href="../specs/spec-collection-only-videos/">Spec 📋</a></td>
+<td><a href="../sequence/sequence-collection-only-videos/">Seq 📝</a></td>
+<td><a href="../plans/plan-collection-only-videos/">Plan 📋</a></td>
+<td>—</td>
+<td>🔍</td>
+<td>Research videos out of the feed, search and Explore hero but playable from collections, watch history and direct links. <code>visibility</code> enum (FEED, COLLECTION_ONLY, HIDDEN) replaces <code>is_hide</code> in one release with owner-approved downtime; Import form option; Admin "Add to collection"; deep-link fallback inserts a non-feed video at slide 0. Plan: CO-1..CO-7 + CO-F1 (atomic backend schema switch, admin endpoint, import, 3 FE tasks, land in two pushes). Next: <code>/swarm-execute</code></td>
+</tr>
+<tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
 <td>—</td>
 <td><a href="../adr/0027-agent-self-improvement-loop/">0027 ✅</a></td>
@@ -8994,8 +9155,9 @@
 <li><a href="../plans/plan-admin-dashboard/">Admin Dashboard</a></li>
 <li><a href="../plans/plan-admin-drive-force-sync/">Admin Drive Force Sync</a></li>
 </ul>
-<h3 id="in-review-6">🔍 In Review (6)<a class="headerlink" href="#in-review-6" title="Permanent link">&para;</a></h3>
+<h3 id="in-review-7">🔍 In Review (7)<a class="headerlink" href="#in-review-7" title="Permanent link">&para;</a></h3>
 <ul>
+<li><a href="../specs/spec-collection-only-videos/">Collection-Only Videos</a></li>
 <li><a href="../plans/plan-video-suggestions/">Video Suggestions</a></li>
 <li><a href="../adr/0009-unified-video-list-api/">Unified Video List API</a></li>
 <li><a href="../plans/plan-hot-video-priority/">Hot Video Priority</a></li>
@@ -9178,10 +9340,15 @@
 <td>Upgrade to Spring Boot 4.1 with a Direct Jackson 3 Migration</td>
 <td>✅ Accepted</td>
 </tr>
+<tr>
+<td>0035</td>
+<td>Video Visibility Enum (FEED, COLLECTION_ONLY, HIDDEN) Replaces is_hide</td>
+<td>✅ Accepted</td>
+</tr>
 </tbody>
 </table>
 <hr />
-<p><em>Last updated: 2026-10-29 — frontend dependency upgrade done (82be7105, prod smoke pass); Frontend dependency upgrade PRD approved + ADR-0034 accepted + spec + sequence + plan; Spring Boot 4.1 upgrade done (SB4-5 prod smoke pass, migrator removed); 2026-10-28 — SB4-2 + SB4-4 (Spring Boot 4.1.2, Jackson 3) built by autopilot; SB4-1 JSON contract baseline landed by autopilot; Spring Boot 4.1 upgrade PRD approved + ADR-0033 accepted + spec + sequence + plan; 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
+<p><em>Last updated: 2026-10-30 — collection-only videos PRD approved + ADR-0035 accepted + spec + sequence + plan; 2026-10-29 — frontend dependency upgrade done (82be7105, prod smoke pass); Frontend dependency upgrade PRD approved + ADR-0034 accepted + spec + sequence + plan; Spring Boot 4.1 upgrade done (SB4-5 prod smoke pass, migrator removed); 2026-10-28 — SB4-2 + SB4-4 (Spring Boot 4.1.2, Jackson 3) built by autopilot; SB4-1 JSON contract baseline landed by autopilot; Spring Boot 4.1 upgrade PRD approved + ADR-0033 accepted + spec + sequence + plan; 2026-10-25 — Web Push PRD drafted + ADR-0032 proposed; 2026-10-24 — basic PWA (service worker, install, new-version banner) built by autopilot; HLS streaming PRD approved + ADR-0031 accepted + spec, sequence, plan; HL-1..HL-7 built and landed by autopilot (old ADR-0006 draft and plan removed); 2026-10-23 — contributor autopilot permissions PRD drafted + ADR-0030 accepted; 2026-10-22 — headless Evolve workflow back with staged proposals (ADR-0029); opt-in <code>--auto</code> / <code>--auto-push</code> for local autopilot (ADR-0028); 2026-10-20 — in-app report PRD + ADR-0026 accepted; opt-in auto gates for headless autopilot (ADR-0025); dynamic cron jobs (ADR-0023) built by autopilot; /autopilot skill built; suggestion re-review built by its first run; ADR-0008 and ADR-0012 marked Accepted; Admin Drive force sync implemented (prod E2E pending); password login (ADR-0018) and admin video import (ADR-0019) verified on prod</em></p>
 
 
 
