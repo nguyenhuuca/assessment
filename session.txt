@@ -1,8 +1,7 @@
 task: Collection-only videos (visibility enum, ADR-0035)
-status: blocked
-progress: 85
-done: CO-1..CO-3 backend 02376098; CO-4..CO-6 frontend 9f32b032
-next: prod pg_dump, then push 1 = backend 02376098; after it is live push 2 = frontend; CO-7 smoke
+status: in_progress
+progress: 95
+done: CO-1..CO-3 backend 02376098 (live, smoke 22/22); CO-4..CO-6 frontend 9f32b032
+next: owner prod smoke CO-7 (collection-only out of feed, plays in collection and ?v=, import option); then CO-F1 cleanup
 plan: docs/plans/plan-collection-only-videos.md
-blocker: Gate 2 - owner approves push 1 (backend, drops is_hide on prod) after a prod backup
-updated: 2026-10-30 22:26
+updated: 2026-10-30 22:35

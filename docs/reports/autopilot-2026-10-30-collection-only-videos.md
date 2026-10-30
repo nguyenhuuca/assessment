@@ -3,8 +3,8 @@
 - **Request:** plan mode, `docs/plans/plan-collection-only-videos.md`, build CO-1..CO-6; push the backend first, then the frontend
 - **Mode:** local
 - **Plan:** [plan-collection-only-videos](../plans/plan-collection-only-videos.md)
-- **Started:** 2026-10-30 21:50 · **Landed:** pending (Gate 2: two pushes)
-- **Result:** committed locally `02376098` (backend) and `9f32b032` (frontend); push pending owner approval
+- **Started:** 2026-10-30 21:50 · **Landed:** 2026-10-30 (push 1 backend `02376098`, push 2 frontend `9f32b032`)
+- **Result:** ✅ pushed `02376098` (backend), then `9f32b032` (frontend)
 
 ## Pipeline
 
@@ -19,8 +19,8 @@
 | Local QA ×2 | `qa-twice.sh`: 380 tests, pass 380 · flaky 0 · fail 0 | 1 of 3 |
 | Fix | Frontend advisory A2 fixed (inserted deep-link slide deduplicated when the feed refetches), regression test fails without it; A1 not reproducible on React Query 5, kept as a guard test | — |
 | Land: full gates | `mvn verify` exit 0 (coverage gate ≥ 0.90 passed); `npm run test` 78 files / 680 tests; `npm run lint` clean | — |
-| Gate 2 (owner) | pending | — |
-| CI + smoke | pending: after each push | — |
+| Gate 2 (owner) | Push 1 approved after the owner's prod `pg_dump` backup; push 2 approved after push 1 was verified live | — |
+| CI + smoke | Push 1: Funny App Build and Deploy 4/4 jobs success (Trivy skipped as usual); `mock-test.sh` 22/22; prod feed 59 videos, `GET /video-stream/{id}` 200, health 200, so the migration applied and the app booted. Push 2: Deploy Frontend (see tracking) | — |
 
 ## What changed
 
