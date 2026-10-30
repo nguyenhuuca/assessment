@@ -8379,7 +8379,7 @@
 <li><strong>PRD:</strong> <a href="../../prd/PRD-frontend-deps-upgrade/">PRD-frontend-deps-upgrade</a></li>
 <li><strong>ADR:</strong> <a href="../../adr/0034-frontend-deps-upgrade/">0034-frontend-deps-upgrade</a></li>
 <li><strong>Spec:</strong> <a href="../../specs/spec-frontend-deps-upgrade/">spec-frontend-deps-upgrade</a></li>
-<li><strong>Status:</strong> Draft</li>
+<li><strong>Status:</strong> Done</li>
 </ul>
 <p>This change has no runtime API flow of its own. The diagrams show the upgrade workflow, the CI delivery path it changes, and the two runtime behaviours the upgrade must preserve (lazy <code>hls.js</code> playback and the PWA new-version check).</p>
 <h2 id="1-upgrade-and-verify-in-groups-land-as-one-commit">1. Upgrade and verify in groups, land as one commit<a class="headerlink" href="#1-upgrade-and-verify-in-groups-land-as-one-commit" title="Permanent link">&para;</a></h2>
@@ -8408,6 +8408,7 @@
             else &gt; 10 or needs refactor
                 B-&gt;&gt;B: rule -&gt; warn in eslint.config.js + TASKS.md follow-up
             end
+            Note over B: fallback not used: all react-hooks rules ended at error (6ed44dde);&lt;br/&gt;only react-refresh/only-export-components stays warn
         end
     end
     B-&gt;&gt;NPM: npm outdated
@@ -8415,25 +8416,27 @@
     B-&gt;&gt;NPM: npm ci (from committed lockfile)
     B-&gt;&gt;Git: one commit (deps, configs, CI Node 22, docs, measurements in body)</code></pre>
 <h2 id="2-delivery-push-to-main-builds-on-node-22">2. Delivery: push to main builds on Node 22<a class="headerlink" href="#2-delivery-push-to-main-builds-on-node-22" title="Permanent link">&para;</a></h2>
+<p><code>deploy-web.yml</code> runs on a push to <code>main</code> or <code>VID-*</code> that touches <code>webapp/**</code> (or the workflow file). It has no lint or test step; those gates run locally (diagram 1).</p>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
     actor O as Owner
     participant GH as GitHub Actions (deploy-web.yml)
     participant N as setup-node@v4 (node 22)
     participant V as Vite 8 build
-    participant Host as Static hosting
+    participant VM as VM (nginx)
 
-    O-&gt;&gt;GH: approve push to main
+    O-&gt;&gt;GH: approve push to main (paths: webapp/**)
     GH-&gt;&gt;N: node-version '22', npm cache
     N-&gt;&gt;GH: npm ci (webapp/)
-    GH-&gt;&gt;V: npm run build
+    GH-&gt;&gt;V: npm run build (VITE_API_BASE_URL set)
     V--&gt;&gt;GH: dist/ (index.html, assets/index-*.js, assets/hls-*.js, sw.js, manifest.json, version.json)
     alt build fails only on Node 22 (EC-6)
         GH--&gt;&gt;O: red run
         O-&gt;&gt;O: reproduce under Node 22 locally
     else green
-        GH-&gt;&gt;Host: deploy dist/
-        O-&gt;&gt;Host: prod smoke (login, feed, HLS + Range, admin, i18n, PWA banner)
+        GH-&gt;&gt;VM: SCP webapp/dist/ contents to the web root
+        GH-&gt;&gt;VM: SSH: reload nginx
+        O-&gt;&gt;VM: prod smoke (login, feed, HLS + Range, admin, i18n, PWA banner)
     end</code></pre>
 <h2 id="3-preserved-lazy-hlsjs-playback">3. Preserved: lazy hls.js playback<a class="headerlink" href="#3-preserved-lazy-hlsjs-playback" title="Permanent link">&para;</a></h2>
 <p><code>hls.js</code> must remain a separate chunk fetched only when a video has <code>hlsUrl</code> (ADR-0031); Vite 8's bundler must not merge it into the main chunk (EC-3).</p>
@@ -8455,9 +8458,11 @@
         H-&gt;&gt;Br: import('hls.js') -&gt; fetch assets/hls-*.js
         Br--&gt;&gt;H: Hls
         H-&gt;&gt;API: hls.loadSource(playlist.m3u8)
-        opt fatal error
-            H--&gt;&gt;P: fallback to rangeUrl
-        end
+    end
+    opt fallback: fatal hls.js error, &lt;video&gt; error event, Hls.isSupported() false, or import fails
+        H-&gt;&gt;H: destroy hls.js, remember currentTime and play state
+        H--&gt;&gt;P: src = rangeUrl
+        H-&gt;&gt;P: on loadedmetadata restore position and resume if it was playing
     end</code></pre>
 <h2 id="4-preserved-pwa-new-version-check">4. Preserved: PWA new-version check<a class="headerlink" href="#4-preserved-pwa-new-version-check" title="Permanent link">&para;</a></h2>
 <p>The custom <code>version-file</code> Vite plugin and the <code>__APP_BUILD__</code> define must keep producing a matching pair after the upgrade.</p>

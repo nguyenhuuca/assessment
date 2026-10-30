@@ -8427,7 +8427,7 @@
 </ul>
 <p>All endpoints are under <code>/v1/funny-app</code>. The user id always comes from the JWT (<code>AppUtils.getCurrentUser()</code>), never from the request. Writes are native SQL in <code>WatchHistoryRepository</code> (ADR-0021). In the diagrams <code>:videoId</code> stands for the path variable <code>{videoId}</code>.</p>
 <h2 id="1-record-a-watch-view-reported-and-save-resume-position">1. Record a watch (view reported) and save resume position<a class="headerlink" href="#1-record-a-watch-view-reported-and-save-resume-position" title="Permanent link">&para;</a></h2>
-<p>A logged-in user plays a video. After 3 s of real, visible playback <code>VideoPlayer.jsx</code> calls the public view endpoint, which also upserts the history row. Later the player sends the resume point (update-only) on a 30 s tick (at most every 10 s), on pause, on end, on tab hidden, and on slide switch or unmount. The history write is best effort: a failure is logged and the view still returns 204.</p>
+<p>A logged-in user plays a video. After 3 s of real, visible playback <code>VideoPlayer.jsx</code> calls the public view endpoint, which also upserts the history row. Later the player sends the resume point (update-only) on a 30 s tick, on pause, on end, on tab hidden, and on slide switch or unmount. All reports are throttled to at most one every 10 s, except pause, end, slide switch and unmount, which force the send (tab hidden is throttled). Guests never call the server (<code>watchHistoryApi.progress</code> returns early without a <code>jwt</code> in localStorage). The history write is best effort: a failure is logged and the view still returns 204.</p>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
     actor U as User
@@ -8436,6 +8436,7 @@
     participant VV as VideoViewService
     participant WC as WatchHistoryController
     participant WS as WatchHistoryServiceImpl
+    participant IC as IncognitoCache (Guava, 60 s, max 10k)
     participant US as UserSettingsRepository
     participant WR as WatchHistoryRepository
     participant DB as PostgreSQL
@@ -8446,15 +8447,21 @@
     VV--&gt;&gt;VC: counted once per viewer per video per 30 min
     VC-&gt;&gt;VC: recordHistory(videoId) - skipped for guests (no user id)
     VC-&gt;&gt;WS: recordWatch(userId, videoId)
-    WS-&gt;&gt;US: findById(userId) - isIncognito
-    US--&gt;&gt;WS: UserSettings or empty
+    WS-&gt;&gt;IC: get(userId, loader) - isIncognito
+    alt cache hit (entry younger than 60 s)
+        IC--&gt;&gt;WS: cached flag
+    else cache miss
+        IC-&gt;&gt;US: loader: findById(userId).map(isIncognitoEnabled).orElse(false)
+        US--&gt;&gt;IC: flag (false when no settings row)
+        IC--&gt;&gt;WS: flag
+    end
     alt incognitoEnabled is true
         WS--&gt;&gt;VC: return, nothing written
     else not incognito
         WS-&gt;&gt;WR: upsertWatched(userId, videoId)
-        WR-&gt;&gt;DB: INSERT SELECT FROM video_sources (PUBLISHED, not hidden) ON CONFLICT DO UPDATE watched_at
-        DB--&gt;&gt;WR: rows affected (0 if video unknown or not public)
-        opt rows affected greater than 0
+        WR-&gt;&gt;DB: INSERT SELECT FROM video_sources (PUBLISHED, not hidden) ON CONFLICT DO UPDATE watched_at RETURNING (xmax = 0)
+        DB--&gt;&gt;WR: Optional Boolean (true = fresh insert, false = existing row moved, empty = unknown or non-public video)
+        opt result is true (fresh insert)
             WS-&gt;&gt;WR: trimToCap(userId, app.watch-history.max-entries = 500)
             WR-&gt;&gt;DB: DELETE rows beyond the newest 500
         end
@@ -8462,13 +8469,15 @@
     VC--&gt;&gt;FE: 204 No Content
     FE-&gt;&gt;FE: invalidateQueries watchHistory (logged in only)
 
-    loop while playing (30 s tick, at most every 10 s) and on pause, end, tab hidden, slide change, unmount
-        FE-&gt;&gt;FE: reportProgress(videoId) - only if view already sent and logged in
+    loop while playing (30 s tick) and on pause, end, tab hidden, slide change, unmount
+        FE-&gt;&gt;FE: reportProgress(videoId, force) - only if view already sent, throttled to 10 s unless force (pause, end, slide switch, unmount), tab hidden is not forced
+        FE-&gt;&gt;FE: watchHistoryApi.progress returns early when no jwt in localStorage (guest)
         FE-&gt;&gt;WC: PUT /v1/funny-app/watch-history/:videoId/progress with positionSec and durationSec (keepalive, rate limit 120)
         WC-&gt;&gt;WS: saveProgress(userId, videoId, positionSec, durationSec)
-        alt value null, negative or not finite, or incognito
+        alt value null, negative or not finite, or incognito (same IncognitoCache lookup)
             WS--&gt;&gt;WC: return silently
         else valid
+            WS-&gt;&gt;WS: clamp dur to 1..21600 and pos to at most dur
             WS-&gt;&gt;WR: updateProgress(userId, videoId, pos, dur)
             WR-&gt;&gt;DB: UPDATE watch_history SET position_sec, duration_sec (update-only, never inserts)
         end
@@ -8534,6 +8543,7 @@
     participant SC as UserSettingsController
     participant SS as UserSettingsServiceImpl
     participant SR as UserSettingsRepository
+    participant IC as IncognitoCache
     participant DB as PostgreSQL
     participant WS as WatchHistoryServiceImpl
 
@@ -8544,15 +8554,20 @@
     SS-&gt;&gt;SR: findById(userId) or create defaults
     SS-&gt;&gt;SR: save(settings with incognitoEnabled)
     SR-&gt;&gt;DB: UPDATE user_settings
+    SS-&gt;&gt;IC: evict(userId) - after commit when a transaction is active
     SC--&gt;&gt;HK: 200 ResultObjectInfo with UserSettingsDto
-    HK-&gt;&gt;FE: setQueryData settings, then invalidateQueries settings
+    HK-&gt;&gt;FE: onSuccess: setQueryData settings (no invalidateQueries)
     FE--&gt;&gt;U: paused banner shown
 
     Note over U,WS: later, while paused
     U-&gt;&gt;FE: watches a video
     FE-&gt;&gt;WS: POST /view then PUT /watch-history/:videoId/progress
-    WS-&gt;&gt;SR: findById(userId) - isIncognito
-    SR--&gt;&gt;WS: incognitoEnabled true
+    WS-&gt;&gt;IC: get(userId, loader) - isIncognito
+    alt cache miss (evicted by the save, or older than 60 s)
+        IC-&gt;&gt;SR: loader: findById(userId).map(isIncognitoEnabled).orElse(false)
+        SR--&gt;&gt;IC: incognitoEnabled true
+    end
+    IC--&gt;&gt;WS: true
     WS--&gt;&gt;FE: 204, no insert and no update</code></pre>
 <h2 id="4-watched-badges-summary-in-feed-and-explore">4. Watched badges (summary) in feed and Explore<a class="headerlink" href="#4-watched-badges-summary-in-feed-and-explore" title="Permanent link">&para;</a></h2>
 <p><code>WatchedBadge.jsx</code> uses <code>useWatchHistorySummary()</code>: one shared request (query key <code>watchHistory</code>, <code>summary</code>, stale time 60 s), only for logged-in users. Guests get an empty map and no request.</p>
@@ -8587,14 +8602,24 @@
     participant SC as UserSettingsController
     participant SS as UserSettingsServiceImpl
     participant WR as WatchHistoryRepository
+    participant IC as IncognitoCache
     participant DB as PostgreSQL
 
-    FE-&gt;&gt;SC: DELETE /v1/funny-app/user/account (after step-up check)
+    FE-&gt;&gt;SC: DELETE /v1/funny-app/user/account (rate limit 3)
     SC-&gt;&gt;SS: deleteAccount(request)
-    SS-&gt;&gt;DB: save user as DEACTIVATED and anonymized
-    SS-&gt;&gt;WR: deleteAll(userId)
-    WR-&gt;&gt;DB: DELETE FROM watch_history WHERE user_id
-    SC--&gt;&gt;FE: 204 No Content</code></pre>
+    alt user already DEACTIVATED
+        SS--&gt;&gt;FE: 409 error.account.alreadyDeactivated
+    else MFA enabled and OTP invalid
+        SS--&gt;&gt;FE: 403 error.otp.incorrect
+    else no MFA and confirmation differs from user name
+        SS--&gt;&gt;FE: 400 error.account.confirmationMismatch
+    else step-up verified
+        SS-&gt;&gt;DB: save user as DEACTIVATED and anonymized
+        SS-&gt;&gt;WR: deleteAll(userId)
+        WR-&gt;&gt;DB: DELETE FROM watch_history WHERE user_id
+        SS-&gt;&gt;IC: evict(userId)
+        SC--&gt;&gt;FE: 204 No Content
+    end</code></pre>
 <h2 id="notes-prd-vs-code">Notes: PRD vs code<a class="headerlink" href="#notes-prd-vs-code" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>PUT /watch-history/:videoId/progress</code> is update-only and is only sent after the view has counted (<code>viewSentRef</code>), so a row always exists first.</li>

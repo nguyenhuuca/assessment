@@ -8397,7 +8397,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
 <p><strong>Planned vs built.</strong></p>
 <ul>
 <li><strong>Built:</strong> manual <code>priority</code> column (0-9999) on <code>video_sources</code>, set by an admin and used for feed ordering. The <code>VideoAccessStats</code> entity and repo, the <code>VideoAccessService.recordAccess(String)</code> signature, and a <code>cleanUpOldVideos</code> job whose delete step is commented out.</li>
-<li><strong>Not built:</strong> <code>recordAccess()</code> body (commented out with a TODO), the Liquibase migration for <code>hot_score</code>, <code>is_hot</code>, <code>hot_rank</code>, <code>HotVideoService</code> / <code>HotVideoServiceImpl</code>, <code>HotVideoProperties</code> (<code>app.hot-video.*</code>), the <code>recomputeHotScores()</code> job, <code>GET /videos/trending</code>, <code>sort=hot</code>, cache pre-warming, and the frontend "Trending Now" section and Hot badge. A grep for <code>hotScore</code> / <code>hot_score</code> in <code>api/src</code> returns nothing.</li>
+<li><strong>Not built:</strong> <code>recordAccess()</code> body (commented out with a TODO), the Liquibase migration for <code>hot_score</code>, <code>is_hot</code>, <code>hot_rank</code>, <code>HotVideoService</code> / <code>HotVideoServiceImpl</code>, <code>HotVideoProperties</code> (<code>app.hot-video.*</code>), the <code>recomputeHotScores()</code> job, <code>GET /videos/trending</code>, <code>sort=hot</code>, cache pre-warming, and the frontend Hot badge. There is no server trending endpoint or section. <code>ExploreView.jsx</code> shows a "Trending Now" hero badge, but it is client side only: the hero is the first video of the list from <code>useVideos</code>, sorted by upvotes, views or newest (default upvotes). A grep for <code>hotScore</code> / <code>hot_score</code> in <code>api/src</code> returns nothing.</li>
 <li><strong>PRD vs code.</strong> The PRD uses paths <code>/api/videos</code>, <code>/api/videos/trending</code>. The real feed endpoint is <code>GET /v1/funny-app/video-stream/list</code>, and there is no <code>/videos</code> list endpoint. <code>recordAccess</code> is called only inside <code>getFileRangeFromDisk</code>, so even once implemented it would count cache misses, not every stream request as the PRD (FR-1) intends. The web client (<code>useVideos</code>) re-sorts the list by <code>upvotes</code> descending, which can override the server order except for ties.</li>
 </ul>
 </blockquote>
@@ -8415,6 +8415,9 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
 
     FE-&gt;&gt;API: GET /v1/funny-app/video-stream/stream/{fileId} (Range header)
     API-&gt;&gt;S: getFileSize(fileId)
+    alt malformed or unsatisfiable Range
+        API--&gt;&gt;FE: 416 Range Not Satisfiable (Content-Range bytes */size)
+    end
     API-&gt;&gt;S: getPartialFileUsingRAF(fileId, start, end)
     S-&gt;&gt;C: getChunkStream(fileId, start, end, loader)
     alt chunk cached
@@ -8435,18 +8438,27 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
     participant FE as Browser (useVideos.js, VideoFeed.jsx)
     participant API as VideoStreamController
     participant S as StreamVideoServiceImpl
+    participant P as HlsPlaybackServiceImpl
+    participant FC as FeedCache (Guava, 30 s)
     participant R as VideoSourceRepository
     participant DB as PostgreSQL
 
     U-&gt;&gt;FE: open Home
     FE-&gt;&gt;API: GET /v1/funny-app/video-stream/list
     API-&gt;&gt;S: getVideosToStream()
-    S-&gt;&gt;R: findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, PUBLISHED)
-    R-&gt;&gt;DB: SELECT ... ORDER BY priority DESC, created_at DESC
-    DB--&gt;&gt;R: rows
-    S--&gt;&gt;API: List of VideoDto (Converter.toVideoDto, no hotScore field)
+    S-&gt;&gt;P: hlsEnabled()
+    P--&gt;&gt;S: flag
+    S-&gt;&gt;FC: get(flag, loader)
+    alt cache hit (within 30 s)
+        FC--&gt;&gt;S: cached unmodifiable list
+    else cache miss
+        FC-&gt;&gt;R: findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, PUBLISHED)
+        R-&gt;&gt;DB: SELECT ... ORDER BY priority DESC, created_at DESC
+        DB--&gt;&gt;R: rows
+        FC--&gt;&gt;S: List of VideoDto (no hotScore field)
+    end
     API--&gt;&gt;FE: 200 ResultListInfo of VideoDto
-    FE-&gt;&gt;FE: mapApiVideo then sort by upvotes desc (client side)
+    FE-&gt;&gt;FE: mapApiVideo then sort by upvotes desc (client side, queryKey videos + category, staleTime 5 min)
     FE--&gt;&gt;U: swipe feed</code></pre>
 <h2 id="3-admin-pins-a-video-with-a-manual-priority">3. Admin pins a video with a manual priority<a class="headerlink" href="#3-admin-pins-a-video-with-a-manual-priority" title="Permanent link">&para;</a></h2>
 <p>This is the only "hot" lever that exists. An admin edits the priority cell in the video table.</p>
@@ -8457,6 +8469,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
     participant API as AdminController (hasRole ADMIN)
     participant S as AdminVideoServiceImpl
     participant R as VideoSourceRepository
+    participant FC as FeedCache
 
     A-&gt;&gt;FE: type priority and blur the input
     FE-&gt;&gt;API: PATCH /v1/funny-app/admin/videos/{id}/priority (JWT, body priority)
@@ -8469,6 +8482,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
         API--&gt;&gt;FE: error ResultErrorInfo
     else ok
         S-&gt;&gt;R: save(source with new priority)
+        S-&gt;&gt;FC: invalidate()
         API--&gt;&gt;FE: 200 ResultObjectInfo "Priority updated" (@AuditLog updateVideoPriority)
     end
     FE--&gt;&gt;A: SaveIndicator, admin videos query refreshed</code></pre>

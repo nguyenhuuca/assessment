@@ -8445,13 +8445,24 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
         FE-&gt;&gt;API: POST /v1/funny-app/user/mfa/verify (otp, username, sessionToken)
         API-&gt;&gt;US: verifyMfa(MfaRequest)
         US-&gt;&gt;MS: getUserId(sessionToken)
-        MS--&gt;&gt;US: userName
-        US-&gt;&gt;DB: userRepo.findAllByUserName(userName)
-        US-&gt;&gt;US: totp.verify(otp, mfaSecret)
-        US--&gt;&gt;API: UserInfoDto (jwt)
-        API--&gt;&gt;FE: 200 ResultObjectInfo of UserInfoDto
-        FE-&gt;&gt;FE: AuthContext.login(jwt, user)
-        FE--&gt;&gt;U: signed in
+        MS--&gt;&gt;US: userName or empty
+        alt unknown or expired sessionToken
+            US--&gt;&gt;API: CustomException error.auth.sessionExpired
+            API--&gt;&gt;FE: error ResultErrorInfo (no JWT)
+        else session found
+            US-&gt;&gt;DB: userRepo.findAllByUserName(userName)
+            US-&gt;&gt;US: requireActive(user)
+            alt user is DEACTIVATED
+                US--&gt;&gt;API: CustomException 403 error.account.deactivated
+                API--&gt;&gt;FE: 403 ResultErrorInfo (no JWT)
+            else active
+                US-&gt;&gt;US: totp.verify(otp, mfaSecret) (wrong OTP raises error.otp.incorrect)
+                US--&gt;&gt;API: UserInfoDto (jwt)
+                API--&gt;&gt;FE: 200 ResultObjectInfo of UserInfoDto
+                FE-&gt;&gt;FE: AuthContext.login(jwt, user)
+                FE--&gt;&gt;U: signed in
+            end
+        end
     end</code></pre>
 <h2 id="2-password-sign-in-failure-generic-401-lockout-rate-limit">2. Password sign-in failure (generic 401, lockout, rate limit)<a class="headerlink" href="#2-password-sign-in-failure-generic-401-lockout-rate-limit" title="Permanent link">&para;</a></h2>
 <p>Every rejection (unknown email, no password set, wrong password, deactivated, locked, over-long password) returns the same <code>401 INVALID_CREDENTIALS</code>, so callers cannot enumerate accounts. A wrong password increments the failure counter in its own transaction. At 5 failures the account is locked for 15 minutes (magic link still works). The IP rate limit answers 429.</p>
@@ -8489,7 +8500,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
         FE--&gt;&gt;U: "invalidCredentials" (same text for every cause)
     end</code></pre>
 <h2 id="3-set-or-change-password-authenticated-mfa-aware">3. Set or change password (authenticated, MFA aware)<a class="headerlink" href="#3-set-or-change-password-authenticated-mfa-aware" title="Permanent link">&para;</a></h2>
-<p>A signed-in user sets a first password (no current password needed) or changes an existing one (current password required) in Settings, <code>SignInPanel.jsx</code>. MFA users must also send a 6-digit OTP. Success bumps <code>credentials_version</code>, which revokes every other session, and returns a fresh JWT for the current one. Remove password (<code>DELETE /user/password</code>) follows the same path with <code>removePassword</code>, always requires the current password and sends <code>PASSWORD_REMOVED</code>.</p>
+<p>A signed-in user sets a first password (no current password needed) or changes an existing one (current password required) in Settings, <code>SignInPanel.jsx</code>. MFA users must also send a 6-digit OTP. Success bumps <code>credentials_version</code>, which revokes every other session, and returns a fresh JWT for the current one. Remove password (<code>DELETE /user/password</code>) follows the same path with <code>removePassword</code>, always requires the current password and sends <code>PASSWORD_REMOVED</code>. If the user has no password, <code>removePassword</code> throws <code>400 PASSWORD_NOT_SET</code> before any credential check.</p>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
     actor U as User
@@ -8507,6 +8518,11 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
     FE-&gt;&gt;API: PUT /v1/funny-app/user/password (JWT, RateLimited 5)
     API-&gt;&gt;PL: setPassword(SetPasswordRequest)
     PL-&gt;&gt;PL: requireEnabled() and currentUser() (AppUtils.getCurrentUser, userRepo.findAllById)
+    opt guard fails
+        PL--&gt;&gt;API: CustomException 404 error.user.notFound (password-login flag off, same guard on POST /user/login)
+        PL--&gt;&gt;API: CustomException 401 error.auth.tokenInvalid (no current user)
+        PL--&gt;&gt;API: CustomException 403 error.account.deactivated
+    end
     PL-&gt;&gt;PL: PasswordPolicy.validate(newPassword, email)
     opt user already has a password
         PL-&gt;&gt;PL: verifyCurrentPassword(user, currentPassword)
@@ -8519,7 +8535,8 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
     PL-&gt;&gt;DB: userRepo.save(user) with credentialsVersion plus 1
     PL-&gt;&gt;CV: evict(userId)
     PL-&gt;&gt;US: issueToken(user) (new cv claim)
-    PL-&gt;&gt;MAIL: sendSimpleMail(security notice) (failure only logged)
+    PL-&gt;&gt;MAIL: sendSimpleMail(security notice) (sendSecurityEmail, failure only logged)
+    Note over PL,MAIL: locale from EmailLocaleResolver.forUser. EmailCacheLimiter daily count is incremented after sending; if the budget is exhausted it only logs a warning and still sends
     PL--&gt;&gt;API: UserInfoDto (jwt, action PASSWORD_SET or PASSWORD_CHANGED)
     API--&gt;&gt;FE: 200 ResultObjectInfo of UserInfoDto
     FE-&gt;&gt;FE: AuthContext.login(newJwt, user) and patch ['settings'] query

@@ -8398,7 +8398,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
 <ul>
 <li>The PRD status is <code>Planning</code> but the SPA is live in <code>webapp/</code> (ADR-0008: Accepted, implemented).</li>
 <li>PRD says React Router v6 for routing. The code uses <code>react-router-dom</code> v7 but defines no <code>&lt;Route&gt;</code> elements. <code>BrowserRouter</code> only provides <code>useNavigate</code> to <code>MagicLinkHandler</code>, and screens are switched by an <code>activeNav</code> state in <code>AppShell</code>.</li>
-<li>PRD says react-bootstrap and Font Awesome. The UI uses custom CSS tokens and Material Symbols.</li>
+<li>PRD says react-bootstrap and Font Awesome. Font Awesome is not used (icons are Material Symbols). <code>bootstrap</code> and <code>react-bootstrap</code> are still dependencies: <code>main.jsx</code> imports <code>bootstrap.min.css</code> and <code>MFALoginModal.jsx</code> uses react-bootstrap <code>Modal</code> and <code>Form</code>, but the rest of the UI is styled with custom CSS tokens.</li>
 <li>PRD lists <code>/private-videos</code>, the private tab and <code>/share-links</code> POST. The private tab was removed and share links are being retired. Only <code>DELETE /share-links/{id}</code> remains in <code>videosApi</code>.</li>
 <li><code>webapp/CLAUDE.md</code> mentions Axios, but <code>src/api/client.js</code> uses <code>fetch</code>. The <code>Authorization</code> header carries the raw JWT with no <code>Bearer</code> prefix.</li>
 <li>There is no global React Query 401 handler. 401 handling lives in <code>client.js</code> (TOKEN_REVOKED only) and <code>AuthContext</code> (the <code>/user/me</code> check at boot).</li>
@@ -8427,7 +8427,9 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
         C-&gt;&gt;API: GET /user/me (Authorization jwt, X-Guest-Token)
         alt 200
             API--&gt;&gt;C: ResultObjectInfo of UserDetailDto
-            AP-&gt;&gt;LS: store user with role and isAdmin
+            opt userData.role defined and a stored user exists
+                AP-&gt;&gt;LS: merge role, permissions and isAdmin (ADMIN or SUPER_ADMIN) into stored user
+            end
             AP-&gt;&gt;AP: loading = false
         else 401 or 403 (expired or invalid token)
             API--&gt;&gt;C: error
@@ -8457,19 +8459,23 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
     alt valid token and no MFA
         API--&gt;&gt;C: 200 ResultObjectInfo (jwt, user)
         H-&gt;&gt;AP: login(jwt, user)
-        AP-&gt;&gt;AP: localStorage jwt and user, isLoggedIn = true
+        AP-&gt;&gt;AP: localStorage jwt and user (isAdmin from payload or role), isLoggedIn = true
+        opt payload has neither role nor isAdmin
+            AP-&gt;&gt;C: authApi.me() then merge role, permissions, isAdmin into user
+        end
         H-&gt;&gt;H: navigate to root (replace)
     else MFA enabled
         API--&gt;&gt;C: 200 action MFA_REQUIRED
+        H-&gt;&gt;H: localStorage user = data.user
         H-&gt;&gt;SH: onMfaRequired(data) opens MFALoginModal
-        SH-&gt;&gt;API: POST /user/mfa/verify (otp, username, sessionToken)
+        SH-&gt;&gt;API: POST /user/mfa/verify (otp, username, sessionToken, whitelisted, no JWT)
         API--&gt;&gt;SH: jwt and user then login()
     else invalid or expired
         API--&gt;&gt;C: error
         H-&gt;&gt;SH: onError(message) shows toast for 5 seconds
     end</code></pre>
 <h2 id="3-screen-guard-no-router-routes">3. Screen guard (no router routes)<a class="headerlink" href="#3-screen-guard-no-router-routes" title="Permanent link">&para;</a></h2>
-<p>There are no protected routes. <code>AppShell</code> picks the screen from <code>activeNav</code> and renders admin screens only when <code>user.isAdmin</code> is true. The server is the real gate: <code>AdminController</code> is <code>@PreAuthorize("hasRole('ADMIN')")</code> and <code>JWTAuthenticationFilter</code> rejects bad tokens with 401.</p>
+<p>There are no protected routes. <code>AppShell</code> picks the screen from <code>activeNav</code> and renders admin screens only when <code>user.isAdmin</code> is true (<code>isAdminRole</code> accepts ADMIN and SUPER_ADMIN). The Report screen and nav item are gated the same way on <code>reporter</code> (<code>userCanReport</code>: CONTRIBUTOR or an admin). The server is the real gate: <code>AdminController</code> is <code>@PreAuthorize("hasRole('ADMIN')")</code> and <code>JWTAuthenticationFilter</code> rejects bad tokens with 401.</p>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
     actor U as User

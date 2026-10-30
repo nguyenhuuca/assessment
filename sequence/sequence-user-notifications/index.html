@@ -8407,6 +8407,8 @@
 <ul>
 <li>The SSE event is named <code>unread</code> with data <code>{"unread":N}</code> (the server-side publisher method is <code>NotificationPublisher.unreadChanged(userId)</code>).</li>
 <li>The PRD predates <code>REPORT_CLOSED</code> and the <code>category</code> filter. <code>NotificationType.ADMIN_TYPES</code> is <code>{REPORT_CLOSED}</code>. <code>GET /notifications?category=GENERAL|ADMIN</code> is accepted from any logged-in user, because the controller and service do no admin check. Only the React dropdown limits the two tabs to admins (<code>user.isAdmin</code>).</li>
+<li><code>NotificationType</code> has six values, not only comment replies: <code>COMMENT_REPLY</code> and <code>COMMENT_REMOVED</code> (<code>NotificationEventListener</code>), <code>SUGGESTION_APPROVED</code>, <code>SUGGESTION_REJECTED</code> and <code>SUGGESTION_LIVE</code> (<code>SuggestionNotificationListener</code>), and <code>REPORT_CLOSED</code> (<code>ReportNotificationListener</code>, driven by <code>ReportClosedEvent</code>). They all use the same upsert, SSE push, list and digest path shown below. Diagram 1 draws only the comment-reply producer.</li>
+<li>The email digest formats each type per item: <code>describeSuggestion</code> for the three <code>SUGGESTION_*</code> types, <code>describeReportClosed</code> for <code>REPORT_CLOSED</code> (reason label from <code>mail.digest.reportReason.*</code>), a "removed" line (with optional reason) for <code>COMMENT_REMOVED</code>, and the reply line (actor, "and N others", snippet) for <code>COMMENT_REPLY</code>.</li>
 <li>Emitters are held in memory per JVM (<code>InMemorySsePublisher</code>), at most 5 per user, 30 minute timeout.</li>
 </ul>
 <h2 id="1-event-to-notification-row-to-sse-unread-push">1. Event to notification row to SSE unread push<a class="headerlink" href="#1-event-to-notification-row-to-sse-unread-push" title="Permanent link">&para;</a></h2>
@@ -8588,7 +8590,7 @@
                 DS-&gt;&gt;DS: skip user
             else active
                 DS-&gt;&gt;NR: findByUserIdAndReadAtIsNullAndEmailedAtIsNull...OrderByUpdatedAtDesc
-                DS-&gt;&gt;DS: build subject and body (max 5 items, then "and N more"), locale via EmailLocaleResolver
+                DS-&gt;&gt;DS: build subject and body (max 5 items, then "and N more"), locale via EmailLocaleResolver,&lt;br/&gt;each item via describe(): reply, removed, describeSuggestion or describeReportClosed
                 DS-&gt;&gt;M: sendSimpleMail(userName, subject, body)
                 DS-&gt;&gt;EL: incrementDailyCount(today)
                 DS-&gt;&gt;NR: markEmailed(ids, now)

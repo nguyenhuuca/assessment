@@ -8556,7 +8556,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
         S--&gt;&gt;AAPI: CustomException 400 error.suggestion.noteRequired
     else valid
         S-&gt;&gt;REPO: findByIdForUpdate(id)
-        S-&gt;&gt;T: REJECT.check(status)
+        S-&gt;&gt;T: REJECT.check(status, null, rereviewCount)
         alt not PENDING
             S--&gt;&gt;AAPI: CustomException 409 error.suggestion.notPending
         else pending
@@ -8575,7 +8575,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
     alt not found or not the owner
         S--&gt;&gt;UAPI: CustomException 404 error.suggestion.notFound
     else owner
-        S-&gt;&gt;T: REREVIEW.check(status, rereviewCount)
+        S-&gt;&gt;T: REREVIEW.check(status, null, rereviewCount)
         alt status is not REJECTED
             S--&gt;&gt;UAPI: CustomException 409 error.suggestion.notRejected
         else rereviewCount is 2 or more

@@ -8511,10 +8511,15 @@
     S-&gt;&gt;S: allowsAutoLabel(32, AUTO_MERGE) ✔ (BR-8)
     S-&gt;&gt;DB: INSERT app_report (FAILED, 'pending', auto_label AUTO_MERGE)
     S-&gt;&gt;DB: COUNT CREATED autopilot reports, role IN (ADMIN, CONTRIBUTOR), last 24 h
-    DB--&gt;&gt;S: 4 (&lt; 10, not capped)
+    DB--&gt;&gt;S: 4 (&lt; 10, not capped, a SUPER_ADMIN skips the count)
     S-&gt;&gt;GH: POST /issues labels [autopilot, autopilot:auto-merge, bug]&lt;br/&gt;body "…Reported in-app by a CONTRIBUTOR…"
-    GH--&gt;&gt;S: issue 71
-    S-&gt;&gt;DB: UPDATE app_report SET status CREATED, issue 71, labels
+    alt GitHub call fails
+        GH--&gt;&gt;S: error
+        S-&gt;&gt;DB: keep row FAILED with error code (no exception thrown, user can retry)
+    else created
+        GH--&gt;&gt;S: issue 71
+        S-&gt;&gt;DB: UPDATE app_report SET status CREATED, issue 71, labels
+    end
     S--&gt;&gt;API: ReportDto
     API--&gt;&gt;FE: 200 ResultObjectInfo&lt;ReportDto&gt;
     FE--&gt;&gt;U: Issue 71 created
@@ -8559,6 +8564,7 @@
     S-&gt;&gt;DB: UPDATE R: CREATED, issue 72 (auto_label stays AUTO)
     S--&gt;&gt;API: ReportDto
     API--&gt;&gt;U: 200</code></pre>
+<p>Other retry outcomes: a SUPER_ADMIN who is not the reporter may retry any report and may use every label (BR-8); a row already CREATED returns 409 <code>error.report.alreadyCreated</code>; any other non-reporter gets 403 <code>error.report.retryForbidden</code>.</p>
 <h2 id="6-contributor-on-another-admin-endpoint">6. Contributor on another admin endpoint<a class="headerlink" href="#6-contributor-on-another-admin-endpoint" title="Permanent link">&para;</a></h2>
 <p>Spec BR-2, EC-8.</p>
 <pre class="mermaid"><code>sequenceDiagram

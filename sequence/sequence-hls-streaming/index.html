@@ -8443,9 +8443,18 @@
     SA-&gt;&gt;FE: toggle HLS on
     FE-&gt;&gt;API: PUT /v1/funny-app/admin/videos/42/hls
     API-&gt;&gt;S: enableHls(42)
-    S-&gt;&gt;DB: status NONE or ERROR to PENDING, clear hls_error
-    S-&gt;&gt;W: wakeUp() on a virtual thread
-    API--&gt;&gt;FE: 200 hlsStatus PENDING
+    alt unknown id
+        S--&gt;&gt;API: CustomException 404 error.video.notFound
+    else source is not a Drive video
+        S--&gt;&gt;API: CustomException 400 error.hls.notDriveVideo
+    else status NONE or ERROR
+        S-&gt;&gt;DB: status to PENDING, clear hls_error
+        S-&gt;&gt;W: wakeUp() on a virtual thread
+    else already PENDING, PROCESSING or READY
+        Note over S: status kept as is
+    end
+    S-&gt;&gt;FC: invalidate()
+    API--&gt;&gt;FE: 200 hlsStatus (PENDING after a new request)
 
     W-&gt;&gt;W: Semaphore(1).tryAcquire()
     W-&gt;&gt;DB: findHlsQueue() (PENDING, oldest first)
@@ -8556,12 +8565,18 @@
         FE-&gt;&gt;HJ: import hls.js, Hls.isSupported(), loadSource + attachMedia
         HJ-&gt;&gt;API: GET /video-stream/hls/fileId/playlist.m3u8
     end
+    alt fileId is not a valid id
+        API--&gt;&gt;FE: 400
+    end
     API-&gt;&gt;P: findPlaylist(fileId)
     P-&gt;&gt;DB: READY and PUBLISHED and not hidden
     P-&gt;&gt;FS: playlist.m3u8 exists
     API--&gt;&gt;FE: 200 application/vnd.apple.mpegurl, no-cache
     loop each segment
         HJ-&gt;&gt;API: GET /video-stream/hls/fileId/seg_N.ts (on Safari the video element fetches it)
+        opt invalid fileId or segment name
+            API--&gt;&gt;HJ: 400
+        end
         API-&gt;&gt;FS: FileSystemResource (no DB)
         API--&gt;&gt;HJ: 200 video/mp2t, immutable
     end
@@ -8630,6 +8645,7 @@
     alt turn HLS off
         SA-&gt;&gt;API: DELETE /v1/funny-app/admin/videos/42/hls
         API-&gt;&gt;S: disableHls(42)
+        Note over S: unknown id gives 404 error.video.notFound, a non-Drive source gives 400 error.hls.notDriveVideo
         S-&gt;&gt;DB: status NONE, hls_error null
     else delete the video
         SA-&gt;&gt;API: DELETE /v1/funny-app/admin/videos/42
@@ -8691,6 +8707,9 @@
     W-&gt;&gt;FS: delete orphan hls directories (row missing or not READY)
     Note over W: any recovery error is logged, startup goes on
     W-&gt;&gt;W: markReady(), wakeUp(), drain PENDING one by one
+    loop every 5 min (@Scheduled cron 0 */5 * * * *)
+        W-&gt;&gt;W: poll() then drain(), a fallback for a missed wake-up or a row left PENDING by a busy file
+    end
 
     C-&gt;&gt;L: tryClaim(fileId)
     C-&gt;&gt;D: download(fileId) again

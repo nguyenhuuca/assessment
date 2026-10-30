@@ -8416,7 +8416,7 @@
     participant DOM as document.documentElement
 
     U-&gt;&gt;M: opens the site
-    M-&gt;&gt;I: import i18n (init with bundled resources, initImmediate false)
+    M-&gt;&gt;I: import './i18n' as a side effect (main.jsx line 3, before App) - init with bundled resources, initImmediate false
     I-&gt;&gt;LS: read key lang
     alt lang stored and supported
         LS--&gt;&gt;I: vi or en
@@ -8477,7 +8477,7 @@
     I--&gt;&gt;FE: languageChanged event
     alt new language differs from knownServerLocale
         FE-&gt;&gt;API: PATCH /v1/funny-app/user/settings with locale
-        alt locale not vi or en
+        alt locale not vi or en (API-only: unreachable from the UI, useLocaleSync only sends vi or en)
             S--&gt;&gt;API: CustomException 400 error.settings.invalidLocale
             API--&gt;&gt;FE: 400 ResultErrorInfo
         else valid
@@ -8520,7 +8520,7 @@
 <li>PRD requirement 1 says the Settings switcher is logged in only. As built, <code>SettingsPage.jsx</code> embeds the same <code>LanguageSwitcher</code> as the header, and the Settings route itself needs login, so this matches.</li>
 <li>PRD says the first visit with a <code>vi-*</code> browser shows Vietnamese and anything else English. As built this comes from i18next <code>supportedLngs</code> + <code>nonExplicitSupportedLngs</code> + <code>fallbackLng: en</code>, not from custom code.</li>
 <li><code>Accept-Language</code> is sent as the raw <code>i18n.language</code> (it can be <code>vi-VN</code>), and the server resolver matches on language only.</li>
-<li>Not every backend error is localized: <code>handleHttpMediaTypeNotSupported</code> and <code>handleEntityNotFound</code> in <code>RestExceptionHandler</code> use plain English text, only keyed <code>CustomException</code> and the validation, missing-parameter and rate-limit handlers go through <code>MessageSource</code>.</li>
+<li>Not every backend error is localized: <code>handleHttpMediaTypeNotSupported</code>, <code>handleEntityNotFound</code> and <code>handleIllegalArgumentException</code> (uses <code>ex.getMessage()</code>) in <code>RestExceptionHandler</code> use plain text, and the <code>HttpClientErrorException</code> overload of <code>handleAuthenticationException</code> passes the upstream body through. The <code>AuthenticationException</code> overload is localized (<code>KEY_BAD_CREDENTIALS</code>). The JWT filter writes its 401 straight from <code>UnauthorizedException.toJson()</code> (codes such as <code>TOKEN_REVOKED</code>), so those bodies are not localized either. Only keyed <code>CustomException</code> and the validation, missing-parameter and rate-limit handlers go through <code>MessageSource</code>.</li>
 <li>The password set, change and remove notices are plain-text mails localized by <code>messages*.properties</code> keys (not HTML templates). The invite mail is the only HTML template (<code>templateFor</code>).</li>
 </ul>
 
