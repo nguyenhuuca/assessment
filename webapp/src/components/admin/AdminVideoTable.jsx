@@ -207,7 +207,7 @@ export default function AdminVideoTable({ statusFilter }) {
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <select
-                      className="admin-status-select"
+                      className={`admin-status-select${visibility === 'COLLECTION_ONLY' ? ' is-collection-only' : ''}`}
                       title={t('visibilityTitle')}
                       aria-busy={isBusyFor(updateVisibility, v.id, x => x?.id)}
                       disabled={isBusyFor(updateVisibility, v.id, x => x?.id)}
@@ -225,9 +225,6 @@ export default function AdminVideoTable({ statusFilter }) {
                       {VISIBILITIES.map(o => <option key={o} value={o}>{t(`visibility.${o}`)}</option>)}
                     </select>
                     <SaveIndicator state={saveState[`${v.id}:visibility`]} />
-                    {visibility === 'COLLECTION_ONLY' && (
-                      <span className="admin-badge collection-only" title={t('collectionOnlyHint')}>{t('collectionOnlyBadge')}</span>
-                    )}
                   </div>
                 </td>
                 <td>

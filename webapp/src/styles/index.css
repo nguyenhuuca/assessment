@@ -1701,6 +1701,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   display: flex;
   align-items: center;
   gap: 10px;
+  /* Keep the title readable; the table wrapper scrolls instead of squashing this column */
+  min-width: 240px;
 }
 
 .admin-thumb {
@@ -1716,6 +1718,11 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.03em;
+  /* At most 3 lines; the full title is in the title attribute */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .admin-cell-muted {
@@ -2295,6 +2302,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   border: 1px solid #ff1744;
 }
 .admin-badge.collection-only { white-space: nowrap; background: rgba(0, 238, 252, 0.12); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+/* Admin videos: the visibility select itself marks COLLECTION_ONLY (no extra badge in that cell) */
+.admin-status-select.is-collection-only { color: var(--accent-cyan); border-color: var(--accent-cyan); }
 /* Status + extra badges in one cell: wrap as a left-aligned group, never indented */
 .admin-badge-stack { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
 .import-collection-only { display: flex; align-items: center; gap: 8px; }

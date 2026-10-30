@@ -105,7 +105,8 @@ describe('AdminVideoTable visibility column', () => {
     expect(screen.getByLabelText('Chế độ hiển thị của OldShown')).toHaveValue('FEED')
   })
 
-  it('styles only HIDDEN rows as hidden and badges COLLECTION_ONLY rows', async () => {
+  // Regression: a separate badge next to the select duplicated it and squeezed the title column
+  it('styles only HIDDEN rows as hidden and marks COLLECTION_ONLY on the select, without a badge', async () => {
     adminApi.getVideos.mockResolvedValue(page(
       video({ id: 2, title: 'Gone', visibility: 'HIDDEN' }),
       video({ id: 3, title: 'Coll', visibility: 'COLLECTION_ONLY' }),
@@ -115,15 +116,15 @@ describe('AdminVideoTable visibility column', () => {
     const coll = screen.getByText('Coll').closest('tr')
     expect(gone).toHaveClass('is-hidden')
     expect(coll).not.toHaveClass('is-hidden')
-    expect(within(coll).getByText('COLLECTION ONLY')).toHaveClass('admin-badge', 'collection-only')
-    expect(within(gone).queryByText('COLLECTION ONLY')).toBeNull()
+    expect(screen.getByLabelText('Chế độ hiển thị của Coll')).toHaveClass('is-collection-only')
+    expect(screen.getByLabelText('Chế độ hiển thị của Gone')).not.toHaveClass('is-collection-only')
+    expect(within(coll).queryByText('COLLECTION ONLY')).toBeNull()
   })
 
   it('warns in the tooltip that collection-only is not private', async () => {
     adminApi.getVideos.mockResolvedValue(page(video({ id: 3, title: 'Coll', visibility: 'COLLECTION_ONLY' })))
     renderTable()
-    expect(await screen.findByText('COLLECTION ONLY')).toHaveAttribute('title', expect.stringContaining('không riêng tư'))
-    expect(screen.getByLabelText('Chế độ hiển thị của Coll')).toHaveAttribute('title', expect.stringContaining('không phải riêng tư'))
+    expect(await screen.findByLabelText('Chế độ hiển thị của Coll')).toHaveAttribute('title', expect.stringContaining('không phải riêng tư'))
   })
 
   it('sends the chosen visibility through the API', async () => {
