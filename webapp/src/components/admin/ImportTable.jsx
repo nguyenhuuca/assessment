@@ -96,7 +96,12 @@ export default function ImportTable() {
                   <tr key={j.id} className="admin-table-row">
                     <td><div className="import-cell-title" title={j.title || j.sourceUrl}>{j.title || j.sourceUrl}</div></td>
                     <td className="admin-cell-muted">{platformLabel(j.platform)}</td>
-                    <td><span className={`admin-badge ${String(j.status).toLowerCase()}`}>{t(`status.${j.status}`, { defaultValue: j.status })}</span></td>
+                    <td>
+                      <span className={`admin-badge ${String(j.status).toLowerCase()}`}>{t(`status.${j.status}`, { defaultValue: j.status })}</span>
+                      {j.visibility === 'COLLECTION_ONLY' && (
+                        <span className="admin-badge collection-only" title={t('collectionOnlyHint')}>{t('collectionOnlyBadge')}</span>
+                      )}
+                    </td>
                     <td><StateCell job={j} /></td>
                     <td className="admin-cell-muted">{formatTime(j.startedAt || j.scheduledAt || j.createdAt)}</td>
                     <td>

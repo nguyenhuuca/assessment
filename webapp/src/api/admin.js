@@ -15,7 +15,8 @@ function buildUrl(path, params) {
 export const getVideos         = (params) => api.get(buildUrl('/admin/videos', params))
 export const updateVideoStatus = (id, status) => patch(`/admin/videos/${id}/status`, { status })
 export const updateVideoPriority = (id, priority) => patch(`/admin/videos/${id}/priority`, { priority })
-export const updateVideoVisibility = (id, hidden) => patch(`/admin/videos/${id}/visibility`, { hidden })
+// visibility: 'FEED' | 'COLLECTION_ONLY' | 'HIDDEN'
+export const updateVideoVisibility = (id, visibility) => patch(`/admin/videos/${id}/visibility`, { visibility })
 // HLS opt-in per video (SUPER_ADMIN): enable queues a conversion, disable removes the HLS output
 export const enableVideoHls    = (id) => api.put(`/admin/videos/${id}/hls`)
 export const disableVideoHls   = (id) => api.delete(`/admin/videos/${id}/hls`)
@@ -41,8 +42,9 @@ export const bulkModerateComments = (body) => patch('/admin/comments/moderation'
 export const hardDeleteComments = (ids) => api.post('/admin/comments/hard-delete', { ids })
 
 // Video import (admin) — see docs/plans/plan-admin-video-import.md "API Contract"
-export const createImports = ({ items, scheduledAt = null }) =>
-  api.post('/admin/video-imports', { items, scheduledAt })
+// visibility is sent only for 'COLLECTION_ONLY'; omitted means the server default (FEED)
+export const createImports = ({ items, scheduledAt = null, visibility }) =>
+  api.post('/admin/video-imports', visibility ? { items, scheduledAt, visibility } : { items, scheduledAt })
 export const listImports   = (params) => api.get(buildUrl('/admin/video-imports', cleanParams(params)))
 export const previewImport = (url) => api.post('/admin/video-imports/preview', { url })
 export const runImportNow  = (id) => api.post(`/admin/video-imports/${id}/run-now`)

@@ -5,6 +5,7 @@ import { isSuperAdmin } from '../../utils/roles.js'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { useTranslation } from 'react-i18next'
+import AddToCollectionModal from '../library/AddToCollectionModal.jsx'
 
 const STATUS_COLORS = {
   PUBLISHED: '#00c853',
@@ -13,6 +14,10 @@ const STATUS_COLORS = {
 }
 
 const STATUSES = ['PUBLISHED', 'PENDING', 'FLAGGED']
+const VISIBILITIES = ['FEED', 'COLLECTION_ONLY', 'HIDDEN']
+
+// Old backends only send `hidden`; fall back so the page keeps working during a rolling deploy.
+const visibilityOf = v => v.visibility ?? (v.hidden ? 'HIDDEN' : 'FEED')
 
 // Checkboxes inside the delete dialog. The confirm promise only resolves to a boolean,
 // so each change is reported to the caller, which keeps it in its own `opts` object.
@@ -119,6 +124,7 @@ function SaveIndicator({ state }) {
 export default function AdminVideoTable({ statusFilter }) {
   const { t } = useTranslation('admin')
   const [page, setPage] = useState(0)
+  const [collectionVideo, setCollectionVideo] = useState(null)
   const [saveState, setSaveState] = useState({}) // { [`${id}:${field}`]: 'saving' | 'saved' | 'error' }
   const { data, isLoading } = useAdminVideos(page, statusFilter)
   const updateStatus   = useUpdateVideoStatus()
@@ -156,6 +162,7 @@ export default function AdminVideoTable({ statusFilter }) {
   return (
     <div className="admin-table-wrap">
       {confirmDialog}
+      {collectionVideo && <AddToCollectionModal video={collectionVideo} onClose={() => setCollectionVideo(null)} />}
       <div className="admin-table-meta">{t('showing', { shown: videos.length, total: totalElements.toLocaleString() })}</div>
       <div className="admin-table-scroll">
         <table className="admin-table">
@@ -164,7 +171,7 @@ export default function AdminVideoTable({ statusFilter }) {
               <th>{t('colAsset')}</th>
               <th>{t('colCreator')}</th>
               <th>{t('colStatus')}</th>
-              <th title={t('hiddenHeaderTitle')}>{t('colHidden')}</th>
+              <th title={t('visibilityTitle')}>{t('colVisibility')}</th>
               <th>{t('colPriority')}</th>
               <th>{t('colHls')}</th>
               <th>{t('colMetrics')}</th>
@@ -172,8 +179,10 @@ export default function AdminVideoTable({ statusFilter }) {
             </tr>
           </thead>
           <tbody>
-            {videos.map(v => (
-              <tr key={v.id} className={`admin-table-row${v.hidden ? ' is-hidden' : ''}`}>
+            {videos.map(v => {
+              const visibility = visibilityOf(v)
+              return (
+              <tr key={v.id} className={`admin-table-row${visibility === 'HIDDEN' ? ' is-hidden' : ''}`}>
                 <td>
                   <div className="admin-asset-cell">
                     {v.thumbnailPath && (
@@ -197,25 +206,28 @@ export default function AdminVideoTable({ statusFilter }) {
                 </td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <label title={v.hidden ? t('hiddenNow') : t('visibleNow')}>
-                      <input
-                        type="checkbox"
-                        className="admin-hide-toggle"
-                        aria-busy={isBusyFor(updateVisibility, v.id, x => x?.id)}
-                        disabled={isBusyFor(updateVisibility, v.id, x => x?.id)}
-                        aria-label={t('hideAria', { title: v.title || t('videoFallback') })}
-                        checked={!!v.hidden}
-                        onChange={e => {
-                          const key = `${v.id}:hidden`
-                          markSaving(key)
-                          updateVisibility.mutate({ id: v.id, hidden: e.target.checked }, {
-                            onSuccess: () => markResult(key, true),
-                            onError: () => markResult(key, false),
-                          })
-                        }}
-                      />
-                    </label>
-                    <SaveIndicator state={saveState[`${v.id}:hidden`]} />
+                    <select
+                      className="admin-status-select"
+                      title={t('visibilityTitle')}
+                      aria-busy={isBusyFor(updateVisibility, v.id, x => x?.id)}
+                      disabled={isBusyFor(updateVisibility, v.id, x => x?.id)}
+                      aria-label={t('visibilityAria', { title: v.title || t('videoFallback') })}
+                      value={visibility}
+                      onChange={e => {
+                        const key = `${v.id}:visibility`
+                        markSaving(key)
+                        updateVisibility.mutate({ id: v.id, visibility: e.target.value }, {
+                          onSuccess: () => markResult(key, true),
+                          onError: () => markResult(key, false),
+                        })
+                      }}
+                    >
+                      {VISIBILITIES.map(o => <option key={o} value={o}>{t(`visibility.${o}`)}</option>)}
+                    </select>
+                    <SaveIndicator state={saveState[`${v.id}:visibility`]} />
+                    {visibility === 'COLLECTION_ONLY' && (
+                      <span className="admin-badge collection-only" title={t('collectionOnlyHint')}>{t('collectionOnlyBadge')}</span>
+                    )}
                   </div>
                 </td>
                 <td>
@@ -263,6 +275,14 @@ export default function AdminVideoTable({ statusFilter }) {
                     </select>
                     <SaveIndicator state={saveState[`${v.id}:status`]} />
                     <button
+                      className="admin-action-btn"
+                      onClick={() => setCollectionVideo({ id: v.id })}
+                      title={t('addToCollection')}
+                      aria-label={t('addToCollectionAria', { title: v.title || t('videoFallback') })}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>playlist_add</span>
+                    </button>
+                    <button
                       className="admin-action-btn danger"
                       aria-busy={isBusyFor(deleteVideo, v.id)}
                       onClick={async () => {
@@ -283,7 +303,8 @@ export default function AdminVideoTable({ statusFilter }) {
                   </div>
                 </td>
               </tr>
-            ))}
+              )
+            })}
           </tbody>
         </table>
       </div>

@@ -7,7 +7,7 @@ import { buildStreamUrl } from '../../utils/videoModel.js'
 import SearchModal from '../modals/SearchModal.jsx'
 import AddToCollectionModal from '../library/AddToCollectionModal.jsx'
 
-export default function VideoSwiper({ videos = [], initialIndex = 0, resume = null, muted = true, onMutedChange, mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
+export default function VideoSwiper({ videos = [], searchVideos = videos, initialIndex = 0, resume = null, muted = true, onMutedChange, mobileSearchOpen = false, onCloseMobileSearch, onShowComments, onDeleteVideo, currentUser }) {
   const { t } = useTranslation('feed')
   const [index, setIndex] = useState(() => Math.min(initialIndex, Math.max(0, videos.length - 1)))
   const [direction, setDirection] = useState('next')
@@ -238,13 +238,15 @@ export default function VideoSwiper({ videos = [], initialIndex = 0, resume = nu
 
       <SearchModal
         show={mobileSearchOpen}
-        videos={videos}
-        currentIndex={index}
+        videos={searchVideos}
+        currentIndex={searchVideos.findIndex(v => v.id === videos[index]?.id)}
         onClose={onCloseMobileSearch}
-        onSelect={itemIndex => {
-          if (itemIndex >= 0) {
-            setDirection(itemIndex >= index ? 'next' : 'prev')
-            setIndex(itemIndex)
+        onSelect={searchIndex => {
+          // SearchModal returns an index into searchVideos; the slides may carry an extra deep-linked video
+          const slideIndex = searchIndex >= 0 ? videos.findIndex(v => v.id === searchVideos[searchIndex]?.id) : -1
+          if (slideIndex >= 0) {
+            setDirection(slideIndex >= index ? 'next' : 'prev')
+            setIndex(slideIndex)
           }
           onCloseMobileSearch?.()
         }}

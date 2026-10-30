@@ -1,10 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getDriveSyncFiles, updateVideoStatus, bulkModerateComments, getJobs, updateJob, runJob, previewJobCron, deleteVideo } from '../admin.js'
+import { getDriveSyncFiles, updateVideoStatus, bulkModerateComments, getJobs, updateJob, runJob, previewJobCron, deleteVideo, updateVideoVisibility, createImports } from '../admin.js'
 import { api } from '../client.js'
 
 vi.mock('../client.js', () => ({ api: { get: vi.fn(), patch: vi.fn(), post: vi.fn(), delete: vi.fn() } }))
 
 beforeEach(() => vi.clearAllMocks())
+
+describe('updateVideoVisibility', () => {
+  it('sends the visibility value, not the legacy hidden flag', async () => {
+    await updateVideoVisibility(5, 'COLLECTION_ONLY')
+    expect(api.patch).toHaveBeenLastCalledWith('/admin/videos/5/visibility', { visibility: 'COLLECTION_ONLY' })
+  })
+})
+
+describe('createImports', () => {
+  it('omits visibility unless set', async () => {
+    await createImports({ items: [{ url: 'u' }] })
+    expect(api.post).toHaveBeenLastCalledWith('/admin/video-imports', { items: [{ url: 'u' }], scheduledAt: null })
+    await createImports({ items: [{ url: 'u' }], visibility: 'COLLECTION_ONLY' })
+    expect(api.post).toHaveBeenLastCalledWith('/admin/video-imports', { items: [{ url: 'u' }], scheduledAt: null, visibility: 'COLLECTION_ONLY' })
+  })
+})
 
 describe('deleteVideo', () => {
   it('sends no query by default', async () => {

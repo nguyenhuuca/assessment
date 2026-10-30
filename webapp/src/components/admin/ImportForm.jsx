@@ -26,6 +26,7 @@ export default function ImportForm() {
   const [title, setTitle] = useState('')
   const [mode, setMode] = useState('NOW')
   const [when, setWhen] = useState('')
+  const [collectionOnly, setCollectionOnly] = useState(false)
   const [errors, setErrors] = useState([])
   const [serverError, setServerError] = useState('')
   const [results, setResults] = useState(null)
@@ -59,7 +60,7 @@ export default function ImportForm() {
 
     const items = single && title.trim() ? [{ ...parsed.items[0], title: title.trim() }] : parsed.items
     const scheduledAt = mode === 'LATER' ? localToIso(when) : null
-    create.mutate({ items, scheduledAt }, {
+    create.mutate(collectionOnly ? { items, scheduledAt, visibility: 'COLLECTION_ONLY' } : { items, scheduledAt }, {
       onSuccess: res => {
         setSent(items)
         setResults((res?.data ?? res)?.results ?? [])
@@ -108,6 +109,9 @@ export default function ImportForm() {
           onChange={e => setWhen(e.target.value)}
         />
       </div>
+      <label className="import-collection-only" title={t('collectionOnlyHint')}>
+        <input type="checkbox" checked={collectionOnly} onChange={e => setCollectionOnly(e.target.checked)} /> {t('importCollectionOnly')}
+      </label>
       {errors.length > 0 && (
         <div className="app-alert error" role="alert">
           {errors.map((er, i) => <div key={i}>{er.message}</div>)}

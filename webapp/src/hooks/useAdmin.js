@@ -61,7 +61,7 @@ export function useUpdateVideoPriority() {
 export function useUpdateVideoVisibility() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, hidden }) => adminApi.updateVideoVisibility(id, hidden),
+    mutationFn: ({ id, visibility }) => adminApi.updateVideoVisibility(id, visibility),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'videos'] }),
   })
 }

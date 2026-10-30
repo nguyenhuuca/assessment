@@ -106,7 +106,44 @@ describe('ImportForm', () => {
   })
 })
 
+describe('ImportForm collection only', () => {
+  it('is off by default and sends no visibility', async () => {
+    renderPanel()
+    expect(screen.getByLabelText(/Collection only/)).not.toBeChecked()
+    type('https://youtu.be/a')
+    fireEvent.click(screen.getByText('Nhập video'))
+    await waitFor(() => expect(adminApi.createImports).toHaveBeenCalled())
+    expect(adminApi.createImports.mock.calls[0][0]).not.toHaveProperty('visibility')
+  })
+
+  it('sends COLLECTION_ONLY when checked', async () => {
+    renderPanel()
+    fireEvent.click(screen.getByLabelText(/Collection only/))
+    type('https://youtu.be/a')
+    fireEvent.click(screen.getByText('Nhập video'))
+    await waitFor(() => expect(adminApi.createImports).toHaveBeenCalledWith({
+      items: [{ url: 'https://youtu.be/a' }], scheduledAt: null, visibility: 'COLLECTION_ONLY',
+    }))
+  })
+
+  it('shows a server error through the existing error path', async () => {
+    adminApi.createImports.mockRejectedValue(new Error('boom'))
+    renderPanel()
+    type('https://youtu.be/a')
+    fireEvent.click(screen.getByText('Nhập video'))
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
+  })
+})
+
 describe('ImportTable', () => {
+  it('badges COLLECTION_ONLY jobs only', async () => {
+    setJobs([job({ id: 1, title: 'Co', visibility: 'COLLECTION_ONLY' }), job({ id: 2, title: 'Fe', visibility: 'FEED' })])
+    renderPanel()
+    await screen.findByText('Co')
+    expect(screen.getAllByText('COLLECTION ONLY')).toHaveLength(1)
+    expect(screen.getByText('COLLECTION ONLY').closest('tr')).toHaveTextContent('Co')
+  })
+
   it('renders progress, ingestion state and mapped errors', async () => {
     setJobs([
       job({ id: 1, status: 'DOWNLOADING', phase: 'DOWNLOAD', progressPct: 42, downloadedBytes: 10485760, totalBytes: 20971520 }),

@@ -82,29 +82,74 @@ describe('AdminVideoTable delete dialog', () => {
   })
 })
 
-describe('AdminVideoTable hidden column', () => {
-  it('reflects the hidden flag per row', async () => {
-    adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 1, title: 'Shown' }), video({ id: 2, title: 'Gone', hidden: true })], totalPages: 1, totalElements: 2 } })
+vi.mock('../../library/AddToCollectionModal.jsx', () => ({
+  default: ({ video, onClose }) => <div role="dialog" data-testid="atc">modal:{video.id}<button onClick={onClose}>close-atc</button></div>,
+}))
+
+describe('AdminVideoTable visibility column', () => {
+  const page = (...rows) => ({ data: { content: rows, totalPages: 1, totalElements: rows.length } })
+
+  it('reflects visibility per row and falls back to hidden when visibility is absent', async () => {
+    adminApi.getVideos.mockResolvedValue(page(
+      video({ id: 1, title: 'Shown', visibility: 'FEED' }),
+      video({ id: 2, title: 'Gone', visibility: 'HIDDEN' }),
+      video({ id: 3, title: 'Coll', visibility: 'COLLECTION_ONLY' }),
+      video({ id: 4, title: 'OldHidden', hidden: true }),
+      video({ id: 5, title: 'OldShown' }),
+    ))
     renderTable()
-    expect(await screen.findByLabelText('Ẩn Shown')).not.toBeChecked()
-    expect(screen.getByLabelText('Ẩn Gone')).toBeChecked()
+    expect(await screen.findByLabelText('Chế độ hiển thị của Shown')).toHaveValue('FEED')
+    expect(screen.getByLabelText('Chế độ hiển thị của Gone')).toHaveValue('HIDDEN')
+    expect(screen.getByLabelText('Chế độ hiển thị của Coll')).toHaveValue('COLLECTION_ONLY')
+    expect(screen.getByLabelText('Chế độ hiển thị của OldHidden')).toHaveValue('HIDDEN')
+    expect(screen.getByLabelText('Chế độ hiển thị của OldShown')).toHaveValue('FEED')
   })
 
-  it('toggling hides the video through the visibility API', async () => {
-    adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 7, title: 'Shown' })], totalPages: 1, totalElements: 1 } })
+  it('styles only HIDDEN rows as hidden and badges COLLECTION_ONLY rows', async () => {
+    adminApi.getVideos.mockResolvedValue(page(
+      video({ id: 2, title: 'Gone', visibility: 'HIDDEN' }),
+      video({ id: 3, title: 'Coll', visibility: 'COLLECTION_ONLY' }),
+    ))
     renderTable()
-    fireEvent.click(await screen.findByLabelText('Ẩn Shown'))
-    await waitFor(() => expect(adminApi.updateVideoVisibility).toHaveBeenCalledWith(7, true))
+    const gone = (await screen.findByText('Gone')).closest('tr')
+    const coll = screen.getByText('Coll').closest('tr')
+    expect(gone).toHaveClass('is-hidden')
+    expect(coll).not.toHaveClass('is-hidden')
+    expect(within(coll).getByText('COLLECTION ONLY')).toHaveClass('admin-badge', 'collection-only')
+    expect(within(gone).queryByText('COLLECTION ONLY')).toBeNull()
   })
 
-  it('marks the row toggle busy while the visibility update is in flight', async () => {
-    adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 7, title: 'Shown' })], totalPages: 1, totalElements: 1 } })
+  it('warns in the tooltip that collection-only is not private', async () => {
+    adminApi.getVideos.mockResolvedValue(page(video({ id: 3, title: 'Coll', visibility: 'COLLECTION_ONLY' })))
+    renderTable()
+    expect(await screen.findByText('COLLECTION ONLY')).toHaveAttribute('title', expect.stringContaining('không riêng tư'))
+    expect(screen.getByLabelText('Chế độ hiển thị của Coll')).toHaveAttribute('title', expect.stringContaining('không phải riêng tư'))
+  })
+
+  it('sends the chosen visibility through the API', async () => {
+    adminApi.getVideos.mockResolvedValue(page(video({ id: 7, title: 'Shown', visibility: 'FEED' })))
+    renderTable()
+    fireEvent.change(await screen.findByLabelText('Chế độ hiển thị của Shown'), { target: { value: 'COLLECTION_ONLY' } })
+    await waitFor(() => expect(adminApi.updateVideoVisibility).toHaveBeenCalledWith(7, 'COLLECTION_ONLY'))
+  })
+
+  it('marks the row control busy while the visibility update is in flight', async () => {
+    adminApi.getVideos.mockResolvedValue(page(video({ id: 7, title: 'Shown' })))
     adminApi.updateVideoVisibility.mockReturnValue(new Promise(() => {}))
     renderTable()
-    const box = await screen.findByLabelText('Ẩn Shown')
-    fireEvent.click(box)
-    await waitFor(() => expect(box).toHaveAttribute('aria-busy', 'true'))
-    expect(box).toBeDisabled()
+    const sel = await screen.findByLabelText('Chế độ hiển thị của Shown')
+    fireEvent.change(sel, { target: { value: 'HIDDEN' } })
+    await waitFor(() => expect(sel).toHaveAttribute('aria-busy', 'true'))
+    expect(sel).toBeDisabled()
+  })
+
+  it('Add to collection opens the modal for that video only', async () => {
+    adminApi.getVideos.mockResolvedValue(page(video({ id: 7, title: 'Shown' }), video({ id: 8, title: 'Other' })))
+    renderTable()
+    fireEvent.click(await screen.findByLabelText('Thêm Other vào collection'))
+    expect(screen.getByTestId('atc')).toHaveTextContent('modal:8')
+    fireEvent.click(screen.getByText('close-atc'))
+    expect(screen.queryByTestId('atc')).toBeNull()
   })
 })
 
