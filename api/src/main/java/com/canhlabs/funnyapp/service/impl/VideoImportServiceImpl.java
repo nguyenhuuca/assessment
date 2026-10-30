@@ -9,6 +9,7 @@ import com.canhlabs.funnyapp.dto.admin.ImportPreviewDto;
 import com.canhlabs.funnyapp.dto.admin.VideoImportJobDto;
 import com.canhlabs.funnyapp.entity.VideoImportJob;
 import com.canhlabs.funnyapp.enums.ImportStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.exception.ImportErrorCode;
 import com.canhlabs.funnyapp.exception.ImportException;
@@ -70,6 +71,7 @@ public class VideoImportServiceImpl implements VideoImportService {
         if (items.size() > bulkMax) {
             throw error(HttpStatus.BAD_REQUEST, 4102, "TOO_MANY_ITEMS");
         }
+        VideoVisibility visibility = resolveVisibility(request.getVisibility());
         Instant now = Instant.now();
         Instant scheduledAt = resolveSchedule(request.getScheduledAt(), now);
 
@@ -77,7 +79,7 @@ public class VideoImportServiceImpl implements VideoImportService {
         boolean runsNow = request.getScheduledAt() == null;
         boolean created = false;
         for (int i = 0; i < items.size(); i++) {
-            CreateVideoImportResultDto.LineResult result = createOne(i + 1, items.get(i), scheduledAt, adminId);
+            CreateVideoImportResultDto.LineResult result = createOne(i + 1, items.get(i), scheduledAt, adminId, visibility);
             created |= result.getJobId() != null;
             results.add(result);
         }
@@ -88,22 +90,25 @@ public class VideoImportServiceImpl implements VideoImportService {
     }
 
     private CreateVideoImportResultDto.LineResult createOne(int line, CreateVideoImportRequest.Item item,
-                                                            Instant scheduledAt, Long adminId) {
+                                                            Instant scheduledAt, Long adminId,
+                                                            VideoVisibility visibility) {
         Optional<ImportUrlValidator.ImportUrl> parsed = item == null ? Optional.empty() : urlResolver.resolve(item.getUrl());
         if (parsed.isEmpty()) {
             return lineError(line, INVALID_URL);
         }
-        return createJob(line, parsed.get(), item.getTitle(), scheduledAt, adminId);
+        return createJob(line, parsed.get(), item.getTitle(), scheduledAt, adminId, visibility);
     }
 
     @Override
-    public CreateVideoImportResultDto.LineResult createResolved(ImportUrlValidator.ImportUrl url, String title, Long adminId) {
+    public CreateVideoImportResultDto.LineResult createResolved(ImportUrlValidator.ImportUrl url, String title, Long adminId,
+                                                                  VideoVisibility visibility) {
         // no URL resolution here: callers run inside a transaction and must not make network calls
-        return createJob(1, url, title, Instant.now(), adminId);
+        return createJob(1, url, title, Instant.now(), adminId, visibility);
     }
 
     private CreateVideoImportResultDto.LineResult createJob(int line, ImportUrlValidator.ImportUrl url, String rawTitle,
-                                                            Instant scheduledAt, Long adminId) {
+                                                            Instant scheduledAt, Long adminId,
+                                                            VideoVisibility visibility) {
         if (jobRepository.existsByNormalizedUrlAndStatusIn(url.normalizedUrl(), ImportStatus.ACTIVE)) {
             return lineError(line, DUPLICATE_ACTIVE);
         }
@@ -115,6 +120,7 @@ public class VideoImportServiceImpl implements VideoImportService {
                 .requestedTitle(title.isEmpty() ? null : title)
                 .scheduledAt(scheduledAt)
                 .createdBy(adminId)
+                .visibility(visibility)
                 .build();
         try {
             VideoImportJob saved = jobRepository.save(job);
@@ -123,6 +129,20 @@ public class VideoImportServiceImpl implements VideoImportService {
             // lost the race against the partial unique index
             return lineError(line, DUPLICATE_ACTIVE);
         }
+    }
+
+    /** Null means FEED; HIDDEN and unknown values are rejected (Rule 5). */
+    private static VideoVisibility resolveVisibility(String raw) {
+        if (raw == null) {
+            return VideoVisibility.FEED;
+        }
+        if (VideoVisibility.FEED.name().equals(raw)) {
+            return VideoVisibility.FEED;
+        }
+        if (VideoVisibility.COLLECTION_ONLY.name().equals(raw)) {
+            return VideoVisibility.COLLECTION_ONLY;
+        }
+        throw error(HttpStatus.BAD_REQUEST, 4104, "INVALID_VISIBILITY");
     }
 
     /** Whole minute divisible by 5 (UTC and Asia/Ho_Chi_Minh agree: the offset is whole hours). */
@@ -255,6 +275,7 @@ public class VideoImportServiceImpl implements VideoImportService {
                 .startedAt(j.getStartedAt())
                 .finishedAt(j.getFinishedAt())
                 .driveFileId(j.getDriveFileId())
+                .visibility(j.getVisibility())
                 .ingested(ingested)
                 .errorCode(j.getErrorCode())
                 .errorMessage(j.getErrorMessage())

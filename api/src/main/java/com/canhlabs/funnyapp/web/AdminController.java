@@ -14,6 +14,7 @@ import com.canhlabs.funnyapp.dto.admin.ModerateCommentRequest;
 import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.service.AdminCommentService;
 import jakarta.validation.Valid;
+import java.util.Arrays;
 import java.util.UUID;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
@@ -22,6 +23,7 @@ import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.utils.Contract;
 import com.canhlabs.funnyapp.service.AdminAccountService;
 import com.canhlabs.funnyapp.service.AdminVideoService;
@@ -112,13 +114,30 @@ public class AdminController {
     @AuditLog("updateVideoVisibility")
     public ResponseEntity<ResultObjectInfo<String>> updateVideoVisibility(
             @PathVariable Long id,
-            @RequestBody Map<String, Boolean> body) {
-        Contract.require(body != null && body.get("hidden") != null, "hidden is required");
-        adminVideoService.updateHidden(id, body.get("hidden"));
+            @RequestBody(required = false) Map<String, Object> body) {
+        adminVideoService.updateVisibility(id, parseVisibility(body));
         return ResponseEntity.ok(ResultObjectInfo.<String>builder()
                 .status(ResultStatus.SUCCESS)
                 .message("Visibility updated")
                 .build());
+    }
+
+    /** New body {visibility}, or the legacy {hidden} (HIDDEN / FEED) kept for one release; exactly one of the two. */
+    private static VideoVisibility parseVisibility(Map<String, Object> body) {
+        Object visibility = body == null ? null : body.get("visibility");
+        Object hidden = body == null ? null : body.get("hidden");
+        Contract.require(visibility != null || hidden != null, "visibility or hidden is required");
+        Contract.require(visibility == null || hidden == null, "send either visibility or hidden, not both");
+        if (hidden != null) {
+            Contract.require(hidden instanceof Boolean, "hidden must be a boolean");
+            return (Boolean) hidden ? VideoVisibility.HIDDEN : VideoVisibility.FEED;
+        }
+        VideoVisibility parsed = Arrays.stream(VideoVisibility.values())
+                .filter(v -> v.name().equals(visibility))
+                .findFirst()
+                .orElse(null);
+        Contract.require(parsed != null, "invalid visibility");
+        return parsed;
     }
 
     @DeleteMapping("/videos/{id}")

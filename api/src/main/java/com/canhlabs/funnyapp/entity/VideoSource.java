@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.entity;
 
 import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -50,9 +51,10 @@ public class VideoSource extends BaseDomain {
     private String desc;
 
 
-    @Column(name = "is_hide", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "visibility", nullable = false, length = 20)
     @Builder.Default
-    private boolean isHide = false;
+    private VideoVisibility visibility = VideoVisibility.FEED;
 
     @Column(name = "thumbnail_path")
     private String thumbnailPath;

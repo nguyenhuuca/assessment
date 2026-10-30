@@ -10,6 +10,7 @@ import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.service.AdminAccountService;
 import com.canhlabs.funnyapp.service.AdminCommentService;
 import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
@@ -141,19 +142,53 @@ class AdminControllerTest {
     // ── PATCH /videos/{id}/visibility ─────────────────────────────────────────
 
     @Test
-    void updateVideoVisibility_hide_returnsOk() {
-        doNothing().when(adminVideoService).updateHidden(1L, true);
+    void updateVideoVisibility_eachValue_callsService() {
+        for (VideoVisibility v : VideoVisibility.values()) {
+            ResponseEntity<ResultObjectInfo<String>> response =
+                    controller.updateVideoVisibility(1L, Map.of("visibility", v.name()));
 
-        ResponseEntity<ResultObjectInfo<String>> response =
-                controller.updateVideoVisibility(1L, Map.of("hidden", true));
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(adminVideoService).updateHidden(1L, true);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            verify(adminVideoService).updateVisibility(1L, v);
+        }
     }
 
     @Test
-    void updateVideoVisibility_missingFlag_throwsAndSkipsService() {
-        assertThrows(RuntimeException.class, () -> controller.updateVideoVisibility(1L, Map.of()));
+    void updateVideoVisibility_legacyHidden_mapsToHiddenOrFeed() {
+        controller.updateVideoVisibility(1L, Map.of("hidden", true));
+        controller.updateVideoVisibility(2L, Map.of("hidden", false));
+
+        verify(adminVideoService).updateVisibility(1L, VideoVisibility.HIDDEN);
+        verify(adminVideoService).updateVisibility(2L, VideoVisibility.FEED);
+    }
+
+    @Test
+    void updateVideoVisibility_nullBodyOrNeitherField_isRejected() {
+        RuntimeException nullBody = assertThrows(RuntimeException.class, () -> controller.updateVideoVisibility(1L, null));
+        RuntimeException empty = assertThrows(RuntimeException.class, () -> controller.updateVideoVisibility(1L, Map.of()));
+
+        assertEquals("visibility or hidden is required", nullBody.getMessage());
+        assertEquals("visibility or hidden is required", empty.getMessage());
+        verifyNoInteractions(adminVideoService);
+    }
+
+    @Test
+    void updateVideoVisibility_bothFields_isRejected() {
+        RuntimeException e = assertThrows(RuntimeException.class,
+                () -> controller.updateVideoVisibility(1L, Map.of("visibility", "FEED", "hidden", true)));
+
+        assertEquals("send either visibility or hidden, not both", e.getMessage());
+        verifyNoInteractions(adminVideoService);
+    }
+
+    @Test
+    void updateVideoVisibility_unknownValueOrBadHidden_isRejected() {
+        RuntimeException unknown = assertThrows(RuntimeException.class,
+                () -> controller.updateVideoVisibility(1L, Map.of("visibility", "feed")));
+        RuntimeException notBoolean = assertThrows(RuntimeException.class,
+                () -> controller.updateVideoVisibility(1L, Map.of("hidden", "yes")));
+
+        assertEquals("invalid visibility", unknown.getMessage());
+        assertEquals("hidden must be a boolean", notBoolean.getMessage());
         verifyNoInteractions(adminVideoService);
     }
 

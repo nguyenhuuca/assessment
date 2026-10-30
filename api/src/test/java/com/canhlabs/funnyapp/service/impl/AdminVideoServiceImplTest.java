@@ -7,6 +7,7 @@ import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
@@ -125,21 +126,56 @@ class AdminVideoServiceImplTest {
     // ── updateHidden ──────────────────────────────────────────────────────────
 
     @Test
-    void updateHidden_videoFound_setsFlagAndSaves() {
+    void updateVisibility_hidden_setsAndSaves() {
         VideoSource source = videoSource(5L, "Title", null, VideoStatus.PUBLISHED);
         when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
 
-        service.updateHidden(5L, true);
+        service.updateVisibility(5L, VideoVisibility.HIDDEN);
 
-        assertTrue(source.isHide());
+        assertEquals(VideoVisibility.HIDDEN, source.getVisibility());
         verify(videoSourceRepository).save(source);
     }
 
     @Test
-    void updateHidden_videoNotFound_throwsIllegalArgumentException() {
+    void updateVisibility_feed_resetsCollectionOnly() {
+        VideoSource source = videoSource(5L, "Title", null, VideoStatus.PUBLISHED);
+        source.setVisibility(VideoVisibility.COLLECTION_ONLY);
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        service.updateVisibility(5L, VideoVisibility.FEED);
+
+        assertEquals(VideoVisibility.FEED, source.getVisibility());
+        verify(videoSourceRepository).save(source);
+    }
+
+    @Test
+    void updateVisibility_collectionOnly_setsAndSaves() {
+        VideoSource source = videoSource(5L, "Title", null, VideoStatus.PUBLISHED);
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        service.updateVisibility(5L, VideoVisibility.COLLECTION_ONLY);
+
+        assertEquals(VideoVisibility.COLLECTION_ONLY, source.getVisibility());
+        verify(videoSourceRepository).save(source);
+    }
+
+    @Test
+    void updateVisibility_sameValueAgain_stillSavesAndInvalidatesFeedCache() {
+        VideoSource source = videoSource(5L, "Title", null, VideoStatus.PUBLISHED);
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        service.updateVisibility(5L, VideoVisibility.FEED);
+        service.updateVisibility(5L, VideoVisibility.FEED);
+
+        verify(videoSourceRepository, times(2)).save(source);
+        verify(feedCache, times(2)).invalidate();
+    }
+
+    @Test
+    void updateVisibility_videoNotFound_throwsIllegalArgumentException() {
         when(videoSourceRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.updateHidden(99L, true));
+        assertThrows(IllegalArgumentException.class, () -> service.updateVisibility(99L, VideoVisibility.HIDDEN));
         verify(videoSourceRepository, never()).save(any());
     }
 
@@ -437,7 +473,7 @@ class AdminVideoServiceImplTest {
 
         service.updateStatus(42L, VideoStatus.FLAGGED);
         service.updatePriority(42L, 5);
-        service.updateHidden(42L, true);
+        service.updateVisibility(42L, VideoVisibility.HIDDEN);
         service.deleteVideo(42L, false, false);
         service.enableHls(42L);
         service.disableHls(42L);
@@ -449,7 +485,7 @@ class AdminVideoServiceImplTest {
     void failedMutation_doesNotInvalidateTheFeedCache() {
         when(videoSourceRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.updateHidden(99L, true));
+        assertThrows(IllegalArgumentException.class, () -> service.updateVisibility(99L, VideoVisibility.HIDDEN));
 
         verify(feedCache, never()).invalidate();
     }

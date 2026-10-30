@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.streaming.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
@@ -87,7 +88,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     public List<VideoDto> getVideosToStream() {
         boolean hlsEnabled = hlsPlaybackService.hlsEnabled();
         return feedCache.get(hlsEnabled, () -> videoSourceRepository
-                .findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED).stream()
+                .findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility.FEED, VideoStatus.PUBLISHED).stream()
                 .map(v -> toDto(v, hlsEnabled))
                 .toList());
     }
@@ -97,7 +98,7 @@ public class StreamVideoServiceImpl implements StreamVideoService {
     public VideoDto getVideoById(Long id) {
         // hidden / PENDING / FLAGGED videos answer exactly like a missing one (deep links included)
         VideoSource source = videoSourceRepository.findById(id)
-                .filter(v -> !v.isHide() && v.getStatus() == VideoStatus.PUBLISHED)
+                .filter(v -> v.getVisibility() != VideoVisibility.HIDDEN && v.getStatus() == VideoStatus.PUBLISHED)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found with id: " + id));
         return toDto(source, hlsPlaybackService.hlsEnabled());
     }

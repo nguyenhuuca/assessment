@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.dto.reaction.ReactionSummaryDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.enums.ReactionType;
@@ -71,7 +72,7 @@ class VideoReactionServiceImplTest {
     }
 
     private void videoExists() {
-        when(videoSourceRepository.existsByIdAndIsHideAndStatus(VIDEO_ID, false, VideoStatus.PUBLISHED)).thenReturn(true);
+        when(videoSourceRepository.existsByIdAndVisibilityNotAndStatus(VIDEO_ID, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)).thenReturn(true);
     }
 
     @Test
@@ -149,7 +150,7 @@ class VideoReactionServiceImplTest {
     @Test
     void react_unknownOrHiddenVideo_throwsNotFound() {
         login();
-        when(videoSourceRepository.existsByIdAndIsHideAndStatus(VIDEO_ID, false, VideoStatus.PUBLISHED)).thenReturn(false);
+        when(videoSourceRepository.existsByIdAndVisibilityNotAndStatus(VIDEO_ID, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)).thenReturn(false);
 
         assertThatThrownBy(() -> service.react(VIDEO_ID, ReactionType.LIKE))
                 .isInstanceOfSatisfying(CustomException.class, e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.NOT_FOUND));
@@ -159,7 +160,7 @@ class VideoReactionServiceImplTest {
     @Test
     void removeReaction_unknownVideo_throwsNotFound() {
         login();
-        when(videoSourceRepository.existsByIdAndIsHideAndStatus(VIDEO_ID, false, VideoStatus.PUBLISHED)).thenReturn(false);
+        when(videoSourceRepository.existsByIdAndVisibilityNotAndStatus(VIDEO_ID, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)).thenReturn(false);
 
         assertThatThrownBy(() -> service.removeReaction(VIDEO_ID))
                 .isInstanceOfSatisfying(CustomException.class, e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.NOT_FOUND));
@@ -168,7 +169,7 @@ class VideoReactionServiceImplTest {
 
     @Test
     void getSummary_unknownVideo_throwsNotFound() {
-        when(videoSourceRepository.existsByIdAndIsHideAndStatus(VIDEO_ID, false, VideoStatus.PUBLISHED)).thenReturn(false);
+        when(videoSourceRepository.existsByIdAndVisibilityNotAndStatus(VIDEO_ID, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)).thenReturn(false);
 
         assertThatThrownBy(() -> service.getSummary(VIDEO_ID))
                 .isInstanceOfSatisfying(CustomException.class, e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.NOT_FOUND));

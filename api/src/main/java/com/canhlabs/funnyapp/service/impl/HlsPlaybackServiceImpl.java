@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.FeatureFlagService;
 import com.canhlabs.funnyapp.service.HlsPlaybackService;
@@ -41,6 +42,6 @@ public class HlsPlaybackServiceImpl implements HlsPlaybackService {
     }
 
     private static boolean isServable(VideoSource v) {
-        return v.getHlsStatus() == HlsStatus.READY && v.getStatus() == VideoStatus.PUBLISHED && !v.isHide();
+        return v.getHlsStatus() == HlsStatus.READY && v.getStatus() == VideoStatus.PUBLISHED && v.getVisibility() != VideoVisibility.HIDDEN;
     }
 }

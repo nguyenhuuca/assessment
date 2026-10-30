@@ -15,6 +15,7 @@
     "startedAt" : "2026-02-03T04:05:06Z",
     "finishedAt" : null,
     "driveFileId" : "drive-1",
+    "visibility" : "COLLECTION_ONLY",
     "ingested" : false,
     "errorCode" : null,
     "errorMessage" : null,

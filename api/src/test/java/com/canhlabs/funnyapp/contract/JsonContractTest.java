@@ -36,6 +36,7 @@ import com.canhlabs.funnyapp.enums.ResultStatus;
 import com.canhlabs.funnyapp.enums.SuggestionRejectReason;
 import com.canhlabs.funnyapp.enums.SuggestionStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.dto.webapi.ResultErrorInfo;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.exception.Error;
@@ -87,12 +88,12 @@ class JsonContractTest {
         WatchHistoryItemDto history = WatchHistoryItemDto.builder().videoId(1L).title("Funny cat").fileId("file-1")
                 .viewCount(12L).watchedAt(T1).positionSec(30).durationSec(120).completed(true).build();
         AdminVideoDto adminVideo = AdminVideoDto.builder().id(1L).title("Funny cat").thumbnailPath("/thumbs/1.jpg")
-                .creatorEmail("user@example.test").status(VideoStatus.PUBLISHED).hidden(true).viewCount(12L)
+                .creatorEmail("user@example.test").status(VideoStatus.PUBLISHED).visibility(VideoVisibility.HIDDEN).hidden(true).viewCount(12L)
                 .priority(3).createdAt(T1).hlsStatus(HlsStatus.READY).hlsError(null).build();
         VideoImportJobDto job = VideoImportJobDto.builder().id(9L).sourceUrl("https://youtu.be/abc")
                 .platform(ImportPlatform.YOUTUBE).title("Imported").status(ImportStatus.DOWNLOADING)
                 .phase("download").progressPct(40).downloadedBytes(400L).totalBytes(1000L).scheduledAt(T1)
-                .startedAt(T2).finishedAt(null).driveFileId("drive-1").ingested(false).errorCode(null)
+                .startedAt(T2).finishedAt(null).driveFileId("drive-1").visibility(VideoVisibility.COLLECTION_ONLY).ingested(false).errorCode(null)
                 .errorMessage(null).attempts(2).createdAt(T1).build();
         ReportDto report = ReportDto.builder().id(ID1).type(ReportType.BUG).title("Broken").status(ReportStatus.CREATED)
                 .issueNumber(40).issueUrl("https://example.test/issues/40").labels(List.of("bug", "autopilot"))

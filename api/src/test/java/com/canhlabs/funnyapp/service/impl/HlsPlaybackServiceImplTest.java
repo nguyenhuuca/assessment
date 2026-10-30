@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.FeatureFlagService;
 import com.canhlabs.funnyapp.utils.AppConstant;
@@ -48,15 +49,23 @@ class HlsPlaybackServiceImplTest {
         Files.writeString(f, "x");
     }
 
-    private void video(HlsStatus hls, VideoStatus status, boolean hide) {
+    private void video(HlsStatus hls, VideoStatus status, VideoVisibility visibility) {
         when(repo.findBySourceId("v1")).thenReturn(Optional.of(
-                VideoSource.builder().sourceId("v1").hlsStatus(hls).status(status).isHide(hide).build()));
+                VideoSource.builder().sourceId("v1").hlsStatus(hls).status(status).visibility(visibility).build()));
     }
 
     @Test
     void findPlaylist_readyPublishedVisibleWithFile_isServed() throws IOException {
         file("v1", "playlist.m3u8");
-        video(HlsStatus.READY, VideoStatus.PUBLISHED, false);
+        video(HlsStatus.READY, VideoStatus.PUBLISHED, VideoVisibility.FEED);
+
+        assertThat(service.findPlaylist("v1")).isPresent();
+    }
+
+    @Test
+    void findPlaylist_collectionOnly_isServed() throws IOException {
+        file("v1", "playlist.m3u8");
+        video(HlsStatus.READY, VideoStatus.PUBLISHED, VideoVisibility.COLLECTION_ONLY);
 
         assertThat(service.findPlaylist("v1")).isPresent();
     }
@@ -65,19 +74,19 @@ class HlsPlaybackServiceImplTest {
     void findPlaylist_notServable_isEmpty() throws IOException {
         file("v1", "playlist.m3u8");
         for (HlsStatus s : new HlsStatus[]{HlsStatus.NONE, HlsStatus.PENDING, HlsStatus.PROCESSING, HlsStatus.ERROR}) {
-            video(s, VideoStatus.PUBLISHED, false);
+            video(s, VideoStatus.PUBLISHED, VideoVisibility.FEED);
             assertThat(service.findPlaylist("v1")).as(s.name()).isEmpty();
         }
-        video(HlsStatus.READY, VideoStatus.PUBLISHED, true);
+        video(HlsStatus.READY, VideoStatus.PUBLISHED, VideoVisibility.HIDDEN);
         assertThat(service.findPlaylist("v1")).as("hidden").isEmpty();
-        video(HlsStatus.READY, VideoStatus.PENDING, false);
+        video(HlsStatus.READY, VideoStatus.PENDING, VideoVisibility.FEED);
         assertThat(service.findPlaylist("v1")).as("not published").isEmpty();
     }
 
     @Test
     void findPlaylist_unknownVideoOrMissingFile_isEmpty() {
         assertThat(service.findPlaylist("nope")).isEmpty();
-        video(HlsStatus.READY, VideoStatus.PUBLISHED, false);
+        video(HlsStatus.READY, VideoStatus.PUBLISHED, VideoVisibility.FEED);
         assertThat(service.findPlaylist("v1")).isEmpty();
     }
 

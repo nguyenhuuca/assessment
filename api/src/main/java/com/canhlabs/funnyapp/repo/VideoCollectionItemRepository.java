@@ -14,11 +14,11 @@ import java.util.UUID;
 
 /**
  * video_collection_items has no entity: rows are (collection, video) pairs written with native SQL.
- * "Visible" everywhere below means is_hide = false AND status = 'PUBLISHED'.
+ * "Visible" everywhere below means visibility <> HIDDEN AND status = 'PUBLISHED'.
  */
 public interface VideoCollectionItemRepository extends Repository<VideoSource, Long> {
 
-    String VISIBLE = "v.is_hide = false AND v.status = 'PUBLISHED'";
+    String VISIBLE = "v.visibility <> 'HIDDEN' AND v.status = 'PUBLISHED'";
 
     /** Inserts at the top (MIN(position) - 1). Returns 1 when inserted, 0 when the pair already existed. */
     @Modifying

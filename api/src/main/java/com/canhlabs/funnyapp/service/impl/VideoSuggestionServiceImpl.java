@@ -6,6 +6,7 @@ import com.canhlabs.funnyapp.dto.suggestion.SuggestionDto;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.entity.VideoSuggestion;
 import com.canhlabs.funnyapp.enums.ImportStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.enums.SuggestionFilter;
 import com.canhlabs.funnyapp.enums.SuggestionRejectReason;
 import com.canhlabs.funnyapp.enums.SuggestionStatus;
@@ -327,7 +328,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
     private Long createImportJob(VideoSuggestion s, Long adminId) {
         ImportUrlValidator.ImportUrl url =
                 new ImportUrlValidator.ImportUrl(s.getSourceUrl(), s.getNormalizedUrl(), s.getPlatform(), null);
-        CreateVideoImportResultDto.LineResult line = importService.createResolved(url, s.getTitle(), adminId);
+        CreateVideoImportResultDto.LineResult line = importService.createResolved(url, s.getTitle(), adminId, VideoVisibility.FEED);
         if (line.getJobId() == null) {
             throw error(HttpStatus.CONFLICT, 4094, importErrorKey(line.getErrorCode()));
         }

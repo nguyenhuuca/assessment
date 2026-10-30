@@ -4,6 +4,9 @@ import com.canhlabs.funnyapp.cache.DriveFileLocks;
 import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.cache.StatsCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.entity.VideoImportJob;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
+import com.canhlabs.funnyapp.repo.VideoImportJobRepository;
 import com.canhlabs.funnyapp.event.VideoIngestedEvent;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
@@ -55,6 +58,12 @@ public class VideoStorageServiceImpl implements VideoStorageService {
     private ChatGptService chatGptService;
     private ApplicationEventPublisher eventPublisher;
     private FeedCache feedCache;
+    private VideoImportJobRepository videoImportJobRepository;
+
+    @Autowired
+    public void injectVideoImportJobRepository(VideoImportJobRepository videoImportJobRepository) {
+        this.videoImportJobRepository = videoImportJobRepository;
+    }
 
     @Autowired
     public void injectFeedCache(FeedCache feedCache) {
@@ -260,10 +269,11 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 .desc(desc)
                 .credentialsRef("")
                 .thumbnailPath(thumbnailPath)
+                .visibility(visibilityFor(fileId))
                 .build();
-        log.info("Video source to save: videoId={}, sourceType={}, sourceId={}, title={}, desc={}, thumbnailPath={}, status={}, priority={}, isHide={}",
+        log.info("Video source to save: videoId={}, sourceType={}, sourceId={}, title={}, desc={}, thumbnailPath={}, status={}, priority={}, visibility={}",
                 entity.getVideoId(), entity.getSourceType(), entity.getSourceId(), entity.getTitle(), entity.getDesc(),
-                entity.getThumbnailPath(), entity.getStatus(), entity.getPriority(), entity.isHide());
+                entity.getThumbnailPath(), entity.getStatus(), entity.getPriority(), entity.getVisibility());
         videoSourceRepository.save(entity);
         feedCache.invalidate();
         log.info("Saved video source id={} videoId={} for Drive file {}", entity.getId(), entity.getVideoId(), fileId);
@@ -288,9 +298,17 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 .filter(d -> !d.isBlank())
                 .isPresent();
         String desc = hasDesc ? null : makeDesc(title);
-        videoSourceRepository.upsertDriveSource(System.nanoTime(), fileId, title, desc, thumbnailPath);
+        videoSourceRepository.upsertDriveSource(System.nanoTime(), fileId, title, desc, thumbnailPath,
+                visibilityFor(fileId).name());
         feedCache.invalidate();
         log.info("Upserted video source for Drive file {} (title: {})", fileId, title);
+    }
+
+    /** Visibility chosen at import time (latest job for the Drive file), FEED when no job exists (Rule 6). */
+    private VideoVisibility visibilityFor(String fileId) {
+        return videoImportJobRepository.findFirstByDriveFileIdOrderByIdDesc(fileId)
+                .map(VideoImportJob::getVisibility)
+                .orElse(VideoVisibility.FEED);
     }
 
     /** The poem is optional: an OpenAI failure (e.g. 429 out of credits) must not stop the video from being saved. */

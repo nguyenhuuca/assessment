@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.repo;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,13 +28,13 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
     @Query("select v.sourceId from VideoSource v where v.sourceId in :ids")
     List<String> findSourceIdsIn(@Param("ids") Collection<String> ids);
 
-    /** Public visibility: not hidden by admin and moderation status PUBLISHED. */
-    boolean existsByIdAndIsHideAndStatus(Long id, boolean isHide, VideoStatus status);
+    /** Playable rule: visibility other than the given one (HIDDEN) and moderation status PUBLISHED. */
+    boolean existsByIdAndVisibilityNotAndStatus(Long id, VideoVisibility visibility, VideoStatus status);
 
     Optional<VideoSource> findBySourceId(String sourceId);
     List<VideoSource> findAllByOrderByCreatedAtDesc();
     List<VideoSource> findAllByDescIsNullOrDesc(String desc);
-    List<VideoSource> findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(boolean hide, VideoStatus status);
+    List<VideoSource> findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility visibility, VideoStatus status);
 
     Page<VideoSource> findAllByStatus(VideoStatus status, Pageable pageable);
 
@@ -42,7 +43,7 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
     /** Atomic increment in the DB; hidden videos are not counted. Returns rows updated (0 = unknown or hidden). */
     @Modifying
     @Transactional
-    @Query(value = "UPDATE video_sources SET view_count = view_count + 1 WHERE id = :id AND is_hide = false", nativeQuery = true)
+    @Query(value = "UPDATE video_sources SET view_count = view_count + 1 WHERE id = :id AND visibility <> 'HIDDEN'", nativeQuery = true)
     int incrementViewCount(@Param("id") Long id);
 
     List<VideoSource> findAllBySourceType(String sourceType);
@@ -50,16 +51,16 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
     List<VideoSource> findAllBySourceTypeAndSourceIdIn(String sourceType, Collection<String> sourceIds);
 
     /**
-     * Force sync: insert the Drive video, or refresh title + thumbnail of the existing row.
-     * Moderation (is_hide, status, priority), view_count and an existing description are kept.
+     * Force sync: insert the Drive video (with the given visibility, used only by the INSERT branch), or refresh title + thumbnail of the existing row.
+     * Moderation (visibility, status, priority), view_count and an existing description are kept.
      */
     @Modifying
     @Transactional
     @Query(value = """
             INSERT INTO video_sources (video_id, source_type, source_id, title, description, credentials_ref,
-                                       thumbnail_path, is_hide, status, priority, created_at, updated_at)
+                                       thumbnail_path, visibility, status, priority, created_at, updated_at)
             VALUES (:videoId, 'google_drive', :sourceId, :title, :desc, '', :thumbnailPath,
-                    false, 'PUBLISHED', 0, now(), now())
+                    :visibility, 'PUBLISHED', 0, now(), now())
             ON CONFLICT (source_type, source_id) DO UPDATE
                SET title          = EXCLUDED.title,
                    thumbnail_path = EXCLUDED.thumbnail_path,
@@ -68,7 +69,8 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
             """, nativeQuery = true)
     int upsertDriveSource(@Param("videoId") Long videoId, @Param("sourceId") String sourceId,
                           @Param("title") String title, @Param("desc") String desc,
-                          @Param("thumbnailPath") String thumbnailPath);
+                          @Param("thumbnailPath") String thumbnailPath,
+                          @Param("visibility") String visibility);
 
     List<VideoSource> findAllByHlsStatus(HlsStatus hlsStatus);
 

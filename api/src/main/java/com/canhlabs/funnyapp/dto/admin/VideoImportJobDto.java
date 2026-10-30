@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.dto.admin;
 
 import com.canhlabs.funnyapp.enums.ImportPlatform;
 import com.canhlabs.funnyapp.enums.ImportStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class VideoImportJobDto {
     private Instant startedAt;
     private Instant finishedAt;
     private String driveFileId;
+    private VideoVisibility visibility;
     /** True once the Drive cron created the video_sources row for driveFileId. */
     private boolean ingested;
     private String errorCode;

@@ -9,6 +9,7 @@ import com.canhlabs.funnyapp.entity.VideoCollection;
 import com.canhlabs.funnyapp.enums.CollectionVisibility;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoCollectionItemRepository;
@@ -206,7 +207,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
     public void addVideo(UUID id, Long videoId) {
         UserDetailDto user = requireUser();
         VideoCollection collection = requireManageable(id, user.getId(), isAdmin(user.getId()));
-        if (videoId == null || !videoSourceRepository.existsByIdAndIsHideAndStatus(videoId, false, VideoStatus.PUBLISHED)) {
+        if (videoId == null || !videoSourceRepository.existsByIdAndVisibilityNotAndStatus(videoId, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)) {
             throw error(HttpStatus.NOT_FOUND, "error.video.notFound");
         }
         if (itemRepository.countItems(collection.getId()) >= MAX_ITEMS_PER_COLLECTION) {

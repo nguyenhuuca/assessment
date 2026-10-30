@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.entity;
 
 import com.canhlabs.funnyapp.enums.ImportPlatform;
 import com.canhlabs.funnyapp.enums.ImportStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -85,6 +86,12 @@ public class VideoImportJob extends BaseDomain {
     @Column(name = "attempts", nullable = false)
     @Builder.Default
     private int attempts = 0;
+
+    /** FEED or COLLECTION_ONLY; copied onto video_sources when the row is created. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "visibility", nullable = false, length = 20)
+    @Builder.Default
+    private VideoVisibility visibility = VideoVisibility.FEED;
 
     @Column(name = "created_by")
     private Long createdBy;

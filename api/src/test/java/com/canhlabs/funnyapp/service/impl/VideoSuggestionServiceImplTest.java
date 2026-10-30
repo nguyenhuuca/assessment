@@ -7,6 +7,7 @@ import com.canhlabs.funnyapp.dto.suggestion.SuggestionDto;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.entity.VideoSuggestion;
 import com.canhlabs.funnyapp.enums.ImportPlatform;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.enums.ImportStatus;
 import com.canhlabs.funnyapp.enums.SuggestionFilter;
 import com.canhlabs.funnyapp.enums.SuggestionRejectReason;
@@ -115,7 +116,7 @@ class VideoSuggestionServiceImplTest {
     }
 
     private void importCreates(long jobId) {
-        when(importService.createResolved(any(), any(), eq(ADMIN)))
+        when(importService.createResolved(any(), any(), eq(ADMIN), eq(VideoVisibility.FEED)))
                 .thenReturn(CreateVideoImportResultDto.LineResult.builder().line(1).jobId(jobId).build());
     }
 
@@ -393,7 +394,7 @@ class VideoSuggestionServiceImplTest {
         withProbe.approve(5L, null, ADMIN);
 
         ArgumentCaptor<ImportUrlValidator.ImportUrl> url = ArgumentCaptor.forClass(ImportUrlValidator.ImportUrl.class);
-        verify(importService).createResolved(url.capture(), any(), eq(ADMIN));
+        verify(importService).createResolved(url.capture(), any(), eq(ADMIN), eq(VideoVisibility.FEED));
         assertThat(url.getValue().sourceUrl()).isEqualTo("https://fb.watch/abcDEF_12/?mibextid=1");
         assertThat(url.getValue().normalizedUrl()).isEqualTo("https://fb.watch/abcDEF_12");
         assertThat(url.getValue().platform()).isEqualTo(ImportPlatform.FACEBOOK);
@@ -412,7 +413,7 @@ class VideoSuggestionServiceImplTest {
         SuggestionDto dto = service.approve(5L, "  New / title ", ADMIN);
 
         ArgumentCaptor<ImportUrlValidator.ImportUrl> url = ArgumentCaptor.forClass(ImportUrlValidator.ImportUrl.class);
-        verify(importService, times(1)).createResolved(url.capture(), eq("New title"), eq(ADMIN));
+        verify(importService, times(1)).createResolved(url.capture(), eq("New title"), eq(ADMIN), eq(VideoVisibility.FEED));
         assertThat(url.getValue().normalizedUrl()).isEqualTo(YT);
         assertThat(url.getValue().platform()).isEqualTo(s.getPlatform());
         verify(importService, never()).create(any(), any());
@@ -440,7 +441,7 @@ class VideoSuggestionServiceImplTest {
 
         service.approve(5L, null, ADMIN);
 
-        verify(importService).createResolved(any(), eq("Funny cat"), eq(ADMIN));
+        verify(importService).createResolved(any(), eq("Funny cat"), eq(ADMIN), eq(VideoVisibility.FEED));
         assertThat(s.getTitle()).isEqualTo("Funny cat");
     }
 
@@ -490,7 +491,7 @@ class VideoSuggestionServiceImplTest {
     void approve_importLineRejected_409WithImportKey_andSuggestionStaysPending() {
         VideoSuggestion s = pending(5);
         when(repository.findByIdForUpdate(5L)).thenReturn(Optional.of(s));
-        when(importService.createResolved(any(), any(), eq(ADMIN)))
+        when(importService.createResolved(any(), any(), eq(ADMIN), eq(VideoVisibility.FEED)))
                 .thenReturn(CreateVideoImportResultDto.LineResult.builder().line(1).errorCode("DUPLICATE_ACTIVE").build());
 
         assertError(() -> service.approve(5L, null, ADMIN), HttpStatus.CONFLICT, "error.import.duplicateActive");
@@ -507,7 +508,7 @@ class VideoSuggestionServiceImplTest {
         for (String[] pair : new String[][]{{"INVALID_URL", "error.import.invalidUrl"}, {"WHATEVER", "error.import.failed"}}) {
             VideoSuggestion s = pending(5);
             when(repository.findByIdForUpdate(5L)).thenReturn(Optional.of(s));
-            when(importService.createResolved(any(), any(), eq(ADMIN)))
+            when(importService.createResolved(any(), any(), eq(ADMIN), eq(VideoVisibility.FEED)))
                     .thenReturn(CreateVideoImportResultDto.LineResult.builder().line(1).errorCode(pair[0]).build());
 
             assertError(() -> service.approve(5L, null, ADMIN), HttpStatus.CONFLICT, pair[1]);
@@ -680,14 +681,14 @@ class VideoSuggestionServiceImplTest {
         when(jobRepository.findLockedById(9L)).thenReturn(Optional.of(job(9L, ImportStatus.FAILED)));
         service.reopen(6L, ADMIN);
         // the retry runs on the detached job; approving must be refused by the import line, not create another job
-        when(importService.createResolved(any(), any(), eq(ADMIN))).thenReturn(
+        when(importService.createResolved(any(), any(), eq(ADMIN), eq(VideoVisibility.FEED))).thenReturn(
                 CreateVideoImportResultDto.LineResult.builder().line(1)
                         .errorCode(VideoImportServiceImpl.DUPLICATE_ACTIVE).build());
 
         assertError(() -> service.approve(6L, null, ADMIN), HttpStatus.CONFLICT, "error.import.duplicateActive");
         assertThat(s.getStatus()).isEqualTo(SuggestionStatus.PENDING);
         assertThat(s.getImportJobId()).isNull();
-        verify(importService, times(1)).createResolved(any(), any(), eq(ADMIN));
+        verify(importService, times(1)).createResolved(any(), any(), eq(ADMIN), eq(VideoVisibility.FEED));
     }
 
     @Test

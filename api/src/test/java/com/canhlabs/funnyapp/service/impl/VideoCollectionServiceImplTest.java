@@ -11,6 +11,7 @@ import com.canhlabs.funnyapp.enums.CollectionVisibility;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.service.HlsPlaybackService;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
@@ -262,7 +263,7 @@ class VideoCollectionServiceImplTest {
 
         login(USER);
         role(USER, UserRole.ADMIN);
-        when(videoSourceRepository.existsByIdAndIsHideAndStatus(5L, false, VideoStatus.PUBLISHED)).thenReturn(true);
+        when(videoSourceRepository.existsByIdAndVisibilityNotAndStatus(5L, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)).thenReturn(true);
         when(itemRepository.addItem(pub.getId(), 5L)).thenReturn(1);
         service.addVideo(pub.getId(), 5L);
         SecurityContextHolder.clearContext();
@@ -503,7 +504,7 @@ class VideoCollectionServiceImplTest {
     void addVideo_hiddenVideo_is404() {
         login(USER);
         VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
-        when(videoSourceRepository.existsByIdAndIsHideAndStatus(5L, false, VideoStatus.PUBLISHED)).thenReturn(false);
+        when(videoSourceRepository.existsByIdAndVisibilityNotAndStatus(5L, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)).thenReturn(false);
 
         assertStatus(() -> service.addVideo(mine.getId(), 5L), HttpStatus.NOT_FOUND);
         verify(itemRepository, never()).addItem(any(), any());
@@ -520,7 +521,7 @@ class VideoCollectionServiceImplTest {
     void addVideo_full_is409() {
         login(USER);
         VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
-        when(videoSourceRepository.existsByIdAndIsHideAndStatus(5L, false, VideoStatus.PUBLISHED)).thenReturn(true);
+        when(videoSourceRepository.existsByIdAndVisibilityNotAndStatus(5L, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)).thenReturn(true);
         when(itemRepository.countItems(mine.getId())).thenReturn((long) VideoCollectionServiceImpl.MAX_ITEMS_PER_COLLECTION);
 
         assertStatus(() -> service.addVideo(mine.getId(), 5L), HttpStatus.CONFLICT);
@@ -530,7 +531,7 @@ class VideoCollectionServiceImplTest {
     void addVideo_idempotent_touchesOnlyWhenInserted() {
         login(USER);
         VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
-        when(videoSourceRepository.existsByIdAndIsHideAndStatus(5L, false, VideoStatus.PUBLISHED)).thenReturn(true);
+        when(videoSourceRepository.existsByIdAndVisibilityNotAndStatus(5L, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)).thenReturn(true);
         when(itemRepository.addItem(mine.getId(), 5L)).thenReturn(1, 0);
 
         service.addVideo(mine.getId(), 5L);

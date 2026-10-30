@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.cache.VideoCache;
 import com.canhlabs.funnyapp.entity.VideoSource;
@@ -141,7 +142,7 @@ class StreamVideoServiceImplTest {
     void getVideosToStream_ordersByPriorityThenCreatedAtDesc() {
         VideoSource high = VideoSource.builder().id(1L).sourceId("hi").title("High Priority").priority(100).build();
         VideoSource low = VideoSource.builder().id(2L).sourceId("lo").title("Low Priority").priority(0).build();
-        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+        when(videoSourceRepository.findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility.FEED, VideoStatus.PUBLISHED))
                 .thenReturn(List.of(high, low));
 
         List<VideoDto> videos = streamVideoService.getVideosToStream();
@@ -155,7 +156,7 @@ class StreamVideoServiceImplTest {
     void getVideosToStream_returnsMappedDtos() {
         VideoSource source = VideoSource.builder()
                 .id(1L).sourceId("src1").title("My Title").desc("My Desc").viewCount(42L).build();
-        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+        when(videoSourceRepository.findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility.FEED, VideoStatus.PUBLISHED))
                 .thenReturn(List.of(source));
 
         List<VideoDto> videos = streamVideoService.getVideosToStream();
@@ -172,7 +173,7 @@ class StreamVideoServiceImplTest {
 
     @Test
     void getVideosToStream_returnsEmptyListWhenNoVideos() {
-        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+        when(videoSourceRepository.findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility.FEED, VideoStatus.PUBLISHED))
                 .thenReturn(Collections.emptyList());
 
         List<VideoDto> videos = streamVideoService.getVideosToStream();
@@ -200,10 +201,20 @@ class StreamVideoServiceImplTest {
 
     @Test
     void getVideoById_hiddenVideo_answersLikeNotFound() {
-        VideoSource source = VideoSource.builder().id(1L).sourceId("src1").isHide(true).build();
+        VideoSource source = VideoSource.builder().id(1L).sourceId("src1").visibility(VideoVisibility.HIDDEN).build();
         when(videoSourceRepository.findById(1L)).thenReturn(Optional.of(source));
 
         assertThrows(IllegalArgumentException.class, () -> streamVideoService.getVideoById(1L));
+    }
+
+    @Test
+    void getVideoById_collectionOnlyVideo_isReturned() {
+        VideoSource source = VideoSource.builder().id(1L).sourceId("src1").visibility(VideoVisibility.COLLECTION_ONLY).build();
+        when(videoSourceRepository.findById(1L)).thenReturn(Optional.of(source));
+
+        VideoDto dto = streamVideoService.getVideoById(1L);
+
+        assertEquals("src1", dto.getFileId());
     }
 
     @Test
@@ -339,7 +350,7 @@ class StreamVideoServiceImplTest {
     @Test
     void getVideosToStream_flagOn_readsFlagOnceForTheWholeList() {
         when(hlsPlaybackService.hlsEnabled()).thenReturn(true);
-        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+        when(videoSourceRepository.findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility.FEED, VideoStatus.PUBLISHED))
                 .thenReturn(List.of(readyVideo(1), readyVideo(2), readyVideo(3)));
 
         List<VideoDto> videos = streamVideoService.getVideosToStream();
@@ -352,7 +363,7 @@ class StreamVideoServiceImplTest {
     @Test
     void getVideosToStream_flagOff_everyHlsUrlIsNull() {
         when(hlsPlaybackService.hlsEnabled()).thenReturn(false);
-        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+        when(videoSourceRepository.findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility.FEED, VideoStatus.PUBLISHED))
                 .thenReturn(List.of(readyVideo(1), readyVideo(2)));
 
         streamVideoService.getVideosToStream().forEach(v -> assertNull(v.getHlsUrl()));
@@ -369,20 +380,20 @@ class StreamVideoServiceImplTest {
 
     @Test
     void getVideosToStream_twoCallsWithinTtl_queryOnce() {
-        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+        when(videoSourceRepository.findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility.FEED, VideoStatus.PUBLISHED))
                 .thenReturn(List.of(VideoSource.builder().id(1L).sourceId("a").title("A").build()));
 
         streamVideoService.getVideosToStream();
         streamVideoService.getVideosToStream();
 
         verify(videoSourceRepository, times(1))
-                .findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED);
+                .findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility.FEED, VideoStatus.PUBLISHED);
     }
 
     @Test
     void updateDesc_evictsTheFeedCache() {
         VideoSource source = VideoSource.builder().id(1L).title("T").desc("").build();
-        when(videoSourceRepository.findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED))
+        when(videoSourceRepository.findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility.FEED, VideoStatus.PUBLISHED))
                 .thenReturn(List.of(source));
         when(videoSourceRepository.findAllByDescIsNullOrDesc("")).thenReturn(List.of(source));
         when(chatGptService.makePoem("T")).thenReturn("poem");
@@ -392,6 +403,6 @@ class StreamVideoServiceImplTest {
         streamVideoService.getVideosToStream();
 
         verify(videoSourceRepository, times(2))
-                .findAllByIsHideAndStatusOrderByPriorityDescCreatedAtDesc(false, VideoStatus.PUBLISHED);
+                .findAllByVisibilityAndStatusOrderByPriorityDescCreatedAtDesc(VideoVisibility.FEED, VideoStatus.PUBLISHED);
     }
 }

@@ -4,6 +4,7 @@ import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,7 +12,7 @@ public interface AdminVideoService {
     Page<AdminVideoDto> getVideos(Pageable pageable, VideoStatus status);
     void updateStatus(Long id, VideoStatus status);
     void updatePriority(Long id, int priority);
-    void updateHidden(Long id, boolean hidden);
+    void updateVisibility(Long id, VideoVisibility visibility);
     /** Drive file first (a failure keeps the row), then the local file, then the row. */
     void deleteVideo(Long id, boolean deleteLocalFile, boolean deleteDriveFile);
     /** NONE or ERROR becomes PENDING and wakes the HLS worker; any other status is returned unchanged. */

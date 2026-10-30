@@ -9,6 +9,7 @@ import com.canhlabs.funnyapp.dto.admin.ImportPreviewDto;
 import com.canhlabs.funnyapp.dto.admin.VideoImportJobDto;
 import com.canhlabs.funnyapp.entity.VideoImportJob;
 import com.canhlabs.funnyapp.enums.ImportPlatform;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.enums.ImportStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.exception.ImportErrorCode;
@@ -45,6 +46,7 @@ import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -84,7 +86,7 @@ class VideoImportServiceImplTest {
         for (String u : urls) {
             items.add(new CreateVideoImportRequest.Item(u, null));
         }
-        return new CreateVideoImportRequest(items, at);
+        return new CreateVideoImportRequest(items, at, null);
     }
 
     private static VideoImportJob job(long id, ImportStatus status) {
@@ -113,7 +115,7 @@ class VideoImportServiceImplTest {
     void create_runNow_savesJobsNormalizedAndWakesWorker() {
         CreateVideoImportRequest req = new CreateVideoImportRequest(List.of(
                 new CreateVideoImportRequest.Item(YT1_SHORT, "  My/Title:  "),
-                new CreateVideoImportRequest.Item(YT2, null)), null);
+                new CreateVideoImportRequest.Item(YT2, null)), null, null);
 
         CreateVideoImportResultDto result = service.create(req, 5L);
 
@@ -167,10 +169,76 @@ class VideoImportServiceImplTest {
     }
 
     @Test
+    void create_visibilityNullOrFeed_storesFeedOnEveryJob() {
+        service.create(request(null, YT1, YT2), 5L);
+        CreateVideoImportRequest explicit = request(null, "https://www.youtube.com/watch?v=zzzzzzzzzzz");
+        explicit.setVisibility("FEED");
+        service.create(explicit, 5L);
+
+        ArgumentCaptor<VideoImportJob> saved = ArgumentCaptor.forClass(VideoImportJob.class);
+        verify(jobRepository, times(3)).save(saved.capture());
+        assertThat(saved.getAllValues()).extracting(VideoImportJob::getVisibility).containsOnly(VideoVisibility.FEED);
+    }
+
+    @Test
+    void create_collectionOnly_storesItOnEveryJob() {
+        CreateVideoImportRequest req = request(null, YT1, YT2);
+        req.setVisibility("COLLECTION_ONLY");
+
+        service.create(req, 5L);
+
+        ArgumentCaptor<VideoImportJob> saved = ArgumentCaptor.forClass(VideoImportJob.class);
+        verify(jobRepository, times(2)).save(saved.capture());
+        assertThat(saved.getAllValues()).extracting(VideoImportJob::getVisibility)
+                .containsOnly(VideoVisibility.COLLECTION_ONLY);
+    }
+
+    @Test
+    void create_hiddenOrUnknownVisibility_isRejectedWith4104AndSavesNothing() {
+        for (String bad : new String[]{"HIDDEN", "secret", ""}) {
+            CreateVideoImportRequest req = request(null, YT1);
+            req.setVisibility(bad);
+
+            assertThatThrownBy(() -> service.create(req, 5L)).isInstanceOfSatisfying(CustomException.class, e -> {
+                assertThat(e.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+                assertThat(e.getSubCode()).isEqualTo(4104);
+                assertThat(e.getMessage()).isEqualTo("INVALID_VISIBILITY");
+            });
+        }
+        verify(jobRepository, never()).save(any());
+        verify(worker, never()).wakeUp();
+    }
+
+    @Test
+    void list_mapsVisibilityToTheDto() {
+        VideoImportJob j = job(1, ImportStatus.PENDING);
+        j.setVisibility(VideoVisibility.COLLECTION_ONLY);
+        when(jobRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(j)));
+
+        var page = service.list(null, org.springframework.data.domain.PageRequest.of(0, 10));
+
+        assertThat(page.getContent().get(0).getVisibility()).isEqualTo(VideoVisibility.COLLECTION_ONLY);
+    }
+
+    @Test
+    void retry_doesNotTouchTheJobVisibility() {
+        VideoImportJob j = job(9, ImportStatus.FAILED);
+        j.setVisibility(VideoVisibility.COLLECTION_ONLY);
+        when(jobRepository.findById(9L)).thenReturn(Optional.of(j));
+        when(jobRepository.retryIfFinal(9L)).thenReturn(1);
+
+        var dto = service.retry(9L);
+
+        assertThat(dto.getVisibility()).isEqualTo(VideoVisibility.COLLECTION_ONLY);
+        verify(jobRepository, never()).save(any());
+    }
+
+    @Test
     void createResolved_savesAJobNow_withTheGivenUrls_andDoesNotWakeTheWorker() {
         var url = new ImportUrlValidator.ImportUrl(FB_SHARE, FB_REEL, ImportPlatform.FACEBOOK, null);
 
-        CreateVideoImportResultDto.LineResult line = service.createResolved(url, " Cat: video ", 7L);
+        CreateVideoImportResultDto.LineResult line = service.createResolved(url, " Cat: video ", 7L, VideoVisibility.COLLECTION_ONLY);
 
         assertThat(line.getLine()).isEqualTo(1);
         assertThat(line.getJobId()).isNotNull();
@@ -180,6 +248,7 @@ class VideoImportServiceImplTest {
         assertThat(saved.getValue().getNormalizedUrl()).isEqualTo(FB_REEL);
         assertThat(saved.getValue().getRequestedTitle()).isEqualTo("Cat video");
         assertThat(saved.getValue().getCreatedBy()).isEqualTo(7L);
+        assertThat(saved.getValue().getVisibility()).isEqualTo(VideoVisibility.COLLECTION_ONLY);
         assertThat(saved.getValue().getScheduledAt()).isBeforeOrEqualTo(Instant.now());
         verify(worker, never()).wakeUp();
     }
@@ -189,7 +258,7 @@ class VideoImportServiceImplTest {
         when(jobRepository.existsByNormalizedUrlAndStatusIn(eq(FB_REEL), anyCollection())).thenReturn(true);
 
         CreateVideoImportResultDto.LineResult line = service.createResolved(
-                new ImportUrlValidator.ImportUrl(FB_SHARE, FB_REEL, ImportPlatform.FACEBOOK, null), null, 7L);
+                new ImportUrlValidator.ImportUrl(FB_SHARE, FB_REEL, ImportPlatform.FACEBOOK, null), null, 7L, VideoVisibility.FEED);
 
         assertThat(line.getErrorCode()).isEqualTo("DUPLICATE_ACTIVE");
         verify(jobRepository, never()).save(any());
@@ -240,7 +309,7 @@ class VideoImportServiceImplTest {
 
     @Test
     void create_nullItemEntry_isInvalidUrl() {
-        CreateVideoImportRequest req = new CreateVideoImportRequest(java.util.Arrays.asList(null, new CreateVideoImportRequest.Item(YT1, null)), null);
+        CreateVideoImportRequest req = new CreateVideoImportRequest(java.util.Arrays.asList(null, new CreateVideoImportRequest.Item(YT1, null)), null, null);
 
         CreateVideoImportResultDto result = service.create(req, 1L);
 
@@ -258,8 +327,8 @@ class VideoImportServiceImplTest {
     @Test
     void create_emptyOrNullItems_is400() {
         assertError(() -> service.create(null, 1L), HttpStatus.BAD_REQUEST, "EMPTY_ITEMS");
-        assertError(() -> service.create(new CreateVideoImportRequest(null, null), 1L), HttpStatus.BAD_REQUEST, "EMPTY_ITEMS");
-        assertError(() -> service.create(new CreateVideoImportRequest(List.of(), null), 1L), HttpStatus.BAD_REQUEST, "EMPTY_ITEMS");
+        assertError(() -> service.create(new CreateVideoImportRequest(null, null, null), 1L), HttpStatus.BAD_REQUEST, "EMPTY_ITEMS");
+        assertError(() -> service.create(new CreateVideoImportRequest(List.of(), null, null), 1L), HttpStatus.BAD_REQUEST, "EMPTY_ITEMS");
         verifyNoInteractions(jobRepository);
     }
 

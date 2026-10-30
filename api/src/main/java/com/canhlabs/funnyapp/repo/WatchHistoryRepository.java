@@ -49,7 +49,7 @@ public interface WatchHistoryRepository extends JpaRepository<WatchHistory, Watc
     @Query(value = """
             INSERT INTO watch_history (user_id, video_id, watched_at)
             SELECT :userId, v.id, now() FROM video_sources v
-             WHERE v.id = :videoId AND v.is_hide = false AND v.status = 'PUBLISHED'
+             WHERE v.id = :videoId AND v.visibility <> 'HIDDEN' AND v.status = 'PUBLISHED'
             ON CONFLICT (user_id, video_id) DO UPDATE SET watched_at = now()
             RETURNING (xmax = 0)
             """, nativeQuery = true)
@@ -83,7 +83,7 @@ public interface WatchHistoryRepository extends JpaRepository<WatchHistory, Watc
                    v.view_count AS "viewCount", h.watched_at AS "watchedAt",
                    h.position_sec AS "positionSec", h.duration_sec AS "durationSec"
               FROM watch_history h JOIN video_sources v ON v.id = h.video_id
-             WHERE h.user_id = :userId AND v.is_hide = false AND v.status = 'PUBLISHED'
+             WHERE h.user_id = :userId AND v.visibility <> 'HIDDEN' AND v.status = 'PUBLISHED'
                AND (CAST(:pattern AS text) IS NULL
                     OR lower(v.title) LIKE lower(CAST(:pattern AS text)) ESCAPE '\\')
              ORDER BY h.watched_at DESC, h.video_id DESC
@@ -91,7 +91,7 @@ public interface WatchHistoryRepository extends JpaRepository<WatchHistory, Watc
             countQuery = """
             SELECT count(*)
               FROM watch_history h JOIN video_sources v ON v.id = h.video_id
-             WHERE h.user_id = :userId AND v.is_hide = false AND v.status = 'PUBLISHED'
+             WHERE h.user_id = :userId AND v.visibility <> 'HIDDEN' AND v.status = 'PUBLISHED'
                AND (CAST(:pattern AS text) IS NULL
                     OR lower(v.title) LIKE lower(CAST(:pattern AS text)) ESCAPE '\\')
             """,

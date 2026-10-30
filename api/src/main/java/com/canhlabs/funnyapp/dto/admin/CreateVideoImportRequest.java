@@ -16,6 +16,8 @@ public class CreateVideoImportRequest {
     private List<Item> items;
     /** Null means run as soon as possible. */
     private Instant scheduledAt;
+    /** FEED (default when null) or COLLECTION_ONLY; kept as text so an unknown value maps to INVALID_VISIBILITY. */
+    private String visibility;
 
     @Getter
     @Setter

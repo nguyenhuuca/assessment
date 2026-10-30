@@ -3,8 +3,11 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
 import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.cache.StatsCache;
+import com.canhlabs.funnyapp.entity.VideoImportJob;
 import com.canhlabs.funnyapp.entity.VideoSource;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.event.VideoIngestedEvent;
+import com.canhlabs.funnyapp.repo.VideoImportJobRepository;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.ChatGptService;
 import com.canhlabs.funnyapp.service.DriveVideoDownloader;
@@ -45,11 +48,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class VideoStorageServiceImplTest {
 
+    @Mock VideoImportJobRepository videoImportJobRepository;
     @Mock StatsCache statsCache;
     @Mock VideoAccessService videoAccessService;
     @Mock DriveVideoDownloader driveVideoDownloader;
@@ -73,6 +78,7 @@ class VideoStorageServiceImplTest {
         service.injectVideoAccessService(videoAccessService);
         service.injectCacheStatsService(statsCache);
         service.injectFeedCache(feedCache);
+        service.injectVideoImportJobRepository(videoImportJobRepository);
     }
 
     // ── getFileSizeFromDisk ─────────────────────────────────────────────────────
@@ -216,6 +222,54 @@ class VideoStorageServiceImplTest {
         assertThat(saved.getTitle()).isEqualTo("My Title");
         assertThat(saved.getDesc()).isEqualTo("A poem");
         assertThat(saved.getSourceType()).isEqualTo("google_drive");
+    }
+
+    @Test
+    void saveInfo_noImportJob_createsFeedRow() {
+        when(videoSourceRepository.existsBySourceId("file123")).thenReturn(false);
+        when(videoSourceRepository.save(any(VideoSource.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        service.saveInfo("file123", "T", "thumb");
+
+        ArgumentCaptor<VideoSource> captor = ArgumentCaptor.forClass(VideoSource.class);
+        verify(videoSourceRepository).save(captor.capture());
+        assertThat(captor.getValue().getVisibility()).isEqualTo(VideoVisibility.FEED);
+    }
+
+    @Test
+    void saveInfo_latestImportJobIsCollectionOnly_createsCollectionOnlyRow() {
+        when(videoSourceRepository.existsBySourceId("file123")).thenReturn(false);
+        when(videoSourceRepository.save(any(VideoSource.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(videoImportJobRepository.findFirstByDriveFileIdOrderByIdDesc("file123")).thenReturn(java.util.Optional.of(
+                VideoImportJob.builder().driveFileId("file123").visibility(VideoVisibility.COLLECTION_ONLY).build()));
+
+        service.saveInfo("file123", "T", "thumb");
+
+        ArgumentCaptor<VideoSource> captor = ArgumentCaptor.forClass(VideoSource.class);
+        verify(videoSourceRepository).save(captor.capture());
+        assertThat(captor.getValue().getVisibility()).isEqualTo(VideoVisibility.COLLECTION_ONLY);
+    }
+
+    @Test
+    void saveInfo_existingRow_doesNotLookUpTheImportJob() {
+        when(videoSourceRepository.existsBySourceId("existing123")).thenReturn(true);
+
+        service.saveInfo("existing123", "T", "thumb");
+
+        verifyNoInteractions(videoImportJobRepository);
+        verify(videoSourceRepository, never()).save(any());
+    }
+
+    @Test
+    void upsertInfo_latestImportJobIsCollectionOnly_passesItToTheInsert() {
+        when(videoSourceRepository.findBySourceId("f4")).thenReturn(java.util.Optional.empty());
+        when(videoImportJobRepository.findFirstByDriveFileIdOrderByIdDesc("f4")).thenReturn(java.util.Optional.of(
+                VideoImportJob.builder().driveFileId("f4").visibility(VideoVisibility.COLLECTION_ONLY).build()));
+
+        service.upsertInfo("f4", "Title", "thumb");
+
+        verify(videoSourceRepository).upsertDriveSource(any(), eq("f4"), eq("Title"), any(), eq("thumb"),
+                eq("COLLECTION_ONLY"));
     }
 
     @Test
@@ -503,7 +557,7 @@ class VideoStorageServiceImplTest {
         service.upsertInfo("f1", "Title", "thumb");
 
         verify(chatGptService, never()).makePoem(anyString());
-        verify(videoSourceRepository).upsertDriveSource(any(), eq("f1"), eq("Title"), eq(null), eq("thumb"));
+        verify(videoSourceRepository).upsertDriveSource(any(), eq("f1"), eq("Title"), eq(null), eq("thumb"), eq("FEED"));
     }
 
     @Test
@@ -513,7 +567,7 @@ class VideoStorageServiceImplTest {
 
         service.upsertInfo("f2", "Title", "thumb");
 
-        verify(videoSourceRepository).upsertDriveSource(any(), eq("f2"), eq("Title"), eq("A poem"), eq("thumb"));
+        verify(videoSourceRepository).upsertDriveSource(any(), eq("f2"), eq("Title"), eq("A poem"), eq("thumb"), eq("FEED"));
     }
 
     @Test

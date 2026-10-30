@@ -9,6 +9,7 @@ import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
+import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
@@ -106,10 +107,10 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     }
 
     @Override
-    public void updateHidden(Long id, boolean hidden) {
+    public void updateVisibility(Long id, VideoVisibility visibility) {
         VideoSource source = videoSourceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
-        source.setHide(hidden);
+        source.setVisibility(visibility);
         videoSourceRepository.save(source);
         feedCache.invalidate();
     }
@@ -208,7 +209,8 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .title(v.getTitle())
                 .thumbnailPath(v.getThumbnailPath())
                 .status(v.getStatus())
-                .hidden(v.isHide())
+                .visibility(v.getVisibility())
+                .hidden(v.getVisibility() == VideoVisibility.HIDDEN)
                 .viewCount(v.getViewCount())
                 .priority(v.getPriority())
                 .createdAt(v.getCreatedAt())

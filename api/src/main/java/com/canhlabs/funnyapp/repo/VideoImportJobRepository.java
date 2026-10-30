@@ -28,6 +28,9 @@ public interface VideoImportJobRepository extends JpaRepository<VideoImportJob, 
 
     Optional<VideoImportJob> findFirstByDriveFileId(String driveFileId);
 
+    /** Latest job for a Drive file: several jobs can share one after a re-import. */
+    Optional<VideoImportJob> findFirstByDriveFileIdOrderByIdDesc(String driveFileId);
+
     /**
      * Atomically takes the oldest due PENDING job and flips it to DOWNLOADING.
      * "Due" allows 1 minute of slack: the DB is on another host, and a 09:05 job must not miss the

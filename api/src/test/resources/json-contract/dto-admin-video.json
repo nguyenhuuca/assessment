@@ -7,6 +7,7 @@
     "thumbnailPath" : "/thumbs/1.jpg",
     "creatorEmail" : "user@example.test",
     "status" : "PUBLISHED",
+    "visibility" : "HIDDEN",
     "hidden" : true,
     "viewCount" : 12,
     "priority" : 3,
