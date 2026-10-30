@@ -144,6 +144,16 @@ describe('ImportTable', () => {
     expect(screen.getByText('COLLECTION ONLY').closest('tr')).toHaveTextContent('Co')
   })
 
+  // Regression: the second badge wrapped under the status with its own left margin (misaligned)
+  it('groups the status and collection-only badges in one stack', async () => {
+    setJobs([job({ id: 1, title: 'Co', visibility: 'COLLECTION_ONLY' })])
+    renderPanel()
+    await screen.findByText('Co')
+    const stack = screen.getByText('COLLECTION ONLY').parentElement
+    expect(stack).toHaveClass('admin-badge-stack')
+    expect(stack.querySelectorAll('.admin-badge')).toHaveLength(2)
+  })
+
   it('renders progress, ingestion state and mapped errors', async () => {
     setJobs([
       job({ id: 1, status: 'DOWNLOADING', phase: 'DOWNLOAD', progressPct: 42, downloadedBytes: 10485760, totalBytes: 20971520 }),

@@ -2294,7 +2294,9 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   color: #ff1744;
   border: 1px solid #ff1744;
 }
-.admin-badge.collection-only { margin-left: 6px; background: rgba(0, 238, 252, 0.12); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+.admin-badge.collection-only { white-space: nowrap; background: rgba(0, 238, 252, 0.12); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+/* Status + extra badges in one cell: wrap as a left-aligned group, never indented */
+.admin-badge-stack { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
 .import-collection-only { display: flex; align-items: center; gap: 8px; }
 .admin-badge.visible {
   background: rgba(0, 200, 83, 0.13);
