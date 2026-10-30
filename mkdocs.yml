@@ -167,6 +167,7 @@ nav:
       - HLS Streaming: plans/plan-hls-streaming.md
       - Spring Boot 4.1 Upgrade: plans/plan-spring-boot-4-upgrade.md
       - Frontend Dependency Upgrade: plans/plan-frontend-deps-upgrade.md
+      - Collection-Only Videos: plans/plan-collection-only-videos.md
       - BE Performance (Medium): plans/plan-be-perf-medium.md
       - Basic PWA: plans/plan-pwa-basic.md
       - Report Webhook State: plans/plan-report-webhook-state.md

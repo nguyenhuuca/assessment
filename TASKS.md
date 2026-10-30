@@ -618,3 +618,14 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **SQ-1** Review all 15 `docs/sequence/` files against code (5 parallel reviewers): 3 High in in-app-report (CONTRIBUTOR role, cap roles, autoLabel permission bit), index missing 2 rows
 - [x] **SQ-2** Fix drift in 14 sequence docs + index.md (caches FeedCache/IncognitoCache, missing error branches, CI deploy flows, Status Done on the two upgrade docs)
+
+## Feature: Collection-only videos (2026-10-30, ADR-0035, [plan](docs/plans/plan-collection-only-videos.md))
+
+- [ ] **CO-1** BE: `visibility` enum replaces `is_hide` (formatted SQL changeset + rollback, entity, every reader, legacy admin API kept) + local migration run on a prod-like dump
+- [ ] **CO-2** BE: `PATCH /admin/videos/{id}/visibility` takes `{visibility}` (legacy `{hidden}` still accepted)
+- [ ] **CO-3** BE: import `visibility` (4104 `INVALID_VISIBILITY`), copied onto `video_sources` by `saveInfo` / `upsertInfo` via `drive_file_id`
+- [ ] **CO-4** FE: admin three-state visibility control, collection-only badge, Add to collection row action
+- [ ] **CO-5** FE: Import form "Collection only" option + import table badge
+- [ ] **CO-6** FE: deep-link fallback inserts a non-feed video at slide 0
+- [ ] **CO-7** Land: prod backup, push 1 (CO-1..CO-3), push 2 (CO-4..CO-6), prod smoke, diagrams As-built
+- [ ] **CO-F1** Follow-up: remove legacy `{hidden}` body and `hidden` DTO field

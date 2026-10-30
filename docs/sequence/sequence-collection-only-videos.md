@@ -198,7 +198,8 @@ sequenceDiagram
         else HIDDEN, not published or unknown
             S-->>API: IllegalArgumentException
             API-->>PF: 400
-            PF-->>U: feed at index 0 with the not-found message
+            PF-->>U: feed at initialIndex or 0, no message (as today)
         end
     end
+    PF->>SH: onDeepLinkResolved() in every branch, AppShell clears deepLinkId
 ```

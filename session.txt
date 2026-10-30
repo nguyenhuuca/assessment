@@ -1,7 +1,7 @@
 task: Collection-only videos (visibility enum, ADR-0035)
 status: in_progress
-progress: 30
-done: CO-0 PRD + ADR-0035 accepted + spec + sequence
-next: /swarm-plan docs/specs/spec-collection-only-videos.md
-plan: -
-updated: 2026-10-30 21:38
+progress: 35
+done: CO-0 PRD + ADR-0035 + spec + sequence 12b432f6; plan approved
+next: CO-1 BE visibility enum replaces is_hide (/swarm-execute)
+plan: docs/plans/plan-collection-only-videos.md
+updated: 2026-10-30 21:44

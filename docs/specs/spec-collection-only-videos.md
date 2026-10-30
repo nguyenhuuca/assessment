@@ -144,7 +144,7 @@ When `PublicFeed` receives a `deepLinkId` that is not in the feed list, it must:
 - start there, applying `deepLinkStartAt` if set;
 - leave the rest of the feed unchanged.
 
-If the fetch fails (400, hidden or unknown video), it must show the feed from index 0 and the existing "video not found" message. This applies to `?v=` links, watch-history play and notification open, which all set `deepLinkId` (`AppShell.jsx` ~:125-137).
+If the fetch fails (400, hidden or unknown video), it must show the feed from `initialIndex ?? 0`, as today when an id is not found (there is no not-found message today, and none is added). In both outcomes it must call `onDeepLinkResolved()`, so `AppShell` clears `deepLinkId` and the lookup does not re-run on every render (today a missing id is never resolved). This applies to `?v=` links, watch-history play and notification open, which all set `deepLinkId` (`AppShell.jsx` ~:125-137).
 
 ### FR-12: Notifications
 
@@ -447,7 +447,7 @@ No concern: `video_sources` has hundreds of rows. The feed index keeps the hot q
 ### EC-6: Deep link to a HIDDEN or unknown video
 
 **Condition:** `?v=` for a `HIDDEN` or missing id.
-**Expected:** `GET /video-stream/{id}` returns 400. The feed opens at index 0 with the existing not-found message. Nothing is inserted.
+**Expected:** `GET /video-stream/{id}` returns 400. The feed opens at `initialIndex ?? 0` with no message (unchanged from today). Nothing is inserted, and `onDeepLinkResolved()` is called.
 
 ### EC-7: Same value set again
 
@@ -509,3 +509,4 @@ None blocking. Decided during `/spec` (2026-10-30):
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0 | 2026-10-30 | nguyenhuuca | Initial draft |
+| 1.1 | 2026-10-30 | nguyenhuuca | FR-11 / EC-6: no not-found message exists today; resolve the deep link on failure too (found while planning) |
