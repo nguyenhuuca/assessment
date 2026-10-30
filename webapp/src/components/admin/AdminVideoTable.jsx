@@ -6,6 +6,7 @@ import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { useTranslation } from 'react-i18next'
 import AddToCollectionModal from '../library/AddToCollectionModal.jsx'
+import RowActionsMenu from './RowActionsMenu.jsx'
 
 const STATUS_COLORS = {
   PUBLISHED: '#00c853',
@@ -271,32 +272,35 @@ export default function AdminVideoTable({ statusFilter }) {
                       {STATUSES.map(s => <option key={s} value={s}>{t(`status.${s}`)}</option>)}
                     </select>
                     <SaveIndicator state={saveState[`${v.id}:status`]} />
-                    <button
-                      className="admin-action-btn"
-                      onClick={() => setCollectionVideo({ id: v.id })}
-                      title={t('addToCollection')}
-                      aria-label={t('addToCollectionAria', { title: v.title || t('videoFallback') })}
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>playlist_add</span>
-                    </button>
-                    <button
-                      className="admin-action-btn danger"
-                      aria-busy={isBusyFor(deleteVideo, v.id)}
-                      onClick={async () => {
-                        const opts = { deleteLocalFile: false, deleteDriveFile: false }
-                        const ok = await confirm({
-                          title: t('deleteVideoTitle'),
-                          message: t('deleteVideoMessage', { title: v.title }),
-                          confirmLabel: t('delete'),
+                    <RowActionsMenu
+                      label={t('rowActionsAria', { title: v.title || t('videoFallback') })}
+                      items={[
+                        {
+                          key: 'collection',
+                          icon: 'playlist_add',
+                          label: t('addToCollection'),
+                          onSelect: () => setCollectionVideo({ id: v.id }),
+                        },
+                        {
+                          key: 'delete',
+                          icon: 'delete',
+                          label: t('delete'),
                           danger: true,
-                          children: <DeleteFileOptions onChange={(key, value) => { opts[key] = value }} />,
-                        })
-                        if (ok) deleteVideo.mutate({ id: v.id, ...opts })
-                      }}
-                      title={t('delete')}
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
-                    </button>
+                          busy: isBusyFor(deleteVideo, v.id),
+                          onSelect: async () => {
+                            const opts = { deleteLocalFile: false, deleteDriveFile: false }
+                            const ok = await confirm({
+                              title: t('deleteVideoTitle'),
+                              message: t('deleteVideoMessage', { title: v.title }),
+                              confirmLabel: t('delete'),
+                              danger: true,
+                              children: <DeleteFileOptions onChange={(key, value) => { opts[key] = value }} />,
+                            })
+                            if (ok) deleteVideo.mutate({ id: v.id, ...opts })
+                          },
+                        },
+                      ]}
+                    />
                   </div>
                 </td>
               </tr>

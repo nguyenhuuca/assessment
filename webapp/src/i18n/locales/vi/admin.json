@@ -348,5 +348,6 @@
         "invalid": "Cron không hợp lệ"
       }
     }
-  }
+  },
+  "rowActionsAria": "Thao tác cho {{title}}"
 }

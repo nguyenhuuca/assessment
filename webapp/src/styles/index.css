@@ -1702,7 +1702,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   align-items: center;
   gap: 10px;
   /* Keep the title readable; the table wrapper scrolls instead of squashing this column */
-  min-width: 240px;
+  min-width: 220px;
 }
 
 .admin-thumb {
@@ -1782,6 +1782,19 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   align-items: center;
   gap: 6px;
 }
+/* Row ⋮ menu (admin tables): the popover is position: fixed so the table's scroll box cannot clip it */
+.row-menu { position: relative; display: inline-flex; }
+.row-menu-popover {
+  position: fixed; z-index: 50; min-width: 200px; padding: 6px; border-radius: 10px;
+  background: var(--bg-elevated); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.row-menu-item {
+  width: 100%; display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 8px; border: 0;
+  background: transparent; color: var(--text); font-size: 13px; font-weight: 600; text-align: left; cursor: pointer;
+}
+.row-menu-item:hover, .row-menu-item:focus-visible { background: var(--bg-high); }
+.row-menu-item .material-symbols-outlined { font-size: 18px; }
+.row-menu-item.danger { color: var(--danger); }
 
 .admin-status-select {
   background: var(--bg-elevated);

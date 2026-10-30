@@ -357,5 +357,6 @@
         "invalid": "Invalid cron expression"
       }
     }
-  }
+  },
+  "rowActionsAria": "Actions for {{title}}"
 }

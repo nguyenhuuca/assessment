@@ -45,7 +45,8 @@ describe('AdminVideoTable delete dialog', () => {
     adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 7, title: 'Shown' })], totalPages: 1, totalElements: 1 } })
     adminApi.deleteVideo.mockResolvedValue({})
     renderTable()
-    fireEvent.click(await screen.findByTitle('Xoá'))
+    fireEvent.click(await screen.findByLabelText('Thao tác cho Shown'))
+    fireEvent.click(screen.getByRole('menuitem', { name: /Xoá/ }))
     return await screen.findByRole('dialog')
   }
   const confirmBtn = (dialog) => within(dialog).getAllByRole('button', { name: 'Xoá' }).pop()
@@ -147,7 +148,8 @@ describe('AdminVideoTable visibility column', () => {
   it('Add to collection opens the modal for that video only', async () => {
     adminApi.getVideos.mockResolvedValue(page(video({ id: 7, title: 'Shown' }), video({ id: 8, title: 'Other' })))
     renderTable()
-    fireEvent.click(await screen.findByLabelText('Thêm Other vào collection'))
+    fireEvent.click(await screen.findByLabelText('Thao tác cho Other'))
+    fireEvent.click(screen.getByRole('menuitem', { name: /Thêm vào collection/ }))
     expect(screen.getByTestId('atc')).toHaveTextContent('modal:8')
     fireEvent.click(screen.getByText('close-atc'))
     expect(screen.queryByTestId('atc')).toBeNull()
