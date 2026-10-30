@@ -3,8 +3,8 @@
 - **Request:** plan mode, `docs/plans/plan-collection-only-videos.md`, build CO-1..CO-6; push the backend first, then the frontend
 - **Mode:** local
 - **Plan:** [plan-collection-only-videos](../plans/plan-collection-only-videos.md)
-- **Started:** 2026-10-30 21:50 · **Landed:** 2026-10-30 (push 1 backend `02376098`, push 2 frontend `9f32b032`)
-- **Result:** ✅ pushed `02376098` (backend), then `9f32b032` (frontend)
+- **Started:** 2026-10-30 21:50 · **Landed:** 2026-10-30 (push 1 backend `02376098`, push 2 frontend `488e285f`)
+- **Result:** ✅ pushed `02376098` (backend), then `488e285f` (frontend)
 
 ## Pipeline
 

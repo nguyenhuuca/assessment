@@ -624,8 +624,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **CO-1** BE: `visibility` enum replaces `is_hide` (formatted SQL changeset + rollback, entity, every reader, legacy admin API kept) + local migration run on a prod-like dump 02376098
 - [x] **CO-2** BE: `PATCH /admin/videos/{id}/visibility` takes `{visibility}` (legacy `{hidden}` still accepted) 02376098
 - [x] **CO-3** BE: import `visibility` (4104 `INVALID_VISIBILITY`), copied onto `video_sources` by `saveInfo` / `upsertInfo` via `drive_file_id` 02376098
-- [x] **CO-4** FE: admin three-state visibility control, collection-only badge, Add to collection row action 9f32b032
-- [x] **CO-5** FE: Import form "Collection only" option + import table badge 9f32b032
-- [x] **CO-6** FE: deep-link fallback inserts a non-feed video at slide 0 9f32b032
+- [x] **CO-4** FE: admin three-state visibility control, collection-only badge, Add to collection row action 488e285f
+- [x] **CO-5** FE: Import form "Collection only" option + import table badge 488e285f
+- [x] **CO-6** FE: deep-link fallback inserts a non-feed video at slide 0 488e285f
 - [ ] **CO-7** Land: prod backup, push 1 (CO-1..CO-3), push 2 (CO-4..CO-6), prod smoke, diagrams As-built
 - [ ] **CO-F1** Follow-up: remove legacy `{hidden}` body and `hidden` DTO field

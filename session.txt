@@ -1,7 +1,7 @@
 task: Collection-only videos (visibility enum, ADR-0035)
 status: in_progress
 progress: 95
-done: CO-1..CO-3 backend 02376098 (live, smoke 22/22); CO-4..CO-6 frontend 9f32b032
+done: CO-1..CO-3 backend 02376098 (live, smoke 22/22); CO-4..CO-6 frontend 488e285f
 next: owner prod smoke CO-7 (collection-only out of feed, plays in collection and ?v=, import option); then CO-F1 cleanup
 plan: docs/plans/plan-collection-only-videos.md
 updated: 2026-10-30 22:35
