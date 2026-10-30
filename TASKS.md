@@ -628,4 +628,4 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **CO-5** FE: Import form "Collection only" option + import table badge 488e285f
 - [x] **CO-6** FE: deep-link fallback inserts a non-feed video at slide 0 488e285f
 - [ ] **CO-7** Land: prod backup, push 1 (CO-1..CO-3), push 2 (CO-4..CO-6), prod smoke, diagrams As-built
-- [ ] **CO-F1** Follow-up: remove legacy `{hidden}` body and `hidden` DTO field
+- [x] **CO-F1** Follow-up: remove legacy `{hidden}` body and `hidden` DTO field 352b428a

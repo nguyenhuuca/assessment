@@ -1,7 +1,7 @@
 task: Collection-only videos (visibility enum, ADR-0035)
 status: in_progress
-progress: 95
-done: CO-1..CO-3 backend 02376098 (live, smoke 22/22); CO-4..CO-6 frontend 488e285f
-next: owner prod smoke CO-7 (collection-only out of feed, plays in collection and ?v=, import option); then CO-F1 cleanup
+progress: 97
+done: CO-1..CO-3 backend 02376098; CO-4..CO-6 frontend 488e285f; admin UI fixes (badges, title col, ⋮ menu) b2415b8f; CO-F1 legacy hidden removed 352b428a
+next: push CO-F1 (owner approval); owner prod smoke CO-7; then diagrams As-built, spec FR-9 (⋮ menu, select tint), tracking ✅
 plan: docs/plans/plan-collection-only-videos.md
-updated: 2026-10-30 22:35
+updated: 2026-10-31 03:07
