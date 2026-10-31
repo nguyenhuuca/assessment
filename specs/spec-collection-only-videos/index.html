@@ -3053,10 +3053,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ec-1-legacy-frontend-after-backend-deploy" class="md-nav__link">
+  <a href="#ec-1-legacy-frontend-after-backend-deploy-superseded-by-co-f1-now-400" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EC-1: Legacy frontend after backend deploy
+        EC-1: Legacy frontend after backend deploy (superseded by CO-F1: now 400)
       
     </span>
   </a>
@@ -3064,10 +3064,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ec-2-both-fields-sent" class="md-nav__link">
+  <a href="#ec-2-both-fields-sent-superseded-by-co-f1-hidden-is-ignored-visibility-applies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EC-2: Both fields sent
+        EC-2: Both fields sent (superseded by CO-F1: hidden is ignored, visibility applies)
       
     </span>
   </a>
@@ -9902,10 +9902,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ec-1-legacy-frontend-after-backend-deploy" class="md-nav__link">
+  <a href="#ec-1-legacy-frontend-after-backend-deploy-superseded-by-co-f1-now-400" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EC-1: Legacy frontend after backend deploy
+        EC-1: Legacy frontend after backend deploy (superseded by CO-F1: now 400)
       
     </span>
   </a>
@@ -9913,10 +9913,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ec-2-both-fields-sent" class="md-nav__link">
+  <a href="#ec-2-both-fields-sent-superseded-by-co-f1-hidden-is-ignored-visibility-applies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EC-2: Both fields sent
+        EC-2: Both fields sent (superseded by CO-F1: hidden is ignored, visibility applies)
       
     </span>
   </a>
@@ -10175,11 +10175,11 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <h3 id="fr-5-admin-visibility-endpoint">FR-5: Admin visibility endpoint<a class="headerlink" href="#fr-5-admin-visibility-endpoint" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>PATCH /admin/videos/{id}/visibility</code> must accept <code>{"visibility": "FEED" | "COLLECTION_ONLY" | "HIDDEN"}</code>.</li>
-<li>For one release it must also accept the legacy <code>{"hidden": true|false}</code>, mapped to <code>HIDDEN|FEED</code>.</li>
+<li>~~For one release it must also accept the legacy <code>{"hidden": true|false}</code>, mapped to <code>HIDDEN|FEED</code>.~~ Removed by FR-13 (CO-F1): a body without <code>visibility</code> is 400 <code>visibility is required</code>.</li>
 <li>It must call <code>feedCache.invalidate()</code>.</li>
 </ul>
 <h3 id="fr-6-admin-list">FR-6: Admin list<a class="headerlink" href="#fr-6-admin-list" title="Permanent link">&para;</a></h3>
-<p><code>GET /admin/videos</code> items must include <code>visibility</code>, and for one release the derived <code>hidden</code> (<code>visibility == HIDDEN</code>).</p>
+<p><code>GET /admin/videos</code> items must include <code>visibility</code>. The derived <code>hidden</code> field was kept for one release and removed by FR-13 (CO-F1).</p>
 <h3 id="fr-7-import">FR-7: Import<a class="headerlink" href="#fr-7-import" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>POST /admin/video-imports</code> must accept an optional top-level <code>visibility</code> (Rule 5) and store it on each created job.</li>
@@ -10216,6 +10216,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <p><code>SUGGESTION_LIVE</code> and other notifications that carry a <code>videoId</code> must keep linking to a <code>COLLECTION_ONLY</code> video. FR-11 opens it, so no notification code changes.</p>
 <h3 id="fr-13-compatibility-cleanup-follow-up">FR-13: Compatibility cleanup (follow-up)<a class="headerlink" href="#fr-13-compatibility-cleanup-follow-up" title="Permanent link">&para;</a></h3>
 <p>After the new frontend is live, a follow-up removes the legacy <code>{hidden}</code> body and the <code>hidden</code> DTO field.</p>
+<p><strong>Done (CO-F1, v1.3):</strong> <code>{"hidden": …}</code> is now 400 <code>visibility is required</code>; <code>AdminVideoDto</code> and its contract JSON no longer carry <code>hidden</code>; the admin page treats a missing <code>visibility</code> as <code>FEED</code>.</p>
 <hr />
 <h2 id="api-changes">API Changes<a class="headerlink" href="#api-changes" title="Permanent link">&para;</a></h2>
 <p>All paths are under <code>/v1/funny-app</code>.</p>
@@ -10455,12 +10456,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <tbody>
 <tr>
 <td><code>visibility</code> (PATCH)</td>
-<td>One of <code>FEED</code>, <code>COLLECTION_ONLY</code>, <code>HIDDEN</code>; mutually exclusive with <code>hidden</code></td>
-<td>400</td>
-</tr>
-<tr>
-<td><code>hidden</code> (PATCH, legacy)</td>
-<td>Boolean; mutually exclusive with <code>visibility</code></td>
+<td>Required; one of <code>FEED</code>, <code>COLLECTION_ONLY</code>, <code>HIDDEN</code> (the legacy <code>hidden</code> body was removed in CO-F1)</td>
 <td>400</td>
 </tr>
 <tr>
@@ -10629,10 +10625,10 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <p>No concern: <code>video_sources</code> has hundreds of rows. The feed index keeps the hot query small.</p>
 <hr />
 <h2 id="edge-cases">Edge Cases<a class="headerlink" href="#edge-cases" title="Permanent link">&para;</a></h2>
-<h3 id="ec-1-legacy-frontend-after-backend-deploy">EC-1: Legacy frontend after backend deploy<a class="headerlink" href="#ec-1-legacy-frontend-after-backend-deploy" title="Permanent link">&para;</a></h3>
+<h3 id="ec-1-legacy-frontend-after-backend-deploy-superseded-by-co-f1-now-400">EC-1: Legacy frontend after backend deploy (superseded by CO-F1: now 400)<a class="headerlink" href="#ec-1-legacy-frontend-after-backend-deploy-superseded-by-co-f1-now-400" title="Permanent link">&para;</a></h3>
 <p><strong>Condition:</strong> the old Admin page sends <code>{"hidden": true}</code>.
 <strong>Expected:</strong> 200, visibility becomes <code>HIDDEN</code>. <code>{"hidden": false}</code> becomes <code>FEED</code>, even if the video was <code>COLLECTION_ONLY</code>.</p>
-<h3 id="ec-2-both-fields-sent">EC-2: Both fields sent<a class="headerlink" href="#ec-2-both-fields-sent" title="Permanent link">&para;</a></h3>
+<h3 id="ec-2-both-fields-sent-superseded-by-co-f1-hidden-is-ignored-visibility-applies">EC-2: Both fields sent (superseded by CO-F1: <code>hidden</code> is ignored, <code>visibility</code> applies)<a class="headerlink" href="#ec-2-both-fields-sent-superseded-by-co-f1-hidden-is-ignored-visibility-applies" title="Permanent link">&para;</a></h3>
 <p><strong>Condition:</strong> body <code>{"visibility": "FEED", "hidden": true}</code>.
 <strong>Expected:</strong> 400 <code>send either visibility or hidden, not both</code>; nothing changes.</p>
 <h3 id="ec-3-import-with-hidden">EC-3: Import with HIDDEN<a class="headerlink" href="#ec-3-import-with-hidden" title="Permanent link">&para;</a></h3>
@@ -10720,6 +10716,12 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <td>2026-10-30</td>
 <td>nguyenhuuca</td>
 <td>Plan review: enum in <code>enums/</code>, latest job wins per Drive file, rollback without Liquibase CLI, inserted deep-link video kept out of feed search</td>
+</tr>
+<tr>
+<td>1.3</td>
+<td>2026-10-31</td>
+<td>nguyenhuuca</td>
+<td>FR-13 done (CO-F1): legacy <code>{hidden}</code> body and <code>hidden</code> DTO field removed; EC-1 / EC-2 superseded</td>
 </tr>
 </tbody>
 </table>
