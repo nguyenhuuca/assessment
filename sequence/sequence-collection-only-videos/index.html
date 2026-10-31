@@ -8573,7 +8573,7 @@
 <li><strong>PRD:</strong> <a href="../../prd/PRD-collection-only-videos/">PRD-collection-only-videos</a></li>
 <li><strong>ADR:</strong> <a href="../../adr/0035-collection-only-videos/">0035-collection-only-videos</a></li>
 <li><strong>Spec:</strong> <a href="../../specs/spec-collection-only-videos/">spec-collection-only-videos</a></li>
-<li><strong>Status:</strong> Draft (to be marked As-built after implementation)</li>
+<li><strong>Status:</strong> As-built (2026-10-31: CO-1..CO-6 live, CO-F1 removed the legacy <code>{hidden}</code> body, prod smoke CO-7 passed)</li>
 </ul>
 <p>All paths are under <code>/v1/funny-app</code>. <code>visibility</code> is one of <code>FEED</code>, <code>COLLECTION_ONLY</code>, <code>HIDDEN</code> (it replaces <code>is_hide</code>). Feed rule: <code>visibility = 'FEED'</code>. Playable rule: <code>visibility &lt;&gt; 'HIDDEN'</code>. Both also require <code>status = 'PUBLISHED'</code>.</p>
 <h2 id="1-admin-changes-a-videos-visibility">1. Admin changes a video's visibility<a class="headerlink" href="#1-admin-changes-a-videos-visibility" title="Permanent link">&para;</a></h2>
@@ -8590,10 +8590,8 @@
     A-&gt;&gt;FE: choose Collection only on a row
     FE-&gt;&gt;API: PATCH /admin/videos/{id}/visibility {visibility COLLECTION_ONLY} (JWT)
     API-&gt;&gt;API: PreAuthorize hasRole ADMIN, AuditLog updateVideoVisibility
-    alt body null, no field, both fields, or unknown value
-        API--&gt;&gt;FE: 400
-    else legacy body {hidden true or false}
-        API-&gt;&gt;API: map to HIDDEN or FEED
+    alt body null, no visibility field (incl. legacy hidden body), or unknown value
+        API--&gt;&gt;FE: 400 visibility is required or invalid visibility
     end
     API-&gt;&gt;S: updateVisibility(id, visibility)
     S-&gt;&gt;DB: findById(id)
@@ -8606,7 +8604,7 @@
         S--&gt;&gt;API: ok
         API--&gt;&gt;FE: 200 Visibility updated
         FE-&gt;&gt;FE: invalidate ['admin','videos']
-        FE--&gt;&gt;A: row shows the Collection only badge
+        FE--&gt;&gt;A: row's visibility select shows Collection only (cyan tint)
     end</code></pre>
 <h2 id="2-feed-excludes-collection_only-videos">2. Feed excludes COLLECTION_ONLY videos<a class="headerlink" href="#2-feed-excludes-collection_only-videos" title="Permanent link">&para;</a></h2>
 <p>Feed search, the Explore hero and the Library "Add videos" picker filter this same list on the client, so they exclude the video too.</p>
@@ -8662,7 +8660,7 @@
     participant S as VideoCollectionServiceImpl
     participant DB as PostgreSQL
 
-    A-&gt;&gt;FE: row action Add to collection
+    A-&gt;&gt;FE: row ⋮ menu, Add to collection
     FE-&gt;&gt;FE: open AddToCollectionModal(videoId)
     A-&gt;&gt;FE: pick a collection
     FE-&gt;&gt;API: PUT /collections/{id}/videos/{videoId} (JWT)

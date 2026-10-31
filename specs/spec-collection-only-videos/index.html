@@ -10083,7 +10083,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 -->
 
 <h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
-<p><strong>Status:</strong> Approved
+<p><strong>Status:</strong> Implemented (2026-10-31)
 <strong>Author:</strong> nguyenhuuca
 <strong>Date:</strong> 2026-10-30
 <strong>Related PRD:</strong> <a href="../../prd/PRD-collection-only-videos/">PRD-collection-only-videos</a>
@@ -10198,6 +10198,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <li>show a badge for <code>COLLECTION_ONLY</code> and keep the row style for <code>HIDDEN</code>;</li>
 <li>offer an "Add to collection" row action that opens <code>AddToCollectionModal</code> for that video.</li>
 </ul>
+<p><strong>As-built (v1.4):</strong> the <code>COLLECTION_ONLY</code> marker is the visibility select itself (cyan <code>is-collection-only</code> tint), not a separate badge, which squeezed the title column. "Add to collection" and Delete live in a row ⋮ menu (<code>RowActionsMenu</code>, fixed-position popover so the table's scroll box cannot clip it). The import table keeps its badge (FR-10).</p>
 <h3 id="fr-10-import-ui">FR-10: Import UI<a class="headerlink" href="#fr-10-import-ui" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>ImportForm</code> must have a "Collection only" checkbox, off by default, that sends <code>visibility: "COLLECTION_ONLY"</code> when checked.</li>
@@ -10513,7 +10514,12 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <tr>
 <td><code>AdminVideoTable</code></td>
 <td><code>webapp/src/components/admin/AdminVideoTable.jsx</code></td>
-<td>Three-state visibility control replaces the hidden checkbox; <code>COLLECTION_ONLY</code> badge; "Add to collection" row action</td>
+<td>Three-state visibility control replaces the hidden checkbox; <code>COLLECTION_ONLY</code> shown as a tinted select; "Add to collection" and Delete in a ⋮ row menu</td>
+</tr>
+<tr>
+<td><code>RowActionsMenu</code></td>
+<td><code>webapp/src/components/admin/RowActionsMenu.jsx</code></td>
+<td>New: ⋮ menu for a table row's secondary actions (as-built)</td>
 </tr>
 <tr>
 <td><code>AddToCollectionModal</code></td>
@@ -10670,7 +10676,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <li>[ ] <code>GET /admin/videos</code> returns <code>visibility</code> and the derived <code>hidden</code> (FR-6)</li>
 <li>[ ] Import with <code>COLLECTION_ONLY</code> stores it on every job; <code>HIDDEN</code> returns 400/4104; the default is <code>FEED</code>; retry keeps it (Rules 5 and 8, EC-3)</li>
 <li>[ ] <code>saveInfo</code> and <code>upsertInfo</code> create the row with the job's visibility, or <code>FEED</code> without a job; an existing row keeps its visibility (Rules 6 and 7, EC-4)</li>
-<li>[ ] Admin table: three-state control, <code>COLLECTION_ONLY</code> badge, "Add to collection" adds the video to the chosen collection (FR-9)</li>
+<li>[ ] Admin table: three-state control, <code>COLLECTION_ONLY</code> marked on the select, "Add to collection" adds the video to the chosen collection (FR-9)</li>
 <li>[ ] Import form checkbox sends <code>COLLECTION_ONLY</code>; the import table shows the badge (FR-10)</li>
 <li>[ ] A deep link, history play or notification for a <code>COLLECTION_ONLY</code> video plays it as slide 0; a <code>HIDDEN</code> or unknown id falls back to the feed (FR-11, EC-5, EC-6)</li>
 <li>[ ] Feed search, the Explore hero and the Library "Add videos" picker do not show <code>COLLECTION_ONLY</code> videos (backend feed-query test + frontend test that these surfaces read only the feed list)</li>
@@ -10722,6 +10728,12 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 <td>2026-10-31</td>
 <td>nguyenhuuca</td>
 <td>FR-13 done (CO-F1): legacy <code>{hidden}</code> body and <code>hidden</code> DTO field removed; EC-1 / EC-2 superseded</td>
+</tr>
+<tr>
+<td>1.4</td>
+<td>2026-10-31</td>
+<td>nguyenhuuca</td>
+<td>As-built FR-9: tinted select instead of a badge, row actions in a ⋮ menu; prod smoke (CO-7) passed, status Implemented</td>
 </tr>
 </tbody>
 </table>
