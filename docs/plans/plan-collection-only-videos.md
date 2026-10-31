@@ -8,7 +8,7 @@ Owner: Builder (/builder)
 
 ## Overview
 
-**Status:** Approved (2026-10-30)
+**Status:** Done (2026-10-31)
 **Author:** nguyenhuuca
 **Date:** 2026-10-30
 **Tracking:** `docs/tracking.md` row "Collection-Only Videos"

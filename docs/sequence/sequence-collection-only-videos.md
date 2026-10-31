@@ -3,7 +3,7 @@
 - **PRD:** [PRD-collection-only-videos](../prd/PRD-collection-only-videos.md)
 - **ADR:** [0035-collection-only-videos](../adr/0035-collection-only-videos.md)
 - **Spec:** [spec-collection-only-videos](../specs/spec-collection-only-videos.md)
-- **Status:** Draft (to be marked As-built after implementation)
+- **Status:** As-built (2026-10-31: CO-1..CO-6 live, CO-F1 removed the legacy `{hidden}` body, prod smoke CO-7 passed)
 
 All paths are under `/v1/funny-app`. `visibility` is one of `FEED`, `COLLECTION_ONLY`, `HIDDEN` (it replaces `is_hide`). Feed rule: `visibility = 'FEED'`. Playable rule: `visibility <> 'HIDDEN'`. Both also require `status = 'PUBLISHED'`.
 
@@ -24,10 +24,8 @@ sequenceDiagram
     A->>FE: choose Collection only on a row
     FE->>API: PATCH /admin/videos/{id}/visibility {visibility COLLECTION_ONLY} (JWT)
     API->>API: PreAuthorize hasRole ADMIN, AuditLog updateVideoVisibility
-    alt body null, no field, both fields, or unknown value
-        API-->>FE: 400
-    else legacy body {hidden true or false}
-        API->>API: map to HIDDEN or FEED
+    alt body null, no visibility field (incl. legacy hidden body), or unknown value
+        API-->>FE: 400 visibility is required or invalid visibility
     end
     API->>S: updateVisibility(id, visibility)
     S->>DB: findById(id)
@@ -40,7 +38,7 @@ sequenceDiagram
         S-->>API: ok
         API-->>FE: 200 Visibility updated
         FE->>FE: invalidate ['admin','videos']
-        FE-->>A: row shows the Collection only badge
+        FE-->>A: row's visibility select shows Collection only (cyan tint)
     end
 ```
 
@@ -110,7 +108,7 @@ sequenceDiagram
     participant S as VideoCollectionServiceImpl
     participant DB as PostgreSQL
 
-    A->>FE: row action Add to collection
+    A->>FE: row ⋮ menu, Add to collection
     FE->>FE: open AddToCollectionModal(videoId)
     A->>FE: pick a collection
     FE->>API: PUT /collections/{id}/videos/{videoId} (JWT)

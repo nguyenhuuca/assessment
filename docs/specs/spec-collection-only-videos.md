@@ -9,7 +9,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 
 ## Metadata
 
-**Status:** Approved
+**Status:** Implemented (2026-10-31)
 **Author:** nguyenhuuca
 **Date:** 2026-10-30
 **Related PRD:** [PRD-collection-only-videos](../prd/PRD-collection-only-videos.md)
@@ -130,6 +130,8 @@ The Admin videos table must:
 - replace the hidden checkbox with a three-state control (Feed / Collection only / Hidden);
 - show a badge for `COLLECTION_ONLY` and keep the row style for `HIDDEN`;
 - offer an "Add to collection" row action that opens `AddToCollectionModal` for that video.
+
+**As-built (v1.4):** the `COLLECTION_ONLY` marker is the visibility select itself (cyan `is-collection-only` tint), not a separate badge, which squeezed the title column. "Add to collection" and Delete live in a row ⋮ menu (`RowActionsMenu`, fixed-position popover so the table's scroll box cannot clip it). The import table keeps its badge (FR-10).
 
 ### FR-10: Import UI
 
@@ -359,7 +361,8 @@ None.
 
 | Component | File | Change |
 |-----------|------|--------|
-| `AdminVideoTable` | `webapp/src/components/admin/AdminVideoTable.jsx` | Three-state visibility control replaces the hidden checkbox; `COLLECTION_ONLY` badge; "Add to collection" row action |
+| `AdminVideoTable` | `webapp/src/components/admin/AdminVideoTable.jsx` | Three-state visibility control replaces the hidden checkbox; `COLLECTION_ONLY` shown as a tinted select; "Add to collection" and Delete in a ⋮ row menu |
+| `RowActionsMenu` | `webapp/src/components/admin/RowActionsMenu.jsx` | New: ⋮ menu for a table row's secondary actions (as-built) |
 | `AddToCollectionModal` | `webapp/src/components/library/AddToCollectionModal.jsx` | Reused from the admin table; no behaviour change expected |
 | `ImportForm` | `webapp/src/components/admin/ImportForm.jsx` | "Collection only" checkbox |
 | `ImportTable` | `webapp/src/components/admin/ImportTable.jsx` | `COLLECTION_ONLY` badge |
@@ -485,7 +488,7 @@ No concern: `video_sources` has hundreds of rows. The feed index keeps the hot q
 - [ ] `GET /admin/videos` returns `visibility` and the derived `hidden` (FR-6)
 - [ ] Import with `COLLECTION_ONLY` stores it on every job; `HIDDEN` returns 400/4104; the default is `FEED`; retry keeps it (Rules 5 and 8, EC-3)
 - [ ] `saveInfo` and `upsertInfo` create the row with the job's visibility, or `FEED` without a job; an existing row keeps its visibility (Rules 6 and 7, EC-4)
-- [ ] Admin table: three-state control, `COLLECTION_ONLY` badge, "Add to collection" adds the video to the chosen collection (FR-9)
+- [ ] Admin table: three-state control, `COLLECTION_ONLY` marked on the select, "Add to collection" adds the video to the chosen collection (FR-9)
 - [ ] Import form checkbox sends `COLLECTION_ONLY`; the import table shows the badge (FR-10)
 - [ ] A deep link, history play or notification for a `COLLECTION_ONLY` video plays it as slide 0; a `HIDDEN` or unknown id falls back to the feed (FR-11, EC-5, EC-6)
 - [ ] Feed search, the Explore hero and the Library "Add videos" picker do not show `COLLECTION_ONLY` videos (backend feed-query test + frontend test that these surfaces read only the feed list)
@@ -513,3 +516,4 @@ None blocking. Decided during `/spec` (2026-10-30):
 | 1.1 | 2026-10-30 | nguyenhuuca | FR-11 / EC-6: no not-found message exists today; resolve the deep link on failure too (found while planning) |
 | 1.2 | 2026-10-30 | nguyenhuuca | Plan review: enum in `enums/`, latest job wins per Drive file, rollback without Liquibase CLI, inserted deep-link video kept out of feed search |
 | 1.3 | 2026-10-31 | nguyenhuuca | FR-13 done (CO-F1): legacy `{hidden}` body and `hidden` DTO field removed; EC-1 / EC-2 superseded |
+| 1.4 | 2026-10-31 | nguyenhuuca | As-built FR-9: tinted select instead of a badge, row actions in a ⋮ menu; prod smoke (CO-7) passed, status Implemented |
