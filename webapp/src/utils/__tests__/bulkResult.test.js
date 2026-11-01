@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import i18n from '../../i18n/index.js'
-import { formatBulkResult } from '../bulkResult.js'
+import { formatBulkResult, buildBulkNotice } from '../bulkResult.js'
 
 const en = i18n.getFixedT('en', 'admin')
 const vi_ = i18n.getFixedT('vi', 'admin')
@@ -23,5 +23,25 @@ describe('formatBulkResult', () => {
 
   it('renders Vietnamese text', () => {
     expect(formatBulkResult({ updated: 3, notFound: [1] }, vi_)).toBe('3 đã cập nhật · 1 không tìm thấy')
+  })
+})
+
+describe('buildBulkNotice', () => {
+  it('groups skipped codes with counts and translated labels', () => {
+    const r = {
+      updated: 1,
+      skipped: [{ id: 1, code: 'error.account.outranked' }, { id: 2, code: 'error.account.outranked' }, { id: 3, code: 'error.nope' }],
+    }
+    const n = buildBulkNotice(r, en)
+    expect(n.summary).toBe('1 updated · 3 skipped')
+    expect(n.reasons).toEqual([
+      { code: 'error.account.outranked', label: en('bulk.reason.error.account.outranked'), count: 2 },
+      { code: 'error.nope', label: en('bulk.reason.unknown'), count: 1 },
+    ])
+  })
+
+  it('has no reasons when nothing was skipped or the result is missing', () => {
+    expect(buildBulkNotice({ updated: 2 }, en).reasons).toEqual([])
+    expect(buildBulkNotice(undefined, en)).toEqual({ summary: '', reasons: [] })
   })
 })

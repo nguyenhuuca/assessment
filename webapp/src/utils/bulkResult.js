@@ -11,3 +11,18 @@ export function formatBulkResult(result, t) {
     .map(([key, count]) => t(`bulk.${key}`, { count }))
     .join(' · ')
 }
+
+/** Summary line plus one entry per skip reason code: { summary, reasons: [{ code, label, count }] }. */
+export function buildBulkNotice(result, t) {
+  const r = result ?? {}
+  const counts = {}
+  ;(r.skipped ?? []).forEach(x => { counts[x.code] = (counts[x.code] ?? 0) + 1 })
+  return {
+    summary: formatBulkResult(r, t),
+    reasons: Object.entries(counts).map(([code, count]) => ({
+      code,
+      label: t(`bulk.reason.${code}`, { defaultValue: t('bulk.reason.unknown') }),
+      count,
+    })),
+  }
+}

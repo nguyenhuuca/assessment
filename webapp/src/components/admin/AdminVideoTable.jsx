@@ -10,7 +10,8 @@ import RowActionsMenu from './RowActionsMenu.jsx'
 import BulkAddToCollectionModal from './BulkAddToCollectionModal.jsx'
 import BulkActionBar from './BulkActionBar.jsx'
 import { useBulkSelection } from '../../hooks/useBulkSelection.js'
-import { formatBulkResult } from '../../utils/bulkResult.js'
+import { buildBulkNotice } from '../../utils/bulkResult.js'
+import BulkResultNotice from './BulkResultNotice.jsx'
 
 const BULK_MAX = 100
 
@@ -182,12 +183,7 @@ export default function AdminVideoTable({ statusFilter }) {
 
   function showResult(res) {
     const r = res?.data ?? res ?? {}
-    const counts = {}
-    ;(r.skipped ?? []).forEach(x => { counts[x.code] = (counts[x.code] ?? 0) + 1 })
-    setNotice({
-      summary: formatBulkResult(r, t),
-      reasons: Object.entries(counts).map(([code, count]) => ({ code, count })),
-    })
+    setNotice(buildBulkNotice(r, t))
     sel.clear()
   }
 
@@ -226,18 +222,7 @@ export default function AdminVideoTable({ statusFilter }) {
         />
       )}
       {bulkError && <div className="app-alert error" role="alert" style={{ marginBottom: 12 }}>{bulkError}</div>}
-      {notice && (
-        <div className="app-alert success" role="status" style={{ marginBottom: 12 }}>
-          {notice.summary}
-          {notice.reasons.length > 0 && (
-            <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
-              {notice.reasons.map(r => (
-                <li key={r.code}>{t('bulkSkippedLabel')}: {t(`bulk.reason.${r.code}`, { defaultValue: t('bulk.reason.unknown') })} ({r.count})</li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+      {notice && <BulkResultNotice notice={notice} style={{ marginBottom: 12 }} />}
       <BulkActionBar count={sel.count} onClear={sel.clear}>
         <select
           className="admin-status-select"

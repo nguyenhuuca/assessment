@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useAdminAccounts, useUpdateAccountRole, useUpdateAccountPermissions, useDeleteAccount, useBulkAccounts } from '../../hooks/useAdmin.js'
 import BulkActionBar from './BulkActionBar.jsx'
 import { useBulkSelection } from '../../hooks/useBulkSelection.js'
-import { formatBulkResult } from '../../utils/bulkResult.js'
+import { buildBulkNotice } from '../../utils/bulkResult.js'
+import BulkResultNotice from './BulkResultNotice.jsx'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useAuth } from '../../hooks/useAuth.js'
@@ -73,9 +74,7 @@ export default function AdminAccountTable() {
     bulk.mutate({ ids: sel.selectedIds, ...body }, {
       onSuccess: res => {
         const r = res?.data ?? res ?? {}
-        const counts = {}
-        ;(r.skipped ?? []).forEach(x => { counts[x.code] = (counts[x.code] ?? 0) + 1 })
-        setNotice({ summary: formatBulkResult(r, t), reasons: Object.entries(counts).map(([code, count]) => ({ code, count })) })
+        setNotice(buildBulkNotice(r, t))
         sel.clear()
       },
       onError: e => setBulkError(e?.message || t('actionFailed')),
@@ -99,18 +98,7 @@ export default function AdminAccountTable() {
     <div className="admin-table-wrap">
       {confirmDialog}
       {bulkError && <div className="app-alert error" role="alert" style={{ margin: 12 }}>{bulkError}</div>}
-      {notice && (
-        <div className="app-alert success" role="status" style={{ margin: 12 }}>
-          {notice.summary}
-          {notice.reasons.length > 0 && (
-            <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
-              {notice.reasons.map(r => (
-                <li key={r.code}>{t('bulkSkippedLabel')}: {t(`bulk.reason.${r.code}`, { defaultValue: t('bulk.reason.unknown') })} ({r.count})</li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+      {notice && <BulkResultNotice notice={notice} style={{ margin: 12 }} />}
       <BulkActionBar count={sel.count} onClear={sel.clear}>
         <select className="admin-status-select" aria-label={t('bulkAccountsRoleAria')} value="" disabled={bulk.isPending} onChange={e => bulkRole(e.target.value)}>
           <option value="">{t('bulkAccountsRolePlaceholder')}</option>
