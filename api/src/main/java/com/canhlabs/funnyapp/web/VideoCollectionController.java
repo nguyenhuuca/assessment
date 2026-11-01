@@ -2,6 +2,8 @@ package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.RateLimited;
+import com.canhlabs.funnyapp.dto.admin.BulkResultDto;
+import com.canhlabs.funnyapp.dto.collection.CollectionBulkRequest;
 import com.canhlabs.funnyapp.dto.collection.CollectionDto;
 import com.canhlabs.funnyapp.dto.collection.CollectionRequest;
 import com.canhlabs.funnyapp.dto.collection.MoveVideoRequest;
@@ -9,6 +11,7 @@ import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ResultStatus;
+import com.canhlabs.funnyapp.service.CollectionBulkService;
 import com.canhlabs.funnyapp.service.VideoCollectionService;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,8 +38,10 @@ import java.util.UUID;
 public class VideoCollectionController {
 
     private final VideoCollectionService collectionService;
+    private final CollectionBulkService collectionBulkService;
 
-    public VideoCollectionController(VideoCollectionService collectionService) {
+    public VideoCollectionController(VideoCollectionService collectionService, CollectionBulkService collectionBulkService) {
+        this.collectionBulkService = collectionBulkService;
         this.collectionService = collectionService;
     }
 
@@ -108,6 +113,15 @@ public class VideoCollectionController {
     public ResponseEntity<Void> addVideo(@PathVariable UUID id, @PathVariable Long videoId) {
         collectionService.addVideo(id, videoId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Add many videos to a collection", description = "1-100 ids, deduped; per-video outcome in the result. A collection the caller cannot manage fails the whole request (404).")
+    @PostMapping("/{id}/videos/bulk")
+    @RateLimited(permit = 10)
+    @AuditLog("bulkAddVideosToCollection")
+    public ResponseEntity<ResultObjectInfo<BulkResultDto>> addVideosBulk(@PathVariable UUID id,
+                                                                         @Valid @RequestBody CollectionBulkRequest request) {
+        return object(collectionBulkService.addVideos(id, request.getVideoIds()), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/videos/{videoId}")

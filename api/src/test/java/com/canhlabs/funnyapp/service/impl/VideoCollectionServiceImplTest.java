@@ -304,6 +304,17 @@ class VideoCollectionServiceImplTest {
         assertStatus(() -> service.getVideoIds(UUID.randomUUID()), HttpStatus.UNAUTHORIZED);
     }
 
+    @Test
+    void requireManageable_managerOnly_withoutLocking() {
+        login(USER);
+        VideoCollection mine = stored(USER, CollectionVisibility.PRIVATE, false);
+        VideoCollection other = stored(OTHER, CollectionVisibility.PRIVATE, false);
+
+        service.requireManageable(mine.getId());
+        assertStatus(() -> service.requireManageable(other.getId()), HttpStatus.NOT_FOUND);
+        verify(collectionRepository, never()).findByIdForUpdate(any());
+    }
+
     // ---- create ----
 
     @Test
@@ -534,8 +545,8 @@ class VideoCollectionServiceImplTest {
         when(videoSourceRepository.existsByIdAndVisibilityNotAndStatus(5L, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)).thenReturn(true);
         when(itemRepository.addItem(mine.getId(), 5L)).thenReturn(1, 0);
 
-        service.addVideo(mine.getId(), 5L);
-        service.addVideo(mine.getId(), 5L);
+        assertThat(service.addVideo(mine.getId(), 5L)).isTrue();
+        assertThat(service.addVideo(mine.getId(), 5L)).isFalse();
 
         verify(collectionRepository).save(mine); // once: the second add was a no-op
         assertThat(mine.getUpdatedAt()).isNotNull();

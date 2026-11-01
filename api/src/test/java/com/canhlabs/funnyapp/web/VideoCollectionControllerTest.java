@@ -42,6 +42,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -86,6 +87,9 @@ class VideoCollectionControllerTest {
 
     @MockitoBean
     VideoCollectionService collectionService;
+
+    @MockitoBean
+    com.canhlabs.funnyapp.service.CollectionBulkService collectionBulkService;
 
     @MockitoBean
     JwtProvider jwtProvider;
@@ -235,6 +239,54 @@ class VideoCollectionControllerTest {
                 .andExpect(status().isNoContent());
         verify(collectionService).addVideo(ID, 9L);
         verify(collectionService).removeVideo(ID, 9L);
+    }
+
+    private org.springframework.test.web.servlet.ResultActions postBulk(String body, boolean authed) throws Exception {
+        String url = BASE + "/" + ID + "/videos/bulk";
+        var req = post(url).servletPath(url).contentType(MediaType.APPLICATION_JSON).content(body);
+        return mockMvc.perform(authed ? req.header("Authorization", TOKEN) : req);
+    }
+
+    @Test
+    void bulkAdd_owner_returns200WithResult() throws Exception {
+        when(collectionBulkService.addVideos(ID, List.of(1L, 2L))).thenReturn(
+                com.canhlabs.funnyapp.dto.admin.BulkResultDto.builder().requested(2).updated(1).unchanged(1).build());
+
+        postBulk("{\"videoIds\":[1,2]}", true)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.requested").value(2))
+                .andExpect(jsonPath("$.data.updated").value(1))
+                .andExpect(jsonPath("$.data.unchanged").value(1));
+    }
+
+    @Test
+    void bulkAdd_otherUsersPrivateCollection_returns404() throws Exception {
+        when(collectionBulkService.addVideos(any(), any())).thenThrow(error(HttpStatus.NOT_FOUND));
+
+        postBulk("{\"videoIds\":[1]}", true).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void bulkAdd_withoutToken_returns401() throws Exception {
+        postBulk("{\"videoIds\":[1]}", false).andExpect(status().isUnauthorized());
+        verifyNoInteractions(collectionBulkService);
+    }
+
+    @Test
+    void bulkAdd_emptyOrNullIds_returns400() throws Exception {
+        postBulk("{\"videoIds\":[]}", true).andExpect(status().isBadRequest());
+        postBulk("{\"videoIds\":[null]}", true).andExpect(status().isBadRequest());
+        postBulk("{}", true).andExpect(status().isBadRequest());
+        verifyNoInteractions(collectionBulkService);
+    }
+
+    @Test
+    void bulkAdd_moreThan100Ids_returns400() throws Exception {
+        String ids = java.util.stream.IntStream.rangeClosed(1, 101)
+                .mapToObj(String::valueOf)
+                .collect(java.util.stream.Collectors.joining(","));
+        postBulk("{\"videoIds\":[" + ids + "]}", true).andExpect(status().isBadRequest());
+        verifyNoInteractions(collectionBulkService);
     }
 
     @Test

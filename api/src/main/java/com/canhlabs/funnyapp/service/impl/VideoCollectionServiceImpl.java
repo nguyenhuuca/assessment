@@ -204,7 +204,7 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
 
     @Override
     @Transactional
-    public void addVideo(UUID id, Long videoId) {
+    public boolean addVideo(UUID id, Long videoId) {
         UserDetailDto user = requireUser();
         VideoCollection collection = requireManageable(id, user.getId(), isAdmin(user.getId()));
         if (videoId == null || !videoSourceRepository.existsByIdAndVisibilityNotAndStatus(videoId, VideoVisibility.HIDDEN, VideoStatus.PUBLISHED)) {
@@ -216,7 +216,16 @@ public class VideoCollectionServiceImpl implements VideoCollectionService {
         if (itemRepository.addItem(collection.getId(), videoId) > 0) {
             touch(collection);
             evictPublicIf(collection);
+            return true;
         }
+        return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void requireManageable(UUID id) {
+        UserDetailDto user = requireUser();
+        requireManageable(id, user.getId(), isAdmin(user.getId()), false);
     }
 
     @Override

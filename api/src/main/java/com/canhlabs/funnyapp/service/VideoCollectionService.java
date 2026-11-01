@@ -28,7 +28,11 @@ public interface VideoCollectionService {
     /** Every video id in a collection the caller manages (404 otherwise). */
     List<Long> getVideoIds(UUID id);
 
-    void addVideo(UUID id, Long videoId);
+    /** Adds the video; true when newly added, false when it was already in the collection. */
+    boolean addVideo(UUID id, Long videoId);
+
+    /** Fails with the same 404 as every collection write unless the caller manages the collection; changes nothing. */
+    void requireManageable(UUID id);
 
     void removeVideo(UUID id, Long videoId);
 
