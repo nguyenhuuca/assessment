@@ -229,3 +229,14 @@ export function useCronPreview(cron, zone, enabled) {
 
 export const useUpdateJob = () => useJobMutation(({ name, body }) => adminApi.updateJob(name, body))
 export const useRunJob    = () => useJobMutation((name) => adminApi.runJob(name))
+
+export function useBulkVideos() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (body) => adminApi.bulkVideos(body),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'videos'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'stats'] })
+    },
+  })
+}

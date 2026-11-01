@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useUpdateVideoVisibility, useDeleteVideo, useToggleVideoHls } from '../../hooks/useAdmin.js'
+import React, { useEffect, useRef, useState } from 'react'
+import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useUpdateVideoVisibility, useDeleteVideo, useToggleVideoHls, useBulkVideos } from '../../hooks/useAdmin.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { isSuperAdmin } from '../../utils/roles.js'
 import { isBusyFor } from '../../utils/mutationBusy.js'
@@ -7,6 +7,11 @@ import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { useTranslation } from 'react-i18next'
 import AddToCollectionModal from '../library/AddToCollectionModal.jsx'
 import RowActionsMenu from './RowActionsMenu.jsx'
+import BulkActionBar from './BulkActionBar.jsx'
+import { useBulkSelection } from '../../hooks/useBulkSelection.js'
+import { formatBulkResult } from '../../utils/bulkResult.js'
+
+const BULK_MAX = 100
 
 const STATUS_COLORS = {
   PUBLISHED: '#00c853',
@@ -21,7 +26,7 @@ const visibilityOf = v => v.visibility ?? 'FEED'
 
 // Checkboxes inside the delete dialog. The confirm promise only resolves to a boolean,
 // so each change is reported to the caller, which keeps it in its own `opts` object.
-function DeleteFileOptions({ onChange }) {
+function DeleteFileOptions({ onChange, withDrive = true }) {
   const { t } = useTranslation('admin')
   const [local, setLocal] = useState(false)
   const [drive, setDrive] = useState(false)
@@ -35,15 +40,19 @@ function DeleteFileOptions({ onChange }) {
         />
         {t('deleteLocalFile')}
       </label>
-      <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-        <input
-          type="checkbox"
-          checked={drive}
-          onChange={e => { onChange('deleteDriveFile', e.target.checked); setDrive(e.target.checked) }}
-        />
-        {t('deleteDriveFile')}
-      </label>
-      <span className="admin-cell-muted">{t('deleteDriveFileHint')}</span>
+      {withDrive && (
+        <>
+          <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <input
+              type="checkbox"
+              checked={drive}
+              onChange={e => { onChange('deleteDriveFile', e.target.checked); setDrive(e.target.checked) }}
+            />
+            {t('deleteDriveFile')}
+          </label>
+          <span className="admin-cell-muted">{t('deleteDriveFileHint')}</span>
+        </>
+      )}
     </div>
   )
 }
@@ -134,6 +143,10 @@ export default function AdminVideoTable({ statusFilter }) {
   const toggleHls      = useToggleVideoHls()
   const { user } = useAuth()
   const canToggleHls = isSuperAdmin(user?.role)
+  const bulk = useBulkVideos()
+  const [bulkError, setBulkError] = useState('')
+  const [notice, setNotice] = useState(null) // { summary, reasons: [{ code, count }] }
+  const headerBox = useRef(null)
 
   const pageData      = data?.data ?? data ?? {}
   const videos        = pageData?.content ?? []
@@ -157,17 +170,96 @@ export default function AdminVideoTable({ statusFilter }) {
 
   const [confirm, confirmDialog] = useConfirm()
 
+  // Selection is per page: changing page or status filter clears it.
+  const sel = useBulkSelection({ pageIds: videos.map(v => v.id), resetKey: `${page}|${statusFilter ?? ''}`, max: BULK_MAX })
+  const { allSelected, someSelected, toggleAll } = sel
+
+  useEffect(() => {
+    if (headerBox.current) headerBox.current.indeterminate = someSelected && !allSelected
+  })
+
+  function runBulk(body) {
+    setBulkError('')
+    setNotice(null)
+    bulk.mutate({ ids: sel.selectedIds, ...body }, {
+      onSuccess: res => {
+        const r = res?.data ?? res ?? {}
+        const counts = {}
+        ;(r.skipped ?? []).forEach(x => { counts[x.code] = (counts[x.code] ?? 0) + 1 })
+        setNotice({
+          summary: formatBulkResult(r, t),
+          reasons: Object.entries(counts).map(([code, count]) => ({ code, count })),
+        })
+        sel.clear()
+      },
+      onError: e => setBulkError(e?.message || t('actionFailed')),
+    })
+  }
+
+  async function deleteSelected() {
+    const opts = { deleteLocalFile: false }
+    const ok = await confirm({
+      title: t('bulkDeleteTitle'),
+      message: t('bulkDeleteMessage', { count: sel.count }),
+      confirmLabel: t('delete'),
+      danger: true,
+      children: <DeleteFileOptions withDrive={false} onChange={(key, value) => { opts[key] = value }} />,
+    })
+    if (ok) runBulk({ action: 'DELETE', deleteLocalFile: opts.deleteLocalFile })
+  }
+
   if (isLoading) return <div className="admin-loading"><div className="vid-spinner" /></div>
 
   return (
     <div className="admin-table-wrap">
       {confirmDialog}
       {collectionVideo && <AddToCollectionModal video={collectionVideo} onClose={() => setCollectionVideo(null)} />}
+      {bulkError && <div className="app-alert error" role="alert" style={{ marginBottom: 12 }}>{bulkError}</div>}
+      {notice && (
+        <div className="app-alert success" role="status" style={{ marginBottom: 12 }}>
+          {notice.summary}
+          {notice.reasons.length > 0 && (
+            <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
+              {notice.reasons.map(r => (
+                <li key={r.code}>{t('bulkSkippedLabel')}: {t(`bulk.reason.${r.code}`, { defaultValue: t('bulk.reason.unknown') })} ({r.count})</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      <BulkActionBar count={sel.count} onClear={sel.clear}>
+        <select
+          className="admin-status-select"
+          aria-label={t('bulkStatusAria')}
+          value=""
+          disabled={bulk.isPending}
+          onChange={e => e.target.value && runBulk({ action: 'STATUS', status: e.target.value })}
+        >
+          <option value="">{t('bulkStatusPlaceholder')}</option>
+          {STATUSES.map(s => <option key={s} value={s}>{t(`status.${s}`)}</option>)}
+        </select>
+        <select
+          className="admin-status-select"
+          aria-label={t('bulkVisibilityAria')}
+          value=""
+          disabled={bulk.isPending}
+          onChange={e => e.target.value && runBulk({ action: 'VISIBILITY', visibility: e.target.value })}
+        >
+          <option value="">{t('bulkVisibilityPlaceholder')}</option>
+          {VISIBILITIES.map(o => <option key={o} value={o}>{t(`visibility.${o}`)}</option>)}
+        </select>
+        <button className="app-btn danger" onClick={deleteSelected} disabled={bulk.isPending} aria-busy={bulk.isPending}>
+          {t('delete')}
+        </button>
+      </BulkActionBar>
       <div className="admin-table-meta">{t('showing', { shown: videos.length, total: totalElements.toLocaleString() })}</div>
       <div className="admin-table-scroll">
         <table className="admin-table">
           <thead>
             <tr>
+              <th style={{ width: 36 }}>
+                <input ref={headerBox} type="checkbox" aria-label={t('selectAll')} checked={allSelected} onChange={toggleAll} />
+              </th>
               <th>{t('colAsset')}</th>
               <th>{t('colCreator')}</th>
               <th>{t('colStatus')}</th>
@@ -182,7 +274,10 @@ export default function AdminVideoTable({ statusFilter }) {
             {videos.map(v => {
               const visibility = visibilityOf(v)
               return (
-              <tr key={v.id} className={`admin-table-row${visibility === 'HIDDEN' ? ' is-hidden' : ''}`}>
+              <tr key={v.id} className={`admin-table-row${visibility === 'HIDDEN' ? ' is-hidden' : ''}${sel.isSelected(v.id) ? ' selected' : ''}`}>
+                <td>
+                  <input type="checkbox" aria-label={t('selectVideo', { id: v.id })} checked={sel.isSelected(v.id)} onChange={() => sel.toggle(v.id)} />
+                </td>
                 <td>
                   <div className="admin-asset-cell">
                     {v.thumbnailPath && (

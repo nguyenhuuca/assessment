@@ -17,6 +17,7 @@ export const updateVideoStatus = (id, status) => patch(`/admin/videos/${id}/stat
 export const updateVideoPriority = (id, priority) => patch(`/admin/videos/${id}/priority`, { priority })
 // visibility: 'FEED' | 'COLLECTION_ONLY' | 'HIDDEN'
 export const updateVideoVisibility = (id, visibility) => patch(`/admin/videos/${id}/visibility`, { visibility })
+export const bulkVideos = (body) => api.post('/admin/videos/bulk', body)
 // HLS opt-in per video (SUPER_ADMIN): enable queues a conversion, disable removes the HLS output
 export const enableVideoHls    = (id) => api.put(`/admin/videos/${id}/hls`)
 export const disableVideoHls   = (id) => api.delete(`/admin/videos/${id}/hls`)

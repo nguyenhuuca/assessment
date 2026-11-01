@@ -367,6 +367,23 @@
     "skipped_one": "{{count}} skipped",
     "skipped_other": "{{count}} skipped",
     "notFound_one": "{{count}} not found",
-    "notFound_other": "{{count}} not found"
-  }
+    "notFound_other": "{{count}} not found",
+    "reason": {
+      "error": {
+        "conflict": "Conflict, could not be applied",
+        "unexpected": "Unexpected error",
+        "request": "Invalid request"
+      },
+      "unknown": "Unknown reason"
+    }
+  },
+  "selectVideo": "Select video {{id}}",
+  "bulkStatusAria": "Change status of selected videos",
+  "bulkStatusPlaceholder": "Change status…",
+  "bulkVisibilityAria": "Change visibility of selected videos",
+  "bulkVisibilityPlaceholder": "Change visibility…",
+  "bulkDeleteTitle": "Delete selected videos",
+  "bulkDeleteMessage_one": "Permanently delete {{count}} selected video? This cannot be undone.",
+  "bulkDeleteMessage_other": "Permanently delete {{count}} selected videos? This cannot be undone.",
+  "bulkSkippedLabel": "Skipped"
 }

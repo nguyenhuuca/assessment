@@ -13,6 +13,7 @@ vi.mock('../../../api/admin.js', () => ({
   deleteVideo: vi.fn(),
   enableVideoHls: vi.fn(),
   disableVideoHls: vi.fn(),
+  bulkVideos: vi.fn(),
 }))
 
 let mockRole = 'ADMIN'
@@ -230,5 +231,98 @@ describe('AdminVideoTable HLS column', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+})
+
+describe('AdminVideoTable bulk actions', () => {
+  const rows = [video({ id: 1, title: 'One' }), video({ id: 2, title: 'Two' })]
+  const page = (totalPages = 1) => ({ data: { content: rows, totalPages, totalElements: 2 } })
+  const ok = (o) => ({ data: { requested: 2, updated: 2, unchanged: 0, skipped: [], notFound: [], ...o } })
+
+  async function selectPage() {
+    renderTable()
+    fireEvent.click(await screen.findByLabelText('Chọn tất cả trên trang'))
+  }
+
+  beforeEach(() => {
+    adminApi.getVideos.mockResolvedValue(page())
+    adminApi.bulkVideos.mockResolvedValue(ok())
+  })
+
+  it('shows no bar until something is selected and marks the header partial', async () => {
+    renderTable()
+    fireEvent.click(await screen.findByLabelText('Chọn video 1'))
+    expect(screen.getByRole('toolbar')).toBeInTheDocument()
+    expect(screen.getByLabelText('Chọn tất cả trên trang').indeterminate).toBe(true)
+  })
+
+  it('changes status of the selected page, shows the notice and clears the selection', async () => {
+    await selectPage()
+    fireEvent.change(screen.getByLabelText('Đổi trạng thái các video đã chọn'), { target: { value: 'FLAGGED' } })
+    await waitFor(() => expect(adminApi.bulkVideos).toHaveBeenCalledWith({ ids: [1, 2], action: 'STATUS', status: 'FLAGGED' }))
+    expect(await screen.findByRole('status')).toHaveTextContent('2 đã cập nhật')
+    expect(screen.queryByRole('toolbar')).toBeNull()
+  })
+
+  it('changes visibility of the selection', async () => {
+    renderTable()
+    fireEvent.click(await screen.findByLabelText('Chọn video 2'))
+    fireEvent.change(screen.getByLabelText('Đổi chế độ hiển thị các video đã chọn'), { target: { value: 'HIDDEN' } })
+    await waitFor(() => expect(adminApi.bulkVideos).toHaveBeenCalledWith({ ids: [2], action: 'VISIBILITY', visibility: 'HIDDEN' }))
+  })
+
+  it('delete confirm states the count, offers no Drive option and sends deleteLocalFile', async () => {
+    await selectPage()
+    fireEvent.click(within(screen.getByRole('toolbar')).getByRole('button', { name: 'Xoá' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent('2 video')
+    const boxes = within(dialog).getAllByRole('checkbox')
+    expect(boxes).toHaveLength(1)
+    fireEvent.click(boxes[0])
+    fireEvent.click(within(dialog).getAllByRole('button', { name: 'Xoá' }).pop())
+    await waitFor(() => expect(adminApi.bulkVideos).toHaveBeenCalledWith({ ids: [1, 2], action: 'DELETE', deleteLocalFile: true }))
+  })
+
+  it('sends nothing when the bulk delete is cancelled', async () => {
+    await selectPage()
+    fireEvent.click(within(screen.getByRole('toolbar')).getByRole('button', { name: 'Xoá' }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getAllByRole('button').find(b => b.className.includes('secondary')))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect(adminApi.bulkVideos).not.toHaveBeenCalled()
+  })
+
+  it('lists skipped reasons grouped by code, with a fallback for unknown codes', async () => {
+    adminApi.bulkVideos.mockResolvedValue(ok({
+      updated: 0,
+      skipped: [
+        { id: 1, code: 'error.conflict', message: 'x' },
+        { id: 2, code: 'error.conflict', message: 'y' },
+        { id: 3, code: 'weird.code', message: 'z' },
+      ],
+    }))
+    await selectPage()
+    fireEvent.change(screen.getByLabelText('Đổi trạng thái các video đã chọn'), { target: { value: 'PENDING' } })
+    const notice = await screen.findByRole('status')
+    expect(notice).toHaveTextContent('3 bị bỏ qua')
+    expect(notice).toHaveTextContent('Xung đột trạng thái, không thể thực hiện (2)')
+    expect(notice).toHaveTextContent('Lý do không xác định (1)')
+  })
+
+  it('keeps the selection and shows the error when the call fails', async () => {
+    adminApi.bulkVideos.mockRejectedValue(new Error('boom'))
+    await selectPage()
+    fireEvent.change(screen.getByLabelText('Đổi trạng thái các video đã chọn'), { target: { value: 'PENDING' } })
+    expect(await screen.findByRole('alert')).toHaveTextContent('boom')
+    expect(screen.getByRole('toolbar')).toBeInTheDocument()
+    expect(screen.getByLabelText('Chọn video 1')).toBeChecked()
+  })
+
+  it('clears the selection when the page changes', async () => {
+    adminApi.getVideos.mockResolvedValue(page(2))
+    await selectPage()
+    expect(screen.getByRole('toolbar')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '2' }))
+    await waitFor(() => expect(screen.queryByRole('toolbar')).toBeNull())
   })
 })
