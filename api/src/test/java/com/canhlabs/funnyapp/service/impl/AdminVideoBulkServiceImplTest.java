@@ -6,6 +6,7 @@ import com.canhlabs.funnyapp.dto.admin.BulkResultDto;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.exception.CustomException;
+import com.canhlabs.funnyapp.exception.ResourceNotFoundException;
 import com.canhlabs.funnyapp.service.AdminVideoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class AdminVideoBulkServiceImplTest {
         when(adminVideoService.updateStatus(1L, VideoStatus.PUBLISHED)).thenReturn(true);
         when(adminVideoService.updateStatus(2L, VideoStatus.PUBLISHED)).thenReturn(false);
         when(adminVideoService.updateStatus(3L, VideoStatus.PUBLISHED))
-                .thenThrow(new IllegalArgumentException("Video not found: 3"));
+                .thenThrow(new ResourceNotFoundException("Video not found: 3"));
         when(adminVideoService.updateStatus(4L, VideoStatus.PUBLISHED))
                 .thenThrow(CustomException.of(HttpStatus.CONFLICT, 409, "error.video.busy"));
 
@@ -111,19 +112,24 @@ class AdminVideoBulkServiceImplTest {
         assertThat(result.getSkipped()).hasSize(1);
         assertThat(result.getSkipped().get(0).getId()).isEqualTo("2");
         assertThat(result.getSkipped().get(0).getCode()).isEqualTo("error.conflict");
+        // CWE-209: the file id in the exception text never reaches the client
+        assertThat(result.getSkipped().get(0).getMessage()).doesNotContain("File x");
         verify(adminVideoService, never()).deleteVideo(anyLong(), anyBoolean(), eq(true));
         verify(adminVideoService).deleteVideo(3L, true, false);
     }
 
     @Test
-    void delete_otherIllegalArgument_isSkippedNotNotFound() {
-        doThrow(new IllegalArgumentException("weird")).when(adminVideoService).deleteVideo(1L, false, false);
+    void delete_plainIllegalArgument_isSkippedNotNotFound() {
+        // a message that merely looks like not-found must not be bucketed as notFound
+        doThrow(new IllegalArgumentException("Video not found: but a plain IAE")).when(adminVideoService).deleteVideo(1L, false, false);
 
         BulkResultDto result = service.bulk(AdminVideoBulkRequest.builder().ids(List.of(1L))
                 .action(Action.DELETE).build());
 
         assertThat(result.getNotFound()).isEmpty();
         assertThat(result.getSkipped()).hasSize(1);
+        assertThat(result.getSkipped().get(0).getCode()).isEqualTo("error.unexpected");
+        assertThat(result.getSkipped().get(0).getMessage()).isEqualTo("Unexpected error");
     }
 
     @Test

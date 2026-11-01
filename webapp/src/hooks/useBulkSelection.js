@@ -12,6 +12,9 @@ export function useBulkSelection({ pageIds, resetKey, max = 100, isSelectable = 
     setState({ key: resetKey, set: selected })
   }
 
+  // Only ids still on the page count: a refetch (e.g. after a delete) must not leave invisible ids selected.
+  const onPage = new Set(pageIds)
+  const visibleIds = [...selected].filter(id => onPage.has(id))
   const selectableIds = pageIds.filter(isSelectable)
   const allSelected = selectableIds.length > 0 && selectableIds.every(id => selected.has(id))
   const someSelected = pageIds.some(id => selected.has(id))
@@ -20,8 +23,8 @@ export function useBulkSelection({ pageIds, resetKey, max = 100, isSelectable = 
 
   return {
     selected,
-    count: selected.size,
-    selectedIds: [...selected],
+    count: visibleIds.length,
+    selectedIds: visibleIds,
     isSelected: id => selected.has(id),
     toggle: id => update(prev => {
       const next = new Set(prev)
@@ -30,6 +33,11 @@ export function useBulkSelection({ pageIds, resetKey, max = 100, isSelectable = 
       return next
     }),
     toggleAll: () => update(() => (allSelected ? new Set() : new Set(selectableIds.slice(0, max)))),
+    removeMany: ids => update(prev => {
+      const next = new Set(prev)
+      ids.forEach(id => next.delete(id))
+      return next
+    }),
     clear: () => update(() => new Set()),
     allSelected,
     someSelected,

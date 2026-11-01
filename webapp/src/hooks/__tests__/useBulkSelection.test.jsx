@@ -56,3 +56,21 @@ describe('useBulkSelection', () => {
     expect(result.current.count).toBe(0)
   })
 })
+
+describe('useBulkSelection – page pruning and removeMany', () => {
+  it('drops ids that left the page from count and selectedIds', () => {
+    const { result, rerender } = renderHook(p => useBulkSelection(p), { initialProps: { pageIds: [1, 2, 3], resetKey: 'a' } })
+    act(() => result.current.toggleAll())
+    expect(result.current.count).toBe(3)
+    rerender({ pageIds: [1, 3], resetKey: 'a' })
+    expect(result.current.count).toBe(2)
+    expect(result.current.selectedIds).toEqual([1, 3])
+  })
+
+  it('removeMany unselects only the given ids', () => {
+    const { result } = renderHook(() => useBulkSelection({ pageIds: [1, 2, 3], resetKey: 'a' }))
+    act(() => result.current.toggleAll())
+    act(() => result.current.removeMany([1, 3]))
+    expect(result.current.selectedIds).toEqual([2])
+  })
+})

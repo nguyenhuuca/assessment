@@ -10,6 +10,7 @@ import com.canhlabs.funnyapp.enums.CommentStatus;
 import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.enums.VideoVisibility;
+import com.canhlabs.funnyapp.exception.ResourceNotFoundException;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoCommentRepository;
@@ -90,7 +91,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     @Override
     public boolean updateStatus(Long id, VideoStatus status) {
         VideoSource source = videoSourceRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + id));
         if (source.getStatus() == status) {
             return false;
         }
@@ -104,7 +105,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     public void updatePriority(Long id, int priority) {
         Contract.require(priority >= 0 && priority <= 9999, "Priority must be between 0 and 9999");
         VideoSource source = videoSourceRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + id));
         source.setPriority(priority);
         videoSourceRepository.save(source);
         feedCache.invalidate();
@@ -113,7 +114,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     @Override
     public boolean updateVisibility(Long id, VideoVisibility visibility) {
         VideoSource source = videoSourceRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + id));
         if (source.getVisibility() == visibility) {
             return false;
         }
@@ -126,7 +127,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     @Override
     public void deleteVideo(Long id, boolean deleteLocalFile, boolean deleteDriveFile) {
         VideoSource source = videoSourceRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + id));
         if (deleteDriveFile && DRIVE_SOURCE.equals(source.getSourceType())) {
             videoStorageService.deleteDriveFile(source.getSourceId());
         }

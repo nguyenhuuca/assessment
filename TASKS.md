@@ -632,8 +632,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Feature: Admin bulk actions (2026-11-01, ADR-0036, [plan](docs/plans/plan-admin-bulk-actions.md))
 
-- [ ] **BK-1** BE: shared `BulkResultDto` + `POST /admin/videos/bulk` (STATUS, VISIBILITY, DELETE local-only)
-- [ ] **BK-2** FE: `useBulkSelection` + `BulkActionBar` + `formatBulkResult`; Comments refactored onto them (no behavior change)
+- [x] **BK-1** BE: shared `BulkResultDto` + `POST /admin/videos/bulk` (STATUS, VISIBILITY, DELETE local-only) 757ace7a
+- [x] **BK-2** FE: `useBulkSelection` + `BulkActionBar` + `formatBulkResult`; Comments refactored onto them (no behavior change) 0e2a03da
 - [ ] **BK-3** FE: Video Vault / Flagged bulk status, visibility, delete
 - [ ] **BK-4** BE: `POST /collections/{id}/videos/bulk`
 - [ ] **BK-5** FE: bulk add to collection (pick-one modal)

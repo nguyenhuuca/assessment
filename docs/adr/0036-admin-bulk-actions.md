@@ -1,4 +1,4 @@
-# ADR-0036: Admin Bulk Actions – One `/bulk` Endpoint per Resource, Per-Row Transactions via Existing Services
+# ADR-0036: Admin Bulk Actions – One `/bulk` Endpoint per Resource, Per-Row Calls to Existing Services
 
 ## Metadata
 
@@ -42,10 +42,10 @@
 
 ### Option 3: `POST /admin/<resource>/bulk` with an `action` discriminator; a bulk service calls the single-row method per id through its Spring proxy (chosen)
 
-- ✅ Each row runs the existing `@Transactional` method → own transaction, all guards and side effects reused unchanged.
+- ✅ Each row runs the existing single-row method → all guards and side effects reused unchanged; a row is exactly as atomic as that method (some are `@Transactional`, `AdminVideoServiceImpl` methods are single repository calls).
 - ✅ Domain exceptions per row become `skipped[{id, code}]`; other rows proceed.
 - ✅ One request, one `@AuditLog` entry with the ids, one rate-limit permit.
-- ❌ N transactions instead of 1 (acceptable: N ≤ 100, in practice ≤ 20 = page size).
+- ❌ N independent units of work instead of 1 (acceptable: N ≤ 100, in practice ≤ 20 = page size).
 - ❌ Not atomic – by design; the result reports exactly what happened.
 
 ## Decision Outcome
@@ -71,7 +71,8 @@
 ### Backend structure
 
 - `dto/admin/BulkRequest` base (ids + validation) and one request record per resource; shared `BulkResultDto` + `BulkResultCollector` (counts, skipped, notFound).
-- One `*BulkService` bean per resource (`AdminVideoBulkServiceImpl`, …) that is **not** `@Transactional` itself and calls the existing service interface per id; `AppException`/`ResponseStatusException` with a code → `skipped`; not-found → `notFound`; a no-op returned by the single method → `unchanged`.
+- One `*BulkService` bean per resource (`AdminVideoBulkServiceImpl`, …) that is **not** `@Transactional` itself and calls the existing service interface per id through `BulkResultCollector.run(id, row)`, which owns the outcome mapping: `true`/`false` → `updated`/`unchanged`; `ResourceNotFoundException` → `notFound`; `CustomException` → `skipped` with its i18n key and user-facing message; `IllegalStateException` → `skipped` `error.conflict`; anything else → `skipped` `error.unexpected`. Only `CustomException` text reaches the client; other messages are logged server-side only (CWE-209).
+- Lookups the bulk path relies on throw `ResourceNotFoundException` (extends `IllegalArgumentException`, so single-row endpoints keep their 400).
 - Single-row methods that currently cannot tell "changed" from "no-op" get a boolean return where needed (status, visibility); existing callers ignore it.
 
 ### Frontend structure
@@ -119,4 +120,5 @@
 ## Changelog
 
 - 2026-11-01: Proposed.
+- 2026-11-01: BK-1 review: typed not-found, shared outcome mapping in `BulkResultCollector.run`, no raw exception text to clients; per-row "transaction" wording corrected.
 - 2026-11-01: Accepted by the owner (no Drive-file delete in bulk; Accounts checkboxes disabled for self/outranked).

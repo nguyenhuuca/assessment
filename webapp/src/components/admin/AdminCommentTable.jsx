@@ -169,7 +169,7 @@ export default function AdminCommentTable() {
         const r = res?.data ?? {}
         const replies = r.repliesDeleted ? t('repliesSuffix', { count: r.repliesDeleted }) : ''
         setNotice(t('deletedPerm', { count: r.deleted ?? 0, replies }))
-        ids.forEach(id => { if (sel.isSelected(id)) sel.toggle(id) })
+        sel.removeMany(ids)
       },
       onError: e => setError(e?.message || t('actionFailed')),
     })
