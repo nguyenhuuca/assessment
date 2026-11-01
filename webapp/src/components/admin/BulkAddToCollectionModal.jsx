@@ -15,6 +15,7 @@ export default function BulkAddToCollectionModal({ videoIds, onClose, onDone }) 
   const create = useCreateCollection()
   const add = useBulkAddToCollection()
   const [selected, setSelected] = useState(null)
+  const [createdRef, setCreatedRef] = useState(null) // { id, visibility } once "create new" succeeded
   const [name, setName] = useState('')
   const [makePublic, setMakePublic] = useState(false)
   const [formError, setFormError] = useState('')
@@ -39,17 +40,35 @@ export default function BulkAddToCollectionModal({ videoIds, onClose, onDone }) 
   function handleAdd() {
     const c = collections.find(x => String(x.id) === String(selected))
     if (c) submit(c.id, c.visibility)
+    else if (createdRef && String(createdRef.id) === String(selected)) submit(createdRef.id, createdRef.visibility)
   }
 
   function handleCreate(e) {
     e.preventDefault()
+    // A previous create already succeeded (its add failed): retry the add, never create a duplicate.
+    if (createdRef) {
+      setFormError('')
+      submit(createdRef.id, createdRef.visibility)
+      return
+    }
     const { name: trimmed, error } = validateName(name)
     setFormError(error)
     if (error) return
     const visibility = isAdmin && makePublic ? 'PUBLIC' : undefined
     create.mutate(
       { name: trimmed, ...(visibility ? { visibility } : {}) },
-      { onSuccess: created => { if (created?.id) submit(created.id, visibility ?? 'PRIVATE') } },
+      {
+        onSuccess: created => {
+          if (!created?.id) {
+            setFormError(t('bulkAddCreateFailed'))
+            return
+          }
+          const ref = { id: created.id, visibility: visibility ?? 'PRIVATE' }
+          setCreatedRef(ref)
+          setSelected(ref.id)
+          submit(ref.id, ref.visibility)
+        },
+      },
     )
   }
 

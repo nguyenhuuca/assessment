@@ -248,6 +248,21 @@ describe('AdminAccountTable bulk actions', () => {
     await waitFor(() => expect(adminApi.bulkAccounts).toHaveBeenCalledWith({ ids: [3], action: 'REVOKE_PERMISSION', permission: 'AUTOPILOT_AUTO' }))
   })
 
+  it('disables the permission select and marks grant/revoke busy while a bulk call is pending', async () => {
+    let finish
+    adminApi.bulkAccounts.mockReturnValue(new Promise(r => { finish = r }))
+    renderTable(rows())
+    await select('u1@x.com')
+    fireEvent.change(await permBox(), { target: { value: 'WRITE' } })
+    expect(await permBox()).toBeEnabled()
+    fireEvent.click(await barBtn('Cấp'))
+    await waitFor(async () => expect(await permBox()).toBeDisabled())
+    expect(await barBtn('Cấp')).toHaveAttribute('aria-busy', 'true')
+    expect(await barBtn('Thu hồi')).toHaveAttribute('aria-busy', 'true')
+    finish({ requested: 1, updated: 1, unchanged: 0, skipped: [], notFound: [] })
+    await waitFor(() => expect(screen.queryByRole('toolbar')).toBeNull())
+  })
+
   it('delete confirms with the count and sends DELETE; Cancel does nothing', async () => {
     renderTable(rows())
     await select('u1@x.com', 'u2@x.com')

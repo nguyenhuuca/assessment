@@ -228,6 +228,16 @@ describe('ImportTable bulk actions', () => {
     expect(screen.queryByRole('toolbar')).toBeNull()
   })
 
+  it('cancel confirmation counts only the selected jobs that can be cancelled', async () => {
+    setJobs(jobs())
+    renderPanel()
+    await screen.findByText('P')
+    pick(1); pick(2); pick(3)
+    fireEvent.click(within(bar()).getByText('Huỷ'))
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent('Huỷ 1 job nhập đã chọn?')
+  })
+
   it('retry sends without confirmation', async () => {
     setJobs(jobs())
     renderPanel()

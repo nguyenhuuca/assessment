@@ -104,12 +104,12 @@ export default function AdminAccountTable() {
           <option value="">{t('bulkAccountsRolePlaceholder')}</option>
           {bulkRoles.map(r => <option key={r} value={r}>{r}</option>)}
         </select>
-        <select className="admin-status-select" aria-label={t('bulkAccountsPermAria')} value={bulkPerm} onChange={e => setBulkPerm(e.target.value)}>
+        <select className="admin-status-select" aria-label={t('bulkAccountsPermAria')} value={bulkPerm} disabled={bulk.isPending} onChange={e => setBulkPerm(e.target.value)}>
           <option value="">{t('bulkAccountsPermPlaceholder')}</option>
           {bulkPerms.map(p => <option key={p.key} value={p.key}>{p.key}</option>)}
         </select>
-        <button className="app-btn secondary" disabled={!bulkPerm || bulk.isPending} onClick={() => runBulk({ action: 'GRANT_PERMISSION', permission: bulkPerm })}>{t('bulkGrant')}</button>
-        <button className="app-btn secondary" disabled={!bulkPerm || bulk.isPending} onClick={() => runBulk({ action: 'REVOKE_PERMISSION', permission: bulkPerm })}>{t('bulkRevoke')}</button>
+        <button className="app-btn secondary" disabled={!bulkPerm || bulk.isPending} aria-busy={bulk.isPending} onClick={() => runBulk({ action: 'GRANT_PERMISSION', permission: bulkPerm })}>{t('bulkGrant')}</button>
+        <button className="app-btn secondary" disabled={!bulkPerm || bulk.isPending} aria-busy={bulk.isPending} onClick={() => runBulk({ action: 'REVOKE_PERMISSION', permission: bulkPerm })}>{t('bulkRevoke')}</button>
         <button className="app-btn danger" onClick={bulkDelete} disabled={bulk.isPending} aria-busy={bulk.isPending}>{t('delete')}</button>
       </BulkActionBar>
       {updatePerms.isError && <div className="app-alert error" role="alert" style={{ margin: 12 }}>{t('permissionsUpdateFailed')}</div>}

@@ -92,7 +92,7 @@ export default function ImportTable() {
   async function cancelSelected() {
     const ok = await confirm({
       title: t('bulkCancelImportsTitle'),
-      message: t('bulkCancelImportsMessage', { count: sel.count }),
+      message: t('bulkCancelImportsMessage', { count: selectedJobs.filter(canCancel).length }),
       confirmLabel: t('cancelJob'),
     })
     if (ok) runBulk('CANCEL')

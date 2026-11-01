@@ -71,6 +71,48 @@ describe('BulkAddToCollectionModal', () => {
     await waitFor(() => expect(onDone).toHaveBeenCalledWith(result))
   })
 
+  it('retries the add on the already-created collection instead of creating a duplicate', async () => {
+    collectionsApi.create.mockResolvedValue({ data: { id: 'n', name: 'Mới' } })
+    collectionsApi.bulkAddVideos.mockRejectedValueOnce(new Error('boom')).mockResolvedValue({ data: result })
+    renderModal()
+    await screen.findByLabelText('Hài')
+    fireEvent.change(screen.getByPlaceholderText('Tên collection'), { target: { value: 'Mới' } })
+    fireEvent.click(screen.getByRole('button', { name: /Tạo và thêm/ }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('boom')
+    fireEvent.click(screen.getByRole('button', { name: /Tạo và thêm/ }))
+    await waitFor(() => expect(onDone).toHaveBeenCalledWith(result))
+    expect(collectionsApi.create).toHaveBeenCalledTimes(1)
+    expect(collectionsApi.bulkAddVideos).toHaveBeenCalledTimes(2)
+    expect(collectionsApi.bulkAddVideos).toHaveBeenLastCalledWith('n', [4, 5, 6])
+  })
+
+  it('retries via the main add button on the created collection', async () => {
+    collectionsApi.create.mockResolvedValue({ data: { id: 'n', name: 'Mới' } })
+    collectionsApi.bulkAddVideos.mockRejectedValueOnce(new Error('boom')).mockResolvedValue({ data: result })
+    renderModal()
+    await screen.findByLabelText('Hài')
+    fireEvent.change(screen.getByPlaceholderText('Tên collection'), { target: { value: 'Mới' } })
+    fireEvent.click(screen.getByRole('button', { name: /Tạo và thêm/ }))
+    await screen.findByRole('alert')
+    const addBtn = screen.getByRole('button', { name: 'Thêm 3 video' })
+    expect(addBtn).toBeEnabled()
+    fireEvent.click(addBtn)
+    await waitFor(() => expect(onDone).toHaveBeenCalledWith(result))
+    expect(collectionsApi.create).toHaveBeenCalledTimes(1)
+    expect(collectionsApi.bulkAddVideos).toHaveBeenLastCalledWith('n', [4, 5, 6])
+  })
+
+  it('shows an error when create returns no id and does not add', async () => {
+    collectionsApi.create.mockResolvedValue({ data: {} })
+    renderModal()
+    await screen.findByLabelText('Hài')
+    fireEvent.change(screen.getByPlaceholderText('Tên collection'), { target: { value: 'Mới' } })
+    fireEvent.click(screen.getByRole('button', { name: /Tạo và thêm/ }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Không tạo được collection')
+    expect(collectionsApi.bulkAddVideos).not.toHaveBeenCalled()
+    expect(onDone).not.toHaveBeenCalled()
+  })
+
   it('stays open and shows the error when the add fails', async () => {
     collectionsApi.bulkAddVideos.mockRejectedValue(new Error('boom'))
     renderModal()

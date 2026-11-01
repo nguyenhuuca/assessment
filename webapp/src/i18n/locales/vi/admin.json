@@ -407,6 +407,7 @@
   "bulkAddSubtitle_other": "{{count}} video",
   "bulkAddSubmit_other": "Thêm {{count}} video",
   "bulkAddCreateAndAdd": "Tạo và thêm",
+  "bulkAddCreateFailed": "Không tạo được collection. Vui lòng thử lại.",
   "bulkAddNone": "Chưa có collection nào. Hãy tạo mới bên dưới.",
   "selectAccount": "Chọn tài khoản {{email}}",
   "bulkAccountsRoleAria": "Đổi vai trò các tài khoản đã chọn",

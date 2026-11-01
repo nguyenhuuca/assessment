@@ -427,6 +427,7 @@
   "bulkAddSubmit_one": "Add {{count}} video",
   "bulkAddSubmit_other": "Add {{count}} videos",
   "bulkAddCreateAndAdd": "Create and add",
+  "bulkAddCreateFailed": "Could not create the collection. Please try again.",
   "bulkAddNone": "No collections yet. Create one below.",
   "selectAccount": "Select account {{email}}",
   "bulkAccountsRoleAria": "Change role of selected accounts",
