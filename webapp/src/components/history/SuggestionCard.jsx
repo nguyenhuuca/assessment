@@ -5,6 +5,7 @@ import SuggestionStatusChip from '../suggestions/SuggestionStatusChip.jsx'
 import { displayStatus } from '../suggestions/suggestionUtils.js'
 import { thumbnailUrl } from '../../utils/videoModel.js'
 import { useRequestRereview } from '../../hooks/useSuggestions.js'
+import ModalHeader from '../common/ModalHeader.jsx'
 
 const MESSAGE_MAX = 300
 const REREVIEW_ERRORS = {
@@ -43,9 +44,7 @@ function RereviewModal({ suggestion, onClose }) {
   return (
     <div className="app-modal-backdrop" onClick={rereview.isPending ? undefined : onClose}>
       <div className="app-modal" role="dialog" aria-modal="true" aria-label={t('rereviewTitle')} onClick={e => e.stopPropagation()}>
-        <div className="app-modal-header">
-          <span className="app-modal-title">{t('rereviewTitle')}</span>
-        </div>
+        <ModalHeader icon="rate_review" title={t('rereviewTitle')} />
         <div className="app-modal-body">
           <p className="admin-cell-muted" style={{ marginTop: 0 }}>{t('rereviewHint')}</p>
           <label className="app-label" htmlFor={`rereview-msg-${suggestion.id}`}>{t('rereviewMessageLabel')}</label>

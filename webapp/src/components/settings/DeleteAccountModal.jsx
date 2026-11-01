@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useDeleteAccount } from '../../hooks/useSettings.js'
+import ModalHeader from '../common/ModalHeader.jsx'
 
 const Spinner = () => (
   <span style={{
@@ -68,14 +69,7 @@ export default function DeleteAccountModal({ show, onHide, settings }) {
       onClick={e => { if (e.target === e.currentTarget) handleClose() }}
     >
       <div className="app-modal">
-        <div className="app-modal-header">
-          <span className="app-modal-title" style={{ color: 'var(--danger)' }}>
-            {t('deleteAccount')}
-          </span>
-          <button className="app-modal-close" onClick={handleClose} aria-label={t('common:close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
-          </button>
-        </div>
+        <ModalHeader icon="person_remove" tone="danger" title={t('deleteAccount')} onClose={handleClose} />
 
         <div className="app-modal-body">
           <div className="app-alert error" style={{ marginBottom: 20 }}>

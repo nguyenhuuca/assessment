@@ -896,17 +896,40 @@ body {
 .app-modal-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 18px 24px;
-  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  padding: 20px 16px 16px 24px;
   flex-shrink: 0;
 }
 
+.app-modal-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-cyan-dim);
+  color: var(--accent-cyan);
+}
+.app-modal-icon .material-symbols-outlined { font-size: 22px; }
+.app-modal-icon.danger { background: var(--danger-bg); color: var(--danger); }
+
+.app-modal-heading { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
 .app-modal-title {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--text);
-  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+.app-modal-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .app-modal-close {
@@ -923,9 +946,11 @@ body {
   flex-shrink: 0;
 }
 .app-modal-close:hover { background: var(--bg-high); color: var(--text); }
+.app-modal-close:disabled { opacity: 0.5; cursor: not-allowed; }
+.app-modal-header .app-modal-close { align-self: flex-start; margin-top: 4px; }
 
 .app-modal-body {
-  padding: 24px;
+  padding: 8px 24px 24px;
   overflow-y: auto;
   flex: 1;
 }
@@ -942,35 +967,7 @@ body {
 
 /* ── Add to collection modal ── */
 .atc-modal { width: 440px; }
-.atc-header {
-  justify-content: flex-start;
-  gap: 12px;
-  padding: 20px 16px 16px 20px;
-  border-bottom: none;
-}
-.atc-header-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--accent-cyan-dim);
-  color: var(--accent-cyan);
-}
-.atc-header-icon .material-symbols-outlined { font-size: 22px; }
-.atc-header-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.atc-header .app-modal-title { font-size: 17px; letter-spacing: 0; }
-.atc-header-sub {
-  font-size: 13px;
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.atc-header .app-modal-close { align-self: flex-start; margin-top: -2px; }
-.atc-body { padding: 4px 20px 20px; }
+.atc-body { padding: 8px 20px 20px; }
 .atc-list {
   list-style: none;
   margin: 0 -4px;

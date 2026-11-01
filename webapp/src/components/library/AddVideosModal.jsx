@@ -5,6 +5,7 @@ import { useCollectionVideoIds, useToggleCollectionItem } from '../../hooks/useC
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { thumbnailUrl } from '../../utils/videoModel.js'
 import { normalizeForSearch, collectionName } from './collectionUtils.js'
+import ModalHeader from '../common/ModalHeader.jsx'
 
 const MAX_RESULTS = 50
 
@@ -65,12 +66,7 @@ export default function AddVideosModal({ collection, onClose }) {
         onClick={e => e.stopPropagation()}
         style={{ maxWidth: 560, width: '100%' }}
       >
-        <div className="app-modal-header">
-          <span className="app-modal-title">{t('addVideosTo', { name: collectionName(collection) })}</span>
-          <button className="app-modal-close" onClick={onClose} aria-label={t('common:close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
-          </button>
-        </div>
+        <ModalHeader icon="video_library" title={t('addVideosTo', { name: collectionName(collection) })} onClose={onClose} />
         <div className="app-modal-body">
           <input
             className="app-input"

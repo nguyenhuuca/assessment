@@ -5,6 +5,7 @@ import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { useTranslation } from 'react-i18next'
 import { formatDate as formatDateI18n } from '../../i18n/format.js'
+import ModalHeader from '../common/ModalHeader.jsx'
 
 const NOTE_MAX = 500
 const BULK_MAX = 100
@@ -29,12 +30,7 @@ function RemoveModal({ comment, count, onClose, onSubmit, saving, error }) {
   return (
     <div className="app-modal-backdrop" onClick={onClose}>
       <div className="app-modal" role="dialog" aria-label={t('removeDialog')} onClick={e => e.stopPropagation()}>
-        <div className="app-modal-header">
-          <span className="app-modal-title">{t('removeDialog')}</span>
-          <button className="app-modal-close" onClick={onClose} aria-label={t('close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
-          </button>
-        </div>
+        <ModalHeader icon="delete" tone="danger" title={t('removeDialog')} onClose={onClose} />
         <div className="app-modal-body">
           <p className="admin-cell-muted" style={{ marginTop: 0 }}>
             {count ? t('selectedCount', { count }) : comment?.content}

@@ -10,6 +10,7 @@ import {
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useStableOrder } from '../../hooks/useStableOrder.js'
 import { isPublic, validateName, collectionName, NAME_MAX } from './collectionUtils.js'
+import ModalHeader from '../common/ModalHeader.jsx'
 
 export default function AddToCollectionModal({ video, onClose }) {
   const { t } = useTranslation(['library', 'common'])
@@ -58,18 +59,7 @@ export default function AddToCollectionModal({ video, onClose }) {
   return (
     <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="app-modal atc-modal" role="dialog" aria-modal="true" aria-label={t('saveToCollection')}>
-        <div className="app-modal-header atc-header">
-          <span className="atc-header-icon" aria-hidden="true">
-            <span className="material-symbols-outlined">bookmark_add</span>
-          </span>
-          <div className="atc-header-text">
-            <span className="app-modal-title">{t('saveToCollection')}</span>
-            {video?.title && <span className="atc-header-sub" title={video.title}>{video.title}</span>}
-          </div>
-          <button className="app-modal-close" onClick={onClose} aria-label={t('common:close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }} aria-hidden="true">close</span>
-          </button>
-        </div>
+        <ModalHeader icon="bookmark_add" title={t('saveToCollection')} subtitle={video?.title} onClose={onClose} />
         <div className="app-modal-body atc-body">
           {!isLoggedIn ? (
             <p className="admin-cell-muted" role="status" style={{ margin: 0 }}>

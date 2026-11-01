@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useCronPreview } from '../../hooks/useAdmin.js'
 import { CRON_FIELDS, cronShapeError, describeCron, fieldIndexAt } from '../../utils/cronText.js'
 import { formatDate } from '../../i18n/format.js'
+import ModalHeader from '../common/ModalHeader.jsx'
 
 const EXAMPLES = ['0 */5 * * * *', '0 */15 * * * *', '0 0 * * * *', '0 30 3 * * *', '0 0 9 * * MON']
 
@@ -49,12 +50,7 @@ export default function CronEditModal({ job, pending, error, onCancel, onSave })
     <div className="app-modal-backdrop" onClick={pending ? undefined : onCancel}>
       <div className="app-modal cron-editor" role="dialog" aria-modal="true"
         aria-label={t('jobs.editor.title', { name: job.name })} onClick={e => e.stopPropagation()}>
-        <div className="app-modal-header">
-          <span className="app-modal-title">{t('jobs.editor.title', { name: job.name })}</span>
-          <button className="app-modal-close" onClick={onCancel} disabled={pending} aria-label={t('common:close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
-          </button>
-        </div>
+        <ModalHeader icon="schedule" title={t('jobs.editor.title', { name: job.name })} onClose={onCancel} closeDisabled={pending} />
         <div className="app-modal-body">
           <p className={`cron-editor-text${shownError ? ' invalid' : ''}`} aria-live="polite">
             {shownError || `“${text}”`}

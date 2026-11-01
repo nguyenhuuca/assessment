@@ -4,6 +4,7 @@ import { formatDate } from '../../i18n/format.js'
 import { authApi } from '../../api/auth.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import SignInPanel from './SignInPanel.jsx'
+import ModalHeader from '../common/ModalHeader.jsx'
 
 const Spinner = () => (
   <span style={{
@@ -99,12 +100,7 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
   return (
     <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) handleClose() }}>
       <div className="app-modal lg">
-        <div className="app-modal-header">
-          <span className="app-modal-title">{t('profile')}</span>
-          <button className="app-modal-close" onClick={handleClose} aria-label={t('common:close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
-          </button>
-        </div>
+        <ModalHeader icon="person" title={t('profile')} onClose={handleClose} />
 
         <div className="app-modal-body">
           {/* Tabs */}

@@ -6,6 +6,7 @@ import {
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { formatDate as formatDateI18n } from '../../i18n/format.js'
+import ModalHeader from '../common/ModalHeader.jsx'
 
 const FILTERS = ['PENDING', 'APPROVED', 'REJECTED', 'LIVE']
 const REASONS = ['DUPLICATE', 'INAPPROPRIATE', 'LOW_QUALITY', 'COPYRIGHT', 'OTHER']
@@ -33,17 +34,12 @@ function useErrorText() {
   }
 }
 
-function ModalShell({ label, onClose, children, footer }) {
+function ModalShell({ label, icon, tone, onClose, children, footer }) {
   const { t } = useTranslation('admin')
   return (
     <div className="app-modal-backdrop" onClick={onClose}>
       <div className="app-modal" role="dialog" aria-label={label} onClick={e => e.stopPropagation()}>
-        <div className="app-modal-header">
-          <span className="app-modal-title">{label}</span>
-          <button className="app-modal-close" onClick={onClose} aria-label={t('close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
-          </button>
-        </div>
+        <ModalHeader icon={icon} tone={tone} title={label} onClose={onClose} />
         <div className="app-modal-body">{children}</div>
         <div className="app-modal-footer">
           <button className="app-btn secondary" onClick={onClose}>{t('cancel')}</button>
@@ -60,6 +56,7 @@ function ApproveModal({ suggestion, onClose, onSubmit, saving, error }) {
   return (
     <ModalShell
       label={t('sugg.approveDialog')}
+      icon="check_circle"
       onClose={onClose}
       footer={(
         <button className="app-btn primary" onClick={() => onSubmit({ title: title.trim() })} disabled={saving} aria-busy={saving}>
@@ -97,6 +94,8 @@ function RejectModal({ suggestion, onClose, onSubmit, saving, error }) {
   return (
     <ModalShell
       label={t('sugg.rejectDialog')}
+      icon="block"
+      tone="danger"
       onClose={onClose}
       footer={<button className="app-btn danger" onClick={submit} disabled={saving} aria-busy={saving}>{t('sugg.reject')}</button>}
     >

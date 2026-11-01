@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { authApi } from '../../api/auth.js'
 import PasswordInput from '../common/PasswordInput.jsx'
+import ModalHeader from '../common/ModalHeader.jsx'
 
 /**
  * Email + password sign-in dialog. Rendered through a portal so it is not clipped by the
@@ -56,12 +57,7 @@ export default function PasswordLoginModal({ show, initialEmail = '', onHide, on
   return createPortal(
     <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onHide() }}>
       <div className="app-modal" role="dialog" aria-modal="true" aria-labelledby="pw-login-title" style={{ width: 400 }}>
-        <div className="app-modal-header">
-          <span className="app-modal-title" id="pw-login-title">{t('passwordLogin')}</span>
-          <button type="button" className="app-modal-close" onClick={onHide} aria-label={t('common:close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
-          </button>
-        </div>
+        <ModalHeader icon="key" titleId="pw-login-title" title={t('passwordLogin')} onClose={onHide} />
 
         <form onSubmit={handleSubmit}>
           <div className="app-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useCreateCollection, useUpdateCollection } from '../../hooks/useCollections.js'
 import { validateName, isPublic, NAME_MAX } from './collectionUtils.js'
+import ModalHeader from '../common/ModalHeader.jsx'
 
 /** Create (collection omitted) or rename / change visibility (collection given). */
 export default function CollectionFormModal({ collection, onClose }) {
@@ -34,12 +35,7 @@ export default function CollectionFormModal({ collection, onClose }) {
   return (
     <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget && !mutation.isPending) onClose() }}>
       <form className="app-modal" role="dialog" aria-modal="true" aria-label={title} onSubmit={handleSubmit}>
-        <div className="app-modal-header">
-          <span className="app-modal-title">{title}</span>
-          <button type="button" className="app-modal-close" onClick={onClose} aria-label={t('common:close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
-          </button>
-        </div>
+        <ModalHeader icon={editing ? 'edit' : 'create_new_folder'} title={title} onClose={onClose} />
         <div className="app-modal-body">
           {(formError || apiError) && <div className="app-alert error" role="alert">{formError || apiError}</div>}
           <label className="app-label" htmlFor="collection-name">{t('nameLabel')}</label>

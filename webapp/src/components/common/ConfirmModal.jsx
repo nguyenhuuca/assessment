@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import ModalHeader from './ModalHeader.jsx'
 
 // App-styled replacement for window.confirm (native dialogs ignore the theme and
 // Chrome can silently suppress them, which turns the action into a no-op).
@@ -10,6 +11,7 @@ export default function ConfirmModal({
   confirmLabel,
   cancelLabel,
   danger = false,
+  icon,
   pending = false,
   ariaLabel,
   onCancel,
@@ -34,12 +36,7 @@ export default function ConfirmModal({
         aria-label={ariaLabel || title}
         onClick={e => e.stopPropagation()}
       >
-        <div className="app-modal-header">
-          <span className="app-modal-title">{title}</span>
-          <button className="app-modal-close" onClick={onCancel} disabled={pending} aria-label={t('common:close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
-          </button>
-        </div>
+        <ModalHeader icon={icon || (danger ? 'warning' : 'help')} tone={danger ? 'danger' : undefined} title={title} onClose={onCancel} closeDisabled={pending} />
         <div className="app-modal-body">
           {message && <p className="admin-cell-muted" style={{ margin: 0, marginBottom: children ? 12 : 0 }}>{message}</p>}
           {children}
