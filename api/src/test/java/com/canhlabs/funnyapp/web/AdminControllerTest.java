@@ -84,7 +84,7 @@ class AdminControllerTest {
 
     @Test
     void updateVideoStatus_validStatus_returnsOk() {
-        doNothing().when(adminVideoService).updateStatus(1L, VideoStatus.FLAGGED);
+        when(adminVideoService.updateStatus(1L, VideoStatus.FLAGGED)).thenReturn(true);
 
         ResponseEntity<ResultObjectInfo<String>> response =
                 controller.updateVideoStatus(1L, Map.of("status", "FLAGGED"));

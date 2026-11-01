@@ -88,12 +88,16 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     }
 
     @Override
-    public void updateStatus(Long id, VideoStatus status) {
+    public boolean updateStatus(Long id, VideoStatus status) {
         VideoSource source = videoSourceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
+        if (source.getStatus() == status) {
+            return false;
+        }
         source.setStatus(status);
         videoSourceRepository.save(source);
         feedCache.invalidate();
+        return true;
     }
 
     @Override
@@ -107,12 +111,16 @@ public class AdminVideoServiceImpl implements AdminVideoService {
     }
 
     @Override
-    public void updateVisibility(Long id, VideoVisibility visibility) {
+    public boolean updateVisibility(Long id, VideoVisibility visibility) {
         VideoSource source = videoSourceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found: " + id));
+        if (source.getVisibility() == visibility) {
+            return false;
+        }
         source.setVisibility(visibility);
         videoSourceRepository.save(source);
         feedCache.invalidate();
+        return true;
     }
 
     @Override

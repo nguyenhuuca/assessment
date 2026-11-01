@@ -10,9 +10,11 @@ import org.springframework.data.domain.Pageable;
 
 public interface AdminVideoService {
     Page<AdminVideoDto> getVideos(Pageable pageable, VideoStatus status);
-    void updateStatus(Long id, VideoStatus status);
+    /** @return false when the video already had that status (nothing saved). */
+    boolean updateStatus(Long id, VideoStatus status);
     void updatePriority(Long id, int priority);
-    void updateVisibility(Long id, VideoVisibility visibility);
+    /** @return false when the video already had that visibility (nothing saved). */
+    boolean updateVisibility(Long id, VideoVisibility visibility);
     /** Drive file first (a failure keeps the row), then the local file, then the row. */
     void deleteVideo(Long id, boolean deleteLocalFile, boolean deleteDriveFile);
     /** NONE or ERROR becomes PENDING and wakes the HLS worker; any other status is returned unchanged. */

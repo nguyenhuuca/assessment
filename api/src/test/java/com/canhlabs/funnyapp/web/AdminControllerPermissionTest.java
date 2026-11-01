@@ -131,6 +131,7 @@ class AdminControllerPermissionTest {
     @MockitoBean AdminVideoService adminVideoService;
     @MockitoBean AdminAccountService adminAccountService;
     @MockitoBean AdminCommentService adminCommentService;
+    @MockitoBean com.canhlabs.funnyapp.service.AdminVideoBulkService adminVideoBulkService;
 
     @Autowired MockMvc mockMvc;
     @Autowired PermissionService permissionService;
@@ -515,5 +516,63 @@ class AdminControllerPermissionTest {
                         .with(authentication(principal(UserRole.USER, Permission.ADMIN.getBit()))))
                 .andExpect(status().isForbidden());
         verifyNoInteractions(adminCommentService);
+    }
+
+    // ── bulk videos ───────────────────────────────────────────────────────────
+
+    private static final String VIDEOS_BULK_URL = AppConstant.API.BASE_URL + "/admin/videos/bulk";
+
+    private org.springframework.test.web.servlet.ResultActions postVideosBulk(String body, UserRole role) throws Exception {
+        return mockMvc.perform(post(VIDEOS_BULK_URL)
+                .contentType("application/json")
+                .content(body)
+                .with(authentication(principal(role, Permission.ADMIN.getBit()))));
+    }
+
+    @Test
+    void bulkVideos_admin_returns200() throws Exception {
+        when(adminVideoBulkService.bulk(any())).thenReturn(
+                com.canhlabs.funnyapp.dto.admin.BulkResultDto.builder().requested(1).updated(1).build());
+
+        postVideosBulk("{\"ids\":[1],\"action\":\"STATUS\",\"status\":\"PUBLISHED\"}", UserRole.ADMIN)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void bulkVideos_userRole_returns403() throws Exception {
+        postVideosBulk("{\"ids\":[1],\"action\":\"DELETE\"}", UserRole.USER)
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(adminVideoBulkService);
+    }
+
+    @Test
+    void bulkVideos_emptyIds_returns400() throws Exception {
+        postVideosBulk("{\"ids\":[],\"action\":\"DELETE\"}", UserRole.ADMIN)
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminVideoBulkService);
+    }
+
+    @Test
+    void bulkVideos_tooManyIds_returns400() throws Exception {
+        String ids = java.util.stream.IntStream.rangeClosed(1, 101)
+                .mapToObj(String::valueOf)
+                .collect(java.util.stream.Collectors.joining(","));
+        postVideosBulk("{\"ids\":[" + ids + "],\"action\":\"DELETE\"}", UserRole.ADMIN)
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminVideoBulkService);
+    }
+
+    @Test
+    void bulkVideos_statusActionWithoutStatus_returns400() throws Exception {
+        postVideosBulk("{\"ids\":[1],\"action\":\"STATUS\"}", UserRole.ADMIN)
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminVideoBulkService);
+    }
+
+    @Test
+    void bulkVideos_visibilityActionWithoutVisibility_returns400() throws Exception {
+        postVideosBulk("{\"ids\":[1],\"action\":\"VISIBILITY\"}", UserRole.ADMIN)
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminVideoBulkService);
     }
 }

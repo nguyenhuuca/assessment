@@ -6,6 +6,10 @@ import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
 import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
+import com.canhlabs.funnyapp.aop.RateLimited;
+import com.canhlabs.funnyapp.dto.admin.AdminVideoBulkRequest;
+import com.canhlabs.funnyapp.dto.admin.BulkResultDto;
+import com.canhlabs.funnyapp.service.AdminVideoBulkService;
 import com.canhlabs.funnyapp.dto.admin.BulkModerateCommentRequest;
 import com.canhlabs.funnyapp.dto.admin.HardDeleteCommentsRequest;
 import com.canhlabs.funnyapp.dto.admin.HardDeleteCommentsResultDto;
@@ -59,6 +63,12 @@ public class AdminController {
     private AdminVideoService adminVideoService;
     private AdminAccountService adminAccountService;
     private AdminCommentService adminCommentService;
+    private AdminVideoBulkService adminVideoBulkService;
+
+    @Autowired
+    public void injectAdminVideoBulkService(AdminVideoBulkService adminVideoBulkService) {
+        this.adminVideoBulkService = adminVideoBulkService;
+    }
 
     @Autowired
     public void injectAdminVideoService(AdminVideoService adminVideoService) {
@@ -225,6 +235,19 @@ public class AdminController {
             @RequestParam(required = false) String videoId) {
         Page<AdminCommentDto> data = adminCommentService.getComments(pageable, status, q, videoId);
         return ResponseEntity.ok(ResultObjectInfo.<Page<AdminCommentDto>>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(data)
+                .build());
+    }
+
+    @PostMapping("/videos/bulk")
+    @AuditLog("bulkVideos")
+    @HasPermission(perm = Permission.ADMIN)
+    @RateLimited(permit = 10)
+    public ResponseEntity<ResultObjectInfo<BulkResultDto>> bulkVideos(
+            @Valid @RequestBody AdminVideoBulkRequest request) {
+        BulkResultDto data = adminVideoBulkService.bulk(request);
+        return ResponseEntity.ok(ResultObjectInfo.<BulkResultDto>builder()
                 .status(ResultStatus.SUCCESS)
                 .data(data)
                 .build());

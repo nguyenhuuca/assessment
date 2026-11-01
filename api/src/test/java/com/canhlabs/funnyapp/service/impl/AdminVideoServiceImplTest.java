@@ -160,15 +160,43 @@ class AdminVideoServiceImplTest {
     }
 
     @Test
-    void updateVisibility_sameValueAgain_stillSavesAndInvalidatesFeedCache() {
+    void updateVisibility_sameValue_returnsFalseAndSkipsSave() {
         VideoSource source = videoSource(5L, "Title", null, VideoStatus.PUBLISHED);
         when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
 
-        service.updateVisibility(5L, VideoVisibility.FEED);
-        service.updateVisibility(5L, VideoVisibility.FEED);
+        assertFalse(service.updateVisibility(5L, VideoVisibility.FEED));
 
-        verify(videoSourceRepository, times(2)).save(source);
-        verify(feedCache, times(2)).invalidate();
+        verify(videoSourceRepository, never()).save(any());
+        verify(feedCache, never()).invalidate();
+    }
+
+    @Test
+    void updateVisibility_changed_returnsTrueAndInvalidatesFeedCache() {
+        VideoSource source = videoSource(5L, "Title", null, VideoStatus.PUBLISHED);
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        assertTrue(service.updateVisibility(5L, VideoVisibility.HIDDEN));
+
+        verify(feedCache).invalidate();
+    }
+
+    @Test
+    void updateStatus_sameStatus_returnsFalseAndSkipsSave() {
+        VideoSource source = videoSource(5L, "Title", null, VideoStatus.PENDING);
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        assertFalse(service.updateStatus(5L, VideoStatus.PENDING));
+
+        verify(videoSourceRepository, never()).save(any());
+        verify(feedCache, never()).invalidate();
+    }
+
+    @Test
+    void updateStatus_changed_returnsTrue() {
+        VideoSource source = videoSource(5L, "Title", null, VideoStatus.PENDING);
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        assertTrue(service.updateStatus(5L, VideoStatus.FLAGGED));
     }
 
     @Test
