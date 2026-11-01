@@ -94,6 +94,7 @@ nav:
       - 0033 - Spring Boot 4.1 Upgrade: adr/0033-spring-boot-4-upgrade.md
       - 0034 - Frontend Dependency Upgrade: adr/0034-frontend-deps-upgrade.md
       - 0035 - Collection-Only Videos: adr/0035-collection-only-videos.md
+      - 0036 - Admin Bulk Actions: adr/0036-admin-bulk-actions.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -109,6 +110,7 @@ nav:
       - HLS Streaming: prd/PRD-hls-streaming.md
       - Web Push: prd/PRD-web-push.md
       - Collection-Only Videos: prd/PRD-collection-only-videos.md
+      - Admin Bulk Actions: prd/PRD-admin-bulk-actions.md
       - Spring Boot 4.1 Upgrade: prd/PRD-spring-boot-4-upgrade.md
       - Frontend Dependency Upgrade: prd/PRD-frontend-deps-upgrade.md
 
@@ -129,6 +131,7 @@ nav:
       - Admin Video Import: sequence/sequence-admin-video-import.md
       - Bookmark / Collections: sequence/sequence-bookmark-feature.md
       - Collection-Only Videos: sequence/sequence-collection-only-videos.md
+      - Admin Bulk Actions: sequence/sequence-admin-bulk-actions.md
       - Contributor Autopilot Permissions: sequence/sequence-contributor-autopilot-permissions.md
       - HLS Streaming: sequence/sequence-hls-streaming.md
       - Hot Video Priority: sequence/sequence-hot-video-priority.md
@@ -168,6 +171,7 @@ nav:
       - Spring Boot 4.1 Upgrade: plans/plan-spring-boot-4-upgrade.md
       - Frontend Dependency Upgrade: plans/plan-frontend-deps-upgrade.md
       - Collection-Only Videos: plans/plan-collection-only-videos.md
+      - Admin Bulk Actions: plans/plan-admin-bulk-actions.md
       - BE Performance (Medium): plans/plan-be-perf-medium.md
       - Basic PWA: plans/plan-pwa-basic.md
       - Report Webhook State: plans/plan-report-webhook-state.md

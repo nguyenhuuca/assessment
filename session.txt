@@ -1,7 +1,8 @@
-task: Collection-only videos (visibility enum, ADR-0035)
-status: done
-progress: 100
-done: CO-1..CO-3 backend 02376098; CO-4..CO-6 frontend 488e285f; admin UI fixes (⋮ menu) b2415b8f; CO-F1 legacy hidden removed 352b428a; CO-7 prod smoke passed, docs As-built
-next: -
-plan: docs/plans/plan-collection-only-videos.md
-updated: 2026-10-31 13:02
+task: Admin bulk actions on every tab (ADR-0036)
+status: blocked
+progress: 15
+done: Planning PRD + ADR-0036 + sequence + plan BK-1..BK-12
+next: owner approves PRD/ADR-0036, then BK-1 videos bulk endpoint + BK-2 FE selection/bulk bar
+plan: docs/plans/plan-admin-bulk-actions.md
+blocker: owner review of PRD + ADR-0036 (open questions: Drive delete in bulk, disabled checkboxes on Accounts)
+updated: 2026-11-01 21:02

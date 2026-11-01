@@ -6,6 +6,7 @@ Older platform flows (login, MFA, streaming, video job, deployment) are PlantUML
 
 | Feature | Diagrams | PRD |
 |---------|----------|-----|
+| Admin Bulk Actions | [sequence-admin-bulk-actions](sequence-admin-bulk-actions.md) | [PRD](../prd/PRD-admin-bulk-actions.md) |
 | Admin Video Import | [sequence-admin-video-import](sequence-admin-video-import.md) | [PRD](../prd/PRD-admin-video-import.md) |
 | Bookmark / Library Collections | [sequence-bookmark-feature](sequence-bookmark-feature.md) | [PRD](../prd/PRD-bookmark-feature.md) |
 | Collection-Only Videos | [sequence-collection-only-videos](sequence-collection-only-videos.md) | [PRD](../prd/PRD-collection-only-videos.md) |

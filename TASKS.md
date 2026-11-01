@@ -629,3 +629,18 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **CO-6** FE: deep-link fallback inserts a non-feed video at slide 0 488e285f
 - [x] **CO-7** Land: prod backup, push 1 (CO-1..CO-3), push 2 (CO-4..CO-6), prod smoke, diagrams As-built (owner smoke passed 2026-10-31)
 - [x] **CO-F1** Follow-up: remove legacy `{hidden}` body and `hidden` DTO field 352b428a
+
+## Feature: Admin bulk actions (2026-11-01, ADR-0036, [plan](docs/plans/plan-admin-bulk-actions.md))
+
+- [ ] **BK-1** BE: shared `BulkResultDto` + `POST /admin/videos/bulk` (STATUS, VISIBILITY, DELETE local-only)
+- [ ] **BK-2** FE: `useBulkSelection` + `BulkActionBar` + `formatBulkResult`; Comments refactored onto them (no behavior change)
+- [ ] **BK-3** FE: Video Vault / Flagged bulk status, visibility, delete
+- [ ] **BK-4** BE: `POST /collections/{id}/videos/bulk`
+- [ ] **BK-5** FE: bulk add to collection (pick-one modal)
+- [ ] **BK-6** BE: `POST /admin/accounts/bulk` (ROLE, GRANT/REVOKE_PERMISSION, DELETE)
+- [ ] **BK-7** FE: accounts bulk bar
+- [ ] **BK-8** BE: `POST /admin/video-suggestions/bulk` (APPROVE, REJECT)
+- [ ] **BK-9** FE: suggestions bulk bar
+- [ ] **BK-10** BE: `POST /admin/video-imports/bulk` (CANCEL, RETRY)
+- [ ] **BK-11** FE: imports bulk bar
+- [ ] **BK-12** Land: push (owner approval), CI green, prod smoke per tab, diagrams As-built
