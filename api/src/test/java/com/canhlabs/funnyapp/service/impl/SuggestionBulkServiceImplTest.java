@@ -105,4 +105,17 @@ class SuggestionBulkServiceImplTest {
         assertThat(result.getNotFound()).isEmpty();
         assertThat(result.getSkipped()).hasSize(1);
     }
+
+    @Test
+    void unexpectedError_isSkippedWithoutLeakingItsMessage() {
+        when(suggestionService.approve(1L, null, 7L)).thenThrow(new RuntimeException("db password=secret"));
+        when(suggestionService.approve(2L, null, 7L)).thenReturn(null);
+
+        BulkResultDto result = service.bulk(approve(1L, 2L), 7L);
+
+        assertThat(result.getUpdated()).isEqualTo(1);
+        assertThat(result.getSkipped()).hasSize(1);
+        assertThat(result.getSkipped().get(0).getCode()).isEqualTo(BulkResultCollector.UNEXPECTED_CODE);
+        assertThat(result.getSkipped().get(0).getMessage()).doesNotContain("secret");
+    }
 }

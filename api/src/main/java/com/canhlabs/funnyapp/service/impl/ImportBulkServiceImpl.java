@@ -3,7 +3,6 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.dto.admin.BulkResultDto;
 import com.canhlabs.funnyapp.dto.admin.ImportBulkRequest;
 import com.canhlabs.funnyapp.exception.CustomException;
-import com.canhlabs.funnyapp.exception.ResourceNotFoundException;
 import com.canhlabs.funnyapp.service.ImportBulkService;
 import com.canhlabs.funnyapp.service.VideoImportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Bulk orchestration only (ADR-0036): not transactional, each row calls the single-row
@@ -24,6 +24,11 @@ import java.util.List;
  */
 @Service
 public class ImportBulkServiceImpl implements ImportBulkService {
+    static final String NOT_FOUND_CODE = "IMPORT_NOT_FOUND";
+    static final Map<String, String> LEGACY_CODES = Map.of(
+            "INVALID_STATE", "error.import.invalidState",
+            "DUPLICATE_ACTIVE", "error.import.duplicateActive");
+
     private VideoImportService videoImportService;
 
     @Autowired
@@ -34,7 +39,8 @@ public class ImportBulkServiceImpl implements ImportBulkService {
     @Override
     public BulkResultDto bulk(ImportBulkRequest request) {
         List<Long> ids = request.distinctIds();
-        BulkResultCollector collector = new BulkResultCollector("imports:" + request.getAction());
+        BulkResultCollector collector = new BulkResultCollector("imports:" + request.getAction())
+                .notFoundWhen(e -> e.getStatus() == HttpStatus.NOT_FOUND && NOT_FOUND_CODE.equals(e.getMessage()));
         for (Long id : ids) {
             collector.run(id, () -> applyRow(request.getAction(), id));
         }
@@ -49,11 +55,10 @@ public class ImportBulkServiceImpl implements ImportBulkService {
             }
             return true;
         } catch (CustomException e) {
-            if (e.getStatus() == HttpStatus.NOT_FOUND) {
-                throw new ResourceNotFoundException("Import job not found: " + id);
-            }
-            if (e.getMessageKey() == null && e.getMessage() != null) {
-                throw CustomException.of(e.getStatus(), e.getSubCode(), e.getMessage());
+            // The import service signals state errors by message text only; give bulk results i18n-style codes.
+            String key = e.getMessageKey() == null ? LEGACY_CODES.get(e.getMessage()) : null;
+            if (key != null) {
+                throw CustomException.of(e.getStatus(), e.getSubCode(), key);
             }
             throw e;
         }

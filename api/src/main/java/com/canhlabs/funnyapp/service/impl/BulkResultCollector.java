@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 
 /**
  * Accumulates per-row outcomes of a bulk action into a {@link BulkResultDto} (ADR-0036). Not thread-safe:
@@ -27,6 +28,7 @@ public class BulkResultCollector {
     static final String CONFLICT_MESSAGE = "Conflicts with the current state";
 
     private final String action;
+    private Predicate<CustomException> notFoundWhen = e -> false;
     private int updated;
     private int unchanged;
     private final List<BulkSkip> skipped = new ArrayList<>();
@@ -35,6 +37,15 @@ public class BulkResultCollector {
     /** @param action label for server-side logs, e.g. {@code "videos:DELETE"} */
     public BulkResultCollector(String action) {
         this.action = action;
+    }
+
+    /**
+     * Marks {@link CustomException}s that mean "row does not exist" for services whose single-row lookups
+     * do not throw {@link ResourceNotFoundException}. Match a specific key or code, never a bare 404.
+     */
+    public BulkResultCollector notFoundWhen(Predicate<CustomException> predicate) {
+        this.notFoundWhen = predicate;
+        return this;
     }
 
     /**
@@ -51,6 +62,10 @@ public class BulkResultCollector {
         } catch (ResourceNotFoundException e) {
             notFound.add(String.valueOf(id));
         } catch (CustomException e) {
+            if (notFoundWhen.test(e)) {
+                notFound.add(String.valueOf(id));
+                return;
+            }
             skip(id, e.getMessageKey() != null ? e.getMessageKey() : FALLBACK_CODE, e.getMessage());
         } catch (IllegalStateException e) {
             log.warn("Bulk {} conflict for id {}: {}", action, id, e.getMessage());

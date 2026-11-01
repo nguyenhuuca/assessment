@@ -5,7 +5,6 @@ import com.canhlabs.funnyapp.dto.admin.BulkResultDto;
 import com.canhlabs.funnyapp.dto.suggestion.SuggestionBulkRequest;
 import com.canhlabs.funnyapp.enums.SuggestionRejectReason;
 import com.canhlabs.funnyapp.exception.CustomException;
-import com.canhlabs.funnyapp.exception.ResourceNotFoundException;
 import com.canhlabs.funnyapp.service.SuggestionBulkService;
 import com.canhlabs.funnyapp.service.VideoSuggestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,8 @@ public class SuggestionBulkServiceImpl implements SuggestionBulkService {
     public BulkResultDto bulk(SuggestionBulkRequest request, Long adminId) {
         validateOnce(request);
         List<Long> ids = request.distinctIds();
-        BulkResultCollector collector = new BulkResultCollector("suggestions:" + request.getAction());
+        BulkResultCollector collector = new BulkResultCollector("suggestions:" + request.getAction())
+                .notFoundWhen(e -> KEY_NOT_FOUND.equals(e.getMessageKey()));
         for (Long id : ids) {
             collector.run(id, () -> applyRow(request, id, adminId));
         }
@@ -63,18 +63,11 @@ public class SuggestionBulkServiceImpl implements SuggestionBulkService {
     }
 
     private boolean applyRow(SuggestionBulkRequest request, Long id, Long adminId) {
-        try {
-            if (request.getAction() == SuggestionBulkRequest.Action.APPROVE) {
-                suggestionService.approve(id, null, adminId);
-            } else {
-                suggestionService.reject(id, request.getReason(), request.getNote(), adminId);
-            }
-            return true;
-        } catch (CustomException e) {
-            if (KEY_NOT_FOUND.equals(e.getMessageKey())) {
-                throw new ResourceNotFoundException("Suggestion not found: " + id);
-            }
-            throw e;
+        if (request.getAction() == SuggestionBulkRequest.Action.APPROVE) {
+            suggestionService.approve(id, null, adminId);
+        } else {
+            suggestionService.reject(id, request.getReason(), request.getNote(), adminId);
         }
+        return true;
     }
 }

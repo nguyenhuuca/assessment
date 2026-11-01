@@ -634,13 +634,13 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **BK-1** BE: shared `BulkResultDto` + `POST /admin/videos/bulk` (STATUS, VISIBILITY, DELETE local-only) 757ace7a
 - [x] **BK-2** FE: `useBulkSelection` + `BulkActionBar` + `formatBulkResult`; Comments refactored onto them (no behavior change) 0e2a03da
-- [ ] **BK-3** FE: Video Vault / Flagged bulk status, visibility, delete
-- [ ] **BK-4** BE: `POST /collections/{id}/videos/bulk`
+- [x] **BK-3** FE: Video Vault / Flagged bulk status, visibility, delete 5a3a72ed
+- [x] **BK-4** BE: `POST /collections/{id}/videos/bulk` 7dc33cdb
 - [ ] **BK-5** FE: bulk add to collection (pick-one modal)
-- [ ] **BK-6** BE: `POST /admin/accounts/bulk` (ROLE, GRANT/REVOKE_PERMISSION, DELETE)
+- [x] **BK-6** BE: `POST /admin/accounts/bulk` (ROLE, GRANT/REVOKE_PERMISSION, DELETE) 978b8a9b
 - [ ] **BK-7** FE: accounts bulk bar
-- [ ] **BK-8** BE: `POST /admin/video-suggestions/bulk` (APPROVE, REJECT)
+- [x] **BK-8** BE: `POST /admin/video-suggestions/bulk` (APPROVE, REJECT) 9d4f282b
 - [ ] **BK-9** FE: suggestions bulk bar
-- [ ] **BK-10** BE: `POST /admin/video-imports/bulk` (CANCEL, RETRY)
+- [x] **BK-10** BE: `POST /admin/video-imports/bulk` (CANCEL, RETRY) f56f4443
 - [ ] **BK-11** FE: imports bulk bar
 - [ ] **BK-12** Land: push (owner approval), CI green, prod smoke per tab, diagrams As-built

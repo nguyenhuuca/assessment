@@ -1,7 +1,8 @@
 task: Admin bulk actions on every tab (ADR-0036)
 status: in_progress
-progress: 15
-done: Planning PRD + ADR-0036 + sequence + plan, approved 2026-11-01
-next: BK-1 videos bulk endpoint + BK-2 FE selection/bulk bar (parallel)
+progress: 60
+done: BK-1 757ace7a; BK-2 0e2a03da; BK-3 5a3a72ed; BK-4 7dc33cdb; BK-6 978b8a9b; BK-8 9d4f282b; BK-10 f56f4443; review fixes
+doing: -
+next: wave 3 BK-5 collection modal; BK-7 accounts UI; BK-9 suggestions UI; BK-11 imports UI
 plan: docs/plans/plan-admin-bulk-actions.md
-updated: 2026-11-01 21:04
+updated: 2026-11-01 21:46

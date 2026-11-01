@@ -58,7 +58,7 @@ class ImportBulkServiceImplTest {
         assertThat(result.getNotFound()).containsExactly("3");
         assertThat(result.getSkipped()).hasSize(1);
         assertThat(result.getSkipped().get(0).getId()).isEqualTo("2");
-        assertThat(result.getSkipped().get(0).getCode()).isEqualTo("INVALID_STATE");
+        assertThat(result.getSkipped().get(0).getCode()).isEqualTo("error.import.invalidState");
     }
 
     @Test
@@ -70,7 +70,7 @@ class ImportBulkServiceImplTest {
 
         assertThat(result.getUpdated()).isEqualTo(1);
         assertThat(result.getSkipped()).hasSize(1);
-        assertThat(result.getSkipped().get(0).getCode()).isEqualTo("DUPLICATE_ACTIVE");
+        assertThat(result.getSkipped().get(0).getCode()).isEqualTo("error.import.duplicateActive");
     }
 
     @Test
