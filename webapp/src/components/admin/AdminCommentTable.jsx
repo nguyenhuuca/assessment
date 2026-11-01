@@ -6,6 +6,8 @@ import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { useTranslation } from 'react-i18next'
 import { formatDate as formatDateI18n } from '../../i18n/format.js'
 import ModalHeader from '../common/ModalHeader.jsx'
+import BulkActionBar from './BulkActionBar.jsx'
+import { useBulkSelection } from '../../hooks/useBulkSelection.js'
 
 const NOTE_MAX = 500
 const BULK_MAX = 100
@@ -81,7 +83,6 @@ export default function AdminCommentTable() {
   const [target, setTarget] = useState(null) // comment object, or 'BULK'
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
-  const [selected, setSelected] = useState(() => new Set())
   const headerBox = useRef(null)
 
   // Debounce keyword search (300ms) and reset to the first page when it changes.
@@ -91,7 +92,6 @@ export default function AdminCommentTable() {
     const t = setTimeout(() => {
       setQ(search)
       setPage(0)
-      setSelected(new Set())
     }, 300)
     return () => clearTimeout(t)
   }, [search, q])
@@ -111,37 +111,21 @@ export default function AdminCommentTable() {
   const totalPages    = pageData?.totalPages ?? 0
   const totalElements = pageData?.totalElements ?? 0
 
-  const pageIds      = comments.map(c => c.id)
-  const allSelected  = pageIds.length > 0 && pageIds.every(id => selected.has(id))
-  const someSelected = pageIds.some(id => selected.has(id))
+  const pageIds = comments.map(c => c.id)
+  // Selection is per page: changing page, status or search clears it.
+  const sel = useBulkSelection({ pageIds, resetKey: `${page}|${status}|${q}`, max: BULK_MAX })
+  const { allSelected, someSelected, toggleAll } = sel
 
   useEffect(() => {
     if (headerBox.current) headerBox.current.indeterminate = someSelected && !allSelected
   }, [someSelected, allSelected])
 
-  // Selection is per page: changing page or filters clears it.
-  function goToPage(p) {
-    setPage(p)
-    setSelected(new Set())
-  }
-
-  function toggleOne(id) {
-    setSelected(prev => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
-
-  function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(pageIds.slice(0, BULK_MAX)))
-  }
+  const goToPage = setPage
 
   function runBulk(body, onDone) {
     setError('')
     setNotice('')
-    bulkModerate.mutate({ ids: [...selected], ...body }, {
+    bulkModerate.mutate({ ids: sel.selectedIds, ...body }, {
       onSuccess: res => {
         const r = res?.data ?? res ?? {}
         const verb = body.action === 'REMOVE' ? t('verbRemoved') : t('verbRestored')
@@ -150,7 +134,7 @@ export default function AdminCommentTable() {
           r.notFound?.length ? t('notFound', { count: r.notFound.length }) : null,
         ].filter(Boolean).join(', ')
         setNotice(t('bulkResult', { verb, count: r.updated ?? 0, extra: extra ? ` (${extra})` : '' }))
-        setSelected(new Set())
+        sel.clear()
         onDone?.()
       },
       onError: e => setError(e?.message || t('actionFailed')),
@@ -158,7 +142,7 @@ export default function AdminCommentTable() {
   }
 
   async function restoreSelected() {
-    if (await confirm({ title: t('restoreTitle'), message: t('restoreSelectedMessage', { count: selected.size }), confirmLabel: t('restore') })) runBulk({ action: 'RESTORE' })
+    if (await confirm({ title: t('restoreTitle'), message: t('restoreSelectedMessage', { count: sel.count }), confirmLabel: t('restore') })) runBulk({ action: 'RESTORE' })
   }
 
   function run(id, body, onDone) {
@@ -185,11 +169,7 @@ export default function AdminCommentTable() {
         const r = res?.data ?? {}
         const replies = r.repliesDeleted ? t('repliesSuffix', { count: r.repliesDeleted }) : ''
         setNotice(t('deletedPerm', { count: r.deleted ?? 0, replies }))
-        setSelected(prev => {
-          const next = new Set(prev)
-          ids.forEach(id => next.delete(id))
-          return next
-        })
+        ids.forEach(id => { if (sel.isSelected(id)) sel.toggle(id) })
       },
       onError: e => setError(e?.message || t('actionFailed')),
     })
@@ -223,9 +203,7 @@ export default function AdminCommentTable() {
       {error && !target && <div className="app-alert error" role="alert" style={{ marginBottom: 12 }}>{error}</div>}
       {notice && <div className="app-alert success" role="status" style={{ marginBottom: 12 }}>{notice}</div>}
 
-      {selected.size > 0 && (
-        <div className="admin-bulk-bar" role="toolbar" aria-label={t('bulkActions')}>
-          <span>{t('selectedBar', { count: selected.size })}</span>
+      <BulkActionBar count={sel.count} onClear={sel.clear}>
           <button
             className="app-btn danger"
             onClick={() => { setError(''); setTarget('BULK') }}
@@ -244,15 +222,13 @@ export default function AdminCommentTable() {
           </button>
           <button
             className="app-btn danger-outline"
-            onClick={() => hardDeleteIds([...selected], t('selectedLabel', { count: selected.size }))}
+            onClick={() => hardDeleteIds(sel.selectedIds, t('selectedLabel', { count: sel.count }))}
             disabled={hardDelete.isPending}
             aria-busy={hardDelete.isPending && hardDelete.variables?.length > 1}
           >
             {t('deletePermanently')}
           </button>
-          <button className="app-btn secondary" onClick={() => setSelected(new Set())}>{t('clearSelection')}</button>
-        </div>
-      )}
+      </BulkActionBar>
 
       {isLoading ? (
         <div className="admin-loading"><div className="vid-spinner" /></div>
@@ -290,13 +266,13 @@ export default function AdminCommentTable() {
                         .filter(Boolean).join(' · ')
                     : undefined
                   return (
-                    <tr key={c.id} className={`admin-table-row${selected.has(c.id) ? ' selected' : ''}`}>
+                    <tr key={c.id} className={`admin-table-row${sel.isSelected(c.id) ? ' selected' : ''}`}>
                       <td>
                         <input
                           type="checkbox"
                           aria-label={t('selectComment', { id: c.id })}
-                          checked={selected.has(c.id)}
-                          onChange={() => toggleOne(c.id)}
+                          checked={sel.isSelected(c.id)}
+                          onChange={() => sel.toggle(c.id)}
                         />
                       </td>
                       <td>
@@ -374,7 +350,7 @@ export default function AdminCommentTable() {
       {target && (
         <RemoveModal
           comment={target === 'BULK' ? null : target}
-          count={target === 'BULK' ? selected.size : 0}
+          count={target === 'BULK' ? sel.count : 0}
           saving={target === 'BULK' ? bulkModerate.isPending : moderate.isPending}
           error={error}
           onClose={() => setTarget(null)}

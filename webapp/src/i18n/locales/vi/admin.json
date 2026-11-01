@@ -349,5 +349,11 @@
       }
     }
   },
-  "rowActionsAria": "Thao tác cho {{title}}"
+  "rowActionsAria": "Thao tác cho {{title}}",
+  "bulk": {
+    "updated_other": "{{count}} đã cập nhật",
+    "unchanged_other": "{{count}} không thay đổi",
+    "skipped_other": "{{count}} bị bỏ qua",
+    "notFound_other": "{{count}} không tìm thấy"
+  }
 }

@@ -358,5 +358,15 @@
       }
     }
   },
-  "rowActionsAria": "Actions for {{title}}"
+  "rowActionsAria": "Actions for {{title}}",
+  "bulk": {
+    "updated_one": "{{count}} updated",
+    "updated_other": "{{count}} updated",
+    "unchanged_one": "{{count}} unchanged",
+    "unchanged_other": "{{count}} unchanged",
+    "skipped_one": "{{count}} skipped",
+    "skipped_other": "{{count}} skipped",
+    "notFound_one": "{{count}} not found",
+    "notFound_other": "{{count}} not found"
+  }
 }
