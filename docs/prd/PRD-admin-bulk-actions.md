@@ -10,7 +10,7 @@ Related Skills: scope, planning-artifacts
 
 ## Overview
 
-**Status:** In Review
+**Status:** Approved (2026-11-01)
 **Author:** nguyenhuuca
 **Date:** 2026-11-01
 **Version:** 1.0
@@ -131,8 +131,8 @@ Admin work happens one row at a time on every admin tab except Comments. Moving 
 
 ## Open Questions
 
-- [ ] Should bulk delete ever offer "also delete the Drive file"? (Proposed: no; per row only.)
-- [ ] Should "select all on page" on Accounts skip rows the viewer cannot change (self, outranked) up front? (Proposed: yes, those checkboxes are disabled.)
+- [x] Should bulk delete ever offer "also delete the Drive file"? **No** – per row only (owner, 2026-11-01).
+- [x] Should "select all on page" on Accounts skip rows the viewer cannot change (self, outranked) up front? **Yes** – those checkboxes are disabled (owner, 2026-11-01).
 
 ## Appendix
 

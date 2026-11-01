@@ -2,7 +2,7 @@
 
 ## Metadata
 
-**Status:** Proposed (2026-11-01) · **Date:** 2026-11-01 · **Deciders:** nguyenhuuca · **Tags:** api, frontend, convention
+**Status:** Accepted (2026-11-01) · **Date:** 2026-11-01 · **Deciders:** nguyenhuuca · **Tags:** api, frontend, convention
 **Related PRD:** [PRD-admin-bulk-actions](../prd/PRD-admin-bulk-actions.md) · **Supersedes:** N/A · **Superseded By:** N/A
 
 **Tech Strategy:** ✅ Follows Golden Path (explicit admin controllers, layered Controller → Service → Repository, `@AuditLog`, `@RateLimited`, React Query mutations). No new dependency.
@@ -119,3 +119,4 @@
 ## Changelog
 
 - 2026-11-01: Proposed.
+- 2026-11-01: Accepted by the owner (no Drive-file delete in bulk; Accounts checkboxes disabled for self/outranked).

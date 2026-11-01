@@ -1,8 +1,7 @@
 task: Admin bulk actions on every tab (ADR-0036)
-status: blocked
+status: in_progress
 progress: 15
-done: Planning PRD + ADR-0036 + sequence + plan BK-1..BK-12
-next: owner approves PRD/ADR-0036, then BK-1 videos bulk endpoint + BK-2 FE selection/bulk bar
+done: Planning PRD + ADR-0036 + sequence + plan, approved 2026-11-01
+next: BK-1 videos bulk endpoint + BK-2 FE selection/bulk bar (parallel)
 plan: docs/plans/plan-admin-bulk-actions.md
-blocker: owner review of PRD + ADR-0036 (open questions: Drive delete in bulk, disabled checkboxes on Accounts)
-updated: 2026-11-01 21:02
+updated: 2026-11-01 21:04

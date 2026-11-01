@@ -10,7 +10,7 @@ Related Skills: swarm-plan, testing
 
 ## Overview
 
-**Status:** Draft
+**Status:** Approved (2026-11-01)
 **Author:** nguyenhuuca
 **Date:** 2026-11-01
 **Tracking:** `docs/tracking.md` row "Admin Bulk Actions"; `TASKS.md` section "Admin bulk actions"
