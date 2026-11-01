@@ -105,6 +105,7 @@ class AdminVideoImportControllerTest {
     @MockitoBean FeatureFlagService featureFlagService;
     @MockitoBean JWTAuthenticationFilter jwtFilter;
     @MockitoBean VideoImportService videoImportService;
+    @MockitoBean com.canhlabs.funnyapp.service.ImportBulkService importBulkService;
 
     @Autowired MockMvc mockMvc;
 
@@ -272,5 +273,49 @@ class AdminVideoImportControllerTest {
     void unauthenticated_isForbidden() throws Exception {
         mockMvc.perform(get(BASE)).andExpect(status().isForbidden());
         verifyNoInteractions(videoImportService);
+    }
+
+    // -- bulk cancel / retry ---------------------------------------------------
+
+    private org.springframework.test.web.servlet.ResultActions postBulk(String body, Authentication auth) throws Exception {
+        return mockMvc.perform(post(BASE + "/bulk").with(authentication(auth))
+                .contentType(MediaType.APPLICATION_JSON).content(body));
+    }
+
+    @Test
+    void bulk_admin_returns200() throws Exception {
+        when(importBulkService.bulk(any())).thenReturn(
+                com.canhlabs.funnyapp.dto.admin.BulkResultDto.builder().requested(1).updated(1).build());
+
+        postBulk("{\"ids\":[1],\"action\":\"CANCEL\"}", admin())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.updated").value(1));
+    }
+
+    @Test
+    void bulk_userRole_returns403() throws Exception {
+        postBulk("{\"ids\":[1],\"action\":\"RETRY\"}", principal(UserRole.USER, Permission.ADMIN.getBit()))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(importBulkService);
+    }
+
+    @Test
+    void bulk_emptyIds_returns400() throws Exception {
+        postBulk("{\"ids\":[],\"action\":\"CANCEL\"}", admin()).andExpect(status().isBadRequest());
+        verifyNoInteractions(importBulkService);
+    }
+
+    @Test
+    void bulk_tooManyIds_returns400() throws Exception {
+        String ids = java.util.stream.IntStream.rangeClosed(1, 101).mapToObj(String::valueOf)
+                .collect(java.util.stream.Collectors.joining(","));
+        postBulk("{\"ids\":[" + ids + "],\"action\":\"CANCEL\"}", admin()).andExpect(status().isBadRequest());
+        verifyNoInteractions(importBulkService);
+    }
+
+    @Test
+    void bulk_missingAction_returns400() throws Exception {
+        postBulk("{\"ids\":[1]}", admin()).andExpect(status().isBadRequest());
+        verifyNoInteractions(importBulkService);
     }
 }

@@ -3,8 +3,10 @@ package com.canhlabs.funnyapp.web;
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.HasPermission;
 import com.canhlabs.funnyapp.aop.RateLimited;
+import com.canhlabs.funnyapp.dto.admin.BulkResultDto;
 import com.canhlabs.funnyapp.dto.admin.CreateVideoImportRequest;
 import com.canhlabs.funnyapp.dto.admin.CreateVideoImportResultDto;
+import com.canhlabs.funnyapp.dto.admin.ImportBulkRequest;
 import com.canhlabs.funnyapp.dto.admin.ImportPreviewDto;
 import com.canhlabs.funnyapp.dto.admin.PreviewImportRequest;
 import com.canhlabs.funnyapp.dto.admin.VideoImportJobDto;
@@ -13,9 +15,11 @@ import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ImportStatus;
 import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.ResultStatus;
+import com.canhlabs.funnyapp.service.ImportBulkService;
 import com.canhlabs.funnyapp.service.VideoImportService;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import com.canhlabs.funnyapp.utils.AppUtils;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,6 +46,13 @@ public class AdminVideoImportController {
     @Autowired
     public void injectVideoImportService(VideoImportService videoImportService) {
         this.videoImportService = videoImportService;
+    }
+
+    private ImportBulkService importBulkService;
+
+    @Autowired
+    public void injectImportBulkService(ImportBulkService importBulkService) {
+        this.importBulkService = importBulkService;
     }
 
     @PostMapping
@@ -90,6 +101,14 @@ public class AdminVideoImportController {
     @HasPermission(perm = Permission.ADMIN)
     public ResponseEntity<ResultObjectInfo<VideoImportJobDto>> retry(@PathVariable Long id) {
         return ok(videoImportService.retry(id));
+    }
+
+    @PostMapping("/bulk")
+    @AuditLog("bulkImports")
+    @HasPermission(perm = Permission.ADMIN)
+    @RateLimited(permit = 10)
+    public ResponseEntity<ResultObjectInfo<BulkResultDto>> bulk(@Valid @RequestBody ImportBulkRequest request) {
+        return ok(importBulkService.bulk(request));
     }
 
     private static <T> ResponseEntity<ResultObjectInfo<T>> ok(T data) {
