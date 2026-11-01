@@ -218,6 +218,17 @@ class AdminControllerTest {
         assertEquals(1, response.getBody().getData().getContent().size());
     }
 
+    @Test
+    void getAccounts_defaultsToStableIdSort() throws NoSuchMethodException {
+        // Regression: no default sort meant no ORDER BY, so an account moved after its role/permissions changed
+        var param = AdminController.class.getMethod("getAccounts", org.springframework.data.domain.Pageable.class)
+                .getParameters()[0];
+        var defaults = param.getAnnotation(org.springframework.data.web.PageableDefault.class);
+        assertNotNull(defaults);
+        assertArrayEquals(new String[]{"id"}, defaults.sort());
+        assertEquals(org.springframework.data.domain.Sort.Direction.ASC, defaults.direction());
+    }
+
     // ── PATCH /accounts/{id}/role ──────────────────────────────────────────────
 
     @Test

@@ -170,7 +170,8 @@ public class AdminController {
 
     @GetMapping("/accounts")
     public ResponseEntity<ResultObjectInfo<Page<AdminAccountDto>>> getAccounts(
-            @PageableDefault(size = 20) Pageable pageable) {
+            // Fixed sort: without ORDER BY Postgres returns rows in physical order, so an updated account jumped around
+            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<AdminAccountDto> data = adminAccountService.getAccounts(pageable);
         return ResponseEntity.ok(ResultObjectInfo.<Page<AdminAccountDto>>builder()
                 .status(ResultStatus.SUCCESS)
