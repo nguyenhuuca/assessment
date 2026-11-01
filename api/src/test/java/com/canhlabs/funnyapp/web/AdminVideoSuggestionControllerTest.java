@@ -107,6 +107,7 @@ class AdminVideoSuggestionControllerTest {
     @MockitoBean FeatureFlagService featureFlagService;
     @MockitoBean JWTAuthenticationFilter jwtFilter;
     @MockitoBean VideoSuggestionService suggestionService;
+    @MockitoBean com.canhlabs.funnyapp.service.SuggestionBulkService bulkService;
 
     @Autowired MockMvc mockMvc;
 
@@ -342,6 +343,41 @@ class AdminVideoSuggestionControllerTest {
         mockMvc.perform(post(BASE + "/6/reopen").with(authentication(principal(UserRole.ADMIN, 0))))
                 .andExpect(status().isForbidden());
         verifyNoInteractions(suggestionService);
+    }
+
+    private org.springframework.test.web.servlet.ResultActions postBulk(String body, Authentication auth) throws Exception {
+        return mockMvc.perform(post(BASE + "/bulk").with(authentication(auth))
+                .contentType(MediaType.APPLICATION_JSON).content(body));
+    }
+
+    @Test
+    void bulk_admin_200_passesReviewerId() throws Exception {
+        when(bulkService.bulk(any(), eq(11L))).thenReturn(
+                com.canhlabs.funnyapp.dto.admin.BulkResultDto.builder().requested(1).updated(1).build());
+
+        postBulk("{\"ids\":[1],\"action\":\"APPROVE\"}", admin())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.updated").value(1));
+        verify(bulkService).bulk(any(), eq(11L));
+    }
+
+    @Test
+    void bulk_userRole_403() throws Exception {
+        postBulk("{\"ids\":[1],\"action\":\"APPROVE\"}", principal(UserRole.USER, Permission.ADMIN.getBit()))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(bulkService);
+    }
+
+    @Test
+    void bulk_invalidBodies_400() throws Exception {
+        String tooMany = java.util.stream.IntStream.rangeClosed(1, 101).mapToObj(String::valueOf)
+                .collect(java.util.stream.Collectors.joining(","));
+        postBulk("{\"ids\":[],\"action\":\"APPROVE\"}", admin()).andExpect(status().isBadRequest());
+        postBulk("{\"ids\":[" + tooMany + "],\"action\":\"APPROVE\"}", admin()).andExpect(status().isBadRequest());
+        postBulk("{\"ids\":[1],\"action\":\"REJECT\"}", admin()).andExpect(status().isBadRequest());
+        postBulk("{\"ids\":[1],\"action\":\"REJECT\",\"reason\":\"OTHER\",\"note\":\"" + "x".repeat(301) + "\"}",
+                admin()).andExpect(status().isBadRequest());
+        verifyNoInteractions(bulkService);
     }
 
     @Test

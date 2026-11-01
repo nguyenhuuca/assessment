@@ -2,6 +2,10 @@ package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.HasPermission;
+import com.canhlabs.funnyapp.aop.RateLimited;
+import com.canhlabs.funnyapp.dto.admin.BulkResultDto;
+import com.canhlabs.funnyapp.dto.suggestion.SuggestionBulkRequest;
+import com.canhlabs.funnyapp.service.SuggestionBulkService;
 import com.canhlabs.funnyapp.dto.suggestion.ApproveSuggestionRequest;
 import com.canhlabs.funnyapp.dto.suggestion.RejectSuggestionRequest;
 import com.canhlabs.funnyapp.dto.suggestion.SuggestionDto;
@@ -31,9 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminVideoSuggestionController {
 
     private final VideoSuggestionService suggestionService;
+    private final SuggestionBulkService bulkService;
 
-    public AdminVideoSuggestionController(VideoSuggestionService suggestionService) {
+    public AdminVideoSuggestionController(VideoSuggestionService suggestionService,
+                                          SuggestionBulkService bulkService) {
         this.suggestionService = suggestionService;
+        this.bulkService = bulkService;
     }
 
     @GetMapping
@@ -75,6 +82,14 @@ public class AdminVideoSuggestionController {
     @HasPermission(perm = Permission.ADMIN)
     public ResponseEntity<ResultObjectInfo<SuggestionDto>> reopen(@PathVariable Long id) {
         return ok(suggestionService.reopen(id, adminId()));
+    }
+
+    @PostMapping("/bulk")
+    @AuditLog("bulkSuggestions")
+    @HasPermission(perm = Permission.ADMIN)
+    @RateLimited(permit = 10)
+    public ResponseEntity<ResultObjectInfo<BulkResultDto>> bulk(@Valid @RequestBody SuggestionBulkRequest request) {
+        return ok(bulkService.bulk(request, adminId()));
     }
 
     private static Long adminId() {
