@@ -636,11 +636,12 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **BK-2** FE: `useBulkSelection` + `BulkActionBar` + `formatBulkResult`; Comments refactored onto them (no behavior change) 0e2a03da
 - [x] **BK-3** FE: Video Vault / Flagged bulk status, visibility, delete 5a3a72ed
 - [x] **BK-4** BE: `POST /collections/{id}/videos/bulk` 7dc33cdb
-- [ ] **BK-5** FE: bulk add to collection (pick-one modal)
+- [x] **BK-5** FE: bulk add to collection (pick-one modal) a31ab437
 - [x] **BK-6** BE: `POST /admin/accounts/bulk` (ROLE, GRANT/REVOKE_PERMISSION, DELETE) 978b8a9b
-- [ ] **BK-7** FE: accounts bulk bar
+- [x] **BK-7** FE: accounts bulk bar fd910c54
 - [x] **BK-8** BE: `POST /admin/video-suggestions/bulk` (APPROVE, REJECT) 9d4f282b
-- [ ] **BK-9** FE: suggestions bulk bar
+- [x] **BK-9** FE: suggestions bulk bar ed1edae8
 - [x] **BK-10** BE: `POST /admin/video-imports/bulk` (CANCEL, RETRY) f56f4443
-- [ ] **BK-11** FE: imports bulk bar
+- [x] **BK-11** FE: imports bulk bar 5dcd872d
+- [x] **BK-F1** Review follow-ups: wave-1 fixes 7664769f; collector not-found mapping 2f2e38bf; shared bulk notice e7b228a7; import cancel count, no duplicate collection, busy permission controls d489d42b
 - [ ] **BK-12** Land: push (owner approval), CI green, prod smoke per tab, diagrams As-built
