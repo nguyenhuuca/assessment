@@ -31,7 +31,8 @@ export const getAccounts       = (params) => api.get(buildUrl('/admin/accounts',
 export const updateAccountRole = (id, role) => patch(`/admin/accounts/${id}/role`, { role })
 export const updateAccountPermissions = (id, permissions) => patch(`/admin/accounts/${id}/permissions`, { permissions })
 export const deleteAccount     = (id) => api.delete(`/admin/accounts/${id}`)
-export const getStats          = () => api.get('/admin/stats')
+export const bulkAccounts      = (body) => api.post('/admin/accounts/bulk', body)
+export const getStats         = () => api.get('/admin/stats')
 
 // Omit empty filters so the query string only carries meaningful params.
 const cleanParams = (params = {}) =>

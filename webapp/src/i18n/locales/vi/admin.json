@@ -378,6 +378,14 @@
         "collection": {
           "videoNotEligible": "Video không đủ điều kiện để thêm vào collection (đang ẩn hoặc chưa đăng)",
           "full": "Collection đã đầy"
+        },
+        "account": {
+          "self": "Không thể đổi tài khoản của chính mình",
+          "roleTooHigh": "Vai trò vượt quá quyền cấp của bạn",
+          "outranked": "Tài khoản không thấp hơn vai trò của bạn",
+          "autopilotBits": "Chỉ SUPER_ADMIN đổi được quyền autopilot",
+          "autopilotRole": "Quyền autopilot chỉ áp dụng cho tài khoản CONTRIBUTOR và ADMIN",
+          "actorNotFound": "Không tìm thấy tài khoản của bạn"
         }
       },
       "unknown": "Lý do không xác định"
@@ -399,5 +407,18 @@
   "bulkAddSubtitle_other": "{{count}} video",
   "bulkAddSubmit_other": "Thêm {{count}} video",
   "bulkAddCreateAndAdd": "Tạo và thêm",
-  "bulkAddNone": "Chưa có collection nào. Hãy tạo mới bên dưới."
+  "bulkAddNone": "Chưa có collection nào. Hãy tạo mới bên dưới.",
+  "selectAccount": "Chọn tài khoản {{email}}",
+  "bulkAccountsRoleAria": "Đổi vai trò các tài khoản đã chọn",
+  "bulkAccountsRolePlaceholder": "Đổi vai trò…",
+  "bulkAccountsPermAria": "Quyền cần cấp hoặc thu hồi",
+  "bulkAccountsPermPlaceholder": "Quyền…",
+  "bulkGrant": "Cấp",
+  "bulkRevoke": "Thu hồi",
+  "bulkDeleteAccountsTitle": "Xoá các tài khoản đã chọn",
+  "bulkDeleteAccountsMessage_other": "Xoá vĩnh viễn {{count}} tài khoản đã chọn? Không thể hoàn tác.",
+  "bulkDemoteTitle": "Đặt vai trò USER",
+  "bulkDemoteMessage_other": "Đặt {{count}} tài khoản đã chọn về USER?",
+  "bulkDemoteConfirm": "Đặt về USER",
+  "bulkGrantAdminMessage_other": "Nâng {{count}} tài khoản đã chọn lên ADMIN? Mỗi tài khoản sẽ có thể:"
 }

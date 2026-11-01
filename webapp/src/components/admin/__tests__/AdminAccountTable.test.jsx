@@ -10,6 +10,7 @@ vi.mock('../../../api/admin.js', () => ({
   updateAccountRole: vi.fn(),
   updateAccountPermissions: vi.fn(),
   deleteAccount: vi.fn(),
+  bulkAccounts: vi.fn(),
 }))
 const viewer = vi.hoisted(() => ({ role: 'SUPER_ADMIN' }))
 vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: () => ({ user: { email: 'boss@x.com', role: viewer.role } }) }))
@@ -157,5 +158,129 @@ describe('AdminAccountTable autopilot toggles', () => {
     renderTable([account({ email: 'c@x.com', role: 'CONTRIBUTOR' })])
     await chips('c@x.com')
     expect(screen.queryByRole('group', { name: /AUTOPILOT/ })).toBeNull()
+  })
+})
+
+describe('AdminAccountTable bulk actions', () => {
+  const rows = () => [
+    account({ id: 1, email: 'boss@x.com', role: 'SUPER_ADMIN' }),
+    account({ id: 2, email: 'adm@x.com', role: 'ADMIN' }),
+    account({ id: 3, email: 'u1@x.com', role: 'USER' }),
+    account({ id: 4, email: 'u2@x.com', role: 'CONTRIBUTOR' }),
+  ]
+  const box = (email) => screen.findByRole('checkbox', { name: `Chọn tài khoản ${email}` })
+  const bar = () => screen.findByRole('toolbar')
+  const roleBox = async () => within(await bar()).getByRole('combobox', { name: 'Đổi vai trò các tài khoản đã chọn' })
+  const permBox = async () => within(await bar()).getByRole('combobox', { name: 'Quyền cần cấp hoặc thu hồi' })
+  const barBtn = async (name) => within(await bar()).getByRole('button', { name })
+  const select = async (...emails) => { for (const e of emails) fireEvent.click(await box(e)) }
+
+  beforeEach(() => adminApi.bulkAccounts.mockResolvedValue({ requested: 2, updated: 2, unchanged: 0, skipped: [], notFound: [] }))
+
+  it('disables checkboxes for self and outranked rows (SUPER_ADMIN viewer)', async () => {
+    renderTable(rows())
+    expect(await box('boss@x.com')).toBeDisabled()
+    expect(await box('adm@x.com')).toBeEnabled()
+    expect(await box('u1@x.com')).toBeEnabled()
+  })
+
+  it('an ADMIN viewer cannot select other ADMIN rows, and select-page skips locked rows', async () => {
+    viewer.role = 'ADMIN'
+    renderTable(rows())
+    expect(await box('adm@x.com')).toBeDisabled()
+    fireEvent.click(await screen.findByRole('checkbox', { name: 'Chọn tất cả trên trang' }))
+    expect(await box('u1@x.com')).toBeChecked()
+    expect(await box('u2@x.com')).toBeChecked()
+    expect(await box('adm@x.com')).not.toBeChecked()
+    expect(await box('boss@x.com')).not.toBeChecked()
+  })
+
+  it('role change sends a ROLE body without a dialog for CONTRIBUTOR', async () => {
+    renderTable(rows())
+    await select('u1@x.com', 'u2@x.com')
+    fireEvent.change(await roleBox(), { target: { value: 'CONTRIBUTOR' } })
+    await waitFor(() => expect(adminApi.bulkAccounts).toHaveBeenCalledWith({ ids: [3, 4], action: 'ROLE', role: 'CONTRIBUTOR' }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(await screen.findByRole('status')).toHaveTextContent('2')
+    await waitFor(() => expect(screen.queryByRole('toolbar')).toBeNull())
+  })
+
+  it('ADMIN shows the grant-admin confirm once for the whole selection', async () => {
+    renderTable(rows())
+    await select('u1@x.com', 'u2@x.com')
+    fireEvent.change(await roleBox(), { target: { value: 'ADMIN' } })
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getAllByRole('listitem')).toHaveLength(5)
+    expect(adminApi.bulkAccounts).not.toHaveBeenCalled()
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Cấp ADMIN' }))
+    await waitFor(() => expect(adminApi.bulkAccounts).toHaveBeenCalledTimes(1))
+    expect(adminApi.bulkAccounts).toHaveBeenCalledWith({ ids: [3, 4], action: 'ROLE', role: 'ADMIN' })
+  })
+
+  it('an ADMIN viewer is not offered the ADMIN role or autopilot bits', async () => {
+    viewer.role = 'ADMIN'
+    renderTable(rows())
+    await select('u1@x.com')
+    expect(Array.from((await roleBox()).options).map(o => o.value)).toEqual(['', 'USER', 'CONTRIBUTOR'])
+    expect(Array.from((await permBox()).options).map(o => o.value)).toEqual(['', 'READ', 'WRITE', 'EXEC', 'DELETE', 'ADMIN'])
+  })
+
+  it('role USER asks a danger confirm with the count', async () => {
+    renderTable(rows())
+    await select('u2@x.com')
+    fireEvent.change(await roleBox(), { target: { value: 'USER' } })
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent('1')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Đặt về USER' }))
+    await waitFor(() => expect(adminApi.bulkAccounts).toHaveBeenCalledWith({ ids: [4], action: 'ROLE', role: 'USER' }))
+  })
+
+  it('grant and revoke send the permission name', async () => {
+    renderTable(rows())
+    await select('u1@x.com')
+    expect(await barBtn('Cấp')).toBeDisabled()
+    fireEvent.change(await permBox(), { target: { value: 'WRITE' } })
+    fireEvent.click(await barBtn('Cấp'))
+    await waitFor(() => expect(adminApi.bulkAccounts).toHaveBeenCalledWith({ ids: [3], action: 'GRANT_PERMISSION', permission: 'WRITE' }))
+    await select('u1@x.com')
+    fireEvent.change(await permBox(), { target: { value: 'AUTOPILOT_AUTO' } })
+    fireEvent.click(await barBtn('Thu hồi'))
+    await waitFor(() => expect(adminApi.bulkAccounts).toHaveBeenCalledWith({ ids: [3], action: 'REVOKE_PERMISSION', permission: 'AUTOPILOT_AUTO' }))
+  })
+
+  it('delete confirms with the count and sends DELETE; Cancel does nothing', async () => {
+    renderTable(rows())
+    await select('u1@x.com', 'u2@x.com')
+    fireEvent.click(await barBtn('Xoá'))
+    let dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent('2')
+    fireEvent.click(within(dialog).getAllByRole('button').find(x => x.classList.contains('secondary')))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect(adminApi.bulkAccounts).not.toHaveBeenCalled()
+    fireEvent.click(await barBtn('Xoá'))
+    dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Xoá' }))
+    await waitFor(() => expect(adminApi.bulkAccounts).toHaveBeenCalledWith({ ids: [3, 4], action: 'DELETE' }))
+  })
+
+  it('renders skipped reasons and falls back for unknown codes', async () => {
+    adminApi.bulkAccounts.mockResolvedValue({ requested: 2, updated: 0, unchanged: 0, skipped: [{ id: 3, code: 'error.account.outranked', message: 'x' }, { id: 4, code: 'error.nope', message: 'y' }], notFound: [] })
+    renderTable(rows())
+    await select('u1@x.com', 'u2@x.com')
+    fireEvent.click(await barBtn('Xoá'))
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xoá' }))
+    const status = await screen.findByRole('status')
+    expect(status).toHaveTextContent('Tài khoản không thấp hơn vai trò của bạn')
+    expect(status).toHaveTextContent('Lý do không xác định')
+  })
+
+  it('keeps the selection and shows an alert on error', async () => {
+    adminApi.bulkAccounts.mockRejectedValueOnce(new Error('boom'))
+    renderTable(rows())
+    await select('u1@x.com')
+    fireEvent.click(await barBtn('Xoá'))
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xoá' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('boom')
+    expect(await box('u1@x.com')).toBeChecked()
   })
 })

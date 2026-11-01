@@ -394,6 +394,14 @@
         "collection": {
           "videoNotEligible": "Not eligible for a collection (hidden or unpublished)",
           "full": "Collection is full"
+        },
+        "account": {
+          "self": "You cannot change your own account",
+          "roleTooHigh": "Role is above what you may assign",
+          "outranked": "Account is not ranked below you",
+          "autopilotBits": "Only a SUPER_ADMIN can change autopilot permissions",
+          "autopilotRole": "Autopilot permissions apply to CONTRIBUTOR and ADMIN accounts only",
+          "actorNotFound": "Your account was not found"
         }
       },
       "unknown": "Unknown reason"
@@ -419,5 +427,21 @@
   "bulkAddSubmit_one": "Add {{count}} video",
   "bulkAddSubmit_other": "Add {{count}} videos",
   "bulkAddCreateAndAdd": "Create and add",
-  "bulkAddNone": "No collections yet. Create one below."
+  "bulkAddNone": "No collections yet. Create one below.",
+  "selectAccount": "Select account {{email}}",
+  "bulkAccountsRoleAria": "Change role of selected accounts",
+  "bulkAccountsRolePlaceholder": "Change role…",
+  "bulkAccountsPermAria": "Permission to grant or revoke",
+  "bulkAccountsPermPlaceholder": "Permission…",
+  "bulkGrant": "Grant",
+  "bulkRevoke": "Revoke",
+  "bulkDeleteAccountsTitle": "Delete selected accounts",
+  "bulkDeleteAccountsMessage_one": "Permanently delete {{count}} selected account? This cannot be undone.",
+  "bulkDeleteAccountsMessage_other": "Permanently delete {{count}} selected accounts? This cannot be undone.",
+  "bulkDemoteTitle": "Set role to USER",
+  "bulkDemoteMessage_one": "Set {{count}} selected account to USER?",
+  "bulkDemoteMessage_other": "Set {{count}} selected accounts to USER?",
+  "bulkDemoteConfirm": "Set to USER",
+  "bulkGrantAdminMessage_one": "Promote {{count}} selected account to ADMIN? Each will be able to:",
+  "bulkGrantAdminMessage_other": "Promote {{count}} selected accounts to ADMIN? Each will be able to:"
 }

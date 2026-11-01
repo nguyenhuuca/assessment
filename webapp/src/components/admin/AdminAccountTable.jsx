@@ -1,5 +1,8 @@
-import React, { useState } from 'react'
-import { useAdminAccounts, useUpdateAccountRole, useUpdateAccountPermissions, useDeleteAccount } from '../../hooks/useAdmin.js'
+import React, { useEffect, useRef, useState } from 'react'
+import { useAdminAccounts, useUpdateAccountRole, useUpdateAccountPermissions, useDeleteAccount, useBulkAccounts } from '../../hooks/useAdmin.js'
+import BulkActionBar from './BulkActionBar.jsx'
+import { useBulkSelection } from '../../hooks/useBulkSelection.js'
+import { formatBulkResult } from '../../utils/bulkResult.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { useAuth } from '../../hooks/useAuth.js'
@@ -34,9 +37,9 @@ export default function AdminAccountTable() {
 
   // The capability list mirrors what ROLE_ADMIN unlocks server-side: AdminController, AdminReportController,
   // AdminVideoSuggestionController, AdminVideoImportController (hasRole('ADMIN')); AdminJobController edit/run is SUPER_ADMIN only
-  const confirmGrantAdmin = (email) => confirm({
+  const confirmGrantAdmin = (message) => confirm({
     title: t('grantAdmin.title'),
-    message: t('grantAdmin.message', { email }),
+    message,
     confirmLabel: t('grantAdmin.confirm'),
     children: (
       <ul style={{ margin: 0, paddingLeft: 20 }}>
@@ -45,17 +48,91 @@ export default function AdminAccountTable() {
     ),
   })
 
+  const bulk = useBulkAccounts()
+  const [bulkError, setBulkError] = useState('')
+  const [notice, setNotice] = useState(null)
+  const [bulkPerm, setBulkPerm] = useState('')
+  const headerBox = useRef(null)
+  // Same lock as the row controls: never yourself, only accounts ranked below you
+  const isLocked = (a) => a.email === user?.email || myRank <= rank(a.role)
+  const sel = useBulkSelection({
+    pageIds: accounts.map(a => a.id),
+    resetKey: page,
+    max: 100,
+    isSelectable: id => { const a = accounts.find(x => x.id === id); return !!a && !isLocked(a) },
+  })
+  useEffect(() => {
+    if (headerBox.current) headerBox.current.indeterminate = sel.someSelected && !sel.allSelected
+  })
+  const bulkRoles = viewerIsSuper ? SELECTABLE_ROLES : ['USER', 'CONTRIBUTOR']
+  const bulkPerms = viewerIsSuper ? [...PERMISSIONS, ...AUTOPILOT_PERMISSIONS] : PERMISSIONS
+
+  function runBulk(body) {
+    setBulkError('')
+    setNotice(null)
+    bulk.mutate({ ids: sel.selectedIds, ...body }, {
+      onSuccess: res => {
+        const r = res?.data ?? res ?? {}
+        const counts = {}
+        ;(r.skipped ?? []).forEach(x => { counts[x.code] = (counts[x.code] ?? 0) + 1 })
+        setNotice({ summary: formatBulkResult(r, t), reasons: Object.entries(counts).map(([code, count]) => ({ code, count })) })
+        sel.clear()
+      },
+      onError: e => setBulkError(e?.message || t('actionFailed')),
+    })
+  }
+
+  async function bulkRole(role) {
+    if (!role) return
+    if (role === 'ADMIN' && !await confirmGrantAdmin(t('bulkGrantAdminMessage', { count: sel.count }))) return
+    if (role === 'USER' && !await confirm({ title: t('bulkDemoteTitle'), message: t('bulkDemoteMessage', { count: sel.count }), confirmLabel: t('bulkDemoteConfirm'), danger: true })) return
+    runBulk({ action: 'ROLE', role })
+  }
+
+  async function bulkDelete() {
+    if (await confirm({ title: t('bulkDeleteAccountsTitle'), message: t('bulkDeleteAccountsMessage', { count: sel.count }), confirmLabel: t('delete'), danger: true })) runBulk({ action: 'DELETE' })
+  }
+
   if (isLoading) return <div className="admin-loading"><div className="vid-spinner" /></div>
 
   return (
     <div className="admin-table-wrap">
       {confirmDialog}
+      {bulkError && <div className="app-alert error" role="alert" style={{ margin: 12 }}>{bulkError}</div>}
+      {notice && (
+        <div className="app-alert success" role="status" style={{ margin: 12 }}>
+          {notice.summary}
+          {notice.reasons.length > 0 && (
+            <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
+              {notice.reasons.map(r => (
+                <li key={r.code}>{t('bulkSkippedLabel')}: {t(`bulk.reason.${r.code}`, { defaultValue: t('bulk.reason.unknown') })} ({r.count})</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      <BulkActionBar count={sel.count} onClear={sel.clear}>
+        <select className="admin-status-select" aria-label={t('bulkAccountsRoleAria')} value="" disabled={bulk.isPending} onChange={e => bulkRole(e.target.value)}>
+          <option value="">{t('bulkAccountsRolePlaceholder')}</option>
+          {bulkRoles.map(r => <option key={r} value={r}>{r}</option>)}
+        </select>
+        <select className="admin-status-select" aria-label={t('bulkAccountsPermAria')} value={bulkPerm} onChange={e => setBulkPerm(e.target.value)}>
+          <option value="">{t('bulkAccountsPermPlaceholder')}</option>
+          {bulkPerms.map(p => <option key={p.key} value={p.key}>{p.key}</option>)}
+        </select>
+        <button className="app-btn secondary" disabled={!bulkPerm || bulk.isPending} onClick={() => runBulk({ action: 'GRANT_PERMISSION', permission: bulkPerm })}>{t('bulkGrant')}</button>
+        <button className="app-btn secondary" disabled={!bulkPerm || bulk.isPending} onClick={() => runBulk({ action: 'REVOKE_PERMISSION', permission: bulkPerm })}>{t('bulkRevoke')}</button>
+        <button className="app-btn danger" onClick={bulkDelete} disabled={bulk.isPending} aria-busy={bulk.isPending}>{t('delete')}</button>
+      </BulkActionBar>
       {updatePerms.isError && <div className="app-alert error" role="alert" style={{ margin: 12 }}>{t('permissionsUpdateFailed')}</div>}
       <div className="admin-table-meta">{t('showing', { shown: accounts.length, total: totalElements.toLocaleString() })}</div>
       <div className="admin-table-scroll">
         <table className="admin-table">
           <thead>
             <tr>
+              <th style={{ width: 36 }}>
+                <input ref={headerBox} type="checkbox" aria-label={t('selectAll')} checked={sel.allSelected} onChange={sel.toggleAll} />
+              </th>
               <th>{t('colEmail')}</th>
               <th>{t('colRole')}</th>
               <th>{t('colPermissions')}</th>
@@ -77,7 +154,7 @@ export default function AdminAccountTable() {
                 : !viewerIsSuper && myRank <= rank(nextRole) ? t('lockAssignLower') : null
               const changeRole = async (role) => {
                 if (role === a.role) return
-                if (role === 'ADMIN' && !await confirmGrantAdmin(a.email)) return
+                if (role === 'ADMIN' && !await confirmGrantAdmin(t('grantAdmin.message', { email: a.email }))) return
                 updateRole.mutate({ id: a.id, role })
               }
               const roleLocked = isSelf || lockReason !== null
@@ -86,7 +163,10 @@ export default function AdminAccountTable() {
               const permsLocked = isSelf || outranked
               const permsTitle = isSelf ? t('cannotChangeOwnPermissions') : outranked ? t('lockLowerRole') : t('permissionsHint')
               return (
-                <tr key={a.id} className="admin-table-row">
+                <tr key={a.id} className={`admin-table-row${sel.isSelected(a.id) ? ' selected' : ''}`}>
+                  <td>
+                    <input type="checkbox" aria-label={t('selectAccount', { email: a.email })} checked={sel.isSelected(a.id)} disabled={isSelf || outranked} onChange={() => sel.toggle(a.id)} />
+                  </td>
                   <td>{a.email}</td>
                   <td>
                     <span className={`admin-badge ${BADGE_CLASS[a.role] ?? 'admin-badge-user'}`}>

@@ -74,6 +74,14 @@ export function useDeleteVideo() {
   })
 }
 
+export function useBulkAccounts() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (body) => adminApi.bulkAccounts(body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'accounts'] }),
+  })
+}
+
 export function useUpdateAccountRole() {
   const qc = useQueryClient()
   return useMutation({
