@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface AdminAccountService {
     Page<AdminAccountDto> getAccounts(Pageable pageable);
+    /** Fresh read of one account; throws ResourceNotFoundException (a 400 on single-row endpoints) when missing. */
+    AdminAccountDto getAccount(Long id);
     void updateRole(Long targetId, Long currentUserId, UserRole role);
     void deleteAccount(Long targetId, Long currentUserId);
 

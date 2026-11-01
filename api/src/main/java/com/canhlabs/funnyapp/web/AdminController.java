@@ -8,6 +8,7 @@ import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.aop.RateLimited;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoBulkRequest;
+import com.canhlabs.funnyapp.dto.admin.AdminAccountBulkRequest;
 import com.canhlabs.funnyapp.dto.admin.BulkResultDto;
 import com.canhlabs.funnyapp.service.AdminVideoBulkService;
 import com.canhlabs.funnyapp.dto.admin.BulkModerateCommentRequest;
@@ -64,6 +65,13 @@ public class AdminController {
     private AdminAccountService adminAccountService;
     private AdminCommentService adminCommentService;
     private AdminVideoBulkService adminVideoBulkService;
+
+    private com.canhlabs.funnyapp.service.AdminAccountBulkService adminAccountBulkService;
+
+    @Autowired
+    public void injectAdminAccountBulkService(com.canhlabs.funnyapp.service.AdminAccountBulkService adminAccountBulkService) {
+        this.adminAccountBulkService = adminAccountBulkService;
+    }
 
     @Autowired
     public void injectAdminVideoBulkService(AdminVideoBulkService adminVideoBulkService) {
@@ -214,6 +222,20 @@ public class AdminController {
         return ResponseEntity.ok(ResultObjectInfo.<AdminAccountDto>builder()
                 .status(ResultStatus.SUCCESS)
                 .data(adminAccountService.updatePermissions(id, current.getId(), permissions))
+                .build());
+    }
+
+    @PostMapping("/accounts/bulk")
+    @AuditLog("bulkAccounts")
+    @HasPermission(perm = Permission.ADMIN)
+    @RateLimited(permit = 10)
+    public ResponseEntity<ResultObjectInfo<BulkResultDto>> bulkAccounts(
+            @Valid @RequestBody AdminAccountBulkRequest request) {
+        UserDetailDto current = AppUtils.getCurrentUser();
+        BulkResultDto data = adminAccountBulkService.bulk(request, current.getId());
+        return ResponseEntity.ok(ResultObjectInfo.<BulkResultDto>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(data)
                 .build());
     }
 

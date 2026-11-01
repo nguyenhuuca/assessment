@@ -75,8 +75,8 @@ class AdminAccountServiceImplTest {
     // ── updateRole ────────────────────────────────────────────────────────────
 
     @Test
-    void updateRole_selfTarget_throwsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class,
+    void updateRole_selfTarget_isBadRequestWithKey() {
+        assertSelfRejected(
                 () -> service.updateRole(42L, 42L, UserRole.USER));
         verify(userRepo, never()).save(any());
     }
@@ -86,7 +86,7 @@ class AdminAccountServiceImplTest {
         actor(1L, UserRole.SUPER_ADMIN);
         when(userRepo.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(com.canhlabs.funnyapp.exception.ResourceNotFoundException.class,
                 () -> service.updateRole(99L, 1L, UserRole.ADMIN));
         verify(userRepo, never()).save(any());
     }
@@ -168,8 +168,8 @@ class AdminAccountServiceImplTest {
     // ── deleteAccount ─────────────────────────────────────────────────────────
 
     @Test
-    void deleteAccount_selfTarget_throwsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class,
+    void deleteAccount_selfTarget_isBadRequestWithKey() {
+        assertSelfRejected(
                 () -> service.deleteAccount(42L, 42L));
         verify(userRepo, never()).deleteById(any());
     }
@@ -242,7 +242,7 @@ class AdminAccountServiceImplTest {
 
     @Test
     void updatePermissions_selfTarget_isRejected() {
-        assertThrows(IllegalArgumentException.class, () -> service.updatePermissions(1L, 1L, 31));
+        assertSelfRejected(() -> service.updatePermissions(1L, 1L, 31));
         verify(userRepo, never()).save(any());
     }
 
@@ -300,7 +300,7 @@ class AdminAccountServiceImplTest {
         actor(1L, UserRole.ADMIN);
         User user = target(10L, UserRole.CONTRIBUTOR);
 
-        assertEquals("Only the SUPER_ADMIN can change autopilot permissions",
+        assertEquals("error.account.autopilotBits",
                 assertThrows(CustomException.class, () -> service.updatePermissions(10L, 1L, 32)).getMessage());
         assertEquals(0, user.getPermissions());
         verify(userRepo, never()).save(any());
@@ -333,7 +333,8 @@ class AdminAccountServiceImplTest {
         actor(1L, UserRole.SUPER_ADMIN);
         User user = target(10L, UserRole.USER);
 
-        assertThrows(IllegalArgumentException.class, () -> service.updatePermissions(10L, 1L, 32));
+        CustomException e = assertThrows(CustomException.class, () -> service.updatePermissions(10L, 1L, 32));
+        assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
         assertEquals(0, user.getPermissions());
         verify(userRepo, never()).save(any());
     }
@@ -424,6 +425,12 @@ class AdminAccountServiceImplTest {
         User u = user(id, "target@example.com", role, false);
         when(userRepo.findById(id)).thenReturn(Optional.of(u));
         return u;
+    }
+
+    private static void assertSelfRejected(org.junit.jupiter.api.function.Executable call) {
+        CustomException e = assertThrows(CustomException.class, call);
+        assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
+        assertEquals("error.account.self", e.getMessageKey());
     }
 
     private static void assertForbidden(org.junit.jupiter.api.function.Executable call) {

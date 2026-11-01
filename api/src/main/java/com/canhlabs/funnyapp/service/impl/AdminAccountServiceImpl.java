@@ -7,6 +7,7 @@ import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.exception.CustomException;
+import com.canhlabs.funnyapp.exception.ResourceNotFoundException;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.service.AdminAccountService;
 import lombok.extern.slf4j.Slf4j;
@@ -45,16 +46,22 @@ public class AdminAccountServiceImpl implements AdminAccountService {
     }
 
     @Override
+    public AdminAccountDto getAccount(Long id) {
+        return userRepo.findById(id).map(this::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+    }
+
+    @Override
     public void updateRole(Long targetId, Long currentUserId, UserRole role) {
         if (targetId.equals(currentUserId)) {
-            throw new IllegalArgumentException("Cannot change your own role");
+            throw selfError();
         }
         UserRole actorRole = actorRole(currentUserId);
         if (!actorRole.outranks(role)) {
-            throw forbidden("Can only assign a role lower than your own");
+            throw forbidden("error.account.roleTooHigh");
         }
         User user = userRepo.findById(targetId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + targetId));
         requireOutranks(actorRole, user);
         // Autopilot grants survive CONTRIBUTOR <-> ADMIN moves and are dropped for USER (ADR-0030 BR-7)
         int keptAutopilot = role == UserRole.USER ? 0 : user.getPermissions() & Permission.AUTOPILOT_BITS;
@@ -69,11 +76,11 @@ public class AdminAccountServiceImpl implements AdminAccountService {
     @Override
     public void deleteAccount(Long targetId, Long currentUserId) {
         if (targetId.equals(currentUserId)) {
-            throw new IllegalArgumentException("Cannot delete your own account");
+            throw selfError();
         }
         UserRole actorRole = actorRole(currentUserId);
         User user = userRepo.findById(targetId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + targetId));
         requireOutranks(actorRole, user);
         userRepo.deleteById(targetId);
         incognitoCache.evict(targetId);
@@ -82,14 +89,14 @@ public class AdminAccountServiceImpl implements AdminAccountService {
     @Override
     public AdminAccountDto updatePermissions(Long targetId, Long currentUserId, int permissions) {
         if (targetId.equals(currentUserId)) {
-            throw new IllegalArgumentException("Cannot change your own permissions");
+            throw selfError();
         }
         if ((permissions & ~(Permission.ALL_BITS | Permission.AUTOPILOT_BITS)) != 0) {
             throw new IllegalArgumentException("Unknown permission bits: " + permissions);
         }
         UserRole actorRole = actorRole(currentUserId);
         User user = userRepo.findById(targetId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + targetId));
         requireOutranks(actorRole, user);
         requireAutopilotRules(actorRole, user, permissions);
         user.setPermissions(permissions);
@@ -104,10 +111,10 @@ public class AdminAccountServiceImpl implements AdminAccountService {
     private static void requireAutopilotRules(UserRole actorRole, User target, int permissions) {
         int requested = permissions & Permission.AUTOPILOT_BITS;
         if (actorRole != UserRole.SUPER_ADMIN && requested != (target.getPermissions() & Permission.AUTOPILOT_BITS)) {
-            throw forbidden("Only the SUPER_ADMIN can change autopilot permissions");
+            throw forbidden("error.account.autopilotBits");
         }
         if (requested != 0 && target.getRole() == UserRole.USER) {
-            throw new IllegalArgumentException("Autopilot permissions need the CONTRIBUTOR or ADMIN role");
+            throw CustomException.of(HttpStatus.BAD_REQUEST, 0, "error.account.autopilotRole");
         }
     }
 
@@ -120,17 +127,21 @@ public class AdminAccountServiceImpl implements AdminAccountService {
     private UserRole actorRole(Long currentUserId) {
         return userRepo.findById(currentUserId)
                 .map(User::getRole)
-                .orElseThrow(() -> forbidden("Current user not found"));
+                .orElseThrow(() -> forbidden("error.account.actorNotFound"));
     }
 
     private static void requireOutranks(UserRole actorRole, User target) {
         if (!actorRole.outranks(target.getRole())) {
-            throw forbidden("Can only manage accounts with a role lower than your own");
+            throw forbidden("error.account.outranked");
         }
     }
 
-    private static CustomException forbidden(String message) {
-        return CustomException.builder().status(HttpStatus.FORBIDDEN).message(message).build();
+    private static CustomException forbidden(String messageKey) {
+        return CustomException.of(HttpStatus.FORBIDDEN, 0, messageKey);
+    }
+
+    private static CustomException selfError() {
+        return CustomException.of(HttpStatus.BAD_REQUEST, 0, "error.account.self");
     }
 
     private AdminAccountDto toDto(User u) {

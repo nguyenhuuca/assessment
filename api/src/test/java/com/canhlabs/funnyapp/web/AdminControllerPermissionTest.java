@@ -132,6 +132,7 @@ class AdminControllerPermissionTest {
     @MockitoBean AdminAccountService adminAccountService;
     @MockitoBean AdminCommentService adminCommentService;
     @MockitoBean com.canhlabs.funnyapp.service.AdminVideoBulkService adminVideoBulkService;
+    @MockitoBean com.canhlabs.funnyapp.service.AdminAccountBulkService adminAccountBulkService;
 
     @Autowired MockMvc mockMvc;
     @Autowired PermissionService permissionService;
@@ -574,5 +575,68 @@ class AdminControllerPermissionTest {
         postVideosBulk("{\"ids\":[1],\"action\":\"VISIBILITY\"}", UserRole.ADMIN)
                 .andExpect(status().isBadRequest());
         verifyNoInteractions(adminVideoBulkService);
+    }
+    // ── bulk accounts ─────────────────────────────────────────────────────────
+
+    private org.springframework.test.web.servlet.ResultActions postAccountsBulk(String body, UserRole role) throws Exception {
+        return mockMvc.perform(post(AppConstant.API.BASE_URL + "/admin/accounts/bulk")
+                .contentType("application/json")
+                .content(body)
+                .with(authentication(principal(role, Permission.ADMIN.getBit()))));
+    }
+
+    @Test
+    void bulkAccounts_admin_returns200() throws Exception {
+        when(adminAccountBulkService.bulk(any(), any())).thenReturn(
+                com.canhlabs.funnyapp.dto.admin.BulkResultDto.builder().requested(1).updated(1).build());
+
+        postAccountsBulk("{\"ids\":[5],\"action\":\"GRANT_PERMISSION\",\"permission\":\"WRITE\"}", UserRole.ADMIN)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void bulkAccounts_userRole_returns403() throws Exception {
+        postAccountsBulk("{\"ids\":[5],\"action\":\"DELETE\"}", UserRole.USER)
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(adminAccountBulkService);
+    }
+
+    @Test
+    void bulkAccounts_emptyIds_returns400() throws Exception {
+        postAccountsBulk("{\"ids\":[],\"action\":\"DELETE\"}", UserRole.ADMIN)
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminAccountBulkService);
+    }
+
+    @Test
+    void bulkAccounts_tooManyIds_returns400() throws Exception {
+        String ids = java.util.stream.LongStream.rangeClosed(1, 101).mapToObj(String::valueOf)
+                .collect(java.util.stream.Collectors.joining(","));
+        postAccountsBulk("{\"ids\":[" + ids + "],\"action\":\"DELETE\"}", UserRole.ADMIN)
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminAccountBulkService);
+    }
+
+    @Test
+    void bulkAccounts_roleActionWithoutRole_returns400() throws Exception {
+        postAccountsBulk("{\"ids\":[5],\"action\":\"ROLE\"}", UserRole.ADMIN)
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminAccountBulkService);
+    }
+
+    @Test
+    void bulkAccounts_permissionActionWithoutPermission_returns400() throws Exception {
+        postAccountsBulk("{\"ids\":[5],\"action\":\"REVOKE_PERMISSION\"}", UserRole.ADMIN)
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminAccountBulkService);
+    }
+
+    @Test
+    void bulkAccounts_unknownRoleOrPermissionName_returns400() throws Exception {
+        postAccountsBulk("{\"ids\":[5],\"action\":\"ROLE\",\"role\":\"ROOT\"}", UserRole.ADMIN)
+                .andExpect(status().isBadRequest());
+        postAccountsBulk("{\"ids\":[5],\"action\":\"GRANT_PERMISSION\",\"permission\":\"NOPE\"}", UserRole.ADMIN)
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(adminAccountBulkService);
     }
 }
