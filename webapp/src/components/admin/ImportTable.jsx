@@ -1,8 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  useCancelImport, useRetryImport, useRunImportNow, useVideoImports,
+  useBulkImports, useCancelImport, useRetryImport, useRunImportNow, useVideoImports,
 } from '../../hooks/useAdmin.js'
+import { useConfirm } from '../../hooks/useConfirm.jsx'
+import { useBulkSelection } from '../../hooks/useBulkSelection.js'
+import { formatBulkResult } from '../../utils/bulkResult.js'
+import BulkActionBar from './BulkActionBar.jsx'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import {
   canCancel, canRetry, canRunNow, errorText, formatMb, formatTime, isRunning, platformLabel,
@@ -56,8 +60,72 @@ export default function ImportTable() {
     mutation.mutate(id, { onError: e => setError(e?.message || t('actionFailed')) })
   }
 
+  const bulk = useBulkImports()
+  const [bulkError, setBulkError] = useState('')
+  const [notice, setNotice] = useState(null) // { summary, reasons: [{ code, count }] }
+  const [confirm, confirmDialog] = useConfirm()
+  const headerBox = useRef(null)
+  const sel = useBulkSelection({ pageIds: jobs.map(j => j.id), resetKey: `${page}|${status}` })
+  const { allSelected, someSelected, toggleAll } = sel
+  const selectedJobs = jobs.filter(j => sel.isSelected(j.id))
+  const anyCancel = selectedJobs.some(canCancel)
+  const anyRetry = selectedJobs.some(canRetry)
+
+  useEffect(() => {
+    if (headerBox.current) headerBox.current.indeterminate = someSelected && !allSelected
+  })
+
+  function runBulk(action) {
+    setBulkError('')
+    setNotice(null)
+    bulk.mutate({ ids: sel.selectedIds, action }, {
+      onSuccess: res => {
+        const r = res?.data ?? res ?? {}
+        const counts = {}
+        ;(r.skipped ?? []).forEach(x => { counts[x.code] = (counts[x.code] ?? 0) + 1 })
+        setNotice({
+          summary: formatBulkResult(r, t),
+          reasons: Object.entries(counts).map(([code, count]) => ({ code, count })),
+        })
+        sel.clear()
+      },
+      onError: e => setBulkError(e?.message || t('actionFailed')),
+    })
+  }
+
+  async function cancelSelected() {
+    const ok = await confirm({
+      title: t('bulkCancelImportsTitle'),
+      message: t('bulkCancelImportsMessage', { count: sel.count }),
+      confirmLabel: t('cancelJob'),
+    })
+    if (ok) runBulk('CANCEL')
+  }
+
   return (
     <div className="admin-table-wrap">
+      {confirmDialog}
+      {bulkError && <div className="app-alert error" role="alert" style={{ marginBottom: 12 }}>{bulkError}</div>}
+      {notice && (
+        <div className="app-alert success" role="status" style={{ marginBottom: 12 }}>
+          {notice.summary}
+          {notice.reasons.length > 0 && (
+            <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
+              {notice.reasons.map(r => (
+                <li key={r.code}>{t('bulkSkippedLabel')}: {t(`bulk.reason.${r.code}`, { defaultValue: t('bulk.reason.unknown') })} ({r.count})</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      <BulkActionBar count={sel.count} onClear={sel.clear}>
+        <button className="app-btn danger" onClick={cancelSelected} disabled={bulk.isPending || !anyCancel} aria-busy={bulk.isPending}>
+          {t('cancelJob')}
+        </button>
+        <button className="app-btn secondary" onClick={() => runBulk('RETRY')} disabled={bulk.isPending || !anyRetry} aria-busy={bulk.isPending}>
+          {t('bulkRetryImports')}
+        </button>
+      </BulkActionBar>
       <div className="admin-filters">
         <select
           className="admin-status-select"
@@ -79,6 +147,7 @@ export default function ImportTable() {
             {/* Fixed column widths: cell content changes with every status update and must not resize the table */}
             <table className="admin-table import-table">
               <colgroup>
+                <col style={{ width: 36 }} />
                 <col />
                 <col className="import-col-platform" />
                 <col className="import-col-status" />
@@ -88,12 +157,14 @@ export default function ImportTable() {
               </colgroup>
               <thead>
                 <tr>
+                  <th><input ref={headerBox} type="checkbox" aria-label={t('selectAll')} checked={allSelected} onChange={toggleAll} /></th>
                   <th>{t('colTitle')}</th><th>{t('colPlatform')}</th><th>{t('colStatus')}</th><th>{t('colProgress')}</th><th>{t('colTime')}</th><th>{t('colActions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {jobs.map(j => (
-                  <tr key={j.id} className="admin-table-row">
+                  <tr key={j.id} className={`admin-table-row${sel.isSelected(j.id) ? ' selected' : ''}`}>
+                    <td><input type="checkbox" aria-label={t('selectImport', { id: j.id })} checked={sel.isSelected(j.id)} onChange={() => sel.toggle(j.id)} /></td>
                     <td><div className="import-cell-title" title={j.title || j.sourceUrl}>{j.title || j.sourceUrl}</div></td>
                     <td className="admin-cell-muted">{platformLabel(j.platform)}</td>
                     <td>

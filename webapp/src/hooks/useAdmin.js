@@ -159,6 +159,7 @@ export const useRunImportNow   = () => useImportMutation((id) => adminApi.runImp
 export const useCancelImport   = () => useImportMutation((id) => adminApi.cancelImport(id))
 export const useRetryImport    = () => useImportMutation((id) => adminApi.retryImport(id))
 export const usePreviewImport  = () => useMutation({ mutationFn: (url) => adminApi.previewImport(url) })
+export const useBulkImports    = () => useImportMutation((body) => adminApi.bulkImports(body))
 
 /** Relative presets resolve to a fresh window at fetch time, so the key holds the filter, not a timestamp. */
 export function useDriveSyncFiles(filter = DEFAULT_TIME_FILTER) {

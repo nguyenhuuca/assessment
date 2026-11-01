@@ -51,6 +51,7 @@ export const previewImport = (url) => api.post('/admin/video-imports/preview', {
 export const runImportNow  = (id) => api.post(`/admin/video-imports/${id}/run-now`)
 export const cancelImport  = (id) => api.post(`/admin/video-imports/${id}/cancel`)
 export const retryImport   = (id) => api.post(`/admin/video-imports/${id}/retry`)
+export const bulkImports   = (body) => api.post('/admin/video-imports/bulk', body)
 
 // Scheduled jobs — see docs/adr/0023-dynamic-cron-jobs.md D4
 export const getJobs   = () => api.get('/admin/jobs')

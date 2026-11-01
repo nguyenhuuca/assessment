@@ -388,7 +388,8 @@
         "import": {
           "duplicateActive": "An import for this link is already active",
           "invalidUrl": "The link is not valid for import",
-          "disabled": "Import is disabled"
+          "disabled": "Import is disabled",
+          "invalidState": "Job is not in a valid state for this action"
         }
       },
       "unknown": "Unknown reason"
@@ -402,5 +403,10 @@
   "bulkDeleteTitle": "Delete selected videos",
   "bulkDeleteMessage_one": "Permanently delete {{count}} selected video? This cannot be undone.",
   "bulkDeleteMessage_other": "Permanently delete {{count}} selected videos? This cannot be undone.",
-  "bulkSkippedLabel": "Skipped"
+  "bulkSkippedLabel": "Skipped",
+  "selectImport": "Select import {{id}}",
+  "bulkCancelImportsTitle": "Cancel selected imports",
+  "bulkCancelImportsMessage_one": "Cancel {{count}} selected import?",
+  "bulkCancelImportsMessage_other": "Cancel {{count}} selected imports?",
+  "bulkRetryImports": "Retry"
 }

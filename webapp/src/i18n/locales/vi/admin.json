@@ -372,7 +372,8 @@
         "import": {
           "duplicateActive": "Đã có import đang chạy cho liên kết này",
           "invalidUrl": "Liên kết không hợp lệ để import",
-          "disabled": "Import đang tắt"
+          "disabled": "Import đang tắt",
+          "invalidState": "Trạng thái job không phù hợp"
         }
       },
       "unknown": "Lý do không xác định"
@@ -385,5 +386,9 @@
   "bulkVisibilityPlaceholder": "Đổi hiển thị…",
   "bulkDeleteTitle": "Xoá các video đã chọn",
   "bulkDeleteMessage_other": "Xoá vĩnh viễn {{count}} video đã chọn? Không thể hoàn tác.",
-  "bulkSkippedLabel": "Bị bỏ qua"
+  "bulkSkippedLabel": "Bị bỏ qua",
+  "selectImport": "Chọn job nhập {{id}}",
+  "bulkCancelImportsTitle": "Huỷ các job đã chọn",
+  "bulkCancelImportsMessage_other": "Huỷ {{count}} job nhập đã chọn?",
+  "bulkRetryImports": "Thử lại"
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import AdminImportPanel from '../AdminImportPanel.jsx'
 import * as adminApi from '../../../api/admin.js'
@@ -12,6 +12,7 @@ vi.mock('../../../api/admin.js', () => ({
   runImportNow: vi.fn(),
   cancelImport: vi.fn(),
   retryImport: vi.fn(),
+  bulkImports: vi.fn(),
 }))
 
 const job = (o) => ({ id: 1, title: 'T', sourceUrl: 'https://youtu.be/a', platform: 'YOUTUBE', status: 'PENDING',
@@ -188,5 +189,95 @@ describe('ImportTable', () => {
     await waitFor(() => expect(adminApi.listImports).toHaveBeenCalled())
     fireEvent.change(screen.getByLabelText('Lọc theo trạng thái'), { target: { value: 'FAILED' } })
     await waitFor(() => expect(adminApi.listImports).toHaveBeenLastCalledWith(expect.objectContaining({ status: 'FAILED' })))
+  })
+})
+
+describe('ImportTable bulk actions', () => {
+  const jobs = () => [
+    job({ id: 1, status: 'PENDING', title: 'P' }),
+    job({ id: 2, status: 'FAILED', errorCode: 'TIMEOUT', title: 'F' }),
+    job({ id: 3, status: 'DONE', ingested: true, title: 'D' }),
+  ]
+  const pick = (id) => fireEvent.click(screen.getByLabelText(`Chọn job nhập ${id}`))
+  const bar = () => screen.getByRole('toolbar')
+
+  beforeEach(() => {
+    adminApi.bulkImports.mockResolvedValue({ data: { requested: 2, updated: 1, unchanged: 0, skipped: [], notFound: [] } })
+  })
+
+  it('shows the bar only with a selection', async () => {
+    setJobs(jobs())
+    renderPanel()
+    await screen.findByText('P')
+    expect(screen.queryByRole('toolbar')).toBeNull()
+    pick(1)
+    expect(bar()).toBeInTheDocument()
+  })
+
+  it('cancel asks for confirmation then sends all selected ids', async () => {
+    setJobs(jobs())
+    renderPanel()
+    await screen.findByText('P')
+    pick(1); pick(3)
+    fireEvent.click(within(bar()).getByText('Huỷ'))
+    const dialog = await screen.findByRole('dialog')
+    expect(adminApi.bulkImports).not.toHaveBeenCalled()
+    fireEvent.click(within(dialog).getAllByRole('button', { name: 'Huỷ' }).pop())
+    await waitFor(() => expect(adminApi.bulkImports).toHaveBeenCalledWith({ ids: [1, 3], action: 'CANCEL' }))
+    expect(await screen.findByRole('status')).toHaveTextContent('1')
+    expect(screen.queryByRole('toolbar')).toBeNull()
+  })
+
+  it('retry sends without confirmation', async () => {
+    setJobs(jobs())
+    renderPanel()
+    await screen.findByText('P')
+    pick(2)
+    fireEvent.click(within(bar()).getByText('Thử lại'))
+    await waitFor(() => expect(adminApi.bulkImports).toHaveBeenCalledWith({ ids: [2], action: 'RETRY' }))
+  })
+
+  it('disables buttons when no selected row qualifies', async () => {
+    setJobs(jobs())
+    renderPanel()
+    await screen.findByText('P')
+    pick(3)
+    expect(within(bar()).getByText('Huỷ')).toBeDisabled()
+    expect(within(bar()).getByText('Thử lại')).toBeDisabled()
+    pick(1)
+    expect(within(bar()).getByText('Huỷ')).toBeEnabled()
+    expect(within(bar()).getByText('Thử lại')).toBeDisabled()
+  })
+
+  it('lists skipped reasons', async () => {
+    adminApi.bulkImports.mockResolvedValue({ data: { requested: 2, updated: 1, unchanged: 0,
+      skipped: [{ id: 2, code: 'error.import.invalidState', message: 'x' }], notFound: [] } })
+    setJobs(jobs())
+    renderPanel()
+    await screen.findByText('P')
+    pick(2)
+    fireEvent.click(within(bar()).getByText('Thử lại'))
+    expect(await screen.findByRole('status')).toHaveTextContent('Trạng thái job không phù hợp')
+  })
+
+  it('keeps the selection and shows an alert on error', async () => {
+    adminApi.bulkImports.mockRejectedValue(new Error('boom'))
+    setJobs(jobs())
+    renderPanel()
+    await screen.findByText('P')
+    pick(2)
+    fireEvent.click(within(bar()).getByText('Thử lại'))
+    expect(await screen.findByRole('alert')).toHaveTextContent('boom')
+    expect(bar()).toBeInTheDocument()
+  })
+
+  it('select-all selects the page and a filter change clears it', async () => {
+    setJobs(jobs())
+    renderPanel()
+    await screen.findByText('P')
+    fireEvent.click(screen.getByLabelText('Chọn tất cả trên trang'))
+    expect(screen.getByLabelText('Chọn job nhập 3')).toBeChecked()
+    fireEvent.change(screen.getByLabelText('Lọc theo trạng thái'), { target: { value: 'FAILED' } })
+    await waitFor(() => expect(screen.queryByRole('toolbar')).toBeNull())
   })
 })
