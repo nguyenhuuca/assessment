@@ -13,5 +13,6 @@ export const collectionsApi = {
   addVideo: (id, videoId) => api.put(`/collections/${enc(id)}/videos/${enc(videoId)}`),
   moveVideo: (id, videoId, afterVideoId) => api.patch(`/collections/${enc(id)}/videos/${enc(videoId)}`, { afterVideoId }),
   removeVideo: (id, videoId) => api.delete(`/collections/${enc(id)}/videos/${enc(videoId)}`),
+  bulkAddVideos: (id, videoIds) => api.post(`/collections/${enc(id)}/videos/bulk`, { videoIds }),
   membership: (videoId) => api.get(`/collections/membership?videoId=${enc(videoId)}`),
 }

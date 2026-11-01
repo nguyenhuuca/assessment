@@ -7,6 +7,7 @@ import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { useTranslation } from 'react-i18next'
 import AddToCollectionModal from '../library/AddToCollectionModal.jsx'
 import RowActionsMenu from './RowActionsMenu.jsx'
+import BulkAddToCollectionModal from './BulkAddToCollectionModal.jsx'
 import BulkActionBar from './BulkActionBar.jsx'
 import { useBulkSelection } from '../../hooks/useBulkSelection.js'
 import { formatBulkResult } from '../../utils/bulkResult.js'
@@ -134,6 +135,7 @@ export default function AdminVideoTable({ statusFilter }) {
   const { t } = useTranslation('admin')
   const [page, setPage] = useState(0)
   const [collectionVideo, setCollectionVideo] = useState(null)
+  const [bulkAddOpen, setBulkAddOpen] = useState(false)
   const [saveState, setSaveState] = useState({}) // { [`${id}:${field}`]: 'saving' | 'saved' | 'error' }
   const { data, isLoading } = useAdminVideos(page, statusFilter)
   const updateStatus   = useUpdateVideoStatus()
@@ -178,20 +180,22 @@ export default function AdminVideoTable({ statusFilter }) {
     if (headerBox.current) headerBox.current.indeterminate = someSelected && !allSelected
   })
 
+  function showResult(res) {
+    const r = res?.data ?? res ?? {}
+    const counts = {}
+    ;(r.skipped ?? []).forEach(x => { counts[x.code] = (counts[x.code] ?? 0) + 1 })
+    setNotice({
+      summary: formatBulkResult(r, t),
+      reasons: Object.entries(counts).map(([code, count]) => ({ code, count })),
+    })
+    sel.clear()
+  }
+
   function runBulk(body) {
     setBulkError('')
     setNotice(null)
     bulk.mutate({ ids: sel.selectedIds, ...body }, {
-      onSuccess: res => {
-        const r = res?.data ?? res ?? {}
-        const counts = {}
-        ;(r.skipped ?? []).forEach(x => { counts[x.code] = (counts[x.code] ?? 0) + 1 })
-        setNotice({
-          summary: formatBulkResult(r, t),
-          reasons: Object.entries(counts).map(([code, count]) => ({ code, count })),
-        })
-        sel.clear()
-      },
+      onSuccess: showResult,
       onError: e => setBulkError(e?.message || t('actionFailed')),
     })
   }
@@ -214,6 +218,13 @@ export default function AdminVideoTable({ statusFilter }) {
     <div className="admin-table-wrap">
       {confirmDialog}
       {collectionVideo && <AddToCollectionModal video={collectionVideo} onClose={() => setCollectionVideo(null)} />}
+      {bulkAddOpen && (
+        <BulkAddToCollectionModal
+          videoIds={sel.selectedIds}
+          onClose={() => setBulkAddOpen(false)}
+          onDone={res => { setBulkError(''); showResult(res); setBulkAddOpen(false) }}
+        />
+      )}
       {bulkError && <div className="app-alert error" role="alert" style={{ marginBottom: 12 }}>{bulkError}</div>}
       {notice && (
         <div className="app-alert success" role="status" style={{ marginBottom: 12 }}>
@@ -248,6 +259,10 @@ export default function AdminVideoTable({ statusFilter }) {
           <option value="">{t('bulkVisibilityPlaceholder')}</option>
           {VISIBILITIES.map(o => <option key={o} value={o}>{t(`visibility.${o}`)}</option>)}
         </select>
+        <button className="app-btn secondary" onClick={() => { setNotice(null); setBulkAddOpen(true) }} disabled={bulk.isPending}>
+          <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: 18 }}>playlist_add</span>
+          {t('addToCollection')}
+        </button>
         <button className="app-btn danger" onClick={deleteSelected} disabled={bulk.isPending} aria-busy={bulk.isPending}>
           {t('delete')}
         </button>

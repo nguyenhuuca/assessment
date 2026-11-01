@@ -4,6 +4,7 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import AdminVideoTable from '../AdminVideoTable.jsx'
 import * as adminApi from '../../../api/admin.js'
+import { collectionsApi } from '../../../api/collections.js'
 
 vi.mock('../../../api/admin.js', () => ({
   getVideos: vi.fn(),
@@ -14,6 +15,10 @@ vi.mock('../../../api/admin.js', () => ({
   enableVideoHls: vi.fn(),
   disableVideoHls: vi.fn(),
   bulkVideos: vi.fn(),
+}))
+
+vi.mock('../../../api/collections.js', () => ({
+  collectionsApi: { mine: vi.fn(), create: vi.fn(), bulkAddVideos: vi.fn(), membership: vi.fn() },
 }))
 
 let mockRole = 'ADMIN'
@@ -316,6 +321,27 @@ describe('AdminVideoTable bulk actions', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('boom')
     expect(screen.getByRole('toolbar')).toBeInTheDocument()
     expect(screen.getByLabelText('Chọn video 1')).toBeChecked()
+  })
+
+  it('adds the selection to a collection, shows the notice with the skip reason and clears the selection', async () => {
+    collectionsApi.mine.mockResolvedValue({ data: [{ id: 'x', name: 'Hài', visibility: 'PRIVATE', canManage: true }] })
+    collectionsApi.bulkAddVideos.mockResolvedValue({ data: {
+      requested: 2, updated: 1, unchanged: 0, notFound: [],
+      skipped: [{ id: 2, code: 'error.collection.videoNotEligible', message: 'x' }],
+    } })
+    await selectPage()
+    fireEvent.click(within(screen.getByRole('toolbar')).getByRole('button', { name: /Thêm vào collection/ }))
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent('2 video')
+    fireEvent.click(await within(dialog).findByLabelText('Hài'))
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Thêm 2 video' }))
+    await waitFor(() => expect(collectionsApi.bulkAddVideos).toHaveBeenCalledWith('x', [1, 2]))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    const notice = await screen.findByRole('status')
+    expect(notice).toHaveTextContent('1 đã cập nhật')
+    expect(notice).toHaveTextContent('1 bị bỏ qua')
+    expect(notice).toHaveTextContent('Video không đủ điều kiện để thêm vào collection (đang ẩn hoặc chưa đăng) (1)')
+    expect(screen.queryByRole('toolbar')).toBeNull()
   })
 
   it('clears the selection when the page changes', async () => {

@@ -374,6 +374,10 @@
           "invalidUrl": "Liên kết không hợp lệ để import",
           "disabled": "Import đang tắt",
           "invalidState": "Trạng thái job không phù hợp"
+        },
+        "collection": {
+          "videoNotEligible": "Video không đủ điều kiện để thêm vào collection (đang ẩn hoặc chưa đăng)",
+          "full": "Collection đã đầy"
         }
       },
       "unknown": "Lý do không xác định"
@@ -390,5 +394,10 @@
   "selectImport": "Chọn job nhập {{id}}",
   "bulkCancelImportsTitle": "Huỷ các job đã chọn",
   "bulkCancelImportsMessage_other": "Huỷ {{count}} job nhập đã chọn?",
-  "bulkRetryImports": "Thử lại"
+  "bulkRetryImports": "Thử lại",
+  "bulkAddTitle": "Thêm vào collection",
+  "bulkAddSubtitle_other": "{{count}} video",
+  "bulkAddSubmit_other": "Thêm {{count}} video",
+  "bulkAddCreateAndAdd": "Tạo và thêm",
+  "bulkAddNone": "Chưa có collection nào. Hãy tạo mới bên dưới."
 }

@@ -153,6 +153,24 @@ export function useToggleCollectionItem() {
 }
 
 /**
+ * Add many videos to one collection (admin bulk action). Variables: { id, videoIds, visibility? }.
+ * Resolves to the bulk result ({ requested, updated, unchanged, skipped, notFound }).
+ */
+export function useBulkAddToCollection() {
+  const qc = useQueryClient()
+  const invalidateLists = useInvalidateLists()
+  return useMutation({
+    mutationFn: async ({ id, videoIds }) => unwrap(await collectionsApi.bulkAddVideos(id, videoIds)),
+    onSuccess: (_res, { id, visibility }) => Promise.all([
+      invalidateLists({ includePublic: visibility !== 'PRIVATE' }),
+      qc.invalidateQueries({ queryKey: ['collections', id, 'videos'] }),
+      qc.invalidateQueries({ queryKey: ['collections', 'membership'] }),
+      qc.invalidateQueries({ queryKey: ['admin', 'videos'] }),
+    ]),
+  })
+}
+
+/**
  * Move a video to sit right after `afterVideoId` (null = top) in a collection's order.
  * Variables: { id, videoId, afterVideoId, visibility? }. The full-list cache is reordered at once and rolled back on error;
  * paged queries and the lists (the cover may change) are refetched. The 'all' key is left alone so a drop does not reload up to 500 items.

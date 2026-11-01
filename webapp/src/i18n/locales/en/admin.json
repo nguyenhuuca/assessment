@@ -390,6 +390,10 @@
           "invalidUrl": "The link is not valid for import",
           "disabled": "Import is disabled",
           "invalidState": "Job is not in a valid state for this action"
+        },
+        "collection": {
+          "videoNotEligible": "Not eligible for a collection (hidden or unpublished)",
+          "full": "Collection is full"
         }
       },
       "unknown": "Unknown reason"
@@ -408,5 +412,12 @@
   "bulkCancelImportsTitle": "Cancel selected imports",
   "bulkCancelImportsMessage_one": "Cancel {{count}} selected import?",
   "bulkCancelImportsMessage_other": "Cancel {{count}} selected imports?",
-  "bulkRetryImports": "Retry"
+  "bulkRetryImports": "Retry",
+  "bulkAddTitle": "Add to collection",
+  "bulkAddSubtitle_one": "{{count}} video",
+  "bulkAddSubtitle_other": "{{count}} videos",
+  "bulkAddSubmit_one": "Add {{count}} video",
+  "bulkAddSubmit_other": "Add {{count}} videos",
+  "bulkAddCreateAndAdd": "Create and add",
+  "bulkAddNone": "No collections yet. Create one below."
 }
