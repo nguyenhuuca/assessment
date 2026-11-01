@@ -303,7 +303,15 @@
     "rereviewBadge": "Re-review {{count}}/{{max}}",
     "cannotReopen": "This suggestion can't be reopened (its import is running or finished)",
     "alreadyPending": "This suggestion is already pending",
-    "duplicate": "Another pending suggestion or active import already exists for this link"
+    "duplicate": "Another pending suggestion or active import already exists for this link",
+    "selectRow": "Select suggestion {{id}}",
+    "bulkApproveTitle": "Approve selected suggestions",
+    "bulkApproveMessage_one": "Approve {{count}} selected suggestion? Each one starts an import.",
+    "bulkApproveMessage_other": "Approve {{count}} selected suggestions? Each one starts an import.",
+    "bulkRejectTitle_one": "Reject {{count}} suggestion",
+    "bulkRejectTitle_other": "Reject {{count}} suggestions",
+    "bulkRejectSubtitle_one": "{{count}} selected suggestion will be rejected with the reason below.",
+    "bulkRejectSubtitle_other": "{{count}} selected suggestions will be rejected with the reason below."
   },
   "jobs": {
     "colName": "Job",
@@ -372,7 +380,16 @@
       "error": {
         "conflict": "Conflict, could not be applied",
         "unexpected": "Unexpected error",
-        "request": "Invalid request"
+        "request": "Invalid request",
+        "suggestion": {
+          "notPending": "Suggestion was already reviewed",
+          "notFound": "Suggestion not found"
+        },
+        "import": {
+          "duplicateActive": "An import for this link is already active",
+          "invalidUrl": "The link is not valid for import",
+          "disabled": "Import is disabled"
+        }
       },
       "unknown": "Unknown reason"
     }

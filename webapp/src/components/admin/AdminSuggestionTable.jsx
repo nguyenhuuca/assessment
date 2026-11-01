@@ -1,17 +1,23 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  useAdminSuggestions, useApproveSuggestion, useRejectSuggestion, useReopenSuggestion,
+  useAdminSuggestions, useApproveSuggestion, useRejectSuggestion, useReopenSuggestion, useBulkSuggestions,
 } from '../../hooks/useAdminSuggestions.js'
 import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { isBusyFor } from '../../utils/mutationBusy.js'
 import { formatDate as formatDateI18n } from '../../i18n/format.js'
 import ModalHeader from '../common/ModalHeader.jsx'
+import BulkActionBar from './BulkActionBar.jsx'
+import { useBulkSelection } from '../../hooks/useBulkSelection.js'
+import { formatBulkResult } from '../../utils/bulkResult.js'
 
 const FILTERS = ['PENDING', 'APPROVED', 'REJECTED', 'LIVE']
 const REASONS = ['DUPLICATE', 'INAPPROPRIATE', 'LOW_QUALITY', 'COPYRIGHT', 'OTHER']
 const TITLE_MAX = 200
 const NOTE_MAX = 300
+const BULK_MAX = 100
+
+const isPending = s => s.status === 'PENDING'
 
 const REOPEN_ERRORS = {
   'error.suggestion.cannotReopen': 'sugg.cannotReopen',
@@ -27,6 +33,7 @@ function useErrorText() {
   const { t } = useTranslation('admin')
   return err => {
     if (err?.code === 'error.import.disabled') return t('sugg.importDisabled')
+    if (err?.code === 'error.suggestion.noteRequired') return t('otherNeedsNote')
     if (err?.code === 'error.suggestion.notPending') return t('sugg.notPending')
     const key = REOPEN_ERRORS[err?.code]
     if (key) return t(key)
@@ -78,7 +85,7 @@ function ApproveModal({ suggestion, onClose, onSubmit, saving, error }) {
   )
 }
 
-function RejectModal({ suggestion, onClose, onSubmit, saving, error }) {
+function RejectModal({ label, subtitle, onClose, onSubmit, saving, error }) {
   const { t } = useTranslation('admin')
   const [reason, setReason] = useState('')
   const [note, setNote] = useState('')
@@ -93,13 +100,13 @@ function RejectModal({ suggestion, onClose, onSubmit, saving, error }) {
 
   return (
     <ModalShell
-      label={t('sugg.rejectDialog')}
+      label={label}
       icon="block"
       tone="danger"
       onClose={onClose}
       footer={<button className="app-btn danger" onClick={submit} disabled={saving} aria-busy={saving}>{t('sugg.reject')}</button>}
     >
-      <p className="admin-cell-muted" style={{ marginTop: 0, wordBreak: 'break-all' }}>{suggestion.title || suggestion.sourceUrl}</p>
+      <p className="admin-cell-muted" style={{ marginTop: 0, wordBreak: 'break-all' }}>{subtitle}</p>
       <label className="app-label" htmlFor="sugg-reason">{t('reason')}</label>
       <select id="sugg-reason" className="app-input" value={reason} onChange={e => setReason(e.target.value)}>
         <option value="">{t('chooseReason')}</option>
@@ -164,11 +171,58 @@ export default function AdminSuggestionTable() {
   const reject = useRejectSuggestion()
   const reopen = useReopenSuggestion()
   const [confirm, confirmDialog] = useConfirm()
+  const bulk = useBulkSuggestions()
+  const [bulkError, setBulkError] = useState('')
+  const [bulkReject, setBulkReject] = useState(false)
+  const [notice, setNotice] = useState(null) // { summary, reasons: [{ code, count }] }
+  const headerBox = useRef(null)
 
   const pageData = data?.data ?? data ?? {}
   const items = pageData?.content ?? []
   const totalPages = pageData?.totalPages ?? 0
   const totalElements = pageData?.totalElements ?? 0
+
+  // Selection is per page and status filter; only PENDING rows can be moderated in bulk.
+  const pendingIds = new Set(items.filter(isPending).map(s => s.id))
+  const sel = useBulkSelection({
+    pageIds: items.map(s => s.id),
+    resetKey: `${page}|${status}`,
+    max: BULK_MAX,
+    isSelectable: id => pendingIds.has(id),
+  })
+  const { allSelected, someSelected, toggleAll } = sel
+
+  useEffect(() => {
+    if (headerBox.current) headerBox.current.indeterminate = someSelected && !allSelected
+  })
+
+  function runBulk(body) {
+    setBulkError('')
+    setNotice(null)
+    bulk.mutate({ ids: sel.selectedIds, ...body }, {
+      onSuccess: res => {
+        const r = res?.data ?? res ?? {}
+        const counts = {}
+        ;(r.skipped ?? []).forEach(x => { counts[x.code] = (counts[x.code] ?? 0) + 1 })
+        setNotice({
+          summary: formatBulkResult(r, t),
+          reasons: Object.entries(counts).map(([code, count]) => ({ code, count })),
+        })
+        setBulkReject(false)
+        sel.clear()
+      },
+      onError: e => setBulkError(errorText(e)),
+    })
+  }
+
+  async function approveSelected() {
+    const ok = await confirm({
+      title: t('sugg.bulkApproveTitle'),
+      message: t('sugg.bulkApproveMessage', { count: sel.count }),
+      confirmLabel: t('sugg.approve'),
+    })
+    if (ok) runBulk({ action: 'APPROVE' })
+  }
 
   function open(kind, s) { setError(''); setTarget({ kind, s }) }
 
@@ -206,6 +260,27 @@ export default function AdminSuggestionTable() {
           <option value="ALL">{t('all')}</option>
         </select>
       </div>
+      {bulkError && !bulkReject && <div className="app-alert error" role="alert" style={{ marginBottom: 12 }}>{bulkError}</div>}
+      {notice && (
+        <div className="app-alert success" role="status" style={{ marginBottom: 12 }}>
+          {notice.summary}
+          {notice.reasons.length > 0 && (
+            <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
+              {notice.reasons.map(r => (
+                <li key={r.code}>{t('bulkSkippedLabel')}: {t(`bulk.reason.${r.code}`, { defaultValue: t('bulk.reason.unknown') })} ({r.count})</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      <BulkActionBar count={sel.count} onClear={sel.clear}>
+        <button className="app-btn primary" onClick={approveSelected} disabled={bulk.isPending} aria-busy={bulk.isPending}>
+          {t('sugg.approve')}
+        </button>
+        <button className="app-btn danger" onClick={() => { setBulkError(''); setBulkReject(true) }} disabled={bulk.isPending}>
+          {t('sugg.reject')}
+        </button>
+      </BulkActionBar>
       {error && !target && <div className="app-alert error" role="alert" style={{ marginBottom: 12 }}>{error}</div>}
 
       {isLoading ? (
@@ -217,6 +292,16 @@ export default function AdminSuggestionTable() {
             <table className="admin-table">
               <thead>
                 <tr>
+                  <th style={{ width: 36 }}>
+                    <input
+                      ref={headerBox}
+                      type="checkbox"
+                      aria-label={t('selectAll')}
+                      checked={allSelected}
+                      disabled={pendingIds.size === 0}
+                      onChange={toggleAll}
+                    />
+                  </th>
                   <th>{t('sugg.colLink')}</th>
                   <th>{t('sugg.colTitle')}</th>
                   <th>{t('sugg.colNote')}</th>
@@ -228,7 +313,17 @@ export default function AdminSuggestionTable() {
               </thead>
               <tbody>
                 {items.map(s => (
-                  <tr key={s.id} className="admin-table-row">
+                  <tr key={s.id} className={`admin-table-row${sel.isSelected(s.id) ? ' selected' : ''}`}>
+                    <td>
+                      {isPending(s) && (
+                        <input
+                          type="checkbox"
+                          aria-label={t('sugg.selectRow', { id: s.id })}
+                          checked={sel.isSelected(s.id)}
+                          onChange={() => sel.toggle(s.id)}
+                        />
+                      )}
+                    </td>
                     <td className="admin-cell-muted" style={{ maxWidth: 220, wordBreak: 'break-all' }}>
                       <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer">{s.sourceUrl}</a>
                       <div style={{ opacity: 0.6 }}>{s.platform}</div>
@@ -305,11 +400,22 @@ export default function AdminSuggestionTable() {
       )}
       {target?.kind === 'reject' && (
         <RejectModal
-          suggestion={target.s}
+          label={t('sugg.rejectDialog')}
+          subtitle={target.s.title || target.s.sourceUrl}
           saving={reject.isPending}
           error={error}
           onClose={() => setTarget(null)}
           onSubmit={({ reason, note }) => run(reject, { id: target.s.id, reason, note })}
+        />
+      )}
+      {bulkReject && (
+        <RejectModal
+          label={t('sugg.bulkRejectTitle', { count: sel.count })}
+          subtitle={t('sugg.bulkRejectSubtitle', { count: sel.count })}
+          saving={bulk.isPending}
+          error={bulkError}
+          onClose={() => setBulkReject(false)}
+          onSubmit={({ reason, note }) => runBulk({ action: 'REJECT', reason, ...(note ? { note } : {}) })}
         />
       )}
     </div>

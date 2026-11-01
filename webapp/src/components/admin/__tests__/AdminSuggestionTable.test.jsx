@@ -7,7 +7,7 @@ import { suggestionsApi } from '../../../api/suggestions.js'
 import i18n from '../../../i18n/index.js'
 
 vi.mock('../../../api/suggestions.js', () => ({
-  suggestionsApi: { adminList: vi.fn(), approve: vi.fn(), reject: vi.fn(), reopen: vi.fn(), pendingCount: vi.fn() },
+  suggestionsApi: { adminList: vi.fn(), approve: vi.fn(), reject: vi.fn(), reopen: vi.fn(), pendingCount: vi.fn(), bulk: vi.fn() },
 }))
 
 const pending = {
@@ -206,6 +206,68 @@ describe('AdminSuggestionTable', () => {
       fireEvent.click(await screen.findByLabelText('Reopen'))
       fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Reopen' }))
       expect(await screen.findByText("This suggestion can't be reopened (its import is running or finished)")).toBeTruthy()
+    })
+  })
+
+  describe('bulk', () => {
+    const pending2 = { ...pending, id: 4, title: 'Second' }
+    const rows = { data: { content: [pending, pending2, rejected, approved], totalPages: 1, totalElements: 4 } }
+
+    async function renderEn() {
+      await i18n.changeLanguage('en')
+      suggestionsApi.adminList.mockResolvedValue(rows)
+      renderTable()
+      await screen.findByText('Funny cat')
+    }
+
+    it('only PENDING rows are selectable and select-all skips the rest', async () => {
+      await renderEn()
+      expect(screen.queryByLabelText('Select suggestion 2')).toBeNull()
+      expect(screen.queryByLabelText('Select suggestion 3')).toBeNull()
+      fireEvent.click(screen.getByLabelText('Select all on page'))
+      expect(screen.getByLabelText('Select suggestion 1')).toBeChecked()
+      expect(screen.getByLabelText('Select suggestion 4')).toBeChecked()
+      expect(screen.getByRole('toolbar')).toHaveTextContent('2')
+    })
+
+    it('approves the selection after confirming and shows skipped reasons', async () => {
+      suggestionsApi.bulk.mockResolvedValue({ data: { requested: 2, updated: 1, unchanged: 0, skipped: [{ id: 4, code: 'error.import.duplicateActive', message: 'x' }], notFound: [] } })
+      await renderEn()
+      fireEvent.click(screen.getByLabelText('Select all on page'))
+      fireEvent.click(within(screen.getByRole('toolbar')).getByRole('button', { name: 'Approve' }))
+      expect(suggestionsApi.bulk).not.toHaveBeenCalled()
+      fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Approve' }))
+      await waitFor(() => expect(suggestionsApi.bulk).toHaveBeenCalledWith({ ids: [1, 4], action: 'APPROVE' }))
+      const status = await screen.findByRole('status')
+      expect(status).toHaveTextContent('1 updated')
+      expect(status).toHaveTextContent('An import for this link is already active')
+      expect(screen.queryByRole('toolbar')).toBeNull()
+    })
+
+    it('rejects with reason and a required note for OTHER', async () => {
+      suggestionsApi.bulk.mockResolvedValue({ data: { requested: 1, updated: 1, unchanged: 0, skipped: [], notFound: [] } })
+      await renderEn()
+      fireEvent.click(screen.getByLabelText('Select suggestion 1'))
+      fireEvent.click(within(screen.getByRole('toolbar')).getByRole('button', { name: 'Reject' }))
+      const dialog = screen.getByRole('dialog', { name: 'Reject 1 suggestion' })
+      fireEvent.change(within(dialog).getByLabelText('Reason'), { target: { value: 'OTHER' } })
+      fireEvent.click(within(dialog).getByRole('button', { name: 'Reject' }))
+      expect(await within(dialog).findByRole('alert')).toBeTruthy()
+      expect(suggestionsApi.bulk).not.toHaveBeenCalled()
+      fireEvent.change(within(dialog).getByLabelText(/Note/), { target: { value: 'spam' } })
+      fireEvent.click(within(dialog).getByRole('button', { name: 'Reject' }))
+      await waitFor(() => expect(suggestionsApi.bulk).toHaveBeenCalledWith({ ids: [1], action: 'REJECT', reason: 'OTHER', note: 'spam' }))
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    })
+
+    it('keeps the selection and shows an alert on a whole-request error', async () => {
+      suggestionsApi.bulk.mockRejectedValue({ status: 503, code: 'error.import.disabled', message: 'x' })
+      await renderEn()
+      fireEvent.click(screen.getByLabelText('Select suggestion 1'))
+      fireEvent.click(within(screen.getByRole('toolbar')).getByRole('button', { name: 'Approve' }))
+      fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Approve' }))
+      expect(await screen.findByRole('alert')).toHaveTextContent('Import is disabled (VIDEO_IMPORT_ENABLED)')
+      expect(screen.getByLabelText('Select suggestion 1')).toBeChecked()
     })
   })
 })

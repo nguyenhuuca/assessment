@@ -294,7 +294,12 @@
     "rereviewBadge": "Yêu cầu review lại {{count}}/{{max}}",
     "cannotReopen": "Không thể mở lại đề xuất này (import đang chạy hoặc đã xong)",
     "alreadyPending": "Đề xuất này đang chờ duyệt",
-    "duplicate": "Đã có đề xuất đang chờ hoặc import đang chạy cho liên kết này"
+    "duplicate": "Đã có đề xuất đang chờ hoặc import đang chạy cho liên kết này",
+    "selectRow": "Chọn đề xuất {{id}}",
+    "bulkApproveTitle": "Duyệt các đề xuất đã chọn",
+    "bulkApproveMessage_other": "Duyệt {{count}} đề xuất đã chọn? Mỗi đề xuất sẽ tạo một import.",
+    "bulkRejectTitle_other": "Từ chối {{count}} đề xuất",
+    "bulkRejectSubtitle_other": "{{count}} đề xuất đã chọn sẽ bị từ chối với lý do bên dưới."
   },
   "jobs": {
     "colName": "Tác vụ",
@@ -359,7 +364,16 @@
       "error": {
         "conflict": "Xung đột trạng thái, không thể thực hiện",
         "unexpected": "Lỗi không mong muốn",
-        "request": "Yêu cầu không hợp lệ"
+        "request": "Yêu cầu không hợp lệ",
+        "suggestion": {
+          "notPending": "Đề xuất đã được xử lý",
+          "notFound": "Không tìm thấy đề xuất"
+        },
+        "import": {
+          "duplicateActive": "Đã có import đang chạy cho liên kết này",
+          "invalidUrl": "Liên kết không hợp lệ để import",
+          "disabled": "Import đang tắt"
+        }
       },
       "unknown": "Lý do không xác định"
     }

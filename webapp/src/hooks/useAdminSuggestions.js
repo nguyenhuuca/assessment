@@ -34,3 +34,5 @@ export const useRejectSuggestion = () =>
   useSuggestionMutation(({ id, reason, note }) => suggestionsApi.reject(id, reason, note))
 export const useReopenSuggestion = () =>
   useSuggestionMutation(({ id }) => suggestionsApi.reopen(id))
+export const useBulkSuggestions = () =>
+  useSuggestionMutation(body => suggestionsApi.bulk(body))
