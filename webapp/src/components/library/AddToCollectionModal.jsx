@@ -8,6 +8,7 @@ import {
   useCreateCollection,
 } from '../../hooks/useCollections.js'
 import { isBusyFor } from '../../utils/mutationBusy.js'
+import { useStableOrder } from '../../hooks/useStableOrder.js'
 import { isPublic, validateName, collectionName, NAME_MAX } from './collectionUtils.js'
 
 export default function AddToCollectionModal({ video, onClose }) {
@@ -29,8 +30,12 @@ export default function AddToCollectionModal({ video, onClose }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  // The server sorts by updatedAt, which every add/remove bumps; keep the order from when the modal opened
+  // so a toggled row does not jump to the top after the refetch.
+  const ordered = useStableOrder(mine.data)
+
   // Only collections the viewer can manage (own collections; public ones only for admins)
-  const collections = (mine.data ?? []).filter(c => c.canManage !== false)
+  const collections = ordered.filter(c => c.canManage !== false)
   const savedIds = new Set((membership.data ?? []).map(String))
   const apiError = toggle.error?.message || create.error?.message || ''
 

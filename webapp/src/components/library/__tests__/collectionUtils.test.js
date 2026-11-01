@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { moveAfterId, moveAfter } from '../collectionUtils.js'
+import { moveAfterId, moveAfter, stableOrder, sortByOrder } from '../collectionUtils.js'
 
 describe('moveAfterId', () => {
   const ids = [10, 20, 30, 40]
@@ -25,5 +25,22 @@ describe('moveAfter', () => {
   it('ignores unknown ids', () => {
     expect(moveAfter(items, 9, null, x => x.id)).toBe(items)
     expect(moveAfter(items, 1, 9, x => x.id)).toBe(items)
+  })
+})
+
+describe('stableOrder / sortByOrder', () => {
+  const items = ids => ids.map(id => ({ id }))
+
+  it('takes the server order the first time', () => {
+    expect(stableOrder(null, items([1, 2, 3]))).toEqual(['1', '2', '3'])
+  })
+
+  it('keeps known ids in place, appends new ones and drops removed ones', () => {
+    expect(stableOrder(['1', '2', '3'], items([4, 3, 1]))).toEqual(['1', '3', '4'])
+  })
+
+  it('sorts by the kept order, unknown ids last', () => {
+    expect(sortByOrder(items([3, 9, 1, 2]), ['1', '2', '3']).map(x => x.id)).toEqual([1, 2, 3, 9])
+    expect(sortByOrder(items([2, 1]), null).map(x => x.id)).toEqual([2, 1])
   })
 })

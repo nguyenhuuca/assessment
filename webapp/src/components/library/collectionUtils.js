@@ -26,6 +26,27 @@ export function pinDefaultFirst(collections = []) {
   return [...collections.filter(c => c.isDefault), ...collections.filter(c => !c.isDefault)]
 }
 
+/**
+ * Keeps a list order stable across refetches: ids already in `prevOrder` keep their place, ids it lacks
+ * (a collection created meanwhile) are appended, ids gone from `items` are dropped. Returns the new id order.
+ */
+export function stableOrder(prevOrder, items = [], getId = x => String(x.id)) {
+  const ids = items.map(getId)
+  if (!prevOrder) return ids
+  const present = new Set(ids)
+  const kept = prevOrder.filter(id => present.has(id))
+  const known = new Set(kept)
+  return [...kept, ...ids.filter(id => !known.has(id))]
+}
+
+/** `items` sorted by `order` (ids missing from it go last, in their own order). */
+export function sortByOrder(items = [], order, getId = x => String(x.id)) {
+  if (!order) return items
+  const rank = new Map(order.map((id, i) => [id, i]))
+  const at = x => rank.get(getId(x)) ?? Number.MAX_SAFE_INTEGER
+  return [...items].sort((a, b) => at(a) - at(b))
+}
+
 /** Copy of `items` with the element at `from` moved to index `to` (same semantics as dnd-kit's arrayMove). */
 export function moveItem(items, from, to) {
   const next = [...items]

@@ -57,6 +57,33 @@ describe('AddToCollectionModal', () => {
     await waitFor(() => expect(collectionsApi.removeVideo).toHaveBeenCalledWith('x', 9))
   })
 
+  it('keeps the list order after a toggle even though the server re-sorts by updatedAt', async () => {
+    collectionsApi.mine.mockResolvedValue({
+      data: [
+        { id: 'w', name: 'Xem sau', isDefault: true, visibility: 'PRIVATE', canManage: true },
+        { id: 'a', name: 'A', visibility: 'PRIVATE', canManage: true },
+        { id: 'b', name: 'B', visibility: 'PRIVATE', canManage: true },
+      ],
+    })
+    collectionsApi.addVideo.mockImplementation(async () => {
+      // the toggle bumps B's updatedAt, so the refetch returns it right after the default
+      collectionsApi.mine.mockResolvedValue({
+        data: [
+          { id: 'w', name: 'Xem sau', isDefault: true, visibility: 'PRIVATE', canManage: true },
+          { id: 'b', name: 'B', visibility: 'PRIVATE', canManage: true },
+          { id: 'a', name: 'A', visibility: 'PRIVATE', canManage: true },
+        ],
+      })
+      return null
+    })
+    const names = () => screen.getAllByRole('checkbox').map(el => el.closest('label').textContent)
+    renderModal()
+    fireEvent.click(await screen.findByLabelText('B'))
+    await waitFor(() => expect(collectionsApi.mine).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(collectionsApi.membership).toHaveBeenCalledTimes(2))
+    expect(names()).toEqual(['Xem sau', 'A', 'B'])
+  })
+
   it('creates a collection inline and adds the video', async () => {
     collectionsApi.create.mockResolvedValue({ data: { id: 'n' } })
     collectionsApi.addVideo.mockResolvedValue(null)
