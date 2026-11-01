@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth.js'
 import {
@@ -23,6 +23,7 @@ export default function AddToCollectionModal({ video, onClose }) {
   const [name, setName] = useState('')
   const [makePublic, setMakePublic] = useState(false)
   const [formError, setFormError] = useState('')
+  const uid = useId()
 
   useEffect(() => {
     const onKey = e => { if (e.key === 'Escape') onClose() }
@@ -56,14 +57,20 @@ export default function AddToCollectionModal({ video, onClose }) {
 
   return (
     <div className="app-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="app-modal" role="dialog" aria-modal="true" aria-label={t('saveToCollection')}>
-        <div className="app-modal-header">
-          <span className="app-modal-title">{t('saveToCollection')}</span>
+      <div className="app-modal atc-modal" role="dialog" aria-modal="true" aria-label={t('saveToCollection')}>
+        <div className="app-modal-header atc-header">
+          <span className="atc-header-icon" aria-hidden="true">
+            <span className="material-symbols-outlined">bookmark_add</span>
+          </span>
+          <div className="atc-header-text">
+            <span className="app-modal-title">{t('saveToCollection')}</span>
+            {video?.title && <span className="atc-header-sub" title={video.title}>{video.title}</span>}
+          </div>
           <button className="app-modal-close" onClick={onClose} aria-label={t('common:close')}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+            <span className="material-symbols-outlined" style={{ fontSize: 20 }} aria-hidden="true">close</span>
           </button>
         </div>
-        <div className="app-modal-body">
+        <div className="app-modal-body atc-body">
           {!isLoggedIn ? (
             <p className="admin-cell-muted" role="status" style={{ margin: 0 }}>
               {t('loginToSave')}
@@ -76,68 +83,84 @@ export default function AddToCollectionModal({ video, onClose }) {
               {mine.isLoading ? (
                 <div className="vid-spinner" />
               ) : (
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {collections.map(c => (
-                    <li key={c.id}>
-                      <label
-                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', cursor: 'pointer' }}
-                        aria-busy={isBusyFor(toggle, c.id, v => v?.id)}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={savedIds.has(String(c.id))}
-                          disabled={membership.isLoading || isBusyFor(toggle, c.id, v => v?.id)}
-                          onChange={() => handleToggle(c)}
-                        />
-                        <span style={{ flex: 1 }}>{collectionName(c)}</span>
-                        {isAdmin && isPublic(c) && (
+                <ul className="atc-list">
+                  {collections.map(c => {
+                    const checked = savedIds.has(String(c.id))
+                    const busy = isBusyFor(toggle, c.id, v => v?.id)
+                    const showPublic = isAdmin && isPublic(c)
+                    const nameId = `${uid}-c-${c.id}`
+                    const iconProps = showPublic
+                      ? { title: t('public'), 'aria-label': t('public'), role: 'img' }
+                      : { 'aria-hidden': true }
+                    return (
+                      <li key={c.id}>
+                        <label className={`atc-row${checked ? ' is-checked' : ''}`} aria-busy={busy}>
                           <span
-                            className="material-symbols-outlined"
-                            title={t('public')}
-                            aria-label={t('public')}
-                            style={{ fontSize: 18, color: 'var(--accent-cyan)' }}
+                            className={`atc-icon${c.isDefault ? ' is-default' : ''}${showPublic ? ' is-public' : ''}`}
+                            {...iconProps}
                           >
-                            public
+                            <span className="material-symbols-outlined" aria-hidden="true">
+                              {c.isDefault ? 'schedule' : showPublic ? 'public' : 'folder'}
+                            </span>
                           </span>
-                        )}
-                      </label>
-                    </li>
-                  ))}
+                          <span className="atc-text">
+                            <span className="atc-name" id={nameId}>{collectionName(c)}</span>
+                            {c.itemCount != null && (
+                              <span className="atc-meta">{t('videoCount', { count: c.itemCount })}</span>
+                            )}
+                          </span>
+                          <input
+                            type="checkbox"
+                            className="atc-input"
+                            aria-labelledby={nameId}
+                            checked={checked}
+                            disabled={membership.isLoading || busy}
+                            onChange={() => handleToggle(c)}
+                          />
+                          <span className="atc-check" aria-hidden="true">
+                            <span className="material-symbols-outlined">{busy ? 'progress_activity' : 'check'}</span>
+                          </span>
+                        </label>
+                      </li>
+                    )
+                  })}
                 </ul>
               )}
 
-              <form onSubmit={handleCreate} style={{ marginTop: 16 }}>
+              <form onSubmit={handleCreate} className="atc-create">
                 <label className="app-label" htmlFor="new-collection-name">{t('createNew')}</label>
-                <input
-                  id="new-collection-name"
-                  className="app-input"
-                  value={name}
-                  maxLength={NAME_MAX}
-                  placeholder={t('nameLabel')}
-                  onChange={e => setName(e.target.value)}
-                />
+                <div className="atc-create-row">
+                  <input
+                    id="new-collection-name"
+                    className="app-input"
+                    value={name}
+                    maxLength={NAME_MAX}
+                    placeholder={t('nameLabel')}
+                    onChange={e => setName(e.target.value)}
+                  />
+                  <button
+                    type="submit"
+                    className="app-btn primary atc-create-btn"
+                    disabled={create.isPending}
+                    aria-busy={create.isPending}
+                  >
+                    <span className="material-symbols-outlined" aria-hidden="true">add</span>
+                    {t('createAndSave')}
+                  </button>
+                </div>
                 {isAdmin && (
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, fontSize: 13 }}>
+                  <label className="atc-switch">
                     <input type="checkbox" checked={makePublic} onChange={e => setMakePublic(e.target.checked)} />
+                    <span className="atc-switch-track" aria-hidden="true" />
                     {t('public')}
                   </label>
                 )}
-                {formError && <div className="app-alert error" role="alert" style={{ marginTop: 8 }}>{formError}</div>}
-                <button
-                  type="submit"
-                  className="app-btn primary"
-                  style={{ marginTop: 10 }}
-                  disabled={create.isPending}
-                  aria-busy={create.isPending}
-                >
-                  {t('createAndSave')}
-                </button>
+                {formError && (
+                  <div className="app-alert error" role="alert" style={{ marginTop: 8, marginBottom: 0 }}>{formError}</div>
+                )}
               </form>
             </>
           )}
-        </div>
-        <div className="app-modal-footer">
-          <button className="app-btn secondary" onClick={onClose}>{t('common:close')}</button>
         </div>
       </div>
     </div>

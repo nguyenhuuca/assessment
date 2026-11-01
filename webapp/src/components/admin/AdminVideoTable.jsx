@@ -278,7 +278,7 @@ export default function AdminVideoTable({ statusFilter }) {
                           key: 'collection',
                           icon: 'playlist_add',
                           label: t('addToCollection'),
-                          onSelect: () => setCollectionVideo({ id: v.id }),
+                          onSelect: () => setCollectionVideo({ id: v.id, title: v.title }),
                         },
                         {
                           key: 'delete',

@@ -76,12 +76,23 @@ describe('AddToCollectionModal', () => {
       })
       return null
     })
-    const names = () => screen.getAllByRole('checkbox').map(el => el.closest('label').textContent)
+    const names = () => [...document.querySelectorAll('.atc-name')].map(el => el.textContent)
     renderModal()
     fireEvent.click(await screen.findByLabelText('B'))
     await waitFor(() => expect(collectionsApi.mine).toHaveBeenCalledTimes(2))
     await waitFor(() => expect(collectionsApi.membership).toHaveBeenCalledTimes(2))
     expect(names()).toEqual(['Xem sau', 'A', 'B'])
+  })
+
+  it('shows the video title under the header when known', async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    render(
+      <QueryClientProvider client={client}>
+        <AddToCollectionModal video={{ id: 9, title: 'Mèo nhảy múa' }} onClose={vi.fn()} />
+      </QueryClientProvider>,
+    )
+    expect(screen.getByText('Mèo nhảy múa')).toBeTruthy()
+    await screen.findByLabelText('Xem sau')
   })
 
   it('creates a collection inline and adds the video', async () => {
