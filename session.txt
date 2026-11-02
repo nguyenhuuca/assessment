@@ -1,8 +1,7 @@
 task: Admin bulk actions on every tab (ADR-0036)
-status: blocked
-progress: 95
-done: BK-1..BK-11 + review fixes pushed 53e3f9a7; CI green; mock-test 22/22
-next: owner prod smoke per tab, then diagrams As-built, tracking done
+status: done
+progress: 100
+done: BK-1..BK-11 + review fixes 53e3f9a7; BK-12 prod smoke pass, docs As-built
+next: -
 plan: docs/plans/plan-admin-bulk-actions.md
-blocker: owner prod smoke: one bulk action per tab with a mixed selection
-updated: 2026-11-01 22:19
+updated: 2026-11-02 20:34

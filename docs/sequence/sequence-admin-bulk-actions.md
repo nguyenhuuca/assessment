@@ -3,7 +3,7 @@
 - **PRD:** [PRD-admin-bulk-actions](../prd/PRD-admin-bulk-actions.md)
 - **ADR:** [0036-admin-bulk-actions](../adr/0036-admin-bulk-actions.md)
 - **Spec:** —
-- **Status:** Draft
+- **Status:** As-built (2026-11-02: BK-1..BK-11 + BK-F1 live in prod-119, owner prod smoke BK-12 passed on every tab)
 
 ## 1. Bulk change video visibility (happy path with mixed rows)
 

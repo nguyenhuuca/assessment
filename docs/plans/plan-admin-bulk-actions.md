@@ -10,7 +10,7 @@ Related Skills: swarm-plan, testing
 
 ## Overview
 
-**Status:** In Progress (BK-1..BK-11 built 2026-11-01; BK-12 land pending)
+**Status:** Done (BK-1..BK-11 built 2026-11-01; BK-12 landed 2026-11-02: prod-119, owner prod smoke passed on every tab)
 **Author:** nguyenhuuca
 **Date:** 2026-11-01
 **Tracking:** `docs/tracking.md` row "Admin Bulk Actions"; `TASKS.md` section "Admin bulk actions"

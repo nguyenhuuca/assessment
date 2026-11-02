@@ -644,4 +644,4 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **BK-10** BE: `POST /admin/video-imports/bulk` (CANCEL, RETRY) f56f4443
 - [x] **BK-11** FE: imports bulk bar 5dcd872d
 - [x] **BK-F1** Review follow-ups: wave-1 fixes 7664769f; collector not-found mapping 2f2e38bf; shared bulk notice e7b228a7; import cancel count, no duplicate collection, busy permission controls d489d42b
-- [ ] **BK-12** Land: push (owner approval), CI green, prod smoke per tab, diagrams As-built
+- [x] **BK-12** Land: pushed 53e3f9a7, CI green (prod-119), owner prod smoke per tab passed 2026-11-02, diagrams As-built
