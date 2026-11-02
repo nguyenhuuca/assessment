@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "signal": "defect:62d2ecda",
+  "run": "session-19a65ca3",
+  "base": "19a65ca3^",
+  "head": "19a65ca3",
+  "fix": "62d2ecda6146e3d63cc23bcd5b520d3d9448219a",
+  "summary": "The desktop Home reel change gave the header icons a fixed rgba(0,0,0,0.45) backdrop with no [data-theme=\"light\"] override, so in light theme they showed as grey discs on a white page.",
+  "expect": {
+    "files": ["styles/index.css"],
+    "patterns": [
+      "light[- ]theme",
+      "data-theme",
+      "(hard-?coded|fixed|literal) .{0,40}(rgba|color|colou?r|backdrop|background)",
+      "rgba\\(0, ?0, ?0, ?0?\\.45\\)",
+      "(dark|black) (disc|backdrop|background|overlay).{0,60}(light|white)",
+      "(no|missing|without) .{0,40}(light|theme)"
+    ]
+  }
+}
