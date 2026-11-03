@@ -254,7 +254,7 @@ export default function AdminVideoTable({ statusFilter }) {
       </BulkActionBar>
       <div className="admin-table-meta">{t('showing', { shown: videos.length, total: totalElements.toLocaleString() })}</div>
       <div className="admin-table-scroll">
-        <table className="admin-table">
+        <table className="admin-table sticky-actions">
           <thead>
             <tr>
               <th style={{ width: 36 }}>

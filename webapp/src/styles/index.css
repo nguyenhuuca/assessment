@@ -2557,6 +2557,23 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 }
 .admin-bulk-bar > span { margin-right: auto; font-weight: 700; }
 .admin-table-row.selected { background: rgba(0, 238, 252, 0.06); }
+/* Actions column pinned to the right edge: row content (long titles, emails) can widen the table past its panel */
+.admin-table.sticky-actions th:last-child,
+.admin-table.sticky-actions .admin-table-row td:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--bg-surface);
+  box-shadow: -8px 0 8px -8px rgba(0, 0, 0, 0.45);
+}
+.admin-table.sticky-actions th:last-child { background: var(--bg-high); }
+/* Same select width on every row, ⋮ at the right edge: a status label or save indicator must not shift the menu */
+.admin-table.sticky-actions .admin-actions .admin-status-select { width: 120px; text-overflow: ellipsis; }
+.admin-table.sticky-actions .admin-actions .row-menu { margin-left: auto; }
+.admin-table.sticky-actions .admin-table-row:hover td:last-child { background: var(--bg-elevated); }
+.admin-table.sticky-actions .admin-table-row.selected td:last-child {
+  background: linear-gradient(rgba(0, 238, 252, 0.06), rgba(0, 238, 252, 0.06)), var(--bg-surface);
+}
 
 /* ── Notifications ── */
 .notif-bell-wrap { position: relative; display: flex; }

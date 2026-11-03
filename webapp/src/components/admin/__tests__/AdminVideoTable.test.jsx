@@ -46,6 +46,17 @@ describe('AdminVideoTable title cell', () => {
   })
 })
 
+describe('AdminVideoTable actions column', () => {
+  it('pins the ⋮ menu column to the right edge so a wide table cannot push it out of view', async () => {
+    adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 3, title: 'Wide' })], totalPages: 1, totalElements: 1 } })
+    renderTable()
+    const menuBtn = await screen.findByLabelText('Thao tác cho Wide')
+    expect(screen.getByRole('table')).toHaveClass('sticky-actions')
+    const row = menuBtn.closest('tr')
+    expect(row.lastElementChild).toContainElement(menuBtn)
+  })
+})
+
 describe('AdminVideoTable delete dialog', () => {
   async function openDialog() {
     adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 7, title: 'Shown' })], totalPages: 1, totalElements: 1 } })
