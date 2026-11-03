@@ -1929,7 +1929,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 /* Row ⋮ menu (admin tables): the popover is position: fixed so the table's scroll box cannot clip it */
 .row-menu { position: relative; display: inline-flex; }
 .row-menu-popover {
-  position: fixed; z-index: 50; min-width: 200px; padding: 6px; border-radius: 10px;
+  /* 60: above .mobile-nav-menu (z 51); the popover is portaled to <body>, so it competes at root level */
+  position: fixed; z-index: 60; min-width: 200px; padding: 6px; border-radius: 10px;
   background: var(--bg-elevated); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 }
 .row-menu-item {

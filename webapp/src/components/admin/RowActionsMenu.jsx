@@ -1,8 +1,11 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 /**
  * ⋮ menu for a table row's secondary actions (pattern of WatchHistoryCard's menu).
  * The popover is position: fixed under the button, so the table's horizontal scroll box cannot clip it.
+ * It is portaled to document.body: the sticky actions cell is its own stacking context, so inside it
+ * the popover would paint under the sticky cells of the following rows.
  * items: [{ key, icon, label, onSelect, danger?, busy? }]
  */
 export default function RowActionsMenu({ label, items }) {
@@ -10,6 +13,7 @@ export default function RowActionsMenu({ label, items }) {
   const [pos, setPos] = useState(null)
   const rootRef = useRef(null)
   const btnRef = useRef(null)
+  const popRef = useRef(null)
 
   useLayoutEffect(() => {
     if (!open) return
@@ -20,7 +24,9 @@ export default function RowActionsMenu({ label, items }) {
   useEffect(() => {
     if (!open) return undefined
     const close = () => setOpen(false)
-    const onDown = e => { if (!rootRef.current?.contains(e.target)) close() }
+    const onDown = e => {
+      if (!rootRef.current?.contains(e.target) && !popRef.current?.contains(e.target)) close()
+    }
     const onKey = e => { if (e.key === 'Escape') close() }
     document.addEventListener('mousedown', onDown)
     document.addEventListener('keydown', onKey)
@@ -49,8 +55,8 @@ export default function RowActionsMenu({ label, items }) {
       >
         <span className="material-symbols-outlined" style={{ fontSize: 16 }} aria-hidden="true">more_vert</span>
       </button>
-      {open && (
-        <div className="row-menu-popover" role="menu" style={pos ?? undefined}>
+      {open && createPortal(
+        <div className="row-menu-popover" role="menu" ref={popRef} style={pos ?? undefined}>
           {items.map(it => (
             <button
               key={it.key}
@@ -64,7 +70,8 @@ export default function RowActionsMenu({ label, items }) {
               {it.label}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   )
