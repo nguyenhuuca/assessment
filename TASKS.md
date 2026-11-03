@@ -645,3 +645,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **BK-11** FE: imports bulk bar 5dcd872d
 - [x] **BK-F1** Review follow-ups: wave-1 fixes 7664769f; collector not-found mapping 2f2e38bf; shared bulk notice e7b228a7; import cancel count, no duplicate collection, busy permission controls d489d42b
 - [x] **BK-12** Land: pushed 53e3f9a7, CI green (prod-119), owner prod smoke per tab passed 2026-11-02, diagrams As-built
+
+## Fix: row ⋮ menu hidden under the table (#78, PR #79, lite)
+
+- [x] **FIX-1** RowActionsMenu popover portaled to `document.body`; outside-click ignores the popover
+- [x] **FIX-2** `.row-menu-popover` z-index 60 (above mobile nav menu)
+- [x] **FIX-3** Regression test in RowActionsMenu.test.jsx

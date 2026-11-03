@@ -51,6 +51,16 @@ describe('RowActionsMenu', () => {
     expect(screen.queryByRole('menu')).toBeNull()
   })
 
+  it('renders the popover in document.body so a sticky table cell cannot stack over it', () => {
+    const { btn } = setup()
+    fireEvent.click(btn)
+    const menu = screen.getByRole('menu')
+    expect(menu.parentElement).toBe(document.body)
+    // a click inside the portaled menu is not an outside click
+    fireEvent.mouseDown(menu)
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+  })
+
   it('places the popover fixed under the button so the table scroll box cannot clip it', () => {
     const { btn } = setup()
     btn.getBoundingClientRect = () => ({ bottom: 100, right: 300, top: 80, left: 270, width: 30, height: 20 })
