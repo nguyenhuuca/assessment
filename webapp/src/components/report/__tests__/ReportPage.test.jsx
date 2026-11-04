@@ -338,6 +338,32 @@ describe('ReportPage', () => {
     expect(screen.queryByText(i18n.t('report:list.loading'))).toBeNull()
   })
 
+  it.each([
+    ['CREATED with autopilot:auto', { status: 'CREATED', labels: ['bug', 'autopilot:auto'] }, 'AUTO'],
+    ['CREATED with autopilot:auto-merge', { status: 'CREATED', labels: ['bug', 'autopilot:auto-merge'] }, 'AUTO_MERGE'],
+    ['CREATED capped (label dropped)', { status: 'CREATED', labels: ['bug'], autoLabel: 'AUTO' }, 'NONE'],
+    ['FAILED with null autoLabel', { status: 'FAILED', githubState: null, autoLabel: null }, 'NONE'],
+    ['FAILED requesting AUTO_MERGE', { status: 'FAILED', githubState: null, autoLabel: 'AUTO_MERGE' }, 'AUTO_MERGE'],
+  ])('Autopilot column: %s', async (_name, over, key) => {
+    reportsApi.listReports.mockResolvedValue({ data: { totalPages: 1, content: [row(over)] } })
+    renderPage()
+    openRecent()
+    await screen.findByText('Old bug')
+    expect(screen.getByRole('columnheader', { name: i18n.t('report:list.colAutopilot') })).toBeInTheDocument()
+    const cells = screen.getAllByRole('cell')
+    expect(cells[6]).toHaveTextContent(new RegExp(`^${i18n.t(`report:autopilot.${key}`)}$`))
+  })
+
+  it('loading and empty rows span all 8 columns', async () => {
+    let resolve
+    reportsApi.listReports.mockReturnValue(new Promise(r => { resolve = r }))
+    renderPage()
+    openRecent()
+    expect((await screen.findByText(i18n.t('report:list.loading'))).closest('td')).toHaveAttribute('colspan', '8')
+    resolve({ data: { totalPages: 0, content: [] } })
+    expect((await screen.findByText(i18n.t('report:list.empty'))).closest('td')).toHaveAttribute('colspan', '8')
+  })
+
   it('shows the empty text after loading an empty list', async () => {
     renderPage()
     openRecent()

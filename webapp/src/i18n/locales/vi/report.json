@@ -42,6 +42,7 @@
     "empty": "Chưa có báo cáo nào.",
     "loading": "Đang tải báo cáo...",
     "colIssue": "Issue",
+    "colAutopilot": "Autopilot",
     "colType": "Loại",
     "colTitle": "Tiêu đề",
     "colReporter": "Người báo",

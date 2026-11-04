@@ -651,3 +651,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **FIX-1** RowActionsMenu popover portaled to `document.body`; outside-click ignores the popover
 - [x] **FIX-2** `.row-menu-popover` z-index 60 (above mobile nav menu)
 - [x] **FIX-3** Regression test in RowActionsMenu.test.jsx
+
+## Lite: Autopilot column in Recent reports (#80, PR #81)
+
+- [x] **AP-1** ReportPage.jsx Autopilot column (CREATED: applied label from `labels`; FAILED: requested `autoLabel`), colSpan 8
+- [x] **AP-2** `list.colAutopilot` in en/vi report.json
+- [x] **AP-3** Tests in ReportPage.test.jsx (5 cases + colSpan)
