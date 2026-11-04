@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-11-04-superadmin-403",
+  "date": "2026-11-04",
+  "mode": "headless",
+  "lite": true,
+  "issue": 84,
+  "pr": 85,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 0,
+  "advisory": 7,
+  "locNonTest": 6,
+  "tests": { "passed": 24, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}

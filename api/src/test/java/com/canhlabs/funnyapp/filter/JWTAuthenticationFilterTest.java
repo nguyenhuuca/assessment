@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.filter;
 
 import com.canhlabs.funnyapp.dto.auth.JwtVerificationResultDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
+import com.canhlabs.funnyapp.enums.Permission;
 import com.canhlabs.funnyapp.exception.UnauthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -248,6 +249,39 @@ class JWTAuthenticationFilterTest {
         assertTrue(response.getContentAsString().contains("603"));
         assertNull(SecurityContextHolder.getContext().getAuthentication());
         verify(filterChain, never()).doFilter(any(), any());
+    }
+
+    private int detailsPermissionsFor(String role, int permissions) throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(HttpHeaders.AUTHORIZATION, "perm-token");
+        UserDetailDto user = UserDetailDto.builder().id(9L).email("p@example.com").role(role).permissions(permissions).build();
+        JwtVerificationResultDto result = new JwtVerificationResultDto();
+        result.setData(user);
+        when(jwtProvider.verifyToken("perm-token")).thenReturn(result);
+
+        filter.doFilterInternal(request, new MockHttpServletResponse(), filterChain);
+
+        return ((UserDetailDto) SecurityContextHolder.getContext().getAuthentication().getDetails()).getPermissions();
+    }
+
+    @Test
+    void doFilterInternal_superAdminWithNoBits_getsAllBits() throws ServletException, IOException {
+        assertEquals(Permission.ALL_BITS, detailsPermissionsFor("SUPER_ADMIN", 0));
+    }
+
+    @Test
+    void doFilterInternal_superAdminWithAutopilotBit_keepsItAndGetsAllBits() throws ServletException, IOException {
+        assertEquals(Permission.ALL_BITS | 64, detailsPermissionsFor("SUPER_ADMIN", 64));
+    }
+
+    @Test
+    void doFilterInternal_adminWithNoBits_staysAtZero() throws ServletException, IOException {
+        assertEquals(0, detailsPermissionsFor("ADMIN", 0));
+    }
+
+    @Test
+    void doFilterInternal_userBitsUnchanged() throws ServletException, IOException {
+        assertEquals(3, detailsPermissionsFor("USER", 3));
     }
 
     @Test

@@ -662,3 +662,9 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **HU-1** AppShell.jsx: removed the logged-in username span from the header
 - [x] **HU-2** AppShell.header.test.jsx (fails without HU-1, proved by stash)
+
+## Lite: SUPER_ADMIN 403 on permission-gated admin endpoints (#84)
+
+- [x] **FIX-1** JWTAuthenticationFilter: SUPER_ADMIN gets Permission.ALL_BITS ORed into details permissions
+- [x] **FIX-2** Filter tests (SA/0, SA/64, ADMIN/0, USER/0); SA/0 fails without FIX-1 (stash proof)
+- [x] **FIX-3** TASKS.md hashes + run metrics JSON
