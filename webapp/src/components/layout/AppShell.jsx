@@ -247,12 +247,6 @@ export default function AppShell() {
             <LoginForm onMfaRequired={data => setMfaModal({ show: true, pendingData: data })} />
           ) : (
             <>
-              <span style={{
-                color: 'var(--text-muted)', fontSize: 13,
-                maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              }}>
-                {user?.email?.split('@')[0]}
-              </span>
               <NotificationBell onOpenNotification={openNotification} />
               <button className="icon-btn" onClick={() => setProfileOpen(true)} title={t('profile')}>
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person</span>
