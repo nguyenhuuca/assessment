@@ -657,3 +657,8 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 - [x] **AP-1** ReportPage.jsx Autopilot column (CREATED: applied label from `labels`; FAILED: requested `autoLabel`), colSpan 8
 - [x] **AP-2** `list.colAutopilot` in en/vi report.json
 - [x] **AP-3** Tests in ReportPage.test.jsx (5 cases + colSpan)
+
+## Lite: Hide username in header after login (#82, PR #83)
+
+- [x] **HU-1** AppShell.jsx: removed the logged-in username span from the header
+- [x] **HU-2** AppShell.header.test.jsx (fails without HU-1, proved by stash)
