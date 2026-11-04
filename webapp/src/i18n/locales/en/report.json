@@ -42,6 +42,7 @@
     "empty": "No reports yet.",
     "loading": "Loading reports...",
     "colIssue": "Issue",
+    "colAutopilot": "Autopilot",
     "colType": "Type",
     "colTitle": "Title",
     "colReporter": "Reporter",

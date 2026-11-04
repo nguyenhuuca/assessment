@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-11-04-report-autopilot-column",
+  "date": "2026-11-04",
+  "mode": "headless",
+  "lite": true,
+  "issue": 80,
+  "pr": 81,
+  "result": "landed",
+  "gate1": "auto",
+  "rounds": { "plan": 1, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 0,
+  "advisory": 2,
+  "locNonTest": 12,
+  "tests": { "passed": 35, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}

@@ -29,6 +29,17 @@ function IssueLink({ url, children }) {
   return <a href={url} target="_blank" rel="noopener noreferrer">{children}</a>
 }
 
+// CREATED rows show the label actually applied (the daily cap can drop it); FAILED rows show the requested one.
+function autopilotOf(r) {
+  if (r.status === 'CREATED') {
+    const labels = r.labels ?? []
+    if (labels.includes('autopilot:auto')) return 'AUTO'
+    if (labels.includes('autopilot:auto-merge')) return 'AUTO_MERGE'
+    return 'NONE'
+  }
+  return r.autoLabel ?? 'NONE'
+}
+
 function StateBadge({ report, t }) {
   if (report.status === 'FAILED' || !report.githubState) {
     return <span className="admin-badge removed">{t('list.failedBadge')}</span>
@@ -223,20 +234,20 @@ export default function ReportPage({ fromPage }) {
                 <tr>
                   <th>{t('list.colTitle')}</th><th>{t('list.colType')}</th><th>{t('list.colReporter')}</th>
                   <th>{t('list.colCreated')}</th><th>{t('list.colState')}</th><th>{t('list.colIssue')}</th>
-                  <th>{t('list.colActions')}</th>
+                  <th>{t('list.colAutopilot')}</th><th>{t('list.colActions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {isFetching && (
                   <tr>
-                    <td colSpan={7} className="admin-cell-muted">
+                    <td colSpan={8} className="admin-cell-muted">
                       <span role="status">
                         <span className="vid-spinner vid-spinner--sm" aria-hidden="true" /> {t('list.loading')}
                       </span>
                     </td>
                   </tr>
                 )}
-                {!isFetching && rows.length === 0 && <tr><td colSpan={7} className="admin-cell-muted">{t('list.empty')}</td></tr>}
+                {!isFetching && rows.length === 0 && <tr><td colSpan={8} className="admin-cell-muted">{t('list.empty')}</td></tr>}
                 {rows.map(r => (
                   <tr key={r.id} className="admin-table-row">
                     <td>{r.title}</td>
@@ -245,6 +256,7 @@ export default function ReportPage({ fromPage }) {
                     <td className="admin-cell-muted">{formatTime(r.createdAt)}</td>
                     <td><StateBadge report={r} t={t} /></td>
                     <td>{r.issueUrl ? <IssueLink url={r.issueUrl}>#{r.issueNumber}</IssueLink> : '—'}</td>
+                    <td className="admin-cell-muted">{t(`autopilot.${autopilotOf(r)}`)}</td>
                     <td>
                       {canRetry(r) && (
                         <button type="button" className="app-btn secondary" disabled={retry.isPending}
