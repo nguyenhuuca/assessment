@@ -3,6 +3,8 @@ package com.canhlabs.funnyapp.filter;
 import com.canhlabs.funnyapp.cache.CredentialsVersionCache;
 import com.canhlabs.funnyapp.dto.auth.JwtVerificationResultDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
+import com.canhlabs.funnyapp.enums.Permission;
+import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.exception.UnauthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -72,6 +74,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 throw new UnauthorizedException(TOKEN_REVOKED, TOKEN_REVOKED_SUB_CODE);
             }
             String role = user.getRole() != null && !user.getRole().isEmpty() ? user.getRole() : "USER";
+            // SUPER_ADMIN is the highest role: its access must not depend on stored bits that can drift or go stale in a token.
+            if (UserRole.SUPER_ADMIN.name().equals(role)) {
+                user.setPermissions(user.getPermissions() | Permission.ALL_BITS);
+            }
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
             authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities);
             authentication.setDetails(user);

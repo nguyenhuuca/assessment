@@ -665,6 +665,6 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 ## Lite: SUPER_ADMIN 403 on permission-gated admin endpoints (#84)
 
-- [ ] **FIX-1** JWTAuthenticationFilter: SUPER_ADMIN gets Permission.ALL_BITS ORed into details permissions
-- [ ] **FIX-2** Filter tests (SA/0, SA/64, ADMIN/0, USER/0); SA/0 fails without FIX-1 (stash proof)
-- [ ] **FIX-3** TASKS.md hashes + run metrics JSON
+- [x] **FIX-1** JWTAuthenticationFilter: SUPER_ADMIN gets Permission.ALL_BITS ORed into details permissions
+- [x] **FIX-2** Filter tests (SA/0, SA/64, ADMIN/0, USER/0); SA/0 fails without FIX-1 (stash proof)
+- [x] **FIX-3** TASKS.md hashes + run metrics JSON
