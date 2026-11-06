@@ -6,6 +6,14 @@ on:
     paths:
       - 'api/**'
       - '.github/workflows/funnyapp-ci.yml'
+
+# One run per branch at a time: each run reads api/.funny-app.version, bumps it and tags vN,
+# so two overlapping runs computed the same N and the second failed on 'tag v123 already exists'.
+# Queue instead of cancel, so every pushed commit still deploys.
+concurrency:
+  group: funny-app-ci-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     name: 🧱 Build Application
