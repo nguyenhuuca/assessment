@@ -57,7 +57,9 @@ public class VideoStreamController {
 
         long startTime = System.currentTimeMillis();
         log.debug("Thread: {}, Virtual: {}", Thread.currentThread().getName(), Thread.currentThread().isVirtual());
-        log.debug("Incoming stream request for fileId: {}", fileId);
+        // INFO on purpose: the Grafana "Funny App - Business Stats" board counts views from these two lines
+        log.info("Incoming stream request for fileId: {}", fileId);
+        log.info("Range header: {}", rangeHeader);
 
         long fileSize = videoService.getFileSize(fileId);
 

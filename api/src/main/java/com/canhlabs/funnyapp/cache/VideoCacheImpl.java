@@ -64,10 +64,11 @@ public class VideoCacheImpl implements VideoCache {
     public InputStream getChunkStream(String fileId, long start, long end, Callable<InputStream> loader) {
         String key = makeKey(fileId, start, end);
 
+        // [CACHE HIT] (INFO) and [MISS] (WARN) feed the Grafana cache panels; keep their levels
         // in case the chunk is already cached
         Optional<byte[]> cached = chunkCache.get(key);
         if (cached.isPresent()) {
-            log.debug("✅ [CACHE HIT] Chunk {} ({} - {})", fileId, start, end);
+            log.info("✅ [CACHE HIT] Chunk {} ({} - {})", fileId, start, end);
             statsCache.recordHit(fileId);
             return new ByteArrayInputStream(cached.get());
         }
@@ -91,7 +92,7 @@ public class VideoCacheImpl implements VideoCache {
                 return new ByteArrayInputStream(data);
             }
 
-            log.debug("[MISS] Chunk {} ({} - {}) hit count = {}", fileId, start, end, hits);
+            log.warn("[MISS] Chunk {} ({} - {}) hit count = {}", fileId, start, end, hits);
             return disk;
 
         } catch (Exception e) {

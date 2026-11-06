@@ -1,5 +1,10 @@
 package com.canhlabs.funnyapp.cache;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -256,5 +261,35 @@ class VideoCacheImplTest {
         }
 
         assertThat(videoCache.accessCounterSize()).isLessThanOrEqualTo(VideoCacheImpl.COUNTER_MAX_SIZE);
+    }
+
+    // ── log levels the Grafana "Business Stats" board depends on ──────────────
+    // Regression: PM-7 moved these to DEBUG and the cache panels went empty in prod.
+
+    @Test
+    void getChunkStream_logsCacheHitAtInfoAndMissAtWarn_forGrafana() throws Exception {
+        Logger logger = (Logger) LoggerFactory.getLogger(VideoCacheImpl.class);
+        ListAppender<ILoggingEvent> logs = new ListAppender<>();
+        logs.start();
+        logger.addAppender(logs);
+        try {
+            when(chunkCache.get("fileL_0_10")).thenReturn(Optional.of(new byte[]{1}));
+            when(chunkCache.get("fileM_50_60")).thenReturn(Optional.empty());
+
+            videoCache.getChunkStream("fileL", 0L, 10L, () -> new ByteArrayInputStream(new byte[]{1}));
+            videoCache.getChunkStream("fileM", 50L, 60L, () -> new ByteArrayInputStream(new byte[]{2}));
+
+            assertThat(logs.list)
+                    .anySatisfy(e -> {
+                        assertThat(e.getFormattedMessage()).contains("[CACHE HIT]");
+                        assertThat(e.getLevel()).isEqualTo(Level.INFO);
+                    })
+                    .anySatisfy(e -> {
+                        assertThat(e.getFormattedMessage()).contains("[MISS]");
+                        assertThat(e.getLevel()).isEqualTo(Level.WARN);
+                    });
+        } finally {
+            logger.detachAppender(logs);
+        }
     }
 }

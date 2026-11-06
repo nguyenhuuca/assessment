@@ -1,5 +1,10 @@
 package com.canhlabs.funnyapp.web;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.slf4j.LoggerFactory;
 import com.canhlabs.funnyapp.streaming.StreamChunkResult;
 import com.canhlabs.funnyapp.dto.video.VideoDto;
 import com.canhlabs.funnyapp.service.HlsPlaybackService;
@@ -361,5 +366,31 @@ class VideoStreamControllerTest {
         when(hlsPlaybackService.findSegment("abc", "seg_0.ts")).thenReturn(Optional.of(temp.resolve("gone.ts")));
 
         assertThat(controller.getHlsSegment("abc", "seg_0.ts").getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    // ── log lines the Grafana "Business Stats" board depends on ──────────────
+    // Regression: PM-7/ST-1 moved these to DEBUG or removed them and the view panels went empty in prod.
+
+    @Test
+    void streamVideo_logsStreamRequestAndRangeAtInfo_forGrafana() throws IOException {
+        Logger logger = (Logger) LoggerFactory.getLogger(VideoStreamController.class);
+        ListAppender<ILoggingEvent> logs = new ListAppender<>();
+        logs.start();
+        logger.addAppender(logs);
+        try {
+            controller.streamVideo("file1", "bytes=0-");
+
+            assertThat(logs.list)
+                    .anySatisfy(e -> {
+                        assertThat(e.getFormattedMessage()).isEqualTo("Incoming stream request for fileId: file1");
+                        assertThat(e.getLevel()).isEqualTo(Level.INFO);
+                    })
+                    .anySatisfy(e -> {
+                        assertThat(e.getFormattedMessage()).startsWith("Range header: bytes=0");
+                        assertThat(e.getLevel()).isEqualTo(Level.INFO);
+                    });
+        } finally {
+            logger.detachAppender(logs);
+        }
     }
 }
