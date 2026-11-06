@@ -139,6 +139,35 @@ class AdminControllerTest {
         verify(adminVideoService).updatePriority(1L, 50);
     }
 
+    // ── PATCH /videos/{id}/details ────────────────────────────────────────────
+
+    @Test
+    void updateVideoDetails_valid_delegatesAndReturnsOk() {
+        ResponseEntity<ResultObjectInfo<String>> response =
+                controller.updateVideoDetails(1L, Map.of("title", "T", "description", "D"));
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Details updated", response.getBody().getMessage());
+        verify(adminVideoService).updateDetails(1L, "T", "D");
+    }
+
+    @Test
+    void updateVideoDetails_missingDescription_passesNull() {
+        controller.updateVideoDetails(1L, Map.of("title", "T"));
+
+        verify(adminVideoService).updateDetails(1L, "T", null);
+    }
+
+    @Test
+    void updateVideoDetails_nullBodyOrBadTypes_rejectedWithoutService() {
+        assertThrows(RuntimeException.class, () -> controller.updateVideoDetails(1L, null));
+        assertThrows(RuntimeException.class, () -> controller.updateVideoDetails(1L, Map.of()));
+        assertThrows(RuntimeException.class, () -> controller.updateVideoDetails(1L, Map.of("title", 5)));
+        assertThrows(RuntimeException.class,
+                () -> controller.updateVideoDetails(1L, Map.of("title", "T", "description", 7)));
+        verify(adminVideoService, never()).updateDetails(any(), any(), any());
+    }
+
     // ── PATCH /videos/{id}/visibility ─────────────────────────────────────────
 
     @Test

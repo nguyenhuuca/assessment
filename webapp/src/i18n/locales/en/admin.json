@@ -367,6 +367,13 @@
     }
   },
   "rowActionsAria": "Actions for {{title}}",
+  "edit": "Edit",
+  "editVideo": {
+    "title": "Edit video",
+    "titleLabel": "Title",
+    "descLabel": "Description",
+    "descHint": "A video with an empty description gets a generated one by the scheduled job."
+  },
   "bulk": {
     "updated_one": "{{count}} updated",
     "updated_other": "{{count}} updated",

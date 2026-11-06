@@ -19,6 +19,7 @@ import java.time.Instant;
 public class AdminVideoDto {
     private Long id;
     private String title;
+    private String description;
     private String thumbnailPath;
     private String creatorEmail;
     private VideoStatus status;

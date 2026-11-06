@@ -128,6 +128,22 @@ public class AdminController {
                 .build());
     }
 
+    @PatchMapping("/videos/{id}/details")
+    @AuditLog("updateVideoDetails")
+    public ResponseEntity<ResultObjectInfo<String>> updateVideoDetails(
+            @PathVariable Long id,
+            @RequestBody(required = false) Map<String, Object> body) {
+        Object title = body == null ? null : body.get("title");
+        Object description = body == null ? null : body.get("description");
+        Contract.require(title instanceof String, "title is required");
+        Contract.require(description == null || description instanceof String, "description must be a string");
+        adminVideoService.updateDetails(id, (String) title, (String) description);
+        return ResponseEntity.ok(ResultObjectInfo.<String>builder()
+                .status(ResultStatus.SUCCESS)
+                .message("Details updated")
+                .build());
+    }
+
     @PatchMapping("/videos/{id}/visibility")
     @AuditLog("updateVideoVisibility")
     public ResponseEntity<ResultObjectInfo<String>> updateVideoVisibility(

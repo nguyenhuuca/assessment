@@ -355,6 +355,13 @@
     }
   },
   "rowActionsAria": "Thao tác cho {{title}}",
+  "edit": "Sửa",
+  "editVideo": {
+    "title": "Sửa video",
+    "titleLabel": "Tiêu đề",
+    "descLabel": "Mô tả",
+    "descHint": "Video có mô tả trống sẽ được tác vụ định kỳ tự tạo mô tả."
+  },
   "bulk": {
     "updated_other": "{{count}} đã cập nhật",
     "unchanged_other": "{{count}} không thay đổi",

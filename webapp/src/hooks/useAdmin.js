@@ -58,6 +58,14 @@ export function useUpdateVideoPriority() {
   })
 }
 
+export function useUpdateVideoDetails() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, title, description }) => adminApi.updateVideoDetails(id, { title, description }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'videos'] }),
+  })
+}
+
 export function useUpdateVideoVisibility() {
   const qc = useQueryClient()
   return useMutation({

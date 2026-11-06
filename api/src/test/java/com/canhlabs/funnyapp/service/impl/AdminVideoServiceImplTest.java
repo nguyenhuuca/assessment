@@ -240,6 +240,82 @@ class AdminVideoServiceImplTest {
         verify(videoSourceRepository, never()).findById(any());
     }
 
+    // ── updateDetails ─────────────────────────────────────────────────────────
+
+    @Test
+    void updateDetails_valid_trimsPersistsAndInvalidatesFeed() {
+        VideoSource source = videoSource(5L, "Old", null, VideoStatus.PENDING);
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        service.updateDetails(5L, "  New title  ", "  New desc ");
+
+        assertEquals("New title", source.getTitle());
+        assertEquals("New desc", source.getDesc());
+        verify(videoSourceRepository).save(source);
+        verify(feedCache).invalidate();
+    }
+
+    @Test
+    void updateDetails_blankDescription_storedAsNull() {
+        VideoSource source = videoSource(5L, "Old", null, VideoStatus.PENDING);
+        source.setDesc("something");
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        service.updateDetails(5L, "Old", "   ");
+
+        assertNull(source.getDesc());
+        verify(videoSourceRepository).save(source);
+    }
+
+    @Test
+    void updateDetails_unchanged_skipsSaveAndCache() {
+        VideoSource source = videoSource(5L, "Same", null, VideoStatus.PENDING);
+        source.setDesc("d");
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        service.updateDetails(5L, " Same ", "d");
+
+        verify(videoSourceRepository, never()).save(any());
+        verify(feedCache, never()).invalidate();
+    }
+
+    @Test
+    void updateDetails_invalidInput_throwsAndSkipsLookup() {
+        assertThrows(RuntimeException.class, () -> service.updateDetails(5L, null, "d"));
+        assertThrows(RuntimeException.class, () -> service.updateDetails(5L, "   ", "d"));
+        assertThrows(RuntimeException.class, () -> service.updateDetails(5L, "x".repeat(201), "d"));
+        assertThrows(RuntimeException.class, () -> service.updateDetails(5L, "ok", "x".repeat(2001)));
+        verify(videoSourceRepository, never()).findById(any());
+    }
+
+    @Test
+    void updateDetails_boundaryLengths_accepted() {
+        VideoSource source = videoSource(5L, "Old", null, VideoStatus.PENDING);
+        when(videoSourceRepository.findById(5L)).thenReturn(Optional.of(source));
+
+        service.updateDetails(5L, "x".repeat(200), "y".repeat(2000));
+
+        verify(videoSourceRepository).save(source);
+    }
+
+    @Test
+    void updateDetails_unknownId_throws() {
+        when(videoSourceRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> service.updateDetails(99L, "t", "d"));
+        verify(videoSourceRepository, never()).save(any());
+    }
+
+    @Test
+    void getVideos_mapsDescription() {
+        VideoSource source = videoSource(5L, "T", null, VideoStatus.PENDING);
+        source.setDesc("the desc");
+        Pageable pageable = PageRequest.of(0, 10);
+        when(videoSourceRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(source)));
+
+        assertEquals("the desc", service.getVideos(pageable, null).getContent().get(0).getDescription());
+    }
+
     // ── deleteVideo ───────────────────────────────────────────────────────────
 
     private VideoSource source(String type, String sourceId) {

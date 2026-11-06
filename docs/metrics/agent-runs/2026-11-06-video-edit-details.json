@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-11-06-video-edit-details",
+  "date": "2026-11-06",
+  "mode": "headless",
+  "lite": false,
+  "issue": 86,
+  "pr": 87,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 1, "code": 2, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 1,
+  "advisory": 7,
+  "locNonTest": 140,
+  "tests": { "passed": 117, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}
