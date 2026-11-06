@@ -265,6 +265,24 @@ class AdminControllerPermissionTest {
         verifyNoInteractions(adminAccountService);
     }
 
+    @Test
+    void updateVideoDetails_userRole_returns403() throws Exception {
+        mockMvc.perform(patch(AppConstant.API.BASE_URL + "/admin/videos/5/details")
+                        .contentType("application/json").content("{\"title\":\"T\"}")
+                        .with(authentication(principal(UserRole.USER, Permission.ADMIN.getBit()))))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(adminVideoService);
+    }
+
+    @Test
+    void updateVideoDetails_admin_reachesService() throws Exception {
+        mockMvc.perform(patch(AppConstant.API.BASE_URL + "/admin/videos/5/details")
+                        .contentType("application/json").content("{\"title\":\"T\",\"description\":\"D\"}")
+                        .with(authentication(principal(UserRole.ADMIN, Permission.ADMIN.getBit()))))
+                .andExpect(status().isOk());
+        verify(adminVideoService).updateDetails(5L, "T", "D");
+    }
+
     // ── 403: ROLE_ADMIN present but ADMIN bit missing (@HasPermission blocks) ─
 
     @Test

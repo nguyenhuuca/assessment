@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useUpdateVideoVisibility, useDeleteVideo, useToggleVideoHls, useBulkVideos } from '../../hooks/useAdmin.js'
+import { useAdminVideos, useUpdateVideoStatus, useUpdateVideoPriority, useUpdateVideoVisibility, useUpdateVideoDetails, useDeleteVideo, useToggleVideoHls, useBulkVideos } from '../../hooks/useAdmin.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { isSuperAdmin } from '../../utils/roles.js'
 import { isBusyFor } from '../../utils/mutationBusy.js'
@@ -7,6 +7,7 @@ import { useConfirm } from '../../hooks/useConfirm.jsx'
 import { useTranslation } from 'react-i18next'
 import AddToCollectionModal from '../library/AddToCollectionModal.jsx'
 import RowActionsMenu from './RowActionsMenu.jsx'
+import VideoEditModal from './VideoEditModal.jsx'
 import BulkAddToCollectionModal from './BulkAddToCollectionModal.jsx'
 import BulkActionBar from './BulkActionBar.jsx'
 import { useBulkSelection } from '../../hooks/useBulkSelection.js'
@@ -142,7 +143,9 @@ export default function AdminVideoTable({ statusFilter }) {
   const updateStatus   = useUpdateVideoStatus()
   const updatePriority = useUpdateVideoPriority()
   const updateVisibility = useUpdateVideoVisibility()
-  const deleteVideo    = useDeleteVideo()
+  const updateDetails  = useUpdateVideoDetails()
+  const [editVideo, setEditVideo] = useState(null)
+  const deleteVideo   = useDeleteVideo()
   const toggleHls      = useToggleVideoHls()
   const { user } = useAuth()
   const canToggleHls = isSuperAdmin(user?.role)
@@ -213,6 +216,18 @@ export default function AdminVideoTable({ statusFilter }) {
   return (
     <div className="admin-table-wrap">
       {confirmDialog}
+      {editVideo && (
+        <VideoEditModal
+          video={editVideo}
+          pending={updateDetails.isPending}
+          error={updateDetails.isError ? (updateDetails.error?.message || t('actionFailed')) : ''}
+          onCancel={() => setEditVideo(null)}
+          onSave={({ title, description }) => updateDetails.mutate(
+            { id: editVideo.id, title, description },
+            { onSuccess: () => setEditVideo(null) },
+          )}
+        />
+      )}
       {collectionVideo && <AddToCollectionModal video={collectionVideo} onClose={() => setCollectionVideo(null)} />}
       {bulkAddOpen && (
         <BulkAddToCollectionModal
@@ -369,6 +384,12 @@ export default function AdminVideoTable({ statusFilter }) {
                     <RowActionsMenu
                       label={t('rowActionsAria', { title: v.title || t('videoFallback') })}
                       items={[
+                        {
+                          key: 'edit',
+                          icon: 'edit',
+                          label: t('edit'),
+                          onSelect: () => { updateDetails.reset(); setEditVideo(v) },
+                        },
                         {
                           key: 'collection',
                           icon: 'playlist_add',

@@ -13,6 +13,8 @@ public interface AdminVideoService {
     /** @return false when the video already had that status (nothing saved). */
     boolean updateStatus(Long id, VideoStatus status);
     void updatePriority(Long id, int priority);
+    /** Title is required (1..200 after trim); description is optional (max 2000, blank becomes null). Nothing is saved when both are unchanged. */
+    void updateDetails(Long id, String title, String description);
     /** @return false when the video already had that visibility (nothing saved). */
     boolean updateVisibility(Long id, VideoVisibility visibility);
     /** Drive file first (a failure keeps the row), then the local file, then the row. */

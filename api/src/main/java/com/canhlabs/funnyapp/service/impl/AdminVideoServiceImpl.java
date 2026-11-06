@@ -25,11 +25,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @Slf4j
 public class AdminVideoServiceImpl implements AdminVideoService {
 
     private static final String DRIVE_SOURCE = "google_drive";
+    private static final int MAX_TITLE = 200;
+    private static final int MAX_DESC = 2000;
 
     private VideoSourceRepository videoSourceRepository;
     private UserRepo userRepo;
@@ -107,6 +111,32 @@ public class AdminVideoServiceImpl implements AdminVideoService {
         VideoSource source = videoSourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + id));
         source.setPriority(priority);
+        videoSourceRepository.save(source);
+        feedCache.invalidate();
+    }
+
+    /**
+     * Not routed through TitleSanitizer: that one strips characters such as ':' and '?' and cuts at 120
+     * because it builds Drive file names, while this is a display title the admin chose on purpose.
+     * The only cache holding a title or description is the feed cache.
+     * A cleared description is stored as null, and the scheduled StreamVideoService.updateDesc() then fills it
+     * with a generated poem; the edit modal says so.
+     */
+    @Override
+    public void updateDetails(Long id, String title, String description) {
+        String newTitle = title == null ? "" : title.trim();
+        Contract.require(!newTitle.isEmpty() && newTitle.length() <= MAX_TITLE,
+                "Title is required and must be at most " + MAX_TITLE + " characters");
+        String newDesc = description == null || description.isBlank() ? null : description.trim();
+        Contract.require(newDesc == null || newDesc.length() <= MAX_DESC,
+                "Description must be at most " + MAX_DESC + " characters");
+        VideoSource source = videoSourceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + id));
+        if (newTitle.equals(source.getTitle()) && Objects.equals(newDesc, source.getDesc())) {
+            return;
+        }
+        source.setTitle(newTitle);
+        source.setDesc(newDesc);
         videoSourceRepository.save(source);
         feedCache.invalidate();
     }
@@ -216,6 +246,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
         return AdminVideoDto.builder()
                 .id(v.getId())
                 .title(v.getTitle())
+                .description(v.getDesc())
                 .thumbnailPath(v.getThumbnailPath())
                 .status(v.getStatus())
                 .visibility(v.getVisibility())

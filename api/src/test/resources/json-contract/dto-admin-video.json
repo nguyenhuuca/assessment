@@ -4,6 +4,7 @@
   "data" : {
     "id" : 1,
     "title" : "Funny cat",
+    "description" : "A cat doing cat things",
     "thumbnailPath" : "/thumbs/1.jpg",
     "creatorEmail" : "user@example.test",
     "status" : "PUBLISHED",

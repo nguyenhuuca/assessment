@@ -11,6 +11,7 @@ vi.mock('../../../api/admin.js', () => ({
   updateVideoStatus: vi.fn(),
   updateVideoPriority: vi.fn(),
   updateVideoVisibility: vi.fn(),
+  updateVideoDetails: vi.fn(),
   deleteVideo: vi.fn(),
   enableVideoHls: vi.fn(),
   disableVideoHls: vi.fn(),
@@ -54,6 +55,37 @@ describe('AdminVideoTable actions column', () => {
     expect(screen.getByRole('table')).toHaveClass('sticky-actions')
     const row = menuBtn.closest('tr')
     expect(row.lastElementChild).toContainElement(menuBtn)
+  })
+})
+
+describe('AdminVideoTable edit details', () => {
+  async function openEdit() {
+    adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 9, title: 'Before', description: 'Desc' })], totalPages: 1, totalElements: 1 } })
+    renderTable()
+    fireEvent.click(await screen.findByLabelText('Thao tác cho Before'))
+    fireEvent.click(screen.getByRole('menuitem', { name: /Sửa/ }))
+    return await screen.findByRole('dialog')
+  }
+
+  it('opens with the current values, saves trimmed values and closes', async () => {
+    adminApi.updateVideoDetails.mockResolvedValue({})
+    const dialog = await openEdit()
+    const title = within(dialog).getByLabelText('Tiêu đề')
+    expect(title).toHaveValue('Before')
+    expect(within(dialog).getByLabelText('Mô tả')).toHaveValue('Desc')
+    fireEvent.change(title, { target: { value: ' After ' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Lưu' }))
+    await waitFor(() => expect(adminApi.updateVideoDetails).toHaveBeenCalledWith(9, { title: 'After', description: 'Desc' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  it('keeps the dialog open and shows the server error when the save fails', async () => {
+    adminApi.updateVideoDetails.mockRejectedValue(new Error('Title too long'))
+    const dialog = await openEdit()
+    fireEvent.change(within(dialog).getByLabelText('Tiêu đề'), { target: { value: 'After' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Lưu' }))
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('Title too long')
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 })
 

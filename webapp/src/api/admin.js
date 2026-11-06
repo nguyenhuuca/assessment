@@ -15,6 +15,7 @@ function buildUrl(path, params) {
 export const getVideos         = (params) => api.get(buildUrl('/admin/videos', params))
 export const updateVideoStatus = (id, status) => patch(`/admin/videos/${id}/status`, { status })
 export const updateVideoPriority = (id, priority) => patch(`/admin/videos/${id}/priority`, { priority })
+export const updateVideoDetails = (id, { title, description }) => patch(`/admin/videos/${id}/details`, { title, description })
 // visibility: 'FEED' | 'COLLECTION_ONLY' | 'HIDDEN'
 export const updateVideoVisibility = (id, visibility) => patch(`/admin/videos/${id}/visibility`, { visibility })
 export const bulkVideos = (body) => api.post('/admin/videos/bulk', body)
