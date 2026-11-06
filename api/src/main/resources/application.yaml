@@ -111,7 +111,7 @@ management:
 #  servlet:
 #    context-path: /api # App config common
 app:
-  # prod-N baked in at build time by CI (-Dapp.build.version); APP_VERSION env still wins
+  # prod-<short sha> baked in at build time by CI (-Dapp.build.version); APP_VERSION env still wins
   version: ${APP_VERSION:@app.build.version@}
   token-expired: 86400000
   jwt-secret-key: ${JWT_SECRET:12345678901234567890123456789012}

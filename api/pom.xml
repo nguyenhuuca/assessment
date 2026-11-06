@@ -21,7 +21,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>24</java.version>
-        <!-- backend version (prod-N) filtered into application.yaml as app.version; CI passes -Dapp.build.version -->
+        <!-- backend version (prod-<short sha>) filtered into application.yaml as app.version; CI passes -Dapp.build.version -->
         <app.build.version>dev</app.build.version>
         <common-lang.version>3.18.0</common-lang.version>
         <json-lib.version>20231013</json-lib.version>

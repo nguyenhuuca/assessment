@@ -41,8 +41,7 @@ jobs:
           java-version: '24'
           cache: 'maven'
 
-      # Single source of the release number: the docker job reuses this output,
-      # and the JAR carries it as app.version (prod runs the JAR on the VM, not the image)
+      # Single source of the release number (docker tag, Helm, git tag): the docker job reuses this output
       - name: Compute next version
         id: next_version
         run: |
@@ -50,9 +49,10 @@ jobs:
           echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
           echo "🚀 Next version: $NEXT_VERSION"
 
-      # Build the project without running tests
+      # Build without tests; the JAR carries app.version=prod-<short sha> (same 7 chars as the FE build id),
+      # because prod runs the JAR on the VM, not the image
       - name: Build project (skip tests)
-        run: mvn -B clean package -DskipTests=true -Dapp.build.version=prod-${{ steps.next_version.outputs.next_version }} --file api/pom.xml
+        run: mvn -B clean package -DskipTests=true -Dapp.build.version=prod-${GITHUB_SHA::7} --file api/pom.xml
 
       # Architecture & package-metrics check (report-only for now) using the
       # abstractness/instability CLI. Vendored jar at ci/aic-cli.jar; reads api/target/classes.
@@ -256,8 +256,6 @@ jobs:
           context: ./api           # Dockerfile in  api/
           file: ./api/Dockerfile   # point to Dockerfile
           push: true
-          build-args: |
-            APP_VERSION=prod-${{ steps.next_version.outputs.next_version }}
           tags: |
             nguyenhuuca/funny-app:prod-${{ steps.next_version.outputs.next_version }}
             nguyenhuuca/funny-app:latest
