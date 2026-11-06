@@ -498,6 +498,7 @@ BE-11 → FE-3/4 → FE-5/6/7 ← FE-8 (parallel)
 
 - [x] **RV-1** Image carries `APP_VERSION=prod-<N>` (Dockerfile `ARG`/`ENV`, CI `build-args`); `app.version: ${APP_VERSION:dev}`
 - [x] **RV-2** `app_report.api_version` (Liquibase `202610230001`), stamped by the server in `ReportServiceImpl` (never from the client); issue body adds `- API: <version>`; tests
+- [x] **RV-3** (2026-11-06) Fix: prod reports showed `dev` because prod runs the JAR on the VM, not the image. `app.version` is now baked into the JAR (`@app.build.version@` resource filtering, CI `-Dapp.build.version=prod-N`); the build job computes N once, the docker job reuses it
 
 ## Report screen dropdown: missing screens (#62, autopilot lite)
 
