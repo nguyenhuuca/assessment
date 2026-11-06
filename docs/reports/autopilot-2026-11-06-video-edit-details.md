@@ -59,3 +59,4 @@ API list-price equivalent, not a bill.
 
 | job | turns | cost | models | run |
 |-----|-------|------|--------|-----|
+| build | 103 | $1.49 | claude-sonnet-5-5 $1.49 | [run](https://github.com/nguyenhuuca/assessment/actions/runs/42168079428) |
