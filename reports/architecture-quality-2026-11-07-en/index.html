@@ -8542,6 +8542,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#follow-ups-2026-11-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Follow-ups (2026-11-07)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8608,8 +8619,8 @@
 <tr>
 <td>Issue Density</td>
 <td>0.00</td>
-<td>≈ 2.0 issues / 100 ncloc (SonarCloud: 336 open = 9 bugs + 327 smells, 0 vulnerabilities; test code included, see §6 #6)</td>
-<td>⚠️ 65% are MINOR. Only 2 bugs are real, see §6. Not comparable with Sonargraph's rule set</td>
+<td>≈ 0.94 issues / 100 ncloc in production code (SonarCloud: 160 open = 8 bugs + 152 smells, 0 vulnerabilities; another 176 sit in test code)</td>
+<td>⚠️ Mostly minor smells. Only 2 bugs are real, see §6. Not comparable with Sonargraph's rule set</td>
 </tr>
 <tr>
 <td>Code Duplicates (≥100 tokens, PMD CPD)</td>
@@ -8621,7 +8632,7 @@
 <td>Redundant Code</td>
 <td>0%</td>
 <td>2 unused classes (<code>enums.CacheKey</code>, <code>utils.ContractBatch</code>, the latter only used by tests)</td>
-<td>⚠️ Small, delete them</td>
+<td>✅ Deleted in <code>e9dd51d7</code></td>
 </tr>
 <tr>
 <td>Structural Debt (cycle debt)</td>
@@ -8746,8 +8757,8 @@
 <tr>
 <td>Complex Methods (CCN &gt; 15)</td>
 <td>0</td>
-<td><strong>2</strong></td>
-<td>⚠️ See below</td>
+<td><strong>2</strong> → 0 after <code>f9f00ede</code></td>
+<td>✅ See below</td>
 </tr>
 <tr>
 <td>Methods with CCN &gt; 10</td>
@@ -8899,14 +8910,8 @@
 </tr>
 <tr>
 <td>5</td>
-<td>SonarCloud reports coverage 0.0% although JaCoCo measures ≥ 90%: the JaCoCo XML report is not passed to Sonar (<code>sonar.coverage.jacoco.xmlReportPaths</code>)</td>
+<td>SonarCloud reports coverage 0.0% although JaCoCo measures ≥ 90%: CI passes <code>api/target/...</code>, which the scanner resolves against <code>api/</code> (log: "No coverage report can be found")</td>
 <td>CI <code>funnyapp-ci.yml</code></td>
-<td>Low (reporting only)</td>
-</tr>
-<tr>
-<td>6</td>
-<td>SonarCloud treats test code as main code (test-only rules such as S2699 and S5778 appear in the MAIN scope), which inflates issue density</td>
-<td>Sonar config (<code>sonar.tests</code>)</td>
 <td>Low (reporting only)</td>
 </tr>
 </tbody>
@@ -8917,6 +8922,44 @@
 <li>S3077 on the <code>volatile</code> fields in <code>JwtProvider</code>: the fields hold immutable objects, and the code comment documents why a double build is harmless.</li>
 <li>S2259 in <code>AdminController.bulkAccounts</code>: the endpoint is behind authentication, so the current user is never null.</li>
 </ul>
+<hr />
+<h2 id="follow-ups-2026-11-07">Follow-ups (2026-11-07)<a class="headerlink" href="#follow-ups-2026-11-07" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Action</th>
+<th>Commit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Restore the interrupt flag before rethrowing, with regression tests that fail without the fix</td>
+<td><code>99eee906</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Split <code>OAuthDriveUploader.upload</code> (CCN 19 → 4) and <code>UserSettingsServiceImpl.updateSettings</code> (17 → 1); max CCN is now 11</td>
+<td><code>f9f00ede</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>AdminController</code> fan-out: open, needs its own plan</td>
+<td>—</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Delete <code>CacheKey</code> and <code>ContractBatch</code></td>
+<td><code>e9dd51d7</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Sonar JaCoCo path made module-relative</td>
+<td><code>05f51b1e</code></td>
+</tr>
+</tbody>
+</table>
 <hr />
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <ul>
