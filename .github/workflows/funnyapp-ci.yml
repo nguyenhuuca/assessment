@@ -135,12 +135,13 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       # Run unit tests and generate coverage report
+      # Sonar resolves sonar.coverage.jacoco.xmlReportPaths against the module base dir (api/), not the repo root
       - name: Run tests with coverage and sonar analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.coverage.jacoco.xmlReportPaths=api/target/jacoco-report/jacoco.xml \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/jacoco-report/jacoco.xml \
             -Dsonar.projectKey=nguyenhuuca_assessment --file api/pom.xml
 
       # Install xmllint to parse coverage XML report
