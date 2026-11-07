@@ -601,7 +601,12 @@ class VideoStorageServiceImplTest {
     @Test
     void downloadFileFromFolder_interrupted_rethrowsAndKeepsInterruptFlag() throws IOException {
         stubListing("dlfile", "clip.mp4", 5L);
-        driveFileLocks.tryClaim("dlfile"); // the forked task skips at once
+        // The download blocks until the scope interrupts it, so join() is still waiting when it checks the
+        // interrupt (a task that already finished lets join() return normally).
+        when(driveVideoDownloader.download(eq("dlfile"), eq(5L), any())).thenAnswer(inv -> {
+            new java.util.concurrent.CountDownLatch(1).await();
+            return null;
+        });
         Thread.currentThread().interrupt();
         try {
             assertThatThrownBy(() -> service.downloadFileFromFolder("folder-id", "2025-01-01T00:00:00Z"))

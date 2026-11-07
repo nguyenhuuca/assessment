@@ -118,10 +118,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
     @Test
     void runAllIgnoreError_interrupted_rethrowsAndKeepsInterruptFlag() {
+        // The task blocks until the scope interrupts it: join() only sees the interrupt while it waits
+        // (a task that already finished lets join() return normally), so the task must still be running.
+        Callable<String> blocking = () -> {
+            new java.util.concurrent.CountDownLatch(1).await();
+            return "never";
+        };
         Thread.currentThread().interrupt();
         try {
             RuntimeException e = assertThrows(RuntimeException.class,
-                    () -> TaskUtils.runAllIgnoreError(List.<Callable<String>>of(() -> "x")));
+                    () -> TaskUtils.runAllIgnoreError(List.of(blocking)));
             assertInstanceOf(InterruptedException.class, e.getCause());
             assertTrue(Thread.currentThread().isInterrupted(), "interrupt flag must be restored");
         } finally {
