@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.streaming.HlsStorage;
 import com.canhlabs.funnyapp.cache.DriveFileLocks;
 import com.canhlabs.funnyapp.cache.FeedCache;
 import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;

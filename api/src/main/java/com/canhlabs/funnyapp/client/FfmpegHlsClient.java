@@ -2,7 +2,7 @@ package com.canhlabs.funnyapp.client;
 
 import com.canhlabs.funnyapp.enums.HlsErrorCode;
 import com.canhlabs.funnyapp.exception.HlsException;
-import com.canhlabs.funnyapp.service.impl.HlsStorage;
+import com.canhlabs.funnyapp.streaming.HlsStorage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.notification;
 
+import com.canhlabs.funnyapp.utils.NotificationText;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.entity.VideoSuggestion;
 import com.canhlabs.funnyapp.enums.NotificationType;
@@ -11,7 +12,6 @@ import com.canhlabs.funnyapp.repo.NotificationRepository;
 import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.repo.VideoImportJobRepository;
 import com.canhlabs.funnyapp.repo.VideoSuggestionRepository;
-import com.canhlabs.funnyapp.service.impl.VideoSuggestionServiceImpl;
 import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -84,7 +84,7 @@ public class SuggestionNotificationListener {
     private void notifyLive(VideoSuggestion s, Long videoSourceId) {
         try {
             deliver(s.getUserId(), NotificationType.SUGGESTION_LIVE, s.getId(),
-                    String.valueOf(videoSourceId), VideoSuggestionServiceImpl.snippetOf(s), null);
+                    String.valueOf(videoSourceId), NotificationText.snippet(s.getTitle(), s.getSourceUrl()), null);
         } catch (Exception e) {
             log.error("Failed to deliver live notification for suggestion {}", s.getId(), e);
         }

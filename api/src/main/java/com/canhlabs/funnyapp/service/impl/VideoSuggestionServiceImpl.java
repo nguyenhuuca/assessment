@@ -189,7 +189,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
             markReviewed(s, adminId);
             VideoSuggestion saved = repository.save(s);
             eventPublisher.publishEvent(new SuggestionReviewedEvent(
-                    saved.getId(), saved.getUserId(), true, snippetOf(saved), null));
+                    saved.getId(), saved.getUserId(), true, NotificationText.snippet(saved.getTitle(), saved.getSourceUrl()), null));
             return toDto(saved, null, suggesterNames(List.of(saved)).get(saved.getUserId()), true, false);
         });
         // the import created the job inside the transaction; wake the worker again now that it is visible
@@ -211,7 +211,7 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
             markReviewed(s, adminId);
             VideoSuggestion saved = repository.save(s);
             eventPublisher.publishEvent(new SuggestionReviewedEvent(
-                    saved.getId(), saved.getUserId(), false, snippetOf(saved), reason == null ? null : reason.name()));
+                    saved.getId(), saved.getUserId(), false, NotificationText.snippet(saved.getTitle(), saved.getSourceUrl()), reason == null ? null : reason.name()));
             return toDto(saved, null, suggesterNames(List.of(saved)).get(saved.getUserId()), true, true);
         });
     }
@@ -403,12 +403,6 @@ public class VideoSuggestionServiceImpl implements VideoSuggestionService {
                 .canRequestRereview(SuggestionTransition.REREVIEW.allowed(s.getStatus(), null, s.getRereviewCount()))
                 .canReopen(admin && canReopen)
                 .build();
-    }
-
-    /** Title, or the source URL when the suggester gave none. */
-    public static String snippetOf(VideoSuggestion s) {
-        String text = s.getTitle() == null || s.getTitle().isBlank() ? s.getSourceUrl() : s.getTitle();
-        return NotificationText.snippet(text);
     }
 
     private static int clampSize(int size) {

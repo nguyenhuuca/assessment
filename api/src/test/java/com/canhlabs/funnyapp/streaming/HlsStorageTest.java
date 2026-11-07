@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.service.impl;
+package com.canhlabs.funnyapp.streaming;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;

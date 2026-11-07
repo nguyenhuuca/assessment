@@ -46,4 +46,16 @@ class NotificationTextTest {
     void actorDisplay_limitedTo100Chars() {
         assertThat(NotificationText.actorDisplay("a".repeat(150) + "@x.com")).hasSize(100);
     }
+
+    @Test
+    void snippetWithFallback_usesPrimaryWhenPresent() {
+        assertThat(NotificationText.snippet("  My  title ", "https://youtu.be/x")).isEqualTo("My title");
+    }
+
+    @Test
+    void snippetWithFallback_usesFallbackWhenPrimaryNullOrBlank() {
+        assertThat(NotificationText.snippet(null, "https://youtu.be/x")).isEqualTo("https://youtu.be/x");
+        assertThat(NotificationText.snippet("   ", "https://youtu.be/x")).isEqualTo("https://youtu.be/x");
+        assertThat(NotificationText.snippet(null, null)).isEmpty();
+    }
 }

@@ -25,6 +25,14 @@ public final class NotificationText {
     }
 
     /**
+     * Snippet of {@code primary}, or of {@code fallback} when primary is null or blank
+     * (e.g. a suggestion's title, else its source URL).
+     */
+    public static String snippet(String primary, String fallback) {
+        return snippet(primary == null || primary.isBlank() ? fallback : primary);
+    }
+
+    /**
      * Local part of an email address ("bob@x.com" -> "bob"); never the full address.
      */
     public static String actorDisplay(String email) {

@@ -1,4 +1,4 @@
-package com.canhlabs.funnyapp.service.impl;
+package com.canhlabs.funnyapp.streaming;
 
 import com.canhlabs.funnyapp.utils.AppConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +39,8 @@ public class HlsStorage {
         this(Path.of(AppConstant.CACHE_DIR, "hls"));
     }
 
-    /** Tests point the root at a temp directory. */
-    HlsStorage(Path root) {
+    /** Explicit root; tests point it at a temp directory. */
+    public HlsStorage(Path root) {
         this.root = root.toAbsolutePath().normalize();
     }
 
