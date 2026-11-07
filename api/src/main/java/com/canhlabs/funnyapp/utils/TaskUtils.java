@@ -71,6 +71,7 @@ public class TaskUtils {
 
             return results;
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // keep the interrupt visible to the caller
             throw new RuntimeException(e);
         }
     }

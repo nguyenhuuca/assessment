@@ -115,4 +115,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         assertNotNull(results.get(2).getError());
         assertEquals("Task 3 Failed", results.get(2).getError().getMessage());
     }
+
+    @Test
+    void runAllIgnoreError_interrupted_rethrowsAndKeepsInterruptFlag() {
+        Thread.currentThread().interrupt();
+        try {
+            RuntimeException e = assertThrows(RuntimeException.class,
+                    () -> TaskUtils.runAllIgnoreError(List.<Callable<String>>of(() -> "x")));
+            assertInstanceOf(InterruptedException.class, e.getCause());
+            assertTrue(Thread.currentThread().isInterrupted(), "interrupt flag must be restored");
+        } finally {
+            Thread.interrupted(); // clear it so other tests on this thread are unaffected
+        }
+    }
 }

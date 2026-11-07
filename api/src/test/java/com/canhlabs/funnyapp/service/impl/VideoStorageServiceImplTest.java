@@ -597,4 +597,19 @@ class VideoStorageServiceImplTest {
 
         verify(feedCache).invalidate();
     }
+
+    @Test
+    void downloadFileFromFolder_interrupted_rethrowsAndKeepsInterruptFlag() throws IOException {
+        stubListing("dlfile", "clip.mp4", 5L);
+        driveFileLocks.tryClaim("dlfile"); // the forked task skips at once
+        Thread.currentThread().interrupt();
+        try {
+            assertThatThrownBy(() -> service.downloadFileFromFolder("folder-id", "2025-01-01T00:00:00Z"))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasCauseInstanceOf(InterruptedException.class);
+            assertThat(Thread.currentThread().isInterrupted()).as("interrupt flag must be restored").isTrue();
+        } finally {
+            Thread.interrupted();
+        }
+    }
 }

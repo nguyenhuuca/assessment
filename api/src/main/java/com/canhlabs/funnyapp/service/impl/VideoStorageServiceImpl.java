@@ -175,6 +175,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
             }
             scope.join(); // Wait for all downloads to complete
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // keep the interrupt visible to the caller (e.g. scheduler shutdown)
             log.error("Error downloading files from folder {}: {}", folderId, e.getMessage());
             throw new RuntimeException(e);
         }
