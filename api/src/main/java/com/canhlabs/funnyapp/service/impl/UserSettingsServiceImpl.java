@@ -57,7 +57,27 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     @Override
     @Transactional
     public UserSettingsDto updateSettings(UpdateUserSettingsRequest request) {
-        // Validate atomically: check all fields before persisting anything
+        validate(request); // atomically: every field is checked before anything is persisted
+
+        // All validations passed — now apply
+        var currentUser = AppUtils.getCurrentUser();
+        Long userId = currentUser.getId();
+        String email = currentUser.getEmail();
+
+        UserSettings settings = userSettingsRepository.findById(userId)
+                .orElseGet(() -> createDefaultSettings(userId));
+
+        applyChanges(settings, request);
+
+        settings = userSettingsRepository.save(settings);
+        incognitoCache.evict(userId);
+
+        User user = userRepo.findAllById(userId);
+        return buildDto(email, user, settings);
+    }
+
+    /** Rejects an empty update and any invalid field, before anything is written. */
+    private static void validate(UpdateUserSettingsRequest request) {
         boolean hasAnyField = request.getNotifyNewContent() != null
                 || request.getNotifyEmail() != null
                 || request.getDefaultQuality() != null
@@ -80,15 +100,10 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         if (request.getLocale() != null && !SUPPORTED_LOCALES.contains(request.getLocale())) {
             throw CustomException.of(HttpStatus.BAD_REQUEST, 400, "error.settings.invalidLocale");
         }
+    }
 
-        // All validations passed — now apply
-        var currentUser = AppUtils.getCurrentUser();
-        Long userId = currentUser.getId();
-        String email = currentUser.getEmail();
-
-        UserSettings settings = userSettingsRepository.findById(userId)
-                .orElseGet(() -> createDefaultSettings(userId));
-
+    /** Copies only the fields the request carries (null = unchanged; locale may be explicitly cleared). */
+    private static void applyChanges(UserSettings settings, UpdateUserSettingsRequest request) {
         if (request.getNotifyNewContent() != null) {
             settings.setNotifyNewContent(request.getNotifyNewContent());
         }
@@ -108,12 +123,6 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         if (request.isLocaleProvided()) {
             settings.setLocale(request.getLocale());
         }
-
-        settings = userSettingsRepository.save(settings);
-        incognitoCache.evict(userId);
-
-        User user = userRepo.findAllById(userId);
-        return buildDto(email, user, settings);
     }
 
     @Override
