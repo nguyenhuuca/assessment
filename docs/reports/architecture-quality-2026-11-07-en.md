@@ -12,9 +12,9 @@ Sonargraph is not installed, so every metric was recomputed with the tools liste
 
 | Metric | 2025-07 | 2026-11 | Comment |
 |--------|---------|---------|---------|
-| Issue Density | 0.00 | ≈ 2.0 issues / 100 ncloc (SonarCloud: 336 open = 9 bugs + 327 smells, 0 vulnerabilities; test code included, see §6 #6) | ⚠️ 65% are MINOR. Only 2 bugs are real, see §6. Not comparable with Sonargraph's rule set |
+| Issue Density | 0.00 | ≈ 0.94 issues / 100 ncloc in production code (SonarCloud: 160 open = 8 bugs + 152 smells, 0 vulnerabilities; another 176 sit in test code) | ⚠️ Mostly minor smells. Only 2 bugs are real, see §6. Not comparable with Sonargraph's rule set |
 | Code Duplicates (≥100 tokens, PMD CPD) | 0 | **0** | ✅ No duplication. SonarCloud agrees: 0.0% |
-| Redundant Code | 0% | 2 unused classes (`enums.CacheKey`, `utils.ContractBatch`, the latter only used by tests) | ⚠️ Small, delete them |
+| Redundant Code | 0% | 2 unused classes (`enums.CacheKey`, `utils.ContractBatch`, the latter only used by tests) | ✅ Deleted in `e9dd51d7` |
 | Structural Debt (cycle debt) | 0 | **0** | ✅ No cycles left to cut (§4) |
 | SonarCloud technical debt | — | 1,847 min (≈ 31 h), debt ratio 0.4%, maintainability rating **A** | ✅ |
 
@@ -50,7 +50,7 @@ Most-used classes (fan-in), which are stable and should change rarely: `exceptio
 | Metric | 2025-07 | 2026-11 | Comment |
 |--------|---------|---------|---------|
 | Average Complexity (McCabe, per method) | 1.65 | ≈ **2.2** (median 1) | ✅ Still very low. lizard counts slightly higher than Sonargraph |
-| Complex Methods (CCN > 15) | 0 | **2** | ⚠️ See below |
+| Complex Methods (CCN > 15) | 0 | **2** → 0 after `f9f00ede` | ✅ See below |
 | Methods with CCN > 10 | — | 10 of 989 | — |
 | Methods longer than 50 lines | — | 1 | — |
 
@@ -99,13 +99,24 @@ IntelliJ's DSM still shows red cells when it is run on the whole `api` directory
 | 2 | Two methods have CCN > 15 | §3 | Medium |
 | 3 | `web.AdminController` has the highest fan-out (31): it serves many admin areas at once | `web.AdminController` | Medium |
 | 4 | Dead code | `enums.CacheKey`, `utils.ContractBatch` | Low |
-| 5 | SonarCloud reports coverage 0.0% although JaCoCo measures ≥ 90%: the JaCoCo XML report is not passed to Sonar (`sonar.coverage.jacoco.xmlReportPaths`) | CI `funnyapp-ci.yml` | Low (reporting only) |
-| 6 | SonarCloud treats test code as main code (test-only rules such as S2699 and S5778 appear in the MAIN scope), which inflates issue density | Sonar config (`sonar.tests`) | Low (reporting only) |
+| 5 | SonarCloud reports coverage 0.0% although JaCoCo measures ≥ 90%: CI passes `api/target/...`, which the scanner resolves against `api/` (log: "No coverage report can be found") | CI `funnyapp-ci.yml` | Low (reporting only) |
 
 SonarCloud bugs judged not actionable:
 - S2184 in `AppConstant`: `20 * 1024 * 1024` cannot overflow `int`. Only the "5MB" comment is wrong.
 - S3077 on the `volatile` fields in `JwtProvider`: the fields hold immutable objects, and the code comment documents why a double build is harmless.
 - S2259 in `AdminController.bulkAccounts`: the endpoint is behind authentication, so the current user is never null.
+
+---
+
+## Follow-ups (2026-11-07)
+
+| # | Action | Commit |
+|---|--------|--------|
+| 1 | Restore the interrupt flag before rethrowing, with regression tests that fail without the fix | `99eee906` |
+| 2 | Split `OAuthDriveUploader.upload` (CCN 19 → 4) and `UserSettingsServiceImpl.updateSettings` (17 → 1); max CCN is now 11 | `f9f00ede` |
+| 3 | `AdminController` fan-out: open, needs its own plan | — |
+| 4 | Delete `CacheKey` and `ContractBatch` | `e9dd51d7` |
+| 5 | Sonar JaCoCo path made module-relative | `05f51b1e` |
 
 ---
 
