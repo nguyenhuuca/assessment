@@ -1,7 +1,7 @@
 task: Architecture quality follow-ups (report 2026-11-07)
-status: in_progress
-progress: 90
-done: AQ-0 report b9ede81a; AQ-1 interrupt flag 99eee906; AQ-3 dead code e9dd51d7; AQ-2 CCN>15 split f9f00ede; AQ-4 Sonar jacoco path 05f51b1e
-next: push after user approval, check SonarCloud coverage > 0; AdminController fan-out (31) needs its own plan
+status: done
+progress: 100
+done: AQ-0 report b9ede81a; AQ-1 interrupt flag 99eee906; AQ-1b deterministic tests 0f074353; AQ-3 dead code e9dd51d7; AQ-2 CCN>15 split f9f00ede; AQ-4 Sonar jacoco path 05f51b1e
+next: AdminController fan-out (31) needs its own plan
 plan: docs/reports/architecture-quality-2026-11-07-en.md
-updated: 2026-11-07 11:58
+updated: 2026-11-07 12:20
