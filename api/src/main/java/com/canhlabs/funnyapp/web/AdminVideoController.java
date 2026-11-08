@@ -19,7 +19,6 @@ import com.canhlabs.funnyapp.enums.VideoVisibility;
 import com.canhlabs.funnyapp.utils.Contract;
 import com.canhlabs.funnyapp.service.AdminVideoService;
 import com.canhlabs.funnyapp.utils.AppConstant;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,8 +42,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(AppConstant.API.BASE_URL + "/admin")
 @PreAuthorize("hasRole('ADMIN')")
-@Slf4j
-public class AdminController {
+public class AdminVideoController {
 
     private AdminVideoService adminVideoService;
     private AdminVideoBulkService adminVideoBulkService;

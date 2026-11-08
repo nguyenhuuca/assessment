@@ -7,7 +7,7 @@ import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.service.FeatureFlagService;
 import com.canhlabs.funnyapp.service.impl.PermissionServiceImpl;
 import com.canhlabs.funnyapp.utils.AppConstant;
-import com.canhlabs.funnyapp.web.AdminController;
+import com.canhlabs.funnyapp.web.AdminVideoController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -78,11 +78,11 @@ class HasPermissionAnnotationTest {
         assertThat(spel).doesNotContain("#perm");
     }
 
-    // ── AdminController.getStats() uses @HasPermission(perm = Permission.ADMIN) ─
+    // ── AdminVideoController.getStats() uses @HasPermission(perm = Permission.ADMIN) ─
 
     @Test
     void getStats_hasPermissionAnnotation_withAdminEnum() throws NoSuchMethodException {
-        Method getStats = AdminController.class.getDeclaredMethod("getStats");
+        Method getStats = AdminVideoController.class.getDeclaredMethod("getStats");
         HasPermission annotation = getStats.getAnnotation(HasPermission.class);
         assertThat(annotation).isNotNull();
         assertThat(annotation.perm()).isEqualTo(Permission.ADMIN);
