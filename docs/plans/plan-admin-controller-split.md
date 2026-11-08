@@ -17,7 +17,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 
 ## Problem
 
-`web.AdminController` (344 lines, 20 endpoints) serves three admin areas at once: videos, accounts and comments. Its direct fan-out is 31 classes, the highest in the codebase. Any change to one area touches the shared class and its two test files (`AdminControllerTest`, 26 tests; `AdminControllerPermissionTest`, 48 tests).
+`web.AdminController` (344 lines, 19 endpoints) serves three admin areas at once: videos, accounts and comments. Its direct fan-out is 31 classes, the highest in the codebase. Any change to one area touches the shared class and its two test files (`AdminControllerTest`, 26 tests; `AdminControllerPermissionTest`, 48 tests).
 
 The other admin areas already have their own controllers: `AdminJobController`, `AdminReportController`, `AdminDriveSyncController`, `AdminVideoImportController` and `AdminVideoSuggestionController`. This plan applies the same pattern to the three areas left in `AdminController`.
 
@@ -40,19 +40,24 @@ Rules for the move:
 - The inline fully-qualified `com.canhlabs.funnyapp.service.AdminAccountBulkService` becomes a normal import.
 
 **Success criteria:**
-- Direct fan-out of every new controller is ≤ 20, measured with the same `jdeps -verbose:class` method as the report. Estimate: videos ≈ 20, accounts ≈ 15, comments ≈ 14.
-- The set of admin routes, HTTP methods and security expressions is identical before and after (AC-1).
+- Direct fan-out of every new controller is ≤ 22, and well below the current 31. It is measured with the same `jdeps -verbose:class` method as the report. Estimate: videos ≈ 20, accounts ≈ 15, comments ≈ 14. If videos ends above 22, AC-6 reports the figure and moves `GET /stats` together with the HLS pair into its own follow-up. The fan-out is not forced down inside this refactor.
+- The set of 19 admin routes, HTTP methods and security expressions is identical before and after (AC-1).
 - All existing tests pass with only wiring changes. No assertion is removed.
 
 ## Tasks
 
 | ID | Task | Files | Notes |
 |----|------|-------|-------|
-| **AC-1** | Route-contract test, written **first** against the current code | `web/AdminRouteContractTest.java` (new) | Reflect over `@RestController` classes in `web` whose base path starts with `/admin`. Collect `(HTTP method, full path, effective @PreAuthorize / @HasPermission)` for every handler and compare with a checked-in list of the 20 current routes. Passes before the split, so it protects the move. Commit on its own |
-| **AC-2** | `AdminCommentController` (smallest area first) | new controller; remove 4 methods from `AdminController` | Move the comment tests from `AdminControllerTest` into `AdminCommentControllerTest` |
-| **AC-3** | `AdminAccountController` | new controller; remove 5 methods | Move the account tests into `AdminAccountControllerTest`. The `getAccounts` `@PageableDefault` reflection test follows its method |
-| **AC-4** | `AdminVideoController` + delete `AdminController` | new controller; delete old class | Move the remaining tests into `AdminVideoControllerTest`. `HasPermissionAnnotationTest` points at `AdminVideoController.getStats` |
-| **AC-5** | Permission test wiring | `AdminControllerPermissionTest` | Change `@WebMvcTest(AdminController.class)` to `@WebMvcTest({AdminVideoController.class, AdminAccountController.class, AdminCommentController.class})`. The 48 tests stay unchanged, since they call URLs, not classes. Do this inside each of AC-2 to AC-4 so every commit is green. Rename the class to `AdminPermissionTest` in AC-4 |
+| **AC-1** | Route-contract test, written **first** against the current code | `web/AdminRouteContractTest.java` (new) | Reflect over `@RestController` classes in `web` whose base path starts with `/admin`. Collect one row per handler with these fields:
+- HTTP method and full path;
+- effective security: the method-level `@PreAuthorize` if present, otherwise the class-level one, plus the `@HasPermission(perm)` value;
+- the `@AuditLog` and `@RateLimited` values.
+
+Compare the rows with a checked-in list of the 19 current routes: 10 video including `/stats`, 5 account and 4 comment. The test also fails on duplicate (method, path) pairs. It passes before the split, so it protects the move. Commit it on its own |
+| **AC-2** | `AdminCommentController` (smallest area first) | new controller; remove 4 methods from `AdminController` | Move the comment tests from `AdminControllerTest` into `AdminCommentControllerTest`. Add the new class to the permission test's `@WebMvcTest` list (AC-5 wiring) |
+| **AC-3** | `AdminAccountController` | new controller; remove 5 methods | Move the account tests into `AdminAccountControllerTest`. The `getAccounts` `@PageableDefault` reflection test (`AdminControllerTest.java:253`) follows its method. Add the class to `@WebMvcTest` |
+| **AC-4** | `AdminVideoController` (10 endpoints) + delete `AdminController` | new controller; delete old class | Move the remaining tests into `AdminVideoControllerTest`. `HasPermissionAnnotationTest.java:10,85` switches to `AdminVideoController.getStats` in this commit. It compiles against `AdminController` until then. `@WebMvcTest` lists the three new controllers |
+| **AC-5** | Permission test wiring (no own commit) | `AdminControllerPermissionTest` | Done inside AC-2 to AC-4, so every commit is green. The 48 tests stay unchanged, since they call URLs, not classes. **The class keeps its name.** `AdminReportControllerPermissionTest.java:57` and `AdminJobControllerPermissionTest.java:47` import its nested `TestSecurity`, and a rename would break them |
 | **AC-6** | Verify and report | `docs/reports/architecture-quality-2026-11-07-en.md` | `mvn verify` (coverage ≥ 90%, `PackageCycleTest`, `AdminRouteContractTest`). Recompute fan-out with jdeps. Update finding 3 and the follow-ups table with the commits |
 
 Each of AC-2 to AC-4 is one atomic commit with green tests, so any step can be pushed or reverted on its own.
@@ -79,7 +84,8 @@ Each of AC-2 to AC-4 is one atomic commit with green tests, so any step can be p
 - Changing URLs, DTOs or service interfaces.
 - Splitting the services. `SuggestionBulkServiceImpl`, `UserServiceImpl` and `VideoSuggestionServiceImpl` are the other coupling hotspots, and they need their own analysis.
 - Sonar S2259 in `bulkAccounts`.
+- Historical docs that name `AdminController` stay as written, because they record the design at the time. These are `docs/sequence/*`, `docs/specs/spec-collection-only-videos.md:328` and `docs/adr/0036-admin-bulk-actions.md:14`.
 
 ## Estimate
 
-About 350 lines moved and 1 new test class of about 120 lines. 5 commits (AC-1 to AC-4, plus AC-6). Roughly 1 to 2 hours.
+About 350 lines moved and 1 new test class of about 120 lines. 5 commits: AC-1, AC-2, AC-3, AC-4 (each including its AC-5 wiring), and AC-6. Roughly 1 to 2 hours.
