@@ -691,3 +691,18 @@ Plan: docs/plans/plan-admin-controller-split.md
 - [x] **AC-4** AdminVideoController (10 endpoints incl. /stats), delete AdminController — 0db76628
 - [x] **AC-5** Permission test wiring across the three controllers (done inside AC-2..AC-4) — in 41906488..0db76628
 - [x] **AC-6** mvn verify, local boot check, jdeps fan-out ≤ 22 each, update report — fan-out 16/14/13, verify 96.52%; boot check left to deploy smoke
+
+## Review: Backend system health (swarm-research, 2026-11-08)
+
+Report: docs/reports/system-health-2026-11-08.md
+
+- [x] **R-1** 6 parallel reviewers (security, concurrency, data, arch, integrations, tests/ops) + orchestrator spot-verification
+- [x] **R-2** Synthesis report, score 7.0/10, 1 Critical (MFA IDOR) + 9 High
+- [~] **R-3** Fix batches: security P1 (MFA IDOR, landed) P2–P5, resilience, data/infra P7–P9, CI/ops P10 (pending user decision)
+
+## Lite: Fix MFA IDOR (system-health 2026-11-08, P1)
+
+- [x] **MF-1** setupMfa/enableMfa/disableMfa bind to the JWT user; enable rejects when already enabled; otpauth label URL-encoded — HASH
+- [x] **MF-2** username removed from EnableRequest/DisableRequest and /mfa/setup query — HASH
+- [x] **MF-3** webapp auth.js + ProfileModal stop sending username — HASH
+- [x] **MF-4** MFA tests rewritten on the security context + regression tests (foreign user, already enabled, no JWT) — HASH

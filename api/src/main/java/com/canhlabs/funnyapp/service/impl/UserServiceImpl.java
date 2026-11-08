@@ -32,6 +32,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.UUID;
@@ -110,12 +112,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String enableMfa(String userName, String secret, String otp) {
+    public String enableMfa(String secret, String otp) {
+        User user = currentUser();
+        if (user.isMfaEnabled()) {
+            raiseKey("error.mfa.alreadyEnabled");
+        }
         if (!totp.verify(otp, secret)) {
             raiseKey("error.otp.incorrect");
-
         }
-        User user = userRepo.findAllByUserName(userName);
         user.setMfaEnabled(true);
         user.setMfaSecret(secret);
         userRepo.save(user);
@@ -123,12 +127,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SetupResponse setupMfa(String userName) {
+    public SetupResponse setupMfa() {
+        User user = currentUser();
         String secret = generateSecret();
         String issuer = "canh-labs";
+        String label = URLEncoder.encode(user.getUserName(), StandardCharsets.UTF_8).replace("+", "%20");
         String otpAuthUrl = String.format(
                 "otpauth://totp/%s:%s?secret=%s&issuer=%s&digits=6&period=30",
-                issuer, userName, secret, issuer
+                issuer, label, secret, issuer
         );
         String qrCode = QrUtil.generateQRCodeBase64(otpAuthUrl, 200, 200);
         return new SetupResponse(secret, qrCode);
@@ -173,11 +179,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String disableMfa(String userName, String otp) {
-        User user = userRepo.findAllByUserName(userName);
-        if (user == null) {
-            raiseKey("error.user.notFound");
-        }
+    public String disableMfa(String otp) {
+        User user = currentUser();
         if (!user.isMfaEnabled()) {
             raiseKey("error.mfa.alreadyDisabled");
         }
@@ -252,6 +255,17 @@ public class UserServiceImpl implements UserService {
                         .mfaAvailable(true)
                         .build())
                 .build()).getToken();
+    }
+
+    /** The authenticated (JWT) user; 401 when missing or unknown, 403 when deactivated. */
+    private User currentUser() {
+        UserDetailDto current = AppUtils.getCurrentUser();
+        User user = current == null || current.getId() == null ? null : userRepo.findAllById(current.getId());
+        if (user == null) {
+            throw CustomException.of(HttpStatus.UNAUTHORIZED, 401, "error.auth.tokenInvalid");
+        }
+        requireActive(user);
+        return user;
     }
 
     /**

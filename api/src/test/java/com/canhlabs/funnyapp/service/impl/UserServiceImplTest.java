@@ -16,6 +16,7 @@ import com.canhlabs.funnyapp.utils.AppUtils;
 import com.canhlabs.funnyapp.utils.QrUtil;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.utils.totp.Totp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,6 +26,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -37,6 +39,7 @@ import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -128,53 +131,129 @@ class UserServiceImplTest {
         assertThat(secret).doesNotContain("=");
     }
 
-    @Test
-    void enableMfa_success() {
-        String userName = "test@abc.com";
-        String secret = "SECRET";
-        String otp = "123456";
-        User user = User.builder().userName(userName).build();
-        when(userRepo.findAllByUserName(userName)).thenReturn(user);
-        when(userRepo.save(any())).thenReturn(user);
-        when(totp.verify( otp, secret)).thenReturn(true);
+    private void loginAs(Long id) {
+        var auth = new org.springframework.security.authentication.TestingAuthenticationToken("u", "p");
+        auth.setDetails(UserDetailDto.builder().id(id).email("jwt@abc.com").build());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
 
-        String result = userService.enableMfa(userName, secret, otp);
-
-        assertThat(result).isEqualTo("success");
-        assertThat(user.isMfaEnabled()).isTrue();
-        assertThat(user.getMfaSecret()).isEqualTo(secret);
-
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
-    void enableMfa_invalidOtp_throws() {
-        String userName = "test@abc.com";
-        String secret = "SECRET";
-        String otp = "123456";
-        User user = User.builder().userName(userName).build();
-        when(userRepo.findAllByUserName(userName)).thenReturn(user);
+    void enableMfa_success() {
+        loginAs(7L);
+        User user = User.builder().id(7L).userName("jwt@abc.com").build();
+        when(userRepo.findAllById(7L)).thenReturn(user);
+        when(userRepo.save(any())).thenReturn(user);
+        when(totp.verify("123456", "SECRET")).thenReturn(true);
 
+        String result = userService.enableMfa("SECRET", "123456");
 
-        when(totp.verify(secret, otp)).thenReturn(false);
+        assertThat(result).isEqualTo("success");
+        assertThat(user.isMfaEnabled()).isTrue();
+        assertThat(user.getMfaSecret()).isEqualTo("SECRET");
+        verify(userRepo).save(user);
+        verify(userRepo, never()).findAllByUserName(anyString());
+    }
 
-        assertThatThrownBy(() -> userService.enableMfa(userName, secret, otp))
+    @Test
+    void enableMfa_invalidOtp_throwsAndDoesNotSave() {
+        loginAs(7L);
+        User user = User.builder().id(7L).userName("jwt@abc.com").build();
+        when(userRepo.findAllById(7L)).thenReturn(user);
+        when(totp.verify("123456", "SECRET")).thenReturn(false);
+
+        assertThatThrownBy(() -> userService.enableMfa("SECRET", "123456"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("error.otp.incorrect");
+        assertThat(user.isMfaEnabled()).isFalse();
+        verify(userRepo, never()).save(any());
+    }
 
+    @Test
+    void enableMfa_alreadyEnabled_throwsWithoutVerifyOrSave() {
+        loginAs(7L);
+        User user = User.builder().id(7L).userName("jwt@abc.com").mfaEnabled(true).mfaSecret("OLD").build();
+        when(userRepo.findAllById(7L)).thenReturn(user);
+
+        assertThatThrownBy(() -> userService.enableMfa("ATTACKER", "123456"))
+                .isInstanceOf(CustomException.class)
+                .hasMessage("error.mfa.alreadyEnabled");
+        assertThat(user.getMfaSecret()).isEqualTo("OLD");
+        verify(totp, never()).verify(anyString(), anyString());
+        verify(userRepo, never()).save(any());
+    }
+
+    @Test
+    void enableMfa_noCurrentUser_throwsAndDoesNotSave() {
+        assertThatThrownBy(() -> userService.enableMfa("SECRET", "123456"))
+                .isInstanceOf(CustomException.class)
+                .hasMessage("error.auth.tokenInvalid");
+        verify(userRepo, never()).save(any());
+    }
+
+    @Test
+    void enableMfa_currentUserNotInDb_throws() {
+        loginAs(7L);
+        when(userRepo.findAllById(7L)).thenReturn(null);
+
+        assertThatThrownBy(() -> userService.enableMfa("SECRET", "123456"))
+                .isInstanceOf(CustomException.class)
+                .hasMessage("error.auth.tokenInvalid");
+        verify(userRepo, never()).save(any());
+    }
+
+    @Test
+    void enableMfa_deactivatedUser_throws() {
+        loginAs(7L);
+        User user = User.builder().id(7L).userName("jwt@abc.com")
+                .status(com.canhlabs.funnyapp.enums.UserStatus.DEACTIVATED).build();
+        when(userRepo.findAllById(7L)).thenReturn(user);
+
+        assertThatThrownBy(() -> userService.enableMfa("SECRET", "123456"))
+                .isInstanceOf(CustomException.class)
+                .hasMessage("error.account.deactivated");
+        verify(userRepo, never()).save(any());
     }
 
     @Test
     void setupMfa_returnsSetupResponse() {
-        String userName = "test@abc.com";
+        loginAs(7L);
+        when(userRepo.findAllById(7L)).thenReturn(User.builder().id(7L).userName("test@abc.com").build());
         try (MockedStatic<QrUtil> qrUtil = mockStatic(QrUtil.class)) {
             qrUtil.when(() -> QrUtil.generateQRCodeBase64(anyString(), anyInt(), anyInt()))
                     .thenReturn("qrCodeBase64");
 
-            SetupResponse resp = userService.setupMfa(userName);
+            SetupResponse resp = userService.setupMfa();
 
             assertThat(resp.secret()).isNotEmpty();
             assertThat(resp.qrCode()).isEqualTo("qrCodeBase64");
         }
+    }
+
+    @Test
+    void setupMfa_labelIsUrlEncoded() {
+        loginAs(7L);
+        when(userRepo.findAllById(7L)).thenReturn(User.builder().id(7L).userName("a b+c@abc.com").build());
+        try (MockedStatic<QrUtil> qrUtil = mockStatic(QrUtil.class)) {
+            qrUtil.when(() -> QrUtil.generateQRCodeBase64(anyString(), anyInt(), anyInt())).thenReturn("qr");
+
+            userService.setupMfa();
+
+            qrUtil.verify(() -> QrUtil.generateQRCodeBase64(
+                    org.mockito.ArgumentMatchers.startsWith("otpauth://totp/canh-labs:a%20b%2Bc%40abc.com?"),
+                    anyInt(), anyInt()));
+        }
+    }
+
+    @Test
+    void setupMfa_noCurrentUser_throws() {
+        assertThatThrownBy(() -> userService.setupMfa())
+                .isInstanceOf(CustomException.class)
+                .hasMessage("error.auth.tokenInvalid");
     }
 
     @Test
@@ -287,53 +366,49 @@ class UserServiceImplTest {
 
     @Test
     void disableMfa_success() {
-        String userName = "test@abc.com";
-        String otp = "123456";
-        String mfaSecret = "SECRET";
-        User user = User.builder().userName(userName).mfaEnabled(true).mfaSecret(mfaSecret).build();
-        when(userRepo.findAllByUserName(userName)).thenReturn(user);
+        loginAs(7L);
+        User user = User.builder().id(7L).userName("test@abc.com").mfaEnabled(true).mfaSecret("SECRET").build();
+        when(userRepo.findAllById(7L)).thenReturn(user);
         when(userRepo.save(any())).thenReturn(user);
+        when(totp.verify("123456", "SECRET")).thenReturn(true);
 
-        when(totp.verify(otp, mfaSecret)).thenReturn(true);
-
-        String result = userService.disableMfa(userName, otp);
+        String result = userService.disableMfa("123456");
 
         assertThat(result).isEqualTo("success");
         assertThat(user.isMfaEnabled()).isFalse();
-
+        verify(userRepo, never()).findAllByUserName(anyString());
     }
 
     @Test
-    void disableMfa_userNotExist_throws() {
-        when(userRepo.findAllByUserName("notfound")).thenReturn(null);
-
-        assertThatThrownBy(() -> userService.disableMfa("notfound", "otp"))
+    void disableMfa_noCurrentUser_throws() {
+        assertThatThrownBy(() -> userService.disableMfa("otp"))
                 .isInstanceOf(CustomException.class)
-                .hasMessage("error.user.notFound");
+                .hasMessage("error.auth.tokenInvalid");
+        verify(userRepo, never()).save(any());
     }
 
     @Test
     void disableMfa_alreadyDisabled_throws() {
-        User user = User.builder().userName("test@abc.com").mfaEnabled(false).build();
-        when(userRepo.findAllByUserName("test@abc.com")).thenReturn(user);
+        loginAs(7L);
+        when(userRepo.findAllById(7L)).thenReturn(User.builder().id(7L).userName("test@abc.com").mfaEnabled(false).build());
 
-        assertThatThrownBy(() -> userService.disableMfa("test@abc.com", "otp"))
+        assertThatThrownBy(() -> userService.disableMfa("otp"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("error.mfa.alreadyDisabled");
     }
 
     @Test
     void disableMfa_invalidOtp_throws() {
-        String userName = "test@abc.com";
-        String otp = "123456";
-        String mfaSecret = "SECRET";
-        User user = User.builder().userName(userName).mfaEnabled(true).mfaSecret(mfaSecret).build();
-        when(userRepo.findAllByUserName(userName)).thenReturn(user);
-        when(totp.verify(mfaSecret, otp)).thenReturn(true);
-        assertThatThrownBy(() -> userService.disableMfa(userName, otp))
+        loginAs(7L);
+        User user = User.builder().id(7L).userName("test@abc.com").mfaEnabled(true).mfaSecret("SECRET").build();
+        when(userRepo.findAllById(7L)).thenReturn(user);
+        when(totp.verify("123456", "SECRET")).thenReturn(false);
+
+        assertThatThrownBy(() -> userService.disableMfa("123456"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("error.otp.incorrect");
-
+        assertThat(user.isMfaEnabled()).isTrue();
+        verify(userRepo, never()).save(any());
     }
 
     @Test

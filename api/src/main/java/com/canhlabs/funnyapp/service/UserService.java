@@ -21,20 +21,24 @@ public interface UserService extends UserDetailsService {
 
     String generateSecret();
 
-    String enableMfa(String userName, String secret, String otp);
+    /**
+     * Enables MFA for the authenticated user only (never a caller-supplied user).
+     * @throws com.canhlabs.funnyapp.exception.CustomException if unauthenticated, MFA already enabled or OTP wrong
+     */
+    String enableMfa(String secret, String otp);
 
     /**
-     * Using to get QR code to return end user
-     * @param userName
-     * @return
+     * Using to get QR code for the authenticated user.
+     * @return secret and QR code
      */
-    SetupResponse setupMfa(String userName);
+    SetupResponse setupMfa();
 
     UserInfoDto verifyMfa(MfaRequest mfaRequest) ;
 
     UserInfoDto joinSystemPaswordless(String token);
 
-    String disableMfa(String userName, String otp);
+    /** Disables MFA for the authenticated user after verifying the OTP. */
+    String disableMfa(String otp);
 
     UserDetailDto getCurrent();
 

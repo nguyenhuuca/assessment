@@ -37,7 +37,7 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
     setMfaLoading(true)
     setMfaMsg(null)
     try {
-      const res = await authApi.mfa.setup(user?.email)
+      const res = await authApi.mfa.setup()
       setQrCode(res.data.qrCode)
       setSecret(res.data.secret)
     } catch (err) {
@@ -55,7 +55,7 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
     setMfaLoading(true)
     setMfaMsg(null)
     try {
-      await authApi.mfa.enable(setupCode, user?.email, secret)
+      await authApi.mfa.enable(setupCode, secret)
       updateUser({ ...user, mfaEnabled: true })
       setMfaMsg({ text: t('mfaEnabledOk'), type: 'success' })
       setQrCode(null)
@@ -75,7 +75,7 @@ export default function ProfileModal({ show, onHide, initialTab = 'info' }) {
     setMfaLoading(true)
     setMfaMsg(null)
     try {
-      await authApi.mfa.disable(disableCode, user?.email)
+      await authApi.mfa.disable(disableCode)
       updateUser({ ...user, mfaEnabled: false })
       setMfaMsg({ text: t('mfaDisabledOk'), type: 'success' })
       setDisableCode('')

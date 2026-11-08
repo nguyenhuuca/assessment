@@ -85,11 +85,10 @@ class UserControllerTest {
 
     @Test
     void setup_shouldReturnSetupResponse() {
-        String username = "user";
         SetupResponse setupResponse = new SetupResponse("secret", "code");
-        when(userService.setupMfa(username)).thenReturn(setupResponse);
+        when(userService.setupMfa()).thenReturn(setupResponse);
 
-        ResponseEntity<ResultObjectInfo<SetupResponse>> response = userController.setup(username);
+        ResponseEntity<ResultObjectInfo<SetupResponse>> response = userController.setup();
 
         assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
         assertEquals(setupResponse, response.getBody().getData());
@@ -97,12 +96,34 @@ class UserControllerTest {
 
     @Test
     void enable_shouldReturnSuccess() {
-        EnableRequest req = new EnableRequest("user", "secret", "otp");
-        when(userService.enableMfa("user", "secret", "otp")).thenReturn("enabled");
+        EnableRequest req = new EnableRequest("otp", "secret");
+        when(userService.enableMfa("secret", "otp")).thenReturn("enabled");
 
         ResponseEntity<ResultObjectInfo<String>> response = userController.enable(req);
 
         assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
+    }
+
+    @Test
+    void enable_foreignUsernameInBody_isIgnored() throws Exception {
+        EnableRequest req = com.canhlabs.funnyapp.config.JsonMappers.create().readValue(
+                "{\"username\":\"victim@abc.com\",\"secret\":\"secret\",\"otp\":\"otp\"}", EnableRequest.class);
+        when(userService.enableMfa("secret", "otp")).thenReturn("success");
+
+        userController.enable(req);
+
+        verify(userService).enableMfa("secret", "otp");
+    }
+
+    @Test
+    void disable_foreignUsernameInBody_isIgnored() throws Exception {
+        DisableRequest req = com.canhlabs.funnyapp.config.JsonMappers.create().readValue(
+                "{\"username\":\"victim@abc.com\",\"otp\":\"otp\"}", DisableRequest.class);
+        when(userService.disableMfa("otp")).thenReturn("success");
+
+        userController.disable(req);
+
+        verify(userService).disableMfa("otp");
     }
 
     @Test
@@ -120,8 +141,8 @@ class UserControllerTest {
 
     @Test
     void disable_shouldReturnSuccess() {
-        DisableRequest req = new DisableRequest("user", "otp");
-        when(userService.disableMfa("user", "otp")).thenReturn("disabled");
+        DisableRequest req = new DisableRequest("otp");
+        when(userService.disableMfa("otp")).thenReturn("disabled");
 
         ResponseEntity<ResultObjectInfo<String>> response = userController.disable(req);
 

@@ -131,26 +131,26 @@ public class UserController extends BaseController {
     }
 
     // Using to get QR code incase the end user enabled MFA button
-    @Operation(summary = "Setup MFA for user", description = "This endpoint is used to setup MFA for the user. It returns a QR code that can be scanned by an authenticator app.")
+    @Operation(summary = "Setup MFA for user", description = "This endpoint is used to setup MFA for the authenticated user. It returns a QR code that can be scanned by an authenticator app.")
     @GetMapping("/mfa/setup")
     @WithSpan
-    public ResponseEntity<ResultObjectInfo<SetupResponse>> setup(@RequestParam String username) {
+    public ResponseEntity<ResultObjectInfo<SetupResponse>> setup() {
 
         return new ResponseEntity<>(ResultObjectInfo.<SetupResponse>builder()
                 .status(ResultStatus.SUCCESS)
-                .data(userService.setupMfa(username))
+                .data(userService.setupMfa())
                 .build(), HttpStatus.OK);
     }
 
     // Using to verify the otp in first time end user enable mfa and scan QR
-    @Operation(summary = "Enable MFA for user", description = "This endpoint is used to enable MFA for the user. It requires the username, secret, and OTP.")
+    @Operation(summary = "Enable MFA for user", description = "This endpoint is used to enable MFA for the user. It acts on the authenticated user and requires the secret and OTP.")
     @PostMapping("/mfa/enable")
     @WithSpan
     public ResponseEntity<ResultObjectInfo<String>> enable(@RequestBody EnableRequest req) {
 
         return new ResponseEntity<>(ResultObjectInfo.<String>builder()
                 .status(ResultStatus.SUCCESS)
-                .data(userService.enableMfa(req.username(), req.secret(), req.otp()))
+                .data(userService.enableMfa(req.secret(), req.otp()))
                 .build(), HttpStatus.OK);
     }
 
@@ -166,11 +166,11 @@ public class UserController extends BaseController {
                 .build(), HttpStatus.OK);
     }
 
-    @Operation(summary = "Disable MFA for user", description = "This endpoint is used to disable MFA for the user. It requires the username and OTP.")
+    @Operation(summary = "Disable MFA for user", description = "This endpoint is used to disable MFA for the authenticated user. It requires the OTP.")
     @PostMapping("/mfa/disable")
     @WithSpan
     public ResponseEntity<ResultObjectInfo<String>> disable(@RequestBody DisableRequest req) {
-        String rs = userService.disableMfa(req.username(), req.otp());
+        String rs = userService.disableMfa(req.otp());
         return new ResponseEntity<>(ResultObjectInfo.<String>builder()
                 .status(ResultStatus.SUCCESS)
                 .data(rs)

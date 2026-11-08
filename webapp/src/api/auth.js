@@ -9,9 +9,9 @@ export const authApi = {
   removePassword: (body) => api.delete('/user/password', body),
   verifyMagic: (token) => api.get(`/user/verify-magic?token=${encodeURIComponent(token)}`),
   mfa: {
-    setup: (username) => api.get(`/user/mfa/setup?username=${encodeURIComponent(username)}`),
+    setup: () => api.get('/user/mfa/setup'),
     verify: (otp, username, sessionToken) => api.post('/user/mfa/verify', { otp, username, sessionToken }),
-    enable: (otp, username, secret) => api.post('/user/mfa/enable', { otp, username, secret }),
-    disable: (otp, username) => api.post('/user/mfa/disable', { otp, username }),
+    enable: (otp, secret) => api.post('/user/mfa/enable', { otp, secret }),
+    disable: (otp) => api.post('/user/mfa/disable', { otp }),
   },
 }
