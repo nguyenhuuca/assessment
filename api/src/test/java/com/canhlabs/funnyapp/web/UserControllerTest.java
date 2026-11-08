@@ -223,4 +223,12 @@ class UserControllerTest {
             org.junit.jupiter.api.Assertions.assertNotNull(m.getAnnotation(AuditLog.class));
         }
     }
+
+    @Test
+    void mfaEndpoints_areRateLimited() throws Exception {
+        assertEquals(10, UserController.class.getMethod("verify", MfaRequest.class).getAnnotation(RateLimited.class).permit());
+        assertEquals(10, UserController.class.getMethod("setup").getAnnotation(RateLimited.class).permit());
+        assertEquals(5, UserController.class.getMethod("enable", EnableRequest.class).getAnnotation(RateLimited.class).permit());
+        assertEquals(5, UserController.class.getMethod("disable", DisableRequest.class).getAnnotation(RateLimited.class).permit());
+    }
 }

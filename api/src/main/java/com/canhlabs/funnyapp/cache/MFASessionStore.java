@@ -7,5 +7,13 @@ public interface MFASessionStore {
 
     Optional<String> getUserId(String sessionToken);
 
+    /**
+     * Records one wrong OTP for the session.
+     *
+     * @return the number of failures so far for this session token
+     */
+    int recordFailure(String sessionToken);
+
+    /** Removes the session and its failure counter. */
     void remove(String sessionToken);
 }

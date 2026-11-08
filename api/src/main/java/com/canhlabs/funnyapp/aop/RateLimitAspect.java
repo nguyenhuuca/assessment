@@ -8,6 +8,7 @@ import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -55,9 +56,10 @@ public class RateLimitAspect {
     }
 
     private String getClientKey(HttpServletRequest request, ProceedingJoinPoint joinPoint) {
-        // get user if authenticated, else use IP address
+        // get user if authenticated, else use IP address. The anonymous token reports isAuthenticated() = true,
+        // so without the instanceof check every guest would share one "USER:anonymousUser" bucket
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated()) {
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
             return "USER:" + auth.getName();
         }
         return "IP:" + request.getRemoteAddr();

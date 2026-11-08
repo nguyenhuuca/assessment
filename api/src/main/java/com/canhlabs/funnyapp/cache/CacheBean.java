@@ -17,6 +17,12 @@ public class CacheBean {
         return factory.createCache( props.getMfa().getTtlMinutes(), props.getMfa().getMaxSize());
     }
 
+    /** Wrong-OTP counter per MFA session token; same TTL and size as mfaSessionCache. */
+    @Bean(name = "mfaAttemptCache")
+    public AppCache<String, Integer> mfaAttemptCache(AppCacheFactory factory, CacheProperties props) {
+        return factory.createCache(props.getMfa().getTtlMinutes(), props.getMfa().getMaxSize());
+    }
+
     @Bean(name ="lockManagerCache")
     public AppCache<String, Boolean> lockManagerCache(AppCacheFactory factory) {
         return factory.createCache(1, 10_000);

@@ -18,7 +18,7 @@
         CacheProperties cacheProperties = new CacheProperties();
         cacheProperties.setType("guava");
         AppCacheFactory factory = new AppCacheFactory(cacheProperties);
-        store = new MFASessionStoreImpl(factory.createDefaultCache());
+        store = new MFASessionStoreImpl(factory.createDefaultCache(), factory.createDefaultCache());
         defaultCache = factory.createDefaultCache();
     }
 
@@ -33,6 +33,24 @@
      void getUserId_shouldReturnEmptyIfNotFound() {
          Optional<String> userId = store.getUserId("nonexistent");
          assertTrue(userId.isEmpty());
+     }
+
+     @Test
+     void recordFailure_countsPerToken() {
+         store.storeSession("t1", "u1");
+         assertEquals(1, store.recordFailure("t1"));
+         assertEquals(2, store.recordFailure("t1"));
+         assertEquals(3, store.recordFailure("t1"));
+         assertEquals(1, store.recordFailure("other"));
+     }
+
+     @Test
+     void remove_resetsFailureCounter() {
+         store.storeSession("t2", "u2");
+         store.recordFailure("t2");
+         store.recordFailure("t2");
+         store.remove("t2");
+         assertEquals(1, store.recordFailure("t2"));
      }
 
      @Test

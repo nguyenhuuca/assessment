@@ -133,6 +133,7 @@ public class UserController extends BaseController {
     // Using to get QR code incase the end user enabled MFA button
     @Operation(summary = "Setup MFA for user", description = "This endpoint is used to setup MFA for the authenticated user. It returns a QR code that can be scanned by an authenticator app.")
     @GetMapping("/mfa/setup")
+    @RateLimited(permit = 10)
     @WithSpan
     public ResponseEntity<ResultObjectInfo<SetupResponse>> setup() {
 
@@ -145,6 +146,7 @@ public class UserController extends BaseController {
     // Using to verify the otp in first time end user enable mfa and scan QR
     @Operation(summary = "Enable MFA for user", description = "This endpoint is used to enable MFA for the user. It acts on the authenticated user and requires the secret and OTP.")
     @PostMapping("/mfa/enable")
+    @RateLimited(permit = 5)
     @WithSpan
     public ResponseEntity<ResultObjectInfo<String>> enable(@RequestBody EnableRequest req) {
 
@@ -157,6 +159,7 @@ public class UserController extends BaseController {
     @Operation(summary = "Verify MFA for user", description = "This endpoint is used to verify the user with MFA enabled. It requires the username and OTP.")
     // Using to verify user in case user login and enabled MFA
     @PostMapping("/mfa/verify")
+    @RateLimited(permit = 10)
     @WithSpan
     public ResponseEntity<ResultObjectInfo<UserInfoDto>> verify(@RequestBody MfaRequest req) {
         UserInfoDto rs = userService.verifyMfa(req);
@@ -168,6 +171,7 @@ public class UserController extends BaseController {
 
     @Operation(summary = "Disable MFA for user", description = "This endpoint is used to disable MFA for the authenticated user. It requires the OTP.")
     @PostMapping("/mfa/disable")
+    @RateLimited(permit = 5)
     @WithSpan
     public ResponseEntity<ResultObjectInfo<String>> disable(@RequestBody DisableRequest req) {
         String rs = userService.disableMfa(req.otp());

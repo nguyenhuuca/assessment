@@ -143,6 +143,22 @@ class RateLimitAspectTest {
         assertThat(clientKeyCaptor.getValue()).isEqualTo("IP:172.16.0.99");
     }
 
+    @Test
+    void rateLimit_anonymousAuthenticationToken_clientKeyPrefixedWithIP() {
+        // Spring's anonymous filter sets this token and it reports isAuthenticated() = true:
+        // guests must still be keyed by IP, not share one global "USER:anonymousUser" bucket
+        SecurityContextHolder.getContext().setAuthentication(new org.springframework.security.authentication.AnonymousAuthenticationToken(
+                "key", "anonymousUser",
+                List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ANONYMOUS"))));
+        request.setRemoteAddr("172.16.0.42");
+
+        rateLimitTestService.doWork();
+
+        ArgumentCaptor<String> clientKeyCaptor = ArgumentCaptor.forClass(String.class);
+        verify(limiter).allowRequest(clientKeyCaptor.capture(), anyString(), anyInt(), anyLong());
+        assertThat(clientKeyCaptor.getValue()).isEqualTo("IP:172.16.0.42");
+    }
+
     // ── 5. permit and windowInSeconds are passed correctly to limiter ─────────
 
     @Test

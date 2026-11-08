@@ -44,6 +44,9 @@ import static com.canhlabs.funnyapp.exception.CustomException.raiseKey;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    /** Wrong OTPs allowed per MFA login session before it is invalidated (CWE-307). */
+    static final int MAX_MFA_ATTEMPTS = 5;
     private UserRepo userRepo;
     private PasswordEncoder bCrypt;
     private JwtProvider jwtProvider;
@@ -150,8 +153,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findAllByUserName(userIdOpt.get());
         requireActive(user);
         if (!totp.verify(mfaRequest.otp(), user.getMfaSecret())) {
+            if (mfaSessionStore.recordFailure(sessionToken) >= MAX_MFA_ATTEMPTS) {
+                mfaSessionStore.remove(sessionToken);
+                raiseKey("error.mfa.tooManyAttempts"); // throws
+            }
             raiseKey("error.otp.incorrect");
         }
+        // one-time: a used session token cannot mint another JWT
+        mfaSessionStore.remove(sessionToken);
         return toUserInfo(user, getToken(user));
     }
 

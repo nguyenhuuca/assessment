@@ -272,7 +272,65 @@ class UserServiceImplTest {
         UserInfoDto result = userService.verifyMfa(req);
 
         assertThat(result.getJwt()).isEqualTo("jwt");
+        // one-time token: it cannot be replayed to mint another JWT
+        verify(mfaSessionStore).remove(sessionToken);
+        verify(mfaSessionStore, never()).recordFailure(anyString());
+    }
 
+    @Test
+    void verifyMfa_wrongOtpBelowCap_keepsSession() {
+        String sessionToken = UUID.randomUUID().toString();
+        User user = User.builder().userName("test@abc.com").mfaSecret("SECRET").build();
+        MfaRequest req = new MfaRequest(sessionToken, "000000", sessionToken);
+        when(mfaSessionStore.getUserId(sessionToken)).thenReturn(Optional.of("test@abc.com"));
+        when(userRepo.findAllByUserName("test@abc.com")).thenReturn(user);
+        when(totp.verify("000000", "SECRET")).thenReturn(false);
+        when(mfaSessionStore.recordFailure(sessionToken)).thenReturn(UserServiceImpl.MAX_MFA_ATTEMPTS - 1);
+
+        assertThatThrownBy(() -> userService.verifyMfa(req))
+                .isInstanceOf(CustomException.class)
+                .hasMessage("error.otp.incorrect");
+        verify(mfaSessionStore, never()).remove(anyString());
+    }
+
+    @Test
+    void verifyMfa_wrongOtpAtCap_invalidatesSession() {
+        String sessionToken = UUID.randomUUID().toString();
+        User user = User.builder().userName("test@abc.com").mfaSecret("SECRET").build();
+        MfaRequest req = new MfaRequest(sessionToken, "000000", sessionToken);
+        when(mfaSessionStore.getUserId(sessionToken)).thenReturn(Optional.of("test@abc.com"));
+        when(userRepo.findAllByUserName("test@abc.com")).thenReturn(user);
+        when(totp.verify("000000", "SECRET")).thenReturn(false);
+        when(mfaSessionStore.recordFailure(sessionToken)).thenReturn(UserServiceImpl.MAX_MFA_ATTEMPTS);
+
+        assertThatThrownBy(() -> userService.verifyMfa(req))
+                .isInstanceOf(CustomException.class)
+                .hasMessage("error.mfa.tooManyAttempts");
+        verify(mfaSessionStore).remove(sessionToken);
+        verify(jwtProvider, never()).generateToken(any(JwtGenerationDto.class));
+    }
+
+    @Test
+    void verifyMfa_bruteForce_fifthWrongOtpKillsSessionThenExpired() {
+        // real store: 4 wrong codes keep the session, the 5th removes it, the 6th call sees no session
+        com.canhlabs.funnyapp.cache.CacheProperties props = new com.canhlabs.funnyapp.cache.CacheProperties();
+        props.setType("guava");
+        com.canhlabs.funnyapp.cache.AppCacheFactory factory = new com.canhlabs.funnyapp.cache.AppCacheFactory(props);
+        MFASessionStore realStore = new com.canhlabs.funnyapp.cache.MFASessionStoreImpl(
+                factory.createDefaultCache(), factory.createDefaultCache());
+        userService.injectMfaStore(realStore);
+        realStore.storeSession("sess", "test@abc.com");
+        User user = User.builder().userName("test@abc.com").mfaSecret("SECRET").build();
+        when(userRepo.findAllByUserName("test@abc.com")).thenReturn(user);
+        MfaRequest req = new MfaRequest("sess", "000000", "sess");
+
+        for (int i = 1; i < UserServiceImpl.MAX_MFA_ATTEMPTS; i++) {
+            assertThatThrownBy(() -> userService.verifyMfa(req)).hasMessage("error.otp.incorrect");
+            assertThat(realStore.getUserId("sess")).isPresent();
+        }
+        assertThatThrownBy(() -> userService.verifyMfa(req)).hasMessage("error.mfa.tooManyAttempts");
+        assertThat(realStore.getUserId("sess")).isEmpty();
+        assertThatThrownBy(() -> userService.verifyMfa(req)).hasMessage("error.auth.sessionExpired");
     }
 
     @Test
