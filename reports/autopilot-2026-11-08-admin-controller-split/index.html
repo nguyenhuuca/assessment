@@ -8582,8 +8582,8 @@
 <li><strong>Request:</strong> Split <code>AdminController</code> following <code>docs/plans/plan-admin-controller-split.md</code> (AC-1 to AC-6). Plan mode: the plan already existed.</li>
 <li><strong>Mode:</strong> local</li>
 <li><strong>Plan:</strong> <a href="../../plans/plan-admin-controller-split/">plan-admin-controller-split</a></li>
-<li><strong>Started:</strong> 2026-11-08 11:51 · <strong>Landed:</strong> 2026-11-08 12:12, local commits; push pending Gate 2</li>
-<li><strong>Result:</strong> committed locally (<code>7c30894e</code>, <code>41906488</code>, <code>0fbd3d0e</code>, <code>0db76628</code>, plus the closing docs commit). Push waits for Gate 2.</li>
+<li><strong>Started:</strong> 2026-11-08 11:51 · <strong>Landed:</strong> 2026-11-08 12:20 (pushed)</li>
+<li><strong>Result:</strong> ✅ pushed <code>07515f25</code> (code: <code>7c30894e</code>, <code>41906488</code>, <code>0fbd3d0e</code>, <code>0db76628</code>)</li>
 </ul>
 <h2 id="pipeline">Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h2>
 <table>
@@ -8642,12 +8642,12 @@
 </tr>
 <tr>
 <td>Gate 2 (owner)</td>
-<td>pending</td>
+<td>push</td>
 <td>—</td>
 </tr>
 <tr>
 <td>CI + smoke</td>
-<td>pending: runs after the push</td>
+<td>CI run 42451416897 green (Build, Test, Docker, Deploy; Trivy disabled). Prod health <code>UP</code>. <code>mock-test.sh</code> 22/22, including <code>/admin/stats</code>, <code>/admin/videos</code>, <code>/admin/accounts</code> and <code>/admin/comments</code></td>
 <td>—</td>
 </tr>
 </tbody>
@@ -8819,6 +8819,34 @@
 <td>—</td>
 <td>opus</td>
 </tr>
+<tr>
+<td>11</td>
+<td>1</td>
+<td>gate2</td>
+<td>—</td>
+<td>—</td>
+<td>push</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>12</td>
+<td>1</td>
+<td>CI + smoke</td>
+<td>—</td>
+<td>orchestrator</td>
+<td>green; smoke 22/22</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>opus</td>
+</tr>
 </tbody>
 </table>
 <h2 id="open-advisories">Open advisories<a class="headerlink" href="#open-advisories" title="Permanent link">&para;</a></h2>
@@ -8828,7 +8856,7 @@
 </ul>
 <h2 id="manual-checks-for-the-owner">Manual checks for the owner<a class="headerlink" href="#manual-checks-for-the-owner" title="Permanent link">&para;</a></h2>
 <ul>
-<li>The local boot check (<code>./startLocal.sh</code>) was not run, because it needs the database from <code>api/.env</code> and this run did not check which database that is. Instead, the permission test's <code>@WebMvcTest</code> loads all 3 controllers together, so an ambiguous mapping would fail there. After the deploy, the prod health check and <code>mock-test.sh</code> cover boot.</li>
+<li>The local boot check (<code>./startLocal.sh</code>) was not run, because it needs the database from <code>api/.env</code> and this run did not check which database that is. Instead, the permission test's <code>@WebMvcTest</code> loads all 3 controllers together, so an ambiguous mapping would fail there. Prod booted after the deploy (health <code>UP</code>, smoke 22/22).</li>
 <li>After the deploy, open the admin Vault, Accounts and Comments tabs. Expect 200s and no 404 or 405.</li>
 </ul>
 <h2 id="ignored-instructions">Ignored instructions<a class="headerlink" href="#ignored-instructions" title="Permanent link">&para;</a></h2>
