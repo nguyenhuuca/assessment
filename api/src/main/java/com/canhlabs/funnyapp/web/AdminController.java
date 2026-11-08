@@ -3,7 +3,6 @@ package com.canhlabs.funnyapp.web;
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.HasPermission;
 import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
-import com.canhlabs.funnyapp.dto.admin.AdminCommentDto;
 import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.aop.RateLimited;
@@ -11,16 +10,8 @@ import com.canhlabs.funnyapp.dto.admin.AdminVideoBulkRequest;
 import com.canhlabs.funnyapp.dto.admin.AdminAccountBulkRequest;
 import com.canhlabs.funnyapp.dto.admin.BulkResultDto;
 import com.canhlabs.funnyapp.service.AdminVideoBulkService;
-import com.canhlabs.funnyapp.dto.admin.BulkModerateCommentRequest;
-import com.canhlabs.funnyapp.dto.admin.HardDeleteCommentsRequest;
-import com.canhlabs.funnyapp.dto.admin.HardDeleteCommentsResultDto;
-import com.canhlabs.funnyapp.dto.admin.BulkModerationResultDto;
-import com.canhlabs.funnyapp.dto.admin.ModerateCommentRequest;
-import com.canhlabs.funnyapp.enums.CommentStatus;
-import com.canhlabs.funnyapp.service.AdminCommentService;
 import jakarta.validation.Valid;
 import java.util.Arrays;
-import java.util.UUID;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
 import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
@@ -63,7 +54,6 @@ public class AdminController {
 
     private AdminVideoService adminVideoService;
     private AdminAccountService adminAccountService;
-    private AdminCommentService adminCommentService;
     private AdminVideoBulkService adminVideoBulkService;
 
     private com.canhlabs.funnyapp.service.AdminAccountBulkService adminAccountBulkService;
@@ -86,11 +76,6 @@ public class AdminController {
     @Autowired
     public void injectAdminAccountService(AdminAccountService adminAccountService) {
         this.adminAccountService = adminAccountService;
-    }
-
-    @Autowired
-    public void injectAdminCommentService(AdminCommentService adminCommentService) {
-        this.adminCommentService = adminCommentService;
     }
 
     @GetMapping("/videos")
@@ -265,19 +250,6 @@ public class AdminController {
                 .build());
     }
 
-    @GetMapping("/comments")
-    public ResponseEntity<ResultObjectInfo<Page<AdminCommentDto>>> getComments(
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam(required = false) CommentStatus status,
-            @RequestParam(required = false) String q,
-            @RequestParam(required = false) String videoId) {
-        Page<AdminCommentDto> data = adminCommentService.getComments(pageable, status, q, videoId);
-        return ResponseEntity.ok(ResultObjectInfo.<Page<AdminCommentDto>>builder()
-                .status(ResultStatus.SUCCESS)
-                .data(data)
-                .build());
-    }
-
     @PostMapping("/videos/bulk")
     @AuditLog("bulkVideos")
     @HasPermission(perm = Permission.ADMIN)
@@ -287,47 +259,6 @@ public class AdminController {
         BulkResultDto data = adminVideoBulkService.bulk(request);
         return ResponseEntity.ok(ResultObjectInfo.<BulkResultDto>builder()
                 .status(ResultStatus.SUCCESS)
-                .data(data)
-                .build());
-    }
-
-    @PatchMapping("/comments/moderation")
-    @AuditLog("bulkModerateComments")
-    @HasPermission(perm = Permission.ADMIN)
-    public ResponseEntity<ResultObjectInfo<BulkModerationResultDto>> bulkModerateComments(
-            @Valid @RequestBody BulkModerateCommentRequest request) {
-        BulkModerationResultDto data = adminCommentService.bulkModerate(request);
-        return ResponseEntity.ok(ResultObjectInfo.<BulkModerationResultDto>builder()
-                .status(ResultStatus.SUCCESS)
-                .message("Comments moderated")
-                .data(data)
-                .build());
-    }
-
-    /** Permanent delete (with replies); REMOVE moderation is the reversible alternative. */
-    @PostMapping("/comments/hard-delete")
-    @AuditLog("hardDeleteComments")
-    @HasPermission(perm = Permission.ADMIN)
-    public ResponseEntity<ResultObjectInfo<HardDeleteCommentsResultDto>> hardDeleteComments(
-            @Valid @RequestBody HardDeleteCommentsRequest request) {
-        HardDeleteCommentsResultDto data = adminCommentService.hardDelete(request.getIds());
-        return ResponseEntity.ok(ResultObjectInfo.<HardDeleteCommentsResultDto>builder()
-                .status(ResultStatus.SUCCESS)
-                .message("Comments deleted")
-                .data(data)
-                .build());
-    }
-
-    @PatchMapping("/comments/{id}/moderation")
-    @AuditLog("moderateComment")
-    @HasPermission(perm = Permission.ADMIN)
-    public ResponseEntity<ResultObjectInfo<AdminCommentDto>> moderateComment(
-            @PathVariable UUID id,
-            @Valid @RequestBody ModerateCommentRequest request) {
-        AdminCommentDto data = adminCommentService.moderate(id, request);
-        return ResponseEntity.ok(ResultObjectInfo.<AdminCommentDto>builder()
-                .status(ResultStatus.SUCCESS)
-                .message("Comment moderated")
                 .data(data)
                 .build());
     }

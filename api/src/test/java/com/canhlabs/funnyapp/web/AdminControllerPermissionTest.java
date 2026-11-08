@@ -83,7 +83,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * The flagOff test overrides the mock to return false, triggering the bypass path.
  */
 @AutoConfigureCache
-@WebMvcTest(AdminController.class)
+@WebMvcTest({AdminController.class, AdminCommentController.class})
 @Import(AdminControllerPermissionTest.TestSecurity.class)
 class AdminControllerPermissionTest {
 
