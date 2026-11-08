@@ -702,7 +702,7 @@ Report: docs/reports/system-health-2026-11-08.md
 
 ## Lite: Fix MFA IDOR (system-health 2026-11-08, P1)
 
-- [x] **MF-1** setupMfa/enableMfa/disableMfa bind to the JWT user; enable rejects when already enabled; otpauth label URL-encoded — HASH
-- [x] **MF-2** username removed from EnableRequest/DisableRequest and /mfa/setup query — HASH
-- [x] **MF-3** webapp auth.js + ProfileModal stop sending username — HASH
-- [x] **MF-4** MFA tests rewritten on the security context + regression tests (foreign user, already enabled, no JWT) — HASH
+- [x] **MF-1** setupMfa/enableMfa/disableMfa bind to the JWT user; enable rejects when already enabled; otpauth label URL-encoded — 4fc275b9
+- [x] **MF-2** username removed from EnableRequest/DisableRequest and /mfa/setup query — 4fc275b9
+- [x] **MF-3** webapp auth.js + ProfileModal stop sending username — 4fc275b9
+- [x] **MF-4** MFA tests rewritten on the security context + regression tests (foreign user, already enabled, no JWT) — 4fc275b9
