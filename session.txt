@@ -1,7 +1,7 @@
-task: Autopilot fix P2 MFA OTP brute force (attempt cap + rate limit)
+task: Autopilot fix P4 share-link delete IDOR (owner check)
 status: done
 progress: 100
-done: MB-1..MB-5 MFA attempt cap, one-time token, rate limits, anon IP key
+done: SL-1 owner-only deleteShareLink d7f920bc; SL-2 regression tests d7f920bc
 next: -
 plan: -
-updated: 2026-11-08 20:44
+updated: 2026-11-08 21:04

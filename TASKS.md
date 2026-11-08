@@ -698,7 +698,7 @@ Report: docs/reports/system-health-2026-11-08.md
 
 - [x] **R-1** 6 parallel reviewers (security, concurrency, data, arch, integrations, tests/ops) + orchestrator spot-verification
 - [x] **R-2** Synthesis report, score 7.0/10, 1 Critical (MFA IDOR) + 9 High
-- [~] **R-3** Fix batches: security P1 (MFA IDOR, landed), P2 (MFA brute force, landed), P3–P5, resilience, data/infra P7–P9, CI/ops P10 (pending user decision)
+- [~] **R-3** Fix batches: security P1 (MFA IDOR, landed), P2 (MFA brute force, landed), P3 (skipped by owner), P4 (share-link IDOR, landed), P5, resilience, data/infra P7–P9, CI/ops P10 (pending user decision)
 
 ## Lite: Fix MFA IDOR (system-health 2026-11-08, P1)
 
@@ -714,3 +714,8 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **MB-3** @RateLimited on /mfa/verify, setup, enable, disable — 3c63344c
 - [x] **MB-4** Regression tests (store, service, controller annotations) — 3c63344c
 - [x] **MB-5** RateLimitAspect: AnonymousAuthenticationToken keyed by IP, not a global USER:anonymousUser bucket — 3c63344c
+
+## Lite: Fix share-link delete IDOR (system-health 2026-11-08, P4)
+
+- [x] **SL-1** deleteShareLink: only the link's owner (JWT user id) can delete; missing or foreign link → 404 error.share.notFound, no JWT → 401 — d7f920bc
+- [x] **SL-2** Regression tests (owner deletes, foreign user 404 no delete, missing 404, no auth 401) — d7f920bc
