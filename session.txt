@@ -1,8 +1,7 @@
 task: Split AdminController by admin area (fan-out 31)
-status: blocked
-progress: 10
-done: AC-0 plan drafted
-next: AC-1 AdminRouteContractTest against current AdminController
+status: done
+progress: 100
+done: AC-1 route contract 7c30894e; AC-2 comments 41906488; AC-3 accounts 0fbd3d0e; AC-4 videos 0db76628; AC-6 fan-out 16/14/13 + report
+next: -
 plan: docs/plans/plan-admin-controller-split.md
-updated: 2026-11-08 10:58
-blocker: user review of the plan before AC-1
+updated: 2026-11-08 12:15

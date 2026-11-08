@@ -39,7 +39,7 @@ Coupling hotspots: these classes depend, directly or transitively, on the most c
 | `service.impl.UserServiceImpl` | 48 | 22 |
 | `service.impl.VideoSuggestionServiceImpl` | 48 | 27 |
 | `web.UserController` | 43 | 21 |
-| `web.AdminController` | 41 | **31** (highest) |
+| `web.AdminController` | 41 | **31** (highest). Split on 2026-11-08 into `AdminVideoController` (16), `AdminAccountController` (14) and `AdminCommentController` (13) |
 
 Most-used classes (fan-in), which are stable and should change rarely: `exception.CustomException` (32), `dto.user.UserDetailDto` (26), `config.AppProperties` (23), `entity.User` (22), `utils.AppUtils` (20).
 
@@ -114,7 +114,7 @@ SonarCloud bugs judged not actionable:
 |---|--------|--------|
 | 1 | Restore the interrupt flag before rethrowing, with regression tests that fail without the fix | `99eee906` |
 | 2 | Split `OAuthDriveUploader.upload` (CCN 19 → 4) and `UserSettingsServiceImpl.updateSettings` (17 → 1); max CCN is now 11 | `f9f00ede` |
-| 3 | `AdminController` fan-out: open, needs its own plan | — |
+| 3 | Split `AdminController` by admin area ([plan](../plans/plan-admin-controller-split.md)). Direct fan-out went from 31 to 16, 14 and 13; the highest in the codebase is now `VideoSuggestionServiceImpl` (27). `AdminRouteContractTest` pins the 19 admin routes and their security annotations | `7c30894e`, `41906488`, `0fbd3d0e`, `0db76628` |
 | 4 | Delete `CacheKey` and `ContractBatch` | `e9dd51d7` |
 | 5 | Sonar JaCoCo path made module-relative | `05f51b1e` |
 
@@ -125,7 +125,7 @@ SonarCloud bugs judged not actionable:
 - ✅ The structure stays clean while the code grew 2.5×: no package or class cycles, no duplication, NCCD 0.80 (was 0.82), and propagation cost halved (1.69% vs 3.60%).
 - ⚠️ ACD rose from 5.08 to 6.04, which is expected at 357 components. The coupling is concentrated in a few classes: `AdminController`, `SuggestionBulkServiceImpl`, `UserServiceImpl` and `VideoSuggestionServiceImpl`.
 - ⚠️ 2 methods exceed CCN 15, 2 classes are dead code, and 2 places swallow the interrupt flag. All are small fixes.
-- 📌 Guards in place: `PackageCycleTest` (package cycles), CI coverage gate ≥ 90%, and the aic-cli metrics report (report-only).
+- 📌 Guards in place: `PackageCycleTest` (package cycles), `AdminRouteContractTest` (admin routes and their security), CI coverage gate ≥ 90%, and the aic-cli metrics report (report-only).
 
 ---
 

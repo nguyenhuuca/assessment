@@ -685,9 +685,9 @@ Plan: docs/plans/plan-video-edit-details.md · Run: 2026-11-06-video-edit-detail
 
 Plan: docs/plans/plan-admin-controller-split.md
 
-- [ ] **AC-1** AdminRouteContractTest: the 19 admin routes + security expressions, written before the split
-- [ ] **AC-2** AdminCommentController (4 endpoints) + tests moved
-- [ ] **AC-3** AdminAccountController (5 endpoints) + tests moved
-- [ ] **AC-4** AdminVideoController (10 endpoints incl. /stats), delete AdminController
-- [ ] **AC-5** Permission test wiring across the three controllers (done inside AC-2..AC-4)
-- [ ] **AC-6** mvn verify, local boot check, jdeps fan-out ≤ 22 each, update report
+- [x] **AC-1** AdminRouteContractTest: the 19 admin routes + security expressions, written before the split — 7c30894e
+- [x] **AC-2** AdminCommentController (4 endpoints) + tests moved — 41906488
+- [x] **AC-3** AdminAccountController (5 endpoints) + tests moved — 0fbd3d0e
+- [x] **AC-4** AdminVideoController (10 endpoints incl. /stats), delete AdminController — 0db76628
+- [x] **AC-5** Permission test wiring across the three controllers (done inside AC-2..AC-4) — in 41906488..0db76628
+- [x] **AC-6** mvn verify, local boot check, jdeps fan-out ≤ 22 each, update report — fan-out 16/14/13, verify 96.52%; boot check left to deploy smoke
