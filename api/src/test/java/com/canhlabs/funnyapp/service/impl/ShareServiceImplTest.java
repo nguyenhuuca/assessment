@@ -217,10 +217,63 @@ class ShareServiceImplTest {
         }
     }
 
+    private static UserDetailDto jwtUser(long id) {
+        return UserDetailDto.builder().id(id).email("u" + id + "@abc.com").build();
+    }
+
     @Test
-    void deleteShareLink_callsRepoDeleteById() {
-        shareService.deleteShareLink(99L);
-        Mockito.verify(shareLinkRepo).deleteById(99L);
+    void deleteShareLink_owner_deletes() {
+        ShareLink link = ShareLink.builder().id(99L).user(User.builder().id(7L).build()).build();
+        when(shareLinkRepo.findById(99L)).thenReturn(java.util.Optional.of(link));
+        try (MockedStatic<AppUtils> utils = Mockito.mockStatic(AppUtils.class)) {
+            utils.when(AppUtils::getCurrentUser).thenReturn(jwtUser(7L));
+
+            assertThat(shareService.deleteShareLink(99L)).isEqualTo("success");
+        }
+        Mockito.verify(shareLinkRepo).delete(link);
+    }
+
+    @Test
+    void deleteShareLink_foreignLink_404AndNothingDeleted() {
+        // regression for the IDOR: user 8 must not delete user 7's link
+        ShareLink link = ShareLink.builder().id(99L).user(User.builder().id(7L).build()).build();
+        when(shareLinkRepo.findById(99L)).thenReturn(java.util.Optional.of(link));
+        try (MockedStatic<AppUtils> utils = Mockito.mockStatic(AppUtils.class)) {
+            utils.when(AppUtils::getCurrentUser).thenReturn(jwtUser(8L));
+
+            assertThatThrownBy(() -> shareService.deleteShareLink(99L))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage("error.share.notFound")
+                    .extracting("status").isEqualTo(org.springframework.http.HttpStatus.NOT_FOUND);
+        }
+        Mockito.verify(shareLinkRepo, Mockito.never()).delete(any(ShareLink.class));
+        Mockito.verify(shareLinkRepo, Mockito.never()).deleteById(any());
+    }
+
+    @Test
+    void deleteShareLink_missing_404() {
+        when(shareLinkRepo.findById(99L)).thenReturn(java.util.Optional.empty());
+        try (MockedStatic<AppUtils> utils = Mockito.mockStatic(AppUtils.class)) {
+            utils.when(AppUtils::getCurrentUser).thenReturn(jwtUser(7L));
+
+            assertThatThrownBy(() -> shareService.deleteShareLink(99L))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage("error.share.notFound");
+        }
+        Mockito.verify(shareLinkRepo, Mockito.never()).delete(any(ShareLink.class));
+    }
+
+    @Test
+    void deleteShareLink_noJwtUser_401() {
+        try (MockedStatic<AppUtils> utils = Mockito.mockStatic(AppUtils.class)) {
+            utils.when(AppUtils::getCurrentUser).thenReturn(null);
+
+            assertThatThrownBy(() -> shareService.deleteShareLink(99L))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage("error.auth.required")
+                    .extracting("status").isEqualTo(org.springframework.http.HttpStatus.UNAUTHORIZED);
+        }
+        Mockito.verifyNoInteractions(shareLinkRepo);
     }
 
     @SuppressWarnings("unchecked")

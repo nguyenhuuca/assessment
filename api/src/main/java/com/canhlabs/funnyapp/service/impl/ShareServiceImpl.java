@@ -16,6 +16,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,6 +24,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -101,7 +103,15 @@ public class ShareServiceImpl implements ShareService {
 
     @Override
     public String deleteShareLink(Long videoId) {
-        shareLinkRepo.deleteById(videoId);
+        UserDetailDto current = AppUtils.getCurrentUser();
+        if (current == null || current.getId() == null) {
+            throw CustomException.of(HttpStatus.UNAUTHORIZED, 401, "error.auth.required");
+        }
+        // owner only (CWE-639); a foreign id gets the same 404 as a missing one, so ids cannot be probed
+        ShareLink link = shareLinkRepo.findById(videoId)
+                .filter(l -> l.getUser() != null && Objects.equals(l.getUser().getId(), current.getId()))
+                .orElseThrow(() -> CustomException.of(HttpStatus.NOT_FOUND, 404, "error.share.notFound"));
+        shareLinkRepo.delete(link);
         return "success";
     }
 
