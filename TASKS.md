@@ -680,3 +680,14 @@ Plan: docs/plans/plan-video-edit-details.md · Run: 2026-11-06-video-edit-detail
 - [x] **ED-3** api/admin.js + useUpdateVideoDetails hook
 - [x] **ED-4** VideoEditModal + Edit row action + en/vi i18n
 - [x] **ED-5** Tests (service, controller, permission, modal, table) + run metrics JSON
+
+## Refactor: Split AdminController by admin area (report 2026-11-07, finding 3)
+
+Plan: docs/plans/plan-admin-controller-split.md
+
+- [ ] **AC-1** AdminRouteContractTest: the 20 admin routes + security expressions, written before the split
+- [ ] **AC-2** AdminCommentController (4 endpoints) + tests moved
+- [ ] **AC-3** AdminAccountController (5 endpoints) + tests moved
+- [ ] **AC-4** AdminVideoController (11 endpoints incl. /stats), delete AdminController
+- [ ] **AC-5** Permission test wiring across the three controllers (done inside AC-2..AC-4)
+- [ ] **AC-6** mvn verify, local boot check, jdeps fan-out ≤ 20 each, update report
