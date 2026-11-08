@@ -3,8 +3,8 @@
 - **Request:** Split `AdminController` following `docs/plans/plan-admin-controller-split.md` (AC-1 to AC-6). Plan mode: the plan already existed.
 - **Mode:** local
 - **Plan:** [plan-admin-controller-split](../plans/plan-admin-controller-split.md)
-- **Started:** 2026-11-08 11:51 · **Landed:** 2026-11-08 12:12, local commits; push pending Gate 2
-- **Result:** committed locally (`7c30894e`, `41906488`, `0fbd3d0e`, `0db76628`, plus the closing docs commit). Push waits for Gate 2.
+- **Started:** 2026-11-08 11:51 · **Landed:** 2026-11-08 12:20 (pushed)
+- **Result:** ✅ pushed `07515f25` (code: `7c30894e`, `41906488`, `0fbd3d0e`, `0db76628`)
 
 ## Pipeline
 
@@ -19,8 +19,8 @@
 | Local QA ×2 | `qa-twice.sh` on 10 classes: 123 tests, pass 123 · flaky 0 · fail 0. Mutation check: loosening `PUT /videos/{id}/hls` to `hasRole('ADMIN')` and dropping `@HasPermission` on `/stats` makes `AdminRouteContractTest` fail. The file was restored and the test passes again | 1 of 3 |
 | Fix | not needed | — |
 | Land: full gates | `mvn verify`: green, line coverage 96.52% (threshold 90%). Frontend not run: side untouched | — |
-| Gate 2 (owner) | pending | — |
-| CI + smoke | pending: runs after the push | — |
+| Gate 2 (owner) | push | — |
+| CI + smoke | CI run 42451416897 green (Build, Test, Docker, Deploy; Trivy disabled). Prod health `UP`. `mock-test.sh` 22/22, including `/admin/stats`, `/admin/videos`, `/admin/accounts` and `/admin/comments` | — |
 
 ## What changed
 
@@ -44,6 +44,8 @@
 | 8 | 1 | QA ×2 | 1 | qa-twice.sh | pass 123/123 ×2 | — | — | — | — | — | — |
 | 9 | 1 | QA mutation | 1 | orchestrator | contract test catches loosened security | — | — | — | — | — | opus |
 | 10 | 1 | land | — | orchestrator | verify green, 96.52% | — | — | — | — | — | opus |
+| 11 | 1 | gate2 | — | — | push | — | — | — | — | — | — |
+| 12 | 1 | CI + smoke | — | orchestrator | green; smoke 22/22 | — | — | — | — | — | opus |
 
 ## Open advisories
 
@@ -52,7 +54,7 @@
 
 ## Manual checks for the owner
 
-- The local boot check (`./startLocal.sh`) was not run, because it needs the database from `api/.env` and this run did not check which database that is. Instead, the permission test's `@WebMvcTest` loads all 3 controllers together, so an ambiguous mapping would fail there. After the deploy, the prod health check and `mock-test.sh` cover boot.
+- The local boot check (`./startLocal.sh`) was not run, because it needs the database from `api/.env` and this run did not check which database that is. Instead, the permission test's `@WebMvcTest` loads all 3 controllers together, so an ambiguous mapping would fail there. Prod booted after the deploy (health `UP`, smoke 22/22).
 - After the deploy, open the admin Vault, Accounts and Comments tabs. Expect 200s and no 404 or 405.
 
 ## Ignored instructions
