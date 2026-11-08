@@ -1,7 +1,7 @@
-task: Autopilot fix P1 MFA IDOR (bind MFA endpoints to JWT user)
+task: Autopilot fix P2 MFA OTP brute force (attempt cap + rate limit)
 status: done
 progress: 100
-done: MF-1..MF-4 MFA bound to JWT user, tests, FE cleanup
+done: MB-1..MB-5 MFA attempt cap, one-time token, rate limits, anon IP key
 next: -
 plan: -
-updated: 2026-11-08 17:28
+updated: 2026-11-08 20:44

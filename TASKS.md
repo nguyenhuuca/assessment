@@ -698,7 +698,7 @@ Report: docs/reports/system-health-2026-11-08.md
 
 - [x] **R-1** 6 parallel reviewers (security, concurrency, data, arch, integrations, tests/ops) + orchestrator spot-verification
 - [x] **R-2** Synthesis report, score 7.0/10, 1 Critical (MFA IDOR) + 9 High
-- [~] **R-3** Fix batches: security P1 (MFA IDOR, landed) P2–P5, resilience, data/infra P7–P9, CI/ops P10 (pending user decision)
+- [~] **R-3** Fix batches: security P1 (MFA IDOR, landed), P2 (MFA brute force, landed), P3–P5, resilience, data/infra P7–P9, CI/ops P10 (pending user decision)
 
 ## Lite: Fix MFA IDOR (system-health 2026-11-08, P1)
 
@@ -706,3 +706,11 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **MF-2** username removed from EnableRequest/DisableRequest and /mfa/setup query — 4fc275b9
 - [x] **MF-3** webapp auth.js + ProfileModal stop sending username — 4fc275b9
 - [x] **MF-4** MFA tests rewritten on the security context + regression tests (foreign user, already enabled, no JWT) — 4fc275b9
+
+## Lite: Fix MFA OTP brute force (system-health 2026-11-08, P2)
+
+- [x] **MB-1** MFASessionStore failed-attempt counter (atomic, same TTL), cleared on remove — 3c63344c
+- [x] **MB-2** verifyMfa: 5th wrong OTP kills the session (error.mfa.tooManyAttempts), success removes the token — 3c63344c
+- [x] **MB-3** @RateLimited on /mfa/verify, setup, enable, disable — 3c63344c
+- [x] **MB-4** Regression tests (store, service, controller annotations) — 3c63344c
+- [x] **MB-5** RateLimitAspect: AnonymousAuthenticationToken keyed by IP, not a global USER:anonymousUser bucket — 3c63344c
