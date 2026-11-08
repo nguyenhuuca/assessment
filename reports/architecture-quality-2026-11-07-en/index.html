@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -8731,7 +8731,7 @@
 <tr>
 <td><code>web.AdminController</code></td>
 <td>41</td>
-<td><strong>31</strong> (highest)</td>
+<td><strong>31</strong> (highest). Split on 2026-11-08 into <code>AdminVideoController</code> (16), <code>AdminAccountController</code> (14) and <code>AdminCommentController</code> (13)</td>
 </tr>
 </tbody>
 </table>
@@ -8945,8 +8945,8 @@
 </tr>
 <tr>
 <td>3</td>
-<td><code>AdminController</code> fan-out: open, needs its own plan</td>
-<td>—</td>
+<td>Split <code>AdminController</code> by admin area (<a href="../../plans/plan-admin-controller-split/">plan</a>). Direct fan-out went from 31 to 16, 14 and 13; the highest in the codebase is now <code>VideoSuggestionServiceImpl</code> (27). <code>AdminRouteContractTest</code> pins the 19 admin routes and their security annotations</td>
+<td><code>7c30894e</code>, <code>41906488</code>, <code>0fbd3d0e</code>, <code>0db76628</code></td>
 </tr>
 <tr>
 <td>4</td>
@@ -8966,7 +8966,7 @@
 <li>✅ The structure stays clean while the code grew 2.5×: no package or class cycles, no duplication, NCCD 0.80 (was 0.82), and propagation cost halved (1.69% vs 3.60%).</li>
 <li>⚠️ ACD rose from 5.08 to 6.04, which is expected at 357 components. The coupling is concentrated in a few classes: <code>AdminController</code>, <code>SuggestionBulkServiceImpl</code>, <code>UserServiceImpl</code> and <code>VideoSuggestionServiceImpl</code>.</li>
 <li>⚠️ 2 methods exceed CCN 15, 2 classes are dead code, and 2 places swallow the interrupt flag. All are small fixes.</li>
-<li>📌 Guards in place: <code>PackageCycleTest</code> (package cycles), CI coverage gate ≥ 90%, and the aic-cli metrics report (report-only).</li>
+<li>📌 Guards in place: <code>PackageCycleTest</code> (package cycles), <code>AdminRouteContractTest</code> (admin routes and their security), CI coverage gate ≥ 90%, and the aic-cli metrics report (report-only).</li>
 </ul>
 <hr />
 <h2 id="method">Method<a class="headerlink" href="#method" title="Permanent link">&para;</a></h2>
@@ -9070,7 +9070,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "search.highlight", "search.suggest", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
