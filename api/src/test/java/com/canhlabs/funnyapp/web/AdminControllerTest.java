@@ -1,24 +1,18 @@
 package com.canhlabs.funnyapp.web;
 
-import com.canhlabs.funnyapp.dto.admin.AdminAccountDto;
 import com.canhlabs.funnyapp.dto.admin.AdminHlsStatusDto;
 import com.canhlabs.funnyapp.enums.HlsStatus;
 import com.canhlabs.funnyapp.dto.admin.AdminStatsDto;
 import com.canhlabs.funnyapp.dto.admin.AdminVideoDto;
-import com.canhlabs.funnyapp.dto.user.UserDetailDto;
 import com.canhlabs.funnyapp.dto.webapi.ResultObjectInfo;
 import com.canhlabs.funnyapp.enums.ResultStatus;
-import com.canhlabs.funnyapp.enums.UserRole;
 import com.canhlabs.funnyapp.enums.VideoStatus;
 import com.canhlabs.funnyapp.enums.VideoVisibility;
-import com.canhlabs.funnyapp.service.AdminAccountService;
 import com.canhlabs.funnyapp.service.AdminVideoService;
-import com.canhlabs.funnyapp.utils.AppUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,7 +31,6 @@ import static org.mockito.Mockito.*;
 class AdminControllerTest {
 
     @Mock AdminVideoService adminVideoService;
-    @Mock AdminAccountService adminAccountService;
 
     @InjectMocks AdminController controller;
 
@@ -45,7 +38,6 @@ class AdminControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         controller.injectAdminVideoService(adminVideoService);
-        controller.injectAdminAccountService(adminAccountService);
     }
 
     // ── GET /videos ────────────────────────────────────────────────────────────
@@ -225,100 +217,6 @@ class AdminControllerTest {
         verify(adminVideoService).deleteVideo(3L, true, true);
     }
 
-    // ── GET /accounts ──────────────────────────────────────────────────────────
-
-    @Test
-    void getAccounts_returnsOkWithPage() {
-        Page<AdminAccountDto> page = new PageImpl<>(List.of(adminAccountDto(1L, UserRole.USER)));
-        when(adminAccountService.getAccounts(any())).thenReturn(page);
-
-        ResponseEntity<ResultObjectInfo<Page<AdminAccountDto>>> response =
-                controller.getAccounts(PageRequest.of(0, 20));
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().getData().getContent().size());
-    }
-
-    @Test
-    void getAccounts_defaultsToStableIdSort() throws NoSuchMethodException {
-        // Regression: no default sort meant no ORDER BY, so an account moved after its role/permissions changed
-        var param = AdminController.class.getMethod("getAccounts", org.springframework.data.domain.Pageable.class)
-                .getParameters()[0];
-        var defaults = param.getAnnotation(org.springframework.data.web.PageableDefault.class);
-        assertNotNull(defaults);
-        assertArrayEquals(new String[]{"id"}, defaults.sort());
-        assertEquals(org.springframework.data.domain.Sort.Direction.ASC, defaults.direction());
-    }
-
-    // ── PATCH /accounts/{id}/role ──────────────────────────────────────────────
-
-    @Test
-    void updateAccountRole_returnsOk() {
-        UserDetailDto currentUser = UserDetailDto.builder().id(99L).email("admin@example.com").build();
-        try (MockedStatic<AppUtils> mocked = mockStatic(AppUtils.class)) {
-            mocked.when(AppUtils::getCurrentUser).thenReturn(currentUser);
-            doNothing().when(adminAccountService).updateRole(10L, 99L, UserRole.ADMIN);
-
-            ResponseEntity<ResultObjectInfo<String>> response =
-                    controller.updateAccountRole(10L, Map.of("role", "ADMIN"));
-
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
-            verify(adminAccountService).updateRole(10L, 99L, UserRole.ADMIN);
-        }
-    }
-
-    @Test
-    void updateAccountPermissions_returnsUpdatedAccount() {
-        UserDetailDto currentUser = UserDetailDto.builder().id(99L).email("admin@example.com").build();
-        AdminAccountDto updated = AdminAccountDto.builder().id(10L).permissions(17).build();
-        try (MockedStatic<AppUtils> mocked = mockStatic(AppUtils.class)) {
-            mocked.when(AppUtils::getCurrentUser).thenReturn(currentUser);
-            when(adminAccountService.updatePermissions(10L, 99L, 17)).thenReturn(updated);
-
-            ResponseEntity<ResultObjectInfo<AdminAccountDto>> response =
-                    controller.updateAccountPermissions(10L, Map.of("permissions", 17));
-
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals(17, response.getBody().getData().getPermissions());
-        }
-    }
-
-    @Test
-    void updateAccountPermissions_missingValue_throwsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class,
-                () -> controller.updateAccountPermissions(10L, Map.of()));
-        verifyNoInteractions(adminAccountService);
-    }
-
-    @Test
-    void updateAccountRole_invalidRole_throwsIllegalArgumentException() {
-        UserDetailDto currentUser = UserDetailDto.builder().id(99L).email("admin@example.com").build();
-        try (MockedStatic<AppUtils> mocked = mockStatic(AppUtils.class)) {
-            mocked.when(AppUtils::getCurrentUser).thenReturn(currentUser);
-
-            assertThrows(IllegalArgumentException.class,
-                    () -> controller.updateAccountRole(10L, Map.of("role", "SUPERUSER")));
-        }
-    }
-
-    // ── DELETE /accounts/{id} ──────────────────────────────────────────────────
-
-    @Test
-    void deleteAccount_returnsOk() {
-        UserDetailDto currentUser = UserDetailDto.builder().id(99L).email("admin@example.com").build();
-        try (MockedStatic<AppUtils> mocked = mockStatic(AppUtils.class)) {
-            mocked.when(AppUtils::getCurrentUser).thenReturn(currentUser);
-            doNothing().when(adminAccountService).deleteAccount(10L, 99L);
-
-            ResponseEntity<ResultObjectInfo<String>> response = controller.deleteAccount(10L);
-
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals(ResultStatus.SUCCESS, response.getBody().getStatus());
-            verify(adminAccountService).deleteAccount(10L, 99L);
-        }
-    }
-
     // ── GET /stats ─────────────────────────────────────────────────────────────
 
     @Test
@@ -343,13 +241,6 @@ class AdminControllerTest {
         AdminVideoDto dto = new AdminVideoDto();
         dto.setId(id);
         dto.setStatus(status);
-        return dto;
-    }
-
-    private static AdminAccountDto adminAccountDto(Long id, UserRole role) {
-        AdminAccountDto dto = new AdminAccountDto();
-        dto.setId(id);
-        dto.setRole(role);
         return dto;
     }
 }
