@@ -72,6 +72,10 @@ public class VideoSource extends BaseDomain {
     @Column(name = "view_count", nullable = false, insertable = false, updatable = false)
     private long viewCount;
 
+    /** Size in bytes of the cached full file; null until known. */
+    @Column(name = "file_size")
+    private Long fileSize;
+
     /** HLS rendition state (ADR-0031). Drive videos only; every other row stays NONE. */
     @Enumerated(EnumType.STRING)
     @Column(name = "hls_status", nullable = false, length = 20)

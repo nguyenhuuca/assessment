@@ -271,6 +271,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 .credentialsRef("")
                 .thumbnailPath(thumbnailPath)
                 .visibility(visibilityFor(fileId))
+                .fileSize(cachedFileSize(fileId))
                 .build();
         log.info("Video source to save: videoId={}, sourceType={}, sourceId={}, title={}, desc={}, thumbnailPath={}, status={}, priority={}, visibility={}",
                 entity.getVideoId(), entity.getSourceType(), entity.getSourceId(), entity.getTitle(), entity.getDesc(),
@@ -279,6 +280,15 @@ public class VideoStorageServiceImpl implements VideoStorageService {
         feedCache.invalidate();
         log.info("Saved video source id={} videoId={} for Drive file {}", entity.getId(), entity.getVideoId(), fileId);
         publishIngested(fileId, entity.getId());
+    }
+
+    /** Size of CACHE_DIR/<fileId>.full, or null when it is missing or unreadable; never throws. */
+    private Long cachedFileSize(String fileId) {
+        try {
+            return getFileSizeFromDisk(fileId);
+        } catch (IOException | RuntimeException e) {
+            return null;
+        }
     }
 
     /** Publish-only: a failing listener or publisher must never fail or change the ingest. */
@@ -300,7 +310,7 @@ public class VideoStorageServiceImpl implements VideoStorageService {
                 .isPresent();
         String desc = hasDesc ? null : makeDesc(title);
         videoSourceRepository.upsertDriveSource(System.nanoTime(), fileId, title, desc, thumbnailPath,
-                visibilityFor(fileId).name());
+                visibilityFor(fileId).name(), cachedFileSize(fileId));
         feedCache.invalidate();
         log.info("Upserted video source for Drive file {} (title: {})", fileId, title);
     }

@@ -269,7 +269,7 @@ class VideoStorageServiceImplTest {
         service.upsertInfo("f4", "Title", "thumb");
 
         verify(videoSourceRepository).upsertDriveSource(any(), eq("f4"), eq("Title"), any(), eq("thumb"),
-                eq("COLLECTION_ONLY"));
+                eq("COLLECTION_ONLY"), any());
     }
 
     @Test
@@ -410,6 +410,60 @@ class VideoStorageServiceImplTest {
         Files.createDirectories(path.getParent());
         Files.writeString(path, content);
         return path;
+    }
+
+    @Test
+    void saveInfo_cachedFileExists_setsFileSize() throws IOException {
+        try {
+            writeCacheFile("sizednew", "0123456789");
+            when(videoSourceRepository.existsBySourceId("sizednew")).thenReturn(false);
+            when(videoSourceRepository.save(any(VideoSource.class))).thenAnswer(inv -> inv.getArgument(0));
+
+            service.saveInfo("sizednew", "T", "thumb");
+
+            ArgumentCaptor<VideoSource> captor = ArgumentCaptor.forClass(VideoSource.class);
+            verify(videoSourceRepository).save(captor.capture());
+            assertThat(captor.getValue().getFileSize()).isEqualTo(10L);
+        } finally {
+            Files.deleteIfExists(cachePath("sizednew"));
+        }
+    }
+
+    @Test
+    void saveInfo_cachedFileMissing_fileSizeIsNull() {
+        when(videoSourceRepository.existsBySourceId("nosuchfile")).thenReturn(false);
+        when(videoSourceRepository.save(any(VideoSource.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        service.saveInfo("nosuchfile", "T", "thumb");
+
+        ArgumentCaptor<VideoSource> captor = ArgumentCaptor.forClass(VideoSource.class);
+        verify(videoSourceRepository).save(captor.capture());
+        assertThat(captor.getValue().getFileSize()).isNull();
+    }
+
+    @Test
+    void upsertInfo_cachedFileMissing_passesNullSizeWithoutException() {
+        when(videoSourceRepository.findBySourceId("nosuchfile2")).thenReturn(java.util.Optional.empty());
+
+        service.upsertInfo("nosuchfile2", "T", "thumb");
+
+        verify(videoSourceRepository).upsertDriveSource(any(), eq("nosuchfile2"), eq("T"), any(), eq("thumb"),
+                eq("FEED"), eq(null));
+    }
+
+    @Test
+    void upsertInfo_cachedFileExists_passesSize() throws IOException {
+        try {
+            writeCacheFile("sizedup", "01234");
+            when(videoSourceRepository.findBySourceId("sizedup")).thenReturn(java.util.Optional.empty());
+
+            service.upsertInfo("sizedup", "T", "thumb");
+
+            verify(videoSourceRepository).upsertDriveSource(any(), eq("sizedup"), eq("T"), any(), eq("thumb"),
+                    eq("FEED"), eq(5L));
+        } finally {
+            Files.deleteIfExists(cachePath("sizedup"));
+        }
     }
 
     // ── getFileSizeFromDisk — happy path ────────────────────────────────────────
@@ -557,7 +611,7 @@ class VideoStorageServiceImplTest {
         service.upsertInfo("f1", "Title", "thumb");
 
         verify(chatGptService, never()).makePoem(anyString());
-        verify(videoSourceRepository).upsertDriveSource(any(), eq("f1"), eq("Title"), eq(null), eq("thumb"), eq("FEED"));
+        verify(videoSourceRepository).upsertDriveSource(any(), eq("f1"), eq("Title"), eq(null), eq("thumb"), eq("FEED"), any());
     }
 
     @Test
@@ -567,7 +621,7 @@ class VideoStorageServiceImplTest {
 
         service.upsertInfo("f2", "Title", "thumb");
 
-        verify(videoSourceRepository).upsertDriveSource(any(), eq("f2"), eq("Title"), eq("A poem"), eq("thumb"), eq("FEED"));
+        verify(videoSourceRepository).upsertDriveSource(any(), eq("f2"), eq("Title"), eq("A poem"), eq("thumb"), eq("FEED"), any());
     }
 
     @Test

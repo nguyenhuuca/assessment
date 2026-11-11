@@ -25,6 +25,8 @@ public class AdminVideoDto {
     private VideoStatus status;
     private VideoVisibility visibility;
     private Long viewCount;
+    /** Size in bytes of the cached full file; null when unknown. */
+    private Long fileSize;
     private Integer priority;
     private Instant createdAt;
     /** Null for videos that are not on Google Drive (HLS is Drive only). */

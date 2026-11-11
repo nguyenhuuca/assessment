@@ -58,19 +58,24 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
     @Transactional
     @Query(value = """
             INSERT INTO video_sources (video_id, source_type, source_id, title, description, credentials_ref,
-                                       thumbnail_path, visibility, status, priority, created_at, updated_at)
+                                       thumbnail_path, visibility, status, priority, file_size, created_at, updated_at)
             VALUES (:videoId, 'google_drive', :sourceId, :title, :desc, '', :thumbnailPath,
-                    :visibility, 'PUBLISHED', 0, now(), now())
+                    :visibility, 'PUBLISHED', 0, :fileSize, now(), now())
             ON CONFLICT (source_type, source_id) DO UPDATE
                SET title          = EXCLUDED.title,
                    thumbnail_path = EXCLUDED.thumbnail_path,
                    description    = COALESCE(video_sources.description, EXCLUDED.description),
+                   file_size      = COALESCE(EXCLUDED.file_size, video_sources.file_size),
                    updated_at     = now()
             """, nativeQuery = true)
     int upsertDriveSource(@Param("videoId") Long videoId, @Param("sourceId") String sourceId,
                           @Param("title") String title, @Param("desc") String desc,
                           @Param("thumbnailPath") String thumbnailPath,
-                          @Param("visibility") String visibility);
+                          @Param("visibility") String visibility,
+                          @Param("fileSize") Long fileSize);
+
+    /** Drive rows whose cached file size was never recorded (startup backfill). */
+    List<VideoSource> findBySourceTypeAndFileSizeIsNull(String sourceType);
 
     List<VideoSource> findAllByHlsStatus(HlsStatus hlsStatus);
 

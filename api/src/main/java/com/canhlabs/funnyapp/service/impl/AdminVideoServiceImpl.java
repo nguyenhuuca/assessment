@@ -252,6 +252,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .status(v.getStatus())
                 .visibility(v.getVisibility())
                 .viewCount(v.getViewCount())
+                .fileSize(v.getFileSize())
                 .priority(v.getPriority())
                 .createdAt(v.getCreatedAt())
                 .hlsStatus(DRIVE_SOURCE.equals(v.getSourceType()) ? v.getHlsStatus() : null)

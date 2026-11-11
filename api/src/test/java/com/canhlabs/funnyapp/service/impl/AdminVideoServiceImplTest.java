@@ -88,6 +88,7 @@ class AdminVideoServiceImplTest {
     void getVideos_mapsSourceToDto() {
         VideoSource source = videoSource(1L, "My Video", "https://thumb.jpg", VideoStatus.PUBLISHED);
         source.setViewCount(42L);
+        source.setFileSize(1234L);
         Pageable pageable = PageRequest.of(0, 20);
         when(videoSourceRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(source)));
 
@@ -100,6 +101,7 @@ class AdminVideoServiceImplTest {
         assertEquals("https://thumb.jpg", dto.getThumbnailPath());
         assertEquals(VideoStatus.PUBLISHED, dto.getStatus());
         assertEquals(42L, dto.getViewCount());
+        assertEquals(1234L, dto.getFileSize());
         assertEquals(0, dto.getPriority());
     }
 
