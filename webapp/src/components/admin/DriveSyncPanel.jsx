@@ -3,21 +3,13 @@ import { useDriveSyncFiles, useDriveSyncRun, useStartDriveSyncRun } from '../../
 import { useAuth } from '../../hooks/useAuth.js'
 import { isSuperAdmin } from '../../utils/roles.js'
 import { formatTime } from '../../utils/importUtils.js'
+import { formatBytes } from '../../utils/formatBytes.js'
 import ConfirmModal from '../common/ConfirmModal.jsx'
 import DriveTimeFilter from './DriveTimeFilter.jsx'
 import { DEFAULT_TIME_FILTER } from '../../utils/timeRange.js'
 import { useTranslation } from 'react-i18next'
 
 const DEFAULT_MAX_BATCH = 50
-
-function formatSize(bytes) {
-  if (bytes === null || bytes === undefined) return '—'
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  let v = bytes
-  let i = 0
-  while (v >= 1024 && i < units.length - 1) { v /= 1024; i++ }
-  return `${i === 0 ? v : v.toFixed(1)} ${units[i]}`
-}
 
 function ItemProgress({ item }) {
   const { t } = useTranslation('admin')
@@ -29,7 +21,7 @@ function ItemProgress({ item }) {
         aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
         <div className="import-progress-fill" style={{ width: `${pct}%` }} />
       </div>
-      <div className="admin-cell-muted">{pct}% · {formatSize(item.downloadedBytes)} / {formatSize(item.totalBytes)}</div>
+      <div className="admin-cell-muted">{pct}% · {formatBytes(item.downloadedBytes)} / {formatBytes(item.totalBytes)}</div>
     </div>
   )
 }
@@ -71,7 +63,7 @@ function ConfirmSyncModal({ files, pending, onCancel, onConfirm }) {
         {files.map(f => (
           <li key={f.fileId}>
             <span>{f.name}</span>
-            <span className="admin-cell-muted">{formatSize(f.sizeBytes)}</span>
+            <span className="admin-cell-muted">{formatBytes(f.sizeBytes)}</span>
           </li>
         ))}
       </ul>
@@ -186,7 +178,7 @@ export default function DriveSyncPanel() {
                           />
                         </td>
                         <td>{f.name}</td>
-                        <td className="admin-cell-muted">{formatSize(f.sizeBytes)}</td>
+                        <td className="admin-cell-muted">{formatBytes(f.sizeBytes)}</td>
                         <td className="admin-cell-muted">{formatTime(f.createdAt)}</td>
                         <td><span className={`admin-badge ${String(f.state).toLowerCase()}`}>{t(`status.${f.state}`, { defaultValue: f.state })}</span></td>
                         <td className="admin-cell-muted">{f.dbTitle || '—'}</td>
