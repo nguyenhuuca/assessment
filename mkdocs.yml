@@ -172,6 +172,7 @@ nav:
       - Frontend Dependency Upgrade: plans/plan-frontend-deps-upgrade.md
       - Collection-Only Videos: plans/plan-collection-only-videos.md
       - Admin Bulk Actions: plans/plan-admin-bulk-actions.md
+      - Admin Video Size: plans/plan-admin-video-size.md
       - BE Performance (Medium): plans/plan-be-perf-medium.md
       - Basic PWA: plans/plan-pwa-basic.md
       - Report Webhook State: plans/plan-report-webhook-state.md

@@ -1,7 +1,8 @@
-task: Autopilot fix P4 share-link delete IDOR (owner check)
-status: done
-progress: 100
-done: SL-1 owner-only deleteShareLink d7f920bc; SL-2 regression tests d7f920bc
-next: -
-plan: -
-updated: 2026-11-08 21:04
+task: Admin video size column (Video Vault)
+status: in_progress
+progress: 10
+done: plan docs/plans/plan-admin-video-size.md
+doing: -
+next: VS-1 Liquibase file_size column + VideoSource.fileSize; VS-5 FE formatBytes
+plan: docs/plans/plan-admin-video-size.md
+updated: 2026-11-11 20:30

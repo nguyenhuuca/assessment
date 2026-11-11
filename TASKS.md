@@ -719,3 +719,12 @@ Report: docs/reports/system-health-2026-11-08.md
 
 - [x] **SL-1** deleteShareLink: only the link's owner (JWT user id) can delete; missing or foreign link → 404 error.share.notFound, no JWT → 401 — d7f920bc
 - [x] **SL-2** Regression tests (owner deletes, foreign user 404 no delete, missing 404, no auth 401) — d7f920bc
+
+## Feature: Admin video size (2026-11-11, [plan](docs/plans/plan-admin-video-size.md))
+
+- [ ] **VS-1** Liquibase `file_size BIGINT NULL` on video_sources + `VideoSource.fileSize`
+- [ ] **VS-2** Write size at ingest (saveInfo, upsertDriveSource with COALESCE) — blocked by VS-1
+- [ ] **VS-3** `VideoFileSizeBackfill` startup listener (null Drive rows from `.full`) — blocked by VS-1
+- [ ] **VS-4** `AdminVideoDto.fileSize` + mapping in GET /admin/videos — blocked by VS-1
+- [ ] **VS-5** FE shared `utils/formatBytes.js`; DriveSyncPanel uses it
+- [ ] **VS-6** FE Size column in AdminVideoTable + en/vi `colSize` — blocked by VS-4, VS-5
