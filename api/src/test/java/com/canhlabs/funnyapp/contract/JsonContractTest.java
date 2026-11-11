@@ -89,7 +89,7 @@ class JsonContractTest {
                 .viewCount(12L).watchedAt(T1).positionSec(30).durationSec(120).completed(true).build();
         AdminVideoDto adminVideo = AdminVideoDto.builder().id(1L).title("Funny cat").description("A cat doing cat things").thumbnailPath("/thumbs/1.jpg")
                 .creatorEmail("user@example.test").status(VideoStatus.PUBLISHED).visibility(VideoVisibility.HIDDEN).viewCount(12L)
-                .priority(3).createdAt(T1).hlsStatus(HlsStatus.READY).hlsError(null).build();
+                .priority(3).createdAt(T1).hlsStatus(HlsStatus.READY).hlsError(null).fileSize(1048576L).build();
         VideoImportJobDto job = VideoImportJobDto.builder().id(9L).sourceUrl("https://youtu.be/abc")
                 .platform(ImportPlatform.YOUTUBE).title("Imported").status(ImportStatus.DOWNLOADING)
                 .phase("download").progressPct(40).downloadedBytes(400L).totalBytes(1000L).scheduledAt(T1)

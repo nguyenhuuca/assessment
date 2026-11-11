@@ -13,6 +13,7 @@
     "priority" : 3,
     "createdAt" : "2026-01-02T03:04:05Z",
     "hlsStatus" : "READY",
-    "hlsError" : null
+    "hlsError" : null,
+    "fileSize" : 1048576
   }
 }

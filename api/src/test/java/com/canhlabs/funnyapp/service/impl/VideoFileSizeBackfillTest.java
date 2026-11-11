@@ -14,6 +14,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,7 +25,7 @@ class VideoFileSizeBackfillTest {
     @Mock VideoStorageService videoStorageService;
 
     private VideoSource row(String id) {
-        return VideoSource.builder().sourceId(id).sourceType("google_drive").build();
+        return VideoSource.builder().id((long) id.hashCode()).sourceId(id).sourceType("google_drive").build();
     }
 
     private VideoFileSizeBackfill backfill() {
@@ -37,10 +38,12 @@ class VideoFileSizeBackfillTest {
         when(videoSourceRepository.findBySourceTypeAndFileSizeIsNull("google_drive")).thenReturn(List.of(a));
         when(videoStorageService.getFileSizeFromDisk("a")).thenReturn(99L);
 
+        when(videoSourceRepository.updateFileSizeIfNull(a.getId(), 99L)).thenReturn(1);
+
         assertThat(backfill().backfill()).isEqualTo(1);
 
-        assertThat(a.getFileSize()).isEqualTo(99L);
-        verify(videoSourceRepository).save(a);
+        verify(videoSourceRepository).updateFileSizeIfNull(a.getId(), 99L);
+        verify(videoSourceRepository, never()).save(any());
     }
 
     @Test
@@ -51,8 +54,7 @@ class VideoFileSizeBackfillTest {
 
         assertThat(backfill().backfill()).isZero();
 
-        assertThat(a.getFileSize()).isNull();
-        verify(videoSourceRepository, never()).save(any());
+        verify(videoSourceRepository, never()).updateFileSizeIfNull(any(), anyLong());
     }
 
     @Test
@@ -62,11 +64,12 @@ class VideoFileSizeBackfillTest {
         when(videoSourceRepository.findBySourceTypeAndFileSizeIsNull("google_drive")).thenReturn(List.of(bad, good));
         when(videoStorageService.getFileSizeFromDisk("bad")).thenReturn(1L);
         when(videoStorageService.getFileSizeFromDisk("good")).thenReturn(2L);
-        when(videoSourceRepository.save(bad)).thenThrow(new IllegalStateException("db down"));
+        when(videoSourceRepository.updateFileSizeIfNull(bad.getId(), 1L)).thenThrow(new IllegalStateException("db down"));
+        when(videoSourceRepository.updateFileSizeIfNull(good.getId(), 2L)).thenReturn(1);
 
         assertThat(backfill().backfill()).isEqualTo(1);
 
-        verify(videoSourceRepository).save(good);
+        verify(videoSourceRepository).updateFileSizeIfNull(good.getId(), 2L);
     }
 
     @Test

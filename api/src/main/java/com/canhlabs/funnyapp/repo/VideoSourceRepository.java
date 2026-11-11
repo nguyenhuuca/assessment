@@ -77,6 +77,13 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
     /** Drive rows whose cached file size was never recorded (startup backfill). */
     List<VideoSource> findBySourceTypeAndFileSizeIsNull(String sourceType);
 
+    /** Backfill write: touches only file_size, and only while it is still null (never overwrites admin edits). */
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE video_sources SET file_size = :fileSize WHERE id = :id AND file_size IS NULL",
+            nativeQuery = true)
+    int updateFileSizeIfNull(@Param("id") Long id, @Param("fileSize") long fileSize);
+
     List<VideoSource> findAllByHlsStatus(HlsStatus hlsStatus);
 
     /** PENDING HLS jobs, oldest first (BR-4). */

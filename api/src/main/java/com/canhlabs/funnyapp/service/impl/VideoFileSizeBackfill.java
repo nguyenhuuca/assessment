@@ -53,9 +53,8 @@ public class VideoFileSizeBackfill {
 
     private boolean fillOne(VideoSource row) {
         try {
-            row.setFileSize(videoStorageService.getFileSizeFromDisk(row.getSourceId()));
-            videoSourceRepository.save(row);
-            return true;
+            long size = videoStorageService.getFileSizeFromDisk(row.getSourceId());
+            return videoSourceRepository.updateFileSizeIfNull(row.getId(), size) == 1;
         } catch (IOException e) {
             return false; // file not cached: leave null
         } catch (RuntimeException e) {
