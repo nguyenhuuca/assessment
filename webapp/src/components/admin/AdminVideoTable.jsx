@@ -12,6 +12,7 @@ import BulkAddToCollectionModal from './BulkAddToCollectionModal.jsx'
 import BulkActionBar from './BulkActionBar.jsx'
 import { useBulkSelection } from '../../hooks/useBulkSelection.js'
 import { buildBulkNotice } from '../../utils/bulkResult.js'
+import { formatBytes } from '../../utils/formatBytes.js'
 import BulkResultNotice from './BulkResultNotice.jsx'
 
 const BULK_MAX = 100
@@ -282,6 +283,7 @@ export default function AdminVideoTable({ statusFilter }) {
               <th>{t('colPriority')}</th>
               <th>{t('colHls')}</th>
               <th>{t('colMetrics')}</th>
+              <th>{t('colSize')}</th>
               <th>{t('colActions')}</th>
             </tr>
           </thead>
@@ -364,6 +366,7 @@ export default function AdminVideoTable({ statusFilter }) {
                 </td>
                 <td><HlsCell video={v} canToggle={canToggleHls} toggle={toggleHls} /></td>
                 <td className="admin-cell-muted">{t('views', { count: v.viewCount ?? 0 })}</td>
+                <td className="admin-cell-muted">{formatBytes(v.fileSize)}</td>
                 <td>
                   <div className="admin-actions">
                     <select

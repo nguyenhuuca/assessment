@@ -76,6 +76,7 @@
   "hlsToggleOff": "Disable HLS and delete the converted files",
   "colPriority": "PRIORITY",
   "colMetrics": "METRICS",
+  "colSize": "Size",
   "colComment": "COMMENT",
   "colAuthor": "AUTHOR",
   "colVideo": "VIDEO",

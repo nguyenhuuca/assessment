@@ -76,6 +76,7 @@
   "hlsToggleOff": "Tắt HLS và xoá các file đã convert",
   "colPriority": "ƯU TIÊN",
   "colMetrics": "SỐ LIỆU",
+  "colSize": "Dung lượng",
   "colComment": "BÌNH LUẬN",
   "colAuthor": "TÁC GIẢ",
   "colVideo": "VIDEO",

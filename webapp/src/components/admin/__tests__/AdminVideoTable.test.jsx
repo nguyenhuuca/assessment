@@ -47,6 +47,22 @@ describe('AdminVideoTable title cell', () => {
   })
 })
 
+describe('AdminVideoTable size column', () => {
+  it('shows the formatted file size, and a dash when unknown', async () => {
+    adminApi.getVideos.mockResolvedValue({ data: { content: [
+      video({ id: 1, title: 'Sized', fileSize: 1048576 }),
+      video({ id: 2, title: 'Unsized', fileSize: null }),
+    ], totalPages: 1, totalElements: 2 } })
+    renderTable()
+    const sizedRow = (await screen.findByText('Sized')).closest('tr')
+    const unsizedRow = screen.getByText('Unsized').closest('tr')
+    expect(within(sizedRow).getByText('1.0 MB')).toBeInTheDocument()
+    expect(within(unsizedRow).queryByText('1.0 MB')).toBeNull()
+    expect(within(unsizedRow).getAllByText('—').length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('columnheader').length).toBe(10)
+  })
+})
+
 describe('AdminVideoTable actions column', () => {
   it('pins the ⋮ menu column to the right edge so a wide table cannot push it out of view', async () => {
     adminApi.getVideos.mockResolvedValue({ data: { content: [video({ id: 3, title: 'Wide' })], totalPages: 1, totalElements: 1 } })
