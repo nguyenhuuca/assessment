@@ -60,7 +60,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 | **Frontend Dependency Upgrade** | [PRD ✅](prd/PRD-frontend-deps-upgrade.md) | [0034 ✅](adr/0034-frontend-deps-upgrade.md) | [Spec 📋](specs/spec-frontend-deps-upgrade.md) | [Seq ✅](sequence/sequence-frontend-deps-upgrade.md) | [Plan ✅](plans/plan-frontend-deps-upgrade.md) | — | ✅ | All 27 outdated webapp packages to latest in one commit: Vite 8 + plugin-react 6, Vitest 5, jsdom 29, ESLint 10, react-hooks 7, React 19.3; CI (deploy-web, autopilot) on Node 22; unused FontAwesome removed; hls.js exact pin 1.7.4. Plan: FD-1..FD-6 (in-range bumps, FontAwesome removal, build/test toolchain, lint toolchain, Node 22 + docs, land), squashed into one commit. Built by autopilot as `82be7105` ([report](reports/autopilot-2026-10-29-frontend-deps-upgrade.md)): npm outdated empty, 655/655 tests, main chunk 248.37 kB gzip, audit 16 → 1 moderate; react-hooks 7 rules set-state-in-effect/refs/immutability briefly at warn, then all 23 lint warnings fixed and rules back to error (`6ed44dde`); flaky admin comment selection bug fixed (`d212e176`); jsdom stays 29 (30 needs Node ≥ 22.22.2/24.15). Deploy Frontend green on Node 22, owner prod smoke pass 2026-10-29 |
 | **Collection-Only Videos** | [PRD ✅](prd/PRD-collection-only-videos.md) | [0035 ✅](adr/0035-collection-only-videos.md) | [Spec ✅](specs/spec-collection-only-videos.md) | [Seq ✅](sequence/sequence-collection-only-videos.md) | [Plan ✅](plans/plan-collection-only-videos.md) | — | ✅ | Research videos out of the feed, search and Explore hero but playable from collections, watch history and direct links. `visibility` enum (FEED, COLLECTION_ONLY, HIDDEN) replaces `is_hide` in one release with owner-approved downtime; Import form option; Admin "Add to collection"; deep-link fallback inserts a non-feed video at slide 0. Plan: CO-1..CO-7 + CO-F1 (atomic backend schema switch, admin endpoint, import, 3 FE tasks, land in two pushes). CO-1..CO-3 `02376098`, CO-4..CO-6 `488e285f` built by autopilot ([report](reports/autopilot-2026-10-30-collection-only-videos.md)); 380 QA tests ×2 green. Landed in two pushes; UI fixes (badge stack, title column, ⋮ row menu) `b2415b8f`; CO-F1 removed the legacy `{hidden}` body `352b428a`; owner prod smoke (CO-7) passed 2026-10-31 |
 | **Admin Bulk Actions** | [PRD ✅](prd/PRD-admin-bulk-actions.md) | [0036 ✅](adr/0036-admin-bulk-actions.md) | — | [Seq ✅](sequence/sequence-admin-bulk-actions.md) | [Plan ✅](plans/plan-admin-bulk-actions.md) | — | ✅ | Multi-select + bulk bar on Video Vault/Flagged (status, visibility, delete, add to collection), Accounts (role, permission bit, delete), Suggestions (approve, reject), Imports (cancel, retry). One `POST …/bulk` per resource; per-row transactions through the existing single-row services (ADR-0036). Comments keep their bulk; Drive Sync already bulk; Scheduled Jobs out of scope. Plan: BK-1..BK-12. BK-1..BK-11 built by /swarm-execute in 3 waves (2026-11-01), each wave reviewed (fixes 7664769f, 2f2e38bf, e7b228a7, d489d42b); BE `mvn verify` + 750 FE tests green; deployed prod-119, owner prod smoke per tab passed 2026-11-02 (BK-12) |
-| **Admin Video Size** | — | — | — | — | [Plan 💡](plans/plan-admin-video-size.md) | — | 💡 | File size column (`video_sources.file_size`, ingest + one-time backfill) shown in the admin Video Vault; VS-1..VS-6 |
+| **Admin Video Size** | — | — | — | — | [Plan ✅](plans/plan-admin-video-size.md) | — | 🔄 | File size column (`video_sources.file_size`, ingest + one-time backfill) shown in the admin Video Vault; VS-1..VS-6 |
 | **Agent Evolve Loop (self-improvement)** | — | [0027 ✅](adr/0027-agent-self-improvement-loop.md) | — | — | [Plan ✅](plans/plan-agent-evolve.md) | — | ✅ | Local `/evolve`: metrics signals → path allowlist + seeded-bug eval gate (`scripts/evolve.mjs`) → owner approves. Compress (D6) cuts duplicate/dead/stale text. Weekly headless workflow back 2026-10-22 with staged proposals ([ADR-0029](adr/0029-headless-evolve-staging.md)). First evolution: reviewer rule for assumptions about unchanged code, case `2026-10-19-swallowed-job-exceptions` caught 0/3 → 3/3 |
 
 ---
@@ -92,7 +92,8 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [Suggestion Re-review](plans/plan-suggestion-rereview.md)
 - [Headless Autopilot](plans/plan-autopilot-headless.md)
 
-### 🔄 In Progress (4)
+### 🔄 In Progress (5)
+- [Admin Video Size](plans/plan-admin-video-size.md)
 - [Collection-Only Videos](plans/plan-collection-only-videos.md)
 - [/autopilot skill](plans/plan-autopilot.md)
 - [Admin Dashboard](plans/plan-admin-dashboard.md)
@@ -107,8 +108,7 @@ Status tracker for all PRDs, ADRs, Specs, and Plans in the project.
 - [File-based Hooks](plans/plan-a-file-based-hooks.md)
 - [Bookmark Feature](plans/plan-bookmark-feature.md)
 
-### 💡 Proposed / No Plan Yet (2)
-- [Admin Video Size](plans/plan-admin-video-size.md)
+### 💡 Proposed / No Plan Yet (1)
 - [Web Push](prd/PRD-web-push.md)
 
 ---

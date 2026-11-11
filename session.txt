@@ -1,8 +1,9 @@
 task: Admin video size column (Video Vault)
-status: in_progress
-progress: 10
-done: plan docs/plans/plan-admin-video-size.md
+status: blocked
+progress: 85
+done: VS-1..VS-4 file_size + backfill + DTO 00a7317b aae06213; VS-5 formatBytes 715b4fe6; VS-6 Size column 072bac98
 doing: -
-next: VS-1 Liquibase file_size column + VideoSource.fileSize; VS-5 FE formatBytes
+next: push (user approval), watch CI, prod smoke Video Vault Size column
 plan: docs/plans/plan-admin-video-size.md
-updated: 2026-11-11 20:30
+blocker: push needs user go-ahead
+updated: 2026-11-11 20:57

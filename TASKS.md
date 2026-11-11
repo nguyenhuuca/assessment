@@ -722,9 +722,9 @@ Report: docs/reports/system-health-2026-11-08.md
 
 ## Feature: Admin video size (2026-11-11, [plan](docs/plans/plan-admin-video-size.md))
 
-- [ ] **VS-1** Liquibase `file_size BIGINT NULL` on video_sources + `VideoSource.fileSize`
-- [ ] **VS-2** Write size at ingest (saveInfo, upsertDriveSource with COALESCE) — blocked by VS-1
-- [ ] **VS-3** `VideoFileSizeBackfill` startup listener (null Drive rows from `.full`) — blocked by VS-1
-- [ ] **VS-4** `AdminVideoDto.fileSize` + mapping in GET /admin/videos — blocked by VS-1
-- [ ] **VS-5** FE shared `utils/formatBytes.js`; DriveSyncPanel uses it
-- [ ] **VS-6** FE Size column in AdminVideoTable + en/vi `colSize` — blocked by VS-4, VS-5
+- [x] **VS-1** Liquibase `file_size BIGINT NULL` on video_sources + `VideoSource.fileSize` — 00a7317b, aae06213
+- [x] **VS-2** Write size at ingest (saveInfo, upsertDriveSource with COALESCE) — blocked by VS-1 — 00a7317b, aae06213
+- [x] **VS-3** `VideoFileSizeBackfill` startup listener (null Drive rows from `.full`) — blocked by VS-1 — 00a7317b, aae06213
+- [x] **VS-4** `AdminVideoDto.fileSize` + mapping in GET /admin/videos — blocked by VS-1 — 00a7317b, aae06213
+- [x] **VS-5** FE shared `utils/formatBytes.js`; DriveSyncPanel uses it — 715b4fe6
+- [x] **VS-6** FE Size column in AdminVideoTable + en/vi `colSize` — blocked by VS-4, VS-5 — 072bac98

@@ -10,7 +10,7 @@ Related Skills: swarm-plan, testing
 
 ## Overview
 
-**Status:** Planned
+**Status:** Built (VS-1..VS-6 on main 2026-11-11; awaiting push + prod smoke)
 **Author:** nguyenhuuca
 **Date:** 2026-11-11
 **Tracking:** `docs/tracking.md` row "Admin Video Size"; `TASKS.md` section "Admin video size"
