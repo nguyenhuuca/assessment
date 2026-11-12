@@ -45,7 +45,7 @@ public class PaymentSettlement {
     /** Adds {@code amount} to the order and moves it to PAID or UNDERPAID unless it is already settled. */
     public void apply(PaymentOrder order, long txId, long amount, Instant now) {
         PaymentOrderStatus before = order.getStatus();
-        order.setPaidAmount(order.getPaidAmount() + amount);
+        order.setPaidAmount(Math.addExact(order.getPaidAmount(), amount));
         if (!SETTLED.contains(before)) {
             Long expected = order.getExpectedAmount();
             if (expected == null || order.getPaidAmount() >= expected) {
@@ -71,7 +71,8 @@ public class PaymentSettlement {
         Optional<PremiumPlan> plan = order.getPlanId() == null ? Optional.empty() : planRepo.findById(order.getPlanId());
         Optional<User> user = order.getUserId() == null ? Optional.empty() : userRepo.findByIdForUpdate(order.getUserId());
         if (plan.isEmpty() || user.isEmpty()) {
-            log.warn("Premium order {} paid but plan or user is missing; entitlement not granted", order.getId());
+            log.error("Premium order {} paid but plan or user is missing (planId={}, userId={}); entitlement NOT granted, needs admin action",
+                    order.getId(), order.getPlanId(), order.getUserId());
             return;
         }
         Instant current = user.get().getPremiumUntil();

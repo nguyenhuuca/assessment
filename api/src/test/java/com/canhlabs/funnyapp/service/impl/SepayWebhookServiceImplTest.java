@@ -120,6 +120,12 @@ class SepayWebhookServiceImplTest {
     }
 
     @Test
+    void verify_uppercaseHexSignature_passes() throws Exception {
+        String upper = "sha256=" + sign(SECRET, TS, BODY).substring(7).toUpperCase();
+        assertThat(service.verify(TS, upper, BODY)).isTrue();
+    }
+
+    @Test
     void verify_noSecret_fails() throws Exception {
         String good = sign(SECRET, TS, BODY);
         props.getSepay().setWebhookSecret("");
@@ -170,7 +176,9 @@ class SepayWebhookServiceImplTest {
     @ParameterizedTest
     @ValueSource(strings = {"not json", "[1]", "null", "{}", "{\"id\":\"x\",\"transferType\":\"in\",\"transferAmount\":1}",
             "{\"id\":1,\"transferAmount\":1}", "{\"id\":1,\"transferType\":\"in\"}",
-            "{\"id\":1.5,\"transferType\":\"in\",\"transferAmount\":1}"})
+            "{\"id\":1.5,\"transferType\":\"in\",\"transferAmount\":1}",
+            "{\"id\":1,\"transferType\":\"in\",\"transferAmount\":1.5}",
+            "{\"id\":1,\"transferType\":\"in\",\"transferAmount\":99999999999999999999}"})
     void parse_invalid_throws(String json) {
         assertThatThrownBy(() -> service.parse(json.getBytes(StandardCharsets.UTF_8)))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -434,6 +442,7 @@ class SepayWebhookServiceImplTest {
         service.process(tx(1, 100000, CODE), TxSource.WEBHOOK);
         assertThat(order.getStatus()).isEqualTo(PaymentOrderStatus.PAID);
         verify(userRepo, never()).save(any());
+        verify(events).publishEvent(any(com.canhlabs.funnyapp.event.PaymentEvent.class));
     }
 
     @Test
@@ -456,6 +465,16 @@ class SepayWebhookServiceImplTest {
         service.process(tx(1, 100000, CODE), TxSource.WEBHOOK);
         assertThat(order.getStatus()).isEqualTo(PaymentOrderStatus.PAID);
         verifyNoInteractions(planRepo, userRepo);
+        verify(events).publishEvent(any(com.canhlabs.funnyapp.event.PaymentEvent.class));
+    }
+
+    @Test
+    void settlement_amountOverflow_throws() {
+        PaymentOrder order = donation(PaymentOrderStatus.PENDING);
+        order.setPaidAmount(Long.MAX_VALUE);
+        withOrder(order);
+        assertThatThrownBy(() -> service.process(tx(1, 5, CODE), TxSource.WEBHOOK))
+                .isInstanceOf(ArithmeticException.class);
     }
 
     @Test

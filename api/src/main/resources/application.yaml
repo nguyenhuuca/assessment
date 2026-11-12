@@ -81,6 +81,12 @@ spring:
 
 server:
   port: ${SERVER_PORT:8081}
+  # Behind the reverse proxy request.getRemoteAddr() must be the real client (rate limiting, SePay IP allowlist).
+  # "native" enables Tomcat's RemoteIpValve, which honours X-Forwarded-For/-Proto only when the direct peer is in
+  # server.tomcat.remoteip.internal-proxies; the default covers loopback and private ranges (10/8, 172.16/12,
+  # 192.168/16, 169.254/16, ::1), so a request from a public IP cannot spoof the header. The proxy MUST overwrite
+  # (not append blindly to) X-Forwarded-For.
+  forward-headers-strategy: native
 #  tomcat:
 #    threads:
 #      max: 10

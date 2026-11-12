@@ -57,4 +57,14 @@ public interface PaymentOrderRepository extends JpaRepository<PaymentOrder, Long
              where o.status = com.canhlabs.funnyapp.enums.PaymentOrderStatus.PENDING
                and o.expiresAt < :now""")
     int expirePending(@Param("now") Instant now);
+
+    /** Delete EXPIRED orders that never received money and have no linked transfer, created before {@code cutoff}. */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            delete from PaymentOrder o
+             where o.status = com.canhlabs.funnyapp.enums.PaymentOrderStatus.EXPIRED
+               and o.paidAmount = 0
+               and o.createdAt < :cutoff
+               and not exists (select 1 from SepayTransaction t where t.orderId = o.id)""")
+    int purgeUnpaidExpired(@Param("cutoff") Instant cutoff);
 }

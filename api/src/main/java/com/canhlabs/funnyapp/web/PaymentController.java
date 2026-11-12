@@ -68,6 +68,7 @@ public class PaymentController {
 
     @Operation(summary = "Order status", description = "Public, polled by the QR screen. Status, type, amount only.")
     @GetMapping("/orders/{code}")
+    @RateLimited(permit = 120, windowInSeconds = 60)
     public ResponseEntity<ResultObjectInfo<OrderStatusDto>> order(@PathVariable String code) {
         return ResponseEntity.ok(ResultObjectInfo.<OrderStatusDto>builder()
                 .status(ResultStatus.SUCCESS)

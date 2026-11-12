@@ -242,8 +242,15 @@ class PaymentOrderServiceImplTest {
     void getByCode_unknownOrNull_is404() {
         when(orderRepo.findByCode(anyString())).thenReturn(Optional.empty());
 
-        assertStatus(() -> service.getByCode("NOPE"), HttpStatus.NOT_FOUND);
-        assertStatus(() -> service.getByCode(null), HttpStatus.NOT_FOUND);
+        assertStatus(() -> service.getByCode("FMZZZZZZZZ"), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void getByCode_malformedCode_is404_withoutDbHit() {
+        for (String bad : new String[]{"NOPE", null, "", "FM123", "FM1234567890", "XX12345678", "FM1234-678"}) {
+            assertStatus(() -> service.getByCode(bad), HttpStatus.NOT_FOUND);
+        }
+        verify(orderRepo, never()).findByCode(anyString());
     }
 
     @Test
@@ -252,5 +259,18 @@ class PaymentOrderServiceImplTest {
 
         assertThat(service.expireStaleOrders()).isEqualTo(2);
         assertThat(service.expireStaleOrders()).isZero();
+    }
+
+    @Test
+    void expireStaleOrders_purgesUnpaidOlderThanSevenDays() {
+        when(orderRepo.expirePending(any(Instant.class))).thenReturn(0);
+        when(orderRepo.purgeUnpaidExpired(any(Instant.class))).thenReturn(3);
+        Instant before = Instant.now();
+
+        service.expireStaleOrders();
+
+        ArgumentCaptor<Instant> cutoff = ArgumentCaptor.forClass(Instant.class);
+        verify(orderRepo).purgeUnpaidExpired(cutoff.capture());
+        assertThat(Duration.between(cutoff.getValue(), before).toDays()).isBetween(6L, 7L);
     }
 }

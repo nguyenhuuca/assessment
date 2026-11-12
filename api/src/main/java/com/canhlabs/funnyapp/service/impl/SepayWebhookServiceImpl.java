@@ -53,6 +53,8 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
     private final JsonMapper mapper;
     private final PaymentSettlement settlement;
     private final Clock clock;
+    private final Pattern codePattern;
+    private final String codePrefix;
 
     @Autowired
     public SepayWebhookServiceImpl(AppProperties props, PaymentOrderRepository orderRepo,
@@ -70,6 +72,8 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
         this.mapper = mapper;
         this.settlement = settlement;
         this.clock = clock;
+        this.codePrefix = props.getSepay().getCodePrefix().toUpperCase(Locale.ROOT);
+        this.codePattern = Pattern.compile(Pattern.quote(codePrefix) + "[A-Z0-9]{8}");
     }
 
     @Override
@@ -110,7 +114,7 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
         if (Math.abs(clock.instant().getEpochSecond() - ts) > MAX_SKEW_SECONDS) {
             return false;
         }
-        byte[] given = signatureHeader.substring(SIGNATURE_PREFIX.length()).getBytes(StandardCharsets.US_ASCII);
+        byte[] given = signatureHeader.substring(SIGNATURE_PREFIX.length()).toLowerCase(Locale.ROOT).getBytes(StandardCharsets.US_ASCII);
         byte[] expected = hmacHex(timestamp, body).getBytes(StandardCharsets.US_ASCII);
         return MessageDigest.isEqual(expected, given);
     }
@@ -132,9 +136,15 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
         if (!id.isIntegralNumber() || !id.canConvertToLong() || !amount.isNumber() || type.isEmpty()) {
             throw new IllegalArgumentException("id, transferAmount or transferType missing");
         }
+        long amountValue;
+        try {
+            amountValue = amount.decimalValue().longValueExact();
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("transferAmount must be an integral VND amount");
+        }
         return new SepayTxPayload(id.longValue(), text(root, "gateway"), bankTime(text(root, "transactionDate")),
                 text(root, "accountNumber"), text(root, "code"), text(root, "content"), type,
-                amount.longValue(), text(root, "referenceCode"));
+                amountValue, text(root, "referenceCode"));
     }
 
     @Override
@@ -169,7 +179,7 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
 
     /** The payload's own code field when it carries our prefix, else the first prefix+8 token in the memo. */
     String extractCode(SepayTxPayload tx) {
-        String prefix = props.getSepay().getCodePrefix().toUpperCase(Locale.ROOT);
+        String prefix = codePrefix;
         if (tx.code() != null) {
             String c = tx.code().trim().toUpperCase(Locale.ROOT);
             if (c.startsWith(prefix)) {
@@ -179,7 +189,7 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
         if (tx.content() == null) {
             return null;
         }
-        Matcher m = Pattern.compile(Pattern.quote(prefix) + "[A-Z0-9]{8}").matcher(tx.content().toUpperCase(Locale.ROOT));
+        Matcher m = codePattern.matcher(tx.content().toUpperCase(Locale.ROOT));
         return m.find() ? m.group() : null;
     }
 

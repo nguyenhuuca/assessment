@@ -19,9 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -33,16 +36,21 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     static final int MAX_CODE_ATTEMPTS = 10;
     private static final String CODE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
+    static final Duration PURGE_AFTER = Duration.ofDays(7);
+
     private final PaymentOrderRepository orderRepo;
     private final PremiumPlanRepository planRepo;
     private final AppProperties appProps;
     private final SecureRandom random = new SecureRandom();
+    private final Pattern codePattern;
 
     public PaymentOrderServiceImpl(PaymentOrderRepository orderRepo, PremiumPlanRepository planRepo,
                                    AppProperties appProps) {
         this.orderRepo = orderRepo;
         this.planRepo = planRepo;
         this.appProps = appProps;
+        String prefix = appProps.getSepay().getCodePrefix() == null ? "" : appProps.getSepay().getCodePrefix().toUpperCase(Locale.ROOT);
+        this.codePattern = Pattern.compile(Pattern.quote(prefix) + "[A-Z0-9]{" + CODE_LENGTH + "}");
     }
 
     @Override
@@ -94,7 +102,11 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     @Override
     @Transactional(readOnly = true)
     public OrderStatusDto getByCode(String code) {
-        PaymentOrder o = orderRepo.findByCode(code == null ? "" : code.trim().toUpperCase())
+        String normalized = code == null ? "" : code.trim().toUpperCase(Locale.ROOT);
+        if (!codePattern.matcher(normalized).matches()) {
+            throw CustomException.of(HttpStatus.NOT_FOUND, 4041, "error.payment.orderNotFound");
+        }
+        PaymentOrder o = orderRepo.findByCode(normalized)
                 .orElseThrow(() -> CustomException.of(HttpStatus.NOT_FOUND, 4041, "error.payment.orderNotFound"));
         Long amount = o.getPaidAmount() > 0 ? Long.valueOf(o.getPaidAmount()) : o.getExpectedAmount();
         return OrderStatusDto.builder().code(o.getCode()).type(o.getType()).status(o.getStatus())
@@ -104,9 +116,14 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     @Override
     @Transactional
     public int expireStaleOrders() {
-        int expired = orderRepo.expirePending(Instant.now());
+        Instant now = Instant.now();
+        int expired = orderRepo.expirePending(now);
         if (expired > 0) {
             log.info("Expired {} stale payment order(s)", expired);
+        }
+        int purged = orderRepo.purgeUnpaidExpired(now.minus(PURGE_AFTER));
+        if (purged > 0) {
+            log.info("Purged {} old unpaid payment order(s)", purged);
         }
         return expired;
     }
