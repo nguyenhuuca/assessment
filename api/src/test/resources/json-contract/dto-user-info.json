@@ -13,7 +13,9 @@
       "permissions" : 5,
       "passwordEnabled" : true,
       "mfaAvailable" : true,
-      "passwordLoginAvailable" : true
+      "passwordLoginAvailable" : true,
+      "premium" : false,
+      "premiumUntil" : null
     }
   }
 }

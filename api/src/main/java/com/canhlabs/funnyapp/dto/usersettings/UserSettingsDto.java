@@ -27,5 +27,7 @@ public class UserSettingsDto {
     /** 'vi' | 'en', or null when the user has not chosen (follow the browser). */
     private String locale;
     private AccountStatusDto accountStatus;
+    private boolean premium;
+    private Instant premiumUntil;
     private Instant updatedAt;
 }

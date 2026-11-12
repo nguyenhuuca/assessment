@@ -131,4 +131,25 @@ class ConverterTest {
         assertThat(Converter.toVideoDto(ready, false).getHlsUrl()).isNull();
         assertThat(Converter.toVideoDto(pending, true).getHlsUrl()).isNull();
     }
+
+    @Test
+    void toUserDetail_premiumStatusFollowsPremiumUntil() {
+        java.time.Instant future = java.time.Instant.now().plusSeconds(3600);
+        java.time.Instant past = java.time.Instant.now().minusSeconds(3600);
+        User user = new User();
+
+        UserDetailDto never = Converter.toUserDetail(user);
+        assertThat(never.isPremium()).isFalse();
+        assertThat(never.getPremiumUntil()).isNull();
+
+        user.setPremiumUntil(past);
+        UserDetailDto expired = Converter.toUserDetail(user);
+        assertThat(expired.isPremium()).isFalse();
+        assertThat(expired.getPremiumUntil()).isEqualTo(past);
+
+        user.setPremiumUntil(future);
+        UserDetailDto active = Converter.toUserDetail(user);
+        assertThat(active.isPremium()).isTrue();
+        assertThat(active.getPremiumUntil()).isEqualTo(future);
+    }
 }

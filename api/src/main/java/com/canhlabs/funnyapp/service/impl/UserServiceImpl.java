@@ -221,6 +221,8 @@ public class UserServiceImpl implements UserService {
                 .mfaAvailable(true)
                 .passwordEnabled(isPasswordEnabled(user))
                 .passwordLoginAvailable(isPasswordLoginAvailable())
+                .premium(user.isPremium(java.time.Instant.now()))
+                .premiumUntil(user.getPremiumUntil())
                 .build();
     }
 

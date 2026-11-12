@@ -201,6 +201,8 @@ public class UserSettingsServiceImpl implements UserSettingsService {
                 .profilePrivate(settings.isProfilePrivate())
                 .locale(settings.getLocale())
                 .accountStatus(accountStatus)
+                .premium(user != null && user.isPremium(java.time.Instant.now()))
+                .premiumUntil(user != null ? user.getPremiumUntil() : null)
                 .updatedAt(settings.getUpdatedAt())
                 .build();
     }

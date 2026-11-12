@@ -47,6 +47,8 @@ public class Converter {
                 // FE derives isAdmin from this on login; without it the admin menu needs a reload
                 .role(user.getRole() != null ? user.getRole().name() : "USER")
                 .permissions(user.getPermissions())
+                .premium(user.isPremium(java.time.Instant.now()))
+                .premiumUntil(user.getPremiumUntil())
                 .build();
     }
 
