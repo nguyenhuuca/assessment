@@ -728,3 +728,4 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **VS-4** `AdminVideoDto.fileSize` + mapping in GET /admin/videos — blocked by VS-1 — 00a7317b, aae06213
 - [x] **VS-5** FE shared `utils/formatBytes.js`; DriveSyncPanel uses it — 715b4fe6
 - [x] **VS-6** FE Size column in AdminVideoTable + en/vi `colSize` — blocked by VS-4, VS-5 — 072bac98
+- [x] **VS-7** Total Size stat card: `AdminStatsDto.totalFileSize` (JPQL `coalesce(sum)`) + FE card en/vi `statTotalSize` — 9c0d7374, 35ad5de3

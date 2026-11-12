@@ -1,8 +1,8 @@
 task: Admin video size column (Video Vault)
-status: done
-progress: 100
-done: VS-1..VS-4 file_size + backfill + DTO 00a7317b aae06213; VS-5 formatBytes 715b4fe6; VS-6 Size column 072bac98; CI rerun green, prod v131 smoke OK
+status: in_progress
+progress: 90
+done: VS-1..VS-6 Size column, prod v131 OK 072bac98; VS-7 Total Size stat card 9c0d7374 35ad5de3
 doing: -
-next: follow-up? sticky Actions col hides Size until horizontal scroll at ~1536px
+next: push (user approval); watch CI; prod smoke Total Size card
 plan: docs/plans/plan-admin-video-size.md
-updated: 2026-11-12 20:45
+updated: 2026-11-12 20:50
