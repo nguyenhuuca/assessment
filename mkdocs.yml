@@ -95,6 +95,7 @@ nav:
       - 0034 - Frontend Dependency Upgrade: adr/0034-frontend-deps-upgrade.md
       - 0035 - Collection-Only Videos: adr/0035-collection-only-videos.md
       - 0036 - Admin Bulk Actions: adr/0036-admin-bulk-actions.md
+      - 0037 - SePay Bank-Transfer Payments: adr/0037-sepay-bank-transfer-payments.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -111,6 +112,7 @@ nav:
       - Web Push: prd/PRD-web-push.md
       - Collection-Only Videos: prd/PRD-collection-only-videos.md
       - Admin Bulk Actions: prd/PRD-admin-bulk-actions.md
+      - SePay Payments: prd/PRD-sepay-payments.md
       - Spring Boot 4.1 Upgrade: prd/PRD-spring-boot-4-upgrade.md
       - Frontend Dependency Upgrade: prd/PRD-frontend-deps-upgrade.md
 
@@ -132,6 +134,7 @@ nav:
       - Bookmark / Collections: sequence/sequence-bookmark-feature.md
       - Collection-Only Videos: sequence/sequence-collection-only-videos.md
       - Admin Bulk Actions: sequence/sequence-admin-bulk-actions.md
+      - SePay Payments: sequence/sequence-sepay-payments.md
       - Contributor Autopilot Permissions: sequence/sequence-contributor-autopilot-permissions.md
       - HLS Streaming: sequence/sequence-hls-streaming.md
       - Hot Video Priority: sequence/sequence-hot-video-priority.md
@@ -173,6 +176,7 @@ nav:
       - Collection-Only Videos: plans/plan-collection-only-videos.md
       - Admin Bulk Actions: plans/plan-admin-bulk-actions.md
       - Admin Video Size: plans/plan-admin-video-size.md
+      - SePay Payments: plans/plan-sepay-payments.md
       - BE Performance (Medium): plans/plan-be-perf-medium.md
       - Basic PWA: plans/plan-pwa-basic.md
       - Report Webhook State: plans/plan-report-webhook-state.md
