@@ -2016,7 +2016,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
 
 .admin-stat-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
   margin-bottom: 20px;
 }
