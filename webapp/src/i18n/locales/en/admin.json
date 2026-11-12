@@ -20,7 +20,8 @@
     "SUGGESTIONS": "SUGGESTIONS",
     "IMPORT_VIDEO": "IMPORT_VIDEO",
     "DRIVE_SYNC": "DRIVE_SYNC",
-    "SCHEDULED_JOBS": "SCHEDULED_JOBS"
+    "SCHEDULED_JOBS": "SCHEDULED_JOBS",
+    "DONATIONS": "DONATIONS"
   },
   "showing": "SHOWING {{shown}} OF {{total}} ENTRIES",
   "showingFiles": "SHOWING {{shown}} OF {{total}} FILES",
@@ -77,7 +78,7 @@
   "hlsToggleOff": "Disable HLS and delete the converted files",
   "colPriority": "PRIORITY",
   "colMetrics": "METRICS",
-  "colSize": "Size",
+  "colSize": "SIZE",
   "colComment": "COMMENT",
   "colAuthor": "AUTHOR",
   "colVideo": "VIDEO",
@@ -240,7 +241,6 @@
   "forceSyncButton": "FORCE_SYNC ({{count}})",
   "maxBatch": "Max {{count}} files per run",
   "colFileName": "FILE NAME",
-  "colSize": "SIZE",
   "colCreatedAt": "CREATED",
   "colState": "STATE",
   "colDbTitle": "TITLE (DB)",
@@ -453,5 +453,79 @@
   "bulkDemoteMessage_other": "Set {{count}} selected accounts to USER?",
   "bulkDemoteConfirm": "Set to USER",
   "bulkGrantAdminMessage_one": "Promote {{count}} selected account to ADMIN? Each will be able to:",
-  "bulkGrantAdminMessage_other": "Promote {{count}} selected accounts to ADMIN? Each will be able to:"
+  "bulkGrantAdminMessage_other": "Promote {{count}} selected accounts to ADMIN? Each will be able to:",
+  "pay": {
+    "actionFailed": "Action failed. Please try again.",
+    "summary": {
+      "donationTotal": "Donations (total)",
+      "donation30d": "Donations (30d)",
+      "premiumTotal": "Premium (total)",
+      "premium30d": "Premium (30d)",
+      "pendingOrders": "Pending orders",
+      "underpaidOrders": "Underpaid orders",
+      "unmatchedTransactions": "Unmatched transfers"
+    },
+    "ordersTitle": "Orders",
+    "filterType": "Filter by type",
+    "filterStatus": "Filter by status",
+    "allTypes": "All types",
+    "allStatuses": "All statuses",
+    "type": {
+      "DONATION": "Donation",
+      "PREMIUM": "Premium"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "PAID": "Paid",
+      "UNDERPAID": "Underpaid",
+      "EXPIRED": "Expired",
+      "CANCELLED": "Cancelled"
+    },
+    "col": {
+      "code": "Code",
+      "type": "Type",
+      "status": "Status",
+      "expected": "Expected",
+      "paid": "Paid",
+      "surplus": "Surplus",
+      "donor": "Donor",
+      "created": "Created",
+      "amount": "Amount",
+      "content": "Content",
+      "gateway": "Bank",
+      "date": "Date"
+    },
+    "noOrders": "No orders",
+    "resolve": "Resolve",
+    "resolveTitle": "Resolve underpaid order {{code}}",
+    "resolveMessage": "Received {{paid}} of {{expected}}.",
+    "resolveConfirm": "Resolve",
+    "resolveChoice": "Resolution",
+    "resolveGrant": "Grant Premium anyway",
+    "resolveDonation": "Keep as a donation only",
+    "unmatchedTitle": "Unmatched transfers",
+    "noUnmatched": "No unmatched transfers",
+    "linkToOrder": "Link to order",
+    "orderCode": "Order code",
+    "link": "Link",
+    "cancel": "Cancel",
+    "plansTitle": "Premium plans",
+    "noPlans": "No plans",
+    "plan": {
+      "add": "Add plan",
+      "edit": "Edit",
+      "save": "Save",
+      "code": "Code",
+      "name": "Name",
+      "durationDays": "Days",
+      "priceVnd": "Price (VND)",
+      "sortOrder": "Sort order",
+      "active": "Active",
+      "activeAria": "Toggle plan {{code}} active",
+      "editAria": "Edit plan {{code}}",
+      "codeInvalid": "Use 3-32 characters: A-Z, 0-9, _",
+      "priceInvalid": "Price must be greater than 0",
+      "daysInvalid": "Days must be greater than 0"
+    }
+  }
 }

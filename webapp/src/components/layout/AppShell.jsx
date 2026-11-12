@@ -26,6 +26,7 @@ import LanguageSwitcher from '../common/LanguageSwitcher.jsx'
 import NotificationBell from '../notifications/NotificationBell.jsx'
 import { useNotificationStream } from '../../hooks/useNotifications.js'
 import { useLocaleSync } from '../../hooks/useLocaleSync.js'
+import { usePaymentsConfig } from '../../hooks/usePayments.js'
 import { notificationNav } from '../../utils/notificationText.js'
 import { userCanReport } from '../../utils/roles.js'
 
@@ -60,6 +61,7 @@ export default function AppShell() {
   const { isLoggedIn, user, logout, sessionNotice, clearSessionNotice } = useAuth()
   const reporter = userCanReport(user)
   const { theme, toggle: toggleTheme } = useTheme()
+  const { enabled: paymentsEnabled } = usePaymentsConfig()
   const [message,       setMessage]       = useState(null)
   const [mfaModal,      setMfaModal]      = useState({ show: false, pendingData: null })
   const [profileOpen,   setProfileOpen]   = useState(false)
@@ -183,7 +185,7 @@ export default function AppShell() {
 
   const mobileMenu = [
     { key: 'suggest',  icon: 'add',                  labelKey: 'suggestVideo', onSelect: handleFab },
-    { key: 'donate',   icon: 'volunteer_activism',   labelKey: 'navDonate',    onSelect: () => openDonate('donate') },
+    ...(paymentsEnabled ? [{ key: 'donate', icon: 'volunteer_activism', labelKey: 'navDonate', onSelect: () => openDonate('donate') }] : []),
     ...(user?.isAdmin ? [{ key: 'admin', icon: 'admin_panel_settings', labelKey: 'navAdmin', onSelect: () => goNav('admin') }] : []),
     ...(reporter ? [{ key: 'report', icon: 'bug_report', labelKey: 'navReport', onSelect: () => goNav('report') }] : []),
     { key: 'settings', icon: 'settings',             labelKey: 'navSettings',  onSelect: () => goNav('settings') },
@@ -337,7 +339,7 @@ export default function AppShell() {
         alignItems: 'center',
         paddingTop: 8, paddingBottom: 16,
       }}>
-        {SIDE_NAV.filter(item => !item.requiresAdmin || user?.isAdmin).map(item => (
+        {SIDE_NAV.filter(item => (!item.requiresAdmin || user?.isAdmin) && (item.key !== 'donate' || paymentsEnabled)).map(item => (
           <button
             key={item.key}
             className={`sidenav-item${activeNav === item.key ? ' active' : ''}`}
@@ -408,7 +410,7 @@ export default function AppShell() {
         ) : activeNav === 'report' && reporter ? (
           <ReportPage fromPage={prevNav} />
         ) : activeNav === 'settings' && isLoggedIn ? (
-          <SettingsPage onBuyPremium={() => openDonate('premium')} />
+          <SettingsPage onBuyPremium={paymentsEnabled ? () => openDonate('premium') : undefined} />
         ) : activeNav === 'donate' ? (
           <DonatePage key={`donate-${donateNonce}`} initialTab={donateTab} />
         ) : activeNav === 'settings' && !isLoggedIn ? (
@@ -455,7 +457,7 @@ export default function AppShell() {
         alignItems: 'center', padding: '0 8px',
       }}>
         {MOBILE_NAV.map(renderMobileNavItem)}
-        {!isLoggedIn && renderMobileNavItem(GUEST_MOBILE_NAV)}
+        {!isLoggedIn && paymentsEnabled && renderMobileNavItem(GUEST_MOBILE_NAV)}
         {isLoggedIn && (
           <MobileNavMenu items={mobileMenu} active={['settings', 'admin', 'report', 'donate'].includes(activeNav)} />
         )}

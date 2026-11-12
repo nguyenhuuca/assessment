@@ -20,7 +20,8 @@
     "SUGGESTIONS": "ĐỀ XUẤT",
     "IMPORT_VIDEO": "NHẬP VIDEO",
     "DRIVE_SYNC": "ĐỒNG BỘ DRIVE",
-    "SCHEDULED_JOBS": "TÁC VỤ ĐỊNH KỲ"
+    "SCHEDULED_JOBS": "TÁC VỤ ĐỊNH KỲ",
+    "DONATIONS": "ỦNG HỘ"
   },
   "showing": "HIỂN THỊ {{shown}} / {{total}} MỤC",
   "showingFiles": "HIỂN THỊ {{shown}} / {{total}} FILE",
@@ -77,7 +78,7 @@
   "hlsToggleOff": "Tắt HLS và xoá các file đã convert",
   "colPriority": "ƯU TIÊN",
   "colMetrics": "SỐ LIỆU",
-  "colSize": "Dung lượng",
+  "colSize": "DUNG LƯỢNG",
   "colComment": "BÌNH LUẬN",
   "colAuthor": "TÁC GIẢ",
   "colVideo": "VIDEO",
@@ -231,7 +232,6 @@
   "forceSyncButton": "FORCE_SYNC ({{count}})",
   "maxBatch": "Tối đa {{count}} file mỗi lần",
   "colFileName": "TÊN FILE",
-  "colSize": "DUNG LƯỢNG",
   "colCreatedAt": "NGÀY TẠO",
   "colState": "TRẠNG THÁI",
   "colDbTitle": "TIÊU ĐỀ (DB)",
@@ -430,5 +430,79 @@
   "bulkDemoteTitle": "Đặt vai trò USER",
   "bulkDemoteMessage_other": "Đặt {{count}} tài khoản đã chọn về USER?",
   "bulkDemoteConfirm": "Đặt về USER",
-  "bulkGrantAdminMessage_other": "Nâng {{count}} tài khoản đã chọn lên ADMIN? Mỗi tài khoản sẽ có thể:"
+  "bulkGrantAdminMessage_other": "Nâng {{count}} tài khoản đã chọn lên ADMIN? Mỗi tài khoản sẽ có thể:",
+  "pay": {
+    "actionFailed": "Thao tác thất bại. Vui lòng thử lại.",
+    "summary": {
+      "donationTotal": "Ủng hộ (tổng)",
+      "donation30d": "Ủng hộ (30 ngày)",
+      "premiumTotal": "Premium (tổng)",
+      "premium30d": "Premium (30 ngày)",
+      "pendingOrders": "Đơn đang chờ",
+      "underpaidOrders": "Đơn thiếu tiền",
+      "unmatchedTransactions": "Chuyển khoản chưa khớp"
+    },
+    "ordersTitle": "Đơn hàng",
+    "filterType": "Lọc theo loại",
+    "filterStatus": "Lọc theo trạng thái",
+    "allTypes": "Mọi loại",
+    "allStatuses": "Mọi trạng thái",
+    "type": {
+      "DONATION": "Ủng hộ",
+      "PREMIUM": "Premium"
+    },
+    "status": {
+      "PENDING": "Đang chờ",
+      "PAID": "Đã thanh toán",
+      "UNDERPAID": "Thiếu tiền",
+      "EXPIRED": "Hết hạn",
+      "CANCELLED": "Đã huỷ"
+    },
+    "col": {
+      "code": "Mã",
+      "type": "Loại",
+      "status": "Trạng thái",
+      "expected": "Cần trả",
+      "paid": "Đã trả",
+      "surplus": "Dư",
+      "donor": "Người ủng hộ",
+      "created": "Tạo lúc",
+      "amount": "Số tiền",
+      "content": "Nội dung",
+      "gateway": "Ngân hàng",
+      "date": "Ngày"
+    },
+    "noOrders": "Chưa có đơn hàng",
+    "resolve": "Xử lý",
+    "resolveTitle": "Xử lý đơn thiếu tiền {{code}}",
+    "resolveMessage": "Đã nhận {{paid}} trên {{expected}}.",
+    "resolveConfirm": "Xử lý",
+    "resolveChoice": "Cách xử lý",
+    "resolveGrant": "Vẫn cấp Premium",
+    "resolveDonation": "Chỉ ghi nhận là ủng hộ",
+    "unmatchedTitle": "Chuyển khoản chưa khớp",
+    "noUnmatched": "Không có chuyển khoản chưa khớp",
+    "linkToOrder": "Gắn vào đơn",
+    "orderCode": "Mã đơn",
+    "link": "Gắn",
+    "cancel": "Huỷ",
+    "plansTitle": "Gói Premium",
+    "noPlans": "Chưa có gói nào",
+    "plan": {
+      "add": "Thêm gói",
+      "edit": "Sửa",
+      "save": "Lưu",
+      "code": "Mã",
+      "name": "Tên",
+      "durationDays": "Số ngày",
+      "priceVnd": "Giá (VND)",
+      "sortOrder": "Thứ tự",
+      "active": "Đang bán",
+      "activeAria": "Bật/tắt gói {{code}}",
+      "editAria": "Sửa gói {{code}}",
+      "codeInvalid": "Dùng 3-32 ký tự: A-Z, 0-9, _",
+      "priceInvalid": "Giá phải lớn hơn 0",
+      "daysInvalid": "Số ngày phải lớn hơn 0"
+    }
+  }
 }

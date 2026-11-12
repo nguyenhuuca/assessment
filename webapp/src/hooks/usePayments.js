@@ -12,6 +12,17 @@ export function usePlans({ enabled = true } = {}) {
   })
 }
 
+/** Whether payments are switched on server-side. Treated as disabled while loading or on error. */
+export function usePaymentsConfig() {
+  const q = useQuery({
+    queryKey: ['payments', 'config'],
+    queryFn: async () => unwrap(await paymentsApi.getPaymentsConfig()),
+    staleTime: 60 * 60 * 1000,
+    retry: false,
+  })
+  return { ...q, enabled: q.data?.enabled === true }
+}
+
 export function useCreateOrder() {
   return useMutation({
     mutationFn: async (body) => unwrap(await paymentsApi.createOrder(body)),
