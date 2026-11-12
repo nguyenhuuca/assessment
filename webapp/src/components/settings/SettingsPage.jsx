@@ -5,6 +5,7 @@ import LanguageSwitcher from '../common/LanguageSwitcher.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useSettings, useUpdateSettings } from '../../hooks/useSettings.js'
 import ProfileModal from '../auth/ProfileModal.jsx'
+import PremiumSection from './PremiumSection.jsx'
 import DeleteAccountModal from './DeleteAccountModal.jsx'
 
 const QUALITY_OPTIONS = [
@@ -238,6 +239,8 @@ export default function SettingsPage() {
           /* placeholder to keep grid layout balanced */
           <div className="settings-col-4" style={{ display: 'contents' }} />
         )}
+
+        <PremiumSection premiumUntil={settings?.premiumUntil ?? user?.premiumUntil} />
 
         {/* ── Notifications ── */}
         <section className="settings-card settings-col-6">

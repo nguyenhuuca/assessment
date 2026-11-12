@@ -47,5 +47,10 @@
   "enterOtp": "Enter your 6-digit authenticator code",
   "typeEmailToConfirm": "Type your email address to confirm:",
   "deleting": "Deleting…",
-  "deleteMyAccount": "Delete My Account"
+  "deleteMyAccount": "Delete My Account",
+  "premium": "Premium",
+  "premiumActiveUntil": "Premium until {{date}}",
+  "premiumFree": "Free",
+  "premiumBuy": "Get Premium",
+  "premiumRenew": "Renew Premium"
 }

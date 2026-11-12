@@ -47,5 +47,10 @@
   "enterOtp": "Nhập mã xác thực gồm 6 chữ số từ ứng dụng xác thực",
   "typeEmailToConfirm": "Nhập địa chỉ email của bạn để xác nhận:",
   "deleting": "Đang xóa…",
-  "deleteMyAccount": "Xóa tài khoản của tôi"
+  "deleteMyAccount": "Xóa tài khoản của tôi",
+  "premium": "Premium",
+  "premiumActiveUntil": "Premium đến {{date}}",
+  "premiumFree": "Miễn phí",
+  "premiumBuy": "Nâng cấp Premium",
+  "premiumRenew": "Gia hạn Premium"
 }

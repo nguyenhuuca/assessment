@@ -6,6 +6,7 @@ import LoginForm from '../auth/LoginForm.jsx'
 import MagicLinkHandler from '../auth/MagicLinkHandler.jsx'
 import MFALoginModal from '../auth/MFALoginModal.jsx'
 import ProfileModal from '../auth/ProfileModal.jsx'
+import PremiumBadge from '../common/PremiumBadge.jsx'
 import SuggestVideoModal from '../suggestions/SuggestVideoModal.jsx'
 import HistoryView from '../history/HistoryView.jsx'
 import DeleteConfirmModal from '../modals/DeleteConfirmModal.jsx'
@@ -248,6 +249,7 @@ export default function AppShell() {
           ) : (
             <>
               <NotificationBell onOpenNotification={openNotification} />
+              <PremiumBadge premiumUntil={user?.premiumUntil} />
               <button className="icon-btn" onClick={() => setProfileOpen(true)} title={t('profile')}>
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person</span>
               </button>

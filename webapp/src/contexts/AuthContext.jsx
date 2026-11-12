@@ -47,7 +47,7 @@ export function AuthProvider({ children }) {
         if (userData?.role !== undefined) {
           setUser(prev => {
             if (!prev) return prev
-            const next = { ...prev, role: userData.role, permissions: userData.permissions ?? prev.permissions, isAdmin: isAdminRole(userData.role) }
+            const next = { ...prev, role: userData.role, permissions: userData.permissions ?? prev.permissions, premium: userData.premium ?? prev.premium, premiumUntil: userData.premiumUntil ?? prev.premiumUntil, isAdmin: isAdminRole(userData.role) }
             localStorage.setItem('user', JSON.stringify(next))
             return next
           })
