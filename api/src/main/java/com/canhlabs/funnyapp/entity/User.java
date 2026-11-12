@@ -84,4 +84,13 @@ public class User extends BaseDomain {
     @Builder.Default
     private int credentialsVersion = 0;
 
+    /** Premium access ends here; null means never bought. */
+    @Column(name = "premium_until")
+    private Instant premiumUntil;
+
+    /** True while the Premium period has not ended at {@code now}. */
+    public boolean isPremium(Instant now) {
+        return premiumUntil != null && premiumUntil.isAfter(now);
+    }
+
 }
