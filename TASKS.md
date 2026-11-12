@@ -733,7 +733,7 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **VS-9** Fix: 6 stat cards wrap at ~1536px → minmax(160px) — ed657bea
 
 ## Feature: SePay payments — donations + Premium (2026-11-12, [plan](docs/plans/plan-sepay-payments.md), [ADR-0037](docs/adr/0037-sepay-bank-transfer-payments.md))
-- [ ] **PAY-1** Liquibase premium_plans/payment_orders/sepay_transactions + users.premium_until; entities, enums, repos
+- [~] **PAY-1** Liquibase premium_plans/payment_orders/sepay_transactions + users.premium_until; entities, enums, repos
 - [ ] **PAY-2** AppProperties.Sepay, order create/get, VietQR URL, PaymentController, expiry job — blocked by PAY-1
 - [ ] **PAY-3** SePay webhook: HMAC verify, dedupe, matching + amount rules, premium extension — blocked by PAY-2
 - [ ] **PAY-4** Admin notifications DONATION_RECEIVED / PREMIUM_PURCHASED / PAYMENT_UNDERPAID — blocked by PAY-3
