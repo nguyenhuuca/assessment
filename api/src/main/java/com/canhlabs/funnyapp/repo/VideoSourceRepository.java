@@ -40,6 +40,10 @@ public interface VideoSourceRepository extends JpaRepository<VideoSource, Long> 
 
     long countByStatus(VideoStatus status);
 
+    /** Total bytes across all sources; rows with unknown (null) size count as 0. */
+    @Query("select coalesce(sum(v.fileSize), 0) from VideoSource v")
+    long sumFileSize();
+
     /** Atomic increment in the DB; hidden videos are not counted. Returns rows updated (0 = unknown or hidden). */
     @Modifying
     @Transactional

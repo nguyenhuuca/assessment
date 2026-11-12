@@ -240,6 +240,7 @@ public class AdminVideoServiceImpl implements AdminVideoService {
                 .flaggedCount(flagged)
                 .totalComments(commentRepository.count())
                 .removedComments(commentRepository.countByStatus(CommentStatus.REMOVED))
+                .totalFileSize(videoSourceRepository.sumFileSize())
                 .build();
     }
 

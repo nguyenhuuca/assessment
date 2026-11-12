@@ -16,4 +16,5 @@ public class AdminStatsDto {
     private long flaggedCount;
     private long totalComments;
     private long removedComments;
+    private long totalFileSize;
 }

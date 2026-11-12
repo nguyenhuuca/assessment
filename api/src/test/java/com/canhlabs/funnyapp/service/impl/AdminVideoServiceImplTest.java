@@ -549,6 +549,7 @@ class AdminVideoServiceImplTest {
         when(userRepo.count()).thenReturn(42L);
         when(commentRepository.count()).thenReturn(300L);
         when(commentRepository.countByStatus(CommentStatus.REMOVED)).thenReturn(7L);
+        when(videoSourceRepository.sumFileSize()).thenReturn(5_368_709_120L);
 
         AdminStatsDto stats = service.getStats();
 
@@ -558,6 +559,7 @@ class AdminVideoServiceImplTest {
         assertEquals(5L,   stats.getFlaggedCount());
         assertEquals(300L, stats.getTotalComments());
         assertEquals(7L,   stats.getRemovedComments());
+        assertEquals(5_368_709_120L, stats.getTotalFileSize());
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────
