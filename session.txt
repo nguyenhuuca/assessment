@@ -1,8 +1,8 @@
 task: Admin video size column (Video Vault)
 status: in_progress
 progress: 90
-done: VS-1..VS-6 Size column, prod v131 OK 072bac98; VS-7 Total Size stat card 9c0d7374 35ad5de3
+done: VS-1..VS-6 Size column 072bac98; VS-7 Total Size card 35ad5de3; VS-8 sticky overlap fix 63c26dce
 doing: -
-next: push (user approval); watch CI; prod smoke Total Size card
+next: push (user approval); watch CI; prod smoke Total Size card + no overlap
 plan: docs/plans/plan-admin-video-size.md
-updated: 2026-11-12 20:50
+updated: 2026-11-12 20:57
