@@ -1,8 +1,8 @@
-task: Admin video size column (Video Vault)
+task: SePay payments — donations + Premium
 status: in_progress
-progress: 90
-done: VS-1..VS-6 Size column 072bac98; VS-7 Total Size card 35ad5de3; VS-8 sticky overlap fix 63c26dce
+progress: 10
+done: Plan PRD/ADR-0037/sequence/plan f10419a6; admin video size VS-1..VS-9 shipped prod-132
 doing: -
-next: push (user approval); watch CI; prod smoke Total Size card + no overlap
-plan: docs/plans/plan-admin-video-size.md
-updated: 2026-11-12 20:57
+next: PAY-1 Liquibase + entities (/swarm-execute); push VS-9 + plan docs (approval)
+plan: docs/plans/plan-sepay-payments.md
+updated: 2026-11-12 21:21

@@ -730,6 +730,7 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **VS-6** FE Size column in AdminVideoTable + en/vi `colSize` — blocked by VS-4, VS-5 — 072bac98
 - [x] **VS-7** Total Size stat card: `AdminStatsDto.totalFileSize` (JPQL `coalesce(sum)`) + FE card en/vi `statTotalSize` — 9c0d7374, 35ad5de3
 - [x] **VS-8** Fix: Video Vault Size/Metrics hidden under sticky Actions at ~1536px (table-scoped CSS) — 63c26dce
+- [x] **VS-9** Fix: 6 stat cards wrap at ~1536px → minmax(160px) — ed657bea
 
 ## Feature: SePay payments — donations + Premium (2026-11-12, [plan](docs/plans/plan-sepay-payments.md), [ADR-0037](docs/adr/0037-sepay-bank-transfer-payments.md))
 - [ ] **PAY-1** Liquibase premium_plans/payment_orders/sepay_transactions + users.premium_until; entities, enums, repos
