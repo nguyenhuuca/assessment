@@ -455,6 +455,7 @@
       "PENDING": "Đang chờ",
       "PAID": "Đã thanh toán",
       "UNDERPAID": "Thiếu tiền",
+      "RESOLVED": "Đã xử lý",
       "EXPIRED": "Hết hạn",
       "CANCELLED": "Đã huỷ"
     },

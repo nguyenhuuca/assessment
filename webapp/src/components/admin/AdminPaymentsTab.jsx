@@ -11,8 +11,8 @@ import {
 
 const PAGE_SIZE = 10
 const ORDER_TYPES = ['DONATION', 'PREMIUM']
-const ORDER_STATUSES = ['PENDING', 'PAID', 'UNDERPAID', 'EXPIRED', 'CANCELLED']
-const STATUS_BADGE = { PENDING: 'pending', UNDERPAID: 'pending', PAID: 'published', EXPIRED: 'removed', CANCELLED: 'removed' }
+const ORDER_STATUSES = ['PENDING', 'PAID', 'UNDERPAID', 'RESOLVED', 'EXPIRED', 'CANCELLED']
+const STATUS_BADGE = { PENDING: 'pending', UNDERPAID: 'pending', PAID: 'published', RESOLVED: 'published', EXPIRED: 'removed', CANCELLED: 'removed' }
 
 function Pager({ page, totalPages, onPage }) {
   if (totalPages <= 1) return null

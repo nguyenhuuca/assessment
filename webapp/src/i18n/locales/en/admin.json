@@ -478,6 +478,7 @@
       "PENDING": "Pending",
       "PAID": "Paid",
       "UNDERPAID": "Underpaid",
+      "RESOLVED": "Resolved",
       "EXPIRED": "Expired",
       "CANCELLED": "Cancelled"
     },
