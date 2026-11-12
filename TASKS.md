@@ -739,7 +739,7 @@ Report: docs/reports/system-health-2026-11-08.md
 - [ ] **PAY-4** Admin notifications DONATION_RECEIVED / PREMIUM_PURCHASED / PAYMENT_UNDERPAID — blocked by PAY-3
 - [ ] **PAY-5** Reconciliation job (SePay transaction API v2, since_id) — blocked by PAY-3
 - [ ] **PAY-6** Admin payments API: orders, unmatched, totals, link, resolve, plans CRUD — blocked by PAY-3
-- [~] **PAY-7** User premium/premiumUntil in DTO + Settings section + badge — blocked by PAY-1
+- [x] **PAY-7** User premium/premiumUntil in DTO + Settings section + badge — blocked by PAY-1 — a0186dce, 2e4f8e6c
 - [ ] **PAY-8** FE Donate page (nav, QR, polling, thank-you, Premium tab) — blocked by PAY-2
 - [ ] **PAY-9** FE admin DONATIONS tab — blocked by PAY-6
 - [ ] **PAY-10** Ops: SePay dashboard + secrets, sandbox simulate, prod smoke, ADR Accepted — blocked by PAY-4, PAY-5, PAY-7, PAY-8, PAY-9
