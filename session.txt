@@ -1,8 +1,9 @@
 task: SePay payments — donations + Premium
-status: in_progress
-progress: 65
-done: PAY-1 schema 042610d9; PAY-2 orders 0ad76991; PAY-3 webhook 26e5ef73; PAY-7 premium 2e4f8e6c; PAY-8 donate page e1f41948
-doing: PAY-4 notif; PAY-5 reconcile; PAY-6 admin API; PAY-3 security review (wave 4)
-next: wave 5 PAY-9 admin tab + hide donate nav when disabled; push (approval)
+status: blocked
+progress: 85
+done: PAY-1..4, PAY-6..9 built (main); PAY-SEC security fixes 0e20146f; PAY-5 deferred
+doing: -
+next: boot app on real Postgres (Docker) to verify migrations/queries; push (approval); PAY-10 SePay setup + sandbox
 plan: docs/plans/plan-sepay-payments.md
-updated: 2026-11-12 21:57
+blocker: push needs owner go-ahead; DB boot check needs Docker Desktop running
+updated: 2026-11-12 22:24
