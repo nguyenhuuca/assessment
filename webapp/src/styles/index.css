@@ -3212,3 +3212,44 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 @media (max-width: 768px) {
   .update-banner { bottom: 76px; }
 }
+
+/* ── Donate / Premium payments ── */
+.pay-page { max-width: 560px; margin: 0 auto; padding: 24px 16px 96px; }
+.pay-heading { font-size: 22px; font-weight: 700; margin: 0 0 16px; color: var(--text); }
+.pay-title { font-size: 18px; font-weight: 700; margin: 0; color: var(--text); text-align: center; }
+.pay-muted { color: var(--text-muted); font-size: 13px; margin: 0; }
+.pay-form { display: flex; flex-direction: column; gap: 14px; }
+.pay-presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.pay-chip {
+  background: var(--bg-high); color: var(--text); border: 1px solid var(--border-subtle);
+  border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: var(--font-body);
+}
+.pay-chip.active { background: var(--accent-cyan-dim); border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.pay-field { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text-muted); }
+.pay-counter { align-self: flex-end; color: var(--text-muted); font-size: 11px; }
+.pay-error { color: #ff6b6b; font-size: 13px; margin: 0 0 12px; }
+.pay-warning {
+  display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 12px;
+  background: rgba(243, 156, 18, 0.12); color: #f39c12; border-radius: 8px; font-size: 13px;
+}
+.pay-plans { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.pay-plan {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+  background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px;
+}
+.pay-plan > div:first-child { flex: 1; min-width: 0; }
+.pay-plan-name { font-weight: 700; color: var(--text); }
+.pay-plan-price { font-weight: 700; color: var(--accent-cyan); }
+.pay-qr { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.pay-qr-img { width: 100%; max-width: 280px; height: auto; border-radius: 12px; background: #fff; padding: 8px; }
+.pay-countdown { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--accent-cyan); }
+.pay-details { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.pay-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 12px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 10px;
+}
+.pay-row-text { display: flex; flex-direction: column; min-width: 0; }
+.pay-row-label { font-size: 11px; color: var(--text-muted); }
+.pay-row-value { font-weight: 700; color: var(--text); word-break: break-all; }
+.pay-outcome { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 32px 0; text-align: center; }

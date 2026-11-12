@@ -19,6 +19,7 @@ import MobileNavMenu from './MobileNavMenu.jsx'
 import AdminView from '../admin/AdminView.jsx'
 import ReportPage from '../report/ReportPage.jsx'
 import SettingsPage from '../settings/SettingsPage.jsx'
+import DonatePage from '../payments/DonatePage.jsx'
 import ActivityBar from '../common/ActivityBar.jsx'
 import UpdateBanner from './UpdateBanner.jsx'
 import LanguageSwitcher from '../common/LanguageSwitcher.jsx'
@@ -42,8 +43,14 @@ const SIDE_NAV = [
   { key: 'explore',  icon: 'explore',             labelKey: 'navExplore' },
   { key: 'library',  icon: 'video_library',       labelKey: 'navLibrary' },
   { key: 'history',  icon: 'history',             labelKey: 'navHistory' },
+  { key: 'donate',   icon: 'volunteer_activism',  labelKey: 'navDonate'  },
   { key: 'admin',    icon: 'admin_panel_settings', labelKey: 'navAdmin',  requiresAdmin: true },
 ]
+
+// Guests have no overflow menu, so Support gets its own bottom-nav tab
+const GUEST_MOBILE_NAV = { key: 'donate', icon: 'volunteer_activism', labelKey: 'navDonate' }
+// Pages that scroll inside <main> (everything except Home, which is a reel)
+const SCROLL_NAVS = ['explore', 'admin', 'settings', 'report', 'library', 'history', 'donate']
 
 // Rendered in the sidebar just above the Settings button (pinned to the bottom)
 const REPORT_NAV = { key: 'report', icon: 'bug_report', labelKey: 'navReport', requiresAdmin: true }
@@ -60,6 +67,8 @@ export default function AppShell() {
   const [prevNav,        setPrevNav]        = useState('home')
   const [adminTab,       setAdminTab]       = useState(null)
   const [adminNonce,     setAdminNonce]     = useState(0)
+  const [donateTab,       setDonateTab]       = useState('donate')
+  const [donateNonce,     setDonateNonce]     = useState(0)
   const [deleteModal,   setDeleteModal]   = useState({ show: false, video: null })
   // Deep link from the URL: ?v={videoId}[&c={commentId}] or ?l={collectionId} — read once, then strip from the address bar
   const [initialLink] = useState(() => {
@@ -145,6 +154,12 @@ export default function AppShell() {
     setActiveNav(key)
   }
 
+  function openDonate(tab) {
+    setDonateTab(tab)
+    setDonateNonce(n => n + 1)
+    goNav('donate')
+  }
+
   // "+" button: users suggest a video; admins go straight to the Import tab
   function handleFab() {
     if (user?.isAdmin) {
@@ -168,6 +183,7 @@ export default function AppShell() {
 
   const mobileMenu = [
     { key: 'suggest',  icon: 'add',                  labelKey: 'suggestVideo', onSelect: handleFab },
+    { key: 'donate',   icon: 'volunteer_activism',   labelKey: 'navDonate',    onSelect: () => openDonate('donate') },
     ...(user?.isAdmin ? [{ key: 'admin', icon: 'admin_panel_settings', labelKey: 'navAdmin', onSelect: () => goNav('admin') }] : []),
     ...(reporter ? [{ key: 'report', icon: 'bug_report', labelKey: 'navReport', onSelect: () => goNav('report') }] : []),
     { key: 'settings', icon: 'settings',             labelKey: 'navSettings',  onSelect: () => goNav('settings') },
@@ -379,8 +395,8 @@ export default function AppShell() {
         marginLeft: 'var(--sidenav-w)',
         marginTop: reelMode ? 0 : 'var(--topnav-h)',
         height: reelMode ? '100vh' : 'calc(100vh - var(--topnav-h))',
-        overflow: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'report' || activeNav === 'library' || activeNav === 'history') ? 'auto' : 'hidden',
-        display: (activeNav === 'explore' || activeNav === 'admin' || activeNav === 'settings' || activeNav === 'report' || activeNav === 'library' || activeNav === 'history') ? 'block' : 'flex',
+        overflow: SCROLL_NAVS.includes(activeNav) ? 'auto' : 'hidden',
+        display: SCROLL_NAVS.includes(activeNav) ? 'block' : 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--bg)',
@@ -392,7 +408,9 @@ export default function AppShell() {
         ) : activeNav === 'report' && reporter ? (
           <ReportPage fromPage={prevNav} />
         ) : activeNav === 'settings' && isLoggedIn ? (
-          <SettingsPage />
+          <SettingsPage onBuyPremium={() => openDonate('premium')} />
+        ) : activeNav === 'donate' ? (
+          <DonatePage key={`donate-${donateNonce}`} initialTab={donateTab} />
         ) : activeNav === 'settings' && !isLoggedIn ? (
           <ComingSoon page="settings" />
         ) : activeNav === 'library' ? (
@@ -437,8 +455,9 @@ export default function AppShell() {
         alignItems: 'center', padding: '0 8px',
       }}>
         {MOBILE_NAV.map(renderMobileNavItem)}
+        {!isLoggedIn && renderMobileNavItem(GUEST_MOBILE_NAV)}
         {isLoggedIn && (
-          <MobileNavMenu items={mobileMenu} active={activeNav === 'settings' || activeNav === 'admin' || activeNav === 'report'} />
+          <MobileNavMenu items={mobileMenu} active={['settings', 'admin', 'report', 'donate'].includes(activeNav)} />
         )}
       </nav>
 

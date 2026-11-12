@@ -50,7 +50,7 @@ function Toggle({ value, onChange, disabled }) {
   )
 }
 
-export default function SettingsPage() {
+export default function SettingsPage({ onBuyPremium }) {
   const { t } = useTranslation('settings')
   const { user } = useAuth()
   const { data: settings, isLoading, isError, error: loadError } = useSettings()
@@ -240,7 +240,7 @@ export default function SettingsPage() {
           <div className="settings-col-4" style={{ display: 'contents' }} />
         )}
 
-        <PremiumSection premiumUntil={settings?.premiumUntil ?? user?.premiumUntil} />
+        <PremiumSection premiumUntil={settings?.premiumUntil ?? user?.premiumUntil} onBuy={onBuyPremium} />
 
         {/* ── Notifications ── */}
         <section className="settings-card settings-col-6">
