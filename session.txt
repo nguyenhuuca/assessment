@@ -1,8 +1,8 @@
 task: SePay payments — donations + Premium
 status: in_progress
-progress: 20
-done: Plan cc0af643; PAY-1 schema+entities+repos 042610d9
-doing: PAY-2 orders API + QR; PAY-7 user premium (wave 2)
-next: wave 3 PAY-3 webhook + PAY-8 donate page
+progress: 40
+done: Plan cc0af643; PAY-1 schema 042610d9; PAY-2 orders API 0ad76991; PAY-7 premium status 2e4f8e6c
+doing: PAY-3 webhook; PAY-8 donate page (wave 3)
+next: wave 4 PAY-4 notif, PAY-5 reconcile, PAY-6 admin API
 plan: docs/plans/plan-sepay-payments.md
-updated: 2026-11-12 21:31
+updated: 2026-11-12 21:44
