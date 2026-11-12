@@ -2,6 +2,8 @@ package com.canhlabs.funnyapp.repo;
 
 import com.canhlabs.funnyapp.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +15,11 @@ import java.time.Instant;
 public interface UserRepo extends JpaRepository<User, Long> {
     User findAllByUserName(String email);
     User findAllById(Long id);
+
+    /** Row lock for entitlement changes (Premium extension) so two payments cannot overwrite each other. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from User u where u.id = :id")
+    java.util.Optional<User> findByIdForUpdate(@Param("id") Long id);
 
     @Modifying
     @Query("update User u set u.failedLoginCount = u.failedLoginCount + 1 where u.id = :id")

@@ -55,6 +55,8 @@ public class AppConstant {
                 PathObject.builder().path("/payments/orders/*").method(HttpMethod.GET.name()).build(),
                 // GitHub repo webhook, authenticated by its HMAC signature instead of a JWT (ADR-0026 D7)
                 PathObject.builder().path("/webhooks/github").method(HttpMethod.POST.name()).build(),
+                // SePay payment webhook, authenticated by its HMAC signature instead of a JWT (ADR-0037)
+                PathObject.builder().path("/webhooks/sepay").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/health").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build()
 
