@@ -736,10 +736,10 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **PAY-1** Liquibase premium_plans/payment_orders/sepay_transactions + users.premium_until; entities, enums, repos — 87861d89, cdb20cb0, 042610d9
 - [x] **PAY-2** AppProperties.Sepay, order create/get, VietQR URL, PaymentController, expiry job — blocked by PAY-1 — 0ad76991
 - [x] **PAY-3** SePay webhook: HMAC verify, dedupe, matching + amount rules, premium extension — blocked by PAY-2 — 26e5ef73
-- [~] **PAY-4** Admin notifications DONATION_RECEIVED / PREMIUM_PURCHASED / PAYMENT_UNDERPAID — blocked by PAY-3
-- [~] **PAY-5** Reconciliation job (SePay transaction API v2, since_id) — blocked by PAY-3
-- [x] **PAY-6** Admin payments API: orders, unmatched, totals, link, resolve, plans CRUD
+- [x] **PAY-4** Admin notifications DONATION_RECEIVED / PREMIUM_PURCHASED / PAYMENT_UNDERPAID — blocked by PAY-3 — c9b5f2e1
+- [ ] **PAY-5** Reconciliation job (SePay transaction API v2, since_id) — blocked by PAY-3 — DEFERRED 2026-11-12: SePay v2 tx id is a UUID, webhook id is numeric → no shared dedupe key; follow-up after real data (owner decision)
+- [x] **PAY-6** Admin payments API: orders, unmatched, totals, link, resolve, plans CRUD — b4a40137
 - [x] **PAY-7** User premium/premiumUntil in DTO + Settings section + badge — blocked by PAY-1 — a0186dce, 2e4f8e6c
 - [x] **PAY-8** FE Donate page (nav, QR, polling, thank-you, Premium tab) — blocked by PAY-2 — e1f41948
-- [ ] **PAY-9** FE admin DONATIONS tab — blocked by PAY-6
+- [~] **PAY-9** FE admin DONATIONS tab — blocked by PAY-6
 - [ ] **PAY-10** Ops: SePay dashboard + secrets, sandbox simulate, prod smoke, ADR Accepted — blocked by PAY-4, PAY-5, PAY-7, PAY-8, PAY-9

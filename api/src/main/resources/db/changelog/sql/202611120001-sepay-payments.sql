@@ -37,7 +37,8 @@ CREATE TABLE payment_orders
     paid_at         TIMESTAMPTZ,
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ  NOT NULL DEFAULT now(),
-    CHECK (type <> 'PREMIUM' OR (plan_id IS NOT NULL AND user_id IS NOT NULL AND expected_amount IS NOT NULL))
+    -- user_id is not required here: ON DELETE SET NULL must keep a deleted buyer's PREMIUM order (money record)
+    CHECK (type <> 'PREMIUM' OR (plan_id IS NOT NULL AND expected_amount IS NOT NULL))
 );
 
 CREATE INDEX idx_payment_orders_status ON payment_orders (status, created_at DESC);
