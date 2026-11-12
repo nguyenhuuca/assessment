@@ -9,6 +9,9 @@ import java.util.List;
 
 public interface PaymentOrderService {
 
+    /** True once the receiving bank account is configured, i.e. orders can be created. */
+    boolean isOrderingEnabled();
+
     List<PlanDto> listActivePlans();
 
     /** @param userId logged-in user id, or null for a guest (guests may only donate). */

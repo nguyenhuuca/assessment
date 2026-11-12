@@ -51,6 +51,7 @@ public class AppConstant {
                 PathObject.builder().path("/user/mfa/verify").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().path("/share-links").method(HttpMethod.GET.name()).build(),
                 // Public donation flow (guests allowed); creating an order is OPTIONAL_AUTH so a JWT is still read
+                PathObject.builder().path("/payments/config").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().path("/payments/plans").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().path("/payments/orders/*").method(HttpMethod.GET.name()).build(),
                 // GitHub repo webhook, authenticated by its HMAC signature instead of a JWT (ADR-0026 D7)

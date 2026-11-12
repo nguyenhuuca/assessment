@@ -66,8 +66,8 @@ class SepayWebhookServiceImplTest {
         planRepo = mock(PremiumPlanRepository.class);
         userRepo = mock(UserRepo.class);
         events = mock(ApplicationEventPublisher.class);
-        service = new SepayWebhookServiceImpl(props, orderRepo, txRepo, planRepo, userRepo,
-                JsonMappers.create(), events, Clock.fixed(NOW, ZoneOffset.UTC));
+        service = new SepayWebhookServiceImpl(props, orderRepo, txRepo, JsonMappers.create(),
+                new PaymentSettlement(orderRepo, planRepo, userRepo, events), Clock.fixed(NOW, ZoneOffset.UTC));
         when(txRepo.insertIgnore(anyLong(), any(), anyString(), anyString(), anyString(), anyLong(), any(), any(),
                 any(), any(), any(), any())).thenReturn(1);
         when(orderRepo.save(any(PaymentOrder.class))).thenAnswer(i -> i.getArgument(0));
@@ -460,8 +460,8 @@ class SepayWebhookServiceImplTest {
 
     @Test
     void publicConstructor_usesSystemClock() {
-        SepayWebhookServiceImpl s = new SepayWebhookServiceImpl(props, orderRepo, txRepo, planRepo, userRepo,
-                JsonMappers.create(), events);
+        SepayWebhookServiceImpl s = new SepayWebhookServiceImpl(props, orderRepo, txRepo, JsonMappers.create(),
+                new PaymentSettlement(orderRepo, planRepo, userRepo, events));
         assertThat(s.isConfigured()).isTrue();
     }
 }

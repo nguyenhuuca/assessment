@@ -101,6 +101,15 @@ class PaymentControllerTest {
     }
 
     @Test
+    void config_isPublicAndReportsEnabled() throws Exception {
+        when(paymentOrderService.isOrderingEnabled()).thenReturn(true);
+
+        mockMvc.perform(get(BASE + "/config").servletPath(BASE + "/config"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.enabled").value(true));
+    }
+
+    @Test
     void plans_isPublic() throws Exception {
         when(paymentOrderService.listActivePlans()).thenReturn(List.of(
                 PlanDto.builder().id(1L).code("PREMIUM_1M").name("1m").durationDays(30).priceVnd(99000).build()));

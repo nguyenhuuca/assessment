@@ -46,6 +46,11 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     }
 
     @Override
+    public boolean isOrderingEnabled() {
+        return appProps.getSepay().isOrderingConfigured();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<PlanDto> listActivePlans() {
         return planRepo.findByActiveTrueOrderBySortOrderAscIdAsc().stream()

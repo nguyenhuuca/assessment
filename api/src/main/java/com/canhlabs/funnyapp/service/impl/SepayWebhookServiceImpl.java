@@ -3,21 +3,14 @@ package com.canhlabs.funnyapp.service.impl;
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.payment.SepayTxPayload;
 import com.canhlabs.funnyapp.entity.PaymentOrder;
-import com.canhlabs.funnyapp.entity.PremiumPlan;
-import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.PaymentOrderStatus;
-import com.canhlabs.funnyapp.enums.PaymentType;
 import com.canhlabs.funnyapp.enums.TxMatchStatus;
 import com.canhlabs.funnyapp.enums.TxSource;
-import com.canhlabs.funnyapp.event.PaymentEvent;
 import com.canhlabs.funnyapp.repo.PaymentOrderRepository;
-import com.canhlabs.funnyapp.repo.PremiumPlanRepository;
 import com.canhlabs.funnyapp.repo.SepayTransactionRepository;
-import com.canhlabs.funnyapp.repo.UserRepo;
 import com.canhlabs.funnyapp.service.SepayWebhookService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.JacksonException;
@@ -30,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -39,7 +31,6 @@ import java.time.format.DateTimeParseException;
 import java.util.HexFormat;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,35 +46,29 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
     static final int MAX_FIELD = 64;
     private static final ZoneId BANK_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
     private static final DateTimeFormatter BANK_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final Set<PaymentOrderStatus> SETTLED = Set.of(PaymentOrderStatus.PAID, PaymentOrderStatus.RESOLVED);
 
     private final AppProperties props;
     private final PaymentOrderRepository orderRepo;
     private final SepayTransactionRepository txRepo;
-    private final PremiumPlanRepository planRepo;
-    private final UserRepo userRepo;
     private final JsonMapper mapper;
-    private final ApplicationEventPublisher eventPublisher;
+    private final PaymentSettlement settlement;
     private final Clock clock;
 
     @Autowired
     public SepayWebhookServiceImpl(AppProperties props, PaymentOrderRepository orderRepo,
-                                   SepayTransactionRepository txRepo, PremiumPlanRepository planRepo,
-                                   UserRepo userRepo, JsonMapper mapper, ApplicationEventPublisher eventPublisher) {
-        this(props, orderRepo, txRepo, planRepo, userRepo, mapper, eventPublisher, Clock.systemUTC());
+                                   SepayTransactionRepository txRepo,
+                                   JsonMapper mapper, PaymentSettlement settlement) {
+        this(props, orderRepo, txRepo, mapper, settlement, Clock.systemUTC());
     }
 
     SepayWebhookServiceImpl(AppProperties props, PaymentOrderRepository orderRepo,
-                            SepayTransactionRepository txRepo, PremiumPlanRepository planRepo,
-                            UserRepo userRepo, JsonMapper mapper, ApplicationEventPublisher eventPublisher,
-                            Clock clock) {
+                            SepayTransactionRepository txRepo,
+                            JsonMapper mapper, PaymentSettlement settlement, Clock clock) {
         this.props = props;
         this.orderRepo = orderRepo;
         this.txRepo = txRepo;
-        this.planRepo = planRepo;
-        this.userRepo = userRepo;
         this.mapper = mapper;
-        this.eventPublisher = eventPublisher;
+        this.settlement = settlement;
         this.clock = clock;
     }
 
@@ -172,43 +157,7 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
             log.info("SePay tx {} already processed (source={})", tx.id(), source);
             return;
         }
-        apply(order, tx, Instant.now(clock));
-    }
-
-    private void apply(PaymentOrder order, SepayTxPayload tx, Instant now) {
-        PaymentOrderStatus before = order.getStatus();
-        order.setPaidAmount(order.getPaidAmount() + tx.amount());
-        if (!SETTLED.contains(before)) {
-            Long expected = order.getExpectedAmount();
-            if (expected == null || order.getPaidAmount() >= expected) {
-                order.setStatus(PaymentOrderStatus.PAID);
-                order.setPaidAt(now);
-                if (order.getType() == PaymentType.PREMIUM) {
-                    extendPremium(order, now);
-                }
-            } else {
-                order.setStatus(PaymentOrderStatus.UNDERPAID);
-            }
-        }
-        orderRepo.save(order);
-        PaymentOrderStatus after = order.getStatus();
-        log.info("SePay tx {} applied to order {}: {} -> {}", tx.id(), order.getId(), before, after);
-        if (after != before && (after == PaymentOrderStatus.PAID || after == PaymentOrderStatus.UNDERPAID)) {
-            eventPublisher.publishEvent(new PaymentEvent(order.getId(), order.getType(), after, tx.amount()));
-        }
-    }
-
-    private void extendPremium(PaymentOrder order, Instant now) {
-        Optional<PremiumPlan> plan = order.getPlanId() == null ? Optional.empty() : planRepo.findById(order.getPlanId());
-        Optional<User> user = order.getUserId() == null ? Optional.empty() : userRepo.findByIdForUpdate(order.getUserId());
-        if (plan.isEmpty() || user.isEmpty()) {
-            log.warn("Premium order {} paid but plan or user is missing; entitlement not granted", order.getId());
-            return;
-        }
-        Instant current = user.get().getPremiumUntil();
-        Instant base = current != null && current.isAfter(now) ? current : now;
-        user.get().setPremiumUntil(base.plus(Duration.ofDays(plan.get().getDurationDays())));
-        userRepo.save(user.get());
+        settlement.apply(order, tx.id(), tx.amount(), Instant.now(clock));
     }
 
     private int store(SepayTxPayload tx, TxSource source, Long orderId, TxMatchStatus status, String code) {

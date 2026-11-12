@@ -65,6 +65,13 @@ class PaymentOrderServiceImplTest {
     }
 
     @Test
+    void isOrderingEnabled_followsBankConfig() {
+        assertThat(service.isOrderingEnabled()).isTrue();
+        props.getSepay().setBankAccount("");
+        assertThat(service.isOrderingEnabled()).isFalse();
+    }
+
+    @Test
     void donation_guest_createsOrderWithFormattedCodeAndQr() {
         stubSave();
         CreateOrderRequest req = donation(50000L);

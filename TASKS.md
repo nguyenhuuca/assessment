@@ -738,7 +738,7 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **PAY-3** SePay webhook: HMAC verify, dedupe, matching + amount rules, premium extension — blocked by PAY-2 — 26e5ef73
 - [~] **PAY-4** Admin notifications DONATION_RECEIVED / PREMIUM_PURCHASED / PAYMENT_UNDERPAID — blocked by PAY-3
 - [~] **PAY-5** Reconciliation job (SePay transaction API v2, since_id) — blocked by PAY-3
-- [~] **PAY-6** Admin payments API: orders, unmatched, totals, link, resolve, plans CRUD — blocked by PAY-3
+- [x] **PAY-6** Admin payments API: orders, unmatched, totals, link, resolve, plans CRUD
 - [x] **PAY-7** User premium/premiumUntil in DTO + Settings section + badge — blocked by PAY-1 — a0186dce, 2e4f8e6c
 - [x] **PAY-8** FE Donate page (nav, QR, polling, thank-you, Premium tab) — blocked by PAY-2 — e1f41948
 - [ ] **PAY-9** FE admin DONATIONS tab — blocked by PAY-6

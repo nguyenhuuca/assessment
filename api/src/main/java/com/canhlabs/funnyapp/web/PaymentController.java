@@ -15,6 +15,7 @@ import com.canhlabs.funnyapp.utils.AppConstant;
 import com.canhlabs.funnyapp.utils.AppUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
+import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,15 @@ public class PaymentController {
 
     public PaymentController(PaymentOrderService paymentOrderService) {
         this.paymentOrderService = paymentOrderService;
+    }
+
+    @Operation(summary = "Payment config", description = "Public. {enabled} is false while SePay is not configured, so the UI can hide donate.")
+    @GetMapping("/config")
+    public ResponseEntity<ResultObjectInfo<Map<String, Boolean>>> config() {
+        return ResponseEntity.ok(ResultObjectInfo.<Map<String, Boolean>>builder()
+                .status(ResultStatus.SUCCESS)
+                .data(Map.of("enabled", paymentOrderService.isOrderingEnabled()))
+                .build());
     }
 
     @Operation(summary = "List active Premium plans", description = "Public.")
