@@ -1,9 +1,8 @@
 task: Admin video size column (Video Vault)
-status: blocked
-progress: 85
-done: VS-1..VS-4 file_size + backfill + DTO 00a7317b aae06213; VS-5 formatBytes 715b4fe6; VS-6 Size column 072bac98
+status: done
+progress: 100
+done: VS-1..VS-4 file_size + backfill + DTO 00a7317b aae06213; VS-5 formatBytes 715b4fe6; VS-6 Size column 072bac98; CI rerun green, prod v131 smoke OK
 doing: -
-next: push (user approval), watch CI, prod smoke Video Vault Size column
+next: follow-up? sticky Actions col hides Size until horizontal scroll at ~1536px
 plan: docs/plans/plan-admin-video-size.md
-blocker: push needs user go-ahead
-updated: 2026-11-11 20:57
+updated: 2026-11-12 20:45
