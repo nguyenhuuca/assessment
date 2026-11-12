@@ -2576,6 +2576,15 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-cyan); 
   background: linear-gradient(rgba(0, 238, 252, 0.06), rgba(0, 238, 252, 0.06)), var(--bg-surface);
 }
 
+/* Video Vault has 10 columns: on desktop, tighter padding, two-line headers and a narrower asset cell
+   keep every column (Metrics, Size) clear of the sticky Actions column at ~1536px without sideways scroll */
+@media (min-width: 769px) {
+  .admin-video-table th, .admin-video-table .admin-table-row td { padding-left: 12px; padding-right: 12px; }
+  .admin-video-table th { white-space: normal; }
+  .admin-video-table td.admin-cell-muted, .admin-video-table td:nth-child(4) .admin-badge { white-space: nowrap; }
+  .admin-video-table .admin-asset-cell { min-width: 160px; }
+}
+
 /* ── Notifications ── */
 .notif-bell-wrap { position: relative; display: flex; }
 .notif-bell { position: relative; }
