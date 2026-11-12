@@ -17,8 +17,10 @@ public interface SepayTransactionRepository extends JpaRepository<SepayTransacti
     /**
      * Idempotent insert keyed on sepay_id. Returns 1 when stored, 0 when SePay already reported it
      * (webhook retry or reconcile overlap). Enum arguments are passed as their names.
+     * No clearAutomatically: the caller holds the locked PaymentOrder in the same persistence
+     * context and updates it after this insert; clearing would detach it and drop that update.
      */
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Modifying(flushAutomatically = true)
     @Query(value = """
             INSERT INTO sepay_transactions
                 (sepay_id, order_id, match_status, source, transfer_type, amount, code, content,

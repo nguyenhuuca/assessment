@@ -43,8 +43,8 @@ public interface PaymentOrderRepository extends JpaRepository<PaymentOrder, Long
     @Query("select coalesce(sum(o.paidAmount), 0) from PaymentOrder o where o.type = :type")
     long sumPaid(@Param("type") PaymentType type);
 
-    /** Money received for a type on orders created at or after {@code from}. */
-    @Query("select coalesce(sum(o.paidAmount), 0) from PaymentOrder o where o.type = :type and o.createdAt >= :from")
+    /** Money received for a type on orders paid at or after {@code from} (e.g. last 30 days). */
+    @Query("select coalesce(sum(o.paidAmount), 0) from PaymentOrder o where o.type = :type and o.paidAt >= :from")
     long sumPaidSince(@Param("type") PaymentType type, @Param("from") Instant from);
 
     /** Flip overdue PENDING orders to EXPIRED. Returns the number of rows changed. */
