@@ -18,5 +18,9 @@
   "suggestionLive": "The video you suggested is now live: {{title}}",
   "reportClosed": "Your report was closed: {{title}}",
   "reportClosedReason": "Your report was closed: {{title}} ({{reason}})",
-  "suggestionUntitled": "video"
+  "suggestionUntitled": "video",
+  "donationReceived": "New donation {{amount}} from {{name}} ({{code}})",
+  "premiumPurchased": "Premium purchased: {{amount}} from {{name}} ({{code}})",
+  "paymentUnderpaid": "Underpaid order {{code}}: received {{paid}}",
+  "anonymous": "Anonymous"
 }

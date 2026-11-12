@@ -21,6 +21,10 @@ public interface UserRepo extends JpaRepository<User, Long> {
     @Query("select u from User u where u.id = :id")
     java.util.Optional<User> findByIdForUpdate(@Param("id") Long id);
 
+    /** Admin accounts that can receive admin notifications (not deleted). */
+    @Query("select u from User u where u.role in (com.canhlabs.funnyapp.enums.UserRole.ADMIN, com.canhlabs.funnyapp.enums.UserRole.SUPER_ADMIN) and u.deletedAt is null")
+    java.util.List<User> findActiveAdmins();
+
     @Modifying
     @Query("update User u set u.failedLoginCount = u.failedLoginCount + 1 where u.id = :id")
     int incrementFailedLoginCount(@Param("id") Long id);

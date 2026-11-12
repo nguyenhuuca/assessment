@@ -41,6 +41,33 @@ describe('REPORT_CLOSED', () => {
   })
 })
 
+describe('payment notifications', () => {
+  const pay = (over) => n({ type: 'DONATION_RECEIVED', amount: '50000', paidAmount: '50000', orderCode: 'FM1234', donorName: 'Lan', ...over })
+  const norm = (v) => v.replace(/\s/g, ' ')
+
+  it('renders the three types in en', async () => {
+    await i18n.changeLanguage('en')
+    expect(norm(notificationTitle(pay({})))).toBe('New donation 50.000 ₫ from Lan (FM1234)')
+    expect(norm(notificationTitle(pay({ type: 'PREMIUM_PURCHASED', amount: '99000', donorName: null }))))
+      .toBe('Premium purchased: 99.000 ₫ from Anonymous (FM1234)')
+    expect(norm(notificationTitle(pay({ type: 'PAYMENT_UNDERPAID', paidAmount: '20000' }))))
+      .toBe('Underpaid order FM1234: received 20.000 ₫')
+  })
+
+  it('renders in vi with the anonymous fallback', async () => {
+    await i18n.changeLanguage('vi')
+    expect(notificationTitle(pay({ donorName: null }))).toContain('Ẩn danh')
+    expect(notificationTitle(pay({ type: 'PAYMENT_UNDERPAID' }))).toContain('chuyển thiếu')
+  })
+
+  it('opens the admin view for admins only', () => {
+    for (const type of ['DONATION_RECEIVED', 'PREMIUM_PURCHASED', 'PAYMENT_UNDERPAID']) {
+      expect(notificationNav({ type }, true, true)).toBe('admin')
+      expect(notificationNav({ type }, true, false)).toBeNull()
+    }
+  })
+})
+
 describe('notificationNav', () => {
   it('opens the report page for admins only', () => {
     expect(notificationNav({ type: 'REPORT_CLOSED' }, true)).toBe('report')

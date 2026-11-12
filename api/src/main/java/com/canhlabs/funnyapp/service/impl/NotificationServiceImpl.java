@@ -86,6 +86,10 @@ public class NotificationServiceImpl implements NotificationService {
                 .actorCount(n.getActorCount())
                 .snippet(asString(payload.get("snippet")))
                 .reason(asString(payload.get("reason")))
+                .orderCode(asString(payload.get("orderCode")))
+                .amount(asString(payload.get("amount")))
+                .paidAmount(asString(payload.get("paidAmount")))
+                .donorName(asString(payload.get("donorName")))
                 .read(n.getReadAt() != null)
                 .updatedAt(n.getUpdatedAt())
                 .build();

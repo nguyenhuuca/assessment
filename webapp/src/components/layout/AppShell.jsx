@@ -120,7 +120,7 @@ export default function AppShell() {
 
   // Notification click: jump to the video, open its comments and highlight the comment
   function openNotification(n) {
-    const nav = notificationNav(n, reporter)
+    const nav = notificationNav(n, reporter, user?.isAdmin)
     if (nav) {
       goNav(nav)
       return

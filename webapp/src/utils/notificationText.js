@@ -1,5 +1,6 @@
 import i18n from '../i18n/index.js'
 import { reasonLabel } from './moderationReasons.js'
+import { formatVnd } from './formatVnd.js'
 
 /** Plain-text title for a notification (rendered as React text, never HTML). */
 export function notificationTitle(n) {
@@ -17,6 +18,16 @@ export function notificationTitle(n) {
     const reason = i18n.t(`report:stateReason.${n.reason}`, { defaultValue: n.reason })
     return i18n.t('notifications:reportClosedReason', { title: n.snippet ?? '', reason })
   }
+  if (n.type === 'DONATION_RECEIVED' || n.type === 'PREMIUM_PURCHASED' || n.type === 'PAYMENT_UNDERPAID') {
+    const params = {
+      amount: formatVnd(n.amount),
+      paid: formatVnd(n.paidAmount),
+      name: n.donorName || i18n.t('notifications:anonymous'),
+      code: n.orderCode ?? '',
+    }
+    const key = { DONATION_RECEIVED: 'donationReceived', PREMIUM_PURCHASED: 'premiumPurchased', PAYMENT_UNDERPAID: 'paymentUnderpaid' }[n.type]
+    return i18n.t(`notifications:${key}`, params)
+  }
   if (n.type === 'COMMENT_REMOVED') {
     return i18n.t('notifications:removed', { reason: reasonLabel(n.reason) })
   }
@@ -27,10 +38,11 @@ export function notificationTitle(n) {
     : i18n.t('notifications:replyOne', { actor })
 }
 
-/** Nav key a notification opens, or null when it opens a video (or nothing). The report page needs CONTRIBUTOR or above. */
-export function notificationNav(n, canReport) {
+/** Nav key a notification opens, or null when it opens a video (or nothing). The report page needs CONTRIBUTOR or above; payment types open the admin view. */
+export function notificationNav(n, canReport, isAdmin) {
   if (n?.type === 'SUGGESTION_APPROVED' || n?.type === 'SUGGESTION_REJECTED') return 'history'
   if (n?.type === 'REPORT_CLOSED') return canReport ? 'report' : null
+  if (n?.type === 'DONATION_RECEIVED' || n?.type === 'PREMIUM_PURCHASED' || n?.type === 'PAYMENT_UNDERPAID') return isAdmin ? 'admin' : null
   return null
 }
 

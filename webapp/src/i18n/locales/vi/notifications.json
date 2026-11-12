@@ -17,5 +17,9 @@
   "suggestionLive": "Video bạn đề xuất đã lên app: {{title}}",
   "reportClosed": "Report của bạn đã được đóng: {{title}}",
   "reportClosedReason": "Report của bạn đã được đóng: {{title}} ({{reason}})",
-  "suggestionUntitled": "video"
+  "suggestionUntitled": "video",
+  "donationReceived": "Donation mới {{amount}} từ {{name}} ({{code}})",
+  "premiumPurchased": "Đã mua Premium: {{amount}} từ {{name}} ({{code}})",
+  "paymentUnderpaid": "Đơn {{code}} chuyển thiếu: đã nhận {{paid}}",
+  "anonymous": "Ẩn danh"
 }

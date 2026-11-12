@@ -136,8 +136,9 @@ class NotificationServiceImplTest {
     }
 
     @Test
-    void adminTypes_areReportClosedOnly_andDerivedQueriesParse() {
-        assertThat(NotificationType.ADMIN_TYPES).containsExactly(NotificationType.REPORT_CLOSED);
+    void adminTypes_areReportAndPaymentTypes_andDerivedQueriesParse() {
+        assertThat(NotificationType.ADMIN_TYPES).containsExactlyInAnyOrder(NotificationType.REPORT_CLOSED,
+                NotificationType.DONATION_RECEIVED, NotificationType.PREMIUM_PURCHASED, NotificationType.PAYMENT_UNDERPAID);
         new PartTree("findByUserIdAndTypeInOrderByUpdatedAtDesc", Notification.class);
         new PartTree("findByUserIdAndTypeNotInOrderByUpdatedAtDesc", Notification.class);
     }

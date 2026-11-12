@@ -9,8 +9,11 @@ public enum NotificationType {
     SUGGESTION_APPROVED,
     SUGGESTION_REJECTED,
     SUGGESTION_LIVE,
-    REPORT_CLOSED;
+    REPORT_CLOSED,
+    DONATION_RECEIVED,
+    PREMIUM_PURCHASED,
+    PAYMENT_UNDERPAID;
 
     /** Types produced by admin features; the notification dropdown lists them under its Admin tab. */
-    public static final Set<NotificationType> ADMIN_TYPES = EnumSet.of(REPORT_CLOSED);
+    public static final Set<NotificationType> ADMIN_TYPES = EnumSet.of(REPORT_CLOSED, DONATION_RECEIVED, PREMIUM_PURCHASED, PAYMENT_UNDERPAID);
 }

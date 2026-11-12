@@ -24,6 +24,11 @@ public class NotificationDto {
     private int actorCount;
     private String snippet;
     private String reason;
+    /** Payment notifications (admin): order code, triggering transfer, order total paid so far, donor name. */
+    private String orderCode;
+    private String amount;
+    private String paidAmount;
+    private String donorName;
     private boolean read;
     private Instant updatedAt;
 }

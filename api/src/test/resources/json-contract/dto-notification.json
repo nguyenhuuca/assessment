@@ -10,6 +10,10 @@
     "actorCount" : 2,
     "snippet" : "haha",
     "reason" : null,
+    "orderCode" : null,
+    "amount" : null,
+    "paidAmount" : null,
+    "donorName" : null,
     "read" : false,
     "updatedAt" : "2026-01-02T03:04:05Z"
   }
