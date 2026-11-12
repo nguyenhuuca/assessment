@@ -1017,6 +1017,8 @@
       
         
       
+        
+      
     
     
     
@@ -1652,6 +1654,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0037-sepay-bank-transfer-payments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0037 - SePay Bank-Transfer Payments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1667,6 +1697,8 @@
   
     
     
+      
+        
       
         
       
@@ -2146,6 +2178,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../prd/PRD-sepay-payments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SePay Payments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../prd/PRD-spring-boot-4-upgrade/" class="md-nav__link">
         
   
@@ -2595,6 +2655,8 @@
       
         
       
+        
+      
     
     
     
@@ -2750,6 +2812,34 @@
     
   
     Admin Bulk Actions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sequence/sequence-sepay-payments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SePay Payments
   
 
     
@@ -3142,6 +3232,8 @@
   
     
     
+      
+        
       
         
       
@@ -3967,6 +4059,34 @@
     
   
     Admin Video Size
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-sepay-payments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SePay Payments
   
 
     
@@ -9270,6 +9390,17 @@
 <td>Multi-select + bulk bar on Video Vault/Flagged (status, visibility, delete, add to collection), Accounts (role, permission bit, delete), Suggestions (approve, reject), Imports (cancel, retry). One <code>POST …/bulk</code> per resource; per-row transactions through the existing single-row services (ADR-0036). Comments keep their bulk; Drive Sync already bulk; Scheduled Jobs out of scope. Plan: BK-1..BK-12. BK-1..BK-11 built by /swarm-execute in 3 waves (2026-11-01), each wave reviewed (fixes 7664769f, 2f2e38bf, e7b228a7, d489d42b); BE <code>mvn verify</code> + 750 FE tests green; deployed prod-119, owner prod smoke per tab passed 2026-11-02 (BK-12)</td>
 </tr>
 <tr>
+<td><strong>SePay Payments</strong></td>
+<td><a href="../prd/PRD-sepay-payments/">PRD 📝</a></td>
+<td><a href="../adr/0037-sepay-bank-transfer-payments/">0037 📝</a></td>
+<td>—</td>
+<td><a href="../sequence/sequence-sepay-payments/">Seq 📝</a></td>
+<td><a href="../plans/plan-sepay-payments/">Plan 📝</a></td>
+<td>—</td>
+<td>⏳</td>
+<td>Donations (guest + user) and Premium plans paid by VietQR; SePay bank-transfer webhook (HMAC) + reconciliation job; admin Donations tab + notifications; entitlement <code>users.premium_until</code> only, no gated features yet. Plan: PAY-1..PAY-10</td>
+</tr>
+<tr>
 <td><strong>Admin Video Size</strong></td>
 <td>—</td>
 <td>—</td>
@@ -9277,8 +9408,8 @@
 <td>—</td>
 <td><a href="../plans/plan-admin-video-size/">Plan ✅</a></td>
 <td>—</td>
-<td>🔄</td>
-<td>File size column (<code>video_sources.file_size</code>, ingest + one-time backfill) shown in the admin Video Vault; VS-1..VS-6</td>
+<td>✅</td>
+<td>File size column (<code>video_sources.file_size</code>, ingest + one-time backfill) shown in the admin Video Vault, Total Size stat card; VS-1..VS-9; prod-132 smoke OK 2026-11-12</td>
 </tr>
 <tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
@@ -9324,6 +9455,7 @@
 <h3 id="in-progress-5">🔄 In Progress (5)<a class="headerlink" href="#in-progress-5" title="Permanent link">&para;</a></h3>
 <ul>
 <li><a href="../plans/plan-admin-video-size/">Admin Video Size</a></li>
+<li><a href="../plans/plan-sepay-payments/">SePay Payments</a></li>
 <li><a href="../plans/plan-collection-only-videos/">Collection-Only Videos</a></li>
 <li><a href="../plans/plan-autopilot/">/autopilot skill</a></li>
 <li><a href="../plans/plan-admin-dashboard/">Admin Dashboard</a></li>
