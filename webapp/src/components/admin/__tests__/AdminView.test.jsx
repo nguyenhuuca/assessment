@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import AdminView from '../AdminView.jsx'
 import i18n from '../../../i18n/index.js'
 
-vi.mock('../../../hooks/useAdmin.js', () => ({ useAdminStats: () => ({ data: { data: {} } }) }))
+const mockStats = vi.hoisted(() => ({ value: {} }))
+vi.mock('../../../hooks/useAdmin.js', () => ({ useAdminStats: () => ({ data: { data: mockStats.value } }) }))
 const mockCount = vi.hoisted(() => ({ value: 0 }))
 vi.mock('../../../hooks/useAdminSuggestions.js', () => ({
   useSuggestionPendingCount: () => ({ data: { data: mockCount.value } }),
@@ -81,5 +82,20 @@ describe('AdminView in English', () => {
     expect(screen.getByRole('button', { name: 'COMMENTS' })).toBeTruthy()
     expect(screen.getByLabelText('Refresh')).toBeTruthy()
     expect(screen.getByLabelText('Admin section')).toBeTruthy()
+  })
+})
+
+describe('AdminView stat cards', () => {
+  it('shows the total size of all videos, human-readable', () => {
+    mockStats.value = { totalFileSize: 5 * 1024 ** 3 }
+    renderView()
+    expect(screen.getByText('TỔNG DUNG LƯỢNG')).toBeInTheDocument()
+    expect(screen.getByText('5.0 GB')).toBeInTheDocument()
+    mockStats.value = {}
+  })
+
+  it('shows a dash while the total size is unknown', () => {
+    renderView()
+    expect(screen.getByText('TỔNG DUNG LƯỢNG').nextSibling).toHaveTextContent('—')
   })
 })

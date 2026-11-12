@@ -2,6 +2,7 @@
   "pageTitle": "QUẢN LÝ NỘI DUNG",
   "subtitle": "Đang quản lý tổng cộng {{total}} video",
   "statTotalVideos": "TỔNG VIDEO",
+  "statTotalSize": "TỔNG DUNG LƯỢNG",
   "statPendingReview": "CHỜ DUYỆT",
   "statSecurityStatus": "TRẠNG THÁI AN TOÀN",
   "statFlagged": "BỊ BÁO CÁO",

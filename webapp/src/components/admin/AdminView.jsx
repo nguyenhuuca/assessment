@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useIsFetching, useQueryClient } from '@tanstack/react-query'
 import { useAdminStats } from '../../hooks/useAdmin.js'
 import { useTranslation } from 'react-i18next'
+import { formatBytes } from '../../utils/formatBytes.js'
 import AdminVideoTable from './AdminVideoTable.jsx'
 import AdminAccountTable from './AdminAccountTable.jsx'
 import AdminCommentTable from './AdminCommentTable.jsx'
@@ -53,6 +54,10 @@ export default function AdminView({ initialTab }) {
         <div className="admin-stat-card">
           <span className="admin-stat-label">{t('statTotalVideos')}</span>
           <span className="admin-stat-value">{stats.totalVideos?.toLocaleString() ?? '—'}</span>
+        </div>
+        <div className="admin-stat-card">
+          <span className="admin-stat-label">{t('statTotalSize')}</span>
+          <span className="admin-stat-value">{formatBytes(stats.totalFileSize)}</span>
         </div>
         <div className="admin-stat-card">
           <span className="admin-stat-label">{t('statPendingReview')}</span>

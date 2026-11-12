@@ -2,6 +2,7 @@
   "pageTitle": "CONTENT_MANAGER",
   "subtitle": "Reviewing {{total}} total cinematic assets",
   "statTotalVideos": "TOTAL_VIDEOS",
+  "statTotalSize": "TOTAL_SIZE",
   "statPendingReview": "PENDING_REVIEW",
   "statSecurityStatus": "SECURITY_STATUS",
   "statFlagged": "FLAGGED",
