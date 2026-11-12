@@ -59,7 +59,10 @@ class ScheduledJobMigrationTest {
     void seed_everyNameExistsInRegistry() throws Exception {
         JobRegistry registry = new JobRegistry(org.mockito.Mockito.mock(AppScheduler.class));
 
-        assertThat(registry.names()).containsExactlyInAnyOrderElementsOf(seed().keySet());
+        // expire-payment-orders is seeded by its own later migration (202611120002)
+        java.util.Set<String> expected = new java.util.HashSet<>(seed().keySet());
+        expected.add(JobRegistry.EXPIRE_PAYMENT_ORDERS);
+        assertThat(registry.names()).containsExactlyInAnyOrderElementsOf(expected);
         seed().keySet().forEach(name -> assertThat(registry.get(name)).as(name).isNotNull());
         assertThat(registry.get("nope")).isNull();
     }

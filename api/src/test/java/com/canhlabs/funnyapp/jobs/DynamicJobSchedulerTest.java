@@ -232,7 +232,7 @@ class DynamicJobSchedulerTest {
     void run_realAppSchedulerJobThatFails_isRecordedAsFailed() {
         NotificationDigestService digestService = mock(NotificationDigestService.class);
         when(digestService.sendDigests()).thenThrow(new IllegalStateException("smtp down"));
-        AppScheduler appScheduler = new AppScheduler(null, null, null, null, null, null, null, null, digestService);
+        AppScheduler appScheduler = new AppScheduler(null, null, null, null, null, null, null, null, digestService, null);
         when(registry.get("notification-digest")).thenReturn(appScheduler::notificationDigest);
         scheduler.reschedule(job("notification-digest", true));
 

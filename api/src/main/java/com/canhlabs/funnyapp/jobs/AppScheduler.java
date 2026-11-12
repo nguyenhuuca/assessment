@@ -6,6 +6,7 @@ import com.canhlabs.funnyapp.cache.CacheStat;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.FfmpegService;
+import com.canhlabs.funnyapp.service.PaymentOrderService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
@@ -41,6 +42,7 @@ public class AppScheduler implements ApplicationRunner {
     private final VideoSourceRepository videoSourceRepository;
     private final AppProperties appProps;
     private final NotificationDigestService notificationDigestService;
+    private final PaymentOrderService paymentOrderService;
 
     @Value("${app.jobs.regenerate-thumbnails:false}")
     private boolean regenerateThumbnailsEnabled;
@@ -49,8 +51,10 @@ public class AppScheduler implements ApplicationRunner {
                         StatsCache statsCache, VideoAccessService videoAccessService,
                         VideoStorageService videoStorageService, FfmpegService ffmpegService,
                         VideoSourceRepository videoSourceRepository, AppProperties appProps,
-                        NotificationDigestService notificationDigestService
+                        NotificationDigestService notificationDigestService,
+                        PaymentOrderService paymentOrderService
     ) {
+        this.paymentOrderService = paymentOrderService;
         this.streamVideoService = streamVideoService;
         this.statsCache = statsCache;
         this.videoAccessService = videoAccessService;
@@ -107,6 +111,11 @@ public class AppScheduler implements ApplicationRunner {
     public void notificationRetention() {
         int deleted = notificationDigestService.purgeOldRead(Instant.now());
         log.info("Notification retention deleted {} read notification(s)", deleted);
+    }
+
+    public void expirePaymentOrders() {
+        int expired = paymentOrderService.expireStaleOrders();
+        log.info("Payment order expiry flipped {} order(s)", expired);
     }
 
     public void cleanUpOldVideos() {

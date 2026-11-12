@@ -53,8 +53,19 @@ class AppSchedulerTest {
     @Mock YouTubeVideoService youTubeVideoService;
     @Mock com.canhlabs.funnyapp.service.notification.NotificationDigestService notificationDigestService;
 
+    @Mock com.canhlabs.funnyapp.service.PaymentOrderService paymentOrderService;
+
     @InjectMocks
     AppScheduler scheduler;
+
+    @Test
+    void expirePaymentOrders_delegatesToService() {
+        when(paymentOrderService.expireStaleOrders()).thenReturn(3);
+
+        scheduler.expirePaymentOrders();
+
+        verify(paymentOrderService).expireStaleOrders();
+    }
 
     @BeforeEach
     void setUp() {

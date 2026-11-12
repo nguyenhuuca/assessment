@@ -48,6 +48,7 @@ public class AppProperties {
     private VideoImport videoImport = new VideoImport();
     private GoogleOauth googleOauth = new GoogleOauth();
     private Github github = new Github();
+    private Sepay sepay = new Sepay();
     private VideoSuggestion videoSuggestion = new VideoSuggestion();
     private WatchHistory watchHistory = new WatchHistory();
     private Hls hls = new Hls();
@@ -120,6 +121,33 @@ public class AppProperties {
 
         private static boolean notBlank(String s) {
             return s != null && !s.isBlank();
+        }
+    }
+
+    /** SePay bank-transfer payments (ADR-0037): {@code app.sepay.*}. Secrets default empty = feature off. */
+    @Getter
+    @Setter
+    public static class Sepay {
+        private String webhookSecret = "";
+        private String apiToken = "";
+        private String bankAccount = "";
+        private String bankCode = "";
+        private String accountName = "";
+        private String codePrefix = "FM";
+        private String qrBaseUrl = "https://qr.sepay.vn/img";
+        private int orderTtlHours = 24;
+        private long minDonation = 10000;
+        /** Comma-separated webhook source IPs; empty disables the allowlist. */
+        private String allowedIps = "";
+        private boolean reconcileEnabled = false;
+
+        /** Orders can only be created once the receiving bank account is known. */
+        public boolean isOrderingConfigured() {
+            return bankAccount != null && !bankAccount.isBlank() && bankCode != null && !bankCode.isBlank();
+        }
+
+        public boolean isWebhookConfigured() {
+            return webhookSecret != null && !webhookSecret.isBlank();
         }
     }
 

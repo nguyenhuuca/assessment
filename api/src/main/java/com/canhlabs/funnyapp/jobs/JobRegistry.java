@@ -14,6 +14,7 @@ public class JobRegistry {
     public static final String NOTIFICATION_DIGEST = "notification-digest";
     public static final String NOTIFICATION_RETENTION = "notification-retention";
     public static final String CLEANUP_OLD_VIDEOS = "cleanup-old-videos";
+    public static final String EXPIRE_PAYMENT_ORDERS = "expire-payment-orders";
 
     private final Map<String, Runnable> jobs;
 
@@ -24,7 +25,8 @@ public class JobRegistry {
                 SYNC_DRIVE_VIDEOS, scheduler::syncDriveVideos,
                 NOTIFICATION_DIGEST, scheduler::notificationDigest,
                 NOTIFICATION_RETENTION, scheduler::notificationRetention,
-                CLEANUP_OLD_VIDEOS, scheduler::cleanUpOldVideos);
+                CLEANUP_OLD_VIDEOS, scheduler::cleanUpOldVideos,
+                EXPIRE_PAYMENT_ORDERS, scheduler::expirePaymentOrders);
     }
 
     /** Null when no code is registered under this name. */

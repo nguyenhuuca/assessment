@@ -158,6 +158,18 @@ app:
     owner: ${GITHUB_REPORT_OWNER:nguyenhuuca}
     repo: ${GITHUB_REPORT_REPO:assessment}
     webhook-secret: ${GITHUB_WEBHOOK_SECRET:}
+  sepay:
+    webhook-secret: ${SEPAY_WEBHOOK_SECRET:}
+    api-token: ${SEPAY_API_TOKEN:}
+    bank-account: ${SEPAY_BANK_ACCOUNT:}
+    bank-code: ${SEPAY_BANK_CODE:}
+    account-name: ${SEPAY_ACCOUNT_NAME:}
+    code-prefix: ${SEPAY_CODE_PREFIX:FM}
+    qr-base-url: ${SEPAY_QR_BASE_URL:https://qr.sepay.vn/img}
+    order-ttl-hours: ${SEPAY_ORDER_TTL_HOURS:24}
+    min-donation: ${SEPAY_MIN_DONATION:10000}
+    allowed-ips: ${SEPAY_ALLOWED_IPS:}
+    reconcile-enabled: ${SEPAY_RECONCILE_ENABLED:false}
   email-setting:
       enable-preview-mode: false
       percentage: 10
