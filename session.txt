@@ -1,8 +1,9 @@
 task: SePay payments — donations + Premium
-status: in_progress
-progress: 88
-done: PAY-1..4, PAY-6..9 built (main); PAY-SEC security fixes 0e20146f; PAY-5 deferred
+status: blocked
+progress: 90
+done: PAY-1..4, PAY-6..9 deployed + prod smoke ok; PAY-SEC 0e20146f; PAY-5 deferred; diagram fix 8ffb5552
 doing: -
-next: watch CI + smoke prod (backend boots, donate nav hidden, admin tab loads); PAY-10 SePay setup + sandbox
+next: owner sets SEPAY_* env + registers webhook on SePay; send test webhook; push 8ffb5552 (approval)
 plan: docs/plans/plan-sepay-payments.md
-updated: 2026-11-13 20:01
+blocker: SePay dashboard + VM env secrets need the owner
+updated: 2026-11-13 20:08
