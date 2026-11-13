@@ -1,9 +1,8 @@
 task: SePay payments — donations + Premium
-status: blocked
-progress: 85
+status: in_progress
+progress: 88
 done: PAY-1..4, PAY-6..9 built (main); PAY-SEC security fixes 0e20146f; PAY-5 deferred
 doing: -
-next: boot app on real Postgres (Docker) to verify migrations/queries; push (approval); PAY-10 SePay setup + sandbox
+next: watch CI + smoke prod (backend boots, donate nav hidden, admin tab loads); PAY-10 SePay setup + sandbox
 plan: docs/plans/plan-sepay-payments.md
-blocker: push needs owner go-ahead; DB boot check needs Docker Desktop running
-updated: 2026-11-12 22:24
+updated: 2026-11-13 20:01
