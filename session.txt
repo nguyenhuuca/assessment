@@ -1,9 +1,9 @@
 task: SePay payments — donations + Premium
 status: blocked
 progress: 90
-done: PAY-1..4, PAY-6..9 deployed + prod smoke ok; PAY-SEC 0e20146f; PAY-5 deferred; .env.example SEPAY_* 8a6e7f0f
+done: PAY-1..4, PAY-6..9 deployed; PAY-SEC 0e20146f; FF sepay_payments_enabled bc5f9ac3; PAY-5 deferred
 doing: -
-next: link a SePay-supported bank account (personal VCB not accepted); register webhook; test 10k donation
+next: link a SePay-supported bank; register webhook; turn on Harness flag sepay_payments_enabled; test 10k donation
 plan: docs/plans/plan-sepay-payments.md
 blocker: SePay does not accept the owner's personal VCB account; owner to pick another bank
-updated: 2026-11-13 20:30
+updated: 2026-11-13 20:42
