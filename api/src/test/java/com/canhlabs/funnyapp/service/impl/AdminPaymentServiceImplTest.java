@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -312,6 +313,79 @@ class AdminPaymentServiceImplTest {
         when(orderRepo.findByCodeForUpdate("FMDONATE01")).thenReturn(Optional.of(donation));
         assertStatus(() -> service.resolveOrder(6L, true), HttpStatus.BAD_REQUEST);
         assertThat(donation.getStatus()).isEqualTo(PaymentOrderStatus.UNDERPAID);
+    }
+
+    // ---- mark paid / cancel ----
+
+    private void stubLock(PaymentOrder order) {
+        when(orderRepo.findById(order.getId())).thenReturn(Optional.of(order));
+        when(orderRepo.findByCodeForUpdate(order.getCode())).thenReturn(Optional.of(order));
+    }
+
+    @Test
+    void markPaid_expiredPremiumFullAmount_paysAndGrantsPremium() {
+        PaymentOrder order = premiumOrder(PaymentOrderStatus.EXPIRED, 0);
+        User user = new User();
+        stubPlanAndUser(user);
+        stubLock(order);
+
+        AdminOrderDto dto = service.markPaid(5L, 100000L);
+
+        assertThat(dto.getStatus()).isEqualTo(PaymentOrderStatus.PAID);
+        assertThat(order.getPaidAmount()).isEqualTo(100000L);
+        assertThat(order.getPaidAt()).isEqualTo(NOW);
+        assertThat(user.getPremiumUntil()).isEqualTo(NOW.plusSeconds(30L * 24 * 3600));
+    }
+
+    @Test
+    void markPaid_pendingPremiumShortAmount_isUnderpaid() {
+        PaymentOrder order = premiumOrder(PaymentOrderStatus.PENDING, 0);
+        stubLock(order);
+
+        assertThat(service.markPaid(5L, 40000L).getStatus()).isEqualTo(PaymentOrderStatus.UNDERPAID);
+        verifyNoInteractions(userRepo);
+    }
+
+    @Test
+    void markPaid_pendingDonation_isPaid() {
+        PaymentOrder order = PaymentOrder.builder().id(6L).code("FMDONATE01").type(PaymentType.DONATION)
+                .status(PaymentOrderStatus.PENDING).paidAmount(0).expiresAt(NOW).build();
+        stubLock(order);
+
+        assertThat(service.markPaid(6L, 10000L).getStatus()).isEqualTo(PaymentOrderStatus.PAID);
+        assertThat(order.getPaidAmount()).isEqualTo(10000L);
+    }
+
+    @Test
+    void markPaid_rejections() {
+        assertStatus(() -> service.markPaid(5L, 0L), HttpStatus.BAD_REQUEST);
+
+        when(orderRepo.findById(404L)).thenReturn(Optional.empty());
+        assertStatus(() -> service.markPaid(404L, 1000L), HttpStatus.NOT_FOUND);
+
+        PaymentOrder paid = premiumOrder(PaymentOrderStatus.PAID, 100000);
+        stubLock(paid);
+        assertStatus(() -> service.markPaid(5L, 1000L), HttpStatus.CONFLICT);
+        assertThat(paid.getPaidAmount()).isEqualTo(100000L);
+    }
+
+    @Test
+    void cancel_pending_isCancelledAndIdempotent() {
+        PaymentOrder order = premiumOrder(PaymentOrderStatus.PENDING, 0);
+        stubLock(order);
+
+        assertThat(service.cancelOrder(5L).getStatus()).isEqualTo(PaymentOrderStatus.CANCELLED);
+        assertThat(service.cancelOrder(5L).getStatus()).isEqualTo(PaymentOrderStatus.CANCELLED);
+        verify(orderRepo, times(1)).save(order);
+    }
+
+    @Test
+    void cancel_paidOrUnderpaid_isConflict() {
+        PaymentOrder underpaid = premiumOrder(PaymentOrderStatus.UNDERPAID, 40000);
+        stubLock(underpaid);
+
+        assertStatus(() -> service.cancelOrder(5L), HttpStatus.CONFLICT);
+        assertThat(underpaid.getStatus()).isEqualTo(PaymentOrderStatus.UNDERPAID);
     }
 
     // ---- plans ----

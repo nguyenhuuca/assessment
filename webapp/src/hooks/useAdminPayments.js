@@ -33,6 +33,10 @@ export const useLinkTransaction = () =>
   useInvalidating(async ({ sepayId, orderCode }) => unwrap(await adminPayments.linkTransaction(sepayId, orderCode)))
 export const useResolveOrder = () =>
   useInvalidating(async ({ id, grantPremium }) => unwrap(await adminPayments.resolveOrder(id, grantPremium)))
+export const useMarkOrderPaid = () =>
+  useInvalidating(async ({ id, amount }) => unwrap(await adminPayments.markOrderPaid(id, amount)))
+export const useCancelOrder = () =>
+  useInvalidating(async ({ id }) => unwrap(await adminPayments.cancelOrder(id)))
 export const useCreatePlan = () =>
   useInvalidating(async (body) => unwrap(await adminPayments.createPlan(body)))
 export const useUpdatePlan = () =>

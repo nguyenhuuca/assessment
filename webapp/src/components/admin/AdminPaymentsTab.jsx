@@ -1,17 +1,21 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ConfirmModal from '../common/ConfirmModal.jsx'
+import RowActionsMenu from './RowActionsMenu.jsx'
 import { validatePlan } from '../../utils/validatePlan.js'
 import { formatVnd } from '../../utils/formatVnd.js'
 import { formatDate } from '../../i18n/format.js'
 import {
   useAdminPaymentsSummary, useAdminPaymentOrders, useAdminUnmatched, useAdminPaymentPlans,
-  useLinkTransaction, useResolveOrder, useCreatePlan, useUpdatePlan, useSetPlanActive,
+  useLinkTransaction, useResolveOrder, useMarkOrderPaid, useCancelOrder, useCreatePlan, useUpdatePlan, useSetPlanActive,
 } from '../../hooks/useAdminPayments.js'
 
 const PAGE_SIZE = 10
 const ORDER_TYPES = ['DONATION', 'PREMIUM']
 const ORDER_STATUSES = ['PENDING', 'PAID', 'UNDERPAID', 'RESOLVED', 'EXPIRED', 'CANCELLED']
+// Orders still waiting for money: admin can confirm a transfer seen on the bank statement, or cancel
+const OPEN_STATUSES = ['PENDING', 'EXPIRED']
+const DATE_TIME = { dateStyle: 'medium', timeStyle: 'short' }
 const STATUS_BADGE = { PENDING: 'pending', UNDERPAID: 'pending', PAID: 'published', RESOLVED: 'published', EXPIRED: 'removed', CANCELLED: 'removed' }
 
 function Pager({ page, totalPages, onPage }) {
@@ -61,7 +65,42 @@ function OrdersSection() {
   const [error, setError] = useState('')
   const { data, isLoading } = useAdminPaymentOrders({ type, status, page, size: PAGE_SIZE })
   const resolve = useResolveOrder()
+  const markPaid = useMarkOrderPaid()
+  const cancel = useCancelOrder()
+  const [paying, setPaying] = useState(null)
+  const [payAmount, setPayAmount] = useState('')
+  const [cancelling, setCancelling] = useState(null)
   const orders = data?.content ?? []
+
+  const onFail = e => setError(e?.message || t('pay.actionFailed'))
+  function openMarkPaid(o) { setError(''); setPayAmount(o.expectedAmount ? String(o.expectedAmount) : ''); setPaying(o) }
+  const payValue = Number(payAmount)
+  const payValid = payAmount !== '' && Number.isInteger(payValue) && payValue > 0
+  function confirmMarkPaid() {
+    if (!payValid) return
+    markPaid.mutate({ id: paying.id, amount: payValue }, {
+      onSuccess: () => setPaying(null),
+      onError: e => { setPaying(null); onFail(e) },
+    })
+  }
+  function confirmCancel() {
+    cancel.mutate({ id: cancelling.id }, {
+      onSuccess: () => setCancelling(null),
+      onError: e => { setCancelling(null); onFail(e) },
+    })
+  }
+  function rowActions(o) {
+    if (OPEN_STATUSES.includes(o.status)) {
+      return [
+        { key: 'paid', icon: 'check_circle', label: t('pay.markPaid'), onSelect: () => openMarkPaid(o) },
+        { key: 'cancel', icon: 'cancel', label: t('pay.cancelOrder'), danger: true, onSelect: () => { setError(''); setCancelling(o) } },
+      ]
+    }
+    if (o.status === 'UNDERPAID') {
+      return [{ key: 'resolve', icon: 'task_alt', label: t('pay.resolve'), onSelect: () => openResolve(o) }]
+    }
+    return []
+  }
 
   function openResolve(o) { setError(''); setGrant(o.type === 'PREMIUM'); setResolving(o) }
   function confirmResolve() {
@@ -109,10 +148,10 @@ function OrdersSection() {
                 <td>{o.paidAmount ? formatVnd(o.paidAmount) : '—'}</td>
                 <td>{o.surplus ? formatVnd(o.surplus) : '—'}</td>
                 <td className="admin-cell-muted">{o.donorName || '—'}</td>
-                <td className="admin-cell-muted">{o.createdAt ? formatDate(o.createdAt) : '—'}</td>
+                <td className="admin-cell-muted">{o.createdAt ? formatDate(o.createdAt, DATE_TIME) : '—'}</td>
                 <td>
-                  {o.status === 'UNDERPAID' && (
-                    <button className="app-btn secondary" onClick={() => openResolve(o)}>{t('pay.resolve')}</button>
+                  {rowActions(o).length > 0 && (
+                    <RowActionsMenu label={t('pay.actions', { code: o.code })} items={rowActions(o)} />
                   )}
                 </td>
               </tr>
@@ -121,6 +160,34 @@ function OrdersSection() {
         </table>
       </div>
       <Pager page={page} totalPages={data?.totalPages ?? 0} onPage={setPage} />
+      {paying && (
+        <ConfirmModal
+          title={t('pay.markPaidTitle', { code: paying.code })}
+          message={t('pay.markPaidMessage')}
+          confirmLabel={t('pay.markPaidConfirm')}
+          pending={markPaid.isPending}
+          onCancel={() => setPaying(null)}
+          onConfirm={confirmMarkPaid}
+        >
+          <label style={{ display: 'block' }}>
+            {t('pay.markPaidAmount')}
+            <input className="admin-input" type="number" min="1" step="1" inputMode="numeric"
+              value={payAmount} onChange={e => setPayAmount(e.target.value)} aria-invalid={!payValid} />
+          </label>
+          {!payValid && <p role="alert" className="admin-cell-muted">{t('pay.markPaidAmountInvalid')}</p>}
+        </ConfirmModal>
+      )}
+      {cancelling && (
+        <ConfirmModal
+          title={t('pay.cancelTitle', { code: cancelling.code })}
+          message={t('pay.cancelMessage')}
+          confirmLabel={t('pay.cancelConfirm')}
+          danger
+          pending={cancel.isPending}
+          onCancel={() => setCancelling(null)}
+          onConfirm={confirmCancel}
+        />
+      )}
       {resolving && (
         <ConfirmModal
           title={t('pay.resolveTitle', { code: resolving.code })}
@@ -188,7 +255,7 @@ function UnmatchedSection() {
                   <td>{formatVnd(r.amount)}</td>
                   <td className="admin-cell-muted">{r.content}</td>
                   <td className="admin-cell-muted">{r.gateway}</td>
-                  <td className="admin-cell-muted">{r.transactionDate ? formatDate(r.transactionDate) : '—'}</td>
+                  <td className="admin-cell-muted">{r.transactionDate ? formatDate(r.transactionDate, DATE_TIME) : '—'}</td>
                   <td>
                     <button className="app-btn secondary" onClick={() => { setLinking(r); setOrderCode(r.code || ''); setError('') }}>
                       {t('pay.linkToOrder')}

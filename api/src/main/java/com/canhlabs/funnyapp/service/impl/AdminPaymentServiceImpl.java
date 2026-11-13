@@ -31,6 +31,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,10 @@ import java.util.stream.Collectors;
 public class AdminPaymentServiceImpl implements AdminPaymentService {
 
     static final int MAX_NAME = 100;
+    /** Orders still waiting for money: the only ones an admin can mark paid or cancel. */
+    private static final Set<PaymentOrderStatus> OPEN = EnumSet.of(PaymentOrderStatus.PENDING, PaymentOrderStatus.EXPIRED);
+    /** Placeholder transaction id in settlement logs for an admin-confirmed payment (no SePay transaction). */
+    static final long MANUAL_TX_ID = 0L;
     private static final Pattern PLAN_CODE = Pattern.compile("^[A-Z0-9_]{3,32}$");
 
     private final PaymentOrderRepository orderRepo;
@@ -124,9 +129,7 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
     @Override
     @Transactional
     public AdminOrderDto resolveOrder(long orderId, boolean grantPremium) {
-        PaymentOrder found = orderRepo.findById(orderId)
-                .orElseThrow(() -> CustomException.of(HttpStatus.NOT_FOUND, 4041, "error.payment.orderNotFound"));
-        PaymentOrder order = orderRepo.findByCodeForUpdate(found.getCode()).orElse(found);
+        PaymentOrder order = lockOrder(orderId);
         if (order.getStatus() == PaymentOrderStatus.RESOLVED) {
             return toDto(order, planCodesFor(order));
         }
@@ -145,6 +148,44 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
         orderRepo.save(order);
         log.info("Admin resolved order {} (grantPremium={})", order.getId(), grantPremium);
         return toDto(order, planCodesFor(order));
+    }
+
+    @Override
+    @Transactional
+    public AdminOrderDto markPaid(long orderId, long amount) {
+        if (amount <= 0) {
+            throw CustomException.of(HttpStatus.BAD_REQUEST, 4006, "error.payment.manualAmountInvalid");
+        }
+        PaymentOrder order = lockOrder(orderId);
+        if (!OPEN.contains(order.getStatus())) {
+            throw CustomException.of(HttpStatus.CONFLICT, 4095, "error.payment.notOpen");
+        }
+        settlement.apply(order, MANUAL_TX_ID, amount, Instant.now(clock));
+        log.info("Admin marked order {} paid manually: {} VND -> {}", order.getId(), amount, order.getStatus());
+        return toDto(order, planCodesFor(order));
+    }
+
+    @Override
+    @Transactional
+    public AdminOrderDto cancelOrder(long orderId) {
+        PaymentOrder order = lockOrder(orderId);
+        if (order.getStatus() == PaymentOrderStatus.CANCELLED) {
+            return toDto(order, planCodesFor(order));
+        }
+        if (!OPEN.contains(order.getStatus())) {
+            throw CustomException.of(HttpStatus.CONFLICT, 4095, "error.payment.notOpen");
+        }
+        order.setStatus(PaymentOrderStatus.CANCELLED);
+        orderRepo.save(order);
+        log.info("Admin cancelled order {}", order.getId());
+        return toDto(order, planCodesFor(order));
+    }
+
+    /** Row lock by code, the same lock the webhook takes, so a manual action and a transfer cannot race. */
+    private PaymentOrder lockOrder(long orderId) {
+        PaymentOrder found = orderRepo.findById(orderId)
+                .orElseThrow(() -> CustomException.of(HttpStatus.NOT_FOUND, 4041, "error.payment.orderNotFound"));
+        return orderRepo.findByCodeForUpdate(found.getCode()).orElse(found);
     }
 
     @Override

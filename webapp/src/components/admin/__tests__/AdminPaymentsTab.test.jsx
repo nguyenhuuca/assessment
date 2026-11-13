@@ -8,7 +8,7 @@ import * as api from '../../../api/adminPayments.js'
 
 vi.mock('../../../api/adminPayments.js', () => ({
   getSummary: vi.fn(), getOrders: vi.fn(), getUnmatched: vi.fn(), linkTransaction: vi.fn(),
-  resolveOrder: vi.fn(), getPlans: vi.fn(), createPlan: vi.fn(), updatePlan: vi.fn(), setPlanActive: vi.fn(),
+  resolveOrder: vi.fn(), markOrderPaid: vi.fn(), cancelOrder: vi.fn(), getPlans: vi.fn(), createPlan: vi.fn(), updatePlan: vi.fn(), setPlanActive: vi.fn(),
 }))
 
 const page = (content) => ({ data: { content, totalElements: content.length, totalPages: 1, number: 0, size: 10 } })
@@ -22,6 +22,7 @@ function renderTab() {
   render(<QueryClientProvider client={qc}><AdminPaymentsTab /></QueryClientProvider>)
   return spy
 }
+const openMenu = async (code) => fireEvent.click(await screen.findByRole('button', { name: `Thao tác cho đơn ${code}` }))
 const invalidated = (spy) => spy.mock.calls.some(([arg]) => JSON.stringify(arg.queryKey) === JSON.stringify(['admin', 'payments']))
 
 beforeEach(() => {
@@ -32,6 +33,8 @@ beforeEach(() => {
   api.getPlans.mockResolvedValue({ data: [plan] })
   api.linkTransaction.mockResolvedValue({ data: {} })
   api.resolveOrder.mockResolvedValue({ data: {} })
+  api.markOrderPaid.mockResolvedValue({ data: {} })
+  api.cancelOrder.mockResolvedValue({ data: {} })
   api.createPlan.mockResolvedValue({ data: {} })
   api.updatePlan.mockResolvedValue({ data: {} })
   api.setPlanActive.mockResolvedValue({ data: {} })
@@ -77,7 +80,8 @@ describe('AdminPaymentsTab', () => {
 
   it('resolves an UNDERPAID premium order granting premium by default', async () => {
     const spy = renderTab()
-    fireEvent.click(await screen.findByRole('button', { name: 'Xử lý' }))
+    await openMenu('FM1')
+    fireEvent.click(screen.getByRole('menuitem', { name: /Xử lý/ }))
     const dialog = screen.getByRole('dialog')
     fireEvent.click(within(dialog).getByRole('button', { name: 'Xử lý' }))
     await waitFor(() => expect(api.resolveOrder).toHaveBeenCalledWith(1, true))
@@ -86,11 +90,65 @@ describe('AdminPaymentsTab', () => {
 
   it('can keep the underpaid order as a donation', async () => {
     renderTab()
-    fireEvent.click(await screen.findByRole('button', { name: 'Xử lý' }))
+    await openMenu('FM1')
+    fireEvent.click(screen.getByRole('menuitem', { name: /Xử lý/ }))
     const dialog = screen.getByRole('dialog')
     fireEvent.click(within(dialog).getByLabelText('Chỉ ghi nhận là ủng hộ'))
     fireEvent.click(within(dialog).getByRole('button', { name: 'Xử lý' }))
     await waitFor(() => expect(api.resolveOrder).toHaveBeenCalledWith(1, false))
+  })
+
+  it('marks a PENDING order paid with the expected amount by default', async () => {
+    api.getOrders.mockResolvedValue(page([order({ id: 3, code: 'FM3', status: 'PENDING', paidAmount: 0 })]))
+    const spy = renderTab()
+    await openMenu('FM3')
+    fireEvent.click(screen.getByRole('menuitem', { name: /Xác nhận đã thanh toán/ }))
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByLabelText('Số tiền đã nhận (VND)')).toHaveValue(50000)
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Xác nhận' }))
+    await waitFor(() => expect(api.markOrderPaid).toHaveBeenCalledWith(3, 50000))
+    await waitFor(() => expect(invalidated(spy)).toBe(true))
+  })
+
+  it('blocks mark-paid with an empty or zero amount', async () => {
+    api.getOrders.mockResolvedValue(page([order({ id: 4, code: 'FM4', type: 'DONATION', status: 'EXPIRED', expectedAmount: null, paidAmount: 0 })]))
+    renderTab()
+    await openMenu('FM4')
+    fireEvent.click(screen.getByRole('menuitem', { name: /Xác nhận đã thanh toán/ }))
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('Nhập số tiền nguyên lớn hơn 0')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Xác nhận' }))
+    fireEvent.change(within(dialog).getByLabelText('Số tiền đã nhận (VND)'), { target: { value: '0' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Xác nhận' }))
+    expect(api.markOrderPaid).not.toHaveBeenCalled()
+    fireEvent.change(within(dialog).getByLabelText('Số tiền đã nhận (VND)'), { target: { value: '20000' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Xác nhận' }))
+    await waitFor(() => expect(api.markOrderPaid).toHaveBeenCalledWith(4, 20000))
+  })
+
+  it('cancels a PENDING order after confirmation', async () => {
+    api.getOrders.mockResolvedValue(page([order({ id: 3, code: 'FM3', status: 'PENDING', paidAmount: 0 })]))
+    renderTab()
+    await openMenu('FM3')
+    fireEvent.click(screen.getByRole('menuitem', { name: /Huỷ đơn/ }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Huỷ đơn' }))
+    await waitFor(() => expect(api.cancelOrder).toHaveBeenCalledWith(3))
+  })
+
+  it('shows the server error when cancelling fails', async () => {
+    api.getOrders.mockResolvedValue(page([order({ id: 3, code: 'FM3', status: 'PENDING', paidAmount: 0 })]))
+    api.cancelOrder.mockRejectedValue({ message: 'Only pending', status: 409 })
+    renderTab()
+    await openMenu('FM3')
+    fireEvent.click(screen.getByRole('menuitem', { name: /Huỷ đơn/ }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Huỷ đơn' }))
+    expect(await screen.findByText('Only pending')).toBeInTheDocument()
+  })
+
+  it('offers no row actions on a PAID order', async () => {
+    renderTab()
+    await screen.findByText('FM2')
+    expect(screen.queryByRole('button', { name: 'Thao tác cho đơn FM2' })).not.toBeInTheDocument()
   })
 
   it('creates a plan after client validation', async () => {

@@ -527,6 +527,17 @@
       "codeInvalid": "Use 3-32 characters: A-Z, 0-9, _",
       "priceInvalid": "Price must be greater than 0",
       "daysInvalid": "Days must be greater than 0"
-    }
+    },
+    "actions": "Actions for order {{code}}",
+    "markPaid": "Mark as paid",
+    "markPaidTitle": "Mark order {{code}} as paid",
+    "markPaidMessage": "Use this when the transfer is on your bank statement but no webhook arrived. Normal amount rules apply: full amount → Paid (Premium granted), less → Underpaid.",
+    "markPaidAmount": "Amount received (VND)",
+    "markPaidAmountInvalid": "Enter a whole amount greater than 0",
+    "markPaidConfirm": "Mark paid",
+    "cancelOrder": "Cancel order",
+    "cancelTitle": "Cancel order {{code}}",
+    "cancelMessage": "A transfer with this code arriving later will not be credited automatically; it will show under unmatched transfers.",
+    "cancelConfirm": "Cancel order"
   }
 }

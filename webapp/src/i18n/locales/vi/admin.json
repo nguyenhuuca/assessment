@@ -504,6 +504,17 @@
       "codeInvalid": "Dùng 3-32 ký tự: A-Z, 0-9, _",
       "priceInvalid": "Giá phải lớn hơn 0",
       "daysInvalid": "Số ngày phải lớn hơn 0"
-    }
+    },
+    "actions": "Thao tác cho đơn {{code}}",
+    "markPaid": "Xác nhận đã thanh toán",
+    "markPaidTitle": "Xác nhận đơn {{code}} đã thanh toán",
+    "markPaidMessage": "Dùng khi tiền đã có trong sao kê nhưng không có webhook. Số tiền áp dụng quy tắc như bình thường: đủ → Đã thanh toán (cấp Premium), thiếu → Thiếu tiền.",
+    "markPaidAmount": "Số tiền đã nhận (VND)",
+    "markPaidAmountInvalid": "Nhập số tiền nguyên lớn hơn 0",
+    "markPaidConfirm": "Xác nhận",
+    "cancelOrder": "Huỷ đơn",
+    "cancelTitle": "Huỷ đơn {{code}}",
+    "cancelMessage": "Chuyển khoản mang mã này đến sau sẽ không được tự ghi nhận; nó sẽ nằm trong mục chuyển khoản chưa khớp.",
+    "cancelConfirm": "Huỷ đơn"
   }
 }

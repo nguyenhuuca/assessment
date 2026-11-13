@@ -181,6 +181,39 @@ class AdminPaymentControllerTest {
     }
 
     @Test
+    void markPaid_admin_callsService() throws Exception {
+        when(service.markPaid(4L, 50000L))
+                .thenReturn(AdminOrderDto.builder().id(4L).status(PaymentOrderStatus.PAID).build());
+
+        mockMvc.perform(post(BASE + "/orders/4/mark-paid").contentType(JSON).content("{\"amount\":50000}")
+                        .with(authentication(principal(UserRole.ADMIN))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("PAID"));
+        verify(service).markPaid(4L, 50000L);
+    }
+
+    @Test
+    void cancel_admin_callsService() throws Exception {
+        when(service.cancelOrder(4L))
+                .thenReturn(AdminOrderDto.builder().id(4L).status(PaymentOrderStatus.CANCELLED).build());
+
+        mockMvc.perform(post(BASE + "/orders/4/cancel").with(authentication(principal(UserRole.ADMIN))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("CANCELLED"));
+        verify(service).cancelOrder(4L);
+    }
+
+    @Test
+    void markPaidAndCancel_user_returns403() throws Exception {
+        mockMvc.perform(post(BASE + "/orders/4/mark-paid").contentType(JSON).content("{\"amount\":1}")
+                        .with(authentication(principal(UserRole.USER))))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post(BASE + "/orders/4/cancel").with(authentication(principal(UserRole.USER))))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(service);
+    }
+
+    @Test
     void plans_admin_lists() throws Exception {
         when(service.listPlans()).thenReturn(List.of(AdminPlanDto.builder().id(1L).code("PREMIUM_1M").active(true).build()));
 

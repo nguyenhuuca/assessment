@@ -28,6 +28,15 @@ public interface AdminPaymentService {
     /** UNDERPAID to RESOLVED, optionally granting Premium. Calling again on a RESOLVED order is a no-op. */
     AdminOrderDto resolveOrder(long orderId, boolean grantPremium);
 
+    /**
+     * PENDING or EXPIRED order the admin confirmed from the bank statement (no webhook arrived):
+     * applies {@code amount} with the webhook amount rules, so it lands on PAID or UNDERPAID.
+     */
+    AdminOrderDto markPaid(long orderId, long amount);
+
+    /** PENDING or EXPIRED to CANCELLED; a later transfer with its code is then stored UNMATCHED. */
+    AdminOrderDto cancelOrder(long orderId);
+
     List<AdminPlanDto> listPlans();
 
     AdminPlanDto createPlan(PlanRequest request);

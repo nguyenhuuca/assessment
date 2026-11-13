@@ -7,6 +7,7 @@ import com.canhlabs.funnyapp.dto.payment.AdminPaymentSummaryDto;
 import com.canhlabs.funnyapp.dto.payment.AdminPlanDto;
 import com.canhlabs.funnyapp.dto.payment.AdminTransactionDto;
 import com.canhlabs.funnyapp.dto.payment.LinkTransactionRequest;
+import com.canhlabs.funnyapp.dto.payment.MarkPaidRequest;
 import com.canhlabs.funnyapp.dto.payment.PlanActiveRequest;
 import com.canhlabs.funnyapp.dto.payment.PlanRequest;
 import com.canhlabs.funnyapp.dto.payment.ResolveOrderRequest;
@@ -85,6 +86,21 @@ public class AdminPaymentController {
     public ResponseEntity<ResultObjectInfo<AdminOrderDto>> resolve(@PathVariable long id,
                                                                     @RequestBody ResolveOrderRequest request) {
         return ok(service.resolveOrder(id, request.isGrantPremium()));
+    }
+
+    @PostMapping("/orders/{id}/mark-paid")
+    @HasPermission(perm = Permission.ADMIN)
+    @AuditLog("adminMarkPaymentOrderPaid")
+    public ResponseEntity<ResultObjectInfo<AdminOrderDto>> markPaid(@PathVariable long id,
+                                                                     @RequestBody MarkPaidRequest request) {
+        return ok(service.markPaid(id, request.getAmount()));
+    }
+
+    @PostMapping("/orders/{id}/cancel")
+    @HasPermission(perm = Permission.ADMIN)
+    @AuditLog("adminCancelPaymentOrder")
+    public ResponseEntity<ResultObjectInfo<AdminOrderDto>> cancel(@PathVariable long id) {
+        return ok(service.cancelOrder(id));
     }
 
     @GetMapping("/plans")
