@@ -142,6 +142,8 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
         return PaymentOrder.builder()
                 .type(PaymentType.DONATION)
                 .userId(userId)
+                // amount the donor picked, shown to admins; it never makes a donation UNDERPAID (PaymentSettlement)
+                .expectedAmount(amount)
                 .donorName(clean(request.getDonorName(), MAX_NAME, "error.payment.nameTooLong"))
                 .message(clean(request.getMessage(), MAX_MESSAGE, "error.payment.messageTooLong"))
                 .build();

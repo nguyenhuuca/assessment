@@ -90,7 +90,7 @@ class PaymentOrderServiceImplTest {
         PaymentOrder saved = cap.getValue();
         assertThat(saved.getCode()).matches("FM[A-Z0-9]{8}");
         assertThat(saved.getUserId()).isNull();
-        assertThat(saved.getExpectedAmount()).isNull();
+        assertThat(saved.getExpectedAmount()).isEqualTo(50000L);
         assertThat(saved.getDonorName()).isEqualTo("Alice");
         assertThat(saved.getMessage()).isEqualTo("hi");
         assertThat(saved.getStatus()).isEqualTo(PaymentOrderStatus.PENDING);

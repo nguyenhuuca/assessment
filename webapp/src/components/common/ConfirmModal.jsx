@@ -20,8 +20,11 @@ export default function ConfirmModal({
   const { t } = useTranslation(['shell', 'common'])
   const confirmRef = useRef(null)
 
+  // Focus once on open: onCancel is usually a new arrow each parent render, and refocusing then
+  // would steal focus from an input inside the modal after every keystroke
+  useEffect(() => { confirmRef.current?.focus() }, [])
+
   useEffect(() => {
-    confirmRef.current?.focus()
     const onKey = e => { if (e.key === 'Escape' && !pending) onCancel() }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)

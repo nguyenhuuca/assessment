@@ -357,6 +357,19 @@ class AdminPaymentServiceImplTest {
     }
 
     @Test
+    void markPaid_donationBelowChosenAmount_isStillPaid() {
+        PaymentOrder order = PaymentOrder.builder().id(6L).code("FMDONATE01").type(PaymentType.DONATION)
+                .status(PaymentOrderStatus.PENDING).expectedAmount(50000L).paidAmount(0).expiresAt(NOW).build();
+        stubLock(order);
+
+        AdminOrderDto dto = service.markPaid(6L, 20000L);
+
+        assertThat(dto.getStatus()).isEqualTo(PaymentOrderStatus.PAID);
+        assertThat(dto.getExpectedAmount()).isEqualTo(50000L);
+        assertThat(dto.getSurplus()).isZero();
+    }
+
+    @Test
     void markPaid_rejections() {
         assertStatus(() -> service.markPaid(5L, 0L), HttpStatus.BAD_REQUEST);
 

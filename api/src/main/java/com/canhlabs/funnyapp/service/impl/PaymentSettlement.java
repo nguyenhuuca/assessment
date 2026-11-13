@@ -48,7 +48,8 @@ public class PaymentSettlement {
         order.setPaidAmount(Math.addExact(order.getPaidAmount(), amount));
         if (!SETTLED.contains(before)) {
             Long expected = order.getExpectedAmount();
-            if (expected == null || order.getPaidAmount() >= expected) {
+            // A donation is PAID whatever arrives; only Premium compares against the price
+            if (order.getType() != PaymentType.PREMIUM || expected == null || order.getPaidAmount() >= expected) {
                 order.setStatus(PaymentOrderStatus.PAID);
                 order.setPaidAt(now);
                 if (order.getType() == PaymentType.PREMIUM) {

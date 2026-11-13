@@ -16,7 +16,7 @@ const ORDER_STATUSES = ['PENDING', 'PAID', 'UNDERPAID', 'RESOLVED', 'EXPIRED', '
 // Orders still waiting for money: admin can confirm a transfer seen on the bank statement, or cancel
 const OPEN_STATUSES = ['PENDING', 'EXPIRED']
 const DATE_TIME = { dateStyle: 'medium', timeStyle: 'short' }
-const STATUS_BADGE = { PENDING: 'pending', UNDERPAID: 'pending', PAID: 'published', RESOLVED: 'published', EXPIRED: 'removed', CANCELLED: 'removed' }
+const STATUS_BADGE = { PENDING: 'pending', UNDERPAID: 'pending', PAID: 'done', RESOLVED: 'done', EXPIRED: 'cancelled', CANCELLED: 'cancelled' }
 
 function Pager({ page, totalPages, onPage }) {
   if (totalPages <= 1) return null
@@ -111,21 +111,23 @@ function OrdersSection() {
   }
 
   return (
-    <section className="admin-table-wrap" aria-label={t('pay.ordersTitle')}>
-      <h2 className="admin-title" style={{ fontSize: 16 }}>{t('pay.ordersTitle')}</h2>
-      <div className="admin-filters">
-        <select className="admin-status-select" aria-label={t('pay.filterType')} value={type}
-          onChange={e => { setType(e.target.value); setPage(0) }}>
-          <option value="">{t('pay.allTypes')}</option>
-          {ORDER_TYPES.map(v => <option key={v} value={v}>{t(`pay.type.${v}`)}</option>)}
-        </select>
-        <select className="admin-status-select" aria-label={t('pay.filterStatus')} value={status}
-          onChange={e => { setStatus(e.target.value); setPage(0) }}>
-          <option value="">{t('pay.allStatuses')}</option>
-          {ORDER_STATUSES.map(v => <option key={v} value={v}>{t(`pay.status.${v}`)}</option>)}
-        </select>
+    <section className="admin-table-wrap pay-section" aria-label={t('pay.ordersTitle')}>
+      <div className="pay-section-head">
+        <h2 className="pay-section-title">{t('pay.ordersTitle')}</h2>
+        <div className="admin-filters">
+          <select className="admin-status-select" aria-label={t('pay.filterType')} value={type}
+            onChange={e => { setType(e.target.value); setPage(0) }}>
+            <option value="">{t('pay.allTypes')}</option>
+            {ORDER_TYPES.map(v => <option key={v} value={v}>{t(`pay.type.${v}`)}</option>)}
+          </select>
+          <select className="admin-status-select" aria-label={t('pay.filterStatus')} value={status}
+            onChange={e => { setStatus(e.target.value); setPage(0) }}>
+            <option value="">{t('pay.allStatuses')}</option>
+            {ORDER_STATUSES.map(v => <option key={v} value={v}>{t(`pay.status.${v}`)}</option>)}
+          </select>
+        </div>
       </div>
-      {error && <p role="alert" className="admin-cell-muted" style={{ color: '#ff1744' }}>{error}</p>}
+      {error && <p role="alert" className="pay-section-error">{error}</p>}
       <div className="admin-table-scroll">
         <table className="admin-table">
           <thead>
@@ -137,7 +139,7 @@ function OrdersSection() {
           </thead>
           <tbody>
             {!isLoading && orders.length === 0 && (
-              <tr><td colSpan={9} className="admin-cell-muted">{t('pay.noOrders')}</td></tr>
+              <tr className="admin-table-row"><td colSpan={9} className="admin-cell-muted">{t('pay.noOrders')}</td></tr>
             )}
             {orders.map(o => (
               <tr className="admin-table-row" key={o.id}>
@@ -235,8 +237,8 @@ function UnmatchedSection() {
   }
 
   return (
-    <section className="admin-table-wrap" aria-label={t('pay.unmatchedTitle')}>
-      <h2 className="admin-title" style={{ fontSize: 16 }}>{t('pay.unmatchedTitle')}</h2>
+    <section className="admin-table-wrap pay-section" aria-label={t('pay.unmatchedTitle')}>
+      <div className="pay-section-head"><h2 className="pay-section-title">{t('pay.unmatchedTitle')}</h2></div>
       <div className="admin-table-scroll">
         <table className="admin-table">
           <thead>
@@ -247,7 +249,7 @@ function UnmatchedSection() {
           </thead>
           <tbody>
             {!isLoading && rows.length === 0 && (
-              <tr><td colSpan={5} className="admin-cell-muted">{t('pay.noUnmatched')}</td></tr>
+              <tr className="admin-table-row"><td colSpan={5} className="admin-cell-muted">{t('pay.noUnmatched')}</td></tr>
             )}
             {rows.map(r => (
               <React.Fragment key={r.sepayId}>
@@ -329,12 +331,12 @@ function PlansSection() {
   }
 
   return (
-    <section className="admin-table-wrap" aria-label={t('pay.plansTitle')}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 className="admin-title" style={{ fontSize: 16 }}>{t('pay.plansTitle')}</h2>
+    <section className="admin-table-wrap pay-section" aria-label={t('pay.plansTitle')}>
+      <div className="pay-section-head">
+        <h2 className="pay-section-title">{t('pay.plansTitle')}</h2>
         <button className="app-btn primary" onClick={() => { setErrors({}); setError(''); setForm({ ...EMPTY_PLAN }) }}>{t('pay.plan.add')}</button>
       </div>
-      {error && <p role="alert" style={{ color: '#ff1744' }}>{error}</p>}
+      {error && <p role="alert" className="pay-section-error">{error}</p>}
       {form && (
         <form onSubmit={save} style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-start', margin: '12px 0' }}>
           {field('code')}{field('name')}{field('durationDays', 'number')}{field('priceVnd', 'number')}{field('sortOrder', 'number')}
@@ -357,7 +359,7 @@ function PlansSection() {
             </tr>
           </thead>
           <tbody>
-            {plans.length === 0 && <tr><td colSpan={6} className="admin-cell-muted">{t('pay.noPlans')}</td></tr>}
+            {plans.length === 0 && <tr className="admin-table-row"><td colSpan={6} className="admin-cell-muted">{t('pay.noPlans')}</td></tr>}
             {plans.map(p => (
               <tr className="admin-table-row" key={p.id}>
                 <td><code>{p.code}</code></td>
