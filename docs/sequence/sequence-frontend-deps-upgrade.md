@@ -36,7 +36,7 @@ sequenceDiagram
             else > 10 or needs refactor
                 B->>B: rule -> warn in eslint.config.js + TASKS.md follow-up
             end
-            Note over B: fallback not used: all react-hooks rules ended at error (6ed44dde);<br/>only react-refresh/only-export-components stays warn
+            Note over B: fallback not used: all react-hooks rules ended at error (6ed44dde),<br/>only react-refresh/only-export-components stays warn
         end
     end
     B->>NPM: npm outdated

@@ -172,7 +172,7 @@ sequenceDiagram
     PL->>CV: evict(userId)
     PL->>US: issueToken(user) (new cv claim)
     PL->>MAIL: sendSimpleMail(security notice) (sendSecurityEmail, failure only logged)
-    Note over PL,MAIL: locale from EmailLocaleResolver.forUser. EmailCacheLimiter daily count is incremented after sending; if the budget is exhausted it only logs a warning and still sends
+    Note over PL,MAIL: locale from EmailLocaleResolver.forUser. EmailCacheLimiter daily count is incremented after sending, if the budget is exhausted it only logs a warning and still sends
     PL-->>API: UserInfoDto (jwt, action PASSWORD_SET or PASSWORD_CHANGED)
     API-->>FE: 200 ResultObjectInfo of UserInfoDto
     FE->>FE: AuthContext.login(newJwt, user) and patch ['settings'] query

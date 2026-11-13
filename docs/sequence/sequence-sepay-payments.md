@@ -65,10 +65,10 @@ sequenceDiagram
     PC->>PS: createOrder() — 401 if guest, 400 if plan inactive
     PS->>DB: insert order (expected_amount = plan.price)
     PS-->>FE: {code, amount, qrUrl}
-    Note over U,WS: user transfers; webhook arrives as in flow 1
+    Note over U,WS: user transfers, webhook arrives as in flow 1
     WS->>DB: paid_amount += amount
     alt paid_amount >= expected_amount
-        WS->>DB: status = PAID; users.premium_until = max(now, premium_until) + days
+        WS->>DB: status = PAID, users.premium_until = max(now, premium_until) + days
         Note right of WS: surplus = paid - expected, shown in admin tab
     else paid_amount < expected_amount
         WS->>DB: status = UNDERPAID
@@ -126,7 +126,7 @@ sequenceDiagram
         R->>API: GET /v2/transactions?since_id=&transfer_type=in (Bearer token)
         API-->>R: data[], pagination
         R->>WS: process(tx, source = RECONCILE) — same path as webhook
-        WS->>DB: insert ON CONFLICT DO NOTHING; match if new
+        WS->>DB: insert ON CONFLICT DO NOTHING, match if new
     end
     R->>DB: save new cursor
     alt 429 / 5xx
