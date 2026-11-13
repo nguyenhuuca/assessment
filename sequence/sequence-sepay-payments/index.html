@@ -8876,10 +8876,10 @@
     PC-&gt;&gt;PS: createOrder() — 401 if guest, 400 if plan inactive
     PS-&gt;&gt;DB: insert order (expected_amount = plan.price)
     PS--&gt;&gt;FE: {code, amount, qrUrl}
-    Note over U,WS: user transfers; webhook arrives as in flow 1
+    Note over U,WS: user transfers, webhook arrives as in flow 1
     WS-&gt;&gt;DB: paid_amount += amount
     alt paid_amount &gt;= expected_amount
-        WS-&gt;&gt;DB: status = PAID; users.premium_until = max(now, premium_until) + days
+        WS-&gt;&gt;DB: status = PAID, users.premium_until = max(now, premium_until) + days
         Note right of WS: surplus = paid - expected, shown in admin tab
     else paid_amount &lt; expected_amount
         WS-&gt;&gt;DB: status = UNDERPAID
@@ -8929,7 +8929,7 @@
         R-&gt;&gt;API: GET /v2/transactions?since_id=&amp;transfer_type=in (Bearer token)
         API--&gt;&gt;R: data[], pagination
         R-&gt;&gt;WS: process(tx, source = RECONCILE) — same path as webhook
-        WS-&gt;&gt;DB: insert ON CONFLICT DO NOTHING; match if new
+        WS-&gt;&gt;DB: insert ON CONFLICT DO NOTHING, match if new
     end
     R-&gt;&gt;DB: save new cursor
     alt 429 / 5xx

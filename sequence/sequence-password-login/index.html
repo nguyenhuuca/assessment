@@ -8956,7 +8956,7 @@ One file per feature that has a PRD: docs/sequence/sequence-<feature>.md (slug =
     PL-&gt;&gt;CV: evict(userId)
     PL-&gt;&gt;US: issueToken(user) (new cv claim)
     PL-&gt;&gt;MAIL: sendSimpleMail(security notice) (sendSecurityEmail, failure only logged)
-    Note over PL,MAIL: locale from EmailLocaleResolver.forUser. EmailCacheLimiter daily count is incremented after sending; if the budget is exhausted it only logs a warning and still sends
+    Note over PL,MAIL: locale from EmailLocaleResolver.forUser. EmailCacheLimiter daily count is incremented after sending, if the budget is exhausted it only logs a warning and still sends
     PL--&gt;&gt;API: UserInfoDto (jwt, action PASSWORD_SET or PASSWORD_CHANGED)
     API--&gt;&gt;FE: 200 ResultObjectInfo of UserInfoDto
     FE-&gt;&gt;FE: AuthContext.login(newJwt, user) and patch ['settings'] query
