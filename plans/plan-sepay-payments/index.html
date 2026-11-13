@@ -9112,6 +9112,7 @@ Related Skills: swarm-plan, testing
 </table>
 <h3 id="config-env-appsepay">Config (env → <code>app.sepay.*</code>)<a class="headerlink" href="#config-env-appsepay" title="Permanent link">&para;</a></h3>
 <p><code>SEPAY_WEBHOOK_SECRET</code>, <code>SEPAY_API_TOKEN</code>, <code>SEPAY_BANK_ACCOUNT</code>, <code>SEPAY_BANK_CODE</code>, <code>SEPAY_ACCOUNT_NAME</code>, <code>SEPAY_CODE_PREFIX</code> (FM), <code>SEPAY_QR_BASE_URL</code> (<code>https://qr.sepay.vn/img</code>), <code>SEPAY_ORDER_TTL_HOURS</code> (24), <code>SEPAY_MIN_DONATION</code> (10000), <code>SEPAY_ALLOWED_IPS</code> (empty = off), <code>SEPAY_RECONCILE_ENABLED</code> (false).</p>
+<p><strong>On/off switch:</strong> Harness flag <code>sepay_payments_enabled</code> (boolean, default <code>false</code>, evaluated per user). New orders and the donate nav (<code>GET /payments/config</code>) need the bank env vars <strong>and</strong> the flag on. The webhook is not gated by the flag, so a transfer for an order already shown is still credited after the flag is turned off.</p>
 <h2 id="implementation-steps">Implementation Steps<a class="headerlink" href="#implementation-steps" title="Permanent link">&para;</a></h2>
 <p>Each task merges to <code>main</code> on its own (trunk-based); dependents start after the prerequisite lands. Sizes target ≤ 400 changed LOC excluding tests.</p>
 <table>
