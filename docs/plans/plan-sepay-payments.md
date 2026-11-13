@@ -50,6 +50,8 @@ Payment Gateway, gating features behind Premium, refunds, auto-renewal, public s
 ### Config (env → `app.sepay.*`)
 `SEPAY_WEBHOOK_SECRET`, `SEPAY_API_TOKEN`, `SEPAY_BANK_ACCOUNT`, `SEPAY_BANK_CODE`, `SEPAY_ACCOUNT_NAME`, `SEPAY_CODE_PREFIX` (FM), `SEPAY_QR_BASE_URL` (`https://qr.sepay.vn/img`), `SEPAY_ORDER_TTL_HOURS` (24), `SEPAY_MIN_DONATION` (10000), `SEPAY_ALLOWED_IPS` (empty = off), `SEPAY_RECONCILE_ENABLED` (false).
 
+**On/off switch:** Harness flag `sepay_payments_enabled` (boolean, default `false`, evaluated per user). New orders and the donate nav (`GET /payments/config`) need the bank env vars **and** the flag on. The webhook is not gated by the flag, so a transfer for an order already shown is still credited after the flag is turned off.
+
 ## Implementation Steps
 
 Each task merges to `main` on its own (trunk-based); dependents start after the prerequisite lands. Sizes target ≤ 400 changed LOC excluding tests.

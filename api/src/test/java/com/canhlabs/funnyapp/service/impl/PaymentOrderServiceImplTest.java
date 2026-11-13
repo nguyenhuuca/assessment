@@ -40,6 +40,8 @@ class PaymentOrderServiceImplTest {
 
     AppProperties props;
     PaymentOrderServiceImpl service;
+    boolean flagOn = true;
+    String askedFlag;
 
     @BeforeEach
     void setUp() {
@@ -48,7 +50,10 @@ class PaymentOrderServiceImplTest {
         s.setBankAccount("123456");
         s.setBankCode("MB");
         s.setAccountName("FUNNY");
-        service = new PaymentOrderServiceImpl(orderRepo, planRepo, props);
+        service = new PaymentOrderServiceImpl(orderRepo, planRepo, props, (flag, def) -> {
+            askedFlag = flag;
+            return flagOn;
+        });
     }
 
     private void stubSave() {
@@ -154,6 +159,21 @@ class PaymentOrderServiceImplTest {
         ok.setDonorName("x".repeat(PaymentOrderServiceImpl.MAX_NAME));
         ok.setMessage("y".repeat(PaymentOrderServiceImpl.MAX_MESSAGE));
         assertThat(service.createOrder(ok, null).getCode()).isNotNull();
+    }
+
+    @Test
+    void isOrderingEnabled_requiresHarnessFlag() {
+        flagOn = false;
+        assertThat(service.isOrderingEnabled()).isFalse();
+        assertThat(askedFlag).isEqualTo("sepay_payments_enabled");
+    }
+
+    @Test
+    void flagOff_createOrder_is503WithoutSaving() {
+        flagOn = false;
+
+        assertStatus(() -> service.createOrder(donation(20000L), null), HttpStatus.SERVICE_UNAVAILABLE);
+        verify(orderRepo, never()).save(any());
     }
 
     @Test

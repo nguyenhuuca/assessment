@@ -11,7 +11,9 @@ import com.canhlabs.funnyapp.enums.PaymentType;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.PaymentOrderRepository;
 import com.canhlabs.funnyapp.repo.PremiumPlanRepository;
+import com.canhlabs.funnyapp.service.FeatureFlagService;
 import com.canhlabs.funnyapp.service.PaymentOrderService;
+import com.canhlabs.funnyapp.utils.AppConstant;
 import com.canhlabs.funnyapp.utils.VietQrUrlBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -41,21 +43,25 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     private final PaymentOrderRepository orderRepo;
     private final PremiumPlanRepository planRepo;
     private final AppProperties appProps;
+    private final FeatureFlagService featureFlagService;
     private final SecureRandom random = new SecureRandom();
     private final Pattern codePattern;
 
     public PaymentOrderServiceImpl(PaymentOrderRepository orderRepo, PremiumPlanRepository planRepo,
-                                   AppProperties appProps) {
+                                   AppProperties appProps, FeatureFlagService featureFlagService) {
         this.orderRepo = orderRepo;
         this.planRepo = planRepo;
         this.appProps = appProps;
+        this.featureFlagService = featureFlagService;
         String prefix = appProps.getSepay().getCodePrefix() == null ? "" : appProps.getSepay().getCodePrefix().toUpperCase(Locale.ROOT);
         this.codePattern = Pattern.compile(Pattern.quote(prefix) + "[A-Z0-9]{" + CODE_LENGTH + "}");
     }
 
     @Override
     public boolean isOrderingEnabled() {
-        return appProps.getSepay().isOrderingConfigured();
+        // Harness flag gates new orders only; the webhook keeps crediting orders already shown (money may be in flight)
+        return appProps.getSepay().isOrderingConfigured()
+                && featureFlagService.isEnabled(AppConstant.Flags.SEPAY_PAYMENTS, false);
     }
 
     @Override
@@ -71,7 +77,7 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     @Transactional
     public OrderDto createOrder(CreateOrderRequest request, Long userId) {
         AppProperties.Sepay sepay = appProps.getSepay();
-        if (!sepay.isOrderingConfigured()) {
+        if (!isOrderingEnabled()) {
             throw CustomException.of(HttpStatus.SERVICE_UNAVAILABLE, 5031, "error.payment.notConfigured");
         }
         if (request == null || request.getType() == null) {
