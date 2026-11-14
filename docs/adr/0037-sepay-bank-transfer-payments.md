@@ -55,7 +55,7 @@ Webhook auth sub-options: API key header (`Authorization: Apikey …`) is a stat
 
 ## Decision Outcome
 
-**Option A**, plus the Option C API as a **reconciliation** job (every 10 min, `since_id`) to recover webhooks missed beyond SePay's ~33 min retry window. Option B can be added later as another order "channel" without changing the order model.
+**Option A**, plus the Option C API as a **reconciliation** job to recover webhooks missed beyond SePay's ~33 min retry window. As built (PAY-5): API v2 searched by the code prefix, once a day at 00:15 Asia/Ho_Chi_Minh over the previous day (T-1); v2 has UUID ids, so there is no `since_id` cursor. Option B can be added later as another order "channel" without changing the order model.
 
 ### Data model (Liquibase)
 - `premium_plans(id, code UNIQUE, name, duration_days, price_vnd BIGINT, active, sort_order, timestamps)` — admin-editable.
@@ -85,3 +85,4 @@ Amounts are VND `BIGINT`. Transfer insert, order update and premium extension ru
 | Date | Change |
 |------|--------|
 | 2026-11-12 | Proposed (/swarm-plan) |
+| 2026-11-14 | Reconciliation as built: API v2 by code prefix, daily at 00:15 for day T-1 (was every 10 min, `since_id`) |

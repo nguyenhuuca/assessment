@@ -21,7 +21,7 @@ Funny Movies runs on a paid VM and has no way to receive money. Viewers who want
 |------|--------|
 | Anyone can donate by VietQR | Donation confirmed on screen ≤ 10 s after SePay webhook, for ≥ 99% of matched transfers |
 | Logged-in users can buy Premium | Premium active automatically after a correct transfer, no admin action |
-| Admin sees every incoming transfer | 100% of SePay webhooks stored (matched or not); missed webhooks recovered by reconciliation within 15 min |
+| Admin sees every incoming transfer | 100% of SePay webhooks stored (matched or not); missed webhooks recovered by reconciliation by 00:15 the next day |
 | No double credit | 0 duplicate credits (dedupe on SePay transaction id) |
 
 ## User Stories
@@ -47,7 +47,7 @@ Funny Movies runs on a paid VM and has no way to receive money. Viewers who want
 - **FR-6** Admin notification (in-app, existing notification system) on `PAID` and `UNDERPAID`.
 - **FR-7** Admin Donations tab: orders (filter by type/status), unmatched transfers, totals; actions: link an unmatched transfer to an order, mark an underpaid order resolved (grant Premium or keep as donation), CRUD Premium plans (name, days, price, active).
 - **FR-8** User API exposes `premium` (bool) and `premiumUntil`; Settings shows Premium status and a buy/renew button; a Premium badge shows in the profile. No feature is gated yet (entitlement mechanism only).
-- **FR-9** Reconciliation job polls SePay transaction API v2 (`since_id`) every 10 min and feeds missing transfers through the same matching path.
+- **FR-9** Reconciliation job reads SePay transaction API v2 (by code prefix) once a day at 00:15 for the previous day (T-1) and feeds missing transfers through the same matching path; admins can also check one order on demand (PAY-13).
 - **FR-10** Scheduled job marks `PENDING` orders past expiry as `EXPIRED`.
 
 ### Non-Functional

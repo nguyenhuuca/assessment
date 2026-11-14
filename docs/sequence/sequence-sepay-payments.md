@@ -120,23 +120,26 @@ sequenceDiagram
     participant WS as SepayWebhookServiceImpl
     participant DB as PostgreSQL
 
-    J->>R: reconcile()
+    J->>R: reconcile() at 00:15 Asia/Ho_Chi_Minh
     alt Harness flag sepay_reconcile_enabled off, or no API token
         R-->>J: return, no call
     end
+    Note over R: day = yesterday (T-1): from yesterday 00:00 to today 00:00, bank time
     loop pages until has_more = false (max 10, 400 ms apart)
         R->>API: GET /v2/transactions?q=FM&transfer_type=in&transaction_date_from=yesterday 00:00 (Bearer token)
         API-->>R: data[], meta.pagination
     end
-    Note over R: keep yesterday's rows (T-1) with an FM code; webhook_success = 1 counted as webhook, the rest go through UUID to negative sepay_id
+    Note over R: keep rows dated yesterday with an FM code (rows from today wait for tomorrow)<br/>webhook_success = 1 counts as webhook, the rest get a negative sepay_id from their UUID
     R->>DB: which sepay_ids are already stored
-    loop each new row
+    loop each row not stored yet
         R->>WS: process(tx, source = RECONCILE), same path as webhook
         WS->>DB: skip if same reference + amount already stored, else insert ON CONFLICT DO NOTHING and match
     end
     alt 401 / 429 / 5xx / bad body
-        R-->>J: stop, log result=api_error; rerun the day from the admin Jobs tab
+        Note over R: stop paging, result = api_error (Run now in the admin Jobs tab the same day reruns T-1)
     end
+    R->>R: log INFO "SePay reconcile run: day, result, total, webhook, reconciled, already, failed"
+    Note over R: Grafana Business Stats, row SePay Reconcile, reads this line<br/>total = webhook + reconciled + already + failed
 ```
 
 ## 4b. Admin checks one order on SePay
