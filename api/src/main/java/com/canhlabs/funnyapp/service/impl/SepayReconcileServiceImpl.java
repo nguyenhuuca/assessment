@@ -127,9 +127,8 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
                 .filter(t -> t.transactionDate() != null && t.transactionDate().isBefore(settledBefore))
                 .toList();
         int recovered = processNew(missed);
-        if (!missed.isEmpty()) {
-            log.info("SePay reconcile: {} candidate(s) without a delivered webhook, {} processed", missed.size(), recovered);
-        }
+        // Grafana "Business Stats" (Job Health row) parses this line: keep its text and INFO level
+        log.info("SePay reconcile run: undelivered={}, settled={}, processed={}", found.size(), missed.size(), recovered);
         return recovered;
     }
 

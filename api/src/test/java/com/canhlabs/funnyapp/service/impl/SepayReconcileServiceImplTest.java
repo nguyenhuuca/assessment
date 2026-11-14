@@ -9,11 +9,16 @@ import com.canhlabs.funnyapp.repo.SepayTransactionRepository;
 import com.canhlabs.funnyapp.service.SepayReconcileService;
 import com.canhlabs.funnyapp.service.SepayWebhookService;
 import com.canhlabs.funnyapp.utils.AppConstant;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -135,6 +140,27 @@ class SepayReconcileServiceImplTest {
 
         assertThat(requests.get()).isZero();
         verify(webhookService, never()).process(any(), any());
+    }
+
+    // Grafana "Business Stats" (Job Health row) parses this line: text and INFO level are a contract
+    @Test
+    void everyRun_logsSummaryAtInfo_forGrafana() {
+        pages.put(1, page(false, tx(U1, 50000, "FMLVKXU9WH", "FMLVKXU9WH ung ho", SETTLED, 0),
+                tx(U2, 20000, "FMABCDEFGH", "FMABCDEFGH", "2026-11-14 14:50:00", 0)));
+        Logger logger = (Logger) LoggerFactory.getLogger(SepayReconcileServiceImpl.class);
+        ListAppender<ILoggingEvent> logs = new ListAppender<>();
+        logs.start();
+        logger.addAppender(logs);
+        try {
+            service.reconcile();
+
+            assertThat(logs.list).anySatisfy(e -> {
+                assertThat(e.getFormattedMessage()).isEqualTo("SePay reconcile run: undelivered=2, settled=1, processed=1");
+                assertThat(e.getLevel()).isEqualTo(Level.INFO);
+            });
+        } finally {
+            logger.detachAppender(logs);
+        }
     }
 
     @Test
