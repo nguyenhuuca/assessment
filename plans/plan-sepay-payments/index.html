@@ -9111,7 +9111,7 @@ Related Skills: swarm-plan, testing
 </tbody>
 </table>
 <h3 id="config-env-appsepay">Config (env → <code>app.sepay.*</code>)<a class="headerlink" href="#config-env-appsepay" title="Permanent link">&para;</a></h3>
-<p><code>SEPAY_WEBHOOK_SECRET</code>, <code>SEPAY_API_TOKEN</code>, <code>SEPAY_BANK_ACCOUNT</code>, <code>SEPAY_BANK_CODE</code>, <code>SEPAY_ACCOUNT_NAME</code>, <code>SEPAY_CODE_PREFIX</code> (FM), <code>SEPAY_QR_BASE_URL</code> (<code>https://qr.sepay.vn/img</code>), <code>SEPAY_ORDER_TTL_HOURS</code> (24), <code>SEPAY_MIN_DONATION</code> (10000), <code>SEPAY_ALLOWED_IPS</code> (empty = off), <code>SEPAY_RECONCILE_ENABLED</code> (false).</p>
+<p><code>SEPAY_WEBHOOK_SECRET</code>, <code>SEPAY_API_TOKEN</code>, <code>SEPAY_API_BASE_URL</code> (live <code>https://userapi.sepay.vn</code>, sandbox <code>https://userapi-sandbox.sepay.vn</code>), <code>SEPAY_BANK_ACCOUNT</code>, <code>SEPAY_BANK_CODE</code>, <code>SEPAY_ACCOUNT_NAME</code>, <code>SEPAY_CODE_PREFIX</code> (FM), <code>SEPAY_QR_BASE_URL</code> (<code>https://qr.sepay.vn/img</code>), <code>SEPAY_ORDER_TTL_HOURS</code> (24), <code>SEPAY_MIN_DONATION</code> (10000), <code>SEPAY_ALLOWED_IPS</code> (empty = off). The reconcile job is switched by the Harness flag <code>sepay_reconcile_enabled</code> (default off), not an env var.</p>
 <p><strong>On/off switch:</strong> Harness flag <code>sepay_payments_enabled</code> (boolean, default <code>false</code>, evaluated per user). New orders and the donate nav (<code>GET /payments/config</code>) need the bank env vars <strong>and</strong> the flag on. The webhook is not gated by the flag, so a transfer for an order already shown is still credited after the flag is turned off.</p>
 <h2 id="implementation-steps">Implementation Steps<a class="headerlink" href="#implementation-steps" title="Permanent link">&para;</a></h2>
 <p>Each task merges to <code>main</code> on its own (trunk-based); dependents start after the prerequisite lands. Sizes target ≤ 400 changed LOC excluding tests.</p>
@@ -9151,8 +9151,8 @@ Related Skills: swarm-plan, testing
 </tr>
 <tr>
 <td><strong>PAY-5</strong></td>
-<td>Reconciliation: <code>SepayReconcileServiceImpl</code> (Java <code>HttpClient</code>, Bearer token, <code>since_id</code> cursor stored in a <code>app_kv</code>/settings row, asc paging, 429 <code>Retry-After</code> → stop) + <code>@Scheduled</code> every 10 min behind <code>SEPAY_RECONCILE_ENABLED</code></td>
-<td>Tests with stubbed HTTP: new tx processed once, duplicates no-op, cursor saved only after full success, 429/5xx keep cursor; job no-op when disabled or token blank</td>
+<td>Reconciliation (as built): <code>SepayReconcileServiceImpl</code> on SePay API v2 <code>GET /v2/transactions?q=FM&amp;transfer_type=in&amp;transaction_date_from=now-72h&amp;transaction_date_sort=asc</code>, pages until <code>has_more=false</code> (max 10, 400 ms apart for the 3 req/s limit). Skips <code>webhook_success=1</code>, rows without the code prefix and transfers younger than 60 min (no account filter, like the webhook: sandbox accounts differ) (SePay still retries the webhook). v2 ids are UUIDs, so each is stored as a stable negative 53-bit <code>sepay_id</code> (webhook ids are positive); <code>process</code> also dedupes on bank reference + amount so a transfer is never credited twice. No cursor: the window is re-read every run. Job <code>reconcile-sepay</code> every 10 min (<code>scheduled_job</code>), gated by the Harness flag <code>sepay_reconcile_enabled</code> and a non-blank <code>SEPAY_API_TOKEN</code></td>
+<td>Stubbed-HTTP tests: flag off / blank token = no call, paging, skips (delivered, stored, recent, foreign, malformed), one failure does not stop the rest, 401/429/bad JSON/unreachable = nothing processed; reference dedupe in <code>process</code></td>
 <td>PAY-3</td>
 </tr>
 <tr>
@@ -9178,6 +9178,12 @@ Related Skills: swarm-plan, testing
 <td>FE admin <code>DONATIONS</code> tab (<code>TABS</code>, <code>TAB_QUERY</code>, render branch, <code>tabs.DONATIONS</code> en/vi): totals cards, orders table (filters, status badges, surplus), unmatched transfers with "link to order", resolve underpaid (ConfirmModal), plans editor</td>
 <td>Vitest for each action calling the right endpoint and invalidating <code>['admin','payments']</code>; table uses <code>formatBytes</code>-style shared <code>formatVnd</code> helper</td>
 <td>PAY-6</td>
+</tr>
+<tr>
+<td><strong>PAY-13</strong></td>
+<td>Admin "Check on SePay" per order (as built): row menu on PENDING / EXPIRED / UNDERPAID orders calls <code>POST /admin/payments/orders/{id}/check-sepay</code>, which searches API v2 with <code>q=&lt;order code&gt;</code> from the order's creation (minus 1 h) and records undelivered transfers through the same path; no flag or age gate, only the API token. 503 when the token is missing, 502 when SePay cannot be read</td>
+<td>Service, controller and tab tests: found / none / already stored / errors</td>
+<td>PAY-5</td>
 </tr>
 <tr>
 <td><strong>PAY-10</strong></td>

@@ -2798,6 +2798,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#4b-admin-checks-one-order-on-sepay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4b. Admin checks one order on SePay
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#5-order-expiry-job" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8781,6 +8792,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#4b-admin-checks-one-order-on-sepay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4b. Admin checks one order on SePay
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#5-order-expiry-job" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8917,23 +8939,53 @@
 <h2 id="4-reconciliation-job-missed-webhooks">4. Reconciliation job (missed webhooks)<a class="headerlink" href="#4-reconciliation-job-missed-webhooks" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
-    participant J as AppScheduler (every 10 min)
+    participant J as AppScheduler reconcile-sepay (every 10 min)
     participant R as SepayReconcileServiceImpl
     participant API as SePay userapi v2
     participant WS as SepayWebhookServiceImpl
     participant DB as PostgreSQL
 
     J-&gt;&gt;R: reconcile()
-    R-&gt;&gt;DB: read last since_id cursor
-    loop pages (per_page=100, asc) — respect 3 req/s
-        R-&gt;&gt;API: GET /v2/transactions?since_id=&amp;transfer_type=in (Bearer token)
-        API--&gt;&gt;R: data[], pagination
-        R-&gt;&gt;WS: process(tx, source = RECONCILE) — same path as webhook
-        WS-&gt;&gt;DB: insert ON CONFLICT DO NOTHING, match if new
+    alt Harness flag sepay_reconcile_enabled off, or no API token
+        R--&gt;&gt;J: return, no call
     end
-    R-&gt;&gt;DB: save new cursor
-    alt 429 / 5xx
-        R--&gt;&gt;J: stop, keep cursor, retry next run
+    loop pages until has_more = false (max 10, 400 ms apart)
+        R-&gt;&gt;API: GET /v2/transactions?q=FM&amp;transfer_type=in&amp;transaction_date_from=now-72h (Bearer token)
+        API--&gt;&gt;R: data[], meta.pagination
+    end
+    Note over R: keep rows with webhook_success != 1, FM code, our account, older than 60 min, UUID to negative sepay_id
+    R-&gt;&gt;DB: which sepay_ids are already stored
+    loop each new row
+        R-&gt;&gt;WS: process(tx, source = RECONCILE), same path as webhook
+        WS-&gt;&gt;DB: skip if same reference + amount already stored, else insert ON CONFLICT DO NOTHING and match
+    end
+    alt 401 / 429 / 5xx / bad body
+        R--&gt;&gt;J: stop, next run reads the 72 h window again
+    end</code></pre>
+<h2 id="4b-admin-checks-one-order-on-sepay">4b. Admin checks one order on SePay<a class="headerlink" href="#4b-admin-checks-one-order-on-sepay" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    participant A as AdminPaymentsTab (row menu)
+    participant C as AdminPaymentController
+    participant S as AdminPaymentServiceImpl
+    participant R as SepayReconcileServiceImpl
+    participant API as SePay userapi v2
+    participant WS as SepayWebhookServiceImpl
+
+    A-&gt;&gt;C: POST /admin/payments/orders/{id}/check-sepay
+    C-&gt;&gt;S: checkOrderOnSepay(id), PENDING / EXPIRED / UNDERPAID only
+    S-&gt;&gt;R: checkCode(order code, order createdAt)
+    R-&gt;&gt;API: GET /v2/transactions?q=FMXXXXXXXX&amp;transfer_type=in&amp;transaction_date_from=createdAt-1h
+    API--&gt;&gt;R: data[]
+    loop rows with this code and webhook_success != 1, not stored yet
+        R-&gt;&gt;WS: process(tx, source = RECONCILE)
+    end
+    R--&gt;&gt;S: found, processed
+    S--&gt;&gt;A: found, processed, order as it is now
+    alt no API token
+        S--&gt;&gt;A: 503
+    else SePay error (401 / 429 / down)
+        S--&gt;&gt;A: 502
     end</code></pre>
 <h2 id="5-order-expiry-job">5. Order expiry job<a class="headerlink" href="#5-order-expiry-job" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>sequenceDiagram
