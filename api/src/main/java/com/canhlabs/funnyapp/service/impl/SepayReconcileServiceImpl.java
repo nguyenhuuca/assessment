@@ -53,7 +53,8 @@ import java.util.stream.Collectors;
 @Service
 public class SepayReconcileServiceImpl implements SepayReconcileService {
 
-    static final URI API_BASE = URI.create("https://userapi.sepay.vn");
+    /** Used when SEPAY_API_BASE_URL is blank. */
+    static final String DEFAULT_API_BASE = "https://userapi.sepay.vn";
     static final String LIST_PATH = "/v2/transactions";
     /** Covers an outage of up to three days. */
     static final Duration LOOKBACK = Duration.ofHours(72);
@@ -69,7 +70,6 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
     private static final DateTimeFormatter BANK_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final HttpClient client;
-    private final URI base;
     private final Clock clock;
     private final Duration pagePause;
     private final AppProperties props;
@@ -85,14 +85,13 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
                         .followRedirects(HttpClient.Redirect.NEVER)
                         .connectTimeout(Duration.ofSeconds(5))
                         .build(),
-                API_BASE, Clock.systemUTC(), PAGE_PAUSE, props, flags, webhookService, txRepo, mapper);
+                Clock.systemUTC(), PAGE_PAUSE, props, flags, webhookService, txRepo, mapper);
     }
 
-    SepayReconcileServiceImpl(HttpClient client, URI base, Clock clock, Duration pagePause, AppProperties props,
+    SepayReconcileServiceImpl(HttpClient client, Clock clock, Duration pagePause, AppProperties props,
                               FeatureFlagService flags, SepayWebhookService webhookService,
                               SepayTransactionRepository txRepo, JsonMapper mapper) {
         this.client = client;
-        this.base = base;
         this.clock = clock;
         this.pagePause = pagePause;
         this.props = props;
@@ -169,7 +168,7 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
     }
 
     private JsonNode get(String token, String query) {
-        HttpRequest request = HttpRequest.newBuilder(URI.create(base.toString().replaceAll("/+$", "") + LIST_PATH + query))
+        HttpRequest request = HttpRequest.newBuilder(URI.create(apiBase() + LIST_PATH + query))
                 .timeout(REQUEST_TIMEOUT)
                 .header("Authorization", "Bearer " + token)
                 .header("Accept", "application/json")
@@ -195,6 +194,13 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
             log.warn("SePay reconcile: transactions API call failed: {}", e.getClass().getSimpleName());
             return null;
         }
+    }
+
+    /** Configured host without trailing slash: sandbox while testing, live in production. */
+    String apiBase() {
+        String configured = props.getSepay().getApiBaseUrl();
+        String base = configured == null || configured.isBlank() ? DEFAULT_API_BASE : configured.trim();
+        return base.replaceAll("/+$", "");
     }
 
     private boolean pause() {

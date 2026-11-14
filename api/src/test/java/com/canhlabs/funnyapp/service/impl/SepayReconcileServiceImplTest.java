@@ -16,7 +16,6 @@ import org.mockito.ArgumentCaptor;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
@@ -90,8 +89,8 @@ class SepayReconcileServiceImplTest {
         webhookService = mock(SepayWebhookService.class);
         txRepo = mock(SepayTransactionRepository.class);
         when(txRepo.findAllById(anyList())).thenReturn(List.of());
-        service = new SepayReconcileServiceImpl(HttpClient.newHttpClient(),
-                URI.create("http://127.0.0.1:" + server.getAddress().getPort()), Clock.fixed(NOW, ZoneOffset.UTC),
+        props.getSepay().setApiBaseUrl("http://127.0.0.1:" + server.getAddress().getPort() + "/");
+        service = new SepayReconcileServiceImpl(HttpClient.newHttpClient(), Clock.fixed(NOW, ZoneOffset.UTC),
                 Duration.ZERO, props, (flag, def) -> AppConstant.Flags.SEPAY_RECONCILE.equals(flag) && flagOn,
                 webhookService, txRepo, JsonMappers.create());
     }
@@ -260,6 +259,18 @@ class SepayReconcileServiceImplTest {
         assertThat(service.reconcile()).isZero();
 
         verify(webhookService, never()).process(any(), any());
+    }
+
+    @Test
+    void apiBase_usesConfiguredHost_elseLive() {
+        props.getSepay().setApiBaseUrl(" https://userapi-sandbox.sepay.vn// ");
+        assertThat(service.apiBase()).isEqualTo("https://userapi-sandbox.sepay.vn");
+
+        props.getSepay().setApiBaseUrl(" ");
+        assertThat(service.apiBase()).isEqualTo("https://userapi.sepay.vn");
+
+        props.getSepay().setApiBaseUrl(null);
+        assertThat(service.apiBase()).isEqualTo(SepayReconcileServiceImpl.DEFAULT_API_BASE);
     }
 
     @Test

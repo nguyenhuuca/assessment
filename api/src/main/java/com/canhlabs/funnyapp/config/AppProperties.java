@@ -130,6 +130,8 @@ public class AppProperties {
     public static class Sepay {
         private String webhookSecret = "";
         private String apiToken = "";
+        /** SePay user API host: live https://userapi.sepay.vn, sandbox https://userapi-sandbox.sepay.vn. */
+        private String apiBaseUrl = "https://userapi.sepay.vn";
         private String bankAccount = "";
         private String bankCode = "";
         private String accountName = "";

@@ -167,6 +167,8 @@ app:
   sepay:
     webhook-secret: ${SEPAY_WEBHOOK_SECRET:}
     api-token: ${SEPAY_API_TOKEN:}
+    # Live https://userapi.sepay.vn, sandbox (Test mode token) https://userapi-sandbox.sepay.vn
+    api-base-url: ${SEPAY_API_BASE_URL:https://userapi.sepay.vn}
     bank-account: ${SEPAY_BANK_ACCOUNT:}
     bank-code: ${SEPAY_BANK_CODE:}
     account-name: ${SEPAY_ACCOUNT_NAME:}
