@@ -219,6 +219,26 @@ class AdminPaymentControllerTest {
     }
 
     @Test
+    void checkOnSepay_admin_callsService() throws Exception {
+        when(service.checkOrderOnSepay(4L)).thenReturn(com.canhlabs.funnyapp.dto.payment.AdminOrderCheckDto.builder()
+                .found(1).processed(1)
+                .order(AdminOrderDto.builder().id(4L).status(PaymentOrderStatus.PAID).build()).build());
+
+        mockMvc.perform(post(BASE + "/orders/4/check-sepay").with(authentication(principal(UserRole.ADMIN))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.found").value(1))
+                .andExpect(jsonPath("$.data.order.status").value("PAID"));
+        verify(service).checkOrderOnSepay(4L);
+    }
+
+    @Test
+    void checkOnSepay_user_returns403() throws Exception {
+        mockMvc.perform(post(BASE + "/orders/4/check-sepay").with(authentication(principal(UserRole.USER))))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(service);
+    }
+
+    @Test
     void markPaidAndCancel_user_returns403() throws Exception {
         mockMvc.perform(post(BASE + "/orders/4/mark-paid").contentType(JSON).content("{\"amount\":1}")
                         .with(authentication(principal(UserRole.USER))))

@@ -17,6 +17,7 @@ export const ignoreTransaction = (sepayId) => api.post(`${BASE}/transactions/${e
 export const linkTransaction = (sepayId, orderCode) => api.post(`${BASE}/transactions/${encodeURIComponent(sepayId)}/link`, { orderCode })
 export const resolveOrder    = (id, grantPremium) => api.post(`${BASE}/orders/${encodeURIComponent(id)}/resolve`, { grantPremium })
 export const markOrderPaid   = (id, amount) => api.post(`${BASE}/orders/${encodeURIComponent(id)}/mark-paid`, { amount })
+export const checkOrderOnSepay = (id) => api.post(`${BASE}/orders/${encodeURIComponent(id)}/check-sepay`, {})
 export const cancelOrder     = (id) => api.post(`${BASE}/orders/${encodeURIComponent(id)}/cancel`, {})
 export const getPlans        = () => api.get(`${BASE}/plans`)
 export const createPlan      = (body) => api.post(`${BASE}/plans`, body)

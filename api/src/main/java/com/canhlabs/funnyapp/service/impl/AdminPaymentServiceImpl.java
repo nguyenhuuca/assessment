@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.dto.payment.AdminOrderCheckDto;
 import com.canhlabs.funnyapp.dto.payment.AdminOrderDto;
 import com.canhlabs.funnyapp.dto.payment.AdminPaymentSummaryDto;
 import com.canhlabs.funnyapp.dto.payment.AdminPlanDto;
@@ -16,6 +17,7 @@ import com.canhlabs.funnyapp.repo.PaymentOrderRepository;
 import com.canhlabs.funnyapp.repo.PremiumPlanRepository;
 import com.canhlabs.funnyapp.repo.SepayTransactionRepository;
 import com.canhlabs.funnyapp.service.AdminPaymentService;
+import com.canhlabs.funnyapp.service.SepayReconcileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,6 +44,9 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
     static final int MAX_NAME = 100;
     /** Orders still waiting for money: the only ones an admin can mark paid or cancel. */
     private static final Set<PaymentOrderStatus> OPEN = EnumSet.of(PaymentOrderStatus.PENDING, PaymentOrderStatus.EXPIRED);
+    /** Orders a transfer can still change: open ones, and UNDERPAID ones that can be topped up. */
+    private static final Set<PaymentOrderStatus> CHECKABLE =
+            EnumSet.of(PaymentOrderStatus.PENDING, PaymentOrderStatus.EXPIRED, PaymentOrderStatus.UNDERPAID);
     /** Placeholder transaction id in settlement logs for an admin-confirmed payment (no SePay transaction). */
     static final long MANUAL_TX_ID = 0L;
     private static final Pattern PLAN_CODE = Pattern.compile("^[A-Z0-9_]{3,32}$");
@@ -50,20 +55,24 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
     private final SepayTransactionRepository txRepo;
     private final PremiumPlanRepository planRepo;
     private final PaymentSettlement settlement;
+    private final SepayReconcileService reconcileService;
     private final Clock clock;
 
     @Autowired
     public AdminPaymentServiceImpl(PaymentOrderRepository orderRepo, SepayTransactionRepository txRepo,
-                                   PremiumPlanRepository planRepo, PaymentSettlement settlement) {
-        this(orderRepo, txRepo, planRepo, settlement, Clock.systemUTC());
+                                   PremiumPlanRepository planRepo, PaymentSettlement settlement,
+                                   SepayReconcileService reconcileService) {
+        this(orderRepo, txRepo, planRepo, settlement, reconcileService, Clock.systemUTC());
     }
 
     AdminPaymentServiceImpl(PaymentOrderRepository orderRepo, SepayTransactionRepository txRepo,
-                            PremiumPlanRepository planRepo, PaymentSettlement settlement, Clock clock) {
+                            PremiumPlanRepository planRepo, PaymentSettlement settlement,
+                            SepayReconcileService reconcileService, Clock clock) {
         this.orderRepo = orderRepo;
         this.txRepo = txRepo;
         this.planRepo = planRepo;
         this.settlement = settlement;
+        this.reconcileService = reconcileService;
         this.clock = clock;
     }
 
@@ -178,6 +187,30 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
         settlement.apply(order, MANUAL_TX_ID, amount, Instant.now(clock));
         log.info("Admin marked order {} paid manually: {} VND -> {}", order.getId(), amount, order.getStatus());
         return toDto(order, planCodesFor(order));
+    }
+
+    @Override
+    public AdminOrderCheckDto checkOrderOnSepay(long orderId) {
+        // No transaction here: the HTTP call must not hold a DB connection, and each transfer is processed in
+        // its own transaction by the webhook path, which takes the order row lock
+        PaymentOrder order = orderRepo.findById(orderId)
+                .orElseThrow(() -> CustomException.of(HttpStatus.NOT_FOUND, 4041, "error.payment.orderNotFound"));
+        if (!CHECKABLE.contains(order.getStatus())) {
+            throw CustomException.of(HttpStatus.CONFLICT, 4096, "error.payment.notCheckable");
+        }
+        Instant since = order.getCreatedAt() != null ? order.getCreatedAt() : Instant.now(clock).minus(Duration.ofDays(3));
+        SepayReconcileService.CheckResult result;
+        try {
+            result = reconcileService.checkCode(order.getCode(), since);
+        } catch (SepayReconcileService.SepayApiException e) {
+            log.warn("SePay check for order {} failed: {}", orderId, e.getMessage());
+            throw e.isConfigured()
+                    ? CustomException.of(HttpStatus.BAD_GATEWAY, 5021, "error.payment.sepayApiFailed")
+                    : CustomException.of(HttpStatus.SERVICE_UNAVAILABLE, 5032, "error.payment.sepayApiNotConfigured");
+        }
+        PaymentOrder now = orderRepo.findById(orderId).orElse(order);
+        return AdminOrderCheckDto.builder().found(result.found()).processed(result.processed())
+                .order(toDto(now, planCodesFor(now))).build();
     }
 
     @Override

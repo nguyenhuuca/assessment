@@ -745,4 +745,5 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **PAY-SEC** Security review fixes: proxy-aware client IP, order lookup rate limit + format check, purge unpaid expired orders, amount exactness, case-insensitive hex, hoisted pattern — 0e20146f
 - [x] **PAY-11** Admin order row menu: mark paid (manual, amount rules) / cancel; date + time in payment tables — 6a18df88
 - [x] **PAY-12** Admin "Ignore" action for unmatched transfers (UNMATCHED → IGNORED, kept in DB); webhook verified end-to-end in SePay Test mode
+- [x] **PAY-13** Admin "Check on SePay" per order (API v2 q=<order code>); reconcile job no longer filters by account (sandbox)
 - [ ] **PAY-10** Ops: SePay dashboard + secrets, sandbox simulate, prod smoke, ADR Accepted — blocked by PAY-4, PAY-5, PAY-7, PAY-8, PAY-9

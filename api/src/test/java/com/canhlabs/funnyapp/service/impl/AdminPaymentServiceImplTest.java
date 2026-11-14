@@ -16,6 +16,8 @@ import com.canhlabs.funnyapp.repo.PaymentOrderRepository;
 import com.canhlabs.funnyapp.repo.PremiumPlanRepository;
 import com.canhlabs.funnyapp.repo.SepayTransactionRepository;
 import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.service.SepayReconcileService;
+import com.canhlabs.funnyapp.dto.payment.AdminOrderCheckDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
@@ -49,6 +51,7 @@ class AdminPaymentServiceImplTest {
     private PremiumPlanRepository planRepo;
     private UserRepo userRepo;
     private ApplicationEventPublisher events;
+    private SepayReconcileService reconcile;
     private AdminPaymentServiceImpl service;
 
     @BeforeEach
@@ -58,8 +61,9 @@ class AdminPaymentServiceImplTest {
         planRepo = mock(PremiumPlanRepository.class);
         userRepo = mock(UserRepo.class);
         events = mock(ApplicationEventPublisher.class);
+        reconcile = mock(SepayReconcileService.class);
         service = new AdminPaymentServiceImpl(orderRepo, txRepo, planRepo,
-                new PaymentSettlement(orderRepo, planRepo, userRepo, events), Clock.fixed(NOW, ZoneOffset.UTC));
+                new PaymentSettlement(orderRepo, planRepo, userRepo, events), reconcile, Clock.fixed(NOW, ZoneOffset.UTC));
         when(orderRepo.save(any(PaymentOrder.class))).thenAnswer(i -> i.getArgument(0));
         when(txRepo.save(any(SepayTransaction.class))).thenAnswer(i -> i.getArgument(0));
         when(planRepo.save(any(PremiumPlan.class))).thenAnswer(i -> i.getArgument(0));
@@ -285,6 +289,61 @@ class AdminPaymentServiceImplTest {
 
         when(txRepo.findById(9L)).thenReturn(Optional.of(tx(TxMatchStatus.MATCHED, 10000)));
         assertStatus(() -> service.ignoreTransaction(9L), HttpStatus.CONFLICT);
+    }
+
+    // ---- check on SePay ----
+
+    @Test
+    void checkOnSepay_searchesTheOrderCodeFromCreation_andReturnsTheReloadedOrder() {
+        Instant created = NOW.minusSeconds(7200);
+        PaymentOrder before = premiumOrder(PaymentOrderStatus.PENDING, 0);
+        before.setCreatedAt(created);
+        PaymentOrder after = premiumOrder(PaymentOrderStatus.PAID, 100000);
+        when(orderRepo.findById(5L)).thenReturn(Optional.of(before), Optional.of(after));
+        when(reconcile.checkCode("FMABCD1234", created)).thenReturn(new SepayReconcileService.CheckResult(1, 1));
+
+        AdminOrderCheckDto dto = service.checkOrderOnSepay(5L);
+
+        assertThat(dto.getFound()).isEqualTo(1);
+        assertThat(dto.getProcessed()).isEqualTo(1);
+        assertThat(dto.getOrder().getStatus()).isEqualTo(PaymentOrderStatus.PAID);
+    }
+
+    @Test
+    void checkOnSepay_withoutCreationTime_looksBackThreeDays() {
+        PaymentOrder order = premiumOrder(PaymentOrderStatus.UNDERPAID, 40000);
+        when(orderRepo.findById(5L)).thenReturn(Optional.of(order));
+        when(reconcile.checkCode("FMABCD1234", NOW.minusSeconds(3 * 86400)))
+                .thenReturn(new SepayReconcileService.CheckResult(0, 0));
+
+        AdminOrderCheckDto dto = service.checkOrderOnSepay(5L);
+
+        assertThat(dto.getFound()).isZero();
+        assertThat(dto.getOrder().getStatus()).isEqualTo(PaymentOrderStatus.UNDERPAID);
+    }
+
+    @Test
+    void checkOnSepay_rejections() {
+        when(orderRepo.findById(5L)).thenReturn(Optional.empty());
+        assertStatus(() -> service.checkOrderOnSepay(5L), HttpStatus.NOT_FOUND);
+
+        when(orderRepo.findById(5L)).thenReturn(Optional.of(premiumOrder(PaymentOrderStatus.PAID, 100000)));
+        assertStatus(() -> service.checkOrderOnSepay(5L), HttpStatus.CONFLICT);
+        verifyNoInteractions(reconcile);
+
+        when(orderRepo.findById(5L)).thenReturn(Optional.of(premiumOrder(PaymentOrderStatus.PENDING, 0)));
+        when(reconcile.checkCode(any(), any()))
+                .thenThrow(new SepayReconcileService.SepayApiException("no token", false));
+        assertStatus(() -> service.checkOrderOnSepay(5L), HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @Test
+    void checkOnSepay_apiFailure_isBadGateway() {
+        when(orderRepo.findById(5L)).thenReturn(Optional.of(premiumOrder(PaymentOrderStatus.EXPIRED, 0)));
+        when(reconcile.checkCode(any(), any()))
+                .thenThrow(new SepayReconcileService.SepayApiException("HTTP 429", true));
+
+        assertStatus(() -> service.checkOrderOnSepay(5L), HttpStatus.BAD_GATEWAY);
     }
 
     // ---- resolve ----
@@ -563,7 +622,7 @@ class AdminPaymentServiceImplTest {
     @Test
     void publicConstructor_usesSystemClock() {
         AdminPaymentServiceImpl s = new AdminPaymentServiceImpl(orderRepo, txRepo, planRepo,
-                new PaymentSettlement(orderRepo, planRepo, userRepo, events));
+                new PaymentSettlement(orderRepo, planRepo, userRepo, events), reconcile);
         when(planRepo.findAllByOrderBySortOrderAscIdAsc()).thenReturn(List.of());
         assertThat(s.listPlans()).isEmpty();
     }

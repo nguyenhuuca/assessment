@@ -2,6 +2,7 @@ package com.canhlabs.funnyapp.web;
 
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.HasPermission;
+import com.canhlabs.funnyapp.dto.payment.AdminOrderCheckDto;
 import com.canhlabs.funnyapp.dto.payment.AdminOrderDto;
 import com.canhlabs.funnyapp.dto.payment.AdminPaymentSummaryDto;
 import com.canhlabs.funnyapp.dto.payment.AdminPlanDto;
@@ -102,6 +103,13 @@ public class AdminPaymentController {
     public ResponseEntity<ResultObjectInfo<AdminOrderDto>> markPaid(@PathVariable long id,
                                                                      @RequestBody MarkPaidRequest request) {
         return ok(service.markPaid(id, request.getAmount()));
+    }
+
+    @PostMapping("/orders/{id}/check-sepay")
+    @HasPermission(perm = Permission.ADMIN)
+    @AuditLog("adminCheckPaymentOrderOnSepay")
+    public ResponseEntity<ResultObjectInfo<AdminOrderCheckDto>> checkOnSepay(@PathVariable long id) {
+        return ok(service.checkOrderOnSepay(id));
     }
 
     @PostMapping("/orders/{id}/cancel")

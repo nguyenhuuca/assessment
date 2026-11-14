@@ -3274,5 +3274,6 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
   color: var(--text);
 }
 .pay-section-error { margin: 0; padding: 0 16px 12px; color: #ff1744; font-size: 13px; }
+.pay-section-notice { margin: 0; padding: 0 16px 12px; color: var(--text-muted); font-size: 13px; }
 .pay-section > form { padding: 0 16px 16px; }
 .pay-section .admin-pagination { padding: 12px 16px; }

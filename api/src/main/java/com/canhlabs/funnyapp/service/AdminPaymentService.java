@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service;
 
+import com.canhlabs.funnyapp.dto.payment.AdminOrderCheckDto;
 import com.canhlabs.funnyapp.dto.payment.AdminOrderDto;
 import com.canhlabs.funnyapp.dto.payment.AdminPaymentSummaryDto;
 import com.canhlabs.funnyapp.dto.payment.AdminPlanDto;
@@ -39,6 +40,12 @@ public interface AdminPaymentService {
      * applies {@code amount} with the webhook amount rules, so it lands on PAID or UNDERPAID.
      */
     AdminOrderDto markPaid(long orderId, long amount);
+
+    /**
+     * Asks SePay now for transfers carrying this order's code (PENDING, EXPIRED or UNDERPAID) and records any the
+     * webhook missed, with the webhook amount rules.
+     */
+    AdminOrderCheckDto checkOrderOnSepay(long orderId);
 
     /** PENDING or EXPIRED to CANCELLED; a later transfer with its code is then stored UNMATCHED. */
     AdminOrderDto cancelOrder(long orderId);

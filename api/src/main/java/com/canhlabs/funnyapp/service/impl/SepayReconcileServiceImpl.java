@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -112,59 +113,86 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
             log.warn("SePay reconcile skipped: SEPAY_API_TOKEN is not set");
             return 0;
         }
+        String prefix = prefix();
+        String from = bankTime(clock.instant().minus(LOOKBACK));
+        List<SepayTxPayload> found = new ArrayList<>();
+        try {
+            fetch(token.trim(), prefix, from, n -> carriesPrefix(n, prefix), found);
+        } catch (SepayApiException e) {
+            // keep what earlier pages gave; the next run reads the whole window again
+            log.warn("SePay reconcile: {}", e.getMessage());
+        }
         Instant settledBefore = clock.instant().minus(MIN_AGE);
-        List<SepayTxPayload> missed = fetchMissed(token.trim()).stream()
+        List<SepayTxPayload> missed = found.stream()
                 .filter(t -> t.transactionDate() != null && t.transactionDate().isBefore(settledBefore))
                 .toList();
-        if (missed.isEmpty()) {
+        int recovered = processNew(missed);
+        if (!missed.isEmpty()) {
+            log.info("SePay reconcile: {} candidate(s) without a delivered webhook, {} processed", missed.size(), recovered);
+        }
+        return recovered;
+    }
+
+    @Override
+    public CheckResult checkCode(String code, Instant since) {
+        String token = props.getSepay().getApiToken();
+        if (token == null || token.isBlank()) {
+            throw new SepayApiException("SEPAY_API_TOKEN is not set", false);
+        }
+        String wanted = code.trim().toUpperCase(Locale.ROOT);
+        // An hour of slack before the order: bank and server clocks differ, and the query filters on bank time
+        String from = bankTime(since.minus(Duration.ofHours(1)));
+        List<SepayTxPayload> found = new ArrayList<>();
+        fetch(token.trim(), wanted, from, n -> carriesCode(n, wanted), found);
+        int processed = processNew(found);
+        log.info("SePay check for order {}: {} undelivered transfer(s), {} processed", wanted, found.size(), processed);
+        return new CheckResult(found.size(), processed);
+    }
+
+    /** Sends each transfer not stored yet through the webhook path; one failure does not stop the rest. */
+    private int processNew(List<SepayTxPayload> txs) {
+        if (txs.isEmpty()) {
             return 0;
         }
-        Set<Long> known = txRepo.findAllById(missed.stream().map(SepayTxPayload::id).toList()).stream()
+        Set<Long> known = txRepo.findAllById(txs.stream().map(SepayTxPayload::id).toList()).stream()
                 .map(SepayTransaction::getSepayId).collect(Collectors.toSet());
-        int recovered = 0;
-        for (SepayTxPayload tx : missed) {
+        int processed = 0;
+        for (SepayTxPayload tx : txs) {
             if (known.contains(tx.id())) {
                 continue;
             }
             try {
+                // process() also skips a transfer stored under another id (same bank reference + amount)
                 webhookService.process(tx, TxSource.RECONCILE);
-                recovered++;
+                processed++;
             } catch (RuntimeException e) {
                 log.warn("SePay reconcile could not process tx {}: {}", tx.id(), e.getClass().getSimpleName());
             }
         }
-        log.info("SePay reconcile: {} candidate(s) without a delivered webhook, {} processed", missed.size(), recovered);
-        return recovered;
+        return processed;
     }
 
     /**
-     * Incoming transfers in the look-back window that carry the code prefix and whose webhook was not delivered.
-     * Any API failure ends the pass with what was read so far; the next run reads the window again.
+     * Incoming transfers matching {@code q} since {@code from} (bank time) whose webhook was not delivered and
+     * that pass {@code keep}. Pages until has_more is false; a failed page throws, keeping earlier pages in out.
      */
-    List<SepayTxPayload> fetchMissed(String token) {
-        String prefix = props.getSepay().getCodePrefix().trim().toUpperCase(Locale.ROOT);
-        String from = LocalDateTime.ofInstant(clock.instant().minus(LOOKBACK), BANK_ZONE).format(BANK_TIME);
-        List<SepayTxPayload> out = new ArrayList<>();
+    void fetch(String token, String q, String from, Predicate<JsonNode> keep, List<SepayTxPayload> out) {
         for (int page = 1; page <= MAX_PAGES; page++) {
             if (page > 1 && !pause()) {
-                break;
+                return;
             }
-            JsonNode root = get(token, "?q=" + enc(prefix) + "&transfer_type=in&transaction_date_from=" + enc(from)
+            JsonNode root = get(token, "?q=" + enc(q) + "&transfer_type=in&transaction_date_from=" + enc(from)
                     + "&transaction_date_sort=asc&per_page=" + PER_PAGE + "&page=" + page);
-            if (root == null) {
-                break;
-            }
             for (JsonNode n : root.path("data")) {
-                SepayTxPayload tx = toPayload(n, prefix);
+                SepayTxPayload tx = keep.test(n) ? toPayload(n) : null;
                 if (tx != null) {
                     out.add(tx);
                 }
             }
             if (!root.path("meta").path("pagination").path("has_more").asBoolean(false)) {
-                break;
+                return;
             }
         }
-        return out;
     }
 
     private JsonNode get(String token, String query) {
@@ -173,27 +201,38 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
                 .header("Authorization", "Bearer " + token)
                 .header("Accept", "application/json")
                 .GET().build();
+        HttpResponse<String> response;
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                // 401 bad token, 422 bad query, 429 rate limit: stop, the next run retries
-                log.warn("SePay reconcile: HTTP {} from transactions API", response.statusCode());
-                return null;
-            }
-            JsonNode root = mapper.readTree(response.body());
-            if (root == null || !root.path("data").isArray()) {
-                log.warn("SePay reconcile: response has no data array");
-                return null;
-            }
-            return root;
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return null;
+            throw new SepayApiException("interrupted", true);
         } catch (IOException | RuntimeException e) {
             // never log the body or the token
-            log.warn("SePay reconcile: transactions API call failed: {}", e.getClass().getSimpleName());
-            return null;
+            throw new SepayApiException("transactions API call failed: " + e.getClass().getSimpleName(), true);
         }
+        if (response.statusCode() != 200) {
+            // 401 bad token, 422 bad query, 429 rate limit
+            throw new SepayApiException("HTTP " + response.statusCode() + " from transactions API", true);
+        }
+        JsonNode root;
+        try {
+            root = mapper.readTree(response.body());
+        } catch (RuntimeException e) {
+            throw new SepayApiException("response is not JSON", true);
+        }
+        if (root == null || !root.path("data").isArray()) {
+            throw new SepayApiException("response has no data array", true);
+        }
+        return root;
+    }
+
+    private String prefix() {
+        return props.getSepay().getCodePrefix().trim().toUpperCase(Locale.ROOT);
+    }
+
+    private static String bankTime(Instant instant) {
+        return LocalDateTime.ofInstant(instant, BANK_ZONE).format(BANK_TIME);
     }
 
     /** Configured host without trailing slash: sandbox while testing, live in production. */
@@ -213,8 +252,23 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
         }
     }
 
-    /** Null for a delivered webhook, an outgoing or malformed row, or one without our code prefix. */
-    private SepayTxPayload toPayload(JsonNode n, String prefix) {
+    /** q also matches inside unrelated words; keep rows whose code or memo really carries the prefix. */
+    private static boolean carriesPrefix(JsonNode n, String prefix) {
+        return startsWith(text(n, "code"), prefix) || contains(text(n, "transaction_content"), prefix);
+    }
+
+    /** One order: SePay's extracted code is that order's code, or the memo contains it. */
+    private static boolean carriesCode(JsonNode n, String code) {
+        String c = text(n, "code");
+        return (c != null && c.trim().equalsIgnoreCase(code)) || contains(text(n, "transaction_content"), code);
+    }
+
+    /**
+     * Null for a delivered webhook (already stored by the webhook path), an outgoing or malformed row. The
+     * account is not checked, like the webhook: the API key only sees this company's accounts, and the order code
+     * still has to match (sandbox test accounts differ from the live one).
+     */
+    private static SepayTxPayload toPayload(JsonNode n) {
         if (n.path("webhook_success").asInt(0) == 1) {
             return null;
         }
@@ -223,24 +277,13 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
         if (uuid == null || amountIn <= 0 || !"in".equalsIgnoreCase(text(n, "transfer_type"))) {
             return null;
         }
-        String code = text(n, "code");
-        String content = text(n, "transaction_content");
-        // q also matches the prefix inside unrelated words; keep rows whose code or memo really carries it
-        if (!startsWithPrefix(code, prefix) && (content == null || !content.toUpperCase(Locale.ROOT).contains(prefix))) {
-            return null;
-        }
-        String account = props.getSepay().getBankAccount();
-        String txAccount = text(n, "account_number");
-        if (account != null && !account.isBlank() && txAccount != null && !account.trim().equals(txAccount.trim())) {
-            return null;
-        }
         Long id = storageId(uuid);
         if (id == null) {
             return null;
         }
         return new SepayTxPayload(id, text(n, "bank_brand_name"),
-                SepayWebhookServiceImpl.bankTime(text(n, "transaction_date")), txAccount, code, content, "in",
-                amountIn, text(n, "reference_number"));
+                SepayWebhookServiceImpl.bankTime(text(n, "transaction_date")), text(n, "account_number"),
+                text(n, "code"), text(n, "transaction_content"), "in", amountIn, text(n, "reference_number"));
     }
 
     /**
@@ -266,8 +309,12 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
         }
     }
 
-    private static boolean startsWithPrefix(String code, String prefix) {
-        return code != null && code.trim().toUpperCase(Locale.ROOT).startsWith(prefix);
+    private static boolean startsWith(String value, String prefix) {
+        return value != null && value.trim().toUpperCase(Locale.ROOT).startsWith(prefix);
+    }
+
+    private static boolean contains(String value, String part) {
+        return value != null && value.toUpperCase(Locale.ROOT).contains(part);
     }
 
     private static String text(JsonNode n, String field) {

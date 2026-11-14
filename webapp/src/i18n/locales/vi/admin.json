@@ -519,6 +519,10 @@
     "ignoreTx": "Bỏ qua",
     "ignoreTitle": "Bỏ qua chuyển khoản {{amount}}",
     "ignoreMessage": "Dùng cho khoản không thuộc đơn nào, ví dụ giao dịch Gửi thử của SePay. Khoản này sẽ biến khỏi danh sách và không được tính cho đơn nào; dữ liệu vẫn được lưu lại.",
-    "ignoreConfirm": "Bỏ qua"
+    "ignoreConfirm": "Bỏ qua",
+    "checkSepay": "Kiểm tra SePay",
+    "checking": "Đang kiểm tra {{code}} trên SePay…",
+    "checkNone": "Chưa có giao dịch nào mang mã {{code}} trên SePay",
+    "checkFound": "Tìm thấy {{found}} giao dịch cho {{code}}, ghi nhận mới {{processed}}. Trạng thái: {{status}}"
   }
 }

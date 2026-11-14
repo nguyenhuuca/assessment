@@ -542,6 +542,10 @@
     "ignoreTx": "Ignore",
     "ignoreTitle": "Ignore transfer of {{amount}}",
     "ignoreMessage": "Use this for a transfer no order owns, such as a SePay test send. It leaves this list and is not counted for any order; the record is kept.",
-    "ignoreConfirm": "Ignore"
+    "ignoreConfirm": "Ignore",
+    "checkSepay": "Check on SePay",
+    "checking": "Checking {{code}} on SePay…",
+    "checkNone": "No transfer with code {{code}} on SePay yet",
+    "checkFound": "Found {{found}} transfer(s) for {{code}}, {{processed}} newly recorded. Status: {{status}}"
   }
 }

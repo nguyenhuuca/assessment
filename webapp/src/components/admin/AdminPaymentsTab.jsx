@@ -7,7 +7,7 @@ import { formatVnd } from '../../utils/formatVnd.js'
 import { formatDate } from '../../i18n/format.js'
 import {
   useAdminPaymentsSummary, useAdminPaymentOrders, useAdminUnmatched, useAdminPaymentPlans,
-  useLinkTransaction, useIgnoreTransaction, useResolveOrder, useMarkOrderPaid, useCancelOrder, useCreatePlan, useUpdatePlan, useSetPlanActive,
+  useLinkTransaction, useIgnoreTransaction, useResolveOrder, useMarkOrderPaid, useCancelOrder, useCheckOrderOnSepay, useCreatePlan, useUpdatePlan, useSetPlanActive,
 } from '../../hooks/useAdminPayments.js'
 
 const PAGE_SIZE = 10
@@ -70,6 +70,8 @@ function OrdersSection() {
   const [paying, setPaying] = useState(null)
   const [payAmount, setPayAmount] = useState('')
   const [cancelling, setCancelling] = useState(null)
+  const check = useCheckOrderOnSepay()
+  const [notice, setNotice] = useState('')
   const orders = data?.content ?? []
 
   const onFail = e => setError(e?.message || t('pay.actionFailed'))
@@ -89,15 +91,27 @@ function OrdersSection() {
       onError: e => { setCancelling(null); onFail(e) },
     })
   }
+  function checkOnSepay(o) {
+    setError('')
+    setNotice(t('pay.checking', { code: o.code }))
+    check.mutate({ id: o.id }, {
+      onSuccess: r => setNotice(r?.found
+        ? t('pay.checkFound', { code: o.code, found: r.found, processed: r.processed, status: t(`pay.status.${r.order?.status}`, r.order?.status) })
+        : t('pay.checkNone', { code: o.code })),
+      onError: e => { setNotice(''); onFail(e) },
+    })
+  }
+  const checkItem = o => ({ key: 'check', icon: 'sync', label: t('pay.checkSepay'), onSelect: () => checkOnSepay(o) })
   function rowActions(o) {
     if (OPEN_STATUSES.includes(o.status)) {
       return [
+        checkItem(o),
         { key: 'paid', icon: 'check_circle', label: t('pay.markPaid'), onSelect: () => openMarkPaid(o) },
         { key: 'cancel', icon: 'cancel', label: t('pay.cancelOrder'), danger: true, onSelect: () => { setError(''); setCancelling(o) } },
       ]
     }
     if (o.status === 'UNDERPAID') {
-      return [{ key: 'resolve', icon: 'task_alt', label: t('pay.resolve'), onSelect: () => openResolve(o) }]
+      return [checkItem(o), { key: 'resolve', icon: 'task_alt', label: t('pay.resolve'), onSelect: () => openResolve(o) }]
     }
     return []
   }
@@ -128,6 +142,7 @@ function OrdersSection() {
         </div>
       </div>
       {error && <p role="alert" className="pay-section-error">{error}</p>}
+      {notice && <p role="status" className="pay-section-notice">{notice}</p>}
       <div className="admin-table-scroll">
         <table className="admin-table">
           <thead>

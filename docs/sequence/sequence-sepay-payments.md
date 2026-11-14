@@ -139,6 +139,35 @@ sequenceDiagram
     end
 ```
 
+## 4b. Admin checks one order on SePay
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A as AdminPaymentsTab (row menu)
+    participant C as AdminPaymentController
+    participant S as AdminPaymentServiceImpl
+    participant R as SepayReconcileServiceImpl
+    participant API as SePay userapi v2
+    participant WS as SepayWebhookServiceImpl
+
+    A->>C: POST /admin/payments/orders/{id}/check-sepay
+    C->>S: checkOrderOnSepay(id), PENDING / EXPIRED / UNDERPAID only
+    S->>R: checkCode(order code, order createdAt)
+    R->>API: GET /v2/transactions?q=FMXXXXXXXX&transfer_type=in&transaction_date_from=createdAt-1h
+    API-->>R: data[]
+    loop rows with this code and webhook_success != 1, not stored yet
+        R->>WS: process(tx, source = RECONCILE)
+    end
+    R-->>S: found, processed
+    S-->>A: found, processed, order as it is now
+    alt no API token
+        S-->>A: 503
+    else SePay error (401 / 429 / down)
+        S-->>A: 502
+    end
+```
+
 ## 5. Order expiry job
 
 ```mermaid

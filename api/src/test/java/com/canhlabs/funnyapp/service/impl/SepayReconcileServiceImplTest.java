@@ -6,6 +6,7 @@ import com.canhlabs.funnyapp.dto.payment.SepayTxPayload;
 import com.canhlabs.funnyapp.entity.SepayTransaction;
 import com.canhlabs.funnyapp.enums.TxSource;
 import com.canhlabs.funnyapp.repo.SepayTransactionRepository;
+import com.canhlabs.funnyapp.service.SepayReconcileService;
 import com.canhlabs.funnyapp.service.SepayWebhookService;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import com.sun.net.httpserver.HttpServer;
@@ -32,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -186,8 +188,9 @@ class SepayReconcileServiceImplTest {
     }
 
     @Test
-    void rowsWithoutOurPrefix_outgoing_malformed_otherAccount_orTooRecent_areDropped() {
-        String otherAccount = tx(U2, 10000, "other account FMCCCCCCCC").replace("1017588888", "999");
+    void rowsWithoutOurPrefix_outgoing_malformed_orTooRecent_areDropped_anyAccountIsKept() {
+        // sandbox test accounts differ from the live one; the order code is what has to match
+        String otherAccount = tx(U2, 10000, "other account FMCCCCCCCC").replace("1017588888", "3571248070");
         pages.put(1, page(false,
                 tx(U1, 10000, "transfer from mom"),                         // no FM anywhere
                 tx("not-a-uuid", 10000, "FMDDDDDDDD"),
@@ -197,9 +200,10 @@ class SepayReconcileServiceImplTest {
                 otherAccount,
                 tx("f1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, "ok fmhhhhhhhh")));
 
-        assertThat(service.reconcile()).isEqualTo(1);
+        assertThat(service.reconcile()).isEqualTo(2);
 
-        assertThat(processed(1)).extracting(SepayTxPayload::content).containsExactly("ok fmhhhhhhhh");
+        assertThat(processed(2)).extracting(SepayTxPayload::content)
+                .containsExactly("other account FMCCCCCCCC", "ok fmhhhhhhhh");
     }
 
     @Test
@@ -258,6 +262,55 @@ class SepayReconcileServiceImplTest {
 
         assertThat(service.reconcile()).isZero();
 
+        verify(webhookService, never()).process(any(), any());
+    }
+
+    // ---- checkCode (admin "Check on SePay") ----
+
+    @Test
+    void checkCode_searchesTheExactCode_ignoresFlagAndAge_processesOnlyThatOrdersTransfers() {
+        flagOn = false; // the admin action does not depend on the job flag
+        pages.put(1, page(false,
+                tx(U1, 50000, "FMAKN7GW7U", "FMAKN7GW7U", "2026-11-14 14:59:00", 0), // 1 min old: still taken
+                tx(U2, 20000, null, "fmakn7gw7u ung ho", SETTLED, null),
+                tx("c1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, "FMOTHER001", "FMOTHER001", SETTLED, 0),
+                tx("d1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, "FMAKN7GW7U", "FMAKN7GW7U", SETTLED, 1)));
+
+        SepayReconcileService.CheckResult r = service.checkCode(" fmakn7gw7u ", Instant.parse("2026-11-13T16:02:00Z"));
+
+        assertThat(r.found()).isEqualTo(2);
+        assertThat(r.processed()).isEqualTo(2);
+        assertThat(queries.get(0)).contains("q=FMAKN7GW7U").contains("transaction_date_from=2026-11-13 22:02:00");
+        assertThat(processed(2)).extracting(SepayTxPayload::amount).containsExactly(50000L, 20000L);
+    }
+
+    @Test
+    void checkCode_alreadyStored_isFoundButNotProcessedAgain() {
+        pages.put(1, page(false, tx(U1, 50000, "FMAKN7GW7U", "FMAKN7GW7U", SETTLED, 0)));
+        when(txRepo.findAllById(anyList())).thenReturn(
+                List.of(SepayTransaction.builder().sepayId(SepayReconcileServiceImpl.storageId(U1)).build()));
+
+        SepayReconcileService.CheckResult r = service.checkCode("FMAKN7GW7U", NOW);
+
+        assertThat(r.found()).isEqualTo(1);
+        assertThat(r.processed()).isZero();
+        verify(webhookService, never()).process(any(), any());
+    }
+
+    @Test
+    void checkCode_failures_throwWithConfiguredFlag() {
+        props.getSepay().setApiToken("");
+        assertThatThrownBy(() -> service.checkCode("FMAKN7GW7U", NOW))
+                .isInstanceOfSatisfying(SepayReconcileService.SepayApiException.class,
+                        e -> assertThat(e.isConfigured()).isFalse());
+        assertThat(requests.get()).isZero();
+
+        props.getSepay().setApiToken(TOKEN);
+        status.set(401);
+        pages.put(1, "{\"status\":\"error\",\"error_code\":\"unauthorized\"}");
+        assertThatThrownBy(() -> service.checkCode("FMAKN7GW7U", NOW))
+                .isInstanceOfSatisfying(SepayReconcileService.SepayApiException.class,
+                        e -> assertThat(e.isConfigured()).isTrue());
         verify(webhookService, never()).process(any(), any());
     }
 

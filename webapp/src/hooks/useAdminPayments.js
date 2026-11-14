@@ -37,6 +37,8 @@ export const useResolveOrder = () =>
   useInvalidating(async ({ id, grantPremium }) => unwrap(await adminPayments.resolveOrder(id, grantPremium)))
 export const useMarkOrderPaid = () =>
   useInvalidating(async ({ id, amount }) => unwrap(await adminPayments.markOrderPaid(id, amount)))
+export const useCheckOrderOnSepay = () =>
+  useInvalidating(async ({ id }) => unwrap(await adminPayments.checkOrderOnSepay(id)))
 export const useCancelOrder = () =>
   useInvalidating(async ({ id }) => unwrap(await adminPayments.cancelOrder(id)))
 export const useCreatePlan = () =>

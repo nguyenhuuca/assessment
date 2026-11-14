@@ -8,7 +8,7 @@ import * as api from '../../../api/adminPayments.js'
 
 vi.mock('../../../api/adminPayments.js', () => ({
   getSummary: vi.fn(), getOrders: vi.fn(), getUnmatched: vi.fn(), linkTransaction: vi.fn(), ignoreTransaction: vi.fn(),
-  resolveOrder: vi.fn(), markOrderPaid: vi.fn(), cancelOrder: vi.fn(), getPlans: vi.fn(), createPlan: vi.fn(), updatePlan: vi.fn(), setPlanActive: vi.fn(),
+  resolveOrder: vi.fn(), markOrderPaid: vi.fn(), cancelOrder: vi.fn(), checkOrderOnSepay: vi.fn(), getPlans: vi.fn(), createPlan: vi.fn(), updatePlan: vi.fn(), setPlanActive: vi.fn(),
 }))
 
 const page = (content) => ({ data: { content, totalElements: content.length, totalPages: 1, number: 0, size: 10 } })
@@ -36,6 +36,7 @@ beforeEach(() => {
   api.resolveOrder.mockResolvedValue({ data: {} })
   api.markOrderPaid.mockResolvedValue({ data: {} })
   api.cancelOrder.mockResolvedValue({ data: {} })
+  api.checkOrderOnSepay.mockResolvedValue({ data: { found: 0, processed: 0, order: { status: 'PENDING' } } })
   api.createPlan.mockResolvedValue({ data: {} })
   api.updatePlan.mockResolvedValue({ data: {} })
   api.setPlanActive.mockResolvedValue({ data: {} })
@@ -177,6 +178,34 @@ describe('AdminPaymentsTab', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: /Huỷ đơn/ }))
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Huỷ đơn' }))
     expect(await screen.findByText('Only pending')).toBeInTheDocument()
+  })
+
+  it('checks a PENDING order on SePay and reports the recorded transfer', async () => {
+    api.getOrders.mockResolvedValue(page([order({ id: 3, code: 'FM3', status: 'PENDING', paidAmount: 0 })]))
+    api.checkOrderOnSepay.mockResolvedValue({ data: { found: 1, processed: 1, order: { status: 'PAID' } } })
+    const spy = renderTab()
+    await openMenu('FM3')
+    fireEvent.click(screen.getByRole('menuitem', { name: /Kiểm tra SePay/ }))
+    await waitFor(() => expect(api.checkOrderOnSepay).toHaveBeenCalledWith(3))
+    expect(await screen.findByRole('status')).toHaveTextContent('Tìm thấy 1 giao dịch cho FM3, ghi nhận mới 1. Trạng thái: Đã thanh toán')
+    await waitFor(() => expect(invalidated(spy)).toBe(true))
+  })
+
+  it('says so when SePay has no transfer for the order', async () => {
+    api.getOrders.mockResolvedValue(page([order({ id: 4, code: 'FM4', status: 'EXPIRED', paidAmount: 0 })]))
+    renderTab()
+    await openMenu('FM4')
+    fireEvent.click(screen.getByRole('menuitem', { name: /Kiểm tra SePay/ }))
+    expect(await screen.findByText('Chưa có giao dịch nào mang mã FM4 trên SePay')).toBeInTheDocument()
+  })
+
+  it('offers the SePay check on an UNDERPAID order and shows a server error', async () => {
+    api.checkOrderOnSepay.mockRejectedValue({ message: 'SePay down', status: 502 })
+    renderTab()
+    await openMenu('FM1')
+    fireEvent.click(screen.getByRole('menuitem', { name: /Kiểm tra SePay/ }))
+    expect(await screen.findByText('SePay down')).toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
   it('offers no row actions on a PAID order', async () => {
