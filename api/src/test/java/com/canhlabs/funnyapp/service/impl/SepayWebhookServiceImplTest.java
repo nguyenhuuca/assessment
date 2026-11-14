@@ -217,6 +217,25 @@ class SepayWebhookServiceImplTest {
     }
 
     @Test
+    void sameReferenceUnderAnotherId_isSkipped_noDoubleCredit() {
+        when(txRepo.existsByReferenceCodeAndAmountAndSepayIdNot("REF", 50000L, 2L)).thenReturn(true);
+
+        service.process(tx(2, 50000, CODE), TxSource.RECONCILE);
+
+        verify(txRepo, never()).insertIgnore(anyLong(), any(), anyString(), anyString(), anyString(), anyLong(),
+                any(), any(), any(), any(), any(), any());
+        verifyNoInteractions(orderRepo, events);
+    }
+
+    @Test
+    void blankReference_skipsTheReferenceCheck() {
+        service.process(new SepayTxPayload(1, "MB", null, null, null, "no code", "in", 1000, " "), TxSource.WEBHOOK);
+
+        verify(txRepo, never()).existsByReferenceCodeAndAmountAndSepayIdNot(any(), anyLong(), any());
+        verifyStored(null, "UNMATCHED");
+    }
+
+    @Test
     void out_isIgnored_noOrderLookup() {
         SepayTxPayload out = new SepayTxPayload(1, "MB", null, null, null, "to " + CODE, "OUT", 5000, null);
         service.process(out, TxSource.WEBHOOK);

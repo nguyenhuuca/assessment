@@ -175,7 +175,6 @@ app:
     order-ttl-hours: ${SEPAY_ORDER_TTL_HOURS:24}
     min-donation: ${SEPAY_MIN_DONATION:10000}
     allowed-ips: ${SEPAY_ALLOWED_IPS:}
-    reconcile-enabled: ${SEPAY_RECONCILE_ENABLED:false}
   email-setting:
       enable-preview-mode: false
       percentage: 10

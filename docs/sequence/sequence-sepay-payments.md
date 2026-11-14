@@ -114,23 +114,28 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    participant J as AppScheduler (every 10 min)
+    participant J as AppScheduler reconcile-sepay (every 10 min)
     participant R as SepayReconcileServiceImpl
     participant API as SePay userapi v2
     participant WS as SepayWebhookServiceImpl
     participant DB as PostgreSQL
 
     J->>R: reconcile()
-    R->>DB: read last since_id cursor
-    loop pages (per_page=100, asc) — respect 3 req/s
-        R->>API: GET /v2/transactions?since_id=&transfer_type=in (Bearer token)
-        API-->>R: data[], pagination
-        R->>WS: process(tx, source = RECONCILE) — same path as webhook
-        WS->>DB: insert ON CONFLICT DO NOTHING, match if new
+    alt Harness flag sepay_reconcile_enabled off, or no API token
+        R-->>J: return, no call
     end
-    R->>DB: save new cursor
-    alt 429 / 5xx
-        R-->>J: stop, keep cursor, retry next run
+    loop pages until has_more = false (max 10, 400 ms apart)
+        R->>API: GET /v2/transactions?q=FM&transfer_type=in&transaction_date_from=now-72h (Bearer token)
+        API-->>R: data[], meta.pagination
+    end
+    Note over R: keep rows with webhook_success != 1, FM code, our account, older than 60 min, UUID to negative sepay_id
+    R->>DB: which sepay_ids are already stored
+    loop each new row
+        R->>WS: process(tx, source = RECONCILE), same path as webhook
+        WS->>DB: skip if same reference + amount already stored, else insert ON CONFLICT DO NOTHING and match
+    end
+    alt 401 / 429 / 5xx / bad body
+        R-->>J: stop, next run reads the 72 h window again
     end
 ```
 

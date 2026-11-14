@@ -54,6 +54,7 @@ class AppSchedulerTest {
     @Mock com.canhlabs.funnyapp.service.notification.NotificationDigestService notificationDigestService;
 
     @Mock com.canhlabs.funnyapp.service.PaymentOrderService paymentOrderService;
+    @Mock com.canhlabs.funnyapp.service.SepayReconcileService sepayReconcileService;
 
     @InjectMocks
     AppScheduler scheduler;
@@ -65,6 +66,13 @@ class AppSchedulerTest {
         scheduler.expirePaymentOrders();
 
         verify(paymentOrderService).expireStaleOrders();
+    }
+
+    @Test
+    void reconcileSepay_delegatesToService() {
+        scheduler.reconcileSepay();
+
+        verify(sepayReconcileService).reconcile();
     }
 
     @BeforeEach

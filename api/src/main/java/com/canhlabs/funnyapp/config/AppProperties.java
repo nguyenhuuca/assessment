@@ -139,7 +139,6 @@ public class AppProperties {
         private long minDonation = 10000;
         /** Comma-separated webhook source IPs; empty disables the allowlist. */
         private String allowedIps = "";
-        private boolean reconcileEnabled = false;
 
         /** Orders can only be created once the receiving bank account is known. */
         public boolean isOrderingConfigured() {

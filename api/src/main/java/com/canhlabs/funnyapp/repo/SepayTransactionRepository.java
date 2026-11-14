@@ -48,6 +48,9 @@ public interface SepayTransactionRepository extends JpaRepository<SepayTransacti
 
     long countByMatchStatus(TxMatchStatus matchStatus);
 
+    /** Same bank transfer already stored under a different SePay id (webhook id vs reconcile API id). */
+    boolean existsByReferenceCodeAndAmountAndSepayIdNot(String referenceCode, long amount, Long sepayId);
+
     /** Atomic status change guarded by the current status: 1 when changed, 0 when the row moved on or is missing. */
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("UPDATE SepayTransaction t SET t.matchStatus = :to WHERE t.sepayId = :sepayId AND t.matchStatus = :from")

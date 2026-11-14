@@ -737,7 +737,7 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **PAY-2** AppProperties.Sepay, order create/get, VietQR URL, PaymentController, expiry job — blocked by PAY-1 — 0ad76991
 - [x] **PAY-3** SePay webhook: HMAC verify, dedupe, matching + amount rules, premium extension — blocked by PAY-2 — 26e5ef73
 - [x] **PAY-4** Admin notifications DONATION_RECEIVED / PREMIUM_PURCHASED / PAYMENT_UNDERPAID — blocked by PAY-3 — c9b5f2e1
-- [ ] **PAY-5** Reconciliation job (SePay transaction API v2, since_id) — blocked by PAY-3 — DEFERRED 2026-11-12: SePay v2 tx id is a UUID, webhook id is numeric → no shared dedupe key; follow-up after real data (owner decision)
+- [x] **PAY-5** Reconciliation job on SePay API v2 searched by code prefix; UUID → negative sepay_id, dedupe by bank reference + amount; Harness flag sepay_reconcile_enabled (replaces SEPAY_RECONCILE_ENABLED)
 - [x] **PAY-6** Admin payments API: orders, unmatched, totals, link, resolve, plans CRUD — b4a40137
 - [x] **PAY-7** User premium/premiumUntil in DTO + Settings section + badge — blocked by PAY-1 — a0186dce, 2e4f8e6c
 - [x] **PAY-8** FE Donate page (nav, QR, polling, thank-you, Premium tab) — blocked by PAY-2 — e1f41948

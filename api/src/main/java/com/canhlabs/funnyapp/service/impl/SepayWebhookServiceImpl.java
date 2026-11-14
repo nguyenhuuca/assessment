@@ -150,6 +150,10 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
     @Override
     @Transactional
     public void process(SepayTxPayload tx, TxSource source) {
+        if (isStoredUnderAnotherId(tx)) {
+            log.info("SePay tx {} skipped: same bank reference and amount already stored (source={})", tx.id(), source);
+            return;
+        }
         String code = extractCode(tx);
         if ("out".equalsIgnoreCase(tx.transferType()) || tx.amount() <= 0) {
             store(tx, source, null, TxMatchStatus.IGNORED, code);
@@ -168,6 +172,16 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
             return;
         }
         settlement.apply(order, tx.id(), tx.amount(), Instant.now(clock));
+    }
+
+    /**
+     * Second dedupe key next to sepay_id: the bank reference plus amount. It keeps a transfer from being credited
+     * twice if the reconcile API ever reports it under an id other than the webhook's.
+     */
+    private boolean isStoredUnderAnotherId(SepayTxPayload tx) {
+        String ref = cut(tx.referenceCode(), MAX_FIELD);
+        return ref != null && !ref.isBlank()
+                && txRepo.existsByReferenceCodeAndAmountAndSepayIdNot(ref, tx.amount(), tx.id());
     }
 
     private int store(SepayTxPayload tx, TxSource source, Long orderId, TxMatchStatus status, String code) {
@@ -218,7 +232,8 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
         return n.isMissingNode() || n.isNull() ? null : n.asText(null);
     }
 
-    private static Instant bankTime(String value) {
+    /** SePay's "yyyy-MM-dd HH:mm:ss" bank time (Vietnam) as an instant; null when absent or malformed. */
+    static Instant bankTime(String value) {
         if (value == null) {
             return null;
         }

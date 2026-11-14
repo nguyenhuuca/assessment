@@ -1,9 +1,9 @@
 task: SePay payments — donations + Premium
 status: blocked
-progress: 92
-done: PAY-1..4, PAY-6..9 deployed; FF sepay_payments_enabled; PAY-11 admin mark paid/cancel; PAY-12 ignore unmatched; webhook OK in SePay Test mode
+progress: 95
+done: PAY-1..9 built; FF sepay_payments_enabled; PAY-11 admin mark paid/cancel; PAY-12 ignore unmatched; PAY-5 reconcile job (API v2, FF)
 doing: -
 next: link a SePay-supported bank (Live); recreate webhook + payment-code config (FM, 8-8) in Live; test 10k donation
 plan: docs/plans/plan-sepay-payments.md
 blocker: SePay Live does not accept the owner's personal VCB account; owner to pick another bank
-updated: 2026-11-14 15:28
+updated: 2026-11-14 15:58

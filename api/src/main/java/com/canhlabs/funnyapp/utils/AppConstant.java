@@ -37,6 +37,8 @@ public class AppConstant {
         public static final String PERMISSION_ENFORCEMENT = "permission_enforcement_enabled";
         public static final String HLS_STREAMING = "hls_streaming_enabled";
         public static final String SEPAY_PAYMENTS = "sepay_payments_enabled";
+        /** Missed-webhook recovery job (PAY-5); off by default, needs SEPAY_API_TOKEN as well. */
+        public static final String SEPAY_RECONCILE = "sepay_reconcile_enabled";
     }
 
     // inner class hold all the path url that ignore the security when access to system
