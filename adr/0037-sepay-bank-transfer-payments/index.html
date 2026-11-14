@@ -9063,7 +9063,7 @@
 <p>Webhook auth sub-options: API key header (<code>Authorization: Apikey …</code>) is a static bearer secret replayable forever if leaked; <strong>HMAC with timestamp</strong> is chosen. IP allowlist is optional defence-in-depth (config, off by default) because the VM sits behind a proxy and SePay's IP list can change.</p>
 <hr />
 <h2 id="decision-outcome">Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permanent link">&para;</a></h2>
-<p><strong>Option A</strong>, plus the Option C API as a <strong>reconciliation</strong> job (every 10 min, <code>since_id</code>) to recover webhooks missed beyond SePay's ~33 min retry window. Option B can be added later as another order "channel" without changing the order model.</p>
+<p><strong>Option A</strong>, plus the Option C API as a <strong>reconciliation</strong> job to recover webhooks missed beyond SePay's ~33 min retry window. As built (PAY-5): API v2 searched by the code prefix, once a day at 00:15 Asia/Ho_Chi_Minh over the previous day (T-1); v2 has UUID ids, so there is no <code>since_id</code> cursor. Option B can be added later as another order "channel" without changing the order model.</p>
 <h3 id="data-model-liquibase">Data model (Liquibase)<a class="headerlink" href="#data-model-liquibase" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>premium_plans(id, code UNIQUE, name, duration_days, price_vnd BIGINT, active, sort_order, timestamps)</code> — admin-editable.</li>
@@ -9100,6 +9100,10 @@
 <tr>
 <td>2026-11-12</td>
 <td>Proposed (/swarm-plan)</td>
+</tr>
+<tr>
+<td>2026-11-14</td>
+<td>Reconciliation as built: API v2 by code prefix, daily at 00:15 for day T-1 (was every 10 min, <code>since_id</code>)</td>
 </tr>
 </tbody>
 </table>

@@ -8939,29 +8939,32 @@
 <h2 id="4-reconciliation-job-missed-webhooks">4. Reconciliation job (missed webhooks)<a class="headerlink" href="#4-reconciliation-job-missed-webhooks" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
-    participant J as AppScheduler reconcile-sepay (every 10 min)
+    participant J as AppScheduler reconcile-sepay (daily 00:15, day T-1)
     participant R as SepayReconcileServiceImpl
     participant API as SePay userapi v2
     participant WS as SepayWebhookServiceImpl
     participant DB as PostgreSQL
 
-    J-&gt;&gt;R: reconcile()
+    J-&gt;&gt;R: reconcile() at 00:15 Asia/Ho_Chi_Minh
     alt Harness flag sepay_reconcile_enabled off, or no API token
         R--&gt;&gt;J: return, no call
     end
+    Note over R: day = yesterday (T-1): from yesterday 00:00 to today 00:00, bank time
     loop pages until has_more = false (max 10, 400 ms apart)
-        R-&gt;&gt;API: GET /v2/transactions?q=FM&amp;transfer_type=in&amp;transaction_date_from=now-72h (Bearer token)
+        R-&gt;&gt;API: GET /v2/transactions?q=FM&amp;transfer_type=in&amp;transaction_date_from=yesterday 00:00 (Bearer token)
         API--&gt;&gt;R: data[], meta.pagination
     end
-    Note over R: keep rows with webhook_success != 1, FM code, our account, older than 60 min, UUID to negative sepay_id
+    Note over R: keep rows dated yesterday with an FM code (rows from today wait for tomorrow)&lt;br/&gt;webhook_success = 1 counts as webhook, the rest get a negative sepay_id from their UUID
     R-&gt;&gt;DB: which sepay_ids are already stored
-    loop each new row
+    loop each row not stored yet
         R-&gt;&gt;WS: process(tx, source = RECONCILE), same path as webhook
         WS-&gt;&gt;DB: skip if same reference + amount already stored, else insert ON CONFLICT DO NOTHING and match
     end
     alt 401 / 429 / 5xx / bad body
-        R--&gt;&gt;J: stop, next run reads the 72 h window again
-    end</code></pre>
+        Note over R: stop paging, result = api_error (Run now in the admin Jobs tab the same day reruns T-1)
+    end
+    R-&gt;&gt;R: log INFO "SePay reconcile run: day, result, total, webhook, reconciled, already, failed"
+    Note over R: Grafana Business Stats, row SePay Reconcile, reads this line&lt;br/&gt;total = webhook + reconciled + already + failed</code></pre>
 <h2 id="4b-admin-checks-one-order-on-sepay">4b. Admin checks one order on SePay<a class="headerlink" href="#4b-admin-checks-one-order-on-sepay" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber

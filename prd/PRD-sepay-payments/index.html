@@ -9126,7 +9126,7 @@
 </tr>
 <tr>
 <td>Admin sees every incoming transfer</td>
-<td>100% of SePay webhooks stored (matched or not); missed webhooks recovered by reconciliation within 15 min</td>
+<td>100% of SePay webhooks stored (matched or not); missed webhooks recovered by reconciliation by 00:15 the next day</td>
 </tr>
 <tr>
 <td>No double credit</td>
@@ -9159,7 +9159,7 @@
 <li><strong>FR-6</strong> Admin notification (in-app, existing notification system) on <code>PAID</code> and <code>UNDERPAID</code>.</li>
 <li><strong>FR-7</strong> Admin Donations tab: orders (filter by type/status), unmatched transfers, totals; actions: link an unmatched transfer to an order, mark an underpaid order resolved (grant Premium or keep as donation), CRUD Premium plans (name, days, price, active).</li>
 <li><strong>FR-8</strong> User API exposes <code>premium</code> (bool) and <code>premiumUntil</code>; Settings shows Premium status and a buy/renew button; a Premium badge shows in the profile. No feature is gated yet (entitlement mechanism only).</li>
-<li><strong>FR-9</strong> Reconciliation job polls SePay transaction API v2 (<code>since_id</code>) every 10 min and feeds missing transfers through the same matching path.</li>
+<li><strong>FR-9</strong> Reconciliation job reads SePay transaction API v2 (by code prefix) once a day at 00:15 for the previous day (T-1) and feeds missing transfers through the same matching path; admins can also check one order on demand (PAY-13).</li>
 <li><strong>FR-10</strong> Scheduled job marks <code>PENDING</code> orders past expiry as <code>EXPIRED</code>.</li>
 </ul>
 <h3 id="non-functional">Non-Functional<a class="headerlink" href="#non-functional" title="Permanent link">&para;</a></h3>
