@@ -7,7 +7,7 @@ import { formatVnd } from '../../utils/formatVnd.js'
 import { formatDate } from '../../i18n/format.js'
 import {
   useAdminPaymentsSummary, useAdminPaymentOrders, useAdminUnmatched, useAdminPaymentPlans,
-  useLinkTransaction, useResolveOrder, useMarkOrderPaid, useCancelOrder, useCreatePlan, useUpdatePlan, useSetPlanActive,
+  useLinkTransaction, useIgnoreTransaction, useResolveOrder, useMarkOrderPaid, useCancelOrder, useCreatePlan, useUpdatePlan, useSetPlanActive,
 } from '../../hooks/useAdminPayments.js'
 
 const PAGE_SIZE = 10
@@ -223,7 +223,16 @@ function UnmatchedSection() {
   const [error, setError] = useState('')
   const { data, isLoading } = useAdminUnmatched({ page, size: PAGE_SIZE })
   const link = useLinkTransaction()
+  const ignore = useIgnoreTransaction()
+  const [ignoring, setIgnoring] = useState(null)
   const rows = data?.content ?? []
+
+  function confirmIgnore() {
+    ignore.mutate({ sepayId: ignoring.sepayId }, {
+      onSuccess: () => setIgnoring(null),
+      onError: err => { setIgnoring(null); setError(err?.message || t('pay.actionFailed')) },
+    })
+  }
 
   function submit(e) {
     e.preventDefault()
@@ -239,6 +248,7 @@ function UnmatchedSection() {
   return (
     <section className="admin-table-wrap pay-section" aria-label={t('pay.unmatchedTitle')}>
       <div className="pay-section-head"><h2 className="pay-section-title">{t('pay.unmatchedTitle')}</h2></div>
+      {error && !linking && <p role="alert" className="pay-section-error">{error}</p>}
       <div className="admin-table-scroll">
         <table className="admin-table">
           <thead>
@@ -259,9 +269,14 @@ function UnmatchedSection() {
                   <td className="admin-cell-muted">{r.gateway}</td>
                   <td className="admin-cell-muted">{r.transactionDate ? formatDate(r.transactionDate, DATE_TIME) : '—'}</td>
                   <td>
-                    <button className="app-btn secondary" onClick={() => { setLinking(r); setOrderCode(r.code || ''); setError('') }}>
-                      {t('pay.linkToOrder')}
-                    </button>
+                    <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                      <button className="app-btn secondary" onClick={() => { setLinking(r); setOrderCode(r.code || ''); setError('') }}>
+                        {t('pay.linkToOrder')}
+                      </button>
+                      <button className="app-btn secondary" onClick={() => { setLinking(null); setError(''); setIgnoring(r) }}>
+                        {t('pay.ignoreTx')}
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 {linking?.sepayId === r.sepayId && (
@@ -283,6 +298,16 @@ function UnmatchedSection() {
         </table>
       </div>
       <Pager page={page} totalPages={data?.totalPages ?? 0} onPage={setPage} />
+      {ignoring && (
+        <ConfirmModal
+          title={t('pay.ignoreTitle', { amount: formatVnd(ignoring.amount) })}
+          message={t('pay.ignoreMessage')}
+          confirmLabel={t('pay.ignoreConfirm')}
+          pending={ignore.isPending}
+          onCancel={() => setIgnoring(null)}
+          onConfirm={confirmIgnore}
+        />
+      )}
     </section>
   )
 }

@@ -161,6 +161,21 @@ class AdminPaymentControllerTest {
     }
 
     @Test
+    void ignore_admin_callsService() throws Exception {
+        mockMvc.perform(post(BASE + "/transactions/9/ignore").with(authentication(principal(UserRole.ADMIN))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("SUCCESS"));
+        verify(service).ignoreTransaction(9L);
+    }
+
+    @Test
+    void ignore_user_returns403() throws Exception {
+        mockMvc.perform(post(BASE + "/transactions/9/ignore").with(authentication(principal(UserRole.USER))))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(service);
+    }
+
+    @Test
     void resolve_admin_callsService() throws Exception {
         when(service.resolveOrder(4L, true))
                 .thenReturn(AdminOrderDto.builder().id(4L).status(PaymentOrderStatus.RESOLVED).build());

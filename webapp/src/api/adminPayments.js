@@ -13,6 +13,7 @@ function qs(params) {
 export const getSummary      = () => api.get(`${BASE}/summary`)
 export const getOrders       = (params) => api.get(`${BASE}/orders${qs(params)}`)
 export const getUnmatched    = (params) => api.get(`${BASE}/transactions/unmatched${qs(params)}`)
+export const ignoreTransaction = (sepayId) => api.post(`${BASE}/transactions/${encodeURIComponent(sepayId)}/ignore`, {})
 export const linkTransaction = (sepayId, orderCode) => api.post(`${BASE}/transactions/${encodeURIComponent(sepayId)}/link`, { orderCode })
 export const resolveOrder    = (id, grantPremium) => api.post(`${BASE}/orders/${encodeURIComponent(id)}/resolve`, { grantPremium })
 export const markOrderPaid   = (id, amount) => api.post(`${BASE}/orders/${encodeURIComponent(id)}/mark-paid`, { amount })

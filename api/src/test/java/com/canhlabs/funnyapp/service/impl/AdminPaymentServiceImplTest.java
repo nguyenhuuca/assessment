@@ -254,6 +254,39 @@ class AdminPaymentServiceImplTest {
         verify(orderRepo, never()).save(any());
     }
 
+    // ---- ignore ----
+
+    @Test
+    void ignore_unmatched_changesStatusOnly() {
+        when(txRepo.updateMatchStatus(9L, TxMatchStatus.UNMATCHED, TxMatchStatus.IGNORED)).thenReturn(1);
+
+        service.ignoreTransaction(9L);
+
+        verify(txRepo).updateMatchStatus(9L, TxMatchStatus.UNMATCHED, TxMatchStatus.IGNORED);
+        verify(txRepo, never()).findById(any());
+        verifyNoInteractions(orderRepo);
+    }
+
+    @Test
+    void ignore_alreadyIgnored_isNoOp() {
+        when(txRepo.updateMatchStatus(9L, TxMatchStatus.UNMATCHED, TxMatchStatus.IGNORED)).thenReturn(0);
+        when(txRepo.findById(9L)).thenReturn(Optional.of(tx(TxMatchStatus.IGNORED, 10000)));
+
+        service.ignoreTransaction(9L);
+
+        verifyNoInteractions(orderRepo);
+    }
+
+    @Test
+    void ignore_rejections() {
+        when(txRepo.updateMatchStatus(9L, TxMatchStatus.UNMATCHED, TxMatchStatus.IGNORED)).thenReturn(0);
+        when(txRepo.findById(9L)).thenReturn(Optional.empty());
+        assertStatus(() -> service.ignoreTransaction(9L), HttpStatus.NOT_FOUND);
+
+        when(txRepo.findById(9L)).thenReturn(Optional.of(tx(TxMatchStatus.MATCHED, 10000)));
+        assertStatus(() -> service.ignoreTransaction(9L), HttpStatus.CONFLICT);
+    }
+
     // ---- resolve ----
 
     @Test

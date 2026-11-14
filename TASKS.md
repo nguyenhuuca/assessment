@@ -744,4 +744,5 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **PAY-9** FE admin DONATIONS tab — blocked by PAY-6 — bc7c0add, b3f60fb2
 - [x] **PAY-SEC** Security review fixes: proxy-aware client IP, order lookup rate limit + format check, purge unpaid expired orders, amount exactness, case-insensitive hex, hoisted pattern — 0e20146f
 - [x] **PAY-11** Admin order row menu: mark paid (manual, amount rules) / cancel; date + time in payment tables — 6a18df88
+- [x] **PAY-12** Admin "Ignore" action for unmatched transfers (UNMATCHED → IGNORED, kept in DB); webhook verified end-to-end in SePay Test mode
 - [ ] **PAY-10** Ops: SePay dashboard + secrets, sandbox simulate, prod smoke, ADR Accepted — blocked by PAY-4, PAY-5, PAY-7, PAY-8, PAY-9

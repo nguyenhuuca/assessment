@@ -25,6 +25,12 @@ public interface AdminPaymentService {
     /** Attaches an UNMATCHED transfer to an order and applies the webhook amount rules. */
     AdminOrderDto linkTransaction(long sepayId, String orderCode);
 
+    /**
+     * UNMATCHED to IGNORED: a transfer no order owns (SePay test send, unrelated income); it leaves the
+     * unmatched list but stays stored. Calling again on an IGNORED transfer is a no-op.
+     */
+    void ignoreTransaction(long sepayId);
+
     /** UNDERPAID to RESOLVED, optionally granting Premium. Calling again on a RESOLVED order is a no-op. */
     AdminOrderDto resolveOrder(long orderId, boolean grantPremium);
 

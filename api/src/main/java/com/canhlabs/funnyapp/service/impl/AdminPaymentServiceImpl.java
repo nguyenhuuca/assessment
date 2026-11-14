@@ -128,6 +128,21 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
 
     @Override
     @Transactional
+    public void ignoreTransaction(long sepayId) {
+        // Conditional update, so a concurrent link that already set MATCHED is never overwritten
+        if (txRepo.updateMatchStatus(sepayId, TxMatchStatus.UNMATCHED, TxMatchStatus.IGNORED) == 1) {
+            log.info("Admin ignored tx {}", sepayId);
+            return;
+        }
+        SepayTransaction tx = txRepo.findById(sepayId)
+                .orElseThrow(() -> CustomException.of(HttpStatus.NOT_FOUND, 4042, "error.payment.txNotFound"));
+        if (tx.getMatchStatus() != TxMatchStatus.IGNORED) {
+            throw CustomException.of(HttpStatus.CONFLICT, 4091, "error.payment.txNotUnmatched");
+        }
+    }
+
+    @Override
+    @Transactional
     public AdminOrderDto resolveOrder(long orderId, boolean grantPremium) {
         PaymentOrder order = lockOrder(orderId);
         if (order.getStatus() == PaymentOrderStatus.RESOLVED) {

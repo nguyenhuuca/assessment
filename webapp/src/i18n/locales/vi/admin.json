@@ -515,6 +515,10 @@
     "cancelOrder": "Huỷ đơn",
     "cancelTitle": "Huỷ đơn {{code}}",
     "cancelMessage": "Chuyển khoản mang mã này đến sau sẽ không được tự ghi nhận; nó sẽ nằm trong mục chuyển khoản chưa khớp.",
-    "cancelConfirm": "Huỷ đơn"
+    "cancelConfirm": "Huỷ đơn",
+    "ignoreTx": "Bỏ qua",
+    "ignoreTitle": "Bỏ qua chuyển khoản {{amount}}",
+    "ignoreMessage": "Dùng cho khoản không thuộc đơn nào, ví dụ giao dịch Gửi thử của SePay. Khoản này sẽ biến khỏi danh sách và không được tính cho đơn nào; dữ liệu vẫn được lưu lại.",
+    "ignoreConfirm": "Bỏ qua"
   }
 }

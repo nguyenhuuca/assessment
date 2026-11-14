@@ -538,6 +538,10 @@
     "cancelOrder": "Cancel order",
     "cancelTitle": "Cancel order {{code}}",
     "cancelMessage": "A transfer with this code arriving later will not be credited automatically; it will show under unmatched transfers.",
-    "cancelConfirm": "Cancel order"
+    "cancelConfirm": "Cancel order",
+    "ignoreTx": "Ignore",
+    "ignoreTitle": "Ignore transfer of {{amount}}",
+    "ignoreMessage": "Use this for a transfer no order owns, such as a SePay test send. It leaves this list and is not counted for any order; the record is kept.",
+    "ignoreConfirm": "Ignore"
   }
 }

@@ -47,4 +47,11 @@ public interface SepayTransactionRepository extends JpaRepository<SepayTransacti
     List<SepayTransaction> findByOrderIdOrderByReceivedAtAsc(Long orderId);
 
     long countByMatchStatus(TxMatchStatus matchStatus);
+
+    /** Atomic status change guarded by the current status: 1 when changed, 0 when the row moved on or is missing. */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("UPDATE SepayTransaction t SET t.matchStatus = :to WHERE t.sepayId = :sepayId AND t.matchStatus = :from")
+    int updateMatchStatus(@Param("sepayId") long sepayId,
+                          @Param("from") TxMatchStatus from,
+                          @Param("to") TxMatchStatus to);
 }

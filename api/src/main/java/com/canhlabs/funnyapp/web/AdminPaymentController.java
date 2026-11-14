@@ -80,6 +80,14 @@ public class AdminPaymentController {
         return ok(service.linkTransaction(sepayId, request.getOrderCode()));
     }
 
+    @PostMapping("/transactions/{sepayId}/ignore")
+    @HasPermission(perm = Permission.ADMIN)
+    @AuditLog("adminIgnorePaymentTransaction")
+    public ResponseEntity<ResultObjectInfo<Void>> ignore(@PathVariable long sepayId) {
+        service.ignoreTransaction(sepayId);
+        return ok(null);
+    }
+
     @PostMapping("/orders/{id}/resolve")
     @HasPermission(perm = Permission.ADMIN)
     @AuditLog("adminResolvePaymentOrder")

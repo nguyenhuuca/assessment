@@ -7,7 +7,7 @@ import { validatePlan } from '../../../utils/validatePlan.js'
 import * as api from '../../../api/adminPayments.js'
 
 vi.mock('../../../api/adminPayments.js', () => ({
-  getSummary: vi.fn(), getOrders: vi.fn(), getUnmatched: vi.fn(), linkTransaction: vi.fn(),
+  getSummary: vi.fn(), getOrders: vi.fn(), getUnmatched: vi.fn(), linkTransaction: vi.fn(), ignoreTransaction: vi.fn(),
   resolveOrder: vi.fn(), markOrderPaid: vi.fn(), cancelOrder: vi.fn(), getPlans: vi.fn(), createPlan: vi.fn(), updatePlan: vi.fn(), setPlanActive: vi.fn(),
 }))
 
@@ -32,6 +32,7 @@ beforeEach(() => {
   api.getUnmatched.mockResolvedValue(page([{ sepayId: 99, amount: 50000, content: 'FM1 pay', code: null, gateway: 'VCB', transactionDate: '2026-11-01T00:00:00Z' }]))
   api.getPlans.mockResolvedValue({ data: [plan] })
   api.linkTransaction.mockResolvedValue({ data: {} })
+  api.ignoreTransaction.mockResolvedValue({ data: null })
   api.resolveOrder.mockResolvedValue({ data: {} })
   api.markOrderPaid.mockResolvedValue({ data: {} })
   api.cancelOrder.mockResolvedValue({ data: {} })
@@ -76,6 +77,33 @@ describe('AdminPaymentsTab', () => {
     fireEvent.change(screen.getByLabelText('Mã đơn'), { target: { value: 'FM1' } })
     fireEvent.click(screen.getByRole('button', { name: 'Gắn' }))
     expect(await screen.findByText('Order cancelled')).toBeInTheDocument()
+  })
+
+  it('ignores an unmatched transfer after confirmation and invalidates', async () => {
+    const spy = renderTab()
+    fireEvent.click(await screen.findByRole('button', { name: 'Bỏ qua' }))
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByText(/Bỏ qua chuyển khoản 50\.000/)).toBeInTheDocument()
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Bỏ qua' }))
+    await waitFor(() => expect(api.ignoreTransaction).toHaveBeenCalledWith(99))
+    await waitFor(() => expect(invalidated(spy)).toBe(true))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('does not ignore when the confirmation is dismissed', async () => {
+    renderTab()
+    fireEvent.click(await screen.findByRole('button', { name: 'Bỏ qua' }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Hủy' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(api.ignoreTransaction).not.toHaveBeenCalled()
+  })
+
+  it('shows the server error when ignoring fails', async () => {
+    api.ignoreTransaction.mockRejectedValue({ message: 'Already matched', status: 409 })
+    renderTab()
+    fireEvent.click(await screen.findByRole('button', { name: 'Bỏ qua' }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Bỏ qua' }))
+    expect(await screen.findByText('Already matched')).toBeInTheDocument()
   })
 
   it('resolves an UNDERPAID premium order granting premium by default', async () => {
