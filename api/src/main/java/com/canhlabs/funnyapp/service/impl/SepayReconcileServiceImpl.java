@@ -28,12 +28,14 @@ import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -47,7 +49,8 @@ import java.util.stream.Collectors;
  *       (webhook ids are positive), so a second pass skips it and the two sources never collide.</li>
  *   <li>{@code process} also dedupes on bank reference + amount, so a transfer stored by the webhook is never
  *       credited again under its reconcile id.</li>
- *   <li>Transfers younger than {@link #MIN_AGE} are left to the webhook, which SePay retries for about 33 minutes.</li>
+ *   <li>Each run covers the previous calendar day (T-1) in Vietnam time; the job runs at 00:15. A late webhook
+ *       retry for the same transfer is skipped by the reference + amount dedupe.</li>
  * </ul>
  */
 @Slf4j
@@ -57,9 +60,6 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
     /** Used when SEPAY_API_BASE_URL is blank. */
     static final String DEFAULT_API_BASE = "https://userapi.sepay.vn";
     static final String LIST_PATH = "/v2/transactions";
-    /** Covers an outage of up to three days. */
-    static final Duration LOOKBACK = Duration.ofHours(72);
-    static final Duration MIN_AGE = Duration.ofMinutes(60);
     static final int PER_PAGE = 100;
     static final int MAX_PAGES = 10;
     /** SePay allows 3 requests per second per IP. */
@@ -114,22 +114,27 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
             return 0;
         }
         String prefix = prefix();
-        String from = bankTime(clock.instant().minus(LOOKBACK));
-        List<SepayTxPayload> found = new ArrayList<>();
+        LocalDate today = LocalDate.ofInstant(clock.instant(), BANK_ZONE);
+        LocalDate day = today.minusDays(1);
+        Instant dayEnd = today.atStartOfDay(BANK_ZONE).toInstant();
+        String from = day.atStartOfDay().format(BANK_TIME);
+        List<JsonNode> rows = new ArrayList<>();
+        String result = "ok";
         try {
-            fetch(token.trim(), prefix, from, n -> carriesPrefix(n, prefix), found);
+            fetch(token.trim(), prefix, from, n -> carriesPrefix(n, prefix) && before(n, dayEnd), rows);
         } catch (SepayApiException e) {
             // keep what earlier pages gave; the next run reads the whole window again
+            result = "api_error";
             log.warn("SePay reconcile: {}", e.getMessage());
         }
-        Instant settledBefore = clock.instant().minus(MIN_AGE);
-        List<SepayTxPayload> missed = found.stream()
-                .filter(t -> t.transactionDate() != null && t.transactionDate().isBefore(settledBefore))
-                .toList();
-        int recovered = processNew(missed);
-        // Grafana "Business Stats" (Job Health row) parses this line: keep its text and INFO level
-        log.info("SePay reconcile run: undelivered={}, settled={}, processed={}", found.size(), missed.size(), recovered);
-        return recovered;
+        long delivered = rows.stream().filter(SepayReconcileServiceImpl::delivered).count();
+        List<SepayTxPayload> open = undelivered(rows);
+        Tally t = processNew(open);
+        // Grafana "Business Stats" (SePay Reconcile row) parses this line: keep its text and INFO level.
+        // total = webhook + reconciled + already + failed
+        log.info("SePay reconcile run: day={}, result={}, total={}, webhook={}, reconciled={}, already={}, failed={}",
+                day, result, delivered + open.size(), delivered, t.processed(), t.already(), t.failed());
+        return t.processed();
     }
 
     @Override
@@ -141,21 +146,27 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
         String wanted = code.trim().toUpperCase(Locale.ROOT);
         // An hour of slack before the order: bank and server clocks differ, and the query filters on bank time
         String from = bankTime(since.minus(Duration.ofHours(1)));
-        List<SepayTxPayload> found = new ArrayList<>();
-        fetch(token.trim(), wanted, from, n -> carriesCode(n, wanted), found);
-        int processed = processNew(found);
+        List<JsonNode> rows = new ArrayList<>();
+        fetch(token.trim(), wanted, from, n -> carriesCode(n, wanted), rows);
+        List<SepayTxPayload> found = undelivered(rows);
+        int processed = processNew(found).processed();
         log.info("SePay check for order {}: {} undelivered transfer(s), {} processed", wanted, found.size(), processed);
         return new CheckResult(found.size(), processed);
     }
 
+    /** Outcome of one pass over undelivered transfers. */
+    record Tally(int processed, int already, int failed) {
+    }
+
     /** Sends each transfer not stored yet through the webhook path; one failure does not stop the rest. */
-    private int processNew(List<SepayTxPayload> txs) {
+    private Tally processNew(List<SepayTxPayload> txs) {
         if (txs.isEmpty()) {
-            return 0;
+            return new Tally(0, 0, 0);
         }
         Set<Long> known = txRepo.findAllById(txs.stream().map(SepayTxPayload::id).toList()).stream()
                 .map(SepayTransaction::getSepayId).collect(Collectors.toSet());
         int processed = 0;
+        int failed = 0;
         for (SepayTxPayload tx : txs) {
             if (known.contains(tx.id())) {
                 continue;
@@ -165,17 +176,35 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
                 webhookService.process(tx, TxSource.RECONCILE);
                 processed++;
             } catch (RuntimeException e) {
+                failed++;
                 log.warn("SePay reconcile could not process tx {}: {}", tx.id(), e.getClass().getSimpleName());
             }
         }
-        return processed;
+        return new Tally(processed, txs.size() - processed - failed, failed);
+    }
+
+    /** The row's bank time is before {@code end}; rows with no readable time are dropped. */
+    private static boolean before(JsonNode n, Instant end) {
+        Instant at = SepayWebhookServiceImpl.bankTime(text(n, "transaction_date"));
+        return at != null && at.isBefore(end);
+    }
+
+    /** SePay says the webhook for this row was delivered (and so stored by the webhook path). */
+    private static boolean delivered(JsonNode n) {
+        return n.path("webhook_success").asInt(0) == 1;
+    }
+
+    /** Valid incoming rows the webhook did not deliver, as webhook payloads. */
+    private static List<SepayTxPayload> undelivered(List<JsonNode> rows) {
+        return rows.stream().filter(n -> !delivered(n)).map(SepayReconcileServiceImpl::toPayload)
+                .filter(Objects::nonNull).toList();
     }
 
     /**
-     * Incoming transfers matching {@code q} since {@code from} (bank time) whose webhook was not delivered and
-     * that pass {@code keep}. Pages until has_more is false; a failed page throws, keeping earlier pages in out.
+     * Incoming rows matching {@code q} since {@code from} (bank time) that pass {@code keep}, delivered or not.
+     * Pages until has_more is false; a failed page throws, keeping earlier pages in out.
      */
-    void fetch(String token, String q, String from, Predicate<JsonNode> keep, List<SepayTxPayload> out) {
+    void fetch(String token, String q, String from, Predicate<JsonNode> keep, List<JsonNode> out) {
         for (int page = 1; page <= MAX_PAGES; page++) {
             if (page > 1 && !pause()) {
                 return;
@@ -183,9 +212,8 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
             JsonNode root = get(token, "?q=" + enc(q) + "&transfer_type=in&transaction_date_from=" + enc(from)
                     + "&transaction_date_sort=asc&per_page=" + PER_PAGE + "&page=" + page);
             for (JsonNode n : root.path("data")) {
-                SepayTxPayload tx = keep.test(n) ? toPayload(n) : null;
-                if (tx != null) {
-                    out.add(tx);
+                if (keep.test(n)) {
+                    out.add(n);
                 }
             }
             if (!root.path("meta").path("pagination").path("has_more").asBoolean(false)) {
@@ -268,7 +296,7 @@ public class SepayReconcileServiceImpl implements SepayReconcileService {
      * still has to match (sandbox test accounts differ from the live one).
      */
     private static SepayTxPayload toPayload(JsonNode n) {
-        if (n.path("webhook_success").asInt(0) == 1) {
+        if (delivered(n)) {
             return null;
         }
         String uuid = text(n, "id");

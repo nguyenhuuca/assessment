@@ -114,7 +114,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    participant J as AppScheduler reconcile-sepay (every 10 min)
+    participant J as AppScheduler reconcile-sepay (daily 00:15, day T-1)
     participant R as SepayReconcileServiceImpl
     participant API as SePay userapi v2
     participant WS as SepayWebhookServiceImpl
@@ -125,17 +125,17 @@ sequenceDiagram
         R-->>J: return, no call
     end
     loop pages until has_more = false (max 10, 400 ms apart)
-        R->>API: GET /v2/transactions?q=FM&transfer_type=in&transaction_date_from=now-72h (Bearer token)
+        R->>API: GET /v2/transactions?q=FM&transfer_type=in&transaction_date_from=yesterday 00:00 (Bearer token)
         API-->>R: data[], meta.pagination
     end
-    Note over R: keep rows with webhook_success != 1, FM code, our account, older than 60 min, UUID to negative sepay_id
+    Note over R: keep yesterday's rows (T-1) with an FM code; webhook_success = 1 counted as webhook, the rest go through UUID to negative sepay_id
     R->>DB: which sepay_ids are already stored
     loop each new row
         R->>WS: process(tx, source = RECONCILE), same path as webhook
         WS->>DB: skip if same reference + amount already stored, else insert ON CONFLICT DO NOTHING and match
     end
     alt 401 / 429 / 5xx / bad body
-        R-->>J: stop, next run reads the 72 h window again
+        R-->>J: stop, log result=api_error; rerun the day from the admin Jobs tab
     end
 ```
 

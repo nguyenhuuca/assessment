@@ -50,7 +50,7 @@ Business Stats counts views, cache hits and job runs from log text. Before you c
 
 - `Incoming stream request for fileId:` (INFO), `Range header: …` (INFO) — `VideoStreamController`
 - `[CACHE HIT]` (INFO), `[MISS]` (WARN) — `VideoCacheImpl`
-- `SePay reconcile run: undelivered=…, settled=…, processed=…` (INFO, every run), `SePay check for order`, `SePay reconcile: …` / `skipped` / `could not process` (WARN) — `SepayReconcileServiceImpl`, pinned in `SepayReconcileServiceImplTest` (row "SePay Reconcile", added v6)
+- `SePay reconcile run:` (INFO, every run; now `day=…, result=…, total=…, webhook=…, reconciled=…, already=…, failed=…`), `SePay check for order`, `SePay reconcile: …` / `skipped` / `could not process` (WARN) — `SepayReconcileServiceImpl`, pinned in `SepayReconcileServiceImplTest` (row "SePay Reconcile", added v6)
 - Others on that board: `User join system`, `Successfully synced from Google Drive` / `Failed to sync from Google Drive`, `Total hits: …, Total misses: …`, `AUDIT | IP=… | User=… | Method=…`, `Send email to … success` / `Send email err`, `Account deactivated and anonymized`, `Rate limit exceeded for client`
 
 History: PM-7 (`0caa8cd7`, 2026-10-24) moved the stream and cache logs to DEBUG, and the Business Stats view and cache panels were empty from 2026-10-26 until the fix `26d282db` (2026-11-06).

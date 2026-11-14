@@ -52,11 +52,14 @@ import static org.mockito.Mockito.when;
 
 class SepayReconcileServiceImplTest {
 
-    private static final Instant NOW = Instant.parse("2026-11-14T08:00:00Z"); // 15:00 in Vietnam
+    private static final Instant NOW = Instant.parse("2026-11-14T17:15:00Z"); // 2026-11-15 00:15 in Vietnam: the run covers 2026-11-14
     private static final String TOKEN = "FAKE_SEPAY_TOKEN";
-    private static final String SETTLED = "2026-11-14 13:30:00"; // 90 minutes before NOW
+    private static final String SETTLED = "2026-11-14 13:30:00"; // yesterday (T-1)
     private static final String U1 = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
     private static final String U2 = "b1b2c3d4-e5f6-7890-abcd-ef1234567890";
+    private static final String U3 = "c1b2c3d4-e5f6-7890-abcd-ef1234567890";
+    private static final String U4 = "d1b2c3d4-e5f6-7890-abcd-ef1234567890";
+    private static final String U5 = "e1b2c3d4-e5f6-7890-abcd-ef1234567890";
 
     private final AtomicInteger requests = new AtomicInteger();
     private final AtomicReference<String> auth = new AtomicReference<>();
@@ -144,9 +147,17 @@ class SepayReconcileServiceImplTest {
 
     // Grafana "Business Stats" (Job Health row) parses this line: text and INFO level are a contract
     @Test
-    void everyRun_logsSummaryAtInfo_forGrafana() {
+    void everyRun_logsTotalsAtInfo_forGrafana() {
         pages.put(1, page(false, tx(U1, 50000, "FMLVKXU9WH", "FMLVKXU9WH ung ho", SETTLED, 0),
-                tx(U2, 20000, "FMABCDEFGH", "FMABCDEFGH", "2026-11-14 14:50:00", 0)));
+                tx(U2, 20000, "FMABCDEFGH", "FMABCDEFGH", "2026-11-15 00:05:00", 0), // today: next run
+                tx(U3, 30000, "FMDELIVERD", "FMDELIVERD", SETTLED, 1),
+                tx(U4, 40000, "FMSTOREDXX", "FMSTOREDXX", SETTLED, 0),
+                tx(U5, 60000, "FMBROKENXX", "FMBROKENXX", SETTLED, 0)));
+        when(txRepo.findAllById(anyList())).thenReturn(
+                List.of(SepayTransaction.builder().sepayId(SepayReconcileServiceImpl.storageId(U4)).build()));
+        long broken = SepayReconcileServiceImpl.storageId(U5);
+        doThrow(new IllegalStateException("boom")).when(webhookService)
+                .process(argThat(p -> p != null && p.id() == broken), any());
         Logger logger = (Logger) LoggerFactory.getLogger(SepayReconcileServiceImpl.class);
         ListAppender<ILoggingEvent> logs = new ListAppender<>();
         logs.start();
@@ -155,9 +166,26 @@ class SepayReconcileServiceImplTest {
             service.reconcile();
 
             assertThat(logs.list).anySatisfy(e -> {
-                assertThat(e.getFormattedMessage()).isEqualTo("SePay reconcile run: undelivered=2, settled=1, processed=1");
+                assertThat(e.getFormattedMessage()).isEqualTo("SePay reconcile run: day=2026-11-14, result=ok, total=4, webhook=1, reconciled=1, already=1, failed=1");
                 assertThat(e.getLevel()).isEqualTo(Level.INFO);
             });
+        } finally {
+            logger.detachAppender(logs);
+        }
+    }
+
+    @Test
+    void apiError_logsRunWithApiErrorResult() {
+        status.set(401);
+        Logger logger = (Logger) LoggerFactory.getLogger(SepayReconcileServiceImpl.class);
+        ListAppender<ILoggingEvent> logs = new ListAppender<>();
+        logs.start();
+        logger.addAppender(logs);
+        try {
+            assertThat(service.reconcile()).isZero();
+
+            assertThat(logs.list).anySatisfy(e -> assertThat(e.getFormattedMessage()).isEqualTo(
+                    "SePay reconcile run: day=2026-11-14, result=api_error, total=0, webhook=0, reconciled=0, already=0, failed=0"));
         } finally {
             logger.detachAppender(logs);
         }
@@ -180,7 +208,7 @@ class SepayReconcileServiceImplTest {
 
         assertThat(auth.get()).isEqualTo("Bearer " + TOKEN);
         assertThat(queries.get(0)).contains("q=FM").contains("transfer_type=in")
-                .contains("transaction_date_from=2026-11-11 15:00:00").contains("transaction_date_sort=asc")
+                .contains("transaction_date_from=2026-11-14 00:00:00").contains("transaction_date_sort=asc")
                 .contains("per_page=100").contains("page=1");
         SepayTxPayload p = processed(1).get(0);
         assertThat(p.id()).isEqualTo(SepayReconcileServiceImpl.storageId(U1)).isNegative();
@@ -214,14 +242,14 @@ class SepayReconcileServiceImplTest {
     }
 
     @Test
-    void rowsWithoutOurPrefix_outgoing_malformed_orTooRecent_areDropped_anyAccountIsKept() {
+    void rowsWithoutOurPrefix_outgoing_malformed_orFromToday_areDropped_anyAccountIsKept() {
         // sandbox test accounts differ from the live one; the order code is what has to match
         String otherAccount = tx(U2, 10000, "other account FMCCCCCCCC").replace("1017588888", "3571248070");
         pages.put(1, page(false,
                 tx(U1, 10000, "transfer from mom"),                         // no FM anywhere
                 tx("not-a-uuid", 10000, "FMDDDDDDDD"),
                 tx("c1b2c3d4-e5f6-7890-abcd-ef1234567890", 0, "FMEEEEEEEE"),
-                tx("d1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, null, "FMFFFFFFFF", "2026-11-14 14:30:00", 0),
+                tx("d1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, null, "FMFFFFFFFF", "2026-11-15 00:01:00", 0),
                 tx("e1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, null, "FMGGGGGGGG", "", 0),
                 otherAccount,
                 tx("f1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, "ok fmhhhhhhhh")));
@@ -297,7 +325,7 @@ class SepayReconcileServiceImplTest {
     void checkCode_searchesTheExactCode_ignoresFlagAndAge_processesOnlyThatOrdersTransfers() {
         flagOn = false; // the admin action does not depend on the job flag
         pages.put(1, page(false,
-                tx(U1, 50000, "FMAKN7GW7U", "FMAKN7GW7U", "2026-11-14 14:59:00", 0), // 1 min old: still taken
+                tx(U1, 50000, "FMAKN7GW7U", "FMAKN7GW7U", "2026-11-15 00:14:00", 0), // today: still taken, checkCode has no day window
                 tx(U2, 20000, null, "fmakn7gw7u ung ho", SETTLED, null),
                 tx("c1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, "FMOTHER001", "FMOTHER001", SETTLED, 0),
                 tx("d1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, "FMAKN7GW7U", "FMAKN7GW7U", SETTLED, 1)));
