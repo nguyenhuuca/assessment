@@ -9401,6 +9401,17 @@
 <td>Donations (guest + user) and Premium plans paid by VietQR; SePay bank-transfer webhook (HMAC) + reconciliation job; admin Donations tab + notifications; entitlement <code>users.premium_until</code> only, no gated features yet. Plan: PAY-1..PAY-10. PAY-1..4, 6..9 + security fixes built by /swarm-execute (2026-11-12); PAY-5 reconcile deferred (v2 UUID vs webhook numeric id); PAY-10 launch pending</td>
 </tr>
 <tr>
+<td><strong>Payment Provider Abstraction</strong></td>
+<td>—</td>
+<td><a href="../adr/0038-payment-provider-abstraction/">0038 ✅</a></td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-payment-provider-abstraction/">Plan ✅</a></td>
+<td>—</td>
+<td>🔄</td>
+<td><code>PaymentProvider</code> port + registry; SePay becomes the first adapter; neutral ingestion/reconcile; <code>sepay_transactions</code> → <code>payment_transactions</code> (provider + string tx id). Switching vendor = one adapter package + config. Plan: PP-1..PP-6</td>
+</tr>
+<tr>
 <td><strong>Admin Video Size</strong></td>
 <td>—</td>
 <td>—</td>

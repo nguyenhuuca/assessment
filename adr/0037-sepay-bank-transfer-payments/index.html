@@ -9019,7 +9019,7 @@
 <h1 id="adr-0037-sepay-bank-transfer-webhook-vietqr-for-donations-and-premium">ADR-0037: SePay Bank-Transfer Webhook (VietQR) for Donations and Premium<a class="headerlink" href="#adr-0037-sepay-bank-transfer-webhook-vietqr-for-donations-and-premium" title="Permanent link">&para;</a></h1>
 <h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
 <p><strong>Status:</strong> Proposed · <strong>Date:</strong> 2026-11-12 · <strong>Deciders:</strong> nguyenhuuca · <strong>Tags:</strong> payments, integration, security, data-model
-<strong>Related PRD:</strong> <a href="../../prd/PRD-sepay-payments/">PRD-sepay-payments</a> · <strong>Supersedes:</strong> N/A · <strong>Superseded By:</strong> N/A</p>
+<strong>Related PRD:</strong> <a href="../../prd/PRD-sepay-payments/">PRD-sepay-payments</a> · <strong>Refactored by:</strong> <a href="../0038-payment-provider-abstraction/">ADR-0038</a> (SePay is now an adapter behind <code>PaymentProvider</code>; <code>sepay_transactions</code> became <code>payment_transactions</code>) · <strong>Supersedes:</strong> N/A · <strong>Superseded By:</strong> N/A</p>
 <p><strong>Tech Strategy:</strong> ⚠️ Adds a new external integration (SePay) — not in the Golden Paths "External Integrations" table; the table must gain a row "Payments | SePay bank-transfer webhook" when this ADR is accepted. All internals follow the Golden Path (Spring Boot, JPA, Liquibase, <code>@Scheduled</code> in <code>AppScheduler</code>, React Query).</p>
 <hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
