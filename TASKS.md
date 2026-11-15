@@ -747,3 +747,11 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **PAY-12** Admin "Ignore" action for unmatched transfers (UNMATCHED → IGNORED, kept in DB); webhook verified end-to-end in SePay Test mode
 - [x] **PAY-13** Admin "Check on SePay" per order (API v2 q=<order code>); reconcile job no longer filters by account (sandbox)
 - [ ] **PAY-10** Ops: SePay dashboard + secrets, sandbox simulate, prod smoke, ADR Accepted — blocked by PAY-4, PAY-5, PAY-7, PAY-8, PAY-9
+
+## Feature: Payment provider abstraction (2026-11-15, [plan](docs/plans/plan-payment-provider-abstraction.md), [ADR-0038](docs/adr/0038-payment-provider-abstraction.md))
+- [x] **PP-1** Neutral model + `PaymentProvider` port + registry; extract `PaymentIngestionService` — d5fad2e2 (PP-1..PP-5 in one commit)
+- [x] **PP-2** SePay adapter package; neutral reconcile service; `/webhooks/payments/{provider}` + `/webhooks/sepay` alias — blocked by PP-1
+- [x] **PP-3** Config split `app.payment.*` / `app.payment.sepay.*` with `SEPAY_*` fallbacks — blocked by PP-2
+- [x] **PP-4** Migration `payment_transactions` (provider, provider_tx_id), `payment_orders.provider`, job `reconcile-payments` — blocked by PP-3
+- [x] **PP-5** Admin API + FE neutral naming (`id`, check-provider, i18n) — blocked by PP-4
+- [x] **PP-6** Docs: ADR Accepted, runbook "add a provider", tracking — blocked by PP-5

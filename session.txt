@@ -1,9 +1,9 @@
-task: SePay payments — donations + Premium
+task: Payment provider abstraction (SePay → adapter)
 status: blocked
-progress: 95
-done: PAY-1..9 built; FF sepay_payments_enabled; PAY-11 admin mark paid/cancel; PAY-12 ignore unmatched; PAY-5 reconcile job (API v2, FF)
+progress: 90
+done: PP-1..PP-5 port, SePay adapter, payment_transactions, admin+FE d5fad2e2; PP-6 docs
 doing: -
-next: link a SePay-supported bank (Live); recreate webhook + payment-code config (FM, 8-8) in Live; test 10k donation
-plan: docs/plans/plan-sepay-payments.md
-blocker: SePay Live does not accept the owner's personal VCB account; owner to pick another bank
-updated: 2026-11-14 15:58
+next: owner approves push; watch CI deploy; check Liquibase 202611150001 applied and webhook alias answers on prod
+plan: docs/plans/plan-payment-provider-abstraction.md
+blocker: push needs owner approval (SePay Live bank account still pending, PAY-10)
+updated: 2026-11-15 21:00

@@ -3,7 +3,7 @@
 ## Metadata
 
 **Status:** Proposed · **Date:** 2026-11-12 · **Deciders:** nguyenhuuca · **Tags:** payments, integration, security, data-model
-**Related PRD:** [PRD-sepay-payments](../prd/PRD-sepay-payments.md) · **Supersedes:** N/A · **Superseded By:** N/A
+**Related PRD:** [PRD-sepay-payments](../prd/PRD-sepay-payments.md) · **Refactored by:** [ADR-0038](0038-payment-provider-abstraction.md) (SePay is now an adapter behind `PaymentProvider`; `sepay_transactions` became `payment_transactions`) · **Supersedes:** N/A · **Superseded By:** N/A
 
 **Tech Strategy:** ⚠️ Adds a new external integration (SePay) — not in the Golden Paths "External Integrations" table; the table must gain a row "Payments | SePay bank-transfer webhook" when this ADR is accepted. All internals follow the Golden Path (Spring Boot, JPA, Liquibase, `@Scheduled` in `AppScheduler`, React Query).
 

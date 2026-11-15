@@ -89,6 +89,7 @@ This is the **SINGLE SOURCE OF TRUTH** for technology choices.
 | Video Processing | FFmpeg (thumbnails) |
 | Authentication | JWT + Magic Links |
 | MFA | TOTP (optional) |
+| Payments | Bank transfer via `PaymentProvider` port (ADR-0038); SePay webhook + API v2 adapter (ADR-0037) |
 
 ## Observability
 
