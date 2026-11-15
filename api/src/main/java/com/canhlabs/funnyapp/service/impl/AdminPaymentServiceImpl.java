@@ -8,16 +8,19 @@ import com.canhlabs.funnyapp.dto.payment.AdminTransactionDto;
 import com.canhlabs.funnyapp.dto.payment.PlanRequest;
 import com.canhlabs.funnyapp.entity.PaymentOrder;
 import com.canhlabs.funnyapp.entity.PremiumPlan;
-import com.canhlabs.funnyapp.entity.SepayTransaction;
+import com.canhlabs.funnyapp.entity.PaymentTransaction;
 import com.canhlabs.funnyapp.enums.PaymentOrderStatus;
 import com.canhlabs.funnyapp.enums.PaymentType;
 import com.canhlabs.funnyapp.enums.TxMatchStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.PaymentOrderRepository;
 import com.canhlabs.funnyapp.repo.PremiumPlanRepository;
-import com.canhlabs.funnyapp.repo.SepayTransactionRepository;
+import com.canhlabs.funnyapp.repo.PaymentTransactionRepository;
 import com.canhlabs.funnyapp.service.AdminPaymentService;
-import com.canhlabs.funnyapp.service.SepayReconcileService;
+import com.canhlabs.funnyapp.service.PaymentReconcileService;
+import com.canhlabs.funnyapp.service.payment.PaymentProvider;
+import com.canhlabs.funnyapp.service.payment.PaymentProviderRegistry;
+import com.canhlabs.funnyapp.service.payment.ProviderApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,32 +50,35 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
     /** Orders a transfer can still change: open ones, and UNDERPAID ones that can be topped up. */
     private static final Set<PaymentOrderStatus> CHECKABLE =
             EnumSet.of(PaymentOrderStatus.PENDING, PaymentOrderStatus.EXPIRED, PaymentOrderStatus.UNDERPAID);
-    /** Placeholder transaction id in settlement logs for an admin-confirmed payment (no SePay transaction). */
-    static final long MANUAL_TX_ID = 0L;
+    /** Placeholder transaction reference in settlement logs for an admin-confirmed payment (no transfer stored). */
+    static final String MANUAL_TX_REF = "manual";
     private static final Pattern PLAN_CODE = Pattern.compile("^[A-Z0-9_]{3,32}$");
 
     private final PaymentOrderRepository orderRepo;
-    private final SepayTransactionRepository txRepo;
+    private final PaymentTransactionRepository txRepo;
     private final PremiumPlanRepository planRepo;
     private final PaymentSettlement settlement;
-    private final SepayReconcileService reconcileService;
+    private final PaymentReconcileService reconcileService;
+    private final PaymentProviderRegistry providers;
     private final Clock clock;
 
     @Autowired
-    public AdminPaymentServiceImpl(PaymentOrderRepository orderRepo, SepayTransactionRepository txRepo,
+    public AdminPaymentServiceImpl(PaymentOrderRepository orderRepo, PaymentTransactionRepository txRepo,
                                    PremiumPlanRepository planRepo, PaymentSettlement settlement,
-                                   SepayReconcileService reconcileService) {
-        this(orderRepo, txRepo, planRepo, settlement, reconcileService, Clock.systemUTC());
+                                   PaymentReconcileService reconcileService, PaymentProviderRegistry providers) {
+        this(orderRepo, txRepo, planRepo, settlement, reconcileService, providers, Clock.systemUTC());
     }
 
-    AdminPaymentServiceImpl(PaymentOrderRepository orderRepo, SepayTransactionRepository txRepo,
+    AdminPaymentServiceImpl(PaymentOrderRepository orderRepo, PaymentTransactionRepository txRepo,
                             PremiumPlanRepository planRepo, PaymentSettlement settlement,
-                            SepayReconcileService reconcileService, Clock clock) {
+                            PaymentReconcileService reconcileService, PaymentProviderRegistry providers,
+                            Clock clock) {
         this.orderRepo = orderRepo;
         this.txRepo = txRepo;
         this.planRepo = planRepo;
         this.settlement = settlement;
         this.reconcileService = reconcileService;
+        this.providers = providers;
         this.clock = clock;
     }
 
@@ -92,7 +98,7 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
     @Transactional(readOnly = true)
     public Page<AdminTransactionDto> listUnmatched(Pageable pageable) {
         return txRepo.findByMatchStatusOrderByReceivedAtDesc(TxMatchStatus.UNMATCHED, pageable).map(t ->
-                AdminTransactionDto.builder().sepayId(t.getSepayId()).amount(t.getAmount())
+                AdminTransactionDto.builder().id(t.getId()).provider(providerName(t.getProvider())).amount(t.getAmount())
                         .content(t.getContent()).code(t.getCode()).gateway(t.getGateway())
                         .transactionDate(t.getTransactionDate()).receivedAt(t.getReceivedAt()).build());
     }
@@ -114,7 +120,7 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
 
     @Override
     @Transactional
-    public AdminOrderDto linkTransaction(long sepayId, String orderCode) {
+    public AdminOrderDto linkTransaction(long transactionId, String orderCode) {
         String code = orderCode == null ? "" : orderCode.trim().toUpperCase(Locale.ROOT);
         PaymentOrder order = orderRepo.findByCodeForUpdate(code)
                 .orElseThrow(() -> CustomException.of(HttpStatus.NOT_FOUND, 4041, "error.payment.orderNotFound"));
@@ -122,7 +128,7 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
             throw CustomException.of(HttpStatus.CONFLICT, 4093, "error.payment.orderCancelled");
         }
         // Read the transaction only after the order lock: a concurrent link waits above and then sees MATCHED.
-        SepayTransaction tx = txRepo.findById(sepayId)
+        PaymentTransaction tx = txRepo.findById(transactionId)
                 .orElseThrow(() -> CustomException.of(HttpStatus.NOT_FOUND, 4042, "error.payment.txNotFound"));
         if (tx.getMatchStatus() != TxMatchStatus.UNMATCHED) {
             throw CustomException.of(HttpStatus.CONFLICT, 4091, "error.payment.txNotUnmatched");
@@ -130,20 +136,20 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
         tx.setMatchStatus(TxMatchStatus.MATCHED);
         tx.setOrderId(order.getId());
         txRepo.save(tx);
-        settlement.apply(order, tx.getSepayId(), tx.getAmount(), Instant.now(clock));
-        log.info("Admin linked tx {} to order {}", sepayId, order.getId());
+        settlement.apply(order, tx.getProvider() + ":" + tx.getProviderTxId(), tx.getAmount(), Instant.now(clock));
+        log.info("Admin linked tx {} to order {}", transactionId, order.getId());
         return toDto(order, planCodesFor(order));
     }
 
     @Override
     @Transactional
-    public void ignoreTransaction(long sepayId) {
+    public void ignoreTransaction(long transactionId) {
         // Conditional update, so a concurrent link that already set MATCHED is never overwritten
-        if (txRepo.updateMatchStatus(sepayId, TxMatchStatus.UNMATCHED, TxMatchStatus.IGNORED) == 1) {
-            log.info("Admin ignored tx {}", sepayId);
+        if (txRepo.updateMatchStatus(transactionId, TxMatchStatus.UNMATCHED, TxMatchStatus.IGNORED) == 1) {
+            log.info("Admin ignored tx {}", transactionId);
             return;
         }
-        SepayTransaction tx = txRepo.findById(sepayId)
+        PaymentTransaction tx = txRepo.findById(transactionId)
                 .orElseThrow(() -> CustomException.of(HttpStatus.NOT_FOUND, 4042, "error.payment.txNotFound"));
         if (tx.getMatchStatus() != TxMatchStatus.IGNORED) {
             throw CustomException.of(HttpStatus.CONFLICT, 4091, "error.payment.txNotUnmatched");
@@ -184,13 +190,13 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
         if (!OPEN.contains(order.getStatus())) {
             throw CustomException.of(HttpStatus.CONFLICT, 4095, "error.payment.notOpen");
         }
-        settlement.apply(order, MANUAL_TX_ID, amount, Instant.now(clock));
+        settlement.apply(order, MANUAL_TX_REF, amount, Instant.now(clock));
         log.info("Admin marked order {} paid manually: {} VND -> {}", order.getId(), amount, order.getStatus());
         return toDto(order, planCodesFor(order));
     }
 
     @Override
-    public AdminOrderCheckDto checkOrderOnSepay(long orderId) {
+    public AdminOrderCheckDto checkOrderOnProvider(long orderId) {
         // No transaction here: the HTTP call must not hold a DB connection, and each transfer is processed in
         // its own transaction by the webhook path, which takes the order row lock
         PaymentOrder order = orderRepo.findById(orderId)
@@ -199,14 +205,14 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
             throw CustomException.of(HttpStatus.CONFLICT, 4096, "error.payment.notCheckable");
         }
         Instant since = order.getCreatedAt() != null ? order.getCreatedAt() : Instant.now(clock).minus(Duration.ofDays(3));
-        SepayReconcileService.CheckResult result;
+        PaymentReconcileService.CheckResult result;
         try {
-            result = reconcileService.checkCode(order.getCode(), since);
-        } catch (SepayReconcileService.SepayApiException e) {
-            log.warn("SePay check for order {} failed: {}", orderId, e.getMessage());
+            result = reconcileService.checkCode(order.getProvider(), order.getCode(), since);
+        } catch (ProviderApiException e) {
+            log.warn("Provider check for order {} failed: {}", orderId, e.getMessage());
             throw e.isConfigured()
-                    ? CustomException.of(HttpStatus.BAD_GATEWAY, 5021, "error.payment.sepayApiFailed")
-                    : CustomException.of(HttpStatus.SERVICE_UNAVAILABLE, 5032, "error.payment.sepayApiNotConfigured");
+                    ? CustomException.of(HttpStatus.BAD_GATEWAY, 5021, "error.payment.providerApiFailed")
+                    : CustomException.of(HttpStatus.SERVICE_UNAVAILABLE, 5032, "error.payment.providerApiNotConfigured");
         }
         PaymentOrder now = orderRepo.findById(orderId).orElse(order);
         return AdminOrderCheckDto.builder().found(result.found()).processed(result.processed())
@@ -316,7 +322,7 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
         return planRepo.findById(order.getPlanId()).map(p -> Map.of(p.getId(), p.getCode())).orElse(Map.of());
     }
 
-    private static AdminOrderDto toDto(PaymentOrder o, Map<Long, String> planCodes) {
+    private AdminOrderDto toDto(PaymentOrder o, Map<Long, String> planCodes) {
         long surplus = o.getType() == PaymentType.PREMIUM && o.getExpectedAmount() != null
                 ? Math.max(0, o.getPaidAmount() - o.getExpectedAmount()) : 0;
         return AdminOrderDto.builder()
@@ -325,7 +331,13 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
                 .donorName(o.getDonorName()).message(o.getMessage()).userId(o.getUserId())
                 .planCode(o.getPlanId() == null ? null : planCodes.get(o.getPlanId()))
                 .createdAt(o.getCreatedAt()).paidAt(o.getPaidAt()).expiresAt(o.getExpiresAt())
+                .provider(providerName(o.getProvider()))
                 .build();
+    }
+
+    /** Display name for a stored provider id; the id itself when that provider is no longer registered. */
+    private String providerName(String id) {
+        return providers.byId(id).map(PaymentProvider::displayName).orElse(id);
     }
 
     private static AdminPlanDto toDto(PremiumPlan p) {

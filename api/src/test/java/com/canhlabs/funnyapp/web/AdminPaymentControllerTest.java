@@ -109,11 +109,12 @@ class AdminPaymentControllerTest {
     @Test
     void unmatched_admin_returnsPage() throws Exception {
         when(service.listUnmatched(PageRequest.of(0, 20))).thenReturn(new PageImpl<>(List.of(
-                AdminTransactionDto.builder().sepayId(9L).amount(5000).content("hi").build())));
+                AdminTransactionDto.builder().id(9L).provider("SePay").amount(5000).content("hi").build())));
 
         mockMvc.perform(get(BASE + "/transactions/unmatched").with(authentication(principal(UserRole.ADMIN))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.content[0].sepayId").value(9));
+                .andExpect(jsonPath("$.data.content[0].id").value(9))
+                .andExpect(jsonPath("$.data.content[0].provider").value("SePay"));
     }
 
     @Test
@@ -219,21 +220,21 @@ class AdminPaymentControllerTest {
     }
 
     @Test
-    void checkOnSepay_admin_callsService() throws Exception {
-        when(service.checkOrderOnSepay(4L)).thenReturn(com.canhlabs.funnyapp.dto.payment.AdminOrderCheckDto.builder()
+    void checkOnProvider_admin_callsService() throws Exception {
+        when(service.checkOrderOnProvider(4L)).thenReturn(com.canhlabs.funnyapp.dto.payment.AdminOrderCheckDto.builder()
                 .found(1).processed(1)
                 .order(AdminOrderDto.builder().id(4L).status(PaymentOrderStatus.PAID).build()).build());
 
-        mockMvc.perform(post(BASE + "/orders/4/check-sepay").with(authentication(principal(UserRole.ADMIN))))
+        mockMvc.perform(post(BASE + "/orders/4/check-provider").with(authentication(principal(UserRole.ADMIN))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.found").value(1))
                 .andExpect(jsonPath("$.data.order.status").value("PAID"));
-        verify(service).checkOrderOnSepay(4L);
+        verify(service).checkOrderOnProvider(4L);
     }
 
     @Test
-    void checkOnSepay_user_returns403() throws Exception {
-        mockMvc.perform(post(BASE + "/orders/4/check-sepay").with(authentication(principal(UserRole.USER))))
+    void checkOnProvider_user_returns403() throws Exception {
+        mockMvc.perform(post(BASE + "/orders/4/check-provider").with(authentication(principal(UserRole.USER))))
                 .andExpect(status().isForbidden());
         verifyNoInteractions(service);
     }

@@ -48,7 +48,7 @@ public class AppProperties {
     private VideoImport videoImport = new VideoImport();
     private GoogleOauth googleOauth = new GoogleOauth();
     private Github github = new Github();
-    private Sepay sepay = new Sepay();
+    private Payment payment = new Payment();
     private VideoSuggestion videoSuggestion = new VideoSuggestion();
     private WatchHistory watchHistory = new WatchHistory();
     private Hls hls = new Hls();
@@ -124,7 +124,30 @@ public class AppProperties {
         }
     }
 
-    /** SePay bank-transfer payments (ADR-0037): {@code app.sepay.*}. Secrets default empty = feature off. */
+    /**
+     * Bank-transfer payments (ADR-0037, ADR-0038): {@code app.payment.*}. The receiving account and business rules are
+     * vendor-neutral; each provider adapter has its own nested block ({@code app.payment.sepay.*}).
+     */
+    @Getter
+    @Setter
+    public static class Payment {
+        /** Provider id used for new orders; every configured provider still accepts webhooks. */
+        private String provider = "sepay";
+        private String bankAccount = "";
+        private String bankCode = "";
+        private String accountName = "";
+        private String codePrefix = "FM";
+        private int orderTtlHours = 24;
+        private long minDonation = 10000;
+        private Sepay sepay = new Sepay();
+
+        /** Orders can only be created once the receiving bank account is known. */
+        public boolean isOrderingConfigured() {
+            return bankAccount != null && !bankAccount.isBlank() && bankCode != null && !bankCode.isBlank();
+        }
+    }
+
+    /** SePay adapter settings: {@code app.payment.sepay.*}. Secrets default empty = webhook / API off. */
     @Getter
     @Setter
     public static class Sepay {
@@ -132,23 +155,16 @@ public class AppProperties {
         private String apiToken = "";
         /** SePay user API host: live https://userapi.sepay.vn, sandbox https://userapi-sandbox.sepay.vn. */
         private String apiBaseUrl = "https://userapi.sepay.vn";
-        private String bankAccount = "";
-        private String bankCode = "";
-        private String accountName = "";
-        private String codePrefix = "FM";
         private String qrBaseUrl = "https://qr.sepay.vn/img";
-        private int orderTtlHours = 24;
-        private long minDonation = 10000;
         /** Comma-separated webhook source IPs; empty disables the allowlist. */
         private String allowedIps = "";
 
-        /** Orders can only be created once the receiving bank account is known. */
-        public boolean isOrderingConfigured() {
-            return bankAccount != null && !bankAccount.isBlank() && bankCode != null && !bankCode.isBlank();
-        }
-
         public boolean isWebhookConfigured() {
             return webhookSecret != null && !webhookSecret.isBlank();
+        }
+
+        public boolean isApiConfigured() {
+            return apiToken != null && !apiToken.isBlank();
         }
     }
 

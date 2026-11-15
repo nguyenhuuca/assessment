@@ -69,4 +69,9 @@ public class PaymentOrder extends BaseDomain {
 
     @Column(name = "paid_at")
     private Instant paidAt;
+
+    /** Payment provider that issued this order's instructions (ADR-0038). */
+    @Column(name = "provider", nullable = false, length = 16)
+    @Builder.Default
+    private String provider = "sepay";
 }

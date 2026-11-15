@@ -8,11 +8,11 @@ import * as api from '../../../api/adminPayments.js'
 
 vi.mock('../../../api/adminPayments.js', () => ({
   getSummary: vi.fn(), getOrders: vi.fn(), getUnmatched: vi.fn(), linkTransaction: vi.fn(), ignoreTransaction: vi.fn(),
-  resolveOrder: vi.fn(), markOrderPaid: vi.fn(), cancelOrder: vi.fn(), checkOrderOnSepay: vi.fn(), getPlans: vi.fn(), createPlan: vi.fn(), updatePlan: vi.fn(), setPlanActive: vi.fn(),
+  resolveOrder: vi.fn(), markOrderPaid: vi.fn(), cancelOrder: vi.fn(), checkOrderOnProvider: vi.fn(), getPlans: vi.fn(), createPlan: vi.fn(), updatePlan: vi.fn(), setPlanActive: vi.fn(),
 }))
 
 const page = (content) => ({ data: { content, totalElements: content.length, totalPages: 1, number: 0, size: 10 } })
-const order = (o) => ({ id: 1, code: 'FM1', type: 'PREMIUM', status: 'UNDERPAID', expectedAmount: 50000, paidAmount: 30000, surplus: 0, ...o })
+const order = (o) => ({ id: 1, code: 'FM1', type: 'PREMIUM', status: 'UNDERPAID', expectedAmount: 50000, paidAmount: 30000, surplus: 0, provider: 'SePay', ...o })
 const plan = { id: 7, code: 'MONTH', name: 'Month', durationDays: 30, priceVnd: 50000, active: true, sortOrder: 1 }
 
 let qc
@@ -29,14 +29,14 @@ beforeEach(() => {
   vi.clearAllMocks()
   api.getSummary.mockResolvedValue({ data: { donationTotal: 100000, donation30d: 50000, premiumTotal: 200000, premium30d: 0, pendingOrders: 2, underpaidOrders: 1, unmatchedTransactions: 3 } })
   api.getOrders.mockResolvedValue(page([order(), order({ id: 2, code: 'FM2', type: 'DONATION', status: 'PAID', paidAmount: 60000, expectedAmount: 50000, surplus: 10000 })]))
-  api.getUnmatched.mockResolvedValue(page([{ sepayId: 99, amount: 50000, content: 'FM1 pay', code: null, gateway: 'VCB', transactionDate: '2026-11-01T00:00:00Z' }]))
+  api.getUnmatched.mockResolvedValue(page([{ id: 99, provider: 'SePay', amount: 50000, content: 'FM1 pay', code: null, gateway: 'VCB', transactionDate: '2026-11-01T00:00:00Z' }]))
   api.getPlans.mockResolvedValue({ data: [plan] })
   api.linkTransaction.mockResolvedValue({ data: {} })
   api.ignoreTransaction.mockResolvedValue({ data: null })
   api.resolveOrder.mockResolvedValue({ data: {} })
   api.markOrderPaid.mockResolvedValue({ data: {} })
   api.cancelOrder.mockResolvedValue({ data: {} })
-  api.checkOrderOnSepay.mockResolvedValue({ data: { found: 0, processed: 0, order: { status: 'PENDING' } } })
+  api.checkOrderOnProvider.mockResolvedValue({ data: { found: 0, processed: 0, order: { status: 'PENDING' } } })
   api.createPlan.mockResolvedValue({ data: {} })
   api.updatePlan.mockResolvedValue({ data: {} })
   api.setPlanActive.mockResolvedValue({ data: {} })
@@ -182,11 +182,11 @@ describe('AdminPaymentsTab', () => {
 
   it('checks a PENDING order on SePay and reports the recorded transfer', async () => {
     api.getOrders.mockResolvedValue(page([order({ id: 3, code: 'FM3', status: 'PENDING', paidAmount: 0 })]))
-    api.checkOrderOnSepay.mockResolvedValue({ data: { found: 1, processed: 1, order: { status: 'PAID' } } })
+    api.checkOrderOnProvider.mockResolvedValue({ data: { found: 1, processed: 1, order: { status: 'PAID' } } })
     const spy = renderTab()
     await openMenu('FM3')
     fireEvent.click(screen.getByRole('menuitem', { name: /Kiểm tra SePay/ }))
-    await waitFor(() => expect(api.checkOrderOnSepay).toHaveBeenCalledWith(3))
+    await waitFor(() => expect(api.checkOrderOnProvider).toHaveBeenCalledWith(3))
     expect(await screen.findByRole('status')).toHaveTextContent('Tìm thấy 1 giao dịch cho FM3, ghi nhận mới 1. Trạng thái: Đã thanh toán')
     await waitFor(() => expect(invalidated(spy)).toBe(true))
   })
@@ -199,8 +199,19 @@ describe('AdminPaymentsTab', () => {
     expect(await screen.findByText('Chưa có giao dịch nào mang mã FM4 trên SePay')).toBeInTheDocument()
   })
 
+  it('names the order\'s own provider in the check action, or a generic fallback', async () => {
+    api.getOrders.mockResolvedValue(page([order({ id: 5, code: 'FM5', status: 'PENDING', provider: 'PayOS' }),
+      order({ id: 6, code: 'FM6', status: 'PENDING', provider: null })]))
+    renderTab()
+    await openMenu('FM5')
+    expect(screen.getByRole('menuitem', { name: /Kiểm tra PayOS/ })).toBeInTheDocument()
+    fireEvent.keyDown(document, { key: 'Escape' })
+    await openMenu('FM6')
+    expect(screen.getByRole('menuitem', { name: /Kiểm tra cổng thanh toán/ })).toBeInTheDocument()
+  })
+
   it('offers the SePay check on an UNDERPAID order and shows a server error', async () => {
-    api.checkOrderOnSepay.mockRejectedValue({ message: 'SePay down', status: 502 })
+    api.checkOrderOnProvider.mockRejectedValue({ message: 'SePay down', status: 502 })
     renderTab()
     await openMenu('FM1')
     fireEvent.click(screen.getByRole('menuitem', { name: /Kiểm tra SePay/ }))

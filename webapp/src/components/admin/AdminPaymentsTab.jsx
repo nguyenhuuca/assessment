@@ -7,7 +7,7 @@ import { formatVnd } from '../../utils/formatVnd.js'
 import { formatDate } from '../../i18n/format.js'
 import {
   useAdminPaymentsSummary, useAdminPaymentOrders, useAdminUnmatched, useAdminPaymentPlans,
-  useLinkTransaction, useIgnoreTransaction, useResolveOrder, useMarkOrderPaid, useCancelOrder, useCheckOrderOnSepay, useCreatePlan, useUpdatePlan, useSetPlanActive,
+  useLinkTransaction, useIgnoreTransaction, useResolveOrder, useMarkOrderPaid, useCancelOrder, useCheckOrderOnProvider, useCreatePlan, useUpdatePlan, useSetPlanActive,
 } from '../../hooks/useAdminPayments.js'
 
 const PAGE_SIZE = 10
@@ -70,7 +70,7 @@ function OrdersSection() {
   const [paying, setPaying] = useState(null)
   const [payAmount, setPayAmount] = useState('')
   const [cancelling, setCancelling] = useState(null)
-  const check = useCheckOrderOnSepay()
+  const check = useCheckOrderOnProvider()
   const [notice, setNotice] = useState('')
   const orders = data?.content ?? []
 
@@ -91,17 +91,20 @@ function OrdersSection() {
       onError: e => { setCancelling(null); onFail(e) },
     })
   }
-  function checkOnSepay(o) {
+  // Provider display name comes from the API (ADR-0038), so a vendor change needs no UI change
+  const providerOf = o => o.provider || t('pay.providerFallback')
+  function checkOnProvider(o) {
     setError('')
-    setNotice(t('pay.checking', { code: o.code }))
+    const provider = providerOf(o)
+    setNotice(t('pay.checking', { code: o.code, provider }))
     check.mutate({ id: o.id }, {
       onSuccess: r => setNotice(r?.found
         ? t('pay.checkFound', { code: o.code, found: r.found, processed: r.processed, status: t(`pay.status.${r.order?.status}`, r.order?.status) })
-        : t('pay.checkNone', { code: o.code })),
+        : t('pay.checkNone', { code: o.code, provider })),
       onError: e => { setNotice(''); onFail(e) },
     })
   }
-  const checkItem = o => ({ key: 'check', icon: 'sync', label: t('pay.checkSepay'), onSelect: () => checkOnSepay(o) })
+  const checkItem = o => ({ key: 'check', icon: 'sync', label: t('pay.checkProvider', { provider: providerOf(o) }), onSelect: () => checkOnProvider(o) })
   function rowActions(o) {
     if (OPEN_STATUSES.includes(o.status)) {
       return [
@@ -243,7 +246,7 @@ function UnmatchedSection() {
   const rows = data?.content ?? []
 
   function confirmIgnore() {
-    ignore.mutate({ sepayId: ignoring.sepayId }, {
+    ignore.mutate({ id: ignoring.id }, {
       onSuccess: () => setIgnoring(null),
       onError: err => { setIgnoring(null); setError(err?.message || t('pay.actionFailed')) },
     })
@@ -254,7 +257,7 @@ function UnmatchedSection() {
     const code = orderCode.trim()
     if (!code) return
     setError('')
-    link.mutate({ sepayId: linking.sepayId, orderCode: code }, {
+    link.mutate({ id: linking.id, orderCode: code }, {
       onSuccess: () => { setLinking(null); setOrderCode('') },
       onError: err => setError(err?.message || t('pay.actionFailed')),
     })
@@ -277,7 +280,7 @@ function UnmatchedSection() {
               <tr className="admin-table-row"><td colSpan={5} className="admin-cell-muted">{t('pay.noUnmatched')}</td></tr>
             )}
             {rows.map(r => (
-              <React.Fragment key={r.sepayId}>
+              <React.Fragment key={r.id}>
                 <tr className="admin-table-row">
                   <td>{formatVnd(r.amount)}</td>
                   <td className="admin-cell-muted">{r.content}</td>
@@ -294,7 +297,7 @@ function UnmatchedSection() {
                     </div>
                   </td>
                 </tr>
-                {linking?.sepayId === r.sepayId && (
+                {linking?.id === r.id && (
                   <tr>
                     <td colSpan={5}>
                       <form onSubmit={submit} style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>

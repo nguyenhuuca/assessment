@@ -22,6 +22,6 @@ class PaymentOrderRepositoryQueryTest {
                 .contains("PaymentOrderStatus.EXPIRED")
                 .contains("o.paidAmount = 0")
                 .contains("o.createdAt < :cutoff")
-                .contains("not exists (select 1 from SepayTransaction t where t.orderId = o.id)");
+                .contains("not exists (select 1 from PaymentTransaction t where t.orderId = o.id)");
     }
 }

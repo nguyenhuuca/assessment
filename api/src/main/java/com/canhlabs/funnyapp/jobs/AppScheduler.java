@@ -7,7 +7,7 @@ import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
 import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.PaymentOrderService;
-import com.canhlabs.funnyapp.service.SepayReconcileService;
+import com.canhlabs.funnyapp.service.PaymentReconcileService;
 import com.canhlabs.funnyapp.service.StreamVideoService;
 import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
@@ -44,7 +44,7 @@ public class AppScheduler implements ApplicationRunner {
     private final AppProperties appProps;
     private final NotificationDigestService notificationDigestService;
     private final PaymentOrderService paymentOrderService;
-    private final SepayReconcileService sepayReconcileService;
+    private final PaymentReconcileService paymentReconcileService;
 
     @Value("${app.jobs.regenerate-thumbnails:false}")
     private boolean regenerateThumbnailsEnabled;
@@ -55,10 +55,10 @@ public class AppScheduler implements ApplicationRunner {
                         VideoSourceRepository videoSourceRepository, AppProperties appProps,
                         NotificationDigestService notificationDigestService,
                         PaymentOrderService paymentOrderService,
-                        SepayReconcileService sepayReconcileService
+                        PaymentReconcileService paymentReconcileService
     ) {
         this.paymentOrderService = paymentOrderService;
-        this.sepayReconcileService = sepayReconcileService;
+        this.paymentReconcileService = paymentReconcileService;
         this.streamVideoService = streamVideoService;
         this.statsCache = statsCache;
         this.videoAccessService = videoAccessService;
@@ -122,9 +122,9 @@ public class AppScheduler implements ApplicationRunner {
         log.info("Payment order expiry flipped {} order(s)", expired);
     }
 
-    /** Runs every 10 minutes; the Harness flag sepay_reconcile_enabled decides inside whether it does anything. */
-    public void reconcileSepay() {
-        sepayReconcileService.reconcile();
+    /** Daily T-1 pass over every provider feed; the Harness flag sepay_reconcile_enabled decides inside whether it runs. */
+    public void reconcilePayments() {
+        paymentReconcileService.reconcile();
     }
 
     public void cleanUpOldVideos() {

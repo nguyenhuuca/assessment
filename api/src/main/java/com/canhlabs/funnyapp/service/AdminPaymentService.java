@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-/** Admin view and manual fixes for donations and Premium payments (ADR-0037). */
+/** Admin view and manual fixes for donations and Premium payments (ADR-0037, ADR-0038). */
 public interface AdminPaymentService {
 
     /** Newest first; null filters mean "all". */
@@ -24,13 +24,13 @@ public interface AdminPaymentService {
     AdminPaymentSummaryDto summary();
 
     /** Attaches an UNMATCHED transfer to an order and applies the webhook amount rules. */
-    AdminOrderDto linkTransaction(long sepayId, String orderCode);
+    AdminOrderDto linkTransaction(long transactionId, String orderCode);
 
     /**
-     * UNMATCHED to IGNORED: a transfer no order owns (SePay test send, unrelated income); it leaves the
+     * UNMATCHED to IGNORED: a transfer no order owns (provider test send, unrelated income); it leaves the
      * unmatched list but stays stored. Calling again on an IGNORED transfer is a no-op.
      */
-    void ignoreTransaction(long sepayId);
+    void ignoreTransaction(long transactionId);
 
     /** UNDERPAID to RESOLVED, optionally granting Premium. Calling again on a RESOLVED order is a no-op. */
     AdminOrderDto resolveOrder(long orderId, boolean grantPremium);
@@ -42,10 +42,10 @@ public interface AdminPaymentService {
     AdminOrderDto markPaid(long orderId, long amount);
 
     /**
-     * Asks SePay now for transfers carrying this order's code (PENDING, EXPIRED or UNDERPAID) and records any the
-     * webhook missed, with the webhook amount rules.
+     * Asks the order's payment provider now for transfers carrying its code (PENDING, EXPIRED or UNDERPAID) and
+     * records any the webhook missed, with the webhook amount rules.
      */
-    AdminOrderCheckDto checkOrderOnSepay(long orderId);
+    AdminOrderCheckDto checkOrderOnProvider(long orderId);
 
     /** PENDING or EXPIRED to CANCELLED; a later transfer with its code is then stored UNMATCHED. */
     AdminOrderDto cancelOrder(long orderId);

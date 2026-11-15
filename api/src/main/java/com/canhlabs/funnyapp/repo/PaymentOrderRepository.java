@@ -65,6 +65,6 @@ public interface PaymentOrderRepository extends JpaRepository<PaymentOrder, Long
              where o.status = com.canhlabs.funnyapp.enums.PaymentOrderStatus.EXPIRED
                and o.paidAmount = 0
                and o.createdAt < :cutoff
-               and not exists (select 1 from SepayTransaction t where t.orderId = o.id)""")
+               and not exists (select 1 from PaymentTransaction t where t.orderId = o.id)""")
     int purgeUnpaidExpired(@Param("cutoff") Instant cutoff);
 }

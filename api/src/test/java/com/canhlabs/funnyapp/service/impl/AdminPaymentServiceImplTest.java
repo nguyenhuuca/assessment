@@ -6,7 +6,7 @@ import com.canhlabs.funnyapp.dto.payment.AdminPlanDto;
 import com.canhlabs.funnyapp.dto.payment.PlanRequest;
 import com.canhlabs.funnyapp.entity.PaymentOrder;
 import com.canhlabs.funnyapp.entity.PremiumPlan;
-import com.canhlabs.funnyapp.entity.SepayTransaction;
+import com.canhlabs.funnyapp.entity.PaymentTransaction;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.PaymentOrderStatus;
 import com.canhlabs.funnyapp.enums.PaymentType;
@@ -14,9 +14,13 @@ import com.canhlabs.funnyapp.enums.TxMatchStatus;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.PaymentOrderRepository;
 import com.canhlabs.funnyapp.repo.PremiumPlanRepository;
-import com.canhlabs.funnyapp.repo.SepayTransactionRepository;
+import com.canhlabs.funnyapp.repo.PaymentTransactionRepository;
 import com.canhlabs.funnyapp.repo.UserRepo;
-import com.canhlabs.funnyapp.service.SepayReconcileService;
+import com.canhlabs.funnyapp.service.PaymentReconcileService;
+import com.canhlabs.funnyapp.service.payment.PaymentProvider;
+import com.canhlabs.funnyapp.service.payment.PaymentProviderRegistry;
+import com.canhlabs.funnyapp.service.payment.ProviderApiException;
+import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.dto.payment.AdminOrderCheckDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,25 +51,30 @@ class AdminPaymentServiceImplTest {
     private static final Instant NOW = Instant.parse("2026-11-12T10:00:00Z");
 
     private PaymentOrderRepository orderRepo;
-    private SepayTransactionRepository txRepo;
+    private PaymentTransactionRepository txRepo;
     private PremiumPlanRepository planRepo;
     private UserRepo userRepo;
     private ApplicationEventPublisher events;
-    private SepayReconcileService reconcile;
+    private PaymentReconcileService reconcile;
     private AdminPaymentServiceImpl service;
 
     @BeforeEach
     void setUp() {
         orderRepo = mock(PaymentOrderRepository.class);
-        txRepo = mock(SepayTransactionRepository.class);
+        txRepo = mock(PaymentTransactionRepository.class);
         planRepo = mock(PremiumPlanRepository.class);
         userRepo = mock(UserRepo.class);
         events = mock(ApplicationEventPublisher.class);
-        reconcile = mock(SepayReconcileService.class);
+        reconcile = mock(PaymentReconcileService.class);
+        PaymentProvider sepay = mock(PaymentProvider.class);
+        when(sepay.id()).thenReturn("sepay");
+        when(sepay.displayName()).thenReturn("SePay");
+        PaymentProviderRegistry providers = new PaymentProviderRegistry(List.of(sepay), new AppProperties());
         service = new AdminPaymentServiceImpl(orderRepo, txRepo, planRepo,
-                new PaymentSettlement(orderRepo, planRepo, userRepo, events), reconcile, Clock.fixed(NOW, ZoneOffset.UTC));
+                new PaymentSettlement(orderRepo, planRepo, userRepo, events), reconcile, providers,
+                Clock.fixed(NOW, ZoneOffset.UTC));
         when(orderRepo.save(any(PaymentOrder.class))).thenAnswer(i -> i.getArgument(0));
-        when(txRepo.save(any(SepayTransaction.class))).thenAnswer(i -> i.getArgument(0));
+        when(txRepo.save(any(PaymentTransaction.class))).thenAnswer(i -> i.getArgument(0));
         when(planRepo.save(any(PremiumPlan.class))).thenAnswer(i -> i.getArgument(0));
     }
 
@@ -74,8 +83,9 @@ class AdminPaymentServiceImplTest {
                 .userId(8L).planId(3L).expectedAmount(100000L).paidAmount(paid).expiresAt(NOW).build();
     }
 
-    private static SepayTransaction tx(TxMatchStatus status, long amount) {
-        return SepayTransaction.builder().sepayId(9L).matchStatus(status).amount(amount).build();
+    private static PaymentTransaction tx(TxMatchStatus status, long amount) {
+        return PaymentTransaction.builder().id(9L).provider("sepay").providerTxId("92704").matchStatus(status)
+                .amount(amount).build();
     }
 
     private static void assertStatus(Runnable r, HttpStatus status) {
@@ -130,7 +140,8 @@ class AdminPaymentServiceImplTest {
 
     @Test
     void listUnmatched_mapsFields() {
-        SepayTransaction t = SepayTransaction.builder().sepayId(9L).matchStatus(TxMatchStatus.UNMATCHED).amount(7000)
+        PaymentTransaction t = PaymentTransaction.builder().id(9L).provider("sepay").providerTxId("1")
+                .matchStatus(TxMatchStatus.UNMATCHED).amount(7000)
                 .content("memo").code("C1").gateway("MB").build();
         PageRequest pr = PageRequest.of(0, 20);
         when(txRepo.findByMatchStatusOrderByReceivedAtDesc(TxMatchStatus.UNMATCHED, pr))
@@ -138,7 +149,8 @@ class AdminPaymentServiceImplTest {
 
         var dto = service.listUnmatched(pr).getContent().get(0);
 
-        assertThat(dto.getSepayId()).isEqualTo(9L);
+        assertThat(dto.getId()).isEqualTo(9L);
+        assertThat(dto.getProvider()).isEqualTo("SePay");
         assertThat(dto.getAmount()).isEqualTo(7000);
         assertThat(dto.getGateway()).isEqualTo("MB");
     }
@@ -170,7 +182,7 @@ class AdminPaymentServiceImplTest {
     @Test
     void link_full_marksPaidAndExtendsPremium() {
         PaymentOrder order = premiumOrder(PaymentOrderStatus.PENDING, 0);
-        SepayTransaction t = tx(TxMatchStatus.UNMATCHED, 100000);
+        PaymentTransaction t = tx(TxMatchStatus.UNMATCHED, 100000);
         User user = new User();
         stubPlanAndUser(user);
         when(orderRepo.findByCodeForUpdate("FMABCD1234")).thenReturn(Optional.of(order));
@@ -188,7 +200,7 @@ class AdminPaymentServiceImplTest {
     @Test
     void link_partial_marksUnderpaidWithoutPremium() {
         PaymentOrder order = premiumOrder(PaymentOrderStatus.PENDING, 0);
-        SepayTransaction t = tx(TxMatchStatus.UNMATCHED, 40000);
+        PaymentTransaction t = tx(TxMatchStatus.UNMATCHED, 40000);
         when(orderRepo.findByCodeForUpdate("FMABCD1234")).thenReturn(Optional.of(order));
         when(txRepo.findById(9L)).thenReturn(Optional.of(t));
 
@@ -202,7 +214,7 @@ class AdminPaymentServiceImplTest {
     @Test
     void link_secondTransferTopsUpUnderpaidOrder() {
         PaymentOrder order = premiumOrder(PaymentOrderStatus.UNDERPAID, 40000);
-        SepayTransaction t = tx(TxMatchStatus.UNMATCHED, 60000);
+        PaymentTransaction t = tx(TxMatchStatus.UNMATCHED, 60000);
         stubPlanAndUser(new User());
         when(orderRepo.findByCodeForUpdate("FMABCD1234")).thenReturn(Optional.of(order));
         when(txRepo.findById(9L)).thenReturn(Optional.of(t));
@@ -214,7 +226,7 @@ class AdminPaymentServiceImplTest {
     @Test
     void link_toAlreadyPaidOrder_addsAmountButDoesNotGrantAgain() {
         PaymentOrder order = premiumOrder(PaymentOrderStatus.PAID, 100000);
-        SepayTransaction t = tx(TxMatchStatus.UNMATCHED, 5000);
+        PaymentTransaction t = tx(TxMatchStatus.UNMATCHED, 5000);
         when(orderRepo.findByCodeForUpdate("FMABCD1234")).thenReturn(Optional.of(order));
         when(txRepo.findById(9L)).thenReturn(Optional.of(t));
 
@@ -228,7 +240,7 @@ class AdminPaymentServiceImplTest {
     @Test
     void link_calledTwice_secondIsConflictAndDoesNotDoubleApply() {
         PaymentOrder order = premiumOrder(PaymentOrderStatus.PENDING, 0);
-        SepayTransaction t = tx(TxMatchStatus.UNMATCHED, 40000);
+        PaymentTransaction t = tx(TxMatchStatus.UNMATCHED, 40000);
         when(orderRepo.findByCodeForUpdate("FMABCD1234")).thenReturn(Optional.of(order));
         when(txRepo.findById(9L)).thenReturn(Optional.of(t));
 
@@ -294,15 +306,15 @@ class AdminPaymentServiceImplTest {
     // ---- check on SePay ----
 
     @Test
-    void checkOnSepay_searchesTheOrderCodeFromCreation_andReturnsTheReloadedOrder() {
+    void checkOnProvider_searchesTheOrderCodeFromCreation_andReturnsTheReloadedOrder() {
         Instant created = NOW.minusSeconds(7200);
         PaymentOrder before = premiumOrder(PaymentOrderStatus.PENDING, 0);
         before.setCreatedAt(created);
         PaymentOrder after = premiumOrder(PaymentOrderStatus.PAID, 100000);
         when(orderRepo.findById(5L)).thenReturn(Optional.of(before), Optional.of(after));
-        when(reconcile.checkCode("FMABCD1234", created)).thenReturn(new SepayReconcileService.CheckResult(1, 1));
+        when(reconcile.checkCode("sepay", "FMABCD1234", created)).thenReturn(new PaymentReconcileService.CheckResult(1, 1));
 
-        AdminOrderCheckDto dto = service.checkOrderOnSepay(5L);
+        AdminOrderCheckDto dto = service.checkOrderOnProvider(5L);
 
         assertThat(dto.getFound()).isEqualTo(1);
         assertThat(dto.getProcessed()).isEqualTo(1);
@@ -310,40 +322,40 @@ class AdminPaymentServiceImplTest {
     }
 
     @Test
-    void checkOnSepay_withoutCreationTime_looksBackThreeDays() {
+    void checkOnProvider_withoutCreationTime_looksBackThreeDays() {
         PaymentOrder order = premiumOrder(PaymentOrderStatus.UNDERPAID, 40000);
         when(orderRepo.findById(5L)).thenReturn(Optional.of(order));
-        when(reconcile.checkCode("FMABCD1234", NOW.minusSeconds(3 * 86400)))
-                .thenReturn(new SepayReconcileService.CheckResult(0, 0));
+        when(reconcile.checkCode("sepay", "FMABCD1234", NOW.minusSeconds(3 * 86400)))
+                .thenReturn(new PaymentReconcileService.CheckResult(0, 0));
 
-        AdminOrderCheckDto dto = service.checkOrderOnSepay(5L);
+        AdminOrderCheckDto dto = service.checkOrderOnProvider(5L);
 
         assertThat(dto.getFound()).isZero();
         assertThat(dto.getOrder().getStatus()).isEqualTo(PaymentOrderStatus.UNDERPAID);
     }
 
     @Test
-    void checkOnSepay_rejections() {
+    void checkOnProvider_rejections() {
         when(orderRepo.findById(5L)).thenReturn(Optional.empty());
-        assertStatus(() -> service.checkOrderOnSepay(5L), HttpStatus.NOT_FOUND);
+        assertStatus(() -> service.checkOrderOnProvider(5L), HttpStatus.NOT_FOUND);
 
         when(orderRepo.findById(5L)).thenReturn(Optional.of(premiumOrder(PaymentOrderStatus.PAID, 100000)));
-        assertStatus(() -> service.checkOrderOnSepay(5L), HttpStatus.CONFLICT);
+        assertStatus(() -> service.checkOrderOnProvider(5L), HttpStatus.CONFLICT);
         verifyNoInteractions(reconcile);
 
         when(orderRepo.findById(5L)).thenReturn(Optional.of(premiumOrder(PaymentOrderStatus.PENDING, 0)));
-        when(reconcile.checkCode(any(), any()))
-                .thenThrow(new SepayReconcileService.SepayApiException("no token", false));
-        assertStatus(() -> service.checkOrderOnSepay(5L), HttpStatus.SERVICE_UNAVAILABLE);
+        when(reconcile.checkCode(any(), any(), any()))
+                .thenThrow(new ProviderApiException("no token", false));
+        assertStatus(() -> service.checkOrderOnProvider(5L), HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @Test
-    void checkOnSepay_apiFailure_isBadGateway() {
+    void checkOnProvider_apiFailure_isBadGateway() {
         when(orderRepo.findById(5L)).thenReturn(Optional.of(premiumOrder(PaymentOrderStatus.EXPIRED, 0)));
-        when(reconcile.checkCode(any(), any()))
-                .thenThrow(new SepayReconcileService.SepayApiException("HTTP 429", true));
+        when(reconcile.checkCode(any(), any(), any()))
+                .thenThrow(new ProviderApiException("HTTP 429", true));
 
-        assertStatus(() -> service.checkOrderOnSepay(5L), HttpStatus.BAD_GATEWAY);
+        assertStatus(() -> service.checkOrderOnProvider(5L), HttpStatus.BAD_GATEWAY);
     }
 
     // ---- resolve ----
@@ -622,7 +634,10 @@ class AdminPaymentServiceImplTest {
     @Test
     void publicConstructor_usesSystemClock() {
         AdminPaymentServiceImpl s = new AdminPaymentServiceImpl(orderRepo, txRepo, planRepo,
-                new PaymentSettlement(orderRepo, planRepo, userRepo, events), reconcile);
+                new PaymentSettlement(orderRepo, planRepo, userRepo, events), reconcile,
+                new PaymentProviderRegistry(List.of(new com.canhlabs.funnyapp.service.payment.sepay.SepayProvider(
+                        new AppProperties(), com.canhlabs.funnyapp.config.JsonMappers.create(), null)),
+                        new AppProperties()));
         when(planRepo.findAllByOrderBySortOrderAscIdAsc()).thenReturn(List.of());
         assertThat(s.listPlans()).isEmpty();
     }

@@ -1,19 +1,19 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.config.AppProperties;
-import com.canhlabs.funnyapp.config.JsonMappers;
-import com.canhlabs.funnyapp.dto.payment.SepayTxPayload;
 import com.canhlabs.funnyapp.entity.PaymentOrder;
 import com.canhlabs.funnyapp.entity.PremiumPlan;
 import com.canhlabs.funnyapp.entity.User;
 import com.canhlabs.funnyapp.enums.PaymentOrderStatus;
 import com.canhlabs.funnyapp.enums.PaymentType;
+import com.canhlabs.funnyapp.enums.TransferDirection;
 import com.canhlabs.funnyapp.enums.TxSource;
 import com.canhlabs.funnyapp.event.PaymentEvent;
 import com.canhlabs.funnyapp.repo.PaymentOrderRepository;
 import com.canhlabs.funnyapp.repo.PremiumPlanRepository;
-import com.canhlabs.funnyapp.repo.SepayTransactionRepository;
+import com.canhlabs.funnyapp.repo.PaymentTransactionRepository;
 import com.canhlabs.funnyapp.repo.UserRepo;
+import com.canhlabs.funnyapp.service.payment.BankTransfer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,13 +21,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationEventPublisher;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.HexFormat;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,151 +39,38 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-class SepayWebhookServiceImplTest {
+class PaymentIngestionServiceImplTest {
 
-    private static final String SECRET = "sepay-test-secret";
     private static final Instant NOW = Instant.parse("2026-11-12T10:00:00Z");
     private static final String CODE = "FMABCD1234";
 
     private AppProperties props;
     private PaymentOrderRepository orderRepo;
-    private SepayTransactionRepository txRepo;
+    private PaymentTransactionRepository txRepo;
     private PremiumPlanRepository planRepo;
     private UserRepo userRepo;
     private ApplicationEventPublisher events;
-    private SepayWebhookServiceImpl service;
+    private PaymentIngestionServiceImpl service;
 
     @BeforeEach
     void setUp() {
         props = new AppProperties();
-        props.getSepay().setWebhookSecret(SECRET);
         orderRepo = mock(PaymentOrderRepository.class);
-        txRepo = mock(SepayTransactionRepository.class);
+        txRepo = mock(PaymentTransactionRepository.class);
         planRepo = mock(PremiumPlanRepository.class);
         userRepo = mock(UserRepo.class);
         events = mock(ApplicationEventPublisher.class);
-        service = new SepayWebhookServiceImpl(props, orderRepo, txRepo, JsonMappers.create(),
+        service = new PaymentIngestionServiceImpl(props, orderRepo, txRepo,
                 new PaymentSettlement(orderRepo, planRepo, userRepo, events), Clock.fixed(NOW, ZoneOffset.UTC));
-        when(txRepo.insertIgnore(anyLong(), any(), anyString(), anyString(), anyString(), anyLong(), any(), any(),
-                any(), any(), any(), any())).thenReturn(1);
+        when(txRepo.insertIgnore(anyString(), anyString(), any(), anyString(), anyString(), anyString(), anyLong(), any(),
+                any(), any(), any(), any(), any())).thenReturn(1);
         when(orderRepo.save(any(PaymentOrder.class))).thenAnswer(i -> i.getArgument(0));
-    }
-
-    // ---- verify ----
-
-    private static String sign(String secret, String ts, byte[] body) throws Exception {
-        Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-        mac.update((ts + ".").getBytes(StandardCharsets.UTF_8));
-        return "sha256=" + HexFormat.of().formatHex(mac.doFinal(body));
-    }
-
-    private static final byte[] BODY = "{\"id\":1}".getBytes(StandardCharsets.UTF_8);
-    private static final String TS = String.valueOf(NOW.getEpochSecond());
-
-    @Test
-    void verify_validSignature_passes() throws Exception {
-        assertThat(service.verify(TS, sign(SECRET, TS, BODY), BODY)).isTrue();
-    }
-
-    @Test
-    void verify_edgeOfWindow_passesAndBeyondFails() throws Exception {
-        String old = String.valueOf(NOW.getEpochSecond() - 300);
-        String tooOld = String.valueOf(NOW.getEpochSecond() - 301);
-        String future = String.valueOf(NOW.getEpochSecond() + 301);
-        assertThat(service.verify(old, sign(SECRET, old, BODY), BODY)).isTrue();
-        assertThat(service.verify(tooOld, sign(SECRET, tooOld, BODY), BODY)).isFalse();
-        assertThat(service.verify(future, sign(SECRET, future, BODY), BODY)).isFalse();
-    }
-
-    @Test
-    void verify_wrongSecretOrTamperedBodyOrTimestamp_fails() throws Exception {
-        assertThat(service.verify(TS, sign("other", TS, BODY), BODY)).isFalse();
-        assertThat(service.verify(TS, sign(SECRET, TS, BODY), "{\"id\":2}".getBytes(StandardCharsets.UTF_8))).isFalse();
-        String shifted = String.valueOf(NOW.getEpochSecond() + 1);
-        assertThat(service.verify(shifted, sign(SECRET, TS, BODY), BODY)).isFalse();
-    }
-
-    @Test
-    void verify_malformedInputs_fail() throws Exception {
-        String good = sign(SECRET, TS, BODY);
-        assertThat(service.verify(null, good, BODY)).isFalse();
-        assertThat(service.verify(TS, null, BODY)).isFalse();
-        assertThat(service.verify(TS, good, null)).isFalse();
-        assertThat(service.verify("abc", good, BODY)).isFalse();
-        assertThat(service.verify(TS, good.substring(7), BODY)).isFalse();
-        assertThat(service.verify(TS, "sha256=", BODY)).isFalse();
-    }
-
-    @Test
-    void verify_uppercaseHexSignature_passes() throws Exception {
-        String upper = "sha256=" + sign(SECRET, TS, BODY).substring(7).toUpperCase();
-        assertThat(service.verify(TS, upper, BODY)).isTrue();
-    }
-
-    @Test
-    void verify_noSecret_fails() throws Exception {
-        String good = sign(SECRET, TS, BODY);
-        props.getSepay().setWebhookSecret("");
-        assertThat(service.isConfigured()).isFalse();
-        assertThat(service.verify(TS, good, BODY)).isFalse();
-    }
-
-    @Test
-    void ipAllowlist_offAllowsAll_onAllowsListedOnly() {
-        assertThat(service.isIpAllowed("9.9.9.9")).isTrue();
-        assertThat(service.isIpAllowed(null)).isTrue();
-        props.getSepay().setAllowedIps(" 1.1.1.1 , 2.2.2.2");
-        assertThat(service.isIpAllowed("2.2.2.2")).isTrue();
-        assertThat(service.isIpAllowed("9.9.9.9")).isFalse();
-        assertThat(service.isIpAllowed(null)).isFalse();
-    }
-
-    // ---- parse ----
-
-    @Test
-    void parse_fullPayload() {
-        String json = """
-                {"id":92704,"gateway":"MBBank","transactionDate":"2026-11-12 17:00:00","accountNumber":"0123456789",
-                 "code":"FMABCD1234","content":"chuyen tien FMABCD1234","transferType":"in","transferAmount":50000,
-                 "referenceCode":"REF1","accumulated":1}""";
-        SepayTxPayload tx = service.parse(json.getBytes(StandardCharsets.UTF_8));
-        assertThat(tx.id()).isEqualTo(92704L);
-        assertThat(tx.amount()).isEqualTo(50000L);
-        assertThat(tx.transferType()).isEqualTo("in");
-        assertThat(tx.gateway()).isEqualTo("MBBank");
-        assertThat(tx.code()).isEqualTo(CODE);
-        assertThat(tx.referenceCode()).isEqualTo("REF1");
-        assertThat(tx.transactionDate()).isEqualTo(Instant.parse("2026-11-12T10:00:00Z"));
-    }
-
-    @Test
-    void parse_optionalFieldsMissingOrBadDate_areNull() {
-        SepayTxPayload tx = service.parse(
-                "{\"id\":5,\"transferType\":\"out\",\"transferAmount\":1,\"code\":null,\"transactionDate\":\"nope\"}"
-                        .getBytes(StandardCharsets.UTF_8));
-        assertThat(tx.code()).isNull();
-        assertThat(tx.content()).isNull();
-        assertThat(tx.transactionDate()).isNull();
-        assertThat(service.parse("{\"id\":5,\"transferType\":\"in\",\"transferAmount\":1}"
-                .getBytes(StandardCharsets.UTF_8)).transactionDate()).isNull();
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"not json", "[1]", "null", "{}", "{\"id\":\"x\",\"transferType\":\"in\",\"transferAmount\":1}",
-            "{\"id\":1,\"transferAmount\":1}", "{\"id\":1,\"transferType\":\"in\"}",
-            "{\"id\":1.5,\"transferType\":\"in\",\"transferAmount\":1}",
-            "{\"id\":1,\"transferType\":\"in\",\"transferAmount\":1.5}",
-            "{\"id\":1,\"transferType\":\"in\",\"transferAmount\":99999999999999999999}"})
-    void parse_invalid_throws(String json) {
-        assertThatThrownBy(() -> service.parse(json.getBytes(StandardCharsets.UTF_8)))
-                .isInstanceOf(IllegalArgumentException.class);
     }
 
     // ---- process ----
 
-    private static SepayTxPayload tx(long id, long amount, String content) {
-        return new SepayTxPayload(id, "MBBank", Instant.parse("2026-11-12T09:59:00Z"), "0123456789012", null,
+    private static BankTransfer tx(long id, long amount, String content) {
+        return payload(id, "MBBank", Instant.parse("2026-11-12T09:59:00Z"), "0123456789012", null,
                 content, "in", amount, "REF");
     }
 
@@ -206,7 +89,7 @@ class SepayWebhookServiceImplTest {
     }
 
     private void verifyStored(Long orderId, String matchStatus) {
-        verify(txRepo).insertIgnore(anyLong(), eq(orderId), eq(matchStatus), anyString(), anyString(), anyLong(),
+        verify(txRepo).insertIgnore(anyString(), anyString(), eq(orderId), eq(matchStatus), anyString(), anyString(), anyLong(),
                 any(), any(), any(), any(), any(), any());
     }
 
@@ -218,26 +101,26 @@ class SepayWebhookServiceImplTest {
 
     @Test
     void sameReferenceUnderAnotherId_isSkipped_noDoubleCredit() {
-        when(txRepo.existsByReferenceCodeAndAmountAndSepayIdNot("REF", 50000L, 2L)).thenReturn(true);
+        when(txRepo.existsSameTransferUnderOtherId("REF", 50000L, "sepay", "2")).thenReturn(true);
 
         service.process(tx(2, 50000, CODE), TxSource.RECONCILE);
 
-        verify(txRepo, never()).insertIgnore(anyLong(), any(), anyString(), anyString(), anyString(), anyLong(),
+        verify(txRepo, never()).insertIgnore(anyString(), anyString(), any(), anyString(), anyString(), anyString(), anyLong(),
                 any(), any(), any(), any(), any(), any());
         verifyNoInteractions(orderRepo, events);
     }
 
     @Test
     void blankReference_skipsTheReferenceCheck() {
-        service.process(new SepayTxPayload(1, "MB", null, null, null, "no code", "in", 1000, " "), TxSource.WEBHOOK);
+        service.process(payload(1, "MB", null, null, null, "no code", "in", 1000, " "), TxSource.WEBHOOK);
 
-        verify(txRepo, never()).existsByReferenceCodeAndAmountAndSepayIdNot(any(), anyLong(), any());
+        verify(txRepo, never()).existsSameTransferUnderOtherId(any(), anyLong(), any(), any());
         verifyStored(null, "UNMATCHED");
     }
 
     @Test
     void out_isIgnored_noOrderLookup() {
-        SepayTxPayload out = new SepayTxPayload(1, "MB", null, null, null, "to " + CODE, "OUT", 5000, null);
+        BankTransfer out = payload(1, "MB", null, null, null, "to " + CODE, "OUT", 5000, null);
         service.process(out, TxSource.WEBHOOK);
         verifyStored(null, "IGNORED");
         verifyNoInteractions(orderRepo, events);
@@ -285,7 +168,7 @@ class SepayWebhookServiceImplTest {
     @Test
     void codeFieldWithPrefix_winsOverContent() {
         withOrder(donation(PaymentOrderStatus.PENDING));
-        SepayTxPayload t = new SepayTxPayload(1, null, null, null, " fmabcd1234 ", "other FMZZZZZZZZ", "in", 1000, null);
+        BankTransfer t = payload(1, null, null, null, " fmabcd1234 ", "other FMZZZZZZZZ", "in", 1000, null);
         service.process(t, TxSource.WEBHOOK);
         verifyStored(7L, "MATCHED");
     }
@@ -293,7 +176,7 @@ class SepayWebhookServiceImplTest {
     @Test
     void codeFieldWithoutPrefix_fallsBackToContent_caseInsensitive() {
         withOrder(donation(PaymentOrderStatus.PENDING));
-        SepayTxPayload t = new SepayTxPayload(1, null, null, null, "XX123", "MBVCB.1.fmabcd1234.CT", "in", 1000, null);
+        BankTransfer t = payload(1, null, null, null, "XX123", "MBVCB.1.fmabcd1234.CT", "in", 1000, null);
         service.process(t, TxSource.WEBHOOK);
         verifyStored(7L, "MATCHED");
     }
@@ -314,11 +197,11 @@ class SepayWebhookServiceImplTest {
     void storedFields_areMaskedAndTruncated() {
         withOrder(donation(PaymentOrderStatus.PENDING));
         String longContent = CODE + "x".repeat(600);
-        service.process(new SepayTxPayload(9, "MBBank", null, "0123456789012", null, longContent, "in", 1000, "R"),
+        service.process(payload(9, "MBBank", null, "0123456789012", null, longContent, "in", 1000, "R"),
                 TxSource.RECONCILE);
         ArgumentCaptor<String> content = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> account = ArgumentCaptor.forClass(String.class);
-        verify(txRepo).insertIgnore(eq(9L), eq(7L), eq("MATCHED"), eq("RECONCILE"), eq("in"), eq(1000L), eq(CODE),
+        verify(txRepo).insertIgnore(eq("sepay"), eq("9"), eq(7L), eq("MATCHED"), eq("RECONCILE"), eq("in"), eq(1000L), eq(CODE),
                 content.capture(), eq("MBBank"), account.capture(), eq("R"), isNull());
         assertThat(content.getValue()).hasSize(500);
         assertThat(account.getValue()).isEqualTo("****9012");
@@ -326,17 +209,17 @@ class SepayWebhookServiceImplTest {
 
     @Test
     void maskAccount_shortBlankNull() {
-        assertThat(SepayWebhookServiceImpl.maskAccount("123")).isEqualTo("****");
-        assertThat(SepayWebhookServiceImpl.maskAccount(" ")).isNull();
-        assertThat(SepayWebhookServiceImpl.maskAccount(null)).isNull();
+        assertThat(PaymentIngestionServiceImpl.maskAccount("123")).isEqualTo("****");
+        assertThat(PaymentIngestionServiceImpl.maskAccount(" ")).isNull();
+        assertThat(PaymentIngestionServiceImpl.maskAccount(null)).isNull();
     }
 
     @Test
     void duplicate_insertReturnsZero_noCredit() {
         PaymentOrder order = donation(PaymentOrderStatus.PENDING);
         withOrder(order);
-        when(txRepo.insertIgnore(anyLong(), any(), anyString(), anyString(), anyString(), anyLong(), any(), any(),
-                any(), any(), any(), any())).thenReturn(0);
+        when(txRepo.insertIgnore(anyString(), anyString(), any(), anyString(), anyString(), anyString(), anyLong(), any(),
+                any(), any(), any(), any(), any())).thenReturn(0);
         service.process(tx(1, 20000, CODE), TxSource.WEBHOOK);
         assertThat(order.getPaidAmount()).isZero();
         assertThat(order.getStatus()).isEqualTo(PaymentOrderStatus.PENDING);
@@ -498,8 +381,15 @@ class SepayWebhookServiceImplTest {
 
     @Test
     void publicConstructor_usesSystemClock() {
-        SepayWebhookServiceImpl s = new SepayWebhookServiceImpl(props, orderRepo, txRepo, JsonMappers.create(),
+        PaymentIngestionServiceImpl s = new PaymentIngestionServiceImpl(props, orderRepo, txRepo,
                 new PaymentSettlement(orderRepo, planRepo, userRepo, events));
-        assertThat(s.isConfigured()).isTrue();
+        assertThat(s.extractCode(payload(1, null, null, null, CODE, null, "in", 1, null))).isEqualTo(CODE);
+    }
+
+    private static BankTransfer payload(long id, String bank, Instant date, String account, String code,
+                                        String content, String type, long amount, String ref) {
+        return new BankTransfer("sepay", String.valueOf(id),
+                "in".equalsIgnoreCase(type) ? TransferDirection.IN : TransferDirection.OUT,
+                amount, code, content, bank, account, ref, date);
     }
 }

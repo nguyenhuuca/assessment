@@ -2,12 +2,16 @@ package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.config.JsonMappers;
-import com.canhlabs.funnyapp.dto.payment.SepayTxPayload;
-import com.canhlabs.funnyapp.entity.SepayTransaction;
 import com.canhlabs.funnyapp.enums.TxSource;
-import com.canhlabs.funnyapp.repo.SepayTransactionRepository;
-import com.canhlabs.funnyapp.service.SepayReconcileService;
-import com.canhlabs.funnyapp.service.SepayWebhookService;
+import com.canhlabs.funnyapp.enums.TransferDirection;
+import com.canhlabs.funnyapp.repo.PaymentTransactionRepository;
+import com.canhlabs.funnyapp.service.PaymentIngestionService;
+import com.canhlabs.funnyapp.service.PaymentReconcileService;
+import com.canhlabs.funnyapp.service.payment.BankTransfer;
+import com.canhlabs.funnyapp.service.payment.PaymentProviderRegistry;
+import com.canhlabs.funnyapp.service.payment.ProviderApiException;
+import com.canhlabs.funnyapp.service.payment.sepay.SepayProvider;
+import com.canhlabs.funnyapp.service.payment.sepay.SepayTransferFeed;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -33,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,7 +45,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -50,7 +55,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class SepayReconcileServiceImplTest {
+/** Reconciliation end to end through the real SePay feed against a stub HTTP server (ADR-0038). */
+class PaymentReconcileServiceImplTest {
 
     private static final Instant NOW = Instant.parse("2026-11-14T17:15:00Z"); // 2026-11-15 00:15 in Vietnam: the run covers 2026-11-14
     private static final String TOKEN = "FAKE_SEPAY_TOKEN";
@@ -70,14 +76,14 @@ class SepayReconcileServiceImplTest {
     private HttpServer server;
     private AppProperties props;
     private boolean flagOn;
-    private SepayWebhookService webhookService;
-    private SepayTransactionRepository txRepo;
-    private SepayReconcileServiceImpl service;
+    private PaymentIngestionService webhookService;
+    private PaymentTransactionRepository txRepo;
+    private PaymentReconcileServiceImpl service;
 
     @BeforeEach
     void setUp() throws IOException {
         server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-        server.createContext(SepayReconcileServiceImpl.LIST_PATH, ex -> {
+        server.createContext(SepayTransferFeed.LIST_PATH, ex -> {
             requests.incrementAndGet();
             auth.set(ex.getRequestHeaders().getFirst("Authorization"));
             String q = URLDecoder.decode(ex.getRequestURI().getRawQuery(), StandardCharsets.UTF_8);
@@ -93,16 +99,20 @@ class SepayReconcileServiceImplTest {
         });
         server.start();
         props = new AppProperties();
-        props.getSepay().setApiToken(TOKEN);
-        props.getSepay().setBankAccount("1017588888");
+        props.getPayment().getSepay().setApiToken(TOKEN);
+        props.getPayment().setBankAccount("1017588888");
         flagOn = true;
-        webhookService = mock(SepayWebhookService.class);
-        txRepo = mock(SepayTransactionRepository.class);
-        when(txRepo.findAllById(anyList())).thenReturn(List.of());
-        props.getSepay().setApiBaseUrl("http://127.0.0.1:" + server.getAddress().getPort() + "/");
-        service = new SepayReconcileServiceImpl(HttpClient.newHttpClient(), Clock.fixed(NOW, ZoneOffset.UTC),
-                Duration.ZERO, props, (flag, def) -> AppConstant.Flags.SEPAY_RECONCILE.equals(flag) && flagOn,
-                webhookService, txRepo, JsonMappers.create());
+        webhookService = mock(PaymentIngestionService.class);
+        txRepo = mock(PaymentTransactionRepository.class);
+        when(txRepo.findStoredTxIds(any(), anyCollection())).thenReturn(Set.of());
+        props.getPayment().getSepay().setApiBaseUrl("http://127.0.0.1:" + server.getAddress().getPort() + "/");
+        SepayTransferFeed feed = new SepayTransferFeed(HttpClient.newHttpClient(), Duration.ZERO, props,
+                JsonMappers.create());
+        PaymentProviderRegistry registry = new PaymentProviderRegistry(
+                List.of(new SepayProvider(props, JsonMappers.create(), feed)), props);
+        service = new PaymentReconcileServiceImpl(registry, webhookService, txRepo,
+                (flag, def) -> AppConstant.Flags.PAYMENT_RECONCILE.equals(flag) && flagOn, props,
+                Clock.fixed(NOW, ZoneOffset.UTC));
     }
 
     @AfterEach
@@ -129,8 +139,8 @@ class SepayReconcileServiceImplTest {
                 + "],\"meta\":{\"pagination\":{\"per_page\":100,\"has_more\":" + hasMore + "}}}";
     }
 
-    private List<SepayTxPayload> processed(int times) {
-        ArgumentCaptor<SepayTxPayload> captor = ArgumentCaptor.forClass(SepayTxPayload.class);
+    private List<BankTransfer> processed(int times) {
+        ArgumentCaptor<BankTransfer> captor = ArgumentCaptor.forClass(BankTransfer.class);
         verify(webhookService, times(times)).process(captor.capture(), eq(TxSource.RECONCILE));
         return captor.getAllValues();
     }
@@ -153,12 +163,10 @@ class SepayReconcileServiceImplTest {
                 tx(U3, 30000, "FMDELIVERD", "FMDELIVERD", SETTLED, 1),
                 tx(U4, 40000, "FMSTOREDXX", "FMSTOREDXX", SETTLED, 0),
                 tx(U5, 60000, "FMBROKENXX", "FMBROKENXX", SETTLED, 0)));
-        when(txRepo.findAllById(anyList())).thenReturn(
-                List.of(SepayTransaction.builder().sepayId(SepayReconcileServiceImpl.storageId(U4)).build()));
-        long broken = SepayReconcileServiceImpl.storageId(U5);
+        when(txRepo.findStoredTxIds(eq("sepay"), anyCollection())).thenReturn(Set.of(U4));
         doThrow(new IllegalStateException("boom")).when(webhookService)
-                .process(argThat(p -> p != null && p.id() == broken), any());
-        Logger logger = (Logger) LoggerFactory.getLogger(SepayReconcileServiceImpl.class);
+                .process(argThat(p -> p != null && U5.equals(p.providerTxId())), any());
+        Logger logger = (Logger) LoggerFactory.getLogger(PaymentReconcileServiceImpl.class);
         ListAppender<ILoggingEvent> logs = new ListAppender<>();
         logs.start();
         logger.addAppender(logs);
@@ -177,7 +185,7 @@ class SepayReconcileServiceImplTest {
     @Test
     void apiError_logsRunWithApiErrorResult() {
         status.set(401);
-        Logger logger = (Logger) LoggerFactory.getLogger(SepayReconcileServiceImpl.class);
+        Logger logger = (Logger) LoggerFactory.getLogger(PaymentReconcileServiceImpl.class);
         ListAppender<ILoggingEvent> logs = new ListAppender<>();
         logs.start();
         logger.addAppender(logs);
@@ -193,7 +201,7 @@ class SepayReconcileServiceImplTest {
 
     @Test
     void blankToken_doesNotCallSepay() {
-        props.getSepay().setApiToken(" ");
+        props.getPayment().getSepay().setApiToken(" ");
 
         assertThat(service.reconcile()).isZero();
 
@@ -210,13 +218,15 @@ class SepayReconcileServiceImplTest {
         assertThat(queries.get(0)).contains("q=FM").contains("transfer_type=in")
                 .contains("transaction_date_from=2026-11-14 00:00:00").contains("transaction_date_sort=asc")
                 .contains("per_page=100").contains("page=1");
-        SepayTxPayload p = processed(1).get(0);
-        assertThat(p.id()).isEqualTo(SepayReconcileServiceImpl.storageId(U1)).isNegative();
+        BankTransfer p = processed(1).get(0);
+        assertThat(p.provider()).isEqualTo("sepay");
+        assertThat(p.providerTxId()).isEqualTo(U1); // the v2 UUID as it is, no hashing
         assertThat(p.amount()).isEqualTo(50000L);
-        assertThat(p.transferType()).isEqualTo("in");
+        assertThat(p.direction()).isEqualTo(TransferDirection.IN);
         assertThat(p.code()).isEqualTo("FMLVKXU9WH");
         assertThat(p.referenceCode()).isEqualTo("FT1");
-        assertThat(p.gateway()).isEqualTo("Vietcombank");
+        assertThat(p.bank()).isEqualTo("Vietcombank");
+        assertThat(p.accountNumber()).isEqualTo("1017588888");
         assertThat(p.transactionDate()).isEqualTo(Instant.parse("2026-11-14T06:30:00Z"));
     }
 
@@ -233,8 +243,7 @@ class SepayReconcileServiceImplTest {
     @Test
     void alreadyStoredByAnEarlierPass_isSkipped() {
         pages.put(1, page(false, tx(U1, 50000, "FMAAAAAAAA"), tx(U2, 20000, "FMBBBBBBBB")));
-        when(txRepo.findAllById(anyList())).thenReturn(
-                List.of(SepayTransaction.builder().sepayId(SepayReconcileServiceImpl.storageId(U1)).build()));
+        when(txRepo.findStoredTxIds(eq("sepay"), anyCollection())).thenReturn(Set.of(U1));
 
         assertThat(service.reconcile()).isEqualTo(1);
 
@@ -256,7 +265,7 @@ class SepayReconcileServiceImplTest {
 
         assertThat(service.reconcile()).isEqualTo(2);
 
-        assertThat(processed(2)).extracting(SepayTxPayload::content)
+        assertThat(processed(2)).extracting(BankTransfer::content)
                 .containsExactly("other account FMCCCCCCCC", "ok fmhhhhhhhh");
     }
 
@@ -273,21 +282,20 @@ class SepayReconcileServiceImplTest {
 
     @Test
     void stopsAtMaxPages() {
-        for (int i = 1; i <= SepayReconcileServiceImpl.MAX_PAGES + 2; i++) {
+        for (int i = 1; i <= SepayTransferFeed.MAX_PAGES + 2; i++) {
             pages.put(i, page(true));
         }
 
         service.reconcile();
 
-        assertThat(requests.get()).isEqualTo(SepayReconcileServiceImpl.MAX_PAGES);
+        assertThat(requests.get()).isEqualTo(SepayTransferFeed.MAX_PAGES);
     }
 
     @Test
     void oneFailingTransfer_doesNotStopTheRest() {
         pages.put(1, page(false, tx(U1, 10000, "FMAAAAAAAA"), tx(U2, 20000, "FMBBBBBBBB")));
-        long failing = SepayReconcileServiceImpl.storageId(U1);
         doThrow(new IllegalStateException("db")).when(webhookService)
-                .process(argThat(t -> t != null && t.id() == failing), any());
+                .process(argThat(t -> t != null && U1.equals(t.providerTxId())), any());
 
         assertThat(service.reconcile()).isEqualTo(1);
 
@@ -330,21 +338,20 @@ class SepayReconcileServiceImplTest {
                 tx("c1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, "FMOTHER001", "FMOTHER001", SETTLED, 0),
                 tx("d1b2c3d4-e5f6-7890-abcd-ef1234567890", 10000, "FMAKN7GW7U", "FMAKN7GW7U", SETTLED, 1)));
 
-        SepayReconcileService.CheckResult r = service.checkCode(" fmakn7gw7u ", Instant.parse("2026-11-13T16:02:00Z"));
+        PaymentReconcileService.CheckResult r = service.checkCode("sepay", " fmakn7gw7u ", Instant.parse("2026-11-13T16:02:00Z"));
 
         assertThat(r.found()).isEqualTo(2);
         assertThat(r.processed()).isEqualTo(2);
         assertThat(queries.get(0)).contains("q=FMAKN7GW7U").contains("transaction_date_from=2026-11-13 22:02:00");
-        assertThat(processed(2)).extracting(SepayTxPayload::amount).containsExactly(50000L, 20000L);
+        assertThat(processed(2)).extracting(BankTransfer::amount).containsExactly(50000L, 20000L);
     }
 
     @Test
     void checkCode_alreadyStored_isFoundButNotProcessedAgain() {
         pages.put(1, page(false, tx(U1, 50000, "FMAKN7GW7U", "FMAKN7GW7U", SETTLED, 0)));
-        when(txRepo.findAllById(anyList())).thenReturn(
-                List.of(SepayTransaction.builder().sepayId(SepayReconcileServiceImpl.storageId(U1)).build()));
+        when(txRepo.findStoredTxIds(eq("sepay"), anyCollection())).thenReturn(Set.of(U1));
 
-        SepayReconcileService.CheckResult r = service.checkCode("FMAKN7GW7U", NOW);
+        PaymentReconcileService.CheckResult r = service.checkCode("sepay", "FMAKN7GW7U", NOW);
 
         assertThat(r.found()).isEqualTo(1);
         assertThat(r.processed()).isZero();
@@ -353,38 +360,34 @@ class SepayReconcileServiceImplTest {
 
     @Test
     void checkCode_failures_throwWithConfiguredFlag() {
-        props.getSepay().setApiToken("");
-        assertThatThrownBy(() -> service.checkCode("FMAKN7GW7U", NOW))
-                .isInstanceOfSatisfying(SepayReconcileService.SepayApiException.class,
+        props.getPayment().getSepay().setApiToken("");
+        assertThatThrownBy(() -> service.checkCode("sepay", "FMAKN7GW7U", NOW))
+                .isInstanceOfSatisfying(ProviderApiException.class,
                         e -> assertThat(e.isConfigured()).isFalse());
         assertThat(requests.get()).isZero();
 
-        props.getSepay().setApiToken(TOKEN);
+        props.getPayment().getSepay().setApiToken(TOKEN);
         status.set(401);
         pages.put(1, "{\"status\":\"error\",\"error_code\":\"unauthorized\"}");
-        assertThatThrownBy(() -> service.checkCode("FMAKN7GW7U", NOW))
-                .isInstanceOfSatisfying(SepayReconcileService.SepayApiException.class,
+        assertThatThrownBy(() -> service.checkCode("sepay", "FMAKN7GW7U", NOW))
+                .isInstanceOfSatisfying(ProviderApiException.class,
                         e -> assertThat(e.isConfigured()).isTrue());
         verify(webhookService, never()).process(any(), any());
     }
 
     @Test
-    void apiBase_usesConfiguredHost_elseLive() {
-        props.getSepay().setApiBaseUrl(" https://userapi-sandbox.sepay.vn// ");
-        assertThat(service.apiBase()).isEqualTo("https://userapi-sandbox.sepay.vn");
-
-        props.getSepay().setApiBaseUrl(" ");
-        assertThat(service.apiBase()).isEqualTo("https://userapi.sepay.vn");
-
-        props.getSepay().setApiBaseUrl(null);
-        assertThat(service.apiBase()).isEqualTo(SepayReconcileServiceImpl.DEFAULT_API_BASE);
+    void checkCode_unknownProvider_isNotConfigured() {
+        assertThatThrownBy(() -> service.checkCode("nope", "FMAKN7GW7U", NOW))
+                .isInstanceOfSatisfying(ProviderApiException.class, e -> assertThat(e.isConfigured()).isFalse());
+        assertThat(requests.get()).isZero();
     }
 
     @Test
-    void storageId_isStableNegativeAndRejectsNonUuid() {
-        assertThat(SepayReconcileServiceImpl.storageId(U1)).isEqualTo(SepayReconcileServiceImpl.storageId(" " + U1))
-                .isNegative().isNotEqualTo(SepayReconcileServiceImpl.storageId(U2))
-                .isGreaterThanOrEqualTo(-SepayReconcileServiceImpl.JS_SAFE_MASK); // exact as a JavaScript number
-        assertThat(SepayReconcileServiceImpl.storageId("49700")).isNull();
+    void publicConstructor_usesSystemClock() {
+        PaymentReconcileServiceImpl s = new PaymentReconcileServiceImpl(
+                new PaymentProviderRegistry(List.of(new SepayProvider(props, JsonMappers.create(),
+                        new SepayTransferFeed(props, JsonMappers.create()))), props),
+                webhookService, txRepo, (flag, def) -> false, props);
+        assertThat(s.reconcile()).isZero();
     }
 }

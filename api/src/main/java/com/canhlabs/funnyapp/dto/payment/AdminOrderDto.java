@@ -25,4 +25,6 @@ public class AdminOrderDto {
     private Instant createdAt;
     private Instant paidAt;
     private Instant expiresAt;
+    /** Display name of the provider that issued the order, e.g. "SePay". */
+    private String provider;
 }

@@ -1,6 +1,7 @@
 package com.canhlabs.funnyapp.service.impl;
 
 import com.canhlabs.funnyapp.config.AppProperties;
+import com.canhlabs.funnyapp.config.JsonMappers;
 import com.canhlabs.funnyapp.dto.payment.CreateOrderRequest;
 import com.canhlabs.funnyapp.dto.payment.OrderDto;
 import com.canhlabs.funnyapp.dto.payment.OrderStatusDto;
@@ -11,6 +12,9 @@ import com.canhlabs.funnyapp.enums.PaymentType;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.PaymentOrderRepository;
 import com.canhlabs.funnyapp.repo.PremiumPlanRepository;
+import com.canhlabs.funnyapp.service.payment.PaymentProviderRegistry;
+import com.canhlabs.funnyapp.service.payment.sepay.SepayProvider;
+import com.canhlabs.funnyapp.service.payment.sepay.SepayTransferFeed;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,14 +50,16 @@ class PaymentOrderServiceImplTest {
     @BeforeEach
     void setUp() {
         props = new AppProperties();
-        AppProperties.Sepay s = props.getSepay();
+        AppProperties.Payment s = props.getPayment();
         s.setBankAccount("123456");
         s.setBankCode("MB");
         s.setAccountName("FUNNY");
+        PaymentProviderRegistry providers = new PaymentProviderRegistry(List.of(new SepayProvider(props,
+                JsonMappers.create(), org.mockito.Mockito.mock(SepayTransferFeed.class))), props);
         service = new PaymentOrderServiceImpl(orderRepo, planRepo, props, (flag, def) -> {
             askedFlag = flag;
             return flagOn;
-        });
+        }, providers);
     }
 
     private void stubSave() {
@@ -72,7 +78,7 @@ class PaymentOrderServiceImplTest {
     @Test
     void isOrderingEnabled_followsBankConfig() {
         assertThat(service.isOrderingEnabled()).isTrue();
-        props.getSepay().setBankAccount("");
+        props.getPayment().setBankAccount("");
         assertThat(service.isOrderingEnabled()).isFalse();
     }
 
@@ -98,6 +104,7 @@ class PaymentOrderServiceImplTest {
         assertThat(dto.getAmount()).isEqualTo(50000L);
         assertThat(dto.getMemo()).isEqualTo(saved.getCode());
         assertThat(dto.getQrUrl()).contains("acc=123456", "bank=MB", "amount=50000", "des=" + saved.getCode());
+        assertThat(saved.getProvider()).isEqualTo("sepay");
         assertThat(dto.getAccountName()).isEqualTo("FUNNY");
     }
 
@@ -178,7 +185,7 @@ class PaymentOrderServiceImplTest {
 
     @Test
     void notConfigured_is503() {
-        props.getSepay().setBankAccount("");
+        props.getPayment().setBankAccount("");
 
         assertStatus(() -> service.createOrder(donation(20000L), null), HttpStatus.SERVICE_UNAVAILABLE);
     }

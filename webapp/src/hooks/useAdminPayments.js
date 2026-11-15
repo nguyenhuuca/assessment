@@ -30,15 +30,15 @@ function useInvalidating(mutationFn) {
 }
 
 export const useIgnoreTransaction = () =>
-  useInvalidating(async ({ sepayId }) => unwrap(await adminPayments.ignoreTransaction(sepayId)))
+  useInvalidating(async ({ id }) => unwrap(await adminPayments.ignoreTransaction(id)))
 export const useLinkTransaction = () =>
-  useInvalidating(async ({ sepayId, orderCode }) => unwrap(await adminPayments.linkTransaction(sepayId, orderCode)))
+  useInvalidating(async ({ id, orderCode }) => unwrap(await adminPayments.linkTransaction(id, orderCode)))
 export const useResolveOrder = () =>
   useInvalidating(async ({ id, grantPremium }) => unwrap(await adminPayments.resolveOrder(id, grantPremium)))
 export const useMarkOrderPaid = () =>
   useInvalidating(async ({ id, amount }) => unwrap(await adminPayments.markOrderPaid(id, amount)))
-export const useCheckOrderOnSepay = () =>
-  useInvalidating(async ({ id }) => unwrap(await adminPayments.checkOrderOnSepay(id)))
+export const useCheckOrderOnProvider = () =>
+  useInvalidating(async ({ id }) => unwrap(await adminPayments.checkOrderOnProvider(id)))
 export const useCancelOrder = () =>
   useInvalidating(async ({ id }) => unwrap(await adminPayments.cancelOrder(id)))
 export const useCreatePlan = () =>

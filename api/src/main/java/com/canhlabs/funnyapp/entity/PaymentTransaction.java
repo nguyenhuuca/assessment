@@ -6,6 +6,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -15,17 +17,28 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
-/** A transfer reported by SePay. The SePay id is the primary key, which makes ingestion idempotent. */
+/**
+ * A transfer reported by a payment provider (ADR-0038). {@code (provider, providerTxId)} is unique, which makes
+ * ingestion idempotent; {@code id} is our own key, used by the admin API.
+ */
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @Entity
-@Table(name = "sepay_transactions")
-public class SepayTransaction {
+@Table(name = "payment_transactions")
+public class PaymentTransaction {
+
     @Id
-    @Column(name = "sepay_id")
-    private Long sepayId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "provider", nullable = false, length = 16)
+    private String provider;
+
+    @Column(name = "provider_tx_id", nullable = false, length = 64)
+    private String providerTxId;
 
     @Column(name = "order_id")
     private Long orderId;

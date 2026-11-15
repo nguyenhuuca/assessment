@@ -34,7 +34,7 @@ public class PaymentController {
         this.paymentOrderService = paymentOrderService;
     }
 
-    @Operation(summary = "Payment config", description = "Public. {enabled} is false while SePay is not configured, so the UI can hide donate.")
+    @Operation(summary = "Payment config", description = "Public. {enabled} is false while payments are not configured, so the UI can hide donate.")
     @GetMapping("/config")
     public ResponseEntity<ResultObjectInfo<Map<String, Boolean>>> config() {
         return ResponseEntity.ok(ResultObjectInfo.<Map<String, Boolean>>builder()

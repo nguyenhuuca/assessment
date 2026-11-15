@@ -164,19 +164,22 @@ app:
     owner: ${GITHUB_REPORT_OWNER:nguyenhuuca}
     repo: ${GITHUB_REPORT_REPO:assessment}
     webhook-secret: ${GITHUB_WEBHOOK_SECRET:}
-  sepay:
-    webhook-secret: ${SEPAY_WEBHOOK_SECRET:}
-    api-token: ${SEPAY_API_TOKEN:}
-    # Live https://userapi.sepay.vn, sandbox (Test mode token) https://userapi-sandbox.sepay.vn
-    api-base-url: ${SEPAY_API_BASE_URL:https://userapi.sepay.vn}
-    bank-account: ${SEPAY_BANK_ACCOUNT:}
-    bank-code: ${SEPAY_BANK_CODE:}
-    account-name: ${SEPAY_ACCOUNT_NAME:}
-    code-prefix: ${SEPAY_CODE_PREFIX:FM}
-    qr-base-url: ${SEPAY_QR_BASE_URL:https://qr.sepay.vn/img}
-    order-ttl-hours: ${SEPAY_ORDER_TTL_HOURS:24}
-    min-donation: ${SEPAY_MIN_DONATION:10000}
-    allowed-ips: ${SEPAY_ALLOWED_IPS:}
+  # Bank-transfer payments (ADR-0038). PAYMENT_* wins; the older SEPAY_* names still work.
+  payment:
+    provider: ${PAYMENT_PROVIDER:sepay}
+    bank-account: ${PAYMENT_BANK_ACCOUNT:${SEPAY_BANK_ACCOUNT:}}
+    bank-code: ${PAYMENT_BANK_CODE:${SEPAY_BANK_CODE:}}
+    account-name: ${PAYMENT_ACCOUNT_NAME:${SEPAY_ACCOUNT_NAME:}}
+    code-prefix: ${PAYMENT_CODE_PREFIX:${SEPAY_CODE_PREFIX:FM}}
+    order-ttl-hours: ${PAYMENT_ORDER_TTL_HOURS:${SEPAY_ORDER_TTL_HOURS:24}}
+    min-donation: ${PAYMENT_MIN_DONATION:${SEPAY_MIN_DONATION:10000}}
+    sepay:
+      webhook-secret: ${SEPAY_WEBHOOK_SECRET:}
+      api-token: ${SEPAY_API_TOKEN:}
+      # Live https://userapi.sepay.vn, sandbox (Test mode token) https://userapi-sandbox.sepay.vn
+      api-base-url: ${SEPAY_API_BASE_URL:https://userapi.sepay.vn}
+      qr-base-url: ${SEPAY_QR_BASE_URL:https://qr.sepay.vn/img}
+      allowed-ips: ${SEPAY_ALLOWED_IPS:}
   email-setting:
       enable-preview-mode: false
       percentage: 10

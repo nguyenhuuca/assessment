@@ -8,7 +8,9 @@ import java.time.Instant;
 @Getter
 @Builder
 public class AdminTransactionDto {
-    private Long sepayId;
+    private Long id;
+    /** Provider display name, e.g. "SePay". */
+    private String provider;
     private long amount;
     private String content;
     private String code;

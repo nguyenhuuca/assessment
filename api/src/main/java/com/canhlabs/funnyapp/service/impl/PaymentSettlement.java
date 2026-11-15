@@ -20,7 +20,7 @@ import java.util.Set;
 
 /**
  * The single place where money lands on an order: amount rules (PAID / UNDERPAID) and the Premium
- * entitlement. Used by the SePay webhook and by admin actions (link a transfer, resolve an order).
+ * entitlement. Used by payment ingestion and by admin actions (link a transfer, resolve an order).
  * Callers hold the order row lock and an open transaction.
  */
 @Slf4j
@@ -43,7 +43,7 @@ public class PaymentSettlement {
     }
 
     /** Adds {@code amount} to the order and moves it to PAID or UNDERPAID unless it is already settled. */
-    public void apply(PaymentOrder order, long txId, long amount, Instant now) {
+    public void apply(PaymentOrder order, String txRef, long amount, Instant now) {
         PaymentOrderStatus before = order.getStatus();
         order.setPaidAmount(Math.addExact(order.getPaidAmount(), amount));
         if (!SETTLED.contains(before)) {
@@ -61,7 +61,7 @@ public class PaymentSettlement {
         }
         orderRepo.save(order);
         PaymentOrderStatus after = order.getStatus();
-        log.info("SePay tx {} applied to order {}: {} -> {}", txId, order.getId(), before, after);
+        log.info("Payment {} applied to order {}: {} -> {}", txRef, order.getId(), before, after);
         if (after != before && (after == PaymentOrderStatus.PAID || after == PaymentOrderStatus.UNDERPAID)) {
             eventPublisher.publishEvent(new PaymentEvent(order.getId(), order.getType(), after, amount));
         }

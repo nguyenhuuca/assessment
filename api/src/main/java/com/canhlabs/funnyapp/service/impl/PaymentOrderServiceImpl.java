@@ -13,8 +13,10 @@ import com.canhlabs.funnyapp.repo.PaymentOrderRepository;
 import com.canhlabs.funnyapp.repo.PremiumPlanRepository;
 import com.canhlabs.funnyapp.service.FeatureFlagService;
 import com.canhlabs.funnyapp.service.PaymentOrderService;
+import com.canhlabs.funnyapp.service.payment.PaymentInstructions;
+import com.canhlabs.funnyapp.service.payment.PaymentProvider;
+import com.canhlabs.funnyapp.service.payment.PaymentProviderRegistry;
 import com.canhlabs.funnyapp.utils.AppConstant;
-import com.canhlabs.funnyapp.utils.VietQrUrlBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -44,24 +46,27 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     private final PremiumPlanRepository planRepo;
     private final AppProperties appProps;
     private final FeatureFlagService featureFlagService;
+    private final PaymentProviderRegistry providers;
     private final SecureRandom random = new SecureRandom();
     private final Pattern codePattern;
 
     public PaymentOrderServiceImpl(PaymentOrderRepository orderRepo, PremiumPlanRepository planRepo,
-                                   AppProperties appProps, FeatureFlagService featureFlagService) {
+                                   AppProperties appProps, FeatureFlagService featureFlagService,
+                                   PaymentProviderRegistry providers) {
         this.orderRepo = orderRepo;
         this.planRepo = planRepo;
         this.appProps = appProps;
         this.featureFlagService = featureFlagService;
-        String prefix = appProps.getSepay().getCodePrefix() == null ? "" : appProps.getSepay().getCodePrefix().toUpperCase(Locale.ROOT);
+        this.providers = providers;
+        String prefix = appProps.getPayment().getCodePrefix() == null ? "" : appProps.getPayment().getCodePrefix().toUpperCase(Locale.ROOT);
         this.codePattern = Pattern.compile(Pattern.quote(prefix) + "[A-Z0-9]{" + CODE_LENGTH + "}");
     }
 
     @Override
     public boolean isOrderingEnabled() {
         // Harness flag gates new orders only; the webhook keeps crediting orders already shown (money may be in flight)
-        return appProps.getSepay().isOrderingConfigured()
-                && featureFlagService.isEnabled(AppConstant.Flags.SEPAY_PAYMENTS, false);
+        return appProps.getPayment().isOrderingConfigured()
+                && featureFlagService.isEnabled(AppConstant.Flags.PAYMENTS, false);
     }
 
     @Override
@@ -76,7 +81,7 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     @Override
     @Transactional
     public OrderDto createOrder(CreateOrderRequest request, Long userId) {
-        AppProperties.Sepay sepay = appProps.getSepay();
+        AppProperties.Payment payment = appProps.getPayment();
         if (!isOrderingEnabled()) {
             throw CustomException.of(HttpStatus.SERVICE_UNAVAILABLE, 5031, "error.payment.notConfigured");
         }
@@ -85,22 +90,25 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
         }
         PaymentOrder order = request.getType() == PaymentType.PREMIUM
                 ? premiumOrder(request, userId)
-                : donationOrder(request, userId, sepay);
-        order.setCode(newUniqueCode(sepay.getCodePrefix()));
-        order.setExpiresAt(Instant.now().plus(sepay.getOrderTtlHours(), ChronoUnit.HOURS));
+                : donationOrder(request, userId, payment);
+        PaymentProvider provider = providers.active();
+        order.setProvider(provider.id());
+        order.setCode(newUniqueCode(payment.getCodePrefix()));
+        order.setExpiresAt(Instant.now().plus(payment.getOrderTtlHours(), ChronoUnit.HOURS));
         PaymentOrder saved = orderRepo.save(order);
 
         long amount = saved.getExpectedAmount() != null ? saved.getExpectedAmount() : request.getAmount();
+        PaymentInstructions pay = provider.instructions(saved.getCode(), amount);
         return OrderDto.builder()
                 .code(saved.getCode())
                 .type(saved.getType())
                 .status(saved.getStatus())
                 .amount(amount)
                 .expiresAt(saved.getExpiresAt())
-                .qrUrl(VietQrUrlBuilder.build(sepay, amount, saved.getCode()))
-                .bankCode(sepay.getBankCode())
-                .bankAccount(sepay.getBankAccount())
-                .accountName(sepay.getAccountName())
+                .qrUrl(pay.qrUrl())
+                .bankCode(pay.bankCode())
+                .bankAccount(pay.bankAccount())
+                .accountName(pay.accountName())
                 .memo(saved.getCode())
                 .build();
     }
@@ -134,10 +142,10 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
         return expired;
     }
 
-    private PaymentOrder donationOrder(CreateOrderRequest request, Long userId, AppProperties.Sepay sepay) {
+    private PaymentOrder donationOrder(CreateOrderRequest request, Long userId, AppProperties.Payment payment) {
         Long amount = request.getAmount();
-        if (amount == null || amount < sepay.getMinDonation()) {
-            throw CustomException.of(HttpStatus.BAD_REQUEST, 4002, "error.payment.amountTooLow", sepay.getMinDonation());
+        if (amount == null || amount < payment.getMinDonation()) {
+            throw CustomException.of(HttpStatus.BAD_REQUEST, 4002, "error.payment.amountTooLow", payment.getMinDonation());
         }
         return PaymentOrder.builder()
                 .type(PaymentType.DONATION)

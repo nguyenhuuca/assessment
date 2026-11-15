@@ -1,6 +1,6 @@
 package com.canhlabs.funnyapp.enums;
 
-/** How a SePay transaction relates to our orders. */
+/** How a provider-reported transfer relates to our orders. */
 public enum TxMatchStatus {
     /** Memo code matched a payment order. */
     MATCHED,

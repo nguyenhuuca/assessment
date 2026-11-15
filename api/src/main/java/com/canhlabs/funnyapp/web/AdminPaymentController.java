@@ -73,19 +73,19 @@ public class AdminPaymentController {
         return ok(service.summary());
     }
 
-    @PostMapping("/transactions/{sepayId}/link")
+    @PostMapping("/transactions/{id}/link")
     @HasPermission(perm = Permission.ADMIN)
     @AuditLog("adminLinkPaymentTransaction")
-    public ResponseEntity<ResultObjectInfo<AdminOrderDto>> link(@PathVariable long sepayId,
+    public ResponseEntity<ResultObjectInfo<AdminOrderDto>> link(@PathVariable long id,
                                                                  @RequestBody LinkTransactionRequest request) {
-        return ok(service.linkTransaction(sepayId, request.getOrderCode()));
+        return ok(service.linkTransaction(id, request.getOrderCode()));
     }
 
-    @PostMapping("/transactions/{sepayId}/ignore")
+    @PostMapping("/transactions/{id}/ignore")
     @HasPermission(perm = Permission.ADMIN)
     @AuditLog("adminIgnorePaymentTransaction")
-    public ResponseEntity<ResultObjectInfo<Void>> ignore(@PathVariable long sepayId) {
-        service.ignoreTransaction(sepayId);
+    public ResponseEntity<ResultObjectInfo<Void>> ignore(@PathVariable long id) {
+        service.ignoreTransaction(id);
         return ok(null);
     }
 
@@ -105,11 +105,11 @@ public class AdminPaymentController {
         return ok(service.markPaid(id, request.getAmount()));
     }
 
-    @PostMapping("/orders/{id}/check-sepay")
+    @PostMapping("/orders/{id}/check-provider")
     @HasPermission(perm = Permission.ADMIN)
-    @AuditLog("adminCheckPaymentOrderOnSepay")
-    public ResponseEntity<ResultObjectInfo<AdminOrderCheckDto>> checkOnSepay(@PathVariable long id) {
-        return ok(service.checkOrderOnSepay(id));
+    @AuditLog("adminCheckPaymentOrderOnProvider")
+    public ResponseEntity<ResultObjectInfo<AdminOrderCheckDto>> checkOnProvider(@PathVariable long id) {
+        return ok(service.checkOrderOnProvider(id));
     }
 
     @PostMapping("/orders/{id}/cancel")

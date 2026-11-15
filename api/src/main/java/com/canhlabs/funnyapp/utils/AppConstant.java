@@ -36,9 +36,10 @@ public class AppConstant {
 
         public static final String PERMISSION_ENFORCEMENT = "permission_enforcement_enabled";
         public static final String HLS_STREAMING = "hls_streaming_enabled";
-        public static final String SEPAY_PAYMENTS = "sepay_payments_enabled";
-        /** Missed-webhook recovery job (PAY-5); off by default, needs SEPAY_API_TOKEN as well. */
-        public static final String SEPAY_RECONCILE = "sepay_reconcile_enabled";
+        /** New payment orders (key predates ADR-0038 and is kept so the Harness flag does not move). */
+        public static final String PAYMENTS = "sepay_payments_enabled";
+        /** Missed-webhook recovery job (PAY-5); off by default, needs the provider API token as well. */
+        public static final String PAYMENT_RECONCILE = "sepay_reconcile_enabled";
     }
 
     // inner class hold all the path url that ignore the security when access to system
@@ -59,7 +60,9 @@ public class AppConstant {
                 PathObject.builder().path("/payments/orders/*").method(HttpMethod.GET.name()).build(),
                 // GitHub repo webhook, authenticated by its HMAC signature instead of a JWT (ADR-0026 D7)
                 PathObject.builder().path("/webhooks/github").method(HttpMethod.POST.name()).build(),
-                // SePay payment webhook, authenticated by its HMAC signature instead of a JWT (ADR-0037)
+                // Payment provider webhooks, each authenticated by the provider (HMAC) instead of a JWT (ADR-0038);
+                // /webhooks/sepay is the old SePay URL, still set in the SePay dashboard
+                PathObject.builder().path("/webhooks/payments/*").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().path("/webhooks/sepay").method(HttpMethod.POST.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/health").method(HttpMethod.GET.name()).build(),
                 PathObject.builder().basePath("").path("/actuator/info").method(HttpMethod.GET.name()).build()
