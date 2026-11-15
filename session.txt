@@ -1,9 +1,8 @@
 task: Payment provider abstraction (SePay → adapter)
-status: blocked
-progress: 90
-done: PP-1..PP-5 port, SePay adapter, payment_transactions, admin+FE d5fad2e2; PP-6 docs
+status: done
+progress: 100
+done: PP-1..PP-5 port, SePay adapter, payment_transactions, admin+FE d5fad2e2; PP-6 docs c834a569; prod smoke ok
 doing: -
-next: owner approves push; watch CI deploy; check Liquibase 202611150001 applied and webhook alias answers on prod
+next: SePay Live: link a supported bank (PAY-10)
 plan: docs/plans/plan-payment-provider-abstraction.md
-blocker: push needs owner approval (SePay Live bank account still pending, PAY-10)
-updated: 2026-11-15 21:00
+updated: 2026-11-15 21:05
