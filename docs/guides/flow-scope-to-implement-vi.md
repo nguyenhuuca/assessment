@@ -352,5 +352,5 @@ templates/artifacts/
 
 - [Hướng dẫn Claude (Tiếng Anh)](claude-guide-en.md)
 - [Hướng dẫn Claude (Tiếng Việt)](claude-guide-vi.md)
-- [Danh sách ADR](README.md#-design-decisions)
+- [Danh sách ADR](../README.md#architecture-decisions-adrs)
 - [Bản tiếng Anh](flow-scope-to-implement.md)

@@ -356,4 +356,4 @@ templates/artifacts/
 
 - [Claude Guide (English)](claude-guide-en.md)
 - [Claude Guide (Vietnamese)](claude-guide-vi.md)
-- [ADR Index](README.md#-design-decisions)
+- [ADR Index](../README.md#architecture-decisions-adrs)

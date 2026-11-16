@@ -132,7 +132,7 @@ Both resolved the same two clarifying questions the same way (rate limit 30/min;
 
 ## Links
 
-- PRD: [baseline](./prd/PRD-watch-history.md) · [opus](./prd/PRD-watch-history-opus.md)
-- ADR: [0013 baseline](./adr/0013-watch-history-design.md) · [0014 opus](./adr/0014-watch-history-design-opus.md)
-- Spec: [baseline](./specs/spec-watch-history.md) · [opus](./specs/spec-watch-history-opus.md)
-- Plan: [baseline](./plans/plan-watch-history.md) · [opus](./plans/plan-watch-history-opus.md)
+- PRD: [baseline](../prd/PRD-watch-history.md) · [opus](../prd/PRD-watch-history-opus.md)
+- ADR: [0013 baseline](../adr/0013-watch-history-design.md) · [0014 opus](../adr/0014-watch-history-design-opus.md)
+- Spec: [baseline](../specs/spec-watch-history.md) · [opus](../specs/spec-watch-history-opus.md)
+- Plan: [baseline](../plans/plan-watch-history.md) · [opus](../plans/plan-watch-history-opus.md)

@@ -243,4 +243,4 @@ Helm config: NodePort 30080, 1 replica, HPA at 80% CPU, 500m CPU / 600Mi memory 
 
 This project is configured with the **Claude Code Framework** — 9 specialist personas, 90+ auto-triggered skills, and multi-agent swarm execution.
 
-See the guide: [English](https://nguyenhuuca.github.io/assessment/claude-guide-en/) · [Tiếng Việt](https://nguyenhuuca.github.io/assessment/claude-guide-vi/)
+See the guide: [English](https://nguyenhuuca.github.io/assessment/guides/claude-guide-en/) · [Tiếng Việt](https://nguyenhuuca.github.io/assessment/guides/claude-guide-vi/)
