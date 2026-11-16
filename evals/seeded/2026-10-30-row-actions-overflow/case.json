@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "signal": "defect:b2415b8f",
+  "run": "2026-10-24-hls-streaming",
+  "base": "488e285f^",
+  "head": "488e285f",
+  "fix": "b2415b8f6059d1f224f139b0f5069f549f0c23bb",
+  "summary": "An Add to collection button was added inline to the admin videos row actions cell next to the status select and delete button; the table outgrew its panel and the delete button sat past the right edge.",
+  "expect": {
+    "files": ["admin/AdminVideoTable.jsx", "styles/index.css"],
+    "patterns": [
+      "overflow",
+      "(cut|clip|push|pushed|spill)\\w* .{0,60}(off|out|edge|panel|container)",
+      "(past|beyond|outside) .{0,40}(edge|panel|container|viewport)",
+      "(too )?(wide|many) .{0,40}(actions?|buttons?|cell|column)",
+      "(⋮|kebab|overflow menu|more_vert)",
+      "actions? cell"
+    ]
+  }
+}
