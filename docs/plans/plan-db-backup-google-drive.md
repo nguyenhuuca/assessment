@@ -1,6 +1,6 @@
 # Plan: Scheduled Database Backups to Google Drive
 
-**Status:** Draft · **Date:** 2026-11-17 · **Author:** nguyenhuuca
+**Status:** In Progress · **Date:** 2026-11-17 · **Author:** nguyenhuuca
 **Tracking:** `docs/tracking.md` row "DB Backup to Google Drive"
 **PRD:** [PRD-db-backup-google-drive](../prd/PRD-db-backup-google-drive.md) · **ADR:** [ADR-0039](../adr/0039-db-backup-google-drive.md) · **Spec:** [spec-db-backup-google-drive](../specs/spec-db-backup-google-drive.md) · **Sequence:** [sequence-db-backup-google-drive](../sequence/sequence-db-backup-google-drive.md)
 

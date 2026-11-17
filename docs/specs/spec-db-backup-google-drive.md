@@ -9,7 +9,7 @@ Handoff to: Builder (/builder), QA Engineer (/qa-engineer)
 
 ## Metadata
 
-**Status:** Draft
+**Status:** Approved
 **Author:** nguyenhuuca
 **Date:** 2026-11-17
 **Related PRD:** [PRD-db-backup-google-drive](../prd/PRD-db-backup-google-drive.md)
