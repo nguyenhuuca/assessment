@@ -379,7 +379,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../plans/plan-react-migration/" class="md-tabs__link">
+        <a href="../plans/plan-db-backup-google-drive/" class="md-tabs__link">
           
   
   
@@ -974,6 +974,8 @@
   
     
     
+      
+        
       
         
       
@@ -1682,6 +1684,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0039-db-backup-google-drive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0039 - DB Backup to Google Drive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1697,6 +1727,8 @@
   
     
     
+      
+        
       
         
       
@@ -2255,6 +2287,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/PRD-db-backup-google-drive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DB Backup to Google Drive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2273,6 +2333,8 @@
       
         
           
+        
+      
         
       
         
@@ -2601,6 +2663,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/spec-db-backup-google-drive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DB Backup to Google Drive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2619,6 +2709,8 @@
       
         
           
+        
+      
         
       
         
@@ -3217,6 +3309,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sequence/sequence-db-backup-google-drive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DB Backup to Google Drive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3232,6 +3352,8 @@
   
     
     
+      
+        
       
         
       
@@ -3343,6 +3465,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-db-backup-google-drive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DB Backup to Google Drive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -4670,6 +4820,8 @@
       
         
       
+        
+      
     
     
     
@@ -4872,6 +5024,34 @@
     
   
     Feature Flags (VI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/runbook-db-restore/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Runbook - DB Restore
   
 
     
@@ -9421,6 +9601,17 @@
 <td>—</td>
 <td>✅</td>
 <td>File size column (<code>video_sources.file_size</code>, ingest + one-time backfill) shown in the admin Video Vault, Total Size stat card; VS-1..VS-9; prod-132 smoke OK 2026-11-12</td>
+</tr>
+<tr>
+<td><strong>DB Backup to Google Drive</strong></td>
+<td><a href="../prd/PRD-db-backup-google-drive/">PRD ✅</a></td>
+<td><a href="../adr/0039-db-backup-google-drive/">0039 📝</a></td>
+<td><a href="../specs/spec-db-backup-google-drive/">Spec 📋</a></td>
+<td><a href="../sequence/sequence-db-backup-google-drive/">Seq ✅</a></td>
+<td><a href="../plans/plan-db-backup-google-drive/">Plan 🔄</a></td>
+<td>—</td>
+<td>🔄</td>
+<td>Daily/weekly/monthly <code>pg_dump -Fc</code> of prod (PostgreSQL 17.5) uploaded to a private Drive folder via the OAuth Drive client; retention 7/4/12 by <code>appProperties</code> tier; alert email on failure; manual restore runbook. In-process job via <code>JobRegistry</code>/<code>scheduled_job</code>; host <code>pg_dump</code> 17 installed by the owner; no encryption in v1 (accepted risk). Manual prod dump 134 KB OK 2026-11-17. Plan: DB-1..DB-8. DB-1..DB-6 built by /swarm-execute 2026-11-17 (mvn verify green); restore <a href="../guides/runbook-db-restore/">runbook</a>; DB-8 prod rollout pending</td>
 </tr>
 <tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
