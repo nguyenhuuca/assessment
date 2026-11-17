@@ -1,8 +1,8 @@
-task: Payment provider abstraction (SePay → adapter)
-status: done
-progress: 100
-done: PP-1..PP-5 port, SePay adapter, payment_transactions, admin+FE d5fad2e2; PP-6 docs c834a569; prod smoke ok
+task: DB backup to Google Drive (daily/weekly/monthly)
+status: in_progress
+progress: 45
+done: PRD; ADR-0039; spec + sequence; plan DB-1..DB-8; prod pg_dump 17 OK
 doing: -
-next: SePay Live: link a supported bank (PAY-10)
-plan: docs/plans/plan-payment-provider-abstraction.md
-updated: 2026-11-15 21:05
+next: owner approves docs; then /swarm-execute wave 1 (DB-1, DB-2)
+plan: docs/plans/plan-db-backup-google-drive.md
+updated: 2026-11-17 21:22

@@ -96,6 +96,7 @@ nav:
       - 0035 - Collection-Only Videos: adr/0035-collection-only-videos.md
       - 0036 - Admin Bulk Actions: adr/0036-admin-bulk-actions.md
       - 0037 - SePay Bank-Transfer Payments: adr/0037-sepay-bank-transfer-payments.md
+      - 0039 - DB Backup to Google Drive: adr/0039-db-backup-google-drive.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -115,6 +116,7 @@ nav:
       - SePay Payments: prd/PRD-sepay-payments.md
       - Spring Boot 4.1 Upgrade: prd/PRD-spring-boot-4-upgrade.md
       - Frontend Dependency Upgrade: prd/PRD-frontend-deps-upgrade.md
+      - DB Backup to Google Drive: prd/PRD-db-backup-google-drive.md
 
   - Specs:
       - Overview: specs/index.md
