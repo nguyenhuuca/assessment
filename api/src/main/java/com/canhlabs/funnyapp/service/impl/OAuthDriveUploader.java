@@ -5,17 +5,12 @@ import com.canhlabs.funnyapp.exception.ImportErrorCode;
 import com.canhlabs.funnyapp.exception.ImportException;
 import com.canhlabs.funnyapp.service.DriveUploader;
 import com.canhlabs.funnyapp.utils.AppConstant;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.InputStreamContent;
-import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.UserCredentials;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedInputStream;
@@ -23,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -42,7 +36,11 @@ public class OAuthDriveUploader implements DriveUploader {
     private volatile Drive drive;
 
     public OAuthDriveUploader(String clientId, String clientSecret, String refreshToken) {
-        this(() -> buildDrive(clientId, clientSecret, refreshToken));
+        this(new OAuthDriveClientFactory(clientId, clientSecret, refreshToken));
+    }
+
+    public OAuthDriveUploader(OAuthDriveClientFactory factory) {
+        this((Supplier<Drive>) factory);
     }
 
     /** Test seam. */
@@ -131,23 +129,5 @@ public class OAuthDriveUploader implements DriveUploader {
             drive = d;
         }
         return d;
-    }
-
-    private static Drive buildDrive(String clientId, String clientSecret, String refreshToken) {
-        try {
-            UserCredentials credentials = UserCredentials.newBuilder()
-                    .setClientId(clientId)
-                    .setClientSecret(clientSecret)
-                    .setRefreshToken(refreshToken)
-                    .build();
-            return new Drive.Builder(
-                    GoogleNetHttpTransport.newTrustedTransport(),
-                    GsonFactory.getDefaultInstance(),
-                    new HttpCredentialsAdapter(credentials.createScoped(List.of(DriveScopes.DRIVE))))
-                    .setApplicationName("VideoStreamApp")
-                    .build();
-        } catch (GeneralSecurityException | IOException e) {
-            throw new ImportException(ImportErrorCode.DRIVE_AUTH_FAILED, e);
-        }
     }
 }

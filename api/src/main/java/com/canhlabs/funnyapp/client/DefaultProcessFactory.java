@@ -17,10 +17,23 @@ public class DefaultProcessFactory implements ProcessFactory {
 
     @Override
     public Process start(List<String> command) throws IOException {
+        return start(command, null);
+    }
+
+    @Override
+    public Process start(List<String> command, Map<String, String> extraEnv) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(command);
-        restrictEnvironment(pb.environment());
+        applyEnvironment(pb.environment(), extraEnv);
         pb.redirectInput(ProcessBuilder.Redirect.from(new File(isWindows() ? "NUL" : "/dev/null")));
         return pb.start();
+    }
+
+    /** Restricts the inherited env, then adds the caller-supplied variables (never inherited from the app). */
+    static void applyEnvironment(Map<String, String> env, Map<String, String> extraEnv) {
+        restrictEnvironment(env);
+        if (extraEnv != null) {
+            env.putAll(extraEnv);
+        }
     }
 
     static void restrictEnvironment(Map<String, String> env) {
