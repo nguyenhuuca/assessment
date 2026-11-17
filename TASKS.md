@@ -770,4 +770,4 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **DB-5** `DbBackupServiceImpl` (shared lock, steps, retention, prune warning) + `BackupAlertNotifier` + metrics — blocked by DB-3, DB-4 — 543a9363
 - [x] **DB-6** `JobRegistry`/`AppScheduler` wiring + migration `202611170001-db-backup-jobs.sql` + migration test; boots locally — blocked by DB-5 — d3ed35be (boot check deferred to DB-8 by owner)
 - [x] **DB-7** Restore runbook, mkdocs nav, tracking — blocked by DB-6 — d40c34e2
-- [ ] **DB-8** Prod rollout: env, Run now ×3, failure drill, restore drill, ADR-0039 Accepted — blocked by DB-7
+- [x] **DB-8** Prod rollout: env, Run now ×3, failure drill, restore drill, ADR-0039 Accepted — blocked by DB-7 — deployed 820aa201, prod OK 2026-11-17; restore + failure drills pending (quarterly)

@@ -1,9 +1,8 @@
 task: DB backup to Google Drive (daily/weekly/monthly)
-status: blocked
-progress: 90
-done: DB-1..DB-4 wave 1-2; DB-5 DbBackupService; DB-6 jobs + seed d3ed35be; DB-7 runbook + docs
+status: done
+progress: 100
+done: DB-1..DB-4 config, pg_dump runner, Drive store; DB-5 service; DB-6 jobs d3ed35be; DB-7 runbook; DB-8 prod OK 820aa201
 doing: -
-next: DB-8: owner sets BACKUP_* env on prod, approves push; watch boot log; Run now x3
+next: quarterly restore drill per docs/guides/runbook-db-restore.md; failure drill
 plan: docs/plans/plan-db-backup-google-drive.md
-blocker: owner go-ahead for git push + prod env (BACKUP_ENABLED, BACKUP_FOLDER_ID)
-updated: 2026-11-17 22:02
+updated: 2026-11-17 22:39

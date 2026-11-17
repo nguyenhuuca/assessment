@@ -1,6 +1,6 @@
 # Plan: Scheduled Database Backups to Google Drive
 
-**Status:** In Progress · **Date:** 2026-11-17 · **Author:** nguyenhuuca
+**Status:** Complete (restore drill pending) · **Date:** 2026-11-17 · **Author:** nguyenhuuca
 **Tracking:** `docs/tracking.md` row "DB Backup to Google Drive"
 **PRD:** [PRD-db-backup-google-drive](../prd/PRD-db-backup-google-drive.md) · **ADR:** [ADR-0039](../adr/0039-db-backup-google-drive.md) · **Spec:** [spec-db-backup-google-drive](../specs/spec-db-backup-google-drive.md) · **Sequence:** [sequence-db-backup-google-drive](../sequence/sequence-db-backup-google-drive.md)
 
@@ -182,3 +182,4 @@ No `@SpringBootTest` in CI (repo convention); boot is verified manually in DB-6.
 | Date | Update |
 |------|--------|
 | 2026-11-17 | Plan drafted from spec; exploration of process seam, Drive test seam, metrics, config, test patterns |
+| 2026-11-17 | DB-1..DB-7 on main, pushed (820aa201), CI green; prod boot OK, migration ran, 3 jobs scheduled; owner enabled backups and ran them OK. Restore and failure drills skipped for now (quarterly) |

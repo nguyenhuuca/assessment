@@ -2,7 +2,7 @@
 
 ## Metadata
 
-**Status:** Proposed · **Date:** 2026-11-17 · **Deciders:** nguyenhuuca · **Tags:** ops, backup, disaster-recovery, jobs, google-drive
+**Status:** Accepted · **Date:** 2026-11-17 · **Deciders:** nguyenhuuca · **Tags:** ops, backup, disaster-recovery, jobs, google-drive
 **Related PRD:** [PRD-db-backup-google-drive](../prd/PRD-db-backup-google-drive.md) · **Supersedes:** N/A · **Superseded By:** N/A
 
 **Tech Strategy:** ✅ Follows Golden Path. Background work runs as a Spring job in `AppScheduler`, scheduled from `scheduled_job` (ADR-0023); Google Drive is reached through the existing OAuth client (ADR-0019); no new library. The only new runtime tool is the PostgreSQL client (`pg_dump` 17), installed on the host by the owner, outside the app build.
@@ -145,7 +145,7 @@ The accepted trade-off is "no backup while the API is down". The API is the prod
 
 ## Validation
 
-- [ ] A manual dump from prod with the host client succeeds (done 2026-11-17: 134 KB `-Fc`)
+- [x] A manual dump from prod with the host client succeeds (done 2026-11-17: 134 KB `-Fc`)
 - [ ] Restore drill: a Drive file restored with `pg_restore` into an empty PostgreSQL 17 database, key table row counts match, the app starts against it
 - [ ] Failure paths alert once: `pg_dump` missing, wrong password, wrong `BACKUP_FOLDER_ID`, expired OAuth token
 - [ ] Retention verified: after more than 7 daily runs (test with a short cron), only the newest 7 daily files remain and no other tier was touched
@@ -171,3 +171,4 @@ The accepted trade-off is "no backup while the API is down". The API is the prod
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-11-17 | nguyenhuuca | Initial draft (Proposed) |
+| 2026-11-17 | nguyenhuuca | Accepted: DB-1..DB-7 deployed (CI green, prod boot + 3 jobs scheduled), owner ran the backups on prod OK. Restore drill and failure drill still pending (do with the first quarterly drill) |
