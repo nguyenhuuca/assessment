@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth.js'
 import { useCreateOrder, usePlans } from '../../hooks/usePayments.js'
 import { formatVnd } from '../../utils/formatVnd.js'
 import { paymentErrorKey } from '../../utils/paymentErrors.js'
+import MoneyInput from '../common/MoneyInput.jsx'
 import PaymentQr from './PaymentQr.jsx'
 
 const MIN_DONATION = 10000
@@ -57,16 +58,12 @@ function DonateForm({ onSubmit, busy }) {
         </button>
       </div>
       {preset === null && (
-        <input
+        <MoneyInput
           className="app-input"
-          type="number"
-          inputMode="numeric"
-          min={MIN_DONATION}
-          step={1000}
           aria-label={t('amount')}
           placeholder={t('amountPlaceholder')}
           value={custom}
-          onChange={e => setCustom(e.target.value)}
+          onChange={setCustom}
         />
       )}
       <label className="pay-field">
