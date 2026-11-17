@@ -134,7 +134,7 @@ describe('AdminPaymentsTab', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: /Xác nhận đã thanh toán/ }))
     const dialog = screen.getByRole('dialog')
     const input = within(dialog).getByLabelText('Số tiền đã nhận (VND)')
-    expect(input).toHaveValue(50000)
+    expect(input).toHaveValue('50.000')
     // regression: each keystroke re-rendered the modal and moved focus to the confirm button
     input.focus()
     fireEvent.change(input, { target: { value: '5000' } })

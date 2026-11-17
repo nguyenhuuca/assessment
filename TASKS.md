@@ -755,3 +755,9 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **PP-4** Migration `payment_transactions` (provider, provider_tx_id), `payment_orders.provider`, job `reconcile-payments` — blocked by PP-3
 - [x] **PP-5** Admin API + FE neutral naming (`id`, check-provider, i18n) — blocked by PP-4
 - [x] **PP-6** Docs: ADR Accepted, runbook "add a provider", tracking — blocked by PP-5
+
+## Fix: money input auto-format (2026-11-17, issue #93, PR #94, lite)
+- [x] **MI-1** `MoneyInput` + `utils/moneyInput.js` (vi-VN grouping, digits-only onChange, 12-digit cap)
+- [x] **MI-2** DonatePage custom amount uses `MoneyInput`
+- [x] **MI-3** AdminPaymentsTab mark-paid popup uses `MoneyInput`
+- [x] **MI-4** Tests: helper, component, Donate, AdminPayments

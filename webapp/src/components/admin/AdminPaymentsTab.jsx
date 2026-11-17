@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ConfirmModal from '../common/ConfirmModal.jsx'
+import MoneyInput from '../common/MoneyInput.jsx'
 import RowActionsMenu from './RowActionsMenu.jsx'
 import { validatePlan } from '../../utils/validatePlan.js'
 import { formatVnd } from '../../utils/formatVnd.js'
@@ -191,8 +192,8 @@ function OrdersSection() {
         >
           <label style={{ display: 'block' }}>
             {t('pay.markPaidAmount')}
-            <input className="admin-input" type="number" min="1" step="1" inputMode="numeric"
-              value={payAmount} onChange={e => setPayAmount(e.target.value)} aria-invalid={!payValid} />
+            <MoneyInput className="admin-input"
+              value={payAmount} onChange={setPayAmount} aria-invalid={!payValid} />
           </label>
           {!payValid && <p role="alert" className="admin-cell-muted">{t('pay.markPaidAmountInvalid')}</p>}
         </ConfirmModal>
