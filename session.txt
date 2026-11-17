@@ -1,8 +1,8 @@
 task: DB backup to Google Drive (daily/weekly/monthly)
 status: in_progress
-progress: 45
-done: PRD; ADR-0039; spec + sequence; plan DB-1..DB-8; prod pg_dump 17 OK
-doing: -
-next: owner approves docs; then /swarm-execute wave 1 (DB-1, DB-2)
+progress: 60
+done: DB-1 ProcessFactory env + OAuth factory 12ee2f1e; DB-2 backup config + model 3e92a8f3
+doing: DB-3 PgDumpRunner; DB-4 DriveBackupStore
+next: merge wave 2, mvn verify; DB-5 DbBackupServiceImpl
 plan: docs/plans/plan-db-backup-google-drive.md
-updated: 2026-11-17 21:22
+updated: 2026-11-17 21:35

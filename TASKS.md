@@ -763,10 +763,10 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **MI-4** Tests: helper, component, Donate, AdminPayments
 
 ## Feature: DB backup to Google Drive (2026-11-17, [plan](docs/plans/plan-db-backup-google-drive.md), [ADR-0039](docs/adr/0039-db-backup-google-drive.md), [spec](docs/specs/spec-db-backup-google-drive.md))
-- [ ] **DB-1** Refactor: `ProcessFactory.start(cmd, extraEnv)` overload; extract `OAuthDriveClientFactory` (video import unchanged)
-- [ ] **DB-2** `AppProperties.Backup` + yaml + `.env.example`; `BackupTier`, `BackupErrorCode`, `BackupException`, `BackupRedactor`, `JdbcUrl`
-- [ ] **DB-3** `PgDumpRunner` (argv, PGPASSWORD env, timeout kill, stderr redaction, PGDMP check) — blocked by DB-1, DB-2
-- [ ] **DB-4** `BackupStore` + `DriveBackupStore` (tier subfolders daily/weekly/monthly auto-created, upload with appProperties, list by tier, trash, error mapping) — blocked by DB-1, DB-2
+- [x] **DB-1** Refactor: `ProcessFactory.start(cmd, extraEnv)` overload; extract `OAuthDriveClientFactory` (video import unchanged) — 12ee2f1e
+- [x] **DB-2** `AppProperties.Backup` + yaml + `.env.example`; `BackupTier`, `BackupErrorCode`, `BackupException`, `BackupRedactor`, `JdbcUrl` — 3e92a8f3 (`.env.example` left to the owner: deny rule)
+- [~] **DB-3** `PgDumpRunner` (argv, PGPASSWORD env, timeout kill, stderr redaction, PGDMP check) — blocked by DB-1, DB-2
+- [~] **DB-4** `BackupStore` + `DriveBackupStore` (tier subfolders daily/weekly/monthly auto-created, upload with appProperties, list by tier, trash, error mapping) — blocked by DB-1, DB-2
 - [ ] **DB-5** `DbBackupServiceImpl` (shared lock, steps, retention, prune warning) + `BackupAlertNotifier` + metrics — blocked by DB-3, DB-4
 - [ ] **DB-6** `JobRegistry`/`AppScheduler` wiring + migration `202611170001-db-backup-jobs.sql` + migration test; boots locally — blocked by DB-5
 - [ ] **DB-7** Restore runbook, mkdocs nav, tracking — blocked by DB-6
