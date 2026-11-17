@@ -75,6 +75,38 @@ class PgDumpRunnerTest {
         return assertThrows(BackupException.class, () -> runner.dump(DB, "app", PASSWORD, target));
     }
 
+    /** Regression: the dump must be owner-only from the first byte, not chmod-ed after pg_dump finished. */
+    @Test
+    void partFileExistsOwnerOnlyBeforePgDumpStarts() throws IOException {
+        java.util.concurrent.atomic.AtomicReference<String> modeAtStart = new java.util.concurrent.atomic.AtomicReference<>();
+        java.util.concurrent.atomic.AtomicBoolean existedAtStart = new java.util.concurrent.atomic.AtomicBoolean();
+        boolean posix = Files.getFileStore(dir).supportsFileAttributeView("posix");
+        ProcessFactory factory = new ProcessFactory() {
+            @Override
+            public Process start(List<String> command) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public Process start(List<String> command, Map<String, String> extraEnv) throws IOException {
+                Path part = Path.of(command.get(command.size() - 1));
+                existedAtStart.set(Files.exists(part));
+                if (posix) {
+                    modeAtStart.set(java.nio.file.attribute.PosixFilePermissions.toString(Files.getPosixFilePermissions(part)));
+                }
+                Files.write(part, dumpBytes());
+                return FakeProcess.finished("", "", 0);
+            }
+        };
+
+        new PgDumpRunner(factory, props).dump(DB, "app", PASSWORD, target);
+
+        assertTrue(existedAtStart.get());
+        if (posix) {
+            assertEquals("rw-------", modeAtStart.get());
+        }
+    }
+
     @Test
     void buildsExactArgvWithoutPasswordAndPassesItInEnv() {
         PgDumpRunner runner = runner(() -> FakeProcess.finished("", "", 0), dumpBytes());

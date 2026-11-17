@@ -69,6 +69,7 @@ public class PgDumpRunner {
             throw new BackupException(BackupErrorCode.INTERNAL_ERROR, BackupStep.DUMP,
                     "cannot create the backup directory", e);
         }
+        createPrivate(part);
 
         Process process;
         try {
@@ -104,7 +105,6 @@ public class PgDumpRunner {
             throw new BackupException(BackupErrorCode.PG_DUMP_TIMEOUT, BackupStep.DUMP,
                     "pg_dump exceeded " + cfg.getTimeout());
         }
-        restrictPermissions(part);
         int exit = process.exitValue();
         if (exit != 0) {
             deleteQuietly(part);
@@ -152,14 +152,21 @@ public class PgDumpRunner {
         }
     }
 
-    private static void restrictPermissions(Path part) {
-        if (!Files.exists(part)) {
-            return;
-        }
+    /**
+     * Creates an empty {@code .part} owned-only (600) BEFORE pg_dump runs: pg_dump truncates and writes the existing
+     * file, which keeps its mode, so the data is never readable by other users, not even while it is being written.
+     */
+    static void createPrivate(Path part) {
         try {
-            Files.setPosixFilePermissions(part, PosixFilePermissions.fromString("rw-------"));
-        } catch (UnsupportedOperationException | IOException e) {
-            // not a POSIX file system (Windows): nothing to restrict
+            Files.deleteIfExists(part);
+            try {
+                Files.createFile(part, PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")));
+            } catch (UnsupportedOperationException e) {
+                Files.createFile(part); // not a POSIX file system (Windows): no mode to set
+            }
+        } catch (IOException e) {
+            throw new BackupException(BackupErrorCode.INTERNAL_ERROR, BackupStep.DUMP,
+                    "cannot create the dump file", e);
         }
     }
 
