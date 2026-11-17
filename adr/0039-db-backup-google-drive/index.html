@@ -9264,7 +9264,7 @@
 
 <h1 id="adr-0039-scheduled-database-backups-to-google-drive-in-process-pg_dump-job">ADR-0039: Scheduled Database Backups to Google Drive (in-process <code>pg_dump</code> job)<a class="headerlink" href="#adr-0039-scheduled-database-backups-to-google-drive-in-process-pg_dump-job" title="Permanent link">&para;</a></h1>
 <h2 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h2>
-<p><strong>Status:</strong> Proposed · <strong>Date:</strong> 2026-11-17 · <strong>Deciders:</strong> nguyenhuuca · <strong>Tags:</strong> ops, backup, disaster-recovery, jobs, google-drive
+<p><strong>Status:</strong> Accepted · <strong>Date:</strong> 2026-11-17 · <strong>Deciders:</strong> nguyenhuuca · <strong>Tags:</strong> ops, backup, disaster-recovery, jobs, google-drive
 <strong>Related PRD:</strong> <a href="../../prd/PRD-db-backup-google-drive/">PRD-db-backup-google-drive</a> · <strong>Supersedes:</strong> N/A · <strong>Superseded By:</strong> N/A</p>
 <p><strong>Tech Strategy:</strong> ✅ Follows Golden Path. Background work runs as a Spring job in <code>AppScheduler</code>, scheduled from <code>scheduled_job</code> (ADR-0023); Google Drive is reached through the existing OAuth client (ADR-0019); no new library. The only new runtime tool is the PostgreSQL client (<code>pg_dump</code> 17), installed on the host by the owner, outside the app build.</p>
 <hr />
@@ -9528,7 +9528,7 @@
 <hr />
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] A manual dump from prod with the host client succeeds (done 2026-11-17: 134 KB <code>-Fc</code>)</li>
+<li>[x] A manual dump from prod with the host client succeeds (done 2026-11-17: 134 KB <code>-Fc</code>)</li>
 <li>[ ] Restore drill: a Drive file restored with <code>pg_restore</code> into an empty PostgreSQL 17 database, key table row counts match, the app starts against it</li>
 <li>[ ] Failure paths alert once: <code>pg_dump</code> missing, wrong password, wrong <code>BACKUP_FOLDER_ID</code>, expired OAuth token</li>
 <li>[ ] Retention verified: after more than 7 daily runs (test with a short cron), only the newest 7 daily files remain and no other tier was touched</li>
@@ -9561,6 +9561,11 @@
 <td>2026-11-17</td>
 <td>nguyenhuuca</td>
 <td>Initial draft (Proposed)</td>
+</tr>
+<tr>
+<td>2026-11-17</td>
+<td>nguyenhuuca</td>
+<td>Accepted: DB-1..DB-7 deployed (CI green, prod boot + 3 jobs scheduled), owner ran the backups on prod OK. Restore drill and failure drill still pending (do with the first quarterly drill)</td>
 </tr>
 </tbody>
 </table>
