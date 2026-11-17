@@ -137,6 +137,17 @@ app:
   subscription-status-enabled: ${SUBSCRIPTION_STATUS_ENABLED:false}
   jobs:
     regenerate-thumbnails: false
+  backup:
+    enabled: ${BACKUP_ENABLED:false}
+    folder-id: ${BACKUP_FOLDER_ID:}
+    pg-dump-path: ${BACKUP_PG_DUMP_PATH:pg_dump}
+    work-dir: ${BACKUP_WORK_DIR:/opt/data/backups}
+    timeout: 10m
+    alert-email: ${BACKUP_ALERT_EMAIL:}
+    retention:
+      daily: 7
+      weekly: 4
+      monthly: 12
   video-import:
     enabled: ${VIDEO_IMPORT_ENABLED:false}
     yt-dlp-path: ${YT_DLP_PATH:yt-dlp}
