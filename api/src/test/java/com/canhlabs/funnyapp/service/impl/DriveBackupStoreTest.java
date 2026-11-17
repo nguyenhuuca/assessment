@@ -254,8 +254,11 @@ class DriveBackupStoreTest {
         props.getBackup().setFolderId("");
 
         assertThatThrownBy(() -> store().list(BackupTier.WEEKLY))
-                .isInstanceOfSatisfying(BackupException.class,
-                        e -> assertThat(e.getCode()).isNotNull());
+                .isInstanceOfSatisfying(BackupException.class, e -> {
+                    assertThat(e.getCode()).isEqualTo(BackupErrorCode.PRUNE_FAILED);
+                    assertThat(e.getCause()).isInstanceOfSatisfying(BackupException.class,
+                            cause -> assertThat(cause.getCode()).isEqualTo(BackupErrorCode.NOT_CONFIGURED));
+                });
     }
 
     @Test
