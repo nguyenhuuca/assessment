@@ -767,7 +767,7 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **DB-2** `AppProperties.Backup` + yaml + `.env.example`; `BackupTier`, `BackupErrorCode`, `BackupException`, `BackupRedactor`, `JdbcUrl` — 3e92a8f3 (`.env.example` left to the owner: deny rule)
 - [x] **DB-3** `PgDumpRunner` (argv, PGPASSWORD env, timeout kill, stderr redaction, PGDMP check) — blocked by DB-1, DB-2 — 2a2e8099, 41429c81 (600 before dump)
 - [x] **DB-4** `BackupStore` + `DriveBackupStore` (tier subfolders daily/weekly/monthly auto-created, upload with appProperties, list by tier, trash, error mapping) — blocked by DB-1, DB-2 — 63d92d77
-- [~] **DB-5** `DbBackupServiceImpl` (shared lock, steps, retention, prune warning) + `BackupAlertNotifier` + metrics — blocked by DB-3, DB-4
-- [ ] **DB-6** `JobRegistry`/`AppScheduler` wiring + migration `202611170001-db-backup-jobs.sql` + migration test; boots locally — blocked by DB-5
+- [x] **DB-5** `DbBackupServiceImpl` (shared lock, steps, retention, prune warning) + `BackupAlertNotifier` + metrics — blocked by DB-3, DB-4 — 543a9363
+- [~] **DB-6** `JobRegistry`/`AppScheduler` wiring + migration `202611170001-db-backup-jobs.sql` + migration test; boots locally — blocked by DB-5
 - [ ] **DB-7** Restore runbook, mkdocs nav, tracking — blocked by DB-6
 - [ ] **DB-8** Prod rollout: env, Run now ×3, failure drill, restore drill, ADR-0039 Accepted — blocked by DB-7

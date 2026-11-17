@@ -1,8 +1,8 @@
 task: DB backup to Google Drive (daily/weekly/monthly)
 status: in_progress
-progress: 70
-done: DB-1 12ee2f1e; DB-2 3e92a8f3; DB-3 PgDumpRunner 41429c81; DB-4 DriveBackupStore 63d92d77
-doing: DB-5 DbBackupServiceImpl + alert + metrics
-next: DB-6 job wiring + migration; boot locally
+progress: 80
+done: DB-1 12ee2f1e; DB-2 3e92a8f3; DB-3 PgDumpRunner 41429c81; DB-4 DriveBackupStore 63d92d77; DB-5 DbBackupService 543a9363
+doing: DB-6 job wiring + migration
+next: boot locally, DB-7 runbook + docs
 plan: docs/plans/plan-db-backup-google-drive.md
-updated: 2026-11-17 21:46
+updated: 2026-11-17 21:54
