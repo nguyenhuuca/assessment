@@ -3419,6 +3419,8 @@
       
         
       
+        
+      
     
     
     
@@ -3481,6 +3483,34 @@
     
   
     DB Backup to Google Drive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-job-run-history/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Job Run History
   
 
     
@@ -9612,6 +9642,17 @@
 <td>—</td>
 <td>✅</td>
 <td>Daily/weekly/monthly <code>pg_dump -Fc</code> of prod (PostgreSQL 17.5) uploaded to a private Drive folder via the OAuth Drive client; retention 7/4/12 by <code>appProperties</code> tier; alert email on failure; manual restore runbook. In-process job via <code>JobRegistry</code>/<code>scheduled_job</code>; host <code>pg_dump</code> 17 installed by the owner; no encryption in v1 (accepted risk). Manual prod dump 134 KB OK 2026-11-17. Plan: DB-1..DB-8. DB-1..DB-6 built by /swarm-execute 2026-11-17 (mvn verify green); restore <a href="../guides/runbook-db-restore/">runbook</a>; DB-8: deployed 820aa201, prod boot OK, owner ran backups OK 2026-11-17; restore drill pending (first quarterly drill)</td>
+</tr>
+<tr>
+<td><strong>Job Run History</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-job-run-history/">Plan ✅</a></td>
+<td>—</td>
+<td>🔄</td>
+<td><code>job_run</code> table: every scheduled-job run (SCHEDULE/MANUAL, SUCCESS/FAILED/SKIPPED, duration, masked error) kept 100 per job; Admin → Jobs last run survives restarts and each job expands to its 20 latest runs. Built 2026-11-18 (mvn verify, vitest green); prod check pending</td>
 </tr>
 <tr>
 <td><strong>Agent Evolve Loop (self-improvement)</strong></td>
