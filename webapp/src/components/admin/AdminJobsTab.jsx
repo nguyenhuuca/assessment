@@ -37,7 +37,7 @@ function JobRow({ job, canEdit, onError }) {
         {open && <JobHistoryModal job={job} onClose={closeHistory} />}
       </td>
       <td className="admin-cell-muted">{job.description}</td>
-      <td>
+      <td className="job-cron-cell">
         <OverlayTrigger placement="top" overlay={<Tooltip id={`cron-tip-${job.name}`}>{cronText}</Tooltip>}>
           {canEdit ? (
             <button type="button" className="cron-cell-btn" aria-label={t('jobs.editCronAria', { name: job.name })}

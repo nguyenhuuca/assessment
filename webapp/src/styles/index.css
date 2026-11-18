@@ -3162,6 +3162,8 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 }
 .cron-cell-btn:hover, .cron-cell-btn:focus-visible { border-color: var(--accent-cyan); }
 .cron-cell-btn .material-symbols-outlined { font-size: 16px; color: var(--text-muted); }
+/* A cron reads as one expression: never wrap it inside the Jobs table */
+.job-cron-cell, .job-cron-cell code, .cron-cell-btn { white-space: nowrap; }
 /* Job run history (job_run): expandable row under each job */
 .admin-badge.success { background: rgba(0, 200, 83, 0.13); color: #00c853; border: 1px solid #00c853; }
 .admin-badge.skipped { background: rgba(173, 170, 170, 0.13); color: var(--text-muted); border: 1px solid var(--text-muted); }
