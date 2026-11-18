@@ -49,7 +49,7 @@ describe('AdminJobsTab', () => {
     expect(screen.queryByRole('textbox')).toBeNull()
     expect(screen.queryByRole('checkbox')).toBeNull()
     // only the run-history toggles: no edit or Run now
-    expect(screen.getAllByRole('button').map(b => b.getAttribute('aria-expanded'))).toEqual(['false', 'false'])
+    expect(screen.getAllByRole('button').map(b => b.getAttribute('aria-haspopup'))).toEqual(['dialog', 'dialog'])
     expect(screen.queryByText('Chạy ngay')).toBeNull()
   })
 
@@ -135,7 +135,7 @@ describe('AdminJobsTab', () => {
     expect(await screen.findAllByText('Run now')).toHaveLength(2)
   })
 
-  it('expands a job to show its run history (ADMIN can read it)', async () => {
+  it('opens the run history of a job in a modal (ADMIN can read it)', async () => {
     setRole('ADMIN')
     adminApi.getJobRuns.mockResolvedValue({ data: [
       { jobName: 'logStats', trigger: 'MANUAL', result: 'FAILED', startedAt: '2026-11-18T03:00:00Z', durationMs: 2500, error: 'IllegalStateException: boom' },
@@ -143,29 +143,31 @@ describe('AdminJobsTab', () => {
       { jobName: 'logStats', trigger: 'SCHEDULE', result: 'SUCCESS', startedAt: '2026-11-18T01:00:00Z', durationMs: 75000, error: null },
     ] })
     renderTab()
-    const toggle = await screen.findByRole('button', { name: 'Lịch sử chạy của logStats' })
+    const open = await screen.findByRole('button', { name: 'Lịch sử chạy của logStats' })
     expect(adminApi.getJobRuns).not.toHaveBeenCalled()
 
-    fireEvent.click(toggle)
+    fireEvent.click(open)
 
-    expect(toggle).toHaveAttribute('aria-expanded', 'true')
-    expect(await screen.findByText('IllegalStateException: boom')).toBeInTheDocument()
+    const dialog = await screen.findByRole('dialog', { name: 'Lịch sử chạy của logStats' })
+    expect(await within(dialog).findByText('IllegalStateException: boom')).toBeInTheDocument()
     expect(adminApi.getJobRuns).toHaveBeenCalledWith('logStats')
-    expect(screen.getByText('Chạy tay')).toBeInTheDocument()
-    expect(screen.getAllByText('Theo lịch')).toHaveLength(2)
-    expect(screen.getByText('BỎ QUA')).toBeInTheDocument()
-    expect(screen.getByText('2.5 s')).toBeInTheDocument()
-    expect(screen.getByText('0 ms')).toBeInTheDocument()
-    expect(screen.getByText('1m 15s')).toBeInTheDocument()
+    expect(within(dialog).getByText('Chạy tay')).toBeInTheDocument()
+    expect(within(dialog).getAllByText('Theo lịch')).toHaveLength(2)
+    expect(within(dialog).getAllByText('BỎ QUA')).toHaveLength(2) // summary + row
+    expect(within(dialog).getByText('2.5 s')).toBeInTheDocument()
+    expect(within(dialog).getByText('0 ms')).toBeInTheDocument()
+    expect(within(dialog).getByText('1m 15s')).toBeInTheDocument()
 
-    fireEvent.click(toggle)
-    expect(screen.queryByText('IllegalStateException: boom')).toBeNull()
+    fireEvent.keyDown(window, { key: 'Escape' })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
-  it('shows an empty state and a load error in the history', async () => {
+  it('history modal shows an empty state, a load error, and closes on the X', async () => {
     renderTab()
     fireEvent.click(await screen.findByRole('button', { name: 'Lịch sử chạy của logStats' }))
     expect(await screen.findByText('Chưa có lần chạy nào được ghi lại')).toBeInTheDocument()
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /đóng|close/i }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
 
     adminApi.getJobRuns.mockRejectedValue(new Error('500'))
     fireEvent.click(screen.getByRole('button', { name: 'Lịch sử chạy của cleanup' }))
