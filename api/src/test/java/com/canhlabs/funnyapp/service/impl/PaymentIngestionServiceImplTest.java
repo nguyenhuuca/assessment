@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.Clock;
@@ -33,6 +34,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -108,6 +110,76 @@ class PaymentIngestionServiceImplTest {
         verify(txRepo, never()).insertIgnore(anyString(), anyString(), any(), anyString(), anyString(), anyString(), anyLong(),
                 any(), any(), any(), any(), any(), any());
         verifyNoInteractions(orderRepo, events);
+    }
+
+    private void verifyNotStored() {
+        verify(txRepo, never()).insertIgnore(anyString(), anyString(), any(), anyString(), anyString(), anyString(),
+                anyLong(), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void matchedTransfer_rechecksReferenceAfterOrderLock_andSkipsWhenStoredMeanwhile() {
+        PaymentOrder order = donation(PaymentOrderStatus.PENDING);
+        withOrder(order);
+        when(txRepo.existsSameTransferUnderOtherId("REF", 50000L, "sepay", "2")).thenReturn(false, true);
+
+        service.process(tx(2, 50000, CODE), TxSource.WEBHOOK);
+
+        InOrder inOrder = inOrder(txRepo, orderRepo);
+        inOrder.verify(txRepo).existsSameTransferUnderOtherId("REF", 50000L, "sepay", "2");
+        inOrder.verify(orderRepo).findByCodeForUpdate(CODE);
+        inOrder.verify(txRepo).existsSameTransferUnderOtherId("REF", 50000L, "sepay", "2");
+        verifyNotStored();
+        assertThat(order.getPaidAmount()).isZero();
+        verifyNoInteractions(events);
+    }
+
+    @Test
+    void blankReference_sameOrderAmountTimestampUnderOtherId_isSkipped() {
+        PaymentOrder order = donation(PaymentOrderStatus.PENDING);
+        withOrder(order);
+        Instant at = Instant.parse("2026-11-12T09:59:00Z");
+        when(txRepo.existsSameTransferForOrderUnderOtherId(7L, 50000L, at, "sepay", "2")).thenReturn(true);
+
+        service.process(payload(2, "MB", at, null, null, CODE, "in", 50000, " "), TxSource.WEBHOOK);
+
+        verifyNotStored();
+        assertThat(order.getPaidAmount()).isZero();
+        verifyNoInteractions(events);
+    }
+
+    @Test
+    void blankReference_differentTimestampOrAmount_isStillCredited() {
+        PaymentOrder order = donation(PaymentOrderStatus.PENDING);
+        withOrder(order);
+        Instant at = Instant.parse("2026-11-12T09:59:00Z");
+        when(txRepo.existsSameTransferForOrderUnderOtherId(7L, 50000L, at, "sepay", "2")).thenReturn(true);
+
+        service.process(payload(3, "MB", at.plusSeconds(60), null, null, CODE, "in", 50000, null), TxSource.WEBHOOK);
+
+        verifyStored(7L, "MATCHED");
+        assertThat(order.getPaidAmount()).isEqualTo(50000);
+    }
+
+    @Test
+    void blankReference_nullTimestamp_isCredited_withoutFallbackQuery() {
+        PaymentOrder order = donation(PaymentOrderStatus.PENDING);
+        withOrder(order);
+
+        service.process(payload(4, "MB", null, null, null, CODE, "in", 50000, null), TxSource.WEBHOOK);
+
+        verify(txRepo, never()).existsSameTransferForOrderUnderOtherId(anyLong(), anyLong(), any(), any(), any());
+        verifyStored(7L, "MATCHED");
+    }
+
+    @Test
+    void reference_present_skipsTheBlankReferenceFallback() {
+        withOrder(donation(PaymentOrderStatus.PENDING));
+
+        service.process(tx(5, 1000, CODE), TxSource.WEBHOOK);
+
+        verify(txRepo, never()).existsSameTransferForOrderUnderOtherId(anyLong(), anyLong(), any(), any(), any());
+        verifyStored(7L, "MATCHED");
     }
 
     @Test

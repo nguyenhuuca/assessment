@@ -61,6 +61,20 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
                                            @Param("provider") String provider,
                                            @Param("providerTxId") String providerTxId);
 
+    /**
+     * Fallback key for a transfer without a bank reference: same order, amount and bank timestamp already stored
+     * under another transaction id.
+     */
+    @Query("""
+            SELECT COUNT(t) > 0 FROM PaymentTransaction t
+             WHERE t.orderId = :orderId AND t.amount = :amount AND t.transactionDate = :transactionDate
+               AND NOT (t.provider = :provider AND t.providerTxId = :providerTxId)""")
+    boolean existsSameTransferForOrderUnderOtherId(@Param("orderId") long orderId,
+                                                   @Param("amount") long amount,
+                                                   @Param("transactionDate") Instant transactionDate,
+                                                   @Param("provider") String provider,
+                                                   @Param("providerTxId") String providerTxId);
+
     /** Which of these provider ids are stored already. */
     @Query("SELECT t.providerTxId FROM PaymentTransaction t WHERE t.provider = :provider AND t.providerTxId IN :ids")
     Set<String> findStoredTxIds(@Param("provider") String provider, @Param("ids") Collection<String> ids);
