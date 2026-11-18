@@ -1,7 +1,10 @@
 package com.canhlabs.funnyapp.jobs;
 
 import com.canhlabs.funnyapp.entity.ScheduledJob;
+import com.canhlabs.funnyapp.enums.JobRunResult;
+import com.canhlabs.funnyapp.enums.JobTrigger;
 import com.canhlabs.funnyapp.repo.ScheduledJobRepository;
+import com.canhlabs.funnyapp.service.JobRunService;
 import com.canhlabs.funnyapp.service.JobScheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -21,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Schedules the {@link JobRegistry} jobs from the {@code scheduled_job} table (ADR-0023).
  * One replica only: a change applies to this pod and persists for the next start.
+ * Every run, including a skipped one, is recorded through {@link JobRunService} (plan-job-run-history).
  */
 @Slf4j
 @Component
@@ -29,15 +33,17 @@ public class DynamicJobScheduler implements JobScheduler {
     private final TaskScheduler taskScheduler;
     private final ScheduledJobRepository repository;
     private final JobRegistry registry;
+    private final JobRunService runs;
 
     private final Map<String, ScheduledFuture<?>> futures = new ConcurrentHashMap<>();
     private final Map<String, AtomicBoolean> running = new ConcurrentHashMap<>();
-    private final Map<String, JobRun> lastRuns = new ConcurrentHashMap<>();
 
-    public DynamicJobScheduler(TaskScheduler taskScheduler, ScheduledJobRepository repository, JobRegistry registry) {
+    public DynamicJobScheduler(TaskScheduler taskScheduler, ScheduledJobRepository repository, JobRegistry registry,
+                               JobRunService runs) {
         this.taskScheduler = taskScheduler;
         this.repository = repository;
         this.registry = registry;
+        this.runs = runs;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -80,7 +86,7 @@ public class DynamicJobScheduler implements JobScheduler {
             }
             ZoneId zone = job.getZone() == null ? ZoneId.systemDefault() : ZoneId.of(job.getZone());
             log.info("Scheduling job '{}' cron='{}' zone={}", name, job.getCron(), zone);
-            return taskScheduler.schedule(() -> execute(name, task), new CronTrigger(job.getCron(), zone));
+            return taskScheduler.schedule(() -> execute(name, task, JobTrigger.SCHEDULE), new CronTrigger(job.getCron(), zone));
         });
     }
 
@@ -90,7 +96,7 @@ public class DynamicJobScheduler implements JobScheduler {
         if (task == null || guard(name).get()) {
             return false;
         }
-        taskScheduler.schedule(() -> execute(name, task), Instant.now());
+        taskScheduler.schedule(() -> execute(name, task, JobTrigger.MANUAL), Instant.now());
         return true;
     }
 
@@ -105,26 +111,34 @@ public class DynamicJobScheduler implements JobScheduler {
         return registry.get(name) != null;
     }
 
-    @Override
-    public JobRun lastRun(String name) {
-        return lastRuns.get(name);
-    }
-
-    private void execute(String name, Runnable task) {
+    private void execute(String name, Runnable task, JobTrigger trigger) {
+        Instant start = Instant.now();
         AtomicBoolean flag = guard(name);
         if (!flag.compareAndSet(false, true)) {
             log.warn("Job '{}' is still running; this run is skipped", name);
+            record(name, trigger, JobRunResult.SKIPPED, start, null);
             return;
         }
-        String result = "SUCCESS";
+        JobRunResult result = JobRunResult.SUCCESS;
+        Exception error = null;
         try {
             task.run();
         } catch (Exception e) {
-            result = "FAILED";
+            result = JobRunResult.FAILED;
+            error = e;
             log.error("Job '{}' failed", name, e);
         } finally {
-            lastRuns.put(name, new JobRun(Instant.now(), result));
             flag.set(false);
+        }
+        record(name, trigger, result, start, error);
+    }
+
+    /** History is best effort: a failed write is logged and never fails the job or the scheduler thread. */
+    private void record(String name, JobTrigger trigger, JobRunResult result, Instant start, Exception error) {
+        try {
+            runs.record(name, trigger, result, start, Instant.now(), error);
+        } catch (RuntimeException e) {
+            log.warn("Cannot record run of job '{}' result={}: {}", name, result, e.toString());
         }
     }
 

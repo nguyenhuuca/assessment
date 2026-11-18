@@ -1,8 +1,8 @@
-task: DB backup to Google Drive (daily/weekly/monthly)
-status: done
-progress: 100
-done: DB-1..DB-4 config, pg_dump runner, Drive store; DB-5 service; DB-6 jobs d3ed35be; DB-7 runbook; DB-8 prod OK 820aa201
-doing: -
-next: quarterly restore drill per docs/guides/runbook-db-restore.md; failure drill
-plan: docs/plans/plan-db-backup-google-drive.md
-updated: 2026-11-17 22:39
+task: Job run history (job_run table + Admin Jobs history)
+status: in_progress
+progress: 85
+done: JR-1 migration+entity+repo; JR-2 JobRunService; JR-3 scheduler records runs + GET runs API; JR-4 Admin Jobs history UI
+doing: JR-5 push + prod check
+next: watch CI; on prod open Admin -> Jobs, expand a job, confirm runs recorded after the next cron
+plan: docs/plans/plan-job-run-history.md
+updated: 2026-11-18 07:18

@@ -771,3 +771,10 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **DB-6** `JobRegistry`/`AppScheduler` wiring + migration `202611170001-db-backup-jobs.sql` + migration test; boots locally — blocked by DB-5 — d3ed35be (boot check deferred to DB-8 by owner)
 - [x] **DB-7** Restore runbook, mkdocs nav, tracking — blocked by DB-6 — d40c34e2
 - [x] **DB-8** Prod rollout: env, Run now ×3, failure drill, restore drill, ADR-0039 Accepted — blocked by DB-7 — deployed 820aa201, prod OK 2026-11-17; restore + failure drills pending (quarterly)
+
+## Feature: Job run history (2026-11-18, [plan](docs/plans/plan-job-run-history.md))
+- [x] **JR-1** Migration `202611180001-job-run.sql`, `JobRun` entity, `JobRunResult`/`JobTrigger`, `JobRunRepository` + migration test
+- [x] **JR-2** `JobRunService` (record + keep 100 per job, masked one-line error, latest per job in one query, recent) + tests
+- [x] **JR-3** `DynamicJobScheduler` records SCHEDULE/MANUAL runs incl. SKIPPED (best effort), in-memory `lastRuns` removed; `GET /admin/jobs/{name}/runs` (ADMIN)
+- [x] **JR-4** Admin → Jobs: expandable history (20 latest), en/vi, success/skipped badges, tests
+- [~] **JR-5** mvn verify + vitest + build green; push + prod check

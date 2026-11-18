@@ -1,10 +1,12 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.dto.admin.JobRunDto;
 import com.canhlabs.funnyapp.dto.admin.ScheduledJobDto;
 import com.canhlabs.funnyapp.dto.admin.UpdateScheduledJobRequest;
 import com.canhlabs.funnyapp.entity.ScheduledJob;
 import com.canhlabs.funnyapp.exception.CustomException;
 import com.canhlabs.funnyapp.repo.ScheduledJobRepository;
+import com.canhlabs.funnyapp.service.JobRunService;
 import com.canhlabs.funnyapp.service.JobScheduler;
 import com.canhlabs.funnyapp.service.ScheduledJobService;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 @Service
@@ -32,18 +35,21 @@ public class ScheduledJobServiceImpl implements ScheduledJobService {
 
     private final ScheduledJobRepository repository;
     private final JobScheduler scheduler;
+    private final JobRunService jobRuns;
 
-    public ScheduledJobServiceImpl(ScheduledJobRepository repository, JobScheduler scheduler) {
+    public ScheduledJobServiceImpl(ScheduledJobRepository repository, JobScheduler scheduler, JobRunService jobRuns) {
         this.repository = repository;
         this.scheduler = scheduler;
+        this.jobRuns = jobRuns;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ScheduledJobDto> list() {
+        Map<String, JobRunDto> latest = jobRuns.latestByJob();
         return repository.findAll().stream()
                 .sorted(Comparator.comparing(ScheduledJob::getName))
-                .map(this::toDto)
+                .map(job -> toDto(job, latest.get(job.getName())))
                 .toList();
     }
 
@@ -67,7 +73,7 @@ public class ScheduledJobServiceImpl implements ScheduledJobService {
         ScheduledJob saved = repository.saveAndFlush(job);
         // a throw here rolls the row back, so the DB and the live schedule stay the same
         scheduler.reschedule(saved);
-        return toDto(saved);
+        return toDto(saved, latest(saved.getName()));
     }
 
     @Override
@@ -93,7 +99,16 @@ public class ScheduledJobServiceImpl implements ScheduledJobService {
         if (!scheduler.runNow(name)) {
             throw CustomException.of(HttpStatus.CONFLICT, 409, "error.job.running");
         }
-        return toDto(job);
+        return toDto(job, latest(name));
+    }
+
+    @Override
+    public List<JobRunDto> runs(String name, int limit) {
+        return jobRuns.recent(find(name).getName(), limit);
+    }
+
+    private JobRunDto latest(String name) {
+        return jobRuns.recent(name, 1).stream().findFirst().orElse(null);
     }
 
     private ScheduledJob find(String name) {
@@ -127,8 +142,7 @@ public class ScheduledJobServiceImpl implements ScheduledJobService {
         }
     }
 
-    private ScheduledJobDto toDto(ScheduledJob job) {
-        JobScheduler.JobRun last = scheduler.lastRun(job.getName());
+    private ScheduledJobDto toDto(ScheduledJob job, JobRunDto last) {
         return ScheduledJobDto.builder()
                 .name(job.getName())
                 .description(job.getDescription())
@@ -136,8 +150,8 @@ public class ScheduledJobServiceImpl implements ScheduledJobService {
                 .zone(job.getZone())
                 .enabled(job.isEnabled())
                 .nextRunAt(job.isEnabled() ? nextRun(job) : null)
-                .lastRunAt(last == null ? null : last.at())
-                .lastResult(last == null ? null : last.result())
+                .lastRunAt(last == null ? null : last.getStartedAt())
+                .lastResult(last == null ? null : last.getResult())
                 .running(scheduler.isRunning(job.getName()))
                 .build();
     }

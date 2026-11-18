@@ -3162,6 +3162,23 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 }
 .cron-cell-btn:hover, .cron-cell-btn:focus-visible { border-color: var(--accent-cyan); }
 .cron-cell-btn .material-symbols-outlined { font-size: 16px; color: var(--text-muted); }
+/* Job run history (job_run): expandable row under each job */
+.admin-badge.success { background: rgba(0, 200, 83, 0.13); color: #00c853; border: 1px solid #00c853; }
+.admin-badge.skipped { background: rgba(173, 170, 170, 0.13); color: var(--text-muted); border: 1px solid var(--text-muted); }
+[data-theme="light"] .admin-badge.success { background: rgba(0, 120, 50, 0.1); color: #00662b; border-color: #00873a; }
+.job-history-toggle {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: none; border: none; padding: 0; color: var(--text); cursor: pointer; font: inherit; text-align: left;
+}
+.job-history-toggle:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; border-radius: 4px; }
+.job-history-toggle .material-symbols-outlined { font-size: 18px; color: var(--text-muted); }
+.job-history-row > td { padding: 0 12px 12px 32px; }
+.job-history { display: flex; flex-direction: column; gap: 6px; }
+.job-history-table { font-size: 13px; }
+.job-history-error { color: var(--text-muted); overflow-wrap: anywhere; max-width: 420px; font-size: 12px; }
+@media (max-width: 768px) {
+  .job-history-row > td { padding-left: 8px; }
+}
 .cron-editor { width: min(560px, calc(100vw - 32px)); }
 .cron-editor-text {
   font-size: 22px; line-height: 1.3; text-align: center; color: var(--accent-cyan);

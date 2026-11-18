@@ -233,6 +233,17 @@ function useJobMutation(fn) {
   })
 }
 
+/** Run history of one job (job_run), loaded when its row is expanded; polls while the job runs.
+ *  Key sits under ['admin', 'jobs'] so Run now / edits invalidate it too. */
+export function useJobRuns(name, enabled, running) {
+  return useQuery({
+    queryKey: ['admin', 'jobs', 'runs', name],
+    queryFn: () => adminApi.getJobRuns(name),
+    enabled,
+    refetchInterval: running ? 5000 : false,
+  })
+}
+
 /** Next runs of the cron being edited (server validates); own key so list invalidation leaves it alone. */
 export function useCronPreview(cron, zone, enabled) {
   return useQuery({

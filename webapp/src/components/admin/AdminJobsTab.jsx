@@ -4,16 +4,74 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import Tooltip from 'react-bootstrap/Tooltip'
 import CronEditModal from './CronEditModal.jsx'
 import { describeCron } from '../../utils/cronText.js'
-import { useAdminJobs, useUpdateJob, useRunJob } from '../../hooks/useAdmin.js'
+import { useAdminJobs, useUpdateJob, useRunJob, useJobRuns } from '../../hooks/useAdmin.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { isSuperAdmin } from '../../utils/roles.js'
 import { formatTime } from '../../utils/importUtils.js'
+
+const COLS_READ = 7
+
+/** 850 → "850 ms", 2500 → "2.5 s", 75000 → "1m 15s". */
+function formatDuration(ms) {
+  if (ms == null) return '—'
+  if (ms < 1000) return `${ms} ms`
+  if (ms < 60_000) return `${(ms / 1000).toFixed(1).replace(/\.0$/, '')} s`
+  const s = Math.round(ms / 1000)
+  return `${Math.floor(s / 60)}m ${s % 60}s`
+}
+
+function ResultBadge({ result }) {
+  const { t } = useTranslation('admin')
+  return <span className={`admin-badge ${result.toLowerCase()}`}>{t(`jobs.result.${result}`, { defaultValue: result })}</span>
+}
+
+function JobHistory({ job, colSpan }) {
+  const { t } = useTranslation('admin')
+  const { data, isLoading, isError } = useJobRuns(job.name, true, job.running)
+  const runs = data?.data ?? []
+  let body
+  if (isLoading) body = <div className="admin-loading"><div className="vid-spinner" /></div>
+  else if (isError) body = <div className="app-alert error" role="alert">{t('jobs.historyFailed')}</div>
+  else if (runs.length === 0) body = <div className="admin-cell-muted">{t('jobs.noRuns')}</div>
+  else body = (
+    <table className="admin-table job-history-table">
+      <thead>
+        <tr>
+          <th>{t('jobs.colStarted')}</th><th>{t('jobs.colTrigger')}</th><th>{t('jobs.colResult')}</th>
+          <th>{t('jobs.colDuration')}</th><th>{t('jobs.colError')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {runs.map((r, i) => (
+          <tr key={`${r.startedAt}-${i}`}>
+            <td className="admin-cell-muted">{formatTime(r.startedAt)}</td>
+            <td className="admin-cell-muted">{t(`jobs.trigger.${r.trigger}`, { defaultValue: r.trigger })}</td>
+            <td><ResultBadge result={r.result} /></td>
+            <td className="admin-cell-muted">{formatDuration(r.durationMs)}</td>
+            <td className="job-history-error">{r.error || '—'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+  return (
+    <tr className="job-history-row">
+      <td colSpan={colSpan}>
+        <div className="job-history" id={`job-history-${job.name}`}>
+          <div className="admin-table-meta">{t('jobs.historyTitle')}</div>
+          {body}
+        </div>
+      </td>
+    </tr>
+  )
+}
 
 function JobRow({ job, canEdit, onError }) {
   const { t, i18n } = useTranslation('admin')
   const update = useUpdateJob()
   const run = useRunJob()
   const [editing, setEditing] = useState(false)
+  const [open, setOpen] = useState(false)
   const [editError, setEditError] = useState('')
   const closeEditor = useCallback(() => setEditing(false), [])
   const cronText = describeCron(job.cron, i18n.language) ?? job.cron
@@ -23,8 +81,16 @@ function JobRow({ job, canEdit, onError }) {
   const save = body => { onError(''); update.mutate({ name: job.name, body }, { onError: fail }) }
 
   return (
+    <>
     <tr className="admin-table-row">
-      <td>{job.name}</td>
+      <td>
+        <button type="button" className="job-history-toggle" aria-expanded={open}
+          aria-controls={`job-history-${job.name}`} aria-label={t('jobs.historyAria', { name: job.name })}
+          onClick={() => setOpen(o => !o)}>
+          <span className="material-symbols-outlined" aria-hidden="true">{open ? 'expand_more' : 'chevron_right'}</span>
+          {job.name}
+        </button>
+      </td>
       <td className="admin-cell-muted">{job.description}</td>
       <td>
         <OverlayTrigger placement="top" overlay={<Tooltip id={`cron-tip-${job.name}`}>{cronText}</Tooltip>}>
@@ -65,7 +131,7 @@ function JobRow({ job, canEdit, onError }) {
         {job.running ? (
           <> <span className="admin-badge pending">{t('jobs.running')}</span></>
         ) : job.lastResult && (
-          <> <span className={`admin-badge ${job.lastResult.toLowerCase()}`}>{t(`jobs.result.${job.lastResult}`, { defaultValue: job.lastResult })}</span></>
+          <> <ResultBadge result={job.lastResult} /></>
         )}
       </td>
       {canEdit && (
@@ -77,6 +143,8 @@ function JobRow({ job, canEdit, onError }) {
         </td>
       )}
     </tr>
+    {open && <JobHistory job={job} colSpan={canEdit ? COLS_READ + 1 : COLS_READ} />}
+    </>
   )
 }
 

@@ -318,6 +318,19 @@
       "SKIPPED": "BỎ QUA"
     },
     "running": "ĐANG CHẠY",
+    "historyAria": "Lịch sử chạy của {{name}}",
+    "historyTitle": "Các lần chạy gần nhất",
+    "noRuns": "Chưa có lần chạy nào được ghi lại",
+    "historyFailed": "Không tải được lịch sử chạy",
+    "colStarted": "Bắt đầu",
+    "colTrigger": "Kích hoạt",
+    "colResult": "Kết quả",
+    "colDuration": "Thời lượng",
+    "colError": "Lỗi",
+    "trigger": {
+      "SCHEDULE": "Theo lịch",
+      "MANUAL": "Chạy tay"
+    },
     "enabledOn": "BẬT",
     "enabledOff": "TẮT",
     "enabledAria": "Bật {{name}}",

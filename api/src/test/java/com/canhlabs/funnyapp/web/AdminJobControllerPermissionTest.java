@@ -89,6 +89,23 @@ class AdminJobControllerPermissionTest {
     }
 
     @Test
+    void runs_admin_returns200WithHistory() throws Exception {
+        when(scheduledJobService.runs("log-stats", 20)).thenReturn(List.of(
+                com.canhlabs.funnyapp.dto.admin.JobRunDto.builder().jobName("log-stats").result("SKIPPED").build()));
+
+        mockMvc.perform(get(RUN_URL).with(authentication(principal(UserRole.ADMIN))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].result").value("SKIPPED"));
+    }
+
+    @Test
+    void runs_user_returns403() throws Exception {
+        mockMvc.perform(get(RUN_URL).param("limit", "5").with(authentication(principal(UserRole.USER))))
+                .andExpect(status().isForbidden());
+        verifyNoMoreInteractions(scheduledJobService);
+    }
+
+    @Test
     void preview_user_returns403() throws Exception {
         mockMvc.perform(get(JOBS_URL + "/preview").param("cron", "0 0 3 * * *")
                         .with(authentication(principal(UserRole.USER))))

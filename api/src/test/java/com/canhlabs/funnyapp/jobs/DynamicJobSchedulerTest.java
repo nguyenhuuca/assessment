@@ -5,7 +5,10 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.canhlabs.funnyapp.entity.ScheduledJob;
+import com.canhlabs.funnyapp.enums.JobRunResult;
+import com.canhlabs.funnyapp.enums.JobTrigger;
 import com.canhlabs.funnyapp.repo.ScheduledJobRepository;
+import com.canhlabs.funnyapp.service.JobRunService;
 import com.canhlabs.funnyapp.service.notification.NotificationDigestService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +32,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -43,6 +50,7 @@ class DynamicJobSchedulerTest {
     @Mock ScheduledJobRepository repository;
     @Mock JobRegistry registry;
     @Mock ScheduledFuture<?> future;
+    @Mock JobRunService runService;
 
     DynamicJobScheduler scheduler;
     ListAppender<ILoggingEvent> logs;
@@ -50,7 +58,7 @@ class DynamicJobSchedulerTest {
 
     @BeforeEach
     void setUp() {
-        scheduler = new DynamicJobScheduler(taskScheduler, repository, registry);
+        scheduler = new DynamicJobScheduler(taskScheduler, repository, registry, runService);
         doReturn(future).when(taskScheduler).schedule(any(Runnable.class), any(Trigger.class));
         logger = (Logger) LoggerFactory.getLogger(DynamicJobScheduler.class);
         logs = new ListAppender<>();
@@ -194,6 +202,8 @@ class DynamicJobSchedulerTest {
         assertThat(nowAccepted).isFalse();
         assertThat(logged(Level.WARN, "still running")).isTrue();
         assertThat(scheduler.isRunning("a")).isFalse();
+        verify(runService).record(eq("a"), eq(JobTrigger.SCHEDULE), eq(JobRunResult.SKIPPED), any(), any(), isNull());
+        verify(runService).record(eq("a"), eq(JobTrigger.SCHEDULE), eq(JobRunResult.SUCCESS), any(), any(), isNull());
     }
 
     @Test
@@ -224,8 +234,13 @@ class DynamicJobSchedulerTest {
 
         scheduledTask().run();
 
-        assertThat(scheduler.lastRun("a").result()).isEqualTo("FAILED");
-        assertThat(scheduler.lastRun("a").at()).isNotNull();
+        ArgumentCaptor<Instant> start = ArgumentCaptor.forClass(Instant.class);
+        ArgumentCaptor<Instant> end = ArgumentCaptor.forClass(Instant.class);
+        ArgumentCaptor<Throwable> error = ArgumentCaptor.forClass(Throwable.class);
+        verify(runService).record(eq("a"), eq(JobTrigger.SCHEDULE), eq(JobRunResult.FAILED),
+                start.capture(), end.capture(), error.capture());
+        assertThat(end.getValue()).isAfterOrEqualTo(start.getValue());
+        assertThat(error.getValue()).isInstanceOf(IllegalStateException.class).hasMessage("boom");
     }
 
     @Test
@@ -238,7 +253,8 @@ class DynamicJobSchedulerTest {
 
         scheduledTask().run();
 
-        assertThat(scheduler.lastRun("notification-digest").result()).isEqualTo("FAILED");
+        verify(runService).record(eq("notification-digest"), eq(JobTrigger.SCHEDULE), eq(JobRunResult.FAILED),
+                any(), any(), any(IllegalStateException.class));
     }
 
     @Test
@@ -248,8 +264,24 @@ class DynamicJobSchedulerTest {
 
         scheduledTask().run();
 
-        assertThat(scheduler.lastRun("a").result()).isEqualTo("SUCCESS");
-        assertThat(scheduler.lastRun("other")).isNull();
+        verify(runService).record(eq("a"), eq(JobTrigger.SCHEDULE), eq(JobRunResult.SUCCESS), any(), any(), isNull());
+    }
+
+    @Test
+    void run_historyWriteFailure_isLoggedAndDoesNotEscape() {
+        AtomicInteger runs = new AtomicInteger();
+        when(registry.get("a")).thenReturn(runs::incrementAndGet);
+        doThrow(new IllegalStateException("db down")).when(runService)
+                .record(anyString(), any(), any(), any(), any(), any());
+        scheduler.reschedule(job("a", true));
+        Runnable task = scheduledTask();
+
+        task.run();
+        task.run();
+
+        assertThat(runs).hasValue(2);
+        assertThat(scheduler.isRunning("a")).isFalse();
+        assertThat(logged(Level.WARN, "Cannot record run of job 'a'")).isTrue();
     }
 
     // ── run now ───────────────────────────────────────────────────────────────
@@ -265,6 +297,7 @@ class DynamicJobSchedulerTest {
         verify(taskScheduler).schedule(captor.capture(), any(Instant.class));
         captor.getValue().run();
         assertThat(runs).hasValue(1);
+        verify(runService).record(eq("a"), eq(JobTrigger.MANUAL), eq(JobRunResult.SUCCESS), any(), any(), isNull());
     }
 
     @Test

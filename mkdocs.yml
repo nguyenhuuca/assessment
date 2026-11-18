@@ -155,6 +155,7 @@ nav:
 
   - Plans:
       - DB Backup to Google Drive: plans/plan-db-backup-google-drive.md
+      - Job Run History: plans/plan-job-run-history.md
       - React Migration: plans/plan-react-migration.md
       - Admin Dashboard: plans/plan-admin-dashboard.md
       - Permissions (Bitwise): plans/plan-permissions-bitwise.md
