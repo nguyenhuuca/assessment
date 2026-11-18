@@ -778,3 +778,8 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **JR-3** `DynamicJobScheduler` records SCHEDULE/MANUAL runs incl. SKIPPED (best effort), in-memory `lastRuns` removed; `GET /admin/jobs/{name}/runs` (ADMIN)
 - [x] **JR-4** Admin → Jobs: expandable history (20 latest), en/vi, success/skipped badges, tests
 - [~] **JR-5** mvn verify + vitest + build green; push + prod check
+
+## Fix: duplicate payment for one transfer code (2026-11-18, issue #95, PR #96, lite)
+- [x] **DUP-1** Re-check the reference dedupe after the order row lock, before the MATCHED store (early check stays)
+- [x] **DUP-2** Blank-reference fallback key: same order, amount, timestamp under another id (`existsSameTransferForOrderUnderOtherId`)
+- [x] **DUP-3** Tests in `PaymentIngestionServiceImplTest`; the DUP-1 InOrder test and the DUP-2 test fail without the fix
