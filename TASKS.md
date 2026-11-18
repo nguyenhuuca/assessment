@@ -777,7 +777,7 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **JR-2** `JobRunService` (record + keep 100 per job, masked one-line error, latest per job in one query, recent) + tests
 - [x] **JR-3** `DynamicJobScheduler` records SCHEDULE/MANUAL runs incl. SKIPPED (best effort), in-memory `lastRuns` removed; `GET /admin/jobs/{name}/runs` (ADMIN)
 - [x] **JR-4** Admin → Jobs: expandable history (20 latest), en/vi, success/skipped badges, tests
-- [~] **JR-5** mvn verify + vitest + build green; push + prod check
+- [x] **JR-5** mvn verify + vitest + build green; deployed 325e865c (+ modal d81ff63b, cron nowrap d583cc22); prod records runs OK 2026-11-18
 
 ## Fix: duplicate payment for one transfer code (2026-11-18, issue #95, PR #96, lite)
 - [x] **DUP-1** Re-check the reference dedupe after the order row lock, before the MATCHED store (early check stays)

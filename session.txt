@@ -1,8 +1,8 @@
 task: Job run history (job_run table + Admin Jobs history)
-status: in_progress
-progress: 85
-done: JR-1 migration+entity+repo; JR-2 JobRunService; JR-3 scheduler records runs + GET runs API; JR-4 Admin Jobs history UI
-doing: JR-5 push + prod check
-next: watch CI; on prod open Admin -> Jobs, expand a job, confirm runs recorded after the next cron
+status: done
+progress: 100
+done: JR-1..JR-4 job_run + API + UI 325e865c; history modal d81ff63b; cron nowrap d583cc22; JR-5 prod OK
+doing: -
+next: -
 plan: docs/plans/plan-job-run-history.md
-updated: 2026-11-18 07:18
+updated: 2026-11-18 19:25

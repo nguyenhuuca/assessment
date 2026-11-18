@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | ✅ Done (JR-1..JR-4 built and verified 2026-11-18; JR-5 prod check after deploy) |
+| Status | ✅ Done (deployed 325e865c, history modal d81ff63b; prod records runs 2026-11-18) |
 | Date | 2026-11-18 |
 | Related | [ADR-0023](../adr/0023-dynamic-cron-jobs.md) (dynamic jobs), [ADR-0039](../adr/0039-db-backup-google-drive.md) (DB backup) |
 
