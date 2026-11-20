@@ -783,3 +783,7 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **DUP-1** Re-check the reference dedupe after the order row lock, before the MATCHED store (early check stays)
 - [x] **DUP-2** Blank-reference fallback key: same order, amount, timestamp under another id (`existsSameTransferForOrderUnderOtherId`)
 - [x] **DUP-3** Tests in `PaymentIngestionServiceImplTest`; the DUP-1 InOrder test and the DUP-2 test fail without the fix
+
+## Fix: duplicate payment, order-code dedupe key always on (2026-11-18, issue #97, lite)
+- [ ] **DUP-4** `isSameTransferForOrder` applies (order, amount, transactionDate) always, not only for a blank reference
+- [ ] **DUP-5** Tests: different id + different reference, same order/amount/time is skipped (fails without DUP-4); different time still credited; webhook string date vs API instant
