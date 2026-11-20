@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "signal": "defect:ed14e981",
+  "run": "2026-10-24-stream-range-cap",
+  "base": "04de01d2906bf7be5c05a0c546e3b4390e0804cb^",
+  "head": "04de01d2906bf7be5c05a0c546e3b4390e0804cb",
+  "fix": "ed14e981f2422737deef9f433274030e4880ce38",
+  "summary": "The run made every cache-miss Range request open a RandomAccessFile through getFileRangeFromDisk and hand the stream on, but that unchanged method opens the file, then seeks and wraps it, so a failing seek or wrapper leaks the open file before LimitedInputStream owns it.",
+  "expect": {
+    "files": ["StreamVideoServiceImpl.java", "VideoStorageServiceImpl.java", "VideoCacheImpl.java"],
+    "patterns": [
+      "leak",
+      "(not|never|n't) (be )?(closed|released)",
+      "RandomAccessFile",
+      "(seek|getFD|FileInputStream).{0,80}(fail|throw|exception)",
+      "(close|release)\\w* .{0,80}(fail|throw|error|exception)",
+      "(own|hand)\\w* .{0,60}(stream|file|resource)"
+    ]
+  }
+}
