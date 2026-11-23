@@ -783,3 +783,10 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **DUP-1** Re-check the reference dedupe after the order row lock, before the MATCHED store (early check stays)
 - [x] **DUP-2** Blank-reference fallback key: same order, amount, timestamp under another id (`existsSameTransferForOrderUnderOtherId`)
 - [x] **DUP-3** Tests in `PaymentIngestionServiceImplTest`; the DUP-1 InOrder test and the DUP-2 test fail without the fix
+
+## Feature: Maven → Gradle build (2026-11-23, [plan](docs/plans/plan-gradle-migration.md), [ADR-0040](docs/adr/0040-gradle-build.md))
+- [ ] **GR-0** Owner accepts ADR-0040 (Kotlin DSL, Gradle 9.x wrapper, single coverage gate from `.coverage-threshold`)
+- [ ] **GR-1** Gradle next to the pom (wrapper, `build.gradle.kts`, preview, lombok, `@app.build.version@` filtering, JaCoCo gate, same JAR name) + `BuildVersionFilteringTest`; parity with Maven proven (deps, test count, LINE %, JAR boots) — blocked by GR-0
+- [ ] **GR-2** Local scripts (`startLocal`, `unittest`, `qa-twice`, `claude-autopilot-merge`) use `./gradlew` — blocked by GR-1
+- [ ] **GR-3** CI (`funnyapp-ci.yml`, `autopilot.yml`), Dockerfile, Sonar, aic path on Gradle; push after approval; prod shows `prod-<sha>` — blocked by GR-1
+- [ ] **GR-4** Delete `pom.xml`; update tech-strategy, CLAUDE.md, AGENTS.md, README, autopilot skill, templates, living docs; ADR-0040 Accepted — blocked by GR-2, GR-3

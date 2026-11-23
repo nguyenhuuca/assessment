@@ -1,8 +1,9 @@
-task: Job run history (job_run table + Admin Jobs history)
-status: done
-progress: 100
-done: JR-1..JR-4 job_run + API + UI 325e865c; history modal d81ff63b; cron nowrap d583cc22; JR-5 prod OK
+task: Maven -> Gradle build migration (api/)
+status: blocked
+progress: 10
+done: Plan + ADR-0040 Proposed (planning only)
 doing: -
-next: -
-plan: docs/plans/plan-job-run-history.md
-updated: 2026-11-18 19:25
+next: GR-0 owner accepts ADR-0040; then GR-1 build.gradle.kts next to pom with parity proof
+plan: docs/plans/plan-gradle-migration.md
+blocker: owner review of ADR-0040 (Kotlin DSL, Gradle 9.x, coverage gate from .coverage-threshold)
+updated: 2026-11-23 21:36

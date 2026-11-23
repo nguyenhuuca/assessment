@@ -97,6 +97,7 @@ nav:
       - 0036 - Admin Bulk Actions: adr/0036-admin-bulk-actions.md
       - 0037 - SePay Bank-Transfer Payments: adr/0037-sepay-bank-transfer-payments.md
       - 0039 - DB Backup to Google Drive: adr/0039-db-backup-google-drive.md
+      - 0040 - Gradle Build: adr/0040-gradle-build.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -154,6 +155,7 @@ nav:
       - DB Backup to Google Drive: sequence/sequence-db-backup-google-drive.md
 
   - Plans:
+      - Gradle Migration: plans/plan-gradle-migration.md
       - DB Backup to Google Drive: plans/plan-db-backup-google-drive.md
       - Job Run History: plans/plan-job-run-history.md
       - React Migration: plans/plan-react-migration.md
