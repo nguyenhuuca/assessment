@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -379,7 +379,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../plans/plan-db-backup-google-drive/" class="md-tabs__link">
+        <a href="../plans/plan-gradle-migration/" class="md-tabs__link">
           
   
   
@@ -974,6 +974,8 @@
   
     
     
+      
+        
       
         
       
@@ -1699,6 +1701,34 @@
     
   
     0039 - DB Backup to Google Drive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0040-gradle-build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0040 - Gradle Build
   
 
     
@@ -3421,6 +3451,8 @@
       
         
       
+        
+      
     
     
     
@@ -3467,6 +3499,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plans/plan-gradle-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gradle Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -9490,6 +9550,17 @@
 <td><code>985ba5b5</code> BE + <code>e7b53b4f</code> FE (autopilot). Schedules of the 6 AppScheduler jobs in <code>scheduled_job</code>; Admin → Scheduled jobs: ADMIN views, SUPER_ADMIN edits cron/zone/enabled or runs now. Cron editor modal + tooltip (ADR-0024). Prod check pending</td>
 </tr>
 <tr>
+<td><strong>Gradle Build (Maven → Gradle)</strong></td>
+<td>—</td>
+<td><a href="../adr/0040-gradle-build/">0040 📝</a></td>
+<td>—</td>
+<td>—</td>
+<td><a href="../plans/plan-gradle-migration/">Plan 📋</a></td>
+<td>—</td>
+<td>🔍</td>
+<td>Planned 2026-11-23: GR-0..GR-4; Kotlin DSL + wrapper, same JAR name, coverage gate from <code>.coverage-threshold</code>. ADR Proposed</td>
+</tr>
+<tr>
 <td><strong>Headless Autopilot</strong></td>
 <td>—</td>
 <td><a href="../adr/0022-headless-autopilot/">0022 ✅</a> + <a href="../adr/0025-autopilot-auto-gates/">0025 ✅</a></td>
@@ -9893,6 +9964,11 @@
 <td>0035</td>
 <td>Video Visibility Enum (FEED, COLLECTION_ONLY, HIDDEN) Replaces is_hide</td>
 <td>✅ Accepted</td>
+</tr>
+<tr>
+<td>0040</td>
+<td>Build the Backend with Gradle Instead of Maven</td>
+<td>💡 Proposed</td>
 </tr>
 </tbody>
 </table>
