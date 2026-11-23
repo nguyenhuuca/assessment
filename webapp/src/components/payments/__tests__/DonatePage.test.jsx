@@ -86,6 +86,17 @@ describe('DonatePage donate flow', () => {
     expect(screen.getByRole('button', { name: 'Donate' })).toBeEnabled()
   })
 
+  it('groups the custom amount while typing and submits the number', async () => {
+    paymentsApi.createOrder.mockResolvedValue({ data: order() })
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: 'Other amount' }))
+    const input = screen.getByLabelText('Amount (VND)', { selector: 'input' })
+    fireEvent.change(input, { target: { value: '50000' } })
+    expect(input).toHaveValue('50.000')
+    fireEvent.click(screen.getByRole('button', { name: 'Donate' }))
+    await waitFor(() => expect(paymentsApi.createOrder).toHaveBeenCalledWith({ type: 'DONATION', amount: 50000 }))
+  })
+
   it('maps a backend error code to a friendly message', async () => {
     paymentsApi.createOrder.mockRejectedValue({ code: 'error.payment.notConfigured', message: 'x' })
     renderPage()

@@ -755,3 +755,31 @@ Report: docs/reports/system-health-2026-11-08.md
 - [x] **PP-4** Migration `payment_transactions` (provider, provider_tx_id), `payment_orders.provider`, job `reconcile-payments` — blocked by PP-3
 - [x] **PP-5** Admin API + FE neutral naming (`id`, check-provider, i18n) — blocked by PP-4
 - [x] **PP-6** Docs: ADR Accepted, runbook "add a provider", tracking — blocked by PP-5
+
+## Fix: money input auto-format (2026-11-17, issue #93, PR #94, lite)
+- [x] **MI-1** `MoneyInput` + `utils/moneyInput.js` (vi-VN grouping, digits-only onChange, 12-digit cap)
+- [x] **MI-2** DonatePage custom amount uses `MoneyInput`
+- [x] **MI-3** AdminPaymentsTab mark-paid popup uses `MoneyInput`
+- [x] **MI-4** Tests: helper, component, Donate, AdminPayments
+
+## Feature: DB backup to Google Drive (2026-11-17, [plan](docs/plans/plan-db-backup-google-drive.md), [ADR-0039](docs/adr/0039-db-backup-google-drive.md), [spec](docs/specs/spec-db-backup-google-drive.md))
+- [x] **DB-1** Refactor: `ProcessFactory.start(cmd, extraEnv)` overload; extract `OAuthDriveClientFactory` (video import unchanged) — 12ee2f1e
+- [x] **DB-2** `AppProperties.Backup` + yaml + `.env.example`; `BackupTier`, `BackupErrorCode`, `BackupException`, `BackupRedactor`, `JdbcUrl` — 3e92a8f3 (`.env.example` left to the owner: deny rule)
+- [x] **DB-3** `PgDumpRunner` (argv, PGPASSWORD env, timeout kill, stderr redaction, PGDMP check) — blocked by DB-1, DB-2 — 2a2e8099, 41429c81 (600 before dump)
+- [x] **DB-4** `BackupStore` + `DriveBackupStore` (tier subfolders daily/weekly/monthly auto-created, upload with appProperties, list by tier, trash, error mapping) — blocked by DB-1, DB-2 — 63d92d77
+- [x] **DB-5** `DbBackupServiceImpl` (shared lock, steps, retention, prune warning) + `BackupAlertNotifier` + metrics — blocked by DB-3, DB-4 — 543a9363
+- [x] **DB-6** `JobRegistry`/`AppScheduler` wiring + migration `202611170001-db-backup-jobs.sql` + migration test; boots locally — blocked by DB-5 — d3ed35be (boot check deferred to DB-8 by owner)
+- [x] **DB-7** Restore runbook, mkdocs nav, tracking — blocked by DB-6 — d40c34e2
+- [x] **DB-8** Prod rollout: env, Run now ×3, failure drill, restore drill, ADR-0039 Accepted — blocked by DB-7 — deployed 820aa201, prod OK 2026-11-17; restore + failure drills pending (quarterly)
+
+## Feature: Job run history (2026-11-18, [plan](docs/plans/plan-job-run-history.md))
+- [x] **JR-1** Migration `202611180001-job-run.sql`, `JobRun` entity, `JobRunResult`/`JobTrigger`, `JobRunRepository` + migration test
+- [x] **JR-2** `JobRunService` (record + keep 100 per job, masked one-line error, latest per job in one query, recent) + tests
+- [x] **JR-3** `DynamicJobScheduler` records SCHEDULE/MANUAL runs incl. SKIPPED (best effort), in-memory `lastRuns` removed; `GET /admin/jobs/{name}/runs` (ADMIN)
+- [x] **JR-4** Admin → Jobs: expandable history (20 latest), en/vi, success/skipped badges, tests
+- [x] **JR-5** mvn verify + vitest + build green; deployed 325e865c (+ modal d81ff63b, cron nowrap d583cc22); prod records runs OK 2026-11-18
+
+## Fix: duplicate payment for one transfer code (2026-11-18, issue #95, PR #96, lite)
+- [x] **DUP-1** Re-check the reference dedupe after the order row lock, before the MATCHED store (early check stays)
+- [x] **DUP-2** Blank-reference fallback key: same order, amount, timestamp under another id (`existsSameTransferForOrderUnderOtherId`)
+- [x] **DUP-3** Tests in `PaymentIngestionServiceImplTest`; the DUP-1 InOrder test and the DUP-2 test fail without the fix

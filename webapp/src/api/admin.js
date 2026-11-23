@@ -59,6 +59,8 @@ export const bulkImports   = (body) => api.post('/admin/video-imports/bulk', bod
 export const getJobs   = () => api.get('/admin/jobs')
 export const updateJob = (name, body) => patch(`/admin/jobs/${encodeURIComponent(name)}`, body)
 export const runJob    = (name) => api.post(`/admin/jobs/${encodeURIComponent(name)}/runs`)
+export const getJobRuns = (name, limit = 20) =>
+  api.get(buildUrl(`/admin/jobs/${encodeURIComponent(name)}/runs`, { limit }))
 export const previewJobCron = (cron, zone, count = 5) =>
   api.get(buildUrl('/admin/jobs/preview', { cron, zone: zone || undefined, count }))
 

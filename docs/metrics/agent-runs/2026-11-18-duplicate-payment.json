@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "2026-11-18-duplicate-payment",
+  "date": "2026-11-18",
+  "mode": "headless",
+  "lite": true,
+  "issue": 95,
+  "pr": 96,
+  "result": "landed",
+  "gate1": "approved",
+  "rounds": { "plan": 3, "code": 1, "qa": 1 },
+  "verdicts": { "plan": "approve", "code": "approve" },
+  "codeReviewSkipped": false,
+  "blocking": 2,
+  "advisory": 4,
+  "locNonTest": 36,
+  "tests": { "passed": 33, "flaky": 0, "failed": 0 },
+  "costUsd": null
+}

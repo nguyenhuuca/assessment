@@ -7,7 +7,7 @@ import * as adminApi from '../../../api/admin.js'
 import { useAuth } from '../../../hooks/useAuth.js'
 import i18n from '../../../i18n/index.js'
 
-vi.mock('../../../api/admin.js', () => ({ getJobs: vi.fn(), updateJob: vi.fn(), runJob: vi.fn(), previewJobCron: vi.fn() }))
+vi.mock('../../../api/admin.js', () => ({ getJobs: vi.fn(), updateJob: vi.fn(), runJob: vi.fn(), previewJobCron: vi.fn(), getJobRuns: vi.fn() }))
 vi.mock('../../../hooks/useAuth.js', () => ({ useAuth: vi.fn() }))
 
 const job = (o) => ({ name: 'logStats', description: 'Log stats', cron: '0 0 * * * *', zone: 'UTC', enabled: true,
@@ -26,6 +26,7 @@ beforeEach(() => {
   adminApi.getJobs.mockResolvedValue({ data: [job(), job({ name: 'cleanup', description: 'Cleanup', zone: null, enabled: false, lastResult: 'FAILED', nextRunAt: null })] })
   adminApi.updateJob.mockResolvedValue({ data: job() })
   adminApi.runJob.mockResolvedValue({})
+  adminApi.getJobRuns.mockResolvedValue({ data: [] })
   adminApi.previewJobCron.mockResolvedValue({ data: ['2026-10-20T01:00:00Z', '2026-10-20T01:05:00Z'] })
 })
 
@@ -47,7 +48,9 @@ describe('AdminJobsTab', () => {
     await screen.findByText('logStats')
     expect(screen.queryByRole('textbox')).toBeNull()
     expect(screen.queryByRole('checkbox')).toBeNull()
-    expect(screen.queryByRole('button')).toBeNull()
+    // only the run-history toggles: no edit or Run now
+    expect(screen.getAllByRole('button').map(b => b.getAttribute('aria-haspopup'))).toEqual(['dialog', 'dialog'])
+    expect(screen.queryByText('Chạy ngay')).toBeNull()
   })
 
   it('ADMIN sees the translated ON/OFF badge', async () => {
@@ -130,5 +133,44 @@ describe('AdminJobsTab', () => {
     await i18n.changeLanguage('en')
     renderTab()
     expect(await screen.findAllByText('Run now')).toHaveLength(2)
+  })
+
+  it('opens the run history of a job in a modal (ADMIN can read it)', async () => {
+    setRole('ADMIN')
+    adminApi.getJobRuns.mockResolvedValue({ data: [
+      { jobName: 'logStats', trigger: 'MANUAL', result: 'FAILED', startedAt: '2026-11-18T03:00:00Z', durationMs: 2500, error: 'IllegalStateException: boom' },
+      { jobName: 'logStats', trigger: 'SCHEDULE', result: 'SKIPPED', startedAt: '2026-11-18T02:00:00Z', durationMs: 0, error: null },
+      { jobName: 'logStats', trigger: 'SCHEDULE', result: 'SUCCESS', startedAt: '2026-11-18T01:00:00Z', durationMs: 75000, error: null },
+    ] })
+    renderTab()
+    const open = await screen.findByRole('button', { name: 'Lịch sử chạy của logStats' })
+    expect(adminApi.getJobRuns).not.toHaveBeenCalled()
+
+    fireEvent.click(open)
+
+    const dialog = await screen.findByRole('dialog', { name: 'Lịch sử chạy của logStats' })
+    expect(await within(dialog).findByText('IllegalStateException: boom')).toBeInTheDocument()
+    expect(adminApi.getJobRuns).toHaveBeenCalledWith('logStats')
+    expect(within(dialog).getByText('Chạy tay')).toBeInTheDocument()
+    expect(within(dialog).getAllByText('Theo lịch')).toHaveLength(2)
+    expect(within(dialog).getAllByText('BỎ QUA')).toHaveLength(2) // summary + row
+    expect(within(dialog).getByText('2.5 s')).toBeInTheDocument()
+    expect(within(dialog).getByText('0 ms')).toBeInTheDocument()
+    expect(within(dialog).getByText('1m 15s')).toBeInTheDocument()
+
+    fireEvent.keyDown(window, { key: 'Escape' })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  it('history modal shows an empty state, a load error, and closes on the X', async () => {
+    renderTab()
+    fireEvent.click(await screen.findByRole('button', { name: 'Lịch sử chạy của logStats' }))
+    expect(await screen.findByText('Chưa có lần chạy nào được ghi lại')).toBeInTheDocument()
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /đóng|close/i }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+
+    adminApi.getJobRuns.mockRejectedValue(new Error('500'))
+    fireEvent.click(screen.getByRole('button', { name: 'Lịch sử chạy của cleanup' }))
+    expect(await screen.findByText('Không tải được lịch sử chạy')).toBeInTheDocument()
   })
 })

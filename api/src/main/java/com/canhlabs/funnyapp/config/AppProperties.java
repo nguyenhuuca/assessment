@@ -52,6 +52,7 @@ public class AppProperties {
     private VideoSuggestion videoSuggestion = new VideoSuggestion();
     private WatchHistory watchHistory = new WatchHistory();
     private Hls hls = new Hls();
+    private Backup backup = new Backup();
 
     @PostConstruct
     void warnDeprecatedKeys() {
@@ -79,6 +80,28 @@ public class AppProperties {
         private long minFreeDiskBytes = 2L * 1024 * 1024 * 1024;
         private String cookiesPath = "";
         private int bulkMax = 20;
+    }
+
+    /** Database backup to Google Drive: {@code app.backup.*}. */
+    @Getter
+    @Setter
+    public static class Backup {
+        private boolean enabled = false;
+        private String folderId = "";
+        private String pgDumpPath = "pg_dump";
+        private String workDir = "/opt/data/backups";
+        private Duration timeout = Duration.ofMinutes(10);
+        private String alertEmail = "";
+        private Retention retention = new Retention();
+
+        /** Number of backups kept per tier. */
+        @Getter
+        @Setter
+        public static class Retention {
+            private int daily = 7;
+            private int weekly = 4;
+            private int monthly = 12;
+        }
     }
 
     /** User video suggestions: {@code app.video-suggestion.*}. */

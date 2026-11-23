@@ -4,6 +4,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import Tooltip from 'react-bootstrap/Tooltip'
 import CronEditModal from './CronEditModal.jsx'
 import { describeCron } from '../../utils/cronText.js'
+import JobHistoryModal, { ResultBadge } from './JobHistoryModal.jsx'
 import { useAdminJobs, useUpdateJob, useRunJob } from '../../hooks/useAdmin.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { isSuperAdmin } from '../../utils/roles.js'
@@ -14,8 +15,10 @@ function JobRow({ job, canEdit, onError }) {
   const update = useUpdateJob()
   const run = useRunJob()
   const [editing, setEditing] = useState(false)
+  const [open, setOpen] = useState(false)
   const [editError, setEditError] = useState('')
   const closeEditor = useCallback(() => setEditing(false), [])
+  const closeHistory = useCallback(() => setOpen(false), [])
   const cronText = describeCron(job.cron, i18n.language) ?? job.cron
   const busy = job.running || run.isPending
 
@@ -24,9 +27,17 @@ function JobRow({ job, canEdit, onError }) {
 
   return (
     <tr className="admin-table-row">
-      <td>{job.name}</td>
-      <td className="admin-cell-muted">{job.description}</td>
       <td>
+        <button type="button" className="job-history-toggle" aria-haspopup="dialog"
+          aria-label={t('jobs.historyAria', { name: job.name })} title={t('jobs.historyAria', { name: job.name })}
+          onClick={() => setOpen(true)}>
+          {job.name}
+          <span className="material-symbols-outlined" aria-hidden="true">history</span>
+        </button>
+        {open && <JobHistoryModal job={job} onClose={closeHistory} />}
+      </td>
+      <td className="admin-cell-muted">{job.description}</td>
+      <td className="job-cron-cell">
         <OverlayTrigger placement="top" overlay={<Tooltip id={`cron-tip-${job.name}`}>{cronText}</Tooltip>}>
           {canEdit ? (
             <button type="button" className="cron-cell-btn" aria-label={t('jobs.editCronAria', { name: job.name })}
@@ -65,7 +76,7 @@ function JobRow({ job, canEdit, onError }) {
         {job.running ? (
           <> <span className="admin-badge pending">{t('jobs.running')}</span></>
         ) : job.lastResult && (
-          <> <span className={`admin-badge ${job.lastResult.toLowerCase()}`}>{t(`jobs.result.${job.lastResult}`, { defaultValue: job.lastResult })}</span></>
+          <> <ResultBadge result={job.lastResult} /></>
         )}
       </td>
       {canEdit && (

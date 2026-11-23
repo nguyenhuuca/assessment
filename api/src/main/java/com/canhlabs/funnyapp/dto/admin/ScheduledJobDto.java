@@ -22,9 +22,9 @@ public class ScheduledJobDto {
     private boolean enabled;
     /** Null when disabled or the cron has no future date. */
     private Instant nextRunAt;
-    /** Null until the job has run since the last restart. */
+    /** Start of the newest recorded run (job_run); null when the job has never run. */
     private Instant lastRunAt;
-    /** SUCCESS or FAILED; null until the job has run since the last restart. */
+    /** SUCCESS, FAILED or SKIPPED; null when the job has never run. */
     private String lastResult;
     private boolean running;
 }

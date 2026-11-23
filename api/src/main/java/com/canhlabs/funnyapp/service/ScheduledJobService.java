@@ -1,5 +1,6 @@
 package com.canhlabs.funnyapp.service;
 
+import com.canhlabs.funnyapp.dto.admin.JobRunDto;
 import com.canhlabs.funnyapp.dto.admin.ScheduledJobDto;
 import com.canhlabs.funnyapp.dto.admin.UpdateScheduledJobRequest;
 
@@ -16,4 +17,7 @@ public interface ScheduledJobService {
 
     /** Starts a manual run (works on a disabled job); 409 when it is already running. */
     ScheduledJobDto runNow(String name);
+
+    /** The newest runs of one job, newest first; 404 for an unknown job. */
+    List<JobRunDto> runs(String name, int limit);
 }

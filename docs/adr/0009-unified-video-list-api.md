@@ -134,7 +134,7 @@ Existing endpoints are retained as thin deprecated wrappers delegating to the ne
 
 ## Validation
 - [ ] Tech Strategy alignment confirmed
-- [ ] Related plan document created: [docs/plans/plan-unified-video-api.md](../plans/plan-unified-video-api.md) *(to be created)*
+- [ ] Related plan document created: `docs/plans/plan-unified-video-api.md` *(never created)*
 
 ---
 

@@ -5,6 +5,7 @@ import com.canhlabs.funnyapp.config.AppProperties;
 import com.canhlabs.funnyapp.cache.CacheStat;
 import com.canhlabs.funnyapp.entity.VideoSource;
 import com.canhlabs.funnyapp.repo.VideoSourceRepository;
+import com.canhlabs.funnyapp.service.DbBackupService;
 import com.canhlabs.funnyapp.service.FfmpegService;
 import com.canhlabs.funnyapp.service.PaymentOrderService;
 import com.canhlabs.funnyapp.service.PaymentReconcileService;
@@ -13,6 +14,7 @@ import com.canhlabs.funnyapp.service.VideoAccessService;
 import com.canhlabs.funnyapp.service.VideoStorageService;
 import com.canhlabs.funnyapp.service.notification.NotificationDigestService;
 import com.canhlabs.funnyapp.service.YouTubeVideoService;
+import com.canhlabs.funnyapp.service.backup.BackupTier;
 import com.canhlabs.funnyapp.utils.AppConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +47,7 @@ public class AppScheduler implements ApplicationRunner {
     private final NotificationDigestService notificationDigestService;
     private final PaymentOrderService paymentOrderService;
     private final PaymentReconcileService paymentReconcileService;
+    private final DbBackupService dbBackupService;
 
     @Value("${app.jobs.regenerate-thumbnails:false}")
     private boolean regenerateThumbnailsEnabled;
@@ -55,8 +58,10 @@ public class AppScheduler implements ApplicationRunner {
                         VideoSourceRepository videoSourceRepository, AppProperties appProps,
                         NotificationDigestService notificationDigestService,
                         PaymentOrderService paymentOrderService,
-                        PaymentReconcileService paymentReconcileService
+                        PaymentReconcileService paymentReconcileService,
+                        DbBackupService dbBackupService
     ) {
+        this.dbBackupService = dbBackupService;
         this.paymentOrderService = paymentOrderService;
         this.paymentReconcileService = paymentReconcileService;
         this.streamVideoService = streamVideoService;
@@ -125,6 +130,19 @@ public class AppScheduler implements ApplicationRunner {
     /** Daily T-1 pass over every provider feed; the Harness flag sepay_reconcile_enabled decides inside whether it runs. */
     public void reconcilePayments() {
         paymentReconcileService.reconcile();
+    }
+
+    /** DB backups to Google Drive (ADR-0039); failures throw so the job is recorded FAILED. */
+    public void dbBackupDaily() {
+        dbBackupService.run(BackupTier.DAILY);
+    }
+
+    public void dbBackupWeekly() {
+        dbBackupService.run(BackupTier.WEEKLY);
+    }
+
+    public void dbBackupMonthly() {
+        dbBackupService.run(BackupTier.MONTHLY);
     }
 
     public void cleanUpOldVideos() {

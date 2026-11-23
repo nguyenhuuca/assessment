@@ -330,6 +330,19 @@
       "SKIPPED": "SKIPPED"
     },
     "running": "RUNNING",
+    "historyAria": "Run history of {{name}}",
+    "historyTitle": "Latest runs",
+    "noRuns": "No recorded runs yet",
+    "historyFailed": "Could not load the run history",
+    "colStarted": "Started",
+    "colTrigger": "Trigger",
+    "colResult": "Result",
+    "colDuration": "Duration",
+    "colError": "Error",
+    "trigger": {
+      "SCHEDULE": "Schedule",
+      "MANUAL": "Run now"
+    },
     "enabledOn": "ON",
     "enabledOff": "OFF",
     "enabledAria": "Enable {{name}}",

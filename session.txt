@@ -1,8 +1,8 @@
-task: Payment provider abstraction (SePay → adapter)
+task: Job run history (job_run table + Admin Jobs history)
 status: done
 progress: 100
-done: PP-1..PP-5 port, SePay adapter, payment_transactions, admin+FE d5fad2e2; PP-6 docs c834a569; prod smoke ok
+done: JR-1..JR-4 job_run + API + UI 325e865c; history modal d81ff63b; cron nowrap d583cc22; JR-5 prod OK
 doing: -
-next: SePay Live: link a supported bank (PAY-10)
-plan: docs/plans/plan-payment-provider-abstraction.md
-updated: 2026-11-15 21:05
+next: -
+plan: docs/plans/plan-job-run-history.md
+updated: 2026-11-18 19:25

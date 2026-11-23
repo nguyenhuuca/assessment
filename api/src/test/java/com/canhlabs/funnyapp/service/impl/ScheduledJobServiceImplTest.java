@@ -1,9 +1,11 @@
 package com.canhlabs.funnyapp.service.impl;
 
+import com.canhlabs.funnyapp.dto.admin.JobRunDto;
 import com.canhlabs.funnyapp.dto.admin.ScheduledJobDto;
 import com.canhlabs.funnyapp.dto.admin.UpdateScheduledJobRequest;
 import com.canhlabs.funnyapp.entity.ScheduledJob;
 import com.canhlabs.funnyapp.exception.CustomException;
+import com.canhlabs.funnyapp.service.JobRunService;
 import com.canhlabs.funnyapp.service.JobScheduler;
 import com.canhlabs.funnyapp.repo.ScheduledJobRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,13 +39,14 @@ import static org.mockito.Mockito.when;
 class ScheduledJobServiceImplTest {
     @Mock ScheduledJobRepository repository;
     @Mock JobScheduler scheduler;
+    @Mock JobRunService jobRuns;
 
     ScheduledJobServiceImpl service;
     ScheduledJob job;
 
     @BeforeEach
     void setUp() {
-        service = new ScheduledJobServiceImpl(repository, scheduler);
+        service = new ScheduledJobServiceImpl(repository, scheduler, jobRuns);
         job = new ScheduledJob();
         job.setName("notification-digest");
         job.setCron("0 */15 * * * *");
@@ -229,7 +233,8 @@ class ScheduledJobServiceImplTest {
         other.setEnabled(true);
         when(repository.findAll()).thenReturn(List.of(job, other));
         Instant at = Instant.parse("2026-10-19T00:00:00Z");
-        when(scheduler.lastRun("notification-digest")).thenReturn(new JobScheduler.JobRun(at, "FAILED"));
+        when(jobRuns.latestByJob()).thenReturn(Map.of("notification-digest",
+                JobRunDto.builder().jobName("notification-digest").startedAt(at).result("FAILED").build()));
         when(scheduler.isRunning("notification-digest")).thenReturn(true);
 
         List<ScheduledJobDto> dtos = service.list();
@@ -240,6 +245,51 @@ class ScheduledJobServiceImplTest {
         assertThat(dtos.get(1).getLastRunAt()).isEqualTo(at);
         assertThat(dtos.get(1).getLastResult()).isEqualTo("FAILED");
         assertThat(dtos.get(1).isRunning()).isTrue();
+    }
+
+    @Test
+    void list_readsLastRunsInOneQuery() {
+        ScheduledJob other = new ScheduledJob();
+        other.setName("a-job");
+        other.setCron("0 0 3 * * *");
+        when(repository.findAll()).thenReturn(List.of(job, other));
+
+        List<ScheduledJobDto> dtos = service.list();
+
+        assertThat(dtos).allSatisfy(d -> assertThat(d.getLastResult()).isNull());
+        verify(jobRuns).latestByJob();
+        verify(jobRuns, never()).recent(any(), org.mockito.ArgumentMatchers.anyInt());
+    }
+
+    @Test
+    void runs_knownJob_returnsHistory() {
+        JobRunDto run = JobRunDto.builder().jobName("notification-digest").result("SKIPPED").build();
+        when(jobRuns.recent("notification-digest", 20)).thenReturn(List.of(run));
+
+        assertThat(service.runs("notification-digest", 20)).containsExactly(run);
+    }
+
+    @Test
+    void runs_unknownJob_returns404() {
+        when(repository.findById("ghost")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.runs("ghost", 20))
+                .isInstanceOfSatisfying(CustomException.class,
+                        e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.NOT_FOUND));
+        verify(jobRuns, never()).recent(any(), org.mockito.ArgumentMatchers.anyInt());
+    }
+
+    @Test
+    void runNow_carriesNewestRecordedRun() {
+        Instant at = Instant.parse("2026-11-18T03:00:00Z");
+        when(scheduler.runNow("notification-digest")).thenReturn(true);
+        when(jobRuns.recent("notification-digest", 1))
+                .thenReturn(List.of(JobRunDto.builder().startedAt(at).result("SUCCESS").build()));
+
+        ScheduledJobDto dto = service.runNow("notification-digest");
+
+        assertThat(dto.getLastRunAt()).isEqualTo(at);
+        assertThat(dto.getLastResult()).isEqualTo("SUCCESS");
     }
 
     @Test

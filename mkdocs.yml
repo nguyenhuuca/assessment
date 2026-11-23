@@ -96,6 +96,7 @@ nav:
       - 0035 - Collection-Only Videos: adr/0035-collection-only-videos.md
       - 0036 - Admin Bulk Actions: adr/0036-admin-bulk-actions.md
       - 0037 - SePay Bank-Transfer Payments: adr/0037-sepay-bank-transfer-payments.md
+      - 0039 - DB Backup to Google Drive: adr/0039-db-backup-google-drive.md
 
   - PRD:
       - Hot Video Priority: prd/PRD-hot-video-priority.md
@@ -115,6 +116,7 @@ nav:
       - SePay Payments: prd/PRD-sepay-payments.md
       - Spring Boot 4.1 Upgrade: prd/PRD-spring-boot-4-upgrade.md
       - Frontend Dependency Upgrade: prd/PRD-frontend-deps-upgrade.md
+      - DB Backup to Google Drive: prd/PRD-db-backup-google-drive.md
 
   - Specs:
       - Overview: specs/index.md
@@ -127,6 +129,7 @@ nav:
       - Spring Boot 4.1 Upgrade: specs/spec-spring-boot-4-upgrade.md
       - Frontend Dependency Upgrade: specs/spec-frontend-deps-upgrade.md
       - Collection-Only Videos: specs/spec-collection-only-videos.md
+      - DB Backup to Google Drive: specs/spec-db-backup-google-drive.md
 
   - Sequence Diagrams:
       - Overview: sequence/index.md
@@ -148,8 +151,11 @@ nav:
       - User Settings: sequence/sequence-user-settings.md
       - Video Suggestions: sequence/sequence-video-suggestions.md
       - Watch History (v2): sequence/sequence-watch-history-v2.md
+      - DB Backup to Google Drive: sequence/sequence-db-backup-google-drive.md
 
   - Plans:
+      - DB Backup to Google Drive: plans/plan-db-backup-google-drive.md
+      - Job Run History: plans/plan-job-run-history.md
       - React Migration: plans/plan-react-migration.md
       - Admin Dashboard: plans/plan-admin-dashboard.md
       - Permissions (Bitwise): plans/plan-permissions-bitwise.md
@@ -204,6 +210,7 @@ nav:
       - Scope to Implement Flow (VI): guides/flow-scope-to-implement-vi.md
       - Feature Flags (EN): guides/feature-flags.md
       - Feature Flags (VI): guides/feature-flags-vi.md
+      - Runbook - DB Restore: guides/runbook-db-restore.md
       - Bitwise Permissions: guides/bitwise-permissions.md
       - Trello Setup: guides/trello-setup-guide.md
       - Trello Board Status: guides/trello-board-status.md

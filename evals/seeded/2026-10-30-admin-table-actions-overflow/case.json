@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "signal": "defect:a1dfa235",
+  "run": "2026-10-30-collection-only-videos",
+  "base": "c32d2a3b78315977ee27a8789700e8282f5b23f7^",
+  "head": "2cbb7a3eabd41950776cf64ebb47077875f00945",
+  "fix": "a1dfa235a17109a5d00add68dfe9d700c1cdd7bf",
+  "summary": "The Video Vault table gained a visibility select, a badge and an add-to-collection button in each row, widening the table inside its scroll box, with nothing pinning the Actions column, so the status select and the menu can sit past the right edge for rows with long titles or emails.",
+  "expect": {
+    "files": ["admin/AdminVideoTable.jsx", "styles/index.css"],
+    "patterns": [
+      "overflow",
+      "(wid(er|en|th)|too wide)",
+      "(scroll|clipp|cut ?off|off-?screen|out of view|past the (right )?edge)",
+      "sticky",
+      "actions? (column|cell).{0,80}(reach|visible|hidden|pinned|view)"
+    ]
+  }
+}

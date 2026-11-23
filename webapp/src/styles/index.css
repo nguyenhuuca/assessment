@@ -3162,6 +3162,40 @@ input[aria-busy="true"] { cursor: progress; opacity: .5; }
 }
 .cron-cell-btn:hover, .cron-cell-btn:focus-visible { border-color: var(--accent-cyan); }
 .cron-cell-btn .material-symbols-outlined { font-size: 16px; color: var(--text-muted); }
+/* A cron reads as one expression: never wrap it inside the Jobs table */
+.job-cron-cell, .job-cron-cell code, .cron-cell-btn { white-space: nowrap; }
+/* Job run history (job_run): expandable row under each job */
+.admin-badge.success { background: rgba(0, 200, 83, 0.13); color: #00c853; border: 1px solid #00c853; }
+.admin-badge.skipped { background: rgba(173, 170, 170, 0.13); color: var(--text-muted); border: 1px solid var(--text-muted); }
+[data-theme="light"] .admin-badge.success { background: rgba(0, 120, 50, 0.1); color: #00662b; border-color: #00873a; }
+.job-history-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none; padding: 0; color: var(--text); cursor: pointer; font: inherit; text-align: left;
+}
+.job-history-toggle .material-symbols-outlined { font-size: 16px; color: var(--text-muted); }
+.job-history-toggle:hover, .job-history-toggle:hover .material-symbols-outlined { color: var(--accent-cyan); }
+.job-history-toggle:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; border-radius: 4px; }
+.job-history-modal { width: min(640px, calc(100vw - 32px)); max-height: min(80vh, 720px); }
+.job-history-summary { display: flex; flex-wrap: wrap; gap: 12px; margin: 4px 0 12px; font-size: 13px; color: var(--text-muted); }
+.job-history-count { display: inline-flex; align-items: center; gap: 4px; }
+.job-history-empty { margin: 16px 0; text-align: center; }
+.job-history-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.job-history-item {
+  border: 1px solid var(--border-subtle); border-left: 3px solid var(--text-muted);
+  border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;
+}
+.job-history-item.success { border-left-color: #00c853; }
+.job-history-item.failed  { border-left-color: #ff1744; }
+.job-history-line { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13px; }
+.job-history-time { font-variant-numeric: tabular-nums; }
+.job-history-trigger { display: inline-flex; align-items: center; gap: 4px; color: var(--text-muted); }
+.job-history-trigger .material-symbols-outlined { font-size: 16px; }
+.job-history-duration { margin-left: auto; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.job-history-error {
+  display: block; font-size: 12px; color: #ff1744; background: rgba(255, 23, 68, 0.06);
+  border-radius: 6px; padding: 6px 8px; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+[data-theme="light"] .job-history-error { color: #b0001f; }
 .cron-editor { width: min(560px, calc(100vw - 32px)); }
 .cron-editor-text {
   font-size: 22px; line-height: 1.3; text-align: center; color: var(--accent-cyan);

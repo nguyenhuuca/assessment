@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -75,6 +76,13 @@ public class PaymentIngestionServiceImpl implements PaymentIngestionService {
             return;
         }
         PaymentOrder order = found.get();
+        // Not redundant with the early check: a concurrent delivery of the same transfer may have committed while we
+        // waited for the order lock, and under READ COMMITTED this statement sees it. Do not remove.
+        if (isStoredUnderAnotherId(tx) || isSameTransferForOrder(tx, order)) {
+            log.warn("{} tx {} skipped after lock: same transfer already stored (source={})",
+                    tx.provider(), tx.providerTxId(), source);
+            return;
+        }
         if (store(tx, source, order.getId(), TxMatchStatus.MATCHED, code) == 0) {
             log.info("{} tx {} already processed (source={})", tx.provider(), tx.providerTxId(), source);
             return;
@@ -90,6 +98,22 @@ public class PaymentIngestionServiceImpl implements PaymentIngestionService {
         String ref = cut(tx.referenceCode(), MAX_FIELD);
         return ref != null && !ref.isBlank()
                 && txRepo.existsSameTransferUnderOtherId(ref, tx.amount(), tx.provider(), tx.providerTxId());
+    }
+
+    /** Fallback when the transfer has no bank reference: same order, amount and timestamp under another id. */
+    private boolean isSameTransferForOrder(BankTransfer tx, PaymentOrder order) {
+        String ref = cut(tx.referenceCode(), MAX_FIELD);
+        if (ref != null && !ref.isBlank()) {
+            return false;
+        }
+        if (tx.transactionDate() == null) {
+            log.debug("{} tx {} has no reference and no timestamp: fallback dedupe skipped",
+                    tx.provider(), tx.providerTxId());
+            return false;
+        }
+        return txRepo.existsSameTransferForOrderUnderOtherId(order.getId(), tx.amount(),
+                tx.transactionDate().truncatedTo(ChronoUnit.MICROS),
+                tx.provider(), tx.providerTxId());
     }
 
     private int store(BankTransfer tx, TxSource source, Long orderId, TxMatchStatus status, String code) {

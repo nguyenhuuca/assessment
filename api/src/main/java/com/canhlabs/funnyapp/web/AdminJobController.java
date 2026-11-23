@@ -3,6 +3,7 @@ package com.canhlabs.funnyapp.web;
 import com.canhlabs.funnyapp.aop.AuditLog;
 import com.canhlabs.funnyapp.aop.HasPermission;
 import com.canhlabs.funnyapp.aop.RateLimited;
+import com.canhlabs.funnyapp.dto.admin.JobRunDto;
 import com.canhlabs.funnyapp.dto.admin.ScheduledJobDto;
 import com.canhlabs.funnyapp.dto.admin.UpdateScheduledJobRequest;
 import com.canhlabs.funnyapp.dto.webapi.ResultListInfo;
@@ -55,6 +56,15 @@ public class AdminJobController {
                                                            @RequestParam(defaultValue = "5") int count) {
         return ResponseEntity.ok(ResultListInfo.<Instant>builder()
                 .status(ResultStatus.SUCCESS).data(scheduledJobService.preview(cron, zone, count)).build());
+    }
+
+    /** Run history of one job, newest first (plan-job-run-history); read-only, so ADMIN may call it. */
+    @GetMapping("/{name}/runs")
+    @HasPermission(perm = Permission.ADMIN)
+    public ResponseEntity<ResultListInfo<JobRunDto>> runs(@PathVariable String name,
+                                                          @RequestParam(defaultValue = "20") int limit) {
+        return ResponseEntity.ok(ResultListInfo.<JobRunDto>builder()
+                .status(ResultStatus.SUCCESS).data(scheduledJobService.runs(name, limit)).build());
     }
 
     @PatchMapping("/{name}")

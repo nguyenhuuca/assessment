@@ -63,6 +63,9 @@ class ScheduledJobMigrationTest {
         java.util.Set<String> expected = new java.util.HashSet<>(seed().keySet());
         expected.add(JobRegistry.EXPIRE_PAYMENT_ORDERS);
         expected.add(JobRegistry.RECONCILE_PAYMENTS); // 202611140001, renamed by 202611150001
+        expected.add(JobRegistry.DB_BACKUP_DAILY); // 202611170001
+        expected.add(JobRegistry.DB_BACKUP_WEEKLY);
+        expected.add(JobRegistry.DB_BACKUP_MONTHLY);
         assertThat(registry.names()).containsExactlyInAnyOrderElementsOf(expected);
         seed().keySet().forEach(name -> assertThat(registry.get(name)).as(name).isNotNull());
         assertThat(registry.get("nope")).isNull();
