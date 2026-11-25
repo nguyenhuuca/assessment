@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "signal": "defect:64d64e00",
+  "run": "2026-10-24-hls-streaming",
+  "base": "488e285f^",
+  "head": "488e285f",
+  "fix": "64d64e007360d0b67d4a4994e8bddd319a5b1205",
+  "summary": "The collection-only badge was added after the status badge in the import table cell with margin-left: 6px and no nowrap; when the cell wraps it lands indented under the status badge and its label breaks over two lines.",
+  "expect": {
+    "files": ["admin/ImportTable.jsx", "styles/index.css"],
+    "patterns": [
+      "margin-left",
+      "(wrap|wraps|wrapped|wrapping)",
+      "(indent|misalign)\\w*",
+      "white-space",
+      "(flex|gap) .{0,40}(badge|stack|group|container)",
+      "badge\\w* .{0,60}(sibling|next to|beside|same cell)"
+    ]
+  }
+}
